@@ -60,6 +60,7 @@
 | Description   | This describes how a developer can use pip to install our package and execute the model    
 | Actors | Developer|
 | Sequence | Note: ```pip install git+https://github.com/stephankokkas/Project-Echo/```|
+| Sequence | Note: GitHub URL will change once the project is handed off but currently Stephan Kokkas is the owner.|
 | | Note: No authentication required |
 | | 1. Pip package is installed |
 | | 2. Load pre-trained model loaded into memory |
