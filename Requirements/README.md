@@ -54,6 +54,20 @@
 
 <br>
 
+
+|       | <strong>PIP Package - Execute pre-trained model </strong>  |
+| ----------- | ----------- |
+| Description   | This describes how a developer can use pip to install our package and execute the model    
+| Actors | Developer|
+| Sequence | Note: ```pip install git+https://github.com/stephankokkas/Project-Echo/```|
+| | Note: No authentication required |
+| | 1. Pip package is installed |
+| | 2. Load pre-trained model loaded into memory |
+| | 3. Pass model valid audio file through docuemented params |
+| | 4. Model will execute in the background and return back classification response or not classified to original requestor |
+
+<br>
+
 |       | <strong>Application - Proof Of Concept Only</strong>  |
 | ----------- | ----------- |
 | Description   | This describes the proof of concept system use case     
