@@ -6,9 +6,8 @@
 
 <br>
 
-|       | Use Case Detail |
+|       | <strong>User Application - Installation</strong> |
 | ----------- | ----------- |
-| Name      | User Application - Installation       |
 | Description   | General user with an android or iphone installs application to their mobile device.  The device could be a phone, tablet or touch screen laptop device.     
 | Actors | General User, Researcher |
 | Sequence | 1. User searches relevant application store for the app. |
@@ -16,9 +15,8 @@
 
 <br>
 
-|       | Use Case Detail |
+|       | <strong>User Application - First Time Run</strong> |
 | ----------- | ----------- |
-| Name      | User Application - First Time Run       |
 | Description   | General user with an android or iphone runs the application for the first time and registers using 3rd party authentication options such as google.
 | Actors | General User, Researcher |
 | Sequence | 1. User runs the app. |
@@ -28,9 +26,8 @@
 
 <br>
 
-|       | Use Case Detail |
+|       | <strong>User Application - Upload Sound Sample</strong> |
 | ----------- | ----------- |
-| Name      | User Application - Upload Sound Sample      |
 | Description   | General user records small 5 second clip of animal sound and uploads it for classification
 | Actors | General User, Researcher |
 | Sequence | 1. User clicks the record button |
@@ -43,9 +40,22 @@
 
 <br>
 
-|       | Use Case Detail |
+|       | <strong>API Server - Store and Process </strong>  |
 | ----------- | ----------- |
-| Name      | Application - Proof Of Concept Only       |
+| Description   | This describes how the back end API will likely work    
+| Actors | Developer|
+| Sequence | Note: API is running all the time |
+| | Note: Only authenticated requests are accepted |
+| | 1. API Recieves request to accept sound clip |
+| | 2. API Transfers file and stores in local database server |
+| | 3. API Calls python model to perform inference on the sound sample |
+| | 4. API Determines if the model confidence is high enough for a response |
+| | 5. API Replys back classification response or not classified to original requestor |
+
+<br>
+
+|       | <strong>Application - Proof Of Concept Only</strong>  |
+| ----------- | ----------- |
 | Description   | This describes the proof of concept system use case     
 | Actors | Developer|
 | Sequence | 1. Developer runs local jupyter notebook |
