@@ -1,4 +1,4 @@
-# Bioacoustics-Classification-Tool
+# Bioacoustics-Classification-Tool : Project ECHO
 Capstone Project (A) - Bioacoustics Classification Tool
 
 Project Description 
