@@ -1,4 +1,4 @@
-## Development Environment Setup (Windows)
+## Data Science Development Environment Setup (Windows)
 
 Install Visual Studio Code
 
