@@ -10,12 +10,15 @@ Install Visual Studio Code
 Install Miniconda
 
 In c:\ProgramData\pip\pip.ini add these lines:
+
+```
 #
 # [global]
 extra-index-url = https://download.pytorch.org/whl/cu117
 
 # [install]
 trusted-host = download.pytorch.org
+```
 
 Open a Miniconda prompt
 
