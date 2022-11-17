@@ -1,9 +1,4 @@
-## Bioacoustics-Classification-Tool
-# Capstone Project (A) - Bioacoustics Classification Tool
-
-# Source Code
-
-# Development Environment Setup (Windows)
+## Development Environment Setup (Windows)
 
 Install Visual Studio Code
 
