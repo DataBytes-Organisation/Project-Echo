@@ -1,0 +1,27 @@
+
+# conda env remove -vv -n dev_min
+# conda env create -vv -f dev_min.yaml
+
+# In c:\ProgramData\pip\pip.ini
+#
+# [global]
+# extra-index-url = https://download.pytorch.org/whl/cu117
+
+# [install]
+# trusted-host = download.pytorch.org
+
+name: dev_min
+channels:
+ - conda-forge
+ - nvidia
+ - pytorch
+ - defaults
+dependencies:
+ - python=3.9
+ - cudatoolkit                        
+ - cudnn
+ - cuda-cupti
+ - ipykernel
+ - go
+ - git
+ - pip
