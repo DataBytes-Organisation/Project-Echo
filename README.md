@@ -26,5 +26,3 @@ How:
 Build a public library/callable API that can take an audio file input, pass the input to a trained classification model, and return an animal classification with high accuracy. 
 
 The solution will leverage machine learning to understand the density and classifications of animals in a survey area. Using existing sound datasets, our team will work to make solid and comprehensive progress in the analysis of labelled data, and its predictive ability using Artificial Intelligence and Machine Learning.  A frontend application will allow users to record sound samples and location data and upload for processing.  We aim to use existing recorded audio samples to train a model to detect the most likely species contained in a given audio sample with a sufficient level of confidence. 
-
-Here is a test change :)
