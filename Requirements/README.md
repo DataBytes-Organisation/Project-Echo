@@ -6,18 +6,18 @@
 
 <br>
 
-|       | <strong>User Application - Installation</strong> |
+|       | <strong>User App - Installation</strong> |
 | ----------- | ----------- |
-| Description   | General user with an android or iphone installs application to their mobile device.  The device could be a phone, tablet or touch screen laptop device.     
+| Description   | General user with an android or iphone installs App to their mobile device.  The device could be a phone, tablet or touch screen laptop device.     
 | Actors | General User, Researcher |
-| Sequence | 1. User searches relevant application store for the app. |
-| |2. User installs the application |
+| Sequence | 1. User searches relevant App store for the app. |
+| |2. User installs the App |
 
 <br>
 
-|       | <strong>User Application - First Time Run</strong> |
+|       | <strong>User App - First Time Run</strong> |
 | ----------- | ----------- |
-| Description   | General user with an android or iphone runs the application for the first time and registers using 3rd party authentication options such as google.
+| Description   | General user with an android or iphone runs the App for the first time and registers using 3rd party authentication options such as google.
 | Actors | General User, Researcher |
 | Sequence | 1. User runs the app. |
 | |2. Splash screen shows while loading. |
@@ -26,17 +26,32 @@
 
 <br>
 
-|       | <strong>User Application - Upload Sound Sample</strong> |
+|       | <strong>User App - Upload Sound Sample</strong> |
 | ----------- | ----------- |
 | Description   | General user records small 5 second clip of animal sound and uploads it for classification
 | Actors | General User, Researcher |
 | Sequence | 1. User clicks the record button |
 | |2. Screen show indicator that recording is in progress |
 | |3. User confirms that recording can be uploaded (in case audio captured something that might breach privacy)|
-| |4. Application uploads the sample to the API server and discards local sample |
+| |4. App uploads the sample to the API server and discards local sample |
 | |4. API server records sample in database for future model training |
 | |5. API server returns with classification result |
 | |6. App displays classification result to the user |
+
+<br>
+
+|       | <strong>Website Front End </strong>  |
+| ----------- | ----------- |
+| Description   | This describes how a user could interface via a website with the classification engine   
+| Actors | General User, Researcher |
+| Sequence | Note: API is running all the time |
+| | Note: Only authenticated requests are accepted |
+| | Note: Website should utilise same technology stack as the Otways project |
+| | 1. User uploads a sound clip |
+| | 2. Website displays indication that it is performing processing |
+| | 3. Website calls API with sound clip and gets result |
+| | 4. Website displays the classification result to the User |
+| | 5. Website allows user to provide a tag with the correct classication to enhance future function |
 
 <br>
 
@@ -59,7 +74,7 @@
 | Description   | In order for this Echo Project to be relevant to the Otways project, components will need to be re-usable.  The intent is that the choice of animals for classification and front end UX design will make consideration of the Otways project.  The Otways project already have a distributed camera setup and it may be possible to extend the hardware footprint to include microphones to collect both audio and image data concurrently.
 | Actors | Otways Developers, Otways Users |
 | Sequence | 1. The validation and test datasets should include animals that are considered as part of the Otways identified endagered species and predators. |
-| | 2. The front end application can be used by Otways bush walkers where poor phone reception is likely |
+| | 2. The front end App can be used by Otways bush walkers where poor phone reception is likely |
 | | 3. The Otways project focuses aspects of UX design that should be incorporated into how results are presented as part of the classification and data descriptions used in Project Echo.   |
 
 <br>
@@ -78,7 +93,7 @@
 
 <br>
 
-|       | <strong>Application - Proof Of Concept Only</strong>  |
+|       | <strong>App - Proof Of Concept Only</strong>  |
 | ----------- | ----------- |
 | Description   | This describes the proof of concept system use case     
 | Actors | Developer|
