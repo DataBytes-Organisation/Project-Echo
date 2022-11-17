@@ -54,6 +54,16 @@
 
 <br>
 
+| | <strong>Integration with Otways Project</strong>  |
+| ----------- | ----------- |
+| Description   | In order for this Echo Project to be relevant to the Otways project, components will need to be re-usable.  The intent is that the choice of animals for classification and front end UX design will make consideration of the Otways project.  The Otways project already have a distributed camera setup and it may be possible to extend the hardware footprint to include microphones to collect both audio and image data concurrently.
+| Actors | Otways Developers, Otways Users |
+| Sequence | 1. The validation and test datasets should include animals that are considered as part of the Otways identified endagered species and predators. |
+| | 2. The front end application can be used by Otways bush walkers where poor phone reception is likely |
+| | 3. The Otways project focuses aspects of UX design that should be incorporated into how results are presented as part of the classification and data descriptions used in Project Echo.   |
+
+<br>
+
 |       | <strong>Application - Proof Of Concept Only</strong>  |
 | ----------- | ----------- |
 | Description   | This describes the proof of concept system use case     
@@ -62,6 +72,4 @@
 | | 2. Jupyter notebook visually displays processing stages during the data pipeline |
 | | 3. Jupyter notebook prints classification results to the notebook render output |
 
-<br>
 
-##### Front End Application for Otways integration
