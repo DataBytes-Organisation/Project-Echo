@@ -2,7 +2,7 @@
 
 ### Capstone Project (A) - Bioacoustics Classification Tool
 
-#### Use Case Analysis
+#### Use Case Analysis - describe the system components and how user interacts
 
 <br>
 
