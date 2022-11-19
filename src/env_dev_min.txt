@@ -19,6 +19,7 @@ tensorboard_plugin_profile
 tensorflow-addons
 tensorflow-datasets
 tensorflow-gpu
+tensorflow-io
 tensorflow_hub
 tensorflow_gnn
 xgboost

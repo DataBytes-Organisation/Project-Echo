@@ -50,6 +50,7 @@ tensorflow-datasets
 tensorflow-estimator
 tensorflow-gpu
 tensorflow-graphics
+tensorflow-io
 tensorflow-metadata
 tensorflow_hub
 tensorflow_gnn
