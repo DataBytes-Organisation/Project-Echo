@@ -54,6 +54,7 @@ tensorflow-io
 tensorflow-metadata
 tensorflow_hub
 tensorflow_gnn
+tensorflow_transform
 tf-explain
 tfimm
 tflite-support
