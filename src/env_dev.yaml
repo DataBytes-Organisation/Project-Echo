@@ -24,4 +24,6 @@ dependencies:
  - ipykernel
  - go
  - git
+ - ffmpeg
+ - sox
  - pip

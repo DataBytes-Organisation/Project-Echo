@@ -21,6 +21,7 @@ librosa
 lightgbm
 ffio
 matplotlib
+museval
 notebook
 numpy
 opencv-python
@@ -34,6 +35,7 @@ pydot
 pyglet
 pyopengl
 pyrender
+pytorch_lightning
 ray
 redis
 rllib
@@ -50,16 +52,20 @@ tensorflow-datasets
 tensorflow-estimator
 tensorflow-gpu
 tensorflow-graphics
+tensorflow-io
 tensorflow-metadata
 tensorflow_hub
 tensorflow_gnn
+tensorflow_transform
 tf-explain
 tfimm
 tflite-support
 timm
-torch 
+torch
+torchcontrib 
 torchvision 
 torchaudio
+torchlibrosa
 torchsummary
 traci
 transformers
