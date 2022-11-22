@@ -2,7 +2,11 @@
 
 ### Capstone Project (A) - Bioacoustics Classification Tool
 
-#### DESIGN - TODO
+#### Architectural design
+
+Source for diagram was created using MIRO tool here: https://miro.com/app/board/uXjVPBXmVOA=/
+
+![Data Flow](DataflowOverview.jpg)
 
 ##### Overall Proof of Concept Design
 
