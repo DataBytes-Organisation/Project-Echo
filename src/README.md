@@ -28,3 +28,18 @@ Create your files e.g. a jupyter notebook file testload.ipynb
 Visual Studio Code will automatically detect your file type
 
 Select the 'dev' environment and run your notebook!
+
+
+-----------------------------------------------------------
+For most of these libraries to work - Python 3.9 is required 
+On mac, open terminal in this directory and execute the following command:
+```
+pip install apache-beam
+```
+
+
+```
+pip install -r env_dev.txt
+```
+
+This will install all the necessary libraries

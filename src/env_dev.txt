@@ -44,6 +44,7 @@ sentence-transformers
 shapely
 spektral
 ta
+tensorflow
 tensorboard_plugin_profile
 tensorflow-addons
 tensorflow-datasets
