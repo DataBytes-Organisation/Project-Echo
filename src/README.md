@@ -36,8 +36,12 @@ On mac, open terminal in this directory and execute the following command:
 ```
 pip install apache-beam
 ```
-
-
+```
+brew install libav
+```
+```
+brew install ffmpeg
+```
 ```
 pip install -r env_dev.txt
 ```
