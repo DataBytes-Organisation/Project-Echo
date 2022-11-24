@@ -18,13 +18,13 @@ The mel-spectrogram pipeline generates spectrogram images from each audio sample
 
 #### Classificaton Model Training
 
-The model training uses pre-computed spectrogram images which have been split into training, test and validation subsets.  The initial protoype
+The model training uses pre-computed spectrogram images which have been split into training, test and validation subsets.  The initial protoype will leverage pre-trained image classification models to perform the classification task.
 
 #### Project Echo Components
 
-##### Prototype Engine
+##### Echo Prototype
 
-The prototype classification engine will demostrate that it is possible to process data from raw labelled sound clips to animals species results.  This prototype engine will be in the form of a series of Jupyter notebook files which must be manually run in sequence (to drive the data pipeline)  It is expected that these prototype notebook files will provid an environment that allows data scientists to further develop and refine models to increase classification performance.
+Echo Prototype is a prototype classification engine and data processing pipeline will demostrate that it is possible to process data from raw labelled sound clips through to classification of animals species.  This prototype engine will be in the form of a series of Jupyter notebook files which must be manually run in sequence (to drive the data pipeline)  It is expected that these prototype notebook files will provide an environment that allows data scientists to further develop and refine models to increase classification performance into the future.
 
 ##### Echo Engine
 
