@@ -19,19 +19,19 @@ CLIP_LENGTH   = 10      # only look at 10 seconds of clip at the start of loaded
 # Adapted configuration parameters below
 # ############################################################################################
 exp_name          = "project_echo" # the saved ckpt prefix name of the model 
-workspace         = "./" # the folder of your code
+workspace         = "./"           # the folder of your code
 dataset_path      = "C:/Users/Andrew/OneDrive - Deakin University/DataSets/birdclef2022/" # the dataset path
-desed_folder      = "" # the desed file
+#desed_folder      = "" # the desed file
 
-dataset_type      = "project_echo" # "audioset" "esc-50" "scv2"
-index_type        = "full_train" # only works for audioset
-balanced_data     = True # only works for audioset
+#dataset_type      = "project_echo" # "audioset" "esc-50" "scv2"
+#index_type        = "full_train" # only works for audioset
+#balanced_data     = True # only works for audioset
 
 # AudioSet & SCV2: "clip_bce" |  ESC-50: "clip_ce" 
 loss_type         = "clip_ce" # 
 
 # trained from a checkpoint, or evaluate a single model 
-resume_checkpoint = None # workspace + "/ckpt/htsat_audioset_pretrain.ckpt"
+#resume_checkpoint = None # workspace + "/ckpt/htsat_audioset_pretrain.ckpt"
 esc_fold          = 0 # just for esc dataset, select the fold you need for evaluation and (+1) validation
 
 # enable debugging to assist with integration
@@ -41,11 +41,11 @@ random_seed       = 970131 # 19970318 970131 12412 127777 1009 34047
 batch_size        = 64 # batch size per GPU x GPU number , default is 32 x 4 = 128
 learning_rate     = 1e-3 # 1e-4 also workable 
 max_epoch         = 100
-num_workers       = 0 # change to >1 for multi-threaded
+num_workers       = 0 # change to >= 1 for multi-threaded
 
-# scheduling curve
+# scheduling curve (warm start for transformer based model)
 lr_scheduler_epoch = [10,20,30]
-lr_rate = [0.02, 0.05, 0.1]
+lr_rate            = [0.02, 0.05, 0.1]
 
 # these data preparation optimizations do not bring many improvements, so deprecated
 #enable_token_label = False # token label
