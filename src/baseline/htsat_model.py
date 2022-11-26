@@ -501,48 +501,11 @@ class HTSAT_Swin_Transformer(nn.Module):
                 norm_before_mlp=self.norm_before_mlp)
             self.layers.append(layer)
 
-        # A deprecated optimization for using a hierarchical output from different blocks
-        # if self.config.htsat_hier_output:
-        #     self.norm = nn.ModuleList(
-        #         [self.norm_layer(
-        #             min(
-        #               self.embed_dim * (2 ** (len(self.depths) - 1)),
-        #               self.embed_dim * (2 ** (i + 1)) 
-        #                 )
-        #         ) for i in range(len(self.depths))]   
-        #     )
-        # else:
-
         self.norm = self.norm_layer(self.num_features)
         self.avgpool = nn.AdaptiveAvgPool1d(1)
         self.maxpool = nn.AdaptiveMaxPool1d(1)
         
-        # A deprecated optimization for using the max value instead of average value
-        # if self.config.htsat_use_max:
-        #     self.a_avgpool = nn.AvgPool1d(kernel_size=3, stride=1, padding=1)
-        #     self.a_maxpool = nn.MaxPool1d(kernel_size=3, stride=1, padding=1)
-
         if self.config.enable_tscam:
-            # if self.config.htsat_hier_output:
-            #     self.tscam_conv = nn.ModuleList()
-            #     for i in range(len(self.depths)):
-            #         zoom_ratio = 2 ** min(len(self.depths) - 1, i + 1)
-            #         zoom_dim = min(
-            #             self.embed_dim * (2 ** (len(self.depths) - 1)),
-            #             self.embed_dim * (2 ** (i + 1)) 
-            #         )
-            #         SF = self.spec_size // zoom_ratio // self.patch_stride[0] // self.freq_ratio
-            #         self.tscam_conv.append(
-            #             nn.Conv2d(
-            #                 in_channels = zoom_dim,
-            #                 out_channels = self.num_classes,
-            #                 kernel_size = (SF, 3),
-            #                 padding = (0,1)
-            #             )
-            #         )
-            #     self.head = nn.Linear(num_classes * len(self.depths), num_classes)
-            # else:
-
             SF = self.spec_size // (2 ** (len(self.depths) - 1)) // self.patch_stride[0] // self.freq_ratio
             self.tscam_conv = nn.Conv2d(
                 in_channels = self.num_features,
@@ -575,10 +538,6 @@ class HTSAT_Swin_Transformer(nn.Module):
 
 
     def forward_features(self, x):
-        # A deprecated optimization for using a hierarchical output from different blocks
-        # if self.config.htsat_hier_output:
-        #     hier_x = []
-        #     hier_attn = []
 
         frames_num = x.shape[2]        
         x = self.patch_embed(x)
@@ -587,44 +546,6 @@ class HTSAT_Swin_Transformer(nn.Module):
         x = self.pos_drop(x)
         for i, layer in enumerate(self.layers):
             x, attn = layer(x)
-            # A deprecated optimization for using a hierarchical output from different blocks
-            # if self.config.htsat_hier_output:
-            #     hier_x.append(x)
-            #     if i == len(self.layers) - 1:
-            #         hier_attn.append(attn)
-
-        # A deprecated optimization for using a hierarchical output from different blocks
-        # if self.config.htsat_hier_output:
-        #     hxs = []
-        #     fphxs = []
-        #     for i in range(len(hier_x)):
-        #         hx = hier_x[i]
-        #         hx = self.norm[i](hx)
-        #         B, N, C = hx.shape
-        #         zoom_ratio = 2 ** min(len(self.depths) - 1, i + 1)
-        #         SF = frames_num // zoom_ratio // self.patch_stride[0]
-        #         ST = frames_num // zoom_ratio // self.patch_stride[1]
-        #         hx = hx.permute(0,2,1).contiguous().reshape(B, C, SF, ST)
-        #         B, C, F, T = hx.shape
-        #         c_freq_bin = F // self.freq_ratio
-        #         hx = hx.reshape(B, C, F // c_freq_bin, c_freq_bin, T)
-        #         hx = hx.permute(0,1,3,2,4).contiguous().reshape(B, C, c_freq_bin, -1)
-                
-        #         hx = self.tscam_conv[i](hx)
-        #         hx = torch.flatten(hx, 2)
-        #         fphx = interpolate(hx.permute(0,2,1).contiguous(), self.spec_size * self.freq_ratio // hx.shape[2])
-                
-        #         hx = self.avgpool(hx)
-        #         hx = torch.flatten(hx, 1)
-        #         hxs.append(hx)
-        #         fphxs.append(fphx)
-        #     hxs = torch.cat(hxs, dim=1)
-        #     fphxs = torch.cat(fphxs, dim = 2)
-        #     hxs = self.head(hxs)
-        #     fphxs = self.head(fphxs)
-        #     output_dict = {'framewise_output': torch.sigmoid(fphxs), 
-        #         'clipwise_output': torch.sigmoid(hxs)}
-        #     return output_dict
 
         if self.config.enable_tscam:
             # for x
@@ -660,24 +581,12 @@ class HTSAT_Swin_Transformer(nn.Module):
 
             x = self.tscam_conv(x)
             x = torch.flatten(x, 2) # B, C, T
-            
-            # A deprecated optimization for using the max value instead of average value
-            # if self.config.htsat_use_max:
-            #     x1 = self.a_maxpool(x)
-            #     x2 = self.a_avgpool(x)
-            #     x = x1 + x2
 
             if self.config.htsat_attn_heatmap:
                 fpx = interpolate(torch.sigmoid(x).permute(0,2,1).contiguous() * attn, 8 * self.patch_stride[1]) 
             else: 
                 fpx = interpolate(torch.sigmoid(x).permute(0,2,1).contiguous(), 8 * self.patch_stride[1]) 
             
-            # A deprecated optimization for using the max value instead of average value
-            # if self.config.htsat_use_max:
-            #     x1 = self.avgpool(x)
-            #     x2 = self.maxpool(x)
-            #     x = x1 + x2
-            # else:
             x = self.avgpool(x)
             x = torch.flatten(x, 1)
 
@@ -761,13 +670,13 @@ class HTSAT_Swin_Transformer(nn.Module):
         return x
 
     def forward(self, x: torch.Tensor, mixup_lambda = None, infer_mode = False):# out_feat_keys: List[str] = None):
-        x = self.spectrogram_extractor(x)   # (batch_size, 1, time_steps, freq_bins)
-        x = self.logmel_extractor(x)    # (batch_size, 1, time_steps, mel_bins)
-        
-        
+        #x = self.spectrogram_extractor(x)   # (batch_size, 1, time_steps, freq_bins)
+        #x = self.logmel_extractor(x)    # (batch_size, 1, time_steps, mel_bins)
+          
         x = x.transpose(1, 3)
         x = self.bn0(x)
         x = x.transpose(1, 3)
+        
         if self.training:
             x = self.spec_augmenter(x)
         if self.training and mixup_lambda is not None:

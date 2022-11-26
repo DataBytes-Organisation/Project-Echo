@@ -9,10 +9,12 @@
 SAMPLE_RATE   = 32000   # all the samples are converted to bit rate of 32000 (Samples/Second)
 MIN_FREQUENCY = 16      # minimum frequency (Hz) for the Fast Fourier Transform related functions
 MAX_FREQUENCY = 4096*3  # maximum frequency (Hz) for the Fast Fourier Transform related functions
-HOP_LENGTH    = 320     # the number of samples to slide spectrogram window along the audio samples
-NUMBER_FFT    = 1024    # the number of FFT to execute within a single spectrogram window
-NUMBER_MELS   = 64      # the number of Mel-Spectrogram groups to split the frequency dimension
-CLIP_LENGTH   = 10      # only look at this many seconds of clip randomly within the audio file
+HOP_LENGTH    = 90      # the number of samples to slide spectrogram window along the audio samples
+NUMBER_FFT    = 2048    # the number of FFT to execute within a single spectrogram window
+NUMBER_MELS   = 128     # the number of Mel-Spectrogram groups to split the frequency dimension
+CLIP_LENGTH   = 5       # only look at this many seconds of clip randomly within the audio file
+
+CLASSES_NUM   = 5       # this is the number of animal species we have in the dataset
 
 
 # ############################################################################################
@@ -20,23 +22,19 @@ CLIP_LENGTH   = 10      # only look at this many seconds of clip randomly within
 # ############################################################################################
 exp_name          = "project_echo" # the saved ckpt prefix name of the model 
 workspace         = "./"           # the folder of your code
-dataset_path      = "d:/birdclef2022/" # the dataset path
+dataset_path      = "c:/birdclef2022/" # the dataset path
+classes_num       = CLASSES_NUM
 
-# AudioSet & SCV2: "clip_bce" |  ESC-50: "clip_ce" 
-loss_type         = "clip_ce" # cross entropy loss  ("clip_ce" or "clip_bce")
-
-# trained from a checkpoint, or evaluate a single model 
-#resume_checkpoint = None # workspace + "/ckpt/htsat_audioset_pretrain.ckpt"
-esc_fold          = 0 # just for esc dataset, select the fold you need for evaluation and (+1) validation
+loss_type         = "clip_ce" # cross entropy loss
 
 # enable debugging to assist with integration
 debug             = True
 
-random_seed       = 970131 # 19970318 970131 12412 127777 1009 34047
-batch_size        = 128 # batch size per GPU x GPU number , default is 32 x 4 = 128
-learning_rate     = 1e-3 # 1e-4 also workable 
-max_epoch         = 10000 # essentially never end training...
-num_workers       = 0 # change to >= 1 for multi-threaded
+random_seed       = 970131  # 19970318 970131 12412 127777 1009 34047
+batch_size        = 32      # default is 32
+learning_rate     = 1e-3    # 1e-4 also workable 
+max_epoch         = 100000  # essentially never end training...
+num_workers       = 0       # change to >= 1 for multi-threaded (needs fixing)
 
 # scheduling curve (warm start for transformer based model)
 lr_scheduler_epoch = [10,20,30]
@@ -48,28 +46,29 @@ enable_repeat_mode = True # repeat the spectrogram / reshape the spectrogram
 # for model's design
 enable_tscam = False # enbale the token-semantic layer
 
-# for signal processing
-sample_rate = SAMPLE_RATE # 32000 # 16000 for scv2, 32000 for audioset and esc-50
-clip_samples = sample_rate * CLIP_LENGTH # audio_set 10-sec clip
-window_size = NUMBER_FFT
-hop_size = HOP_LENGTH # 320 # 160 for scv2, 320 for audioset and esc-50
-mel_bins = NUMBER_MELS # 64
-fmin = MIN_FREQUENCY # 5
-fmax = MAX_FREQUENCY # 14000
-shift_max = int(clip_samples * 0.5)
 
-# for data collection
-classes_num = 5 # this is the number of animal species we have in the dataset
-crop_size = None # int(clip_samples * 0.5) deprecated
+# ############################################################################################
+# signal processing hyperparamaters
+# ############################################################################################
+sample_rate  = SAMPLE_RATE               # default: 32000 
+clip_samples = sample_rate * CLIP_LENGTH # default: 10 seconds worth
+window_size  = NUMBER_FFT                # default: set window size same as FFT count
+hop_size     = HOP_LENGTH                # default: 320 works with 10 seconds, 32000 bitrate
+mel_bins     = NUMBER_MELS               # default: 64 number of frequency bands
+fmin         = MIN_FREQUENCY             # default: 5
+fmax         = MAX_FREQUENCY             # default: 14000
+shift_max    = int(clip_samples * 0.5)
+
 
 # ############################################################################################
 # htsat hyperparamaters
 # ############################################################################################
-htsat_window_size = 8           # 8 
-htsat_spec_size   = 256         # 256
-htsat_patch_size  = 4           # 4 
-htsat_stride      = (4, 4)
-htsat_num_head    = [4,8,16,32]
-htsat_dim         = 96          # 96 
-htsat_depth       = [2,2,6,2]
+htsat_weight_decay = 0.04        # default: 0.05
+htsat_window_size  = 8           # default: 8 
+htsat_spec_size    = 512         # default: 256
+htsat_patch_size   = 4           # default: 4 
+htsat_stride       = (4, 4)      # default: (4, 4)
+htsat_num_head     = [4,8,16,32] # default: [4,8,16,32]
+htsat_dim          = 48          # default: 96 
+htsat_depth        = [2,2,6,2]   # default: [2,2,6,2]
 
