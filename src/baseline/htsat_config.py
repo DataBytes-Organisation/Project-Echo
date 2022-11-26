@@ -28,7 +28,7 @@ dataset_path      = "C:/Users/Andrew/OneDrive - Deakin University/DataSets/birdc
 #balanced_data     = True # only works for audioset
 
 # AudioSet & SCV2: "clip_bce" |  ESC-50: "clip_ce" 
-loss_type         = "clip_ce" # 
+loss_type         = "clip_ce" # cross entropy loss  ("clip_ce" or "clip_bce")
 
 # trained from a checkpoint, or evaluate a single model 
 #resume_checkpoint = None # workspace + "/ckpt/htsat_audioset_pretrain.ckpt"
@@ -56,7 +56,7 @@ lr_rate            = [0.02, 0.05, 0.1]
 #token_label_range = [0.2,0.6]
 #enable_time_shift = False # shift time
 #enable_label_enhance = False # enhance hierarchical label
-#enable_repeat_mode = False # repeat the spectrogram / reshape the spectrogram
+enable_repeat_mode = False # repeat the spectrogram / reshape the spectrogram
 
 # for model's design
 enable_tscam = True # enbale the token-semantic layer
