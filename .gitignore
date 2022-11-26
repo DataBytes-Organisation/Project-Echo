@@ -131,3 +131,4 @@ dmypy.json
 # pytorch lightening
 lightning_logs/
 checkpoints/
+datasets/
