@@ -730,7 +730,8 @@ class HTSAT_Swin_Transformer(nn.Module):
         B, C, T, F = x.shape
         target_T = int(self.spec_size * self.freq_ratio)
         target_F = self.spec_size // self.freq_ratio
-        assert T <= target_T and F <= target_F, "the wav size should less than or equal to the swin input size"
+        ss = "ZZ the wav size should less than or equal to the swin input size " + str(T) + " "+ str(target_T) + " " + str(F)+ " " + str(target_F)
+        assert T <= target_T and F <= target_F, ss
         # to avoid bicubic zero error
         if T < target_T:
             x = nn.functional.interpolate(x, (target_T, x.shape[3]), mode="bicubic", align_corners=True)
@@ -748,7 +749,7 @@ class HTSAT_Swin_Transformer(nn.Module):
         B, C, T, F = x.shape
         target_T = int(self.spec_size * self.freq_ratio)
         target_F = self.spec_size // self.freq_ratio
-        assert T <= target_T and F <= target_F, "the wav size should less than or equal to the swin input size"
+        assert T <= target_T and F <= target_F, "YY the wav size should less than or equal to the swin input size"
         # to avoid bicubic zero error
         if T < target_T:
             x = nn.functional.interpolate(x, (target_T, x.shape[3]), mode="bicubic", align_corners=True)
