@@ -10,7 +10,7 @@ SAMPLE_RATE   = 32000   # all the samples are converted to bit rate of 32000 (Sa
 MIN_FREQUENCY = 16      # minimum frequency (Hz) for the Fast Fourier Transform related functions
 MAX_FREQUENCY = 4096*3  # maximum frequency (Hz) for the Fast Fourier Transform related functions
 HOP_LENGTH    = 256     # the number of samples to slide spectrogram window along the audio samples
-NUMBER_FFT    = 2048    # the number of FFT to execute within a single spectrogram window
+NUMBER_FFT    = 1024    # the number of FFT to execute within a single spectrogram window
 NUMBER_MELS   = 128     # the number of Mel-Spectrogram groups to split the frequency dimension
 CLIP_LENGTH   = 8       # only look at this many seconds of clip randomly within the audio file
 
@@ -59,7 +59,7 @@ enable_tscam = False # enbale the token-semantic layer
 # for signal processing
 sample_rate = SAMPLE_RATE # 32000 # 16000 for scv2, 32000 for audioset and esc-50
 clip_samples = sample_rate * CLIP_LENGTH # audio_set 10-sec clip
-window_size = 1024
+window_size = NUMBER_FFT
 hop_size = HOP_LENGTH # 320 # 160 for scv2, 320 for audioset and esc-50
 mel_bins = NUMBER_MELS # 64
 fmin = MIN_FREQUENCY # 5
@@ -68,7 +68,7 @@ shift_max = int(clip_samples * 0.5)
 
 # for data collection
 classes_num = 5
-patch_size = (25, 4) # deprecated
+#patch_size = (25, 4) # deprecated
 crop_size = None # int(clip_samples * 0.5) deprecated
 
 # for htsat hyperparamater
@@ -77,7 +77,7 @@ htsat_spec_size =  256  # 256
 htsat_patch_size = 4    # 4 
 htsat_stride = (4, 4)
 htsat_num_head = [4,8,16,32]
-htsat_dim = 8           # 96 
+htsat_dim = 96          # 96 
 htsat_depth = [2,2,6,2]
 
 # swin_pretrain_path = None
