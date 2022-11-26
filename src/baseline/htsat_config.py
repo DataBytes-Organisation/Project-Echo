@@ -20,7 +20,7 @@ CLIP_LENGTH   = 10      # only look at this many seconds of clip randomly within
 # ############################################################################################
 exp_name          = "project_echo" # the saved ckpt prefix name of the model 
 workspace         = "./"           # the folder of your code
-dataset_path      = "C:/Users/Andrew/OneDrive - Deakin University/DataSets/birdclef2022/" # the dataset path
+dataset_path      = "d:/birdclef2022/" # the dataset path
 
 # AudioSet & SCV2: "clip_bce" |  ESC-50: "clip_ce" 
 loss_type         = "clip_ce" # cross entropy loss  ("clip_ce" or "clip_bce")
