@@ -41,3 +41,9 @@ make sure this is in the same format for either window or mac
 self._SET_OUTPUT_DIR = 'C:\\Users\\steph\\Downloads\\'
 #MAC
 #self._SET_OUTPUT_DIR = '/Users/stephankokkas/Downloads/'
+
+
+## Output
+The final pipeline will load the tensors into three dataframes - train, test, and validation - with the label of that tensor. Alternatively, you can view the raw tensors in your output directory. 
+
+The train, test, and validation directories contain raw mp3 files and are not tensors. For the tensors, they will be in the tensors directory. 
