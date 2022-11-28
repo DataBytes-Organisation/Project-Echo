@@ -1,12 +1,34 @@
-Research links
+-----------------------------------------------------------
+For most of these libraries to work - Python 3.9 is required 
+On mac, open terminal in this directory and execute the following command:
+https://www.gyan.dev/ffmpeg/builds/
+```
+pip install apache-beam
+```
+```
+brew install libav
+```
+```
+brew install ffmpeg
+```
+```
+pip install -r env_dev.txt
+```
 
-https://github.com/dandavison/sylph
-https://mauri870.github.io/blog/posts/audio-spectrograms-in-tensorflow/
-https://www.tensorflow.org/tutorials/audio/simple_audio
+This will install all the necessary libraries
 
+windows: https://windowsloop.com/install-ffmpeg-windows-10/
 
-Im assuming the main objective of this pipeline is to reduce the computational cost of training by transforming and preprocessing the audio clips before
-we begin training so that we can do image classification. Loading all the images into memory will be much easier than all the audio files. 
+Please make sure that if you are on a Mac, that your path resebles the below example path
+if you are on windows, please ensure that your path looks like this:
 
+WIN
+self.DATASET_PATH = 'C:\\Users\\steph\\Documents\\birdclef2022\\'
+MAC
+#self.DATASET_PATH  = '/Users/stephankokkas/Downloads/birdclef2022/'
 
-https://pypi.org/project/AudioConverter/
+make sure this is in the same format for either window or mac
+#WIN
+self._SET_OUTPUT_DIR = 'C:\\Users\\steph\\Downloads\\'
+#MAC
+#self._SET_OUTPUT_DIR = '/Users/stephankokkas/Downloads/'
