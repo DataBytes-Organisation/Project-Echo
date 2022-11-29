@@ -19,8 +19,8 @@ channels:
 dependencies:
  - python=3.9
  - cudatoolkit                        
- - cudnn
- - cuda-cupti
+#  - cudnn
+#  - cuda-cupti
  - ipykernel
  - go
  - git

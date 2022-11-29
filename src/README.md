@@ -29,3 +29,15 @@ Visual Studio Code will automatically detect your file type
 
 Select the 'dev' environment and run your notebook!
 
+
+
+For MAC:
+Open the src directory in terminal and execute:
+
+```
+conda env create -f env_dev.yaml
+```
+
+If you do not have anaconda installed it will not work - please ensure anaconda is installed first.
+ This doc will help with any issues https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html
+
