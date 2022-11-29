@@ -18,6 +18,7 @@ channels:
  - defaults
 dependencies:
  - python=3.9.15
+ - pip
 #  - cudatoolkit                        
 #  - cudnn
 #  - cuda-cupti
@@ -26,4 +27,49 @@ dependencies:
  - git
  - ffmpeg
  - sox
- - pip
+ - pip:
+    - keras
+    - keras-datasets
+    - keras-models
+    - keras-nlp
+    - keras-rl
+    - keras-toolbox
+    - keras-unet
+    - keras-util
+    - librosa
+    - lightgbm
+    - ffio
+    - ffprobe
+    - matplotlib
+    - notebook
+    - numpy
+    - pandas
+    - pydot
+    - pydub
+    - pytorch_lightning
+    - scikit-image
+    - scikit-learn
+    - scipy
+    - sentence-transformers
+    - tensorboard_plugin_profile
+    - tensorflow==2.10.1
+    - tensorflow-addons
+    - tensorflow-datasets
+    - tensorflow-estimator
+    - tensorflow-gpu==2.10.1
+    - tensorflow-graphics
+    - tensorflow-metadata
+    - tensorflow_hub
+    - tensorflow_gnn
+    - tensorflow_io==0.27.0
+    - tf-explain
+    - tfimm
+    - tflite-support
+    - timm
+    - torch 
+    - torchvision 
+    - torchaudio
+    - torchsummary
+    - torchlibrosa
+    - transformers
+    - unzip
