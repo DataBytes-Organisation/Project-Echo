@@ -73,6 +73,35 @@ class AsymmetricLoss(nn.Module):
 
         return -loss.mean()
 
+def pre_train(model):
+    ckpt = torch.load('swin_tiny_patch4_window7_224.pth', map_location="cpu")
+    # load pretrain model
+    ckpt = ckpt["model"]
+    found_parameters = []
+    unfound_parameters = []
+    model_params = dict(model.state_dict())
+
+    for key in model_params:
+        m_key = key.replace("sed_model.", "")
+        if m_key in ckpt:
+            if m_key == "patch_embed.proj.weight":
+                ckpt[m_key] = torch.mean(ckpt[m_key], dim = 1, keepdim = True)
+            if m_key == "head.weight" or m_key == "head.bias":
+                ckpt.pop(m_key)
+                unfound_parameters.append(key)
+                continue
+            assert model_params[key].shape==ckpt[m_key].shape, "%s is not match, %s vs. %s" %(key, str(model_params[key].shape), str(ckpt[m_key].shape))
+            found_parameters.append(key)
+            ckpt[key] = ckpt.pop(m_key)
+        else:
+            unfound_parameters.append(key)
+    print("pretrain param num: %d \t wrapper param num: %d"%(len(found_parameters), len(ckpt.keys())))
+    print("unfound parameters: ", unfound_parameters)
+    model.load_state_dict(ckpt, strict = False)
+    model_params = dict(model.named_parameters())
+
+# can't seem to this to work...
+# pre_train(sed_model)
 
 def get_mix_lambda(mixup_alpha, batch_size):
     mixup_lambdas = [np.random.beta(mixup_alpha, mixup_alpha, 1)[0] for _ in range(batch_size)]
