@@ -17,11 +17,13 @@ channels:
  - pytorch
  - defaults
 dependencies:
- - python=3.9
+ - python=3.9.15
  - cudatoolkit                        
-#  - cudnn
-#  - cuda-cupti
+ - cudnn
+ - cuda-cupti
  - ipykernel
  - go
  - git
+ - ffmpeg
+ - sox
  - pip
