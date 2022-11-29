@@ -71,6 +71,9 @@ class DataGeneratorEx(tf.keras.utils.Sequence):
     # this shuffles the whole list of training samples
     def shuffle_dataset(self):
         random.shuffle(self.audio_dataset)
+        
+    def on_epoch_end(self):
+        print("epoch end")
 
     # get sample at location 'index'
     def __getitem__(self, index):
