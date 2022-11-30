@@ -128,3 +128,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# pytorch lightening
+lightning_logs/
+checkpoints/
+datasets/
+melspecs/
