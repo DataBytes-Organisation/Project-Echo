@@ -7,11 +7,11 @@
 # General parameters used by Project Echo
 # ############################################################################################
 SAMPLE_RATE   = 32000   # all the samples are converted to bit rate of 32000 (Samples/Second)
-MIN_FREQUENCY = 16      # minimum frequency (Hz) for the Fast Fourier Transform related functions
-MAX_FREQUENCY = 4096*3  # maximum frequency (Hz) for the Fast Fourier Transform related functions
-HOP_LENGTH    = 180     # the number of samples to slide spectrogram window along the audio samples
-NUMBER_FFT    = 2048    # the number of FFT to execute within a single spectrogram window
-NUMBER_MELS   = 64      # the number of Mel-Spectrogram groups to split the frequency dimension
+MIN_FREQUENCY = 0       # minimum frequency (Hz) for the Fast Fourier Transform related functions
+MAX_FREQUENCY = 8000    # maximum frequency (Hz) for the Fast Fourier Transform related functions
+HOP_LENGTH    = 512     # the number of samples to slide spectrogram window along the audio samples
+NUMBER_FFT    = 512     # the number of FFT to execute within a single spectrogram window
+NUMBER_MELS   = 128     # the number of Mel-Spectrogram groups to split the frequency dimension
 CLIP_LENGTH   = 5       # only look at this many seconds of clip randomly within the audio file
 
 CLASSES_NUM   = 5       # this is the number of animal species we have in the dataset
@@ -32,7 +32,7 @@ debug             = True
 
 random_seed       = 970131  # 19970318 970131 12412 127777 1009 34047
 batch_size        = 8       # default is 32
-learning_rate     = 1e-5    # 1e-4 also workable 
+learning_rate     = 1e-3    # 1e-4 also workable 
 max_epoch         = 100000  # essentially never end training...
 num_workers       = 0       # change to >= 1 for multi-threaded (needs fixing)
 
@@ -65,10 +65,10 @@ shift_max    = int(clip_samples * 0.5)
 # ############################################################################################
 htsat_weight_decay = 0.05        # default: 0.05
 htsat_window_size  = 8           # default: 8 
-htsat_spec_size    = 256         # default: 256
+htsat_spec_size    = 512         # default: 256
 htsat_patch_size   = 4           # default: 4 
 htsat_stride       = (4, 4)      # default: (4, 4)
 htsat_num_head     = [4,8,16,32] # default: [4,8,16,32]
-htsat_dim          = 96          # default: 96 
+htsat_dim          = 48          # default: 96 
 htsat_depth        = [2,2,6,2]   # default: [2,2,6,2]
 
