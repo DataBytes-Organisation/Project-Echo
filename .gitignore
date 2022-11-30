@@ -134,3 +134,4 @@ lightning_logs/
 checkpoints/
 datasets/
 melspecs/
+models/
