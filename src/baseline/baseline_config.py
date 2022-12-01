@@ -28,10 +28,10 @@ classes_num       = CLASSES_NUM
 loss_type         = "clip_ce" # cross entropy loss
 
 # enable debugging to assist with integration
-debug             = True
+debug             = False
 
 random_seed       = 970131  # 19970318 970131 12412 127777 1009 34047
-batch_size        = 8       # default is 32
+batch_size        = 32      # default is 32
 learning_rate     = 1e-3    # 1e-4 also workable 
 max_epoch         = 100000  # essentially never end training...
 num_workers       = 0       # change to >= 1 for multi-threaded (needs fixing)
@@ -41,7 +41,7 @@ lr_scheduler_epoch = [10,20,30]
 lr_rate            = [0.02, 0.05, 0.1]
 
 # these data preparation optimizations do not bring many improvements, so deprecated
-enable_repeat_mode = True # repeat the spectrogram / reshape the spectrogram
+enable_repeat_mode = False # repeat the spectrogram / reshape the spectrogram
 
 # for model's design
 enable_tscam = False # enbale the token-semantic layer
@@ -69,6 +69,6 @@ htsat_spec_size    = 512         # default: 256
 htsat_patch_size   = 4           # default: 4 
 htsat_stride       = (4, 4)      # default: (4, 4)
 htsat_num_head     = [4,8,16,32] # default: [4,8,16,32]
-htsat_dim          = 48          # default: 96 
+htsat_dim          = 96          # default: 96 
 htsat_depth        = [2,2,6,2]   # default: [2,2,6,2]
 
