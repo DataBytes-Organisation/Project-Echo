@@ -22,7 +22,7 @@ CLASSES_NUM   = 5       # this is the number of animal species we have in the da
 # ############################################################################################
 exp_name          = "project_echo" # the saved ckpt prefix name of the model 
 workspace         = "./"           # the folder of your code
-dataset_path      = "c:/birdclef2022-out/OUTPUT_tensors/" # the dataset path
+dataset_path      = "/Users/stephankokkas/Downloads/OUTPUT_tensors/" # the dataset path
 classes_num       = CLASSES_NUM
 
 loss_type         = "clip_ce" # cross entropy loss
