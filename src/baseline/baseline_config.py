@@ -32,7 +32,7 @@ debug             = False
 
 random_seed       = 970131  # 19970318 970131 12412 127777 1009 34047
 batch_size        = 32      # default is 32
-learning_rate     = 1e-3    # 1e-4 also workable 
+learning_rate     = 1e-4    # 1e-4 also workable 
 max_epoch         = 100000  # essentially never end training...
 num_workers       = 0       # change to >= 1 for multi-threaded (needs fixing)
 

@@ -6,7 +6,7 @@ graphviz
 gviz-api
 gym
 h5py
-ipywidgets 
+ipywidgets==7.7.2
 joblib
 kaggle
 keras
