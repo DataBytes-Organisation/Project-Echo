@@ -1,13 +1,17 @@
 
-# This baseline prototype models includes two types of models
+# Model Baselines
 
-> CNN model using pre-trained image classifiers (see baseline_cnn.ipynb)
+This baseline prototype models includes two types of models
 
-> HTS-AT SOTA model used without pre-trained weights (see baseline_htsat.ipynb)
+> CNN model using pre-trained image classifiers (see [baseline_cnn.ipynb]())
+
+> HTS-AT SOTA model used without pre-trained weights (see [baseline_htsat.ipynb]())
 
 ## A benchmark classification using HTS-AT model
 
 This baseline is an attempt to integrate and adapt code from the original author's source code from: https://github.com/retrocirce/hts-audio-transformer
+
+![HTS-AT Architecture](HTS-AT-Arch-From-Paper.png) 
 
 ## The original author of this model
 Ke Chen
