@@ -28,6 +28,14 @@ The model training uses pre-computed spectrogram images which have been split in
 
 Care must be taken in the implementation to ensure that augmentation is only applied to the training data set.  If augmented files are included in the validation or test set then data leakage is likely to occur and the metrics will not be valid (as augmented signals are not real world samples).
 
+#### Product Concept Design
+
+The following diagram shows the product concept design the project aims to achieve longer term.  This design view below provides an overview of a proposed collection of components that interact to simulate the detection of animals via a network of sensors.  The Echo Simulator provides a way to generate random sound events (with associated location metadata) for the engine to process. In this way, the simulator is simulating the real world audio sensor array. Simulated Sensor data is translated into 'Detection Events' which are stored in the Echo Store ready for the HMI client to connect and visualise.  
+
+When a new Detection Event is added into the system, the API pushes these events to the client so that detections can be visualised in real time.  In addition to the animal classification result, probability information is provided.  This probably information can be integrated and combined by the HMI to form a 'heatmap' of animal sounds per species.  
+
+![Data Flow](ProductConceptDesign.jpg) 
+
 #### Project Echo Components
 
 The following sub-sections describe each of the major components of the Project Echo system.  These components.  The Project Echo team members will contribute across these components (as a matrix organisation) to apply their skills in cross dispine virtual teams.
@@ -51,3 +59,7 @@ The Echo HMI provides a front end user experience (UX) for capturing sound clips
 ##### Echo Store
 
 The Echo Store is a modern database solution for storing raw audio files as requested via the Echo API Service.  This store acts a record of the sound sample requests and provides an opportunity for researchers to later label these records and further fine tune the quality of the species classification model.
+
+##### Echo Simulator
+
+The Echo simulator
