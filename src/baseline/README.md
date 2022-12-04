@@ -1,4 +1,10 @@
 
+# This baseline prototype models includes two types of models
+
+> CNN model using pre-trained image classifiers (see baseline_cnn.ipynb)
+
+> HTS-AT SOTA model used without pre-trained weights (see baseline_htsat.ipynb)
+
 ## A benchmark classification using HTS-AT model
 
 This baseline is an attempt to integrate and adapt code from the original author's source code from: https://github.com/retrocirce/hts-audio-transformer
@@ -18,3 +24,24 @@ The HTS-AT algorithm is one of the top performing algorithms on the baseline ESC
 The code in this folder is an adaptation of the original author's code with the eventual aim to leverage pre-computed melspectrograms rather than calculating them inline (which the original code does).
 
 The original code was implemented in pytorch and leverages the pytorch lightening framework.  This approach will be continued for this benchmark investigation.  If proved to be successful the project may move to re-writing this code for tensorflow (the preferred framework for Project Echo)
+
+## Monitoring training of the CNN model
+
+The baseline CNN model is integrated with tensorboard.  To monitor the training in real time run the following from miniconda command line:
+
+> open miniconda command prompt (Windows -> Start -> Anaconda Prompt (miniconda))
+
+> conda activate dev
+
+> cd Project-Echo/src/baseline/
+
+> tensorboard --logdir=./tensorboard_logs
+
+Then go to your favourite web browser and open up the tensorboard display via http://localhost:6006/  
+
+Example screenshots from training the cnn model:
+
+![Tensorboard Example 1](TensorBoard_1.png) 
+
+![Tensorboard Example 2](TensorBoard_2.png) 
+
