@@ -232,7 +232,7 @@ class EchoModule(pl.LightningModule):
         
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer,
                                                   mode='max',
-                                                  patience=2,
+                                                  patience=20,
                                                   factor=0.80,
                                                   verbose=True)
         

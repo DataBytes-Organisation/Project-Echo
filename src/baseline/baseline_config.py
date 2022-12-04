@@ -33,7 +33,7 @@ debug             = False
 random_seed       = 970131  # 19970318 970131 12412 127777 1009 34047
 batch_size        = 32      # default is 32
 learning_rate     = 1e-4    # 1e-4 also workable 
-max_epoch         = 100000  # essentially never end training...
+max_epoch         = 70      # early stop
 num_workers       = 0       # change to >= 1 for multi-threaded (needs fixing)
 
 # scheduling curve (warm start for transformer based model)
@@ -63,7 +63,7 @@ shift_max    = int(clip_samples * 0.5)
 # ############################################################################################
 # htsat hyperparamaters
 # ############################################################################################
-htsat_weight_decay = 0.05        # default: 0.05
+htsat_weight_decay = 0.01        # default: 0.05
 htsat_window_size  = 8           # default: 8 
 htsat_spec_size    = 512         # default: 256
 htsat_patch_size   = 4           # default: 4 
