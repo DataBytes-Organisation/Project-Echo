@@ -209,7 +209,7 @@ class EchoModule(pl.LightningModule):
             lr = self.config.learning_rate, 
             betas = (0.9, 0.999), eps = 1e-08, weight_decay = self.config.htsat_weight_decay, 
         )
-
+        
         # learning rate scheduler
         def lr_foo(epoch):       
             if epoch < 3:
@@ -223,11 +223,41 @@ class EchoModule(pl.LightningModule):
                 else:
                     lr_scale = self.config.lr_rate[lr_pos]
             return lr_scale
-        
+
         # construct the learning rate scheduler
-        scheduler = optim.lr_scheduler.LambdaLR(
-            optimizer,
-            lr_lambda=lr_foo
-        )
+        #scheduler = optim.lr_scheduler.LambdaLR(
+        #    optimizer,
+        #    lr_lambda=lr_foo
+        #)
         
-        return [optimizer], [scheduler]
+        scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer,
+                                                  mode='max',
+                                                  patience=20,
+                                                  factor=0.80,
+                                                  verbose=True)
+        
+        lr_scheduler_config = {
+            # REQUIRED: The scheduler instance
+            "scheduler": scheduler,
+            # The unit of the scheduler's step size, could also be 'step'.
+            # 'epoch' updates the scheduler on epoch end whereas 'step'
+            # updates it after a optimizer update.
+            "interval": "epoch",
+            # How many epochs/steps should pass between calls to
+            # `scheduler.step()`. 1 corresponds to updating the learning
+            # rate after every epoch/step.
+            "frequency": 1,
+            # Metric to to monitor for schedulers like `ReduceLROnPlateau`
+            "monitor": "acc",
+            # If set to `True`, will enforce that the value specified 'monitor'
+            # is available when the scheduler is updated, thus stopping
+            # training if not found. If set to `False`, it will only produce a warning
+            "strict": True,
+            # If using the `LearningRateMonitor` callback to monitor the
+            # learning rate progress, this keyword can be used to specify
+            # a custom logged name
+            "name": None,
+        }
+        
+        
+        return { "optimizer": optimizer, "lr_scheduler":lr_scheduler_config }

@@ -131,6 +131,9 @@ dmypy.json
 
 # pytorch lightening
 lightning_logs/
+tensorboard_logs/
 checkpoints/
 datasets/
 melspecs/
+models/
+logs/
