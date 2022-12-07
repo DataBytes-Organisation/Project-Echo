@@ -6,15 +6,15 @@
 # ############################################################################################
 # General parameters used by Project Echo
 # ############################################################################################
-SAMPLE_RATE   = 32000   # all the samples are converted to bit rate of 32000 (Samples/Second)
-MIN_FREQUENCY = 0       # minimum frequency (Hz) for the Fast Fourier Transform related functions
-MAX_FREQUENCY = 8000    # maximum frequency (Hz) for the Fast Fourier Transform related functions
-HOP_LENGTH    = 512     # the number of samples to slide spectrogram window along the audio samples
-NUMBER_FFT    = 512     # the number of FFT to execute within a single spectrogram window
-NUMBER_MELS   = 128     # the number of Mel-Spectrogram groups to split the frequency dimension
-CLIP_LENGTH   = 5       # only look at this many seconds of clip randomly within the audio file
+SAMPLE_RATE   = 44100//2 # all the samples are converted to bit rate of 32000 (Samples/Second)
+MIN_FREQUENCY = 0        # minimum frequency (Hz) for the Fast Fourier Transform related functions
+MAX_FREQUENCY = 44100//4 # maximum frequency (Hz) for the Fast Fourier Transform related functions
+HOP_LENGTH    = 512      # the number of samples to slide spectrogram window along the audio samples
+NUMBER_FFT    = 512      # the number of FFT to execute within a single spectrogram window
+NUMBER_MELS   = 128      # the number of Mel-Spectrogram groups to split the frequency dimension
+CLIP_LENGTH   = 5        # only look at this many seconds of clip randomly within the audio file
 
-CLASSES_NUM   = 5       # this is the number of animal species we have in the dataset
+CLASSES_NUM   = 16       # this is the number of animal species we have in the dataset
 
 
 # ############################################################################################
@@ -22,7 +22,7 @@ CLASSES_NUM   = 5       # this is the number of animal species we have in the da
 # ############################################################################################
 exp_name          = "project_echo" # the saved ckpt prefix name of the model 
 workspace         = "./"           # the folder of your code
-dataset_path      = "c:/birdclef2022-out/OUTPUT_tensors/" # the dataset path
+dataset_path      = "d:/dataset/processed/OUTPUT_tensors/" # the dataset path
 classes_num       = CLASSES_NUM
 
 loss_type         = "clip_ce" # cross entropy loss
