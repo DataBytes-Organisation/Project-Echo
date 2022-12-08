@@ -11,8 +11,11 @@ def upload_file():
 @app.route('/uploader', methods = ['GET', 'POST'])
 def echo_upload_file():
    if request.method == 'POST':
+      print(request)
       f = request.files['file']
-      f.save(secure_filename(f.filename))
+      filename = secure_filename(f.filename)
+      f.save(filename)
+      # TODO run the classifier here
       return 'file uploaded successfully'
 		
 if __name__ == '__main__':
