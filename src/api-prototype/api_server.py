@@ -10,7 +10,7 @@ app = Flask(__name__,
 
 @app.route('/')
 def demo_page():
-   return render_template('index.html', utc_dt=datetime.datetime.utcnow())
+   return render_template('index.html', species='')
 	
 @app.route('/uploader', methods = ['GET', 'POST'])
 def echo_upload_file():
@@ -20,8 +20,13 @@ def echo_upload_file():
       filename = secure_filename(f.filename)
       if len(filename) > 0:
          f.save(filename)
-      # TODO run the classifier here
-      return render_template('index.html', utc_dt=datetime.datetime.utcnow())
+         
+         # TODO run the classifier here
+         species='Cat'
+      else:
+         species = "No File Uploaded!"
+      
+      return render_template('index.html', species=species)
 
 if __name__ == '__main__':
     print("starting app")
