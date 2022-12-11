@@ -29,6 +29,7 @@ numpy
 opencv-python
 pandas
 pandas-profiling
+path
 plotly
 promise
 protobuf
