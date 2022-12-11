@@ -65,7 +65,7 @@ shift_max    = int(clip_samples * 0.5)
 # ############################################################################################
 # htsat hyperparamaters
 # ############################################################################################
-htsat_weight_decay = 0.01        # default: 0.05
+htsat_weight_decay = 0.025       # default: 0.05
 htsat_window_size  = 8           # default: 8 
 htsat_spec_size    = 512         # default: 256
 htsat_patch_size   = 4           # default: 4 
