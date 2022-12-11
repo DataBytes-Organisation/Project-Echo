@@ -12,6 +12,11 @@ warnings.filterwarnings("ignore")
 
 PATH_TO_MODEL = os.path.join(os.getcwd(), 'project-echo-package', 'project_echo', 'Models', 'baseline_timm_model_dataset_2_15_classes.hdf5')
 
+target_classes = ['nightjar', 'skylark', 'yellow-faced honeyeater', 'feral goat',
+                  'sambar deer', 'grey shrikethrush', 'australian raven', 'fallow deer',
+                  'yellow robin', 'cat', 'whistler', 'white-plumed honeyeater',
+                  'brown rat', 'pied currawong', 'wild pig']
+
 ########################################################################################
 # MODEL PARAMETERS
 ########################################################################################
@@ -144,6 +149,7 @@ def process_raw_audio(_model_, path_to_audio_file, sr: int = 16000):
         tmp_data = tf.io.parse_tensor(tf.io.read_file(_tmp_path_), tf.float32)
 
         _mod_data_ = dataset_transforms(tmp_data, _model_)
+        _mod_data_ = tf.expand_dims(_mod_data_, 0)
 
         _ret_data_.append(_mod_data_)
         os.remove(_tmp_path_)
@@ -152,11 +158,19 @@ def process_raw_audio(_model_, path_to_audio_file, sr: int = 16000):
 
 
 def predict(_model_, path_to_file):
+
+    def translate_results(result):
+        target_index = tf.argmax(tf.squeeze(result)).numpy()
+        target_class = target_classes[target_index]    
+        target_proba = 100.0*tf.nn.softmax(result)[0,target_index].numpy()
+        target_proba = str(round(target_proba, 2))
+
+        return target_class, target_proba
+
     _predict_data_ = process_raw_audio(_model_, path_to_file)
 
     for x in _predict_data_:
-        print(_model_.predict(x))
-        input()
+        print(translate_results(_model_.predict(x)))
     
 
 
