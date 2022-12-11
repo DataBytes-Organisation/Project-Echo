@@ -4,8 +4,8 @@ import pkg_resources
 from setuptools import setup, find_packages
 
 setup(
-    name="PROJECT-ECHO",
-    py_modules=["project_echo"],
+    name="echo",
+    py_modules=["echo"],
     version="1.0",
     description="Robust Bioaccoustic Recognition and Classification Tool",
     readme="README.md",
