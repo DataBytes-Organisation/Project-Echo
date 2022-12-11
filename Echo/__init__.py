@@ -9,6 +9,8 @@ import tfimm
 from pydub import AudioSegment, effects
 import tensorflow as tf
 import tensorflow_io as tfio
+from os.path import isfile, join
+from os import listdir
 
 target_classes = ['nightjar', 'skylark', 'yellow-faced honeyeater', 'feral goat',
                   'sambar deer', 'grey shrikethrush', 'australian raven', 'fallow deer',
@@ -85,7 +87,6 @@ def process_raw_audio(_model_, path_to_audio_file, sr: int = 16000):
     MELS = 128
     FMIN = 0
     FMAX = int(SAMPLE_RATE)/2
-    TOP_DB = 80
     CLIP_LENGTH = 5000
     BITRATE = '32k'
 
@@ -155,7 +156,7 @@ def process_raw_audio(_model_, path_to_audio_file, sr: int = 16000):
     return _ret_data_
 
 
-def predict(_model_, path_to_file):
+def predict(_model_, path_to_file, traverse_path:bool = False):
 
     def translate_results(result):
         target_index = tf.argmax(tf.squeeze(result)).numpy()
@@ -165,9 +166,21 @@ def predict(_model_, path_to_file):
 
         return target_class, target_proba
 
-    _predict_data_ = process_raw_audio(_model_, path_to_file)
+    if not traverse_path:
+        _predict_data_ = process_raw_audio(_model_, path_to_file)
 
-    print(f'Your audio file is split into {len(_predict_data_)} windows of 5 seconds per window... per sliding window we found:')
-    for x in _predict_data_:
-        _ret = translate_results(_model_.predict(x, verbose = 0))
-        print(f'    A {_ret[0]} with a confidence of {_ret[1]}%')
+        print(f'Your audio file is: {os.path.split(path_to_file)[-1]}')
+        print(f'Your file is split into {len(_predict_data_)} windows of 5 seconds width per window. For each sliding window, we found:')
+        for x in _predict_data_:
+            _ret = translate_results(_model_.predict(x, verbose = 0))
+            print(f'    A {_ret[0]} with a confidence of {_ret[1]}%')
+    else:
+        for _file_ in [f for f in listdir(path_to_file) if isfile(join(path_to_file, f))]:
+            _predict_data_ = process_raw_audio(_model_, os.path.join(path_to_file, _file_))
+
+            print(f'Your audio file is: {os.path.split(os.path.join(path_to_file, _file_))[-1]}')
+            print(f'Your file is split into {len(_predict_data_)} windows of 5 seconds width per window. For each sliding window, we found:')
+            for x in _predict_data_:
+                _ret = translate_results(_model_.predict(x, verbose = 0))
+                print(f'    A {_ret[0]} with a confidence of {_ret[1]}%')
+            
