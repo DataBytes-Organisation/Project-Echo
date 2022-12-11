@@ -7,11 +7,11 @@ Project echo is a bioaccouostic classification tool.
 
 We used Python 3.9.9 and [PyTorch](https://pytorch.org/) 1.10.1, but the codebase is expected to be compatible with Python 3.7 or later and recent PyTorch versions. The codebase also depends on a few Python packages like [ffmpeg-python](https://github.com/kkroening/ffmpeg-python) for reading audio files. The following command will pull and install the latest commit from this repository, along with its Python dependencies 
 
-    pip install git+https://github.com/stephankokkas/project-echo/pip-package.git
+    pip install git+https://github.com/stephankokkas/Project-Echo/tree/SK-PIP-Package-with-new-main/project-echo-package.git
 
 To update the package to the latest version of this repository, please run:
 
-    pip install --upgrade --no-deps --force-reinstall git+https://github.com/stephankokkas/project-echo/pip-package.git
+    pip install --upgrade --no-deps --force-reinstall git+https://github.com/stephankokkas/Project-Echo/tree/SK-PIP-Package-with-new-main/project-echo-package.git
 
 It also requires the command-line tool [`ffmpeg`](https://ffmpeg.org/) to be installed on your system, which is available from most package managers:
 
@@ -46,7 +46,4 @@ import project_echo
 
 model = echo.load_model("base")
 result = model.predict("audio.mp3")
-print(result["text"])
 ```
-
-Internally, the `transcribe()` method reads the entire file and processes the audio with a sliding 30-second window, performing autoregressive sequence-to-sequence predictions on each window.
