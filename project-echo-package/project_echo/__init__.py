@@ -1,16 +1,14 @@
+import logging, os
+logging.disable(logging.WARNING)
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+
 import keras
-import tensorflow as tf
 import ffmpeg
-import tensorflow_io as tfio
 from keras.models import load_model as lm
 import tfimm
 from pydub import AudioSegment, effects
-import os
-
-import warnings
-warnings.filterwarnings("ignore")
-
-PATH_TO_MODEL = os.path.join(os.getcwd(), 'project-echo-package', 'project_echo', 'Models', 'baseline_timm_model_dataset_2_15_classes.hdf5')
+import tensorflow as tf
+import tensorflow_io as tfio
 
 target_classes = ['nightjar', 'skylark', 'yellow-faced honeyeater', 'feral goat',
                   'sambar deer', 'grey shrikethrush', 'australian raven', 'fallow deer',
@@ -73,7 +71,7 @@ class EchoTfimmModel(tf.keras.Model):
         x = self.classifier(x)               
         return x
 
-def load_model():
+def load_model(PATH_TO_MODEL):
     test_model = EchoTfimmModel()
     test_model.build([None, 224, 224, 1])
     test_model.load_weights(PATH_TO_MODEL)
@@ -169,14 +167,7 @@ def predict(_model_, path_to_file):
 
     _predict_data_ = process_raw_audio(_model_, path_to_file)
 
+    print(f'Your audio file is split into {len(_predict_data_)} windows of 5 seconds per window... per sliding window we found:')
     for x in _predict_data_:
-        print(translate_results(_model_.predict(x)))
-    
-
-
-path_to_raw_audio_file = '/Users/stephankokkas/Downloads/Alauda_arvensis_Bru_DAT0042_04_short.mp3'
-
-my_model = load_model()
-classification = predict(my_model, path_to_raw_audio_file)
-
-
+        _ret = translate_results(_model_.predict(x, verbose = 0))
+        print(f'    A {_ret[0]} with a confidence of {_ret[1]}%')
