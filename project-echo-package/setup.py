@@ -11,7 +11,6 @@ setup(
     readme="README.md",
     python_requires=">=3.7",
     author="Deakin University 2022 T3 Project Echo DataByte Capstone A Team",
-    license="MIT",
     packages=find_packages(exclude=["tests*"]),
     install_requires=[
         str(r)
