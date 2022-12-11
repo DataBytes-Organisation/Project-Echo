@@ -5,8 +5,6 @@ import tensorflow_io as tfio
 from keras.models import load_model as lm
 import tfimm
 from pydub import AudioSegment, effects
-import numpy as np
-import tempfile
 import os
 
 import warnings
