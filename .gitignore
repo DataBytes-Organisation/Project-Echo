@@ -5,6 +5,7 @@ __pycache__/
 *.DS_Store
 # C extensions
 *.so
+.vscode
 
 # Distribution / packaging
 .Python
@@ -127,3 +128,12 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# pytorch lightening
+lightning_logs/
+tensorboard_logs/
+checkpoints/
+datasets/
+melspecs/
+models/
+logs/
