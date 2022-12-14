@@ -73,7 +73,9 @@ class EchoTfimmModel(tf.keras.Model):
         x = self.classifier(x)               
         return x
 
-def load_model(PATH_TO_MODEL):
+def load_model():
+    PATH_TO_MODEL = os.path.join(os.getcwd(), 'Echo', 'Models', 'baseline_timm_model_dataset_2_15_classes.hdf5')
+    
     test_model = EchoTfimmModel()
     test_model.build([None, 224, 224, 1])
     test_model.load_weights(PATH_TO_MODEL)

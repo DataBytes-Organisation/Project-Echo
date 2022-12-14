@@ -135,5 +135,4 @@ tensorboard_logs/
 checkpoints/
 datasets/
 melspecs/
-models/
 logs/
