@@ -136,3 +136,7 @@ checkpoints/
 datasets/
 melspecs/
 logs/
+data/
+output/
+*birdclef*
+models/

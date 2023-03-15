@@ -10,6 +10,7 @@ import tensorflow as tf
 MODEL_INPUT_IMAGE_WIDTH = 224
 MODEL_INPUT_IMAGE_HEIGHT = 224
 MODEL_INPUT_IMAGE_CHANNELS = 1
+MODEL_OUTPUT_CLASSES = 15
 
 
 ########################################################################################
@@ -31,7 +32,7 @@ class EchoClassifierLayer(tf.keras.layers.Layer):
         
         self.do2 = tf.keras.layers.Dropout(dropout)        
         
-        self.out = tf.keras.layers.Dense(15, 
+        self.out = tf.keras.layers.Dense(MODEL_OUTPUT_CLASSES, 
                                          activation=tf.keras.activations.linear)
 
     def call(self, inputs):
