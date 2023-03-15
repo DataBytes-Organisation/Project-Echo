@@ -10,6 +10,11 @@ We believe that sound analysis can revolutionize the way we monitor animal popul
 
 Project Echo is dedicated to providing conservationists with the best possible tools to protect and preserve endangered wildlife and minimize the impact of predatory and other destructive fauna. We believe that sound analysis can unlock new insights into animal populations and are excited to continue our progress towards our vision.
 
+# Our Git File Structure 📂:
+
+![MicrosoftTeams-image (1)](https://user-images.githubusercontent.com/3150898/225461178-079563ee-0f3b-4364-8350-753f4047e82b.png)
+
+Throughout this project we want to try and maintain the above file structure so that we have a clear understanding of where prototype like files live, and developement / component type files.
 
 # Try out our model!
 
