@@ -5,7 +5,13 @@ There are currently 1 versions of this dataset up on Google Cloud Storage. They 
 |  	bucket name | description  |
 |---|---|
 | project_echo_bucket_1    | This is a raw dump of all scraped data. Currently containing ALA and mammals datasets    |
+| project_echo_bucket_2    | This is a bucket containing unedited training data for the 15 Otway species   |
+| project_echo_bucket_3    | This is a bucket containing audio clips of up to 10s each with sliences filtered out   |
+| project_echo_birdclef    | Birdclef 2022 dataset for testing purposes  |
 
+
+
+## Instructions
 
 This folder contains the code that give access to the Google Cloud Storage for the Project otways Dataset. Please follow the instructions below:
 
