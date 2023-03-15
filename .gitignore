@@ -136,3 +136,4 @@ checkpoints/
 datasets/
 melspecs/
 logs/
+data/
