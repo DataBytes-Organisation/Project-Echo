@@ -1,23 +1,23 @@
 ## Project Otways Dataset
 
-There are currently 3 versions of this dataset up on Google Cloud Storage. They are as the followng:
+There are currently 1 versions of this dataset up on Google Cloud Storage. They are as the followng:
 
-|  	bucket-quickstart_project-echo-369809 | This is a raw dump of all scraped data. Currently containing ALA and mammals datasets  |
+|  	bucket name | description  |
 |---|---|
-| project_echo_dataset_1    | Unedited Training dataset of 16 species   |
-| project_echo_dataset_2 | Edited to filter out silences reformatted to 5 second long clips in wav format  |
-| project_echo_dataset_3 | Edited to filter out silences reformatted to 10 second long clips in wav format  |
+| project_echo_bucket_1    | This is a raw dump of all scraped data. Currently containing ALA and mammals datasets    |
+
 
 This folder contains the code that give access to the Google Cloud Storage for the Project otways Dataset. Please follow the instructions below:
 
 1. Install google cloud storage on your local dev environment
 pip install google-cloud-storage
 
-2. Get the access key from Tony Zhai and save it to the same directory as this folder.
+2. Install the Coogle Cloud CLI https://cloud.google.com/sdk/docs/install
 
-3. Open GoogleCloud_download.ipynb Bucket name is currently 'project_echo_dataset_1'. set dl_dir to the path where you want the dataset to be stored.
+3. Once installed, open the shell and type "gcloud auth application-default login"
+and log in using your deakin credentials (xxxxxx@deakin.edu.au) and sign in using 2FA
 
-4. Make sure that the name of the key file XXXXXXXXXXXX.json is stored in the variable os.environ['GOOGLE_APPLICATION_CREDENTIALS']
+4. Open GoogleCloud_download.ipynb Bucket name is currently 'project_echo_bucket_1'. set dl_dir to the path where you want the dataset to be stored.
 
 5. Run the python script. It should take around 20 minutes depending on the speed of your connection.
 
