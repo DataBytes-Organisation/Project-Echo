@@ -1,6 +1,6 @@
 ## Project Otways Dataset
 
-There are currently 1 versions of this dataset up on Google Cloud Storage. They are as the followng:
+There are currently 3 versions of this dataset up on Google Cloud Storage. They are as the following:
 
 |  	bucket name | description  |
 |---|---|
@@ -9,7 +9,7 @@ There are currently 1 versions of this dataset up on Google Cloud Storage. They 
 | project_echo_bucket_3    | This is a bucket containing audio clips of up to 10s each with sliences filtered out   |
 | project_echo_birdclef    | Birdclef 2022 dataset for testing purposes  |
 
-
+Google Cloud Project name: sit-23t1-project-echo-25288b9
 
 ## Instructions
 
