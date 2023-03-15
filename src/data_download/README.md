@@ -14,8 +14,14 @@ pip install google-cloud-storage
 
 2. Install the Coogle Cloud CLI https://cloud.google.com/sdk/docs/install
 
-3. Once installed, open the shell and type "gcloud auth application-default login"
-and log in using your deakin credentials (xxxxxx@deakin.edu.au) and sign in using 2FA
+3. Once installed, open the shell and type "gcloud auth application-default login". It will open up a browser.
+Log in using your deakin credentials (xxxxxx@deakin.edu.au) and sign in using 2FA
+
+![login](ScreenshotGCP.png)
+
+You should see this if you're successfully authenticated
+
+![Success](ScreenshotSuccess.png)
 
 4. Open GoogleCloud_download.ipynb Bucket name is currently 'project_echo_bucket_1'. set dl_dir to the path where you want the dataset to be stored.
 
