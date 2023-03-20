@@ -167,22 +167,18 @@ def predict(_model_, path_to_file, traverse_path:bool = False):
         target_proba = str(round(target_proba, 2))
 
         return target_class, target_proba
+    
+    def predictForFile(file):
+        _predict_data_ = process_raw_audio(_model_, os.path.join(path_to_file, _file_))
 
-    if not traverse_path:
-        _predict_data_ = process_raw_audio(_model_, path_to_file)
-
-        print(f'Your audio file is: {os.path.split(path_to_file)[-1]}')
+        print(f'Your audio file is: {os.path.split(os.path.join(path_to_file, _file_))[-1]}')
         print(f'Your file is split into {len(_predict_data_)} windows of 5 seconds width per window. For each sliding window, we found:')
         for x in _predict_data_:
             _ret = translate_results(_model_.predict(x, verbose = 0))
             print(f'    A {_ret[0]} with a confidence of {_ret[1]}%')
+
+    if not traverse_path:
+        predictForFile(path_to_file)
     else:
         for _file_ in [f for f in listdir(path_to_file) if isfile(join(path_to_file, f))]:
-            _predict_data_ = process_raw_audio(_model_, os.path.join(path_to_file, _file_))
-
-            print(f'Your audio file is: {os.path.split(os.path.join(path_to_file, _file_))[-1]}')
-            print(f'Your file is split into {len(_predict_data_)} windows of 5 seconds width per window. For each sliding window, we found:')
-            for x in _predict_data_:
-                _ret = translate_results(_model_.predict(x, verbose = 0))
-                print(f'    A {_ret[0]} with a confidence of {_ret[1]}%')
-            
+            predictForFile(os.path.join(path_to_file, _file_))
