@@ -16,7 +16,7 @@ Project Echo is dedicated to providing conservationists with the best possible t
 
 Throughout this project we want to try and maintain the above file structure so that we have a clear understanding of where prototype like files live, and developement / component type files.
 
-# Try out our model!
+# Try out our model! - Currently Unavailable...
 
 Install our pip package:
 ``` python
