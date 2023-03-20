@@ -1,0 +1,332 @@
+
+Index of scientific names
+Acanthagenys rufogularis 123
+Acanthiza chrysorrhoa 131
+lineata 132
+nana 131
+pusilla 130
+reguloides 130
+Acanthorhynchus tenuirostris 119
+Accipiter cirrocephalus 90
+fasciatus 89
+novaehollandiae 89
+Acridotheres tristis 216
+Acritoscincus duperreyi 194
+Acrobates pygmaeus 70
+Acrocephalus australis 151
+Aegotheles cristatus 102
+Alauda arvensis 215
+Alisterus scapularis 116
+Amphibolurus muricatus 193
+Anas castanea 161
+gracilis 160
+rhynchotis 160
+superciliosa 159
+Anepischetosia maccoyi 195
+Anhinga novaehollandiae 173
+Anseranas semipalmata 156
+Antechinus agilis 65
+minimus 65
+swainsonii 66
+Anthochaera carunculata 124
+chrysoptera 123
+Anthus australis 155
+Antigone rubicunda 178
+Apus pacificus 103
+Aquila audax 88
+Arctocephalus pusillus 82
+Ardea alba 168
+pacifica 167
+Ardenna tenuirostris 185
+
+Arenaria interpres 189
+Artamus cyanopterus 134
+personatus 133
+superciliosus 133
+Austrelaps superbus 201
+Austronomus australis 76
+Aythya australis 161
+Biziura lobata 162
+Botaurus poiciloptilus 166
+Bubulcus coromandus 168
+Cacatua galerita 110
+sanguinea 109
+tenuirostris 109
+Cacomantis flabelliformis 97
+pallidus 97
+variolosus 98
+Calamanthus fuliginosus 128
+pyrrhopygius 128
+Calidris acuminata 190
+ruficollis 189
+Caligavis chrysops 124
+Callocephalon fimbriatum 108
+Calyptorhynchus funereus 107
+Capra hircus 213
+Carduelis carduelis 219
+Cercartetus nanus 68
+Cereopsis novaehollandiae 156
+Cervus unicolor 213
+Ceyx azureus 104
+Chalcites basalis 96
+lucidus 96
+Chalinolobus gouldii 78
+morio 79
+Charadrius bicinctus 188
+ruficapillus 187
+Chelodina longicollis 193
+
+
+Chenonetta jubata 159
+Chlidonias hybrida 192
+Chloris chloris 218
+Chroicocephalus novaehollandiae 190
+Cinclosoma punctatum 132
+Circus approximans 90
+assimilis 91
+Cisticola exilis 152
+Cladorhynchus leucocephalus 179
+Colluricincla harmonica 140
+Columba leucomela 93
+livia 214
+Coracina novaehollandiae 136
+Corcorax melanorhamphos 146
+Cormobates leucophaea 117
+Corvus coronoides 145
+mellori 145
+tasmanicus 144
+Coturnix pectoralis 86
+ypsilophora 86
+Cracticus tibicen 135
+torquatus 134
+Crinia signifera 206
+Cygnus atratus 157
+Dacelo novaeguineae 103
+Dama dama 214
+Daphoenositta chrysoptera 137
+Dasyornis broadbenti 126
+Dasyurus maculatus 64
+Delphinus delphis 84
+Dicaeum hirundinaceum 153
+Drysdalia coronoides 201
+Egretta garzetta nigripes 170
+intermedia 169
+novaehollandiae 169
+Elanus axillaris 87
+Elseyornis melanops 181
+Eolophus roseicapilla 108
+Eopsaltria australis 146
+Epthianura albifrons 122
+Erythrogonys cinctus 181
+Eubalaena australis 83
+
+Eudynamys orientalis 95
+Eudyptula minor 183
+Eulamprus tympanum 195
+Eurostopodus mystacalis 101
+Falco berigora 106
+cenchroides 105
+longipennis 106
+peregrinus 107
+Falcunculus frontatus 138
+Falsistrellus tasmaniensis 79
+Felis catus 212
+Fulica atra 178
+Gallinago hardwickii 182
+Gallinula tenebrosa 177
+Gallirallus philippensis 174
+Gavicalis virescens 125
+Geocrinia laevis 206
+victoriana 207
+Gerygone olivacea 129
+Glossopsitta concinna 111
+porphyrocephala 112
+pusilla 111
+Glyciphila melanops 119
+Grallina cyanoleuca 142
+Haematopus fuliginosus 187
+longirostris 186
+Haliaeetus leucogaster 92
+Haliastur sphenurus 92
+Hieraaetus morphnoides 88
+Himantopus leucocephalus 179
+Hirundapus caudacutus 102
+Hirundo neoxena 149
+Hydromys chrysogaster 82
+Hydroprogne caspia 191
+Hydrurga leptonyx 83
+Isoodon obesulus
+
+67
+
+Lalage tricolor 137
+Lampropholis guichenoti 196
+Larus pacificus 191
+
+Nyctophilus geoffroyi 77
+gouldi 78
+
+Lathamus discolor 115
+Lepus europaeus 210
+Lewinia pectoralis 174
+Limnodynastes dumerilii 204
+peronii 204
+tasmaniensis 205
+Liopholis whitii 196
+Lissolepis coventryi 197
+Litoria ewingii 203
+raniformis 203
+Macropus giganteus 72
+Malacorhynchus membranaceus
+Malurus cyaneus 117
+Manorina melanocephala 125
+Mastacomys fuscus 73
+Megalurus gramineus 151
+Megaptera novaeangliae 84
+Melithreptus brevirostris 121
+lunatus 121
+Merops ornatus 105
+Microcarbo melanoleucos 171
+Microeca fascinans 147
+Milvus migrans 91
+Miniopterus orianae 77
+Morus serrator 186
+Mus musculus 209
+Myiagra cyanoleuca 143
+inquieta 144
+rubecula 143
+Myzomela sanguinolenta 118
+Neobatrachus sudellae 205
+Neochmia temporalis 155
+Neophema chrysogaster 114
+chrysostoma 114
+Nesoptilotus leucotis 122
+Ninox boobook 100
+connivens 100
+strenua 99
+Niveoscincus coventryi 197
+Notamacropus rufogriseus 72
+Notechis scutatus 202
+Nycticorax caledonicus 167
+
+Ocyphaps lophotes 95
+Orcinus orca 85
+Oriolus sagittatus 140
+Ornithorhynchus anatinus 81
+Oryctolagus cuniculus 211
+Oxyura australis 162
+
+158
+
+Pachycephala olivacea 138
+pectoralis 139
+rufiventris 139
+Pachyptila turtur 184
+Pandion cristatus 87
+Pardalotus punctatus 127
+striatus 127
+Passer domesticus 217
+montanus 218
+Pelecanus conspicillatus 170
+Perameles nasuta 67
+Petaurus australis 69
+breviceps 69
+Petrochelidon ariel 150
+nigricans 150
+Petroica boodang 149
+phoenicea 148
+rodinogaster 148
+rosea 147
+Pezoporus wallicus 115
+Phalacrocorax carbo 173
+fuscescens 171
+sulcirostris 172
+varius 172
+Phaps chalcoptera 94
+elegans 94
+Phascolarctos cinereus 68
+Phylidonyris novaehollandiae 120
+pyrrhopterus 120
+Platalea flavipes 166
+regia 165
+Platycercus elegans 112
+eximius 113
+Podargus strigoides 101
+
+Podiceps cristatus 164
+Poliocephalus poliocephalus 163
+Porphyrio melanotus 176
+Porzana fluminea 175
+pusilla 175
+tabuensis 176
+Potorous tridactylus 71
+Psephotus haematonotus 113
+Pseudemoia entrecasteauxii 198
+pagenstecheri 198
+spenceri 199
+Pseudocheirus peregrinus 70
+Pseudomys fumeus 74
+novaehollandiae 74
+Pseudophryne bibronii 207
+semimarmorata 208
+Pteropus poliocephalus 76
+Ptilonorhynchus violaceus 116
+Ptilotula penicillata 126
+Puffinus gavia 185
+Rankinia diemensis 194
+Rattus fuscipes 75
+lutreolus 75
+norvegicus 209
+rattus 210
+Recurvirostra novaehollandiae
+Rhipidura albiscapa 141
+leucophrys 141
+rufifrons 142
+Saproscincus mustelinus 199
+Sericornis frontalis 129
+Sminthopsis leucopus 66
+Spilopelia chinensis 215
+Stagonopleura bella 154
+guttata 154
+Stictonetta naevosa 157
+
+180
+
+Stipiturus malachurus 118
+Strepera graculina 135
+versicolor 136
+Sturnus vulgaris 216
+Sus scrofa 212
+Tachybaptus novaehollandiae 163
+Tachyglossus aculeatus 64
+Tadorna tadornoides 158
+Thalassarche cauta 184
+melanophris 183
+Thalasseus bergii 192
+Thinornis cucullatus 188
+Threskiornis molucca 164
+spinicollis 165
+Tiliqua nigrolutea 200
+scincoides 200
+Todiramphus sanctus 104
+Tribonyx ventralis 177
+Trichoglossus moluccanus 110
+Trichosurus vulpecula 71
+Tringa nebularia 182
+Turdus merula 217
+Turnix varius 93
+Tursiops truncatus 85
+Tyto delicatula 99
+novaehollandiae 98
+Vanellus miles 180
+Vespadelus darlingtoni 80
+regulus 80
+vulturnus 81
+Vulpes vulpes 211
+Wallabia bicolor 73
+Zoothera lunulata 153
+Zosterops lateralis 150
+
+
+
+

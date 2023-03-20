@@ -1,0 +1,77 @@
+
+# conda env remove -vv -n dev
+# conda env create -vv -f dev.yaml
+
+# In c:\ProgramData\pip\pip.ini
+#
+# [global]
+# extra-index-url = https://download.pytorch.org/whl/cu117
+
+# [install]
+# trusted-host = download.pytorch.org
+
+name: dev
+channels:
+ - conda-forge
+ - nvidia
+ - pytorch
+ - defaults
+dependencies:
+ - python=3.10.0
+ - pip
+#  - cudatoolkit                        
+#  - cudnn
+#  - cuda-cupti
+ - ipykernel
+ - go
+ - git
+ - ffmpeg
+ - sox
+ - pip:
+    - keras
+    - keras-datasets
+    - keras-models
+    - keras-nlp
+    - keras-rl
+    - keras-toolbox
+    - keras-unet
+    - keras-util
+    - librosa==0.10.0
+    - lightgbm
+    - ffio
+    - ffprobe
+    - google-cloud
+    - google-cloud-storage
+    - matplotlib
+    - notebook
+    - numpy
+    - pandas
+    - pydot
+    - pydub
+    - pytorch_lightning
+    - scikit-image
+    - scikit-learn
+    - scipy
+    - sentence-transformers
+    - tensorboard_plugin_profile
+    - tensorflow==2.11.0
+    - tensorflow-addons
+    - tensorflow-datasets
+    - tensorflow-estimator
+    # - tensorflow-gpu==2.10.1
+    - tensorflow-graphics
+    - tensorflow-metadata
+    - tensorflow_hub
+    - tensorflow_gnn
+    - tensorflow_io
+    - tf-explain
+    - tfimm
+    - tflite-support
+    - timm
+    - torch 
+    - torchvision 
+    - torchaudio
+    - torchsummary
+    - torchlibrosa
+    - transformers
+    - unzip
