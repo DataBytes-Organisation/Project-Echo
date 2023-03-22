@@ -12,6 +12,7 @@ class Map:
         def __init__(self, lat, long) -> None:
             self.lat = lat
             self.long = long
+            self.T_TS = None
 
     def __init__(self):
         self.otways_size = (20, 15)
