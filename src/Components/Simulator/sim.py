@@ -6,7 +6,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from event_generator import Event
 from geopy.distance import distance
-from math import radians, sin, cos, sqrt, asin, degrees, pi
+from math import radians, sin, cos, sqrt, asin, degrees, pi, atan2
 import matplotlib.pyplot as plt
 import folium
 from folium.plugins import MarkerCluster
@@ -63,64 +63,58 @@ class Simulator():
         # print(f"Triangulation error: {error} meters")
 
     def _triangulate(self, tdoa_data: list[tuple[float, float, float]], event_lat, event_long) -> tuple[float, float]:
-        def distance(lat1, lon1, lat2, lon2):
-            # Convert latitude and longitude to radians
-            lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
-            # Haversine formula for calculating distance between two points on a sphere
-            dlon = lon2 - lon1 
-            dlat = lat2 - lat1 
-            a = sin(dlat / 2)**2 + cos(lat1) * cos(lat2) * sin(dlon / 2)**2
-            c = 2 * asin(sqrt(a)) 
-            distance_meters = R * c
-            return distance_meters
+        def circle_intersection(lat1, lon1, r1, lat2, lon2, r2):
+            # Convert latitudes and longitudes to radians
+            lat1, lon1, lat2, lon2 = map(lambda x: x * pi / 180, [lat1, lon1, lat2, lon2])
+            # Calculate distance between circle centers
+            d_lat = lat2 - lat1
+            d_lon = lon2 - lon1
+            a = sin(d_lat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(d_lon / 2) ** 2
+            c = 2 * atan2(sqrt(a), sqrt(1 - a))
+            # Calculate intersection points (if any)
+            if abs(r1 - r2) <= c * r1 <= r1 + r2:
+                # One intersection point
+                d = r1 ** 2 - (r1 ** 2 - r2 ** 2 + c ** 2 * r1 ** 2) / (2 * c)
+                if d < 0:
+                    return [] # no intersection points
+                h = sqrt(d)
+                lat = lat1 + d_lat * d / c
+                lon = lon1 + d_lon * d / c
+                lat1_int = lat + h * (lon2 - lon1) / c
+                lon1_int = lon - h * (lat2 - lat1) / c
+                return [(lat1_int * 180 / pi, lon1_int * 180 / pi)]
+            elif c * r1 < abs(r1 - r2) or c * r1 > r1 + r2:
+                # No intersection points
+                return []
+            else:
+                # Two intersection points
+                d = (r1 ** 2 - r2 ** 2 + c ** 2 * r1 ** 2) / (2 * c)
+                if abs(r1 - r2) <= c * r1 <= r1 + r2 and d < 0:
+                    return [] # no intersection points
+                h = sqrt(r1 ** 2 - d ** 2)
+                lat = lat1 + d_lat * d / c
+                lon = lon1 + d_lon * d / c
+                lat1_int = lat + h * (lon2 - lon1) / c
+                lon1_int = lon - h * (lat2 - lat1) / c
+                lat2_int = lat - h * (lon2 - lon1) / c
+                lon2_int = lon + h * (lat2 - lat1) / c
+                if lat1_int == lat2_int and lon1_int == lon2_int:
+                    return [(lat1_int * 180 / pi, lon1_int * 180 / pi)]
+                else:
+                    return [(lat1_int * 180 / pi, lon1_int * 180 / pi), (lat2_int * 180 / pi, lon2_int * 180 / pi)]
 
-        def trilateration(lat1, lon1, r1, lat2, lon2, r2, lat3, lon3, r3):
-            # Convert latitudes and longitudes to meters
-            x1, y1 = distance(lat1, lon1, lat1, lon1), distance(lat1, lon1, lat1, lon1)
-            x2, y2 = distance(lat2, lon2, lat1, lon1), distance(lat2, lon2, lat1, lon1)
-            x3, y3 = distance(lat3, lon3, lat1, lon1), distance(lat3, lon3, lat1, lon1)
-            A = 2 * x2 - 2 * x1
-            B = 2 * y2 - 2 * y1
-            C = r1**2 - r2**2 - x1**2 + x2**2 - y1**2 + y2**2
-            D = 2 * x3 - 2 * x2
-            E = 2 * y3 - 2 * y2
-            F = r2**2 - r3**2 - x2**2 + x3**2 - y2**2 + y3**2
-            x = (C*E - F*B) / (E*A - B*D)
-            y = (C*D - A*F) / (B*D - A*E)
-            # Convert the intersection point from meters to latitude and longitude
-            intersection_lat = degrees(y / R)
-            intersection_lon = degrees(x / (R * cos(radians(intersection_lat))))
-            return intersection_lat, intersection_lon
-        
-        c = 343*2 # speed of sound in meters/second
-        R = 6371000  # radius of the Earth in meters
+            
+        c = 343 # speed of sound in m/s
 
         latitudes = [tdoa_data[2][0], tdoa_data[1][0], tdoa_data[0][0]]
         longitudes = [tdoa_data[2][1], tdoa_data[1][1], tdoa_data[0][1]]
-        radii = [c * tdoa_data[2][2], c * tdoa_data[1][2], c * tdoa_data[0][2]]
+        radii = [(c * tdoa_data[2][2]), (c * tdoa_data[1][2]), (c * tdoa_data[0][2])]
         self.map_intersections(latitudes, longitudes, radii, event_lat, event_long)
 
-        for i in range(len(latitudes)):
-            for j in range(i+1, len(latitudes)):
-                lat1, lon1, r1 = latitudes[i], longitudes[i], radii[i]
-                lat2, lon2, r2 = latitudes[j], longitudes[j], radii[j]
-                d = sqrt((lat2-lat1)**2 + (lon2-lon1)**2)
-                if d < r1 + r2:  # if the circles intersect
-                    for k in range(j+1, len(latitudes)):
-                        lat3, lon3, r3 = latitudes[k], longitudes[k], radii[k]
-                        d1 = sqrt((lat3-lat1)**2 + (lon3-lon1)**2)
-                        d2 = sqrt((lat3-lat2)**2 + (lon3-lon2)**2)
-                        if d1 < r1 + r3 and d2 < r2 + r3: # if all three circles intersect
-                            lat1, lon1, r1 = latitudes[0], longitudes[0], radii[0]
-                            lat2, lon2, r2 = latitudes[1], longitudes[1], radii[1]
-                            lat3, lon3, r3 = latitudes[2], longitudes[2], radii[2]
+        # Test intersection of first two circles
+        intersection_points = circle_intersection(latitudes[0], longitudes[0], radii[0], latitudes[1], longitudes[1], radii[1])
+        print(intersection_points)
 
-                            intersection_lat, intersection_lon = trilateration(lat1, lon1, r1, lat2, lon2, r2, lat3, lon3, r3)
-
-                            if intersection_lat is not None and intersection_lon is not None:
-                                print(f'The circles intersect at the point {(intersection_lat, intersection_lon)}')
-                            else:
-                                print('The circles do not intersect')
 
     
     def map_intersections(self, latitudes, longitudes, radii, event_lat, event_long):
@@ -132,8 +126,7 @@ class Simulator():
                 radius=rad,
                 color='black',
                 fill=False,
-                dash_array='10',
-                fixed_radius=True
+                dash_array='10'
             ).add_to(marker_cluster)
 
         folium.Marker(location=[event_lat, event_long], icon=folium.Icon(icon="paw", prefix='fa', color="red")).add_to(self.simulated_map.folium_map)
