@@ -6,7 +6,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from event_generator import Event
 from geopy.distance import distance
-from math import radians, sin, cos, sqrt, atan2, degrees
+from math import radians, sin, cos, sqrt, asin, degrees, pi
 import matplotlib.pyplot as plt
 import folium
 from folium.plugins import MarkerCluster
@@ -58,79 +58,70 @@ class Simulator():
             print("Not enough TDOA data to triangulate event")
             return
 
-        event_lat_est, event_long_est = self._triangulate(toda_data, event_lat, event_long)
-        error = distance((event_lat, event_long), (event_lat_est, event_long_est)).m
-        print(f"Triangulation error: {error} meters")
+        print(self._triangulate(toda_data, event_lat, event_long))
+        # error = distance((event_lat, event_long), (event_lat_est, event_long_est)).m
+        # print(f"Triangulation error: {error} meters")
 
     def _triangulate(self, tdoa_data: list[tuple[float, float, float]], event_lat, event_long) -> tuple[float, float]:
-        #assuming elevation = 0
-        earthR = 6371
+        def distance(lat1, lon1, lat2, lon2):
+            # Convert latitude and longitude to radians
+            lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
+            # Haversine formula for calculating distance between two points on a sphere
+            dlon = lon2 - lon1 
+            dlat = lat2 - lat1 
+            a = sin(dlat / 2)**2 + cos(lat1) * cos(lat2) * sin(dlon / 2)**2
+            c = 2 * asin(sqrt(a)) 
+            distance_meters = R * c
+            return distance_meters
+
+        def trilateration(lat1, lon1, r1, lat2, lon2, r2, lat3, lon3, r3):
+            # Convert latitudes and longitudes to meters
+            x1, y1 = distance(lat1, lon1, lat1, lon1), distance(lat1, lon1, lat1, lon1)
+            x2, y2 = distance(lat2, lon2, lat1, lon1), distance(lat2, lon2, lat1, lon1)
+            x3, y3 = distance(lat3, lon3, lat1, lon1), distance(lat3, lon3, lat1, lon1)
+            A = 2 * x2 - 2 * x1
+            B = 2 * y2 - 2 * y1
+            C = r1**2 - r2**2 - x1**2 + x2**2 - y1**2 + y2**2
+            D = 2 * x3 - 2 * x2
+            E = 2 * y3 - 2 * y2
+            F = r2**2 - r3**2 - x2**2 + x3**2 - y2**2 + y3**2
+            x = (C*E - F*B) / (E*A - B*D)
+            y = (C*D - A*F) / (B*D - A*E)
+            # Convert the intersection point from meters to latitude and longitude
+            intersection_lat = degrees(y / R)
+            intersection_lon = degrees(x / (R * cos(radians(intersection_lat))))
+            return intersection_lat, intersection_lon
+        
         c = 343*2 # speed of sound in meters/second
+        R = 6371000  # radius of the Earth in meters
 
-        LatA = tdoa_data[2][0]
-        LonA = tdoa_data[2][1]
-        DistA = c * tdoa_data[2][2]
-
-        LatB = tdoa_data[1][0]
-        LonB = tdoa_data[1][1]
-        DistB = c * tdoa_data[1][2]
-
-        LatC = tdoa_data[0][0]
-        LonC = tdoa_data[0][1]
-        DistC = c * tdoa_data[0][2]
-
-        latitudes = [LatA, LatB, LatC]
-        longitudes = [LonA, LonB, LonC]
-        radii = [DistA, DistB, DistC]
-
+        latitudes = [tdoa_data[2][0], tdoa_data[1][0], tdoa_data[0][0]]
+        longitudes = [tdoa_data[2][1], tdoa_data[1][1], tdoa_data[0][1]]
+        radii = [c * tdoa_data[2][2], c * tdoa_data[1][2], c * tdoa_data[0][2]]
         self.map_intersections(latitudes, longitudes, radii, event_lat, event_long)
-        input()
 
-        #using authalic sphere
-        #if using an ellipsoid this step is slightly different
-        #Convert geodetic Lat/Long to ECEF xyz
-        #   1. Convert Lat/Long to radians
-        #   2. Convert Lat/Long(radians) to ECEF
-        xA = earthR *(math.cos(math.radians(LatA)) * math.cos(math.radians(LonA)))
-        yA = earthR *(math.cos(math.radians(LatA)) * math.sin(math.radians(LonA)))
-        zA = earthR *(math.sin(math.radians(LatA)))
+        for i in range(len(latitudes)):
+            for j in range(i+1, len(latitudes)):
+                lat1, lon1, r1 = latitudes[i], longitudes[i], radii[i]
+                lat2, lon2, r2 = latitudes[j], longitudes[j], radii[j]
+                d = sqrt((lat2-lat1)**2 + (lon2-lon1)**2)
+                if d < r1 + r2:  # if the circles intersect
+                    for k in range(j+1, len(latitudes)):
+                        lat3, lon3, r3 = latitudes[k], longitudes[k], radii[k]
+                        d1 = sqrt((lat3-lat1)**2 + (lon3-lon1)**2)
+                        d2 = sqrt((lat3-lat2)**2 + (lon3-lon2)**2)
+                        if d1 < r1 + r3 and d2 < r2 + r3: # if all three circles intersect
+                            lat1, lon1, r1 = latitudes[0], longitudes[0], radii[0]
+                            lat2, lon2, r2 = latitudes[1], longitudes[1], radii[1]
+                            lat3, lon3, r3 = latitudes[2], longitudes[2], radii[2]
 
-        xB = earthR *(math.cos(math.radians(LatB)) * math.cos(math.radians(LonB)))
-        yB = earthR *(math.cos(math.radians(LatB)) * math.sin(math.radians(LonB)))
-        zB = earthR *(math.sin(math.radians(LatB)))
+                            intersection_lat, intersection_lon = trilateration(lat1, lon1, r1, lat2, lon2, r2, lat3, lon3, r3)
 
-        xC = earthR *(math.cos(math.radians(LatC)) * math.cos(math.radians(LonC)))
-        yC = earthR *(math.cos(math.radians(LatC)) * math.sin(math.radians(LonC)))
-        zC = earthR *(math.sin(math.radians(LatC)))
+                            if intersection_lat is not None and intersection_lon is not None:
+                                print(f'The circles intersect at the point {(intersection_lat, intersection_lon)}')
+                            else:
+                                print('The circles do not intersect')
 
-        P1 = np.array([xA, yA, zA])
-        P2 = np.array([xB, yB, zB])
-        P3 = np.array([xC, yC, zC])
-
-        #from wikipedia
-        #transform to get circle 1 at origin
-        #transform to get circle 2 on x axis
-        ex = (P2 - P1)/(np.linalg.norm(P2 - P1))
-        i = np.dot(ex, P3 - P1)
-        ey = (P3 - P1 - i*ex)/(np.linalg.norm(P3 - P1 - i*ex))
-        ez = np.cross(ex,ey)
-        d = np.linalg.norm(P2 - P1)
-        j = np.dot(ey, P3 - P1)
-
-        #from wikipedia
-        #plug and chug using above values
-        x = (pow(DistA,2) - pow(DistB,2) + pow(d,2))/(2*d)
-        y = ((pow(DistA,2) - pow(DistC,2) + pow(i,2) + pow(j,2))/(2*j)) - ((i/j)*x)
-
-        # only one case shown here
-        z = np.sqrt(pow(DistA,2) - pow(x,2) - pow(y,2))
-
-        #triPt is an array with ECEF x,y,z of trilateration point
-        triPt = P1 + x*ex + y*ey + z*ez
-
-        #convert back to lat/long from ECEF
-        #convert to degrees and return
-        return math.degrees(math.asin(triPt[2] / earthR)), math.degrees(math.atan2(triPt[1],triPt[0]))
     
     def map_intersections(self, latitudes, longitudes, radii, event_lat, event_long):
         marker_cluster = MarkerCluster().add_to(self.simulated_map.folium_map)
@@ -156,3 +147,5 @@ if __name__ == "__main__":
     ECHO_SIMULATOR._connect_mics()
     ECHO_SIMULATOR._draw_node_graph()
     ECHO_SIMULATOR.triangulate_event(*Event(ECHO_SIMULATOR.simulated_map).get_event_lat_long())
+
+        
