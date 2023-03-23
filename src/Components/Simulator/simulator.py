@@ -34,7 +34,7 @@ class Simulator():
 
     def _draw_node_graph(self) -> None:
         nx.draw(self.graph, with_labels=False)
-        plt.savefig(os.path.join(os.getcwd(),'src/Components/Simulator/mic_node_graph.png'))
+        plt.savefig(os.path.join(os.getcwd(),'src/Components/Simulator/outputs/mic_node_graph.png'))
         # plt.show()
 
     def triangulate_event(self, event_lat: float, event_long: float) -> None:
@@ -131,7 +131,7 @@ class Simulator():
 
         folium.Marker(location=[event_lat, event_long], icon=folium.Icon(icon="paw", prefix='fa', color="red")).add_to(self.simulated_map.folium_map)
 
-        self.simulated_map.folium_map.save(os.path.join(os.getcwd(),'src/Components/Simulator/map_event_detection.html'))
+        self.simulated_map.folium_map.save(os.path.join(os.getcwd(),'src/Components/Simulator/outputs/map_event_detection.html'))
 
 
 if __name__ == "__main__":
@@ -141,4 +141,5 @@ if __name__ == "__main__":
     ECHO_SIMULATOR._draw_node_graph()
     ECHO_SIMULATOR.triangulate_event(*Event(ECHO_SIMULATOR.simulated_map).get_event_lat_long())
 
+        
         

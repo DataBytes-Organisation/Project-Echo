@@ -70,7 +70,7 @@ class Map:
         for mic in self.microphones:
             folium.Marker(location=[mic.lat, mic.long], icon=folium.Icon(icon="microphone", prefix='fa', color="orange")).add_to(m)
 
-        m.save(os.path.join(os.getcwd(),'src/Components/Simulator/map.html'))
+        m.save(os.path.join(os.getcwd(),'src/Components/Simulator/outputs/map.html'))
         self.folium_map = m
 
 if __name__ == "__main__":
