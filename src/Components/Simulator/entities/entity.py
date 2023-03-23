@@ -23,4 +23,9 @@ class Entity():
     def getLLA(self):
         return self.lla
     
+    # get distance in meters to another entity
+    def distance(self, other):
+        
+        
+    
     
