@@ -17,6 +17,7 @@ class Map:
     def __init__(self):
         self.otways_size = (20, 15)
         self.square_size = 3
+        self.folium_map = None
 
         self.microphones = []
         # -38.790144470951354, 143.52798948464255
@@ -64,12 +65,13 @@ class Map:
 
     def print_map(self):
         map_center = [(self.otways_coordinates[0] + self.otways_coordinates[1])/2, (self.otways_coordinates[2] + self.otways_coordinates[3])/2]
-        m = folium.Map(location=map_center, zoom_start=13)
+        m = folium.Map(location=map_center, zoom_start=15)
 
         for mic in self.microphones:
             folium.Marker(location=[mic.lat, mic.long], icon=folium.Icon(icon="microphone", prefix='fa', color="orange")).add_to(m)
 
         m.save(os.path.join(os.getcwd(),'src/Components/Simulator/map.html'))
+        self.folium_map = m
 
 if __name__ == "__main__":
     print("Meant to be imported. Not run.")
