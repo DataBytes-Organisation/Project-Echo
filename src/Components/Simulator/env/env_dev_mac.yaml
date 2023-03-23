@@ -36,6 +36,7 @@ dependencies:
     - pandas
     - pydot
     - pydub
+    - pyproj
     - scikit-image
     - scikit-learn
     - scipy

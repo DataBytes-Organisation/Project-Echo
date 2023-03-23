@@ -5,8 +5,9 @@
 #############################################################################
 
 import species
+import entity
 
-class Animal():
+class Animal(entity.Entity):
     def __init__(self) -> None:
         self.species = species.Species.DOG
         
