@@ -37,9 +37,14 @@ truth_animal = Animal(lla=(-48.0,134.0,10.0))
 print(f'True animal LLA', truth_animal.getLLA())
 
 # set the location of three sensors around this animal
-sensor_1 = MicrophoneStation(lla=(-48.0,133.09,10.0))
+sensor_1 = MicrophoneStation(lla=(-48.0,133.99,10.0))
+print(f'Sensor 1    LLA', sensor_1.getLLA())
+
 sensor_2 = MicrophoneStation(lla=(-48.0,134.01,10.0))
+print(f'Sensor 2    LLA', sensor_2.getLLA())
+
 sensor_3 = MicrophoneStation(lla=(-48.01,134.0,10.0))
+print(f'Sensor 3    LLA', sensor_3.getLLA())
 
 print("distance 1", sensor_1.distance(truth_animal))
 print("distance 2", sensor_2.distance(truth_animal))
