@@ -1,4 +1,5 @@
 import json
+import uuid
 import os
 import networkx as nx
 import matplotlib.pyplot as plt
@@ -133,6 +134,7 @@ class Simulator():
     
     def broadcast_message(self, predicted_lla, toda_data) -> None:
         _tmp_json_data = {
+            "event_ID" : str(uuid.uuid1()),
             "mic_name" : toda_data[0].name,
             "mic_uuid" : toda_data[0].unique_identifier,
             "event_coordinates" : predicted_lla,
