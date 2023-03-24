@@ -4,8 +4,6 @@ import numpy as np
 from entities.animal import Animal 
 from entities.microphone import MicrophoneStation
 
-# import entities.microphone
-
 # the following function generated using GPT-4
 def trilaterate(p1, r1, p2, r2, p3, r3):
     # Calculate relative positions of point 2 and point 3
@@ -51,14 +49,6 @@ print("distance 2", sensor_2.distance(truth_animal))
 print("distance 3", sensor_3.distance(truth_animal))
 
 # Sphere centers and radii
-# p1 = np.array([0, 0, 0])
-# r1 = 5
-# p2 = np.array([10, 0, 0])
-# r2 = 7
-# p3 = np.array([5, 10, 0])
-# r3 = 9
-
-# Sphere centers and radii
 p1 = np.array(sensor_1.getECEF())
 r1 = sensor_1.distance(truth_animal)
 p2 = np.array(sensor_2.getECEF())
@@ -69,7 +59,7 @@ r3 = sensor_3.distance(truth_animal)
 # Trilateration
 intersection = trilaterate(p1, r1, p2, r2, p3, r3)
 if intersection is not None:
-    print(f"Intersection point: {intersection}")
+    print(f"Intersection point ECEF: {intersection}")
     predicted_animal = Animal()
     predicted_animal.setECEF(intersection)
     print(f'Predicted animal LLA', predicted_animal.getLLA())
