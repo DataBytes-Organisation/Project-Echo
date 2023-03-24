@@ -13,7 +13,7 @@ import numpy as np
 
 class Simulator():
     def __init__(self) -> None:
-        self.NODE_THRESHOLD = 0.004
+        self.NODE_THRESHOLD = 0.008
         self.SIMULATED_OTWAYS_MAP = Otways()
         self.graph = None
         
