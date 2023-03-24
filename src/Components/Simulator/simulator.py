@@ -13,7 +13,7 @@ import numpy as np
 
 class Simulator():
     def __init__(self) -> None:
-        self.NODE_THRESHOLD = 0.008
+        self.NODE_THRESHOLD = 0.004
         self.SIMULATED_OTWAYS_MAP = Otways()
         self.graph = None
         
@@ -51,8 +51,8 @@ class Simulator():
         sorted_mics = sorted(distances, key=lambda x: x[1])
 
         for mic, dist in sorted_mics[:3]:
-            speed_of_sound = 343
-            time_diff = dist / speed_of_sound
+            c = 343
+            time_diff = dist / c
             mic.set_time_delay(time_diff)
             print(f"Microphone triggered at lat: {mic.getLLA()[0]}, long: {mic.getLLA()[1]} with time diff of {time_diff} seconds")
             toda_data.append(mic)
@@ -61,11 +61,26 @@ class Simulator():
             print("Not enough TDOA data to triangulate event")
             return
         
+        # Show mic souond radius on map as well as event location and output map
+        marker_cluster = MarkerCluster().add_to(self.SIMULATED_OTWAYS_MAP.folium_map)
+
+        for mic in toda_data:
+            folium.CircleMarker(
+                location=[mic.getLLA()[0], mic.getLLA()[1]],
+                radius=mic.get_time_delay()*c,
+                color='black',
+                fill=False,
+                dash_array='10'
+            ).add_to(marker_cluster)
+
+        folium.Marker(location=[event_lat, event_long], icon=folium.Icon(icon="paw", prefix='fa', color="red"), popup="Event Location").add_to(self.SIMULATED_OTWAYS_MAP.folium_map)
+        self.SIMULATED_OTWAYS_MAP.folium_map.save(os.path.join(os.getcwd(),'src/Components/Simulator/outputs/map_event_detection.html'))
+        
         predicted_lla = self._triangulate(toda_data)
         if predicted_lla is not None:
             error = distance((event_lat, event_long), (predicted_lla[0], predicted_lla[1])).m
             print(f"\nTriangulation error: {round(error, 2)} meters")
-            self.map_intersections(toda_data, event_lat, event_long, predicted_lla)
+            self.map_intersections(predicted_lla)
         else:
             print('\nInsufficient trilaterate')
 
@@ -110,21 +125,8 @@ class Simulator():
             predicted_animal.setECEF(intersection)
             return predicted_animal.getLLA()
     
-    def map_intersections(self, toda_data, event_lat, event_long, predicted_lla):
-        marker_cluster = MarkerCluster().add_to(self.SIMULATED_OTWAYS_MAP.folium_map)
-
-        for mic in toda_data:
-            folium.CircleMarker(
-                location=[mic.getLLA()[0], mic.getLLA()[1]],
-                radius=mic.get_time_delay()*343,
-                color='black',
-                fill=False,
-                dash_array='10'
-            ).add_to(marker_cluster)
-
-        folium.Marker(location=[event_lat, event_long], icon=folium.Icon(icon="paw", prefix='fa', color="red"), popup="Event Location").add_to(self.SIMULATED_OTWAYS_MAP.folium_map)
+    def map_intersections(self, predicted_lla):
         folium.Marker(location=[predicted_lla[0] + 0.0001, predicted_lla[1] + 0.0001], icon=folium.Icon(icon="signal-stream", color="green"), popup="Predicted Location", icon_offset=(0, 0)).add_to(self.SIMULATED_OTWAYS_MAP.folium_map)
-
         self.SIMULATED_OTWAYS_MAP.folium_map.save(os.path.join(os.getcwd(),'src/Components/Simulator/outputs/map_event_detection.html'))
 
 
