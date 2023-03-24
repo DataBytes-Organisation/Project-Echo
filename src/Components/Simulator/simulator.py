@@ -1,3 +1,4 @@
+import json
 import os
 import networkx as nx
 import matplotlib.pyplot as plt
@@ -81,6 +82,7 @@ class Simulator():
             error = distance((event_lat, event_long), (predicted_lla[0], predicted_lla[1])).m
             print(f"\nTriangulation error: {round(error, 2)} meters")
             self.map_intersections(predicted_lla)
+            self.broadcast_message(predicted_lla, toda_data)
         else:
             print('\nInsufficient trilaterate')
 
@@ -102,7 +104,7 @@ class Simulator():
 
             # Calculate the z-coordinate, if possible
             z_squared = r1 ** 2 - x ** 2 - y ** 2
-            if z_squared < 0:
+            if z_squared <= 0:
                 return None  # No intersection
             z = np.sqrt(z_squared)
 
@@ -116,7 +118,7 @@ class Simulator():
         _r_ = []
         for mic in tdoa_data:
             _p_.append(np.array(mic.getECEF()))
-            _r_.append(mic.get_time_delay() * c)
+            _r_.append((mic.get_time_delay() * c) * 1.001) # add weight to radius
 
         intersection = trilaterate(_p_[0], _r_[0], _p_[1], _r_[1], _p_[2], _r_[2])
 
@@ -125,9 +127,19 @@ class Simulator():
             predicted_animal.setECEF(intersection)
             return predicted_animal.getLLA()
     
-    def map_intersections(self, predicted_lla):
+    def map_intersections(self, predicted_lla) -> None:
         folium.Marker(location=[predicted_lla[0] + 0.0001, predicted_lla[1] + 0.0001], icon=folium.Icon(icon="signal-stream", color="green"), popup="Predicted Location", icon_offset=(0, 0)).add_to(self.SIMULATED_OTWAYS_MAP.folium_map)
         self.SIMULATED_OTWAYS_MAP.folium_map.save(os.path.join(os.getcwd(),'src/Components/Simulator/outputs/map_event_detection.html'))
+    
+    def broadcast_message(self, predicted_lla, toda_data) -> None:
+        _tmp_json_data = {
+            "mic_name" : toda_data[0].name,
+            "mic_uuid" : toda_data[0].unique_identifier,
+            "event_coordinates" : predicted_lla,
+            "audio_sample" : "audio_sample.mp3"
+        }
+
+        print(json.dumps(_tmp_json_data))
 
 
 if __name__ == "__main__":
