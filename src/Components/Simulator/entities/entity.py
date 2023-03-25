@@ -34,6 +34,10 @@ class Entity():
     def getLLA(self):
         return self.lla
     
+    # set the Latitude longitude altitude location
+    def setLLA(self, lla):
+        self.lla = lla
+    
     # get distance in meters to another entity
     def distance(self, other):
         return math.dist(self.getECEF(), other.getECEF())

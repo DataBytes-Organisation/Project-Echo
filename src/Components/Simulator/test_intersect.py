@@ -31,7 +31,9 @@ def trilaterate(p1, r1, p2, r2, p3, r3):
     return p
 
 # Set an animal true location
-truth_animal = Animal(lla=(-48.0,134.0,10.0))
+truth_animal = Animal()
+truth_animal.setLLA((-48.0,134.0,10.0))
+print(f'True animal LLA', truth_animal.getLLA())
 print(f'True animal LLA', truth_animal.getLLA())
 
 # set the location of three sensors around this animal
