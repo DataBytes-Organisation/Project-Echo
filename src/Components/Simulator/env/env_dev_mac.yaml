@@ -44,3 +44,4 @@ dependencies:
     - geopy
     - folium
     - shapely
+    - ipympl
