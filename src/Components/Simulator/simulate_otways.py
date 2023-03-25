@@ -41,8 +41,8 @@ class Otways(entities.entity.Entity):
         self.generate_microphones(100)
 
     def print_map(self):
-        map_center = [(self.get_otways_coordinates()[0] + self.get_otways_coordinates()[1])/2, (self.get_otways_coordinates()[2] + self.get_otways_coordinates()[3])/2]
-        m = folium.Map(location=map_center, zoom_start=15)
+        map_center = self.get_otways_coordinates()[0]
+        m = folium.Map(location=map_center, zoom_start=13)
 
         for mic in self.microphones:
             folium.Marker(location=[mic.getLLA()[0], mic.getLLA()[1]], icon=folium.Icon(icon="microphone", prefix='fa', color="orange")).add_to(m)

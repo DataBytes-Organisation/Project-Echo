@@ -42,6 +42,10 @@ class Simulator():
         plt.savefig(os.path.join(os.getcwd(),'src/Components/Simulator/outputs/mic_node_graph.png'))
         if plt_noodes: plt.show()
 
+    def reset_mics(self):
+        for mic in self.graph.nodes():
+            mic.reset()
+
     def simulate_event_occuring(self, animal_obect: Animal) -> None:
         print(f'\nEvent occured at Lat, Long pair [{animal_obect.getLLA()[0]}, {animal_obect.getLLA()[1]}] at time: {animal_obect.get_sound_production_time()}\n')
 
@@ -64,37 +68,46 @@ class Simulator():
             for mic in graph.nodes():
                 if mic.TRIGGERED:
                     triggered_mics.append(mic)
+
+            triggered_mics.sort(key=lambda x: x.event_timestamp)
             return triggered_mics
 
-        for mic in find_triggered_mics(self.graph):
-            print(mic.get_trigger_event_time())
-        input()
-        
-        # marker_cluster = MarkerCluster().add_to(self.SIMULATED_OTWAYS_MAP.folium_map)
+        def solve_animal_lla(list_triggered_mics):
+            estimate_animal = Animal()
+            best_err = 100000000
 
-        # for mic in toda_data:
-        #     folium.CircleMarker(
-        #         location=[mic.getLLA()[0], mic.getLLA()[1]],
-        #         radius=mic.get_time_delay()*c,
-        #         color='black',
-        #         fill=False,
-        #         dash_array='10'
-        #     ).add_to(marker_cluster)
+            for lat in np.arange(self.SIMULATED_OTWAYS_MAP.get_otways_coordinates()[3][0], self.SIMULATED_OTWAYS_MAP.get_otways_coordinates()[1][0], 0.001):
+                for lon in np.arange(self.SIMULATED_OTWAYS_MAP.get_otways_coordinates()[4][1], self.SIMULATED_OTWAYS_MAP.get_otways_coordinates()[2][1], 0.001):
+                    estimate_animal.setLLA((lat, lon, 10.0))
 
-        # folium.Marker(location=[event_lat, event_long], icon=folium.Icon(icon="paw", prefix='fa', color="red"), popup="Event Location").add_to(self.SIMULATED_OTWAYS_MAP.folium_map)
-        # self.SIMULATED_OTWAYS_MAP.folium_map.save(os.path.join(os.getcwd(),'src/Components/Simulator/outputs/map_event_detection.html'))
+                    st_est = [mic.distance(estimate_animal) / self.c - np.min([m.distance(estimate_animal) / self.c for m in list_triggered_mics]) for mic in list_triggered_mics]
+                    st_obs = [(mic.get_trigger_event_time() - list_triggered_mics[0].get_trigger_event_time()).total_seconds() for mic in list_triggered_mics]
+
+                    err = sum([abs(st_obs[i] - st_est[i]) for i in range(4)])
+
+                    if err < best_err:
+                        best_err = err
+                        best_lat, best_lon = lat, lon
+
+            return best_lat, best_lon
+
+                        
+        # using only the information about sensors and observed trigger times
+        triggered_mics_ = find_triggered_mics(self.graph)
+        predicted_lla = solve_animal_lla(triggered_mics_)  
         
-        # predicted_lla = self._triangulate(toda_data)
-        # if predicted_lla is not None:
-        #     error = distance((event_lat, event_long), (predicted_lla[0], predicted_lla[1])).m
-        #     print(f"\nTriangulation error: {round(error, 2)} meters")
-        #     self.map_intersections(predicted_lla)
-        #     self.broadcast_message(predicted_lla, toda_data)
-        # else:
-        #     print('\nInsufficient trilaterate')
+        if predicted_lla is not None:
+            error = distance((animal_obect.getLLA()[0], animal_obect.getLLA()[1]), (predicted_lla[0], predicted_lla[1])).m
+            print(f"\nTriangulation error: {round(error, 2)} meters - predicted lla {predicted_lla}")
+            self.map_intersections(predicted_lla, animal_obect.getLLA())
+            self.broadcast_message(predicted_lla, triggered_mics_)
+            self.reset_mics()
+        else:
+            print('\nInsufficient trilaterate')
     
-    def map_intersections(self, predicted_lla) -> None:
-        folium.Marker(location=[predicted_lla[0] + 0.0001, predicted_lla[1] + 0.0001], icon=folium.Icon(icon="signal-stream", color="green"), popup="Predicted Location", icon_offset=(0, 0)).add_to(self.SIMULATED_OTWAYS_MAP.folium_map)
+    def map_intersections(self, predicted_lla, truth_lla) -> None:
+        folium.Marker(location=[truth_lla[0], truth_lla[1]], icon=folium.Icon(icon="paw", prefix='fa', color="red"), popup="Animal Truth Location", icon_offset=(0, 0)).add_to(self.SIMULATED_OTWAYS_MAP.folium_map)
+        folium.Marker(location=[predicted_lla[0], predicted_lla[1]], icon=folium.Icon(icon="signal", color="green"), popup="Predicted Location", icon_offset=(0, 0)).add_to(self.SIMULATED_OTWAYS_MAP.folium_map)
         self.SIMULATED_OTWAYS_MAP.folium_map.save(os.path.join(os.getcwd(),'src/Components/Simulator/outputs/map_event_detection.html'))
     
     def broadcast_message(self, predicted_lla, toda_data) -> None:
@@ -116,7 +129,8 @@ if __name__ == "__main__":
     ECHO_SIMULATOR._connect_mics()
     ECHO_SIMULATOR._draw_node_graph()
 
-    ECHO_SIMULATOR.simulate_event_occuring(Animal())
+    for _ in range(10):
+        ECHO_SIMULATOR.simulate_event_occuring(Animal())
 
         
         
