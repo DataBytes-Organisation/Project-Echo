@@ -56,7 +56,7 @@ class Simulator():
 
         mics_around_event = find_closest_mics(self.graph, animal_obect.getLLA()[0], animal_obect.getLLA()[1], 4)
         for mic in mics_around_event:
-            mic.set_trigger_event_time(animal_obect.get_sound_production_time() - datetime.timedelta(seconds=mic.distance(animal_obect)/self.c))
+            mic.set_trigger_event_time(animal_obect.get_sound_production_time() + datetime.timedelta(seconds=mic.distance(animal_obect)/self.c))
 
         
         def find_triggered_mics(graph):
