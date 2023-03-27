@@ -4,6 +4,8 @@
 
 The following steps should get your started:
 
+Install Visual Studio 2022 Community Edition [https://visualstudio.microsoft.com/vs/community/] with c++ modules installed
+
 Install Visual Studio Code [https://code.visualstudio.com/]
 
 Install Miniconda [https://docs.conda.io/en/latest/miniconda.html]
