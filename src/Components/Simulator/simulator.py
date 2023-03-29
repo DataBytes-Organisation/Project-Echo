@@ -47,8 +47,6 @@ class Simulator():
             mic.reset()
 
     def simulate_event_occuring(self, animal_obect: Animal) -> None:
-        print(f'\nEvent occured at Lat, Long pair [{animal_obect.getLLA()[0]}, {animal_obect.getLLA()[1]}] at time: {animal_obect.get_sound_production_time()}\n')
-
         def find_closest_mics(graph, event_lat, event_long, n):
             mics_distances = []
             for mic in graph.nodes():
@@ -98,9 +96,13 @@ class Simulator():
         
         if predicted_lla is not None:
             error = distance((animal_obect.getLLA()[0], animal_obect.getLLA()[1]), (predicted_lla[0], predicted_lla[1])).m
-            print(f"\nTriangulation error: {round(error, 2)} meters - predicted lla {predicted_lla}")
-            self.map_intersections(predicted_lla, animal_obect.getLLA())
-            self.broadcast_message(predicted_lla, triggered_mics_)
+            if error < 100:
+                print(f'\nEvent occured at Lat, Long pair [{animal_obect.getLLA()[0]}, {animal_obect.getLLA()[1]}] at time: {animal_obect.get_sound_production_time()}\n')
+                print(f"\nTriangulation error: {round(error, 2)} meters - predicted lla {predicted_lla}")
+                self.map_intersections(predicted_lla, animal_obect.getLLA())
+                self.broadcast_message(predicted_lla, triggered_mics_)
+            else:
+                pass
             self.reset_mics()
         else:
             print('\nInsufficient trilaterate')
@@ -129,7 +131,7 @@ if __name__ == "__main__":
     ECHO_SIMULATOR._connect_mics()
     ECHO_SIMULATOR._draw_node_graph()
 
-    for _ in range(10):
+    for _ in range(3):
         ECHO_SIMULATOR.simulate_event_occuring(Animal())
 
         
