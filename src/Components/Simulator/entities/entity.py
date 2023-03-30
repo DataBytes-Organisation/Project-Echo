@@ -3,9 +3,9 @@
 # This class represents any simulated entity sharing common code
 #############################################################################
 
-import math
+from math import sqrt
 from pyproj import Transformer
-from shapely.geometry import Polygon, Point
+import math
 import random
 import numpy as np
 
@@ -34,36 +34,42 @@ class Entity():
     def getLLA(self):
         return self.lla
     
+    # set the Latitude longitude altitude location
+    def setLLA(self, lla):
+        self.lla = lla
+    
     # get distance in meters to another entity
     def distance(self, other):
         return math.dist(self.getECEF(), other.getECEF())
-    
+
     def randLatLong(self) -> list[float]:
-        """
-        This function will generate and return a random Lat and Long value within the boundaries
-        of the Otways National Forest square size of 300m x 300m
-        """
-        square_size = 3
-        otways_coordinates = [-38.790144470951354, -38.79177529796978, 143.52798948464255, 143.5965127875795]
-
-        square_lat_half = square_size / 2 * 1.1 / 111.0
-        square_long_half = square_size / 2 * 1.1 / 111.0 / np.cos(np.deg2rad((otways_coordinates[0] + otways_coordinates[1]) / 2))
-        center_lat = (otways_coordinates[0] + otways_coordinates[1]) / 2
-        center_long = (otways_coordinates[2] + otways_coordinates[3]) / 2
-
-        square_boundary = Polygon([(center_lat + square_lat_half, center_long + square_long_half),
-                                   (center_lat + square_lat_half, center_long - square_long_half),
-                                   (center_lat - square_lat_half, center_long - square_long_half),
-                                   (center_lat - square_lat_half, center_long + square_long_half)])
+        # Define the four corner points of the diamond
+        left_diamond = (-38.78648354661556, 143.5445900890966)
+        top_diamond = (-38.77310461001655, 143.5769246453492)
+        bottom_diamond = (-38.80412439285561, 143.5796606462629)
+        right_diamond = (-38.78299363122898, 143.60726938275553)
 
         while True:
-            point = Point(random.uniform(center_lat - square_lat_half, center_lat + square_lat_half),
-                          random.uniform(center_long - square_long_half, center_long + square_long_half))
-            if square_boundary.contains(point):
-                break
+            # Generate a random latitude value within the vertical bounds of the diamond
+            lat = random.uniform(bottom_diamond[0], top_diamond[0])
 
-        return [point.x, point.y]
+            # Calculate the left and right longitude bounds based on the current latitude
+            left_bound = left_diamond[1] + (left_diamond[1] - right_diamond[1]) * (lat - left_diamond[0]) / (top_diamond[0] - left_diamond[0])
+            right_bound = right_diamond[1] + (right_diamond[1] - left_diamond[1]) * (lat - right_diamond[0]) / (bottom_diamond[0] - right_diamond[0])
 
-    def get_otways_coordinates(self) -> list[float]:
-        return [-38.790144470951354, -38.79177529796978, 143.52798948464255, 143.5965127875795]
+            # Generate a random longitude value within the calculated bounds
+            lon = random.uniform(left_bound, right_bound)
+
+            # Check if the generated lat/lon values fall within the diamond
+            if (lon >= left_diamond[1] and lon <= right_diamond[1] and lat >= bottom_diamond[0] and lat <= top_diamond[0]):
+                return [lat, lon]
         
+
+    def get_otways_coordinates(self):
+        centre_diamond = (-38.78619972614279, 143.5743202660838)
+        left_diamond = (-38.78648354661556, 143.5445900890966)
+        top_diamond = (-38.77310461001655, 143.5769246453492)
+        bottom_diamond = (-38.80412439285561, 143.5796606462629)
+        right_diamond = (-38.78299363122898, 143.60726938275553)
+
+        return centre_diamond, top_diamond, right_diamond, bottom_diamond, left_diamond
