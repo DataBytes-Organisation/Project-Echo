@@ -17,10 +17,12 @@ Autoencoders are a type of neural network that learns to encode and decode image
 
 Idea: We could use a combination of supervised feature extraction method combined with unsupervised clustering methods: 
 
-First build an auto-encoded that is trained in a supervised way to create a vector representation of 2 image inputs known to be of different classes, with a combined loss function that uses a combination of losses:
+First build an auto-encoded that is trained in a supervised way to create a vector representation of 2 image inputs known to be of different classes, with a combined loss function that uses a weighted sum combination of losses:
 
 - reconstruction error: in being able to reconstruct the two original feature images
-- classification error: in being able to only represent latent space features that reduce classification error
+- classification error: in being able to only represent latent space features that reduce classification error.
+
+The classification error would be a cross-entropy loss via a fully connected layer attached to the latent space representation.
 
 #### Histogram of Oriented Gradients (HOG)
 
@@ -45,6 +47,11 @@ Wiki Reference: https://en.wikipedia.org/wiki/Scale-invariant_feature_transform
 
 Convolutional Neural Networks (CNNs) have proven to be powerful tools for image feature extraction. By training a CNN on a large dataset, the network learns hierarchical feature representations that can be used as feature vectors. You can use pre-trained models like VGG, ResNet, or Inception and extract features from the intermediate layers (e.g., fully connected layers or last convolutional layers) to generate a vector representation of the image.
 
+Here is an artical on using this idea to feed into clustering:
+
+https://franky07724-57962.medium.com/using-keras-pre-trained-models-for-feature-extraction-in-image-clustering-a142c6cdf5b1
+
+Papers with code has papers on 'deep clustering' tasks which seem to map here: https://paperswithcode.com/task/deep-clustering
 
 ### Dimension Reduction Algorithms
 
@@ -54,19 +61,32 @@ In order to improve the performance of downstream clustering methods, the applic
 
 PCA is a widely used linear dimensionality reduction technique that seeks to project the original data into a lower-dimensional subspace while preserving the maximum variance. PCA computes eigenvectors and eigenvalues of the data covariance matrix and selects the top principal components as the new basis for the lower-dimensional space. In unsupervised image classification, PCA can help reveal the underlying structure of the data and improve clustering performance by reducing noise and redundancy.
 
+Wiki Reference: https://en.wikipedia.org/wiki/Principal_component_analysis
+
 ### t-Distributed Stochastic Neighbor Embedding (t-SNE)
 
 t-SNE is a non-linear dimensionality reduction technique that focuses on preserving local neighborhood relationships in the lower-dimensional space. It minimizes the divergence between probability distributions that represent pairwise similarities in the original and reduced spaces. t-SNE is particularly useful for visualizing high-dimensional image data and can aid in understanding the structure and relationships between different classes or clusters.
 
+https://en.wikipedia.org/wiki/T-distributed_stochastic_neighbor_embedding
+
+
 ### Clustering-Based Methods
+
+Scikit learn has a good page on this topic showing a range of ML techniques for clustering: https://scikit-learn.org/stable/modules/clustering.html
+
+
 
 #### K-Means Clustering
 
 K-means is an unsupervised clustering algorithm that partitions a set of images into K distinct groups, where each image belongs to the cluster with the nearest mean. The algorithm iteratively updates the centroids of the clusters and assigns images to the closest centroid until convergence. K-means is simple to implement, but the choice of K and initial centroids can significantly impact the results.
 
+Wiki Reference: https://en.wikipedia.org/wiki/K-means_clustering
+
 #### Hierarchical Clustering
 
 Hierarchical clustering builds a tree-like structure to represent the relationships between images. The algorithm starts by treating each image as a separate cluster and iteratively merges the closest clusters until all images belong to a single cluster. Hierarchical clustering can use different distance metrics and linkage criteria to determine the similarity between clusters, which can influence the structure of the resulting dendrogram.
+
+Wiki Reference: https://en.wikipedia.org/wiki/Hierarchical_clustering
 
 
 
