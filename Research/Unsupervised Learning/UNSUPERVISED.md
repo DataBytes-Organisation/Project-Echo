@@ -47,6 +47,11 @@ Wiki Reference: https://en.wikipedia.org/wiki/Scale-invariant_feature_transform
 
 Convolutional Neural Networks (CNNs) have proven to be powerful tools for image feature extraction. By training a CNN on a large dataset, the network learns hierarchical feature representations that can be used as feature vectors. You can use pre-trained models like VGG, ResNet, or Inception and extract features from the intermediate layers (e.g., fully connected layers or last convolutional layers) to generate a vector representation of the image.
 
+#### Hidden Markov Models (HMMs) Features
+
+In the paper (Bird Species Recognition Using Unsupervised
+Modeling of Individual Vocalization Elements, 2019) the temporal evolution of features in modells using HMMs.
+
 Here is an artical on using this idea to feed into clustering:
 
 https://franky07724-57962.medium.com/using-keras-pre-trained-models-for-feature-extraction-in-image-clustering-a142c6cdf5b1
@@ -88,5 +93,39 @@ Hierarchical clustering builds a tree-like structure to represent the relationsh
 
 Wiki Reference: https://en.wikipedia.org/wiki/Hierarchical_clustering
 
+
+#### Summary / Recommendation
+
+Unsupervised techniques can be used in both feature extraction and classification aspects of the problem.  This summary proposes using standard library implementations to assist us in getting a working solution by end of T1 2023, steering away from implementing complex algorithms suggested by some papers.
+
+Application of unsupervised learning techniques can produce high accuracy (~97%)classification results.
+
+Suggest our Echo Engine have variants or plugins to allow the researcher to choose different pipelines for processing the audio.
+
+At least one of the prototyping paths (engine variants) we explore on project echo should include building upon unsupervised techniques (both in extracting features and classification)
+
+For Feature learning / Extractions I suggest:
+
+- Application of deep learning and pre-trained image vectorisation: 1D and 2D Auto-encoders including variants such as variational autoencoders for structured latent space representation or transfer learning from pre-trained image classifiers.
+Sinusoidal breakdown using FFTs (see Bird Species Recognition Using Unsupervised Modelling of Individual Vocalization Elements, 2019)
+- Application of 'traditional' image processing techniques (e.g. SURF) see OpenCV library for other techniques: https://docs.opencv.org/3.4/db/d27/tutorial_py_table_of_contents_feature2d.html
+
+For Unsupervised classification suggest:
+
+- Application of non-deep learning clustering techniques (see https://scikit-learn.org/stable/modules/clustering.html#clustering)
+- Application of dimensionality reduction techniques (see https://scikit-learn.org/stable/modules/decomposition.html#decompositions)
+
+Suggest we also setup/design a generalised pipeline for model training that has several phases (some may simply be pass-through)
+
+- Data Load (dealing with files and database endpoints)
+- Data Cleaning (noise removal, rescaling, normalising, resampling)
+- Data Segmentation (identifying 5 second clips containing vocalisations, includes trigger/detection aspects)
+- 1D Data Augmentation library of techniques
+- 2D Data Augmentation library of techniques
+- Feature Extraction
+- Feature Vectorisation
+- Species Classification options (binary, multi-class and multi-label)
+
+- This would allow us to have a family of techniques which could be combined into an "ensemble" to get even better overall performance.
 
 
