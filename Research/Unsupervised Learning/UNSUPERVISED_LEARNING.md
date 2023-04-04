@@ -128,4 +128,24 @@ Suggest we also setup/design a generalised pipeline for model training that has 
 
 - This would allow us to have a family of techniques which could be combined into an "ensemble" to get even better overall performance.
 
+References:
 
+Acevedo, M. A., Corrada-Bravo, C. J., Corrada-Bravo, H., Villanueva-Rivera, L. J., & Aide, T. M. (2009). Automated classification of bird and amphibian calls using machine learning: A comparison of methods. Ecological Informatics, 4(4), 206-214. https://doi.org/10.1016/j.ecoinf.2009.06.005 
+
+Aide, T. M., Corrada-Bravo, C., Campos-Cerqueira, M., Milan, C., Vega, G., & Alvarez, R. (2013). Real-time bioacoustics monitoring and automated species identification. PeerJ, 2013(1), Article e103. https://doi.org/10.7717/peerj.103 
+
+Esmaeilpour, M., Cardinal, P., & Koerich, A. L. (2020). Unsupervised feature learning for environmental sound classification using weighted cycle-consistent generative adversarial network. Applied Soft Computing, 86, 105912. 
+
+Jancovic, P., & Köküer, M. (2019). Bird Species Recognition Using Unsupervised Modeling of Individual Vocalization Elements. IEEE/ACM Transactions on Audio, Speech, and Language Processing, 27(5), 932-947. https://doi.org/10.1109/TASLP.2019.2904790 
+
+Michaud, F., Sueur, J., Le Cesne, M., & Haupert, S. (2023). Unsupervised classification to improve the quality of a bird song recording dataset. Ecological Informatics, 74, N.PAG-N.PAG. https://doi.org/10.1016/j.ecoinf.2022.101952 
+
+Morfi, V., Bas, Y., Pamula, H., Glotin, H., & Stowell, D. (2019). NIPS4Bplus: a richly annotated birdsong audio dataset. PeerJ Computer Science, 5, e223. https://doi.org/10.7717/peerj-cs.223 
+
+Mutanu, L., Gohil, J., Gupta, K., Wagio, P., & Kotonya, G. (2022). A Review of Automated Bioacoustics and General Acoustics Classification Research. Sensors (14248220), 22(21), 8361. https://doi.org/10.3390/s22218361 
+
+Olaode, A., Naghdy, G., & Todd, C. (2014). Unsupervised classification of images: a review. International Journal of Image Processing, 8(5), 325-342. 
+
+Stowell, D., & Plumbley, M. D. (2014). Automatic large-scale classification of bird sounds is strongly improved by unsupervised feature learning [Article]. PeerJ, 2014(1), Article e488. https://doi.org/10.7717/peerj.488 
+
+Todor, G. (2017). Computational Bioacoustics : Biodiversity Monitoring and Assessment (Vol. 00004). De Gruyter. 
