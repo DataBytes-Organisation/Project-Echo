@@ -1,0 +1,67 @@
+[{
+    "timestamp": "2023-03-22T13:45:12.000Z",
+    "sensorId": 2,
+    "species": "Sus Scrofa",
+    "microphoneLLA":[-33.1101,150.0567, 23],
+    "animalEstLLA": [-33.1105,150.0569, 23],
+    "animalTrueLLA": [-33.1106,150.0570, 23],
+    "animalLLAUncertainty": 10,
+    "audioClip": "some audio_base64 data",
+    "confidence": 99.4
+},
+{
+    "timestamp": "2023-03-22T13:55:40.000Z",
+    "sensorId": 2,
+    "species": "Cervus Unicolour",
+    "microphoneLLA":[-33.1101,150.0567, 23],
+    "animalEstLLA": [-33.1543,150.2007, 23],
+    "animalTrueLLA": [-33.1555,150.2009, 23],
+    "animalLLAUncertainty": 10,
+    "audioClip": "some audio_base64 data",
+    "confidence": 98.5
+},
+{
+    "timestamp": "2023-03-22T14:55:44.000Z",
+    "sensorId": 1,
+    "species": "Aegotheles Cristatus",
+    "microphoneLLA":[-33.1121,150.0577, 24],
+    "animalEstLLA": [-33.1543,150.2007, 23],
+    "animalTrueLLA": [-33.1555,150.2009, 23],
+    "animalLLAUncertainty": 10,
+    "audioClip": "some audio_base64 data",
+    "confidence": 96.5
+},
+{
+    "timestamp": "2023-03-22T15:20:01.000Z",
+    "sensorId": 2,
+    "species": "Corvus Coronoides",
+    "microphoneLLA":[-33.1101,150.0567, 23],
+    "animalEstLLA": [-33.1543,150.2007, 23],
+    "animalTrueLLA": [-33.1555,150.2009, 23],
+    "animalLLAUncertainty": 10,
+    "audioClip": "some audio_base64 data",
+    "confidence": 97.1
+},
+{
+    "timestamp": "2023-03-23T05:55:53.000Z",
+    "sensorId": 3,
+    "species": "Colluricincla Harmonica",
+    "microphoneLLA":[-33.1111,150.0587, 23],
+    "animalEstLLA": [-33.1543,150.2007, 23],
+    "animalTrueLLA": [-33.1555,150.2009, 23],
+    "animalLLAUncertainty": 10,
+    "audioClip": "some audio_base64 data",
+    "confidence": 82.0
+},
+{
+    "timestamp": "2023-03-24T13:20:13.000Z",
+    "sensorId": 3,
+    "species": "Sus Scrofa",
+    "microphoneLLA":[-33.1111,150.0587, 23],
+    "animalEstLLA": [-33.1543,150.2007, 23],
+    "animalTrueLLA": [-33.1555,150.2009, 23],
+    "animalLLAUncertainty": 10,
+    "audioClip": "some audio_base64 data",
+    "confidence": 95.6
+}
+]
