@@ -1,5 +1,5 @@
 import os
-from fastapi import FastAPI, Body, HTTPException, status
+from fastapi import FastAPI, Body, HTTPException, status, APIRouter
 from fastapi.responses import Response, JSONResponse
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel, Field, EmailStr
@@ -7,9 +7,14 @@ from bson import ObjectId
 from typing import Optional, List
 import motor.motor_asyncio
 import datetime
+from serializers import eventEntity, eventListEntity
+import models
+import pymongo
 
 app = FastAPI()
-client = motor.motor_asyncio.AsyncIOMotorClient("mongodb://localhost:27017")
+router = APIRouter()
+client = pymongo.MongoClient("mongodb://localhost:27017")
+#client = motor.motor_asyncio.AsyncIOMotorClient("mongodb://localhost:27017")
 db = client.mydatabase
 
 
@@ -49,53 +54,6 @@ class StudentModel(BaseModel):
             }
         }
 
-class EventModel(BaseModel):
-    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    timestamp: datetime.datetime = Field(...)
-    sensorId: int = Field(...)
-    species: str = Field(...)
-    microphoneLLA: list[float] = []
-    animalEstLLA: list[float] = []
-    animalTrueLLA: list[float] = []
-    animalLLAUncertainty: int = Field(...)
-    audioClip: str = Field(...)
-    confidence: float = Field(...)
-
-    class Config:
-        allow_population_by_field_name = True
-        arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str}
-        schema_extra = {
-            "example": {                          
-                "timestamp": "2023-03-22T13:45:12.000Z",
-                "sensorId": 2,
-                "species": "Sus Scrofa",
-                "microphoneLLA":[-33.1101,150.0567, 23],
-                "animalEstLLA": [-33.1105,150.0569, 23],
-                "animalTrueLLA": [-33.1106,150.0570, 23],
-                "animalLLAUncertainty": 10,
-                "audio clip": "some audio_base64 data",
-                "confidence": 99.4
-            }
-        }
-
-class UpdateStudentModel(BaseModel):
-    name: Optional[str]
-    email: Optional[EmailStr]
-    course: Optional[str]
-    gpa: Optional[float]
-
-    class Config:
-        arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str}
-        schema_extra = {
-            "example": {
-                "name": "Jane Doe",
-                "email": "jdoe@example.com",
-                "course": "Experiments, Science, and Fashion in Nanophotonics",
-                "gpa": "3.0",
-            }
-        }
 
 '''
 @app.post("/", response_description="Add new student", response_model=StudentModel)
@@ -106,27 +64,35 @@ async def create_student(student: StudentModel = Body(...)):
     return JSONResponse(status_code=status.HTTP_201_CREATED, content=created_student)
 '''
 
-@app.get(
-    "/", response_description="List all events", response_model=List[EventModel]
-)
-async def list_events():
-    events = await db["events"].find().to_list(1000)
+@app.get("/event", response_description="List all events")
+def list_events():
+    events = eventListEntity(db["events"].find())
+    print(events)
     return events
 
 
-@app.get(
-    "/event", response_description="Get a single event", response_model=EventModel
-)
-async def show_event(species: str):
+@app.get("/species", response_description="Get events with certain species")
+def show_event(species: str):
     print(species)
-    event = await db["events"].find({"species": species})
-    return event.to_list(2)
+    events = eventListEntity(db["events"].find({"species": species}))
+    print(events)
+    return events
 
+@app.get("/time", response_description="Get events within certain duration")
+def show_event_from_time(start: str, end: str):
+    print(start, end)
+    datetime_start = datetime.datetime.strptime(start, '%Y-%m-%d-%H-%M-%S')
+    datetime_end = datetime.datetime.strptime(end, '%Y-%m-%d-%H-%M-%S')
+    aggregate = [
+        
+        {
+            '$match':{'timestamp': {'$lt' : datetime_end, '$gte' : datetime_start }}
+        }
 
-
-@app.get("/hello/{name}")
-async def hello(name:str,age:int):
-   return {"name": name, "age":age}
+    ]
+    events = eventListEntity(db["events"].aggregate(aggregate))
+    print(events)
+    return events
 '''
 @app.put("/{id}", response_description="Update a student", response_model=StudentModel)
 async def update_student(id: str, student: UpdateStudentModel = Body(...)):
