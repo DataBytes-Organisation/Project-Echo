@@ -1,8 +1,9 @@
 
 REM clean up cache and start from scratch
 call conda activate base
-REM call conda clean --all --yes
-REM call pip cache purge
+call conda update --all --yes
+call conda clean  --all --yes
+call pip cache purge
 
 REM create the full dev environment
 call conda activate base

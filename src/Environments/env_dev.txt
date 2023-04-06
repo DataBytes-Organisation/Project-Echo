@@ -9,7 +9,7 @@ graphviz
 gviz-api
 gym
 h5py
-ipywidgets==7.7.2
+ipywidgets
 joblib
 kaggle
 keras
@@ -20,7 +20,7 @@ keras-rl
 keras-toolbox
 keras-unet
 keras-util
-librosa==0.10.0
+librosa==0.10.0.post2
 lightgbm
 ffio
 ffprobe
