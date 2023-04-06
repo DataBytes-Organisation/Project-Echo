@@ -16,8 +16,8 @@ channels:
  - pytorch
  - defaults
 dependencies:
- - python=3.7.3
- - cudatoolkit=11.2                        
+ - python=3.8.16
+ - cudatoolkit=11.7                        
  - cudnn
  - cuda-cupti
  - ipykernel
