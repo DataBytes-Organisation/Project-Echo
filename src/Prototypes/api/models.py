@@ -47,21 +47,13 @@ class EventModel(BaseModel):
                 "confidence": 99.4
             }
         }
-
-class UpdateStudentModel(BaseModel):
-    name: Optional[str]
-    email: Optional[EmailStr]
-    course: Optional[str]
-    gpa: Optional[float]
-
-    class Config:
-        arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str}
-        schema_extra = {
-            "example": {
-                "name": "Jane Doe",
-                "email": "jdoe@example.com",
-                "course": "Experiments, Science, and Fashion in Nanophotonics",
-                "gpa": "3.0",
-            }
-        }
+'''
+class speciesModel(BaseModel):
+    return {
+        "_id": str(species["_id"]),
+        "commonName": species["commonName"],
+        "type": species["type"],
+        "status": species["status"],
+        "diet": species["diet"]
+    }
+'''
