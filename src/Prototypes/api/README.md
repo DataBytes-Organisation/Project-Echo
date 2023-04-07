@@ -10,5 +10,5 @@ pip install -r requirements.txt
 set the variable in app.py client = pymongo.MongoClient("mongodb://localhost:27017") or whatever other connection string you have set up.
 
 # Start the service:
-uvicorn app:app --reload
+python -m uvicorn app:app --reload
 
