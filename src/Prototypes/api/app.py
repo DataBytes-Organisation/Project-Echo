@@ -7,7 +7,7 @@ from bson import ObjectId
 from typing import Optional, List
 import motor.motor_asyncio
 import datetime
-from serializers import eventEntity, eventListEntity, eventSpeciesListEntity, eventSpeciesEntity
+import serializers
 import models
 import pymongo
 
@@ -34,47 +34,22 @@ class PyObjectId(ObjectId):
         field_schema.update(type="string")
 
 
-class StudentModel(BaseModel):
-    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    name: str = Field(...)
-    email: EmailStr = Field(...)
-    course: str = Field(...)
-    gpa: float = Field(..., le=4.0)
-
-    class Config:
-        allow_population_by_field_name = True
-        arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str}
-        schema_extra = {
-            "example": {
-                "name": "Jane Doe",
-                "email": "jdoe@example.com",
-                "course": "Experiments, Science, and Fashion in Nanophotonics",
-                "gpa": "3.0",
-            }
-        }
-
-
 @app.get("/event", response_description="List all events")
 def list_events():
     
-    events = eventListEntity(db["events"].find())
-    print(events)
+    events = serializers.eventListEntity(db["events"].find())
     return events
 
 
 @app.get("/species", response_description="Get events with certain species")
 def show_event(species: str):
-    print(species)
-    events = eventListEntity(db["events"].find({"species": species}))
-    print(events)
+    events = serializers.eventListEntity(db["events"].find({"species": species}))
     return events
 
 @app.get("/time", response_description="Get events within certain duration")
 def show_event_from_time(start: str, end: str):
-    print(start, end)
-    datetime_start = datetime.datetime.strptime(start, '%Y-%m-%d-%H-%M-%S')
-    datetime_end = datetime.datetime.strptime(end, '%Y-%m-%d-%H-%M-%S')
+    datetime_start = datetime.datetime.fromtimestamp(int(start))
+    datetime_end = datetime.datetime.fromtimestamp(int(end))
     aggregate = [
         {
             '$lookup': {
@@ -90,12 +65,26 @@ def show_event_from_time(start: str, end: str):
         },
         {
             '$project': { "audioClip": 0}
-        }
+        },
+        {
+            "$addFields": {
+            "timestamp": { "$toLong": "$timestamp" }}
+        }       
 
     ]
-    events = eventSpeciesListEntity(db["events"].aggregate(aggregate))
-    print(events)
+    events = serializers.eventSpeciesListEntity(db["events"].aggregate(aggregate))
     return events
 
-'''start = datetime.datetime(2023, 3, 22, 13, 44)
-end = datetime.datetime(2023, 3, 23, 13, 44)'''
+@app.get("/audio", response_description="returns audio given ID")
+def show_audio(id: str):
+    aggregate = [
+        {
+            '$match':{'_id': ObjectId(id)}
+        },
+        {
+            '$project': { "audioClip": 1}
+        }
+    ]
+    results = list(db["events"].aggregate(aggregate))
+    audio = serializers.audioListEntity(results)[0]
+    return audio

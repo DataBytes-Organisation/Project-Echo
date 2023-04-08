@@ -1,6 +1,6 @@
 def eventEntity(event) -> dict:
     return {
-        "id": str(event["_id"]),
+        "_id": str(event["_id"]),
         "timestamp": event["timestamp"],
         "sensorId": event["sensorId"],
         "species": event["species"],
@@ -12,7 +12,7 @@ def eventEntity(event) -> dict:
     }
 def eventSpeciesEntity(event) -> dict:
     return {
-        "id": str(event["_id"]),
+        "_id": str(event["_id"]),
         "timestamp": event["timestamp"],
         "sensorId": event["sensorId"],
         "species": event["species"],
@@ -32,9 +32,18 @@ def speciesEntity(species) -> dict:
         "status": species["status"],
         "diet": species["diet"]
     }
+
+def audioEntity(audio) -> dict:
+    return {
+        "_id": str(audio["_id"]),
+        "audioClip": audio["audioClip"]
+    }
     
 def eventListEntity(events) -> list:
     return [eventEntity(event) for event in events]
     
 def eventSpeciesListEntity(events) -> list:
     return [eventSpeciesEntity(event) for event in events]
+
+def audioListEntity(audios) -> list:
+    return [audioEntity(audio) for audio in audios]
