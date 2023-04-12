@@ -1,0 +1,600 @@
+<html>
+  <head>
+    <!-- Imports -->
+    <meta charset="UTF-8" />
+    <!-- Open Layers -->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="./css/ol.css"
+    />
+
+    <script
+      type="text/javascript"
+      src="./js/ol.js"
+    ></script>
+
+    <!-- Bootstrap -->
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+		<script src="https://kit.fontawesome.com/8aa980d912.js" crossorigin="anonymous"></script>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD"
+      crossorigin="anonymous"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.2/css/bootstrap.min.css"
+      integrity="sha512-03lLgNjzF8a/9Ioxp/xxsVlF1rzKjzBDeZmREIwzIF4nTBm4L9bUy+HViFfj45Sb6pwgV7Izjq0wU3qJ4+zpFw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+    />
+
+    <!-- JavaScript Bundle with Popper -->
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"
+      integrity="sha512-7JJuAfpfZHWvpo+Fd6W8x+b1/ECNdgfMsG+OoJOAR8dKIHrwszNnZdLQaw+nvRfX9ZHJn1ucy3q5m5/Z8smGpg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.10.2/umd/popper.min.js"
+      integrity="sha512-Plh5C5l5yoh+5r5JhOOfWOkDeJ7wPy1c4nq3FzPAMoJ6mSDU6aA2mHxE+6kTQ1ZwU/XTzNvEeG19fij33V9EBw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.2/js/bootstrap.min.js"
+      integrity="sha512-X6GLVKwrWY4Y4z4DC+DW9dJ8sqqZfT6I06T6TQ2ffvD8WwFLY4OekP6z9XcE8BlWp0MZ3qG1HCKiup7xg8LEBQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+
+    <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-FS6uHvInSKC7Kufo3qZ2roVZ1HWTAMjzVgBV+oHYy8TD/Ptw33DTN2cEjfyxNn5f"
+      crossorigin="anonymous"
+    ></script>
+
+    <!-- SplashScreen Styling -->
+		<link rel="stylesheet" type="text/css" href="./css/splash_screen_style.css">
+
+		<!-- HMI -->
+		<link rel="stylesheet" href="./css/HMI_style.css" type="text/css">
+		<script type="text/javascript" src="./js/audio.js"></script>
+		<script type="module" src='./js/HMI.js'></script>
+		<script type="text/javascript" src="./js/animation.js"></script>
+		<script type="module" src='./js/HMI-utils.js'></script>
+
+    <!-- End Imports -->
+    <title>Echo | Welcome</title>
+  </head>
+  <body>
+    <div class="screen" onclick="fadeAnim()">  
+			<div class="screen-image"></div>  
+			<div class="screen-overlay"></div>  
+			<div class="screen-content">
+			  <i class="screen-icon fa-brands fa-codepen"></i>
+			  <div class="screen-user">
+				<span class="name" id="name" data-value="PROJECT ECHO" onmouseenter="{textFlex()}">PROJECT ECHO</span>
+				<span class="subtitle" >Click to start</span>
+			  </div>
+			</div>
+		</div>
+		
+		<div id="blur"></div>
+
+    <div class="container" style="margin-left: 0px !important">
+      <!-- Row 1 with nav spanning the entire width and a fixed top-->
+      <div class="row">
+        <div class="col-md-12">
+          <nav class="navbar navbar-expand-lg navbar-dark bg-black fixed-top shadow-sm">
+            <div class="container-fluid">
+              <!-- Title on the left end -->
+              <a class="navbar-brand" href="#">
+                <box-icon
+                  name="wifi"
+                  animation="tada"
+                  size="lg"
+                  class="logo"
+                ></box-icon>
+
+                <span class="title">Echo</span>
+              </a>
+
+              <!-- Space in the middle -->
+              <div class="navbar-collapse justify-content-center"></div>
+
+              <!-- Links on the right end -->
+              <ul class="navbar-nav">
+                <li class="nav-item">
+                  <a 
+                    class="nav-link"
+                    id="nav-simulator" 
+                    href="#"
+                    onclick="{openSIMULATOR}">
+                    <!-- <i class="fa fa-play"></i> -->
+                    Simulator
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a
+                    onclick="{openABOUT}"
+                    id="nav-about"
+                    class="nav-link"
+                    
+                    target="_blank">
+                    <!-- <i class="fa fa-info-circle"></i>  -->
+                    About Project Echo
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a
+                    id="nav-databytes"
+                    class="nav-link"
+                    href="https://github.com/DataBytes-Organisation#hi-there--and-welcome-to-databytes-https://github.com/DataBytes-Organisation#hi-there--and-welcome-to-databytes-"
+                    target="">
+                    <!-- <i class="fa fa-database"></i> -->
+                    DataBytes Organization
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a
+                    onclick="{openFAQ}" 
+                    class="nav-link"
+                    id="nav-faq"
+                    href="#">
+                    <!-- <i class="fa fa-question-circle"></i> -->
+                    FAQ
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </nav>
+        </div>
+      </div>
+
+<!--
+      <div>
+        <iframe src="../../Simulator/outputs/map_event_detection.html" width="100%" height="500"></iframe>
+      </div>
+
+-->
+      <!-- Row 2 with main contents spanning the entire width-->
+      <div class="row main bg-black" style="padding: 0px !important;">
+        <div class="col-md-12 col-main" style="padding: 0px !important;">
+          <div id="basemap" onclick="{openNav}"></div>
+          <div id="filter-menu">
+            <h3 style="text-align: left; color: white;">
+              Filter Menu
+            </h3>
+            <div class="dropdown">
+              <button class="btn btn-secondary dropdown-toggle btn-no-background" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                Animal Vocalizations
+              </button>
+              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <div class="row">
+                  <div class="col">
+                    
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="_reptile" onchange="updateFilter('_reptile')">
+                      <label class="form-check-label" for="_reptile">Reptile</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="_bird" onchange="updateFilter('_bird')">
+                      <label class="form-check-label" for="_bird">Bird</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="_mammal" onchange="updateFilter('_mammal')">
+                      <label class="form-check-label" for="_mammal">Mammal</label>
+                    </div>
+
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="_insect" onchange="updateFilter('_insect')">
+                      <label class="form-check-label" for="_insect">Insect</label>
+                    </div>
+
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="_amphibian" onchange="updateFilter('_amphibian')">
+                      <label class="form-check-label" for="_amphibian">Amphibian</label>
+                    </div>
+
+                  </div>
+                  <div class="col-6">
+                    
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="_endangered" onchange="updateFilter('_endangered')">
+                      <label class="form-check-label" for="_endangered" onchange="">Endangered</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="_vulnerable" onchange="updateFilter('_vulnerable')">
+                      <label class="form-check-label" for="_vulnerable">Vunerable</label>
+                    </div>
+
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="_nearthreatened" onchange="updateFilter('_nearthreatened')">
+                      <label class="form-check-label" for="_nearThreatened">Near Threatened</label>
+                    </div>
+
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="_normal" onchange="updateFilter('_normal')">
+                      <label class="form-check-label" for="_normal">Normal</label>
+                    </div>
+
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="_invasive" onchange="updateFilter('_invasive')">
+                      <label class="form-check-label" for="_invasive">Invasive</label>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="dropdown">
+              <button class="btn btn-secondary dropdown-toggle btn-no-background" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                Animal Simulation
+              </button>
+              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <div class="row">
+                  <div class="col">
+                    
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="reptile" onchange="updateFilter('reptile')">
+                      <label class="form-check-label" for="reptile">Reptile</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="bird" onchange="{updateFilter('bird')}">
+                      <label class="form-check-label" for="bird">Bird</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="mammal" onchange="{updateFilter('mammal')}">
+                      <label class="form-check-label" for="mammal">Mammal</label>
+                    </div>
+
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="insect" onchange="{updateFilter('insect')}">
+                      <label class="form-check-label" for="insect">Insect</label>
+                    </div>
+
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="amphibian" onchange="{updateFilter('amphibian')}">
+                      <label class="form-check-label" for="amphibian">Amphibian</label>
+                    </div>
+
+                  </div>
+                  <div class="col-6">
+                    
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="endangered" onchange="{updateFilter('endangered')}">
+                      <label class="form-check-label" for="endangered">Endangered</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="vulnerable" onchange="{updateFilter('vulnerable')}">
+                      <label class="form-check-label" for="vulnerable">Vunerable</label>
+                    </div>
+
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="nearthreatened" onchange="{updateFilter('nearthreatened')}">
+                      <label class="form-check-label" for="nearthreatened">Near Threatened</label>
+                    </div>
+
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="normal" onchange="{updateFilter('normal')}">
+                      <label class="form-check-label" for="Normal" >Normal</label>
+                    </div>
+
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="invasive" onchange="{updateFilter('invasive')}" >
+                      <label class="form-check-label" for="invasive">Invasive</label>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="dropdown">
+              <button class="btn btn-secondary dropdown-toggle btn-no-background" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                Microphones
+              </button>
+              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <div class="row">
+                  <div class="col">
+                    
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="microphones">
+                      <label class="form-check-label" for="microphones">Hide Microphones</label>
+                    </div>
+                   
+                  </div>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            
+            
+            
+            
+            
+            
+          
+        </div>
+      </div>
+
+      <!-- Row 3 with footer contents spanning the entire width-->
+      <!--div class="row">
+        <div class="col-md-12">
+          <footer>...</footer>
+        </div>
+      </div-->
+    </div>
+
+    <div id="menuPanel">
+      <a href="javascript:void(0)" class="closebtn" onclick="{closeNav()}">&times;</a>
+      <h2>(Insert Animal Name here)</h2>
+      <img src="./images/sample_img.png"></img>
+  
+  
+      <div>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</div>
+      <h2>Audio</h2>
+      <span><i class="fa fa-volume-up fa-2x" style="color:black;opacity:.5" onclick="{playAudio()}"></i></span>
+       <audio hidden controls src="./audio/t-rex-roar.mp3"></audio>
+    </div>
+
+
+    <div id="FAQ" class="overlay">
+      <h2>FAQ OVERLAY PAGE</h2>
+    </div>
+
+    <div id="ABOUT" class="overlay">
+      <h2>ABOUT OVERLAY PAGE</h2>
+    </div>
+
+<script>
+
+  var overlay = null;
+  function openFAQ() {
+    if(overlay){
+      closeOverlay(overlay)
+    }
+    console.log('FAQ: ', document.getElementById("FAQ"));
+    document.getElementById("FAQ").style.width = "100%";
+    document.getElementById("FAQ").style.height = "100%";
+    overlay = "OpenFAQ"
+  }
+
+  function closeFAQ() {
+    document.getElementById("FAQ").style.width = "0%";
+    document.getElementById("FAQ").style.height = "0%";
+    overlay = null
+  }
+
+  function openABOUT() {
+    if(overlay){
+      
+      closeOverlay(overlay)
+    }
+    document.getElementById("ABOUT").classList.add("active");
+    console.log('OPEN ABOUT: ', document.getElementById("ABOUT"));
+    document.getElementById("ABOUT").style.width = "100%";
+    document.getElementById("ABOUT").style.height = "100%";
+    overlay = "OpenABOUT"
+  }
+
+  function closeABOUT() {
+    console.log("CLOSING THE ABOUT PAGE...")
+    
+    document.getElementById("ABOUT").style.width = "0%";
+    document.getElementById("ABOUT").style.height = "0%";
+    overlay = null
+  }
+
+  function closeOverlay(overlay){
+
+    console.log("Closing Overlay: ", overlay)
+
+    if (overlay == "OpenFAQ"){
+
+      closeFAQ()
+    }
+    else if (overlay == "OpenABOUT"){
+      closeABOUT()
+    }
+    
+  }
+
+  function openSIMULATOR(){
+
+    if(overlay){
+      closeOverlay(overlay)
+    }
+    console.log("Opening Simulator...")
+
+  }
+
+  function openNav() {
+    console.log('menuPanel: ', document.getElementById("menuPanel"))
+    document.getElementById("menuPanel").style.width = "30%";
+  }
+
+  function closeNav() {
+    document.getElementById("menuPanel").style.width = "0";
+  }
+
+  let aud = 0;
+  function playAudio() {
+    if(aud==0){
+      document.getElementsByTagName("audio")[0].play();
+      aud++;
+      document.querySelector("i").style.opacity="1";
+    } else {
+      document.querySelector("audio").pause();
+      aud--;
+      document.querySelector("i").style.opacity=".5";
+    }				
+  }
+  
+</script>
+
+<script>
+  
+  //import { updateLayers } from "./js/HMI.js";
+  //selecting the .form-check-input class (all the filter checkboxes fall under this class)                   
+  const myClass = document.querySelectorAll('.form-check-input')
+
+  //An array to store the ID for each checkbox 
+  const checkboxIDs = []
+
+  //Populating the checkbox
+  myClass.forEach(element => {
+    console.log("doingsomething")
+    checkboxIDs.push(element.id);
+  });
+
+  //init variable is set to true before the user has selected any filter options
+  //before a user has checked any filter options, all layers will appear on screen
+  let init = true
+  let filterState = [...checkboxIDs];
+  console.log(filterState, "FilterState:  ")
+  console.log(checkboxIDs)
+
+  function updateFilter(checkbox){
+
+    if (init){
+      filterState = []
+      init = false
+    }
+    if (document.getElementById(checkbox).checked){
+      if(!filterState.includes(checkbox)){
+        filterState.push(checkbox)
+      }
+    }
+    else{
+      let index = filterState.indexOf(checkbox)
+        if (index > -1) {
+          filterState.splice(index, 1);
+        }
+    }
+    console.log("Current filter state:  ", filterState);
+    updateLayers(filterState)
+  }
+
+  // Get all the dropdowns on the page
+  const dropdowns = document.querySelectorAll(".dropdown");
+
+  // Add a click event listener to each dropdown
+  dropdowns.forEach((dropdown) => {
+    const button = dropdown.querySelector(".dropdown-toggle");
+    const menu = dropdown.querySelector(".dropdown-menu");
+    const inputs = dropdown.querySelectorAll(".form-check-input");
+
+    // Toggle the 'show' class on the menu and button when clicked
+    button.addEventListener("click", () => {
+      menu.classList.toggle("show");
+      button.classList.toggle("show");
+    });
+
+    
+  });
+
+</script>
+
+<script type = "module">
+  import { updateLayers } from "./js/HMI.js";
+  window.updateLayers = updateLayers;
+</script>
+
+    <script type="module">
+      import { initialiseHMI } from "./js/HMI.js";
+
+
+      //All global state based info is stored in the hmiState
+      let hmiState = {};
+      window.hmiState = hmiState; 
+
+      //Basemap config
+      //pls do not change origin lat long, these are set to target wild otways region
+      hmiState.originLat = -38.8078;
+      hmiState.originLon = 143.54741;
+      hmiState.defaultZoom = 10;
+      hmiState.requestInterval = 1000;
+
+      const microphoneLocations = [
+        { lat: -38.808, lon: 143.554 },
+        { lat: -38.813, lon: 143.537 },
+        { lat: -38.794, lon: 143.52 },
+        { lat: -38.824, lon: 143.51 },
+        { lat: -38.812, lon: 143.573 },
+      ];
+
+      const vocalizationLocations = [
+        {eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Tawny Frogmouth", speciesIdentificationConfidence: 90.98, locationLat:-38.71 ,locationLon:143.000 , locationConfidence:90.98 , animalType:"bird", animalStatus:"normal" ,animalDiet: "omnivore" },
+        {eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Wild boar", speciesIdentificationConfidence: 90.98, locationLat:-38.808 ,locationLon:143.8 , locationConfidence:90.98 , animalType:"amphibian", animalStatus:"invasive" ,animalDiet: "omnivore" },
+        {eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Red fox", speciesIdentificationConfidence: 90.98, locationLat:-38.89 ,locationLon:142.554 , locationConfidence:90.98 , animalType:"mammal", animalStatus:"endangered" ,animalDiet: "omnivore" },
+        {eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Redeye", speciesIdentificationConfidence: 90.98, locationLat:-38.608 ,locationLon:143.254 , locationConfidence:90.98 , animalType:"insect", animalStatus:"near threatened" ,animalDiet: "omnivore" },
+        {eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Brown Rat", speciesIdentificationConfidence: 90.98, locationLat:-38.508 ,locationLon:141.87 , locationConfidence:90.98 , animalType:"reptile", animalStatus:"vulnerable" ,animalDiet: "omnivore" },
+      ];
+
+
+      const trueLocations = [
+        {eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Tawny Frogmouth", speciesIdentificationConfidence: 100, locationLat:-38.715 ,locationLon:143.000 , locationConfidence:100 , animalType:"bird", animalStatus:"normal" ,animalDiet: "omnivore" },
+        {eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Wild boar", speciesIdentificationConfidence: 100, locationLat:-38.820 ,locationLon:143.8 , locationConfidence:100 , animalType:"amphibian", animalStatus:"invasive" ,animalDiet: "omnivore" },
+        {eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Red fox", speciesIdentificationConfidence: 100, locationLat:-38.870 ,locationLon:142.554 , locationConfidence:100 , animalType:"mammal", animalStatus:"endangered" ,animalDiet: "omnivore" },
+        {eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Redeye", speciesIdentificationConfidence: 100, locationLat:-38.612 ,locationLon:143.254 , locationConfidence:100 , animalType:"insect", animalStatus:"near threatened" ,animalDiet: "omnivore" },
+        {eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Brown Rat", speciesIdentificationConfidence: 100, locationLat:-38.513 ,locationLon:141.87 , locationConfidence:100 , animalType:"reptile", animalStatus:"vulnerable" ,animalDiet: "omnivore" },
+      ];
+
+      hmiState.trueLocations = trueLocations;
+      hmiState.vocalizationLocations = vocalizationLocations;
+      hmiState.microphoneLocations = microphoneLocations;
+      initialiseHMI(hmiState);
+
+      const el = (sel) => {return document.getElementById(sel);}
+      const elArea  = el("basemap");
+      // const elPopup = el("popup");
+      const elPopup = el("menuPanel");
+      const faqOl = el("nav-faq");
+      const aboutOl = el("nav-about");
+      const simulatorOl = el("nav-simulator")
+      //Add popup message at anywhere in map
+      // const showPopup = (evt) => {
+      // 	const elBtn = evt.currentTarget;
+      // 	Object.assign(elPopup.style, {
+      // 		left: `${evt.pageX + elBtn.scrollLeft - elBtn.offsetLeft - 320}px`,
+      // 		top:  `${evt.pageY + elBtn.scrollTop - elBtn.offsetTop - 180}px`,
+      // 		display: `block`,
+      // 	});
+      // };
+      simulatorOl.addEventListener("click",openSIMULATOR)
+      aboutOl.addEventListener("click",openABOUT);
+      elArea.addEventListener("click", openNav);
+      faqOl.addEventListener("click", openFAQ);
+      //Add sound listener to icon
+      // let a=0;
+      // document.getElementsByTagName("i")[0].addEventListener("click",function(){
+      // 	if(a==0){
+      // 		document.getElementsByTagName("audio")[0].play();
+      // 		a++;
+      // 		document.querySelector("i").style.opacity="1";
+      // 	} else {
+      // 		document.querySelector("audio").pause();
+      // 		a--;
+      // 		document.querySelector("i").style.opacity=".5";
+      // 	}
+      // });
+
+    </script>
+  </body>
+</html>
