@@ -1,0 +1,260 @@
+:root {
+    --background-rgb: 11 102 35;
+    
+    --jade-rgb: 0 168 107;
+    --primary-rgb: var(--jade-rgb);
+
+  }
+  
+  * {
+    box-sizing: border-box;
+  }
+  
+  body {
+    height: 100vh;
+    display: grid;
+    place-items: center;
+    background-color: rgb(var(--background-rgb));
+    margin: 0rem;
+    overflow: hidden;
+  }
+  
+  .screen {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    
+    
+    background-color: rgb(var(--primary-rgb) / 15%);
+    overflow: hidden;
+    position: relative;
+    z-index: 10;
+  }
+
+  .change{
+    opacity: 0;
+    transition: all 1s;
+  }
+  
+  .screen:after,
+  .screen:before {
+    content: "";
+    height: 0px;
+    position: absolute;
+    z-index: 4;
+    left: 50%;
+    translate: -50% 0%;
+    background-color: white;
+  }
+  
+  .screen:before {
+    width: 15%;
+    top: 0rem;
+    
+  }
+  
+  .screen:after {
+    width: 25%;
+    bottom: 0rem;
+    
+  }
+
+  
+  @keyframes pan-overlay {
+    from {
+      background-position: 0% 0%;
+    }
+    
+    to {
+      background-position: 0% -100%;
+    }
+  }
+  
+  .screen-overlay {    
+    background: linear-gradient(
+      rgb(var(--primary-rgb) / 0.15),
+      rgb(var(--primary-rgb) / 0.15) 3px,
+      transparent 3px,
+      transparent 9px
+    );
+    background-size: 100% 9px;
+    height: 100%;
+    width: 100%;
+    animation: pan-overlay 22s infinite linear;
+    position: absolute;
+    z-index: 2;
+    left: 0px;
+    top: 0px;
+  }
+  
+  @keyframes pan-image {  
+    0% {
+      background-position: 36% 42%;
+      background-size: 200%;
+    }
+    
+    20% {
+      background-position: 30% 35%;
+      background-size: 200%;
+    }
+    
+    20.0001% { /* -- View 2 -- */
+      background-position: 60% 85%;
+      background-size: 500%;
+    }
+    
+    40% {
+      background-position: 49% 81%;
+      background-size: 500%;
+    }
+    
+    40.0001% { /* -- View 3 -- */
+      background-position: 80% 42%;
+      background-size: 300%;
+    }
+    
+    60% {
+      background-position: 84% 33%;
+      background-size: 300%;
+    }
+    
+    60.0001% { /* -- View 4 -- */
+      background-position: 0% 0%;
+      background-size: 300%;
+    }
+    
+    80% {
+      background-position: 15% 4%;
+      background-size: 300%;
+    }
+    
+    80.0001% { /* -- View 5 -- */
+      background-position: 80% 10%;
+      background-size: 300%;
+    }
+    
+    100% {
+      background-position: 72% 14%;
+      background-size: 300%;
+    }
+  }
+  /* IMAGE: https://wallpaperaccess.com/magical-forest */
+  .screen > .screen-image {
+    background-image: url("./forest_1.jpg") ;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    z-index: 1;
+    left: 0px;
+    top: 0px;
+    background-size: 300%;
+    background-position: 0% 0%;
+    filter: sepia(100%) hue-rotate(160deg);
+    opacity: 0.6;
+    animation: pan-image 15s linear infinite;
+  }
+  
+  .screen > .screen-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    flex-grow: 1;
+    gap: 4rem;
+    position: relative;
+    z-index: 3;
+    margin: 1rem;
+    padding-bottom: 6rem;
+    
+    
+  }
+  
+  .screen > .screen-content > .screen-icon {
+    color: white;
+    font-size: 4rem;
+    text-shadow: 0px 0px 0.5rem white;
+  }
+  
+  .screen > .screen-content > .screen-user{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    position: relative;
+  }
+  
+  .screen > .screen-content > .screen-user:before,
+  .screen > .screen-content > .screen-user:after {
+    content: "";
+    position: absolute;
+    top: 0px;
+    background-color: rgb(var(--primary-rgb));
+    
+    box-shadow: 0px 0px 8px 3px rgb(var(--primary-rgb) / 60%);
+  }
+  
+  .screen > .screen-content > .screen-user:before {
+    height: 2px;
+    width: 50px;
+    translate: -20px -1rem;
+    opacity: 0.75;
+  }
+  
+  .screen > .screen-content > .screen-user:after {
+    height: 3px;
+    width: 30px;
+    translate: 26px calc(-1rem - 0.5px);
+  }
+  
+  .screen > .screen-content > .screen-user > :is(.name, .subtitle) {
+    font-family: "Source Code Pro", monospace;
+    color: white; 
+    text-align: center;
+    text-transform: uppercase; 
+  }
+  
+  
+  .screen > .screen-content > .screen-user > .name {
+    position: relative;
+    font-size: 4.25rem;
+    font-weight: 400;
+  }
+  
+  .screen > .screen-content > .screen-user > .name:before,
+  .screen > .screen-content > .screen-user > .name:after {
+    content: "";
+    height: 4px;
+    width: 4px;
+    position: absolute;
+    
+    
+  }
+  
+  .screen > .screen-content > .screen-user > .name:before {
+    top: 55%;
+    right: -1.5rem;
+  }
+  
+  .screen > .screen-content > .screen-user > .name:after {
+    top: 45%;
+    left: -1.5rem;  
+  }
+  
+  #blur {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    z-index: 2;
+    backdrop-filter: blur(12vmax);
+    background-color: rgb(var(--background-rgb));
+  }
+
+  .map_view{
+    position: absolute;
+    top: 0px;
+    left:0px;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
+  }
+  
