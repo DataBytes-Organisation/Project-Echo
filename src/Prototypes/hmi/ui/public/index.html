@@ -97,7 +97,7 @@
       <!-- Row 1 with nav spanning the entire width and a fixed top-->
       <div class="row">
         <div class="col-md-12">
-          <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top shadow-sm">
+          <nav class="navbar navbar-expand-lg navbar-dark bg-black fixed-top shadow-sm">
             <div class="container-fluid">
               <!-- Title on the left end -->
               <a class="navbar-brand" href="#">
@@ -117,33 +117,44 @@
               <!-- Links on the right end -->
               <ul class="navbar-nav">
                 <li class="nav-item">
-                  <a class="nav-link" href="#">
-                    <i class="fa fa-play"></i>
+                  <a 
+                    class="nav-link"
+                    id="nav-simulator" 
+                    href="#"
+                    onclick="{openSIMULATOR}">
+                    <!-- <i class="fa fa-play"></i> -->
                     Simulator
                   </a>
                 </li>
                 <li class="nav-item">
                   <a
+                    onclick="{openABOUT}"
+                    id="nav-about"
                     class="nav-link"
-                    href="https://github.com/DataBytes-Organisation/Project-Echo/blob/main/README.md#project-echo---a-bioacoustics-classification-tool-"
+                    
                     target="_blank">
-                    <i class="fa fa-info-circle"></i>
+                    <!-- <i class="fa fa-info-circle"></i>  -->
                     About Project Echo
                   </a>
                 </li>
                 <li class="nav-item">
                   <a
+                    id="nav-databytes"
                     class="nav-link"
                     href="https://github.com/DataBytes-Organisation#hi-there--and-welcome-to-databytes-https://github.com/DataBytes-Organisation#hi-there--and-welcome-to-databytes-"
                     target="">
-                    <i class="fa fa-database"></i>
+                    <!-- <i class="fa fa-database"></i> -->
                     DataBytes Organization
                   </a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="#">
-                    <i class="fa fa-question-circle"></i>
-                    FAQs
+                  <a
+                    onclick="{openFAQ}" 
+                    class="nav-link"
+                    id="nav-faq"
+                    href="#">
+                    <!-- <i class="fa fa-question-circle"></i> -->
+                    FAQ
                   </a>
                 </li>
               </ul>
@@ -152,133 +163,165 @@
         </div>
       </div>
 
+<!--
+      <div>
+        <iframe src="../../Simulator/outputs/map_event_detection.html" width="100%" height="500"></iframe>
+      </div>
+
+-->
       <!-- Row 2 with main contents spanning the entire width-->
-      <div class="row main bg-light" style="padding: 0px !important;">
+      <div class="row main bg-black" style="padding: 0px !important;">
         <div class="col-md-12 col-main" style="padding: 0px !important;">
           <div id="basemap" onclick="{openNav}"></div>
           <div id="filter-menu">
-            <h3 style="text-align: center; border: 1px solid #e7e7e7">
+            <h3 style="text-align: left; color: white;">
               Filter Menu
             </h3>
             <div class="dropdown">
-              <button
-                class="btn btn-secondary dropdown-toggle"
-                type="button"
-                id="dropdownMenuButton"
-                data-bs-toggle="dropdown"
-                aria-expanded="true"
-              >
-                <i class="fas fa-filter"></i>
-                Filter By
+              <button class="btn btn-secondary dropdown-toggle btn-no-background" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                Animal Vocalizations
               </button>
-              <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                <li>
-                  <div class="form-check form-switch">
-                    <input
-                      class="form-check-input"
-                      type="checkbox"
-                      id="option1"
-                      name="option1"
-                    />
-                    <label class="form-check-label" for="option1"
-                      >Option 1</label
-                    >
+              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <div class="row">
+                  <div class="col">
+                    
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="_reptile" onchange="updateFilter('_reptile')">
+                      <label class="form-check-label" for="_reptile">Reptile</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="_bird" onchange="updateFilter('_bird')">
+                      <label class="form-check-label" for="_bird">Bird</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="_mammal" onchange="updateFilter('_mammal')">
+                      <label class="form-check-label" for="_mammal">Mammal</label>
+                    </div>
+
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="_insect" onchange="updateFilter('_insect')">
+                      <label class="form-check-label" for="_insect">Insect</label>
+                    </div>
+
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="_amphibian" onchange="updateFilter('_amphibian')">
+                      <label class="form-check-label" for="_amphibian">Amphibian</label>
+                    </div>
+
                   </div>
-                </li>
-                <li>
-                  <div class="form-check form-switch">
-                    <input
-                      class="form-check-input"
-                      type="checkbox"
-                      id="option2"
-                      name="option2"
-                    />
-                    <label class="form-check-label" for="option2"
-                      >Option 2</label
-                    >
+                  <div class="col-6">
+                    
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="_endangered" onchange="updateFilter('_endangered')">
+                      <label class="form-check-label" for="_endangered" onchange="">Endangered</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="_vulnerable" onchange="updateFilter('_vulnerable')">
+                      <label class="form-check-label" for="_vulnerable">Vunerable</label>
+                    </div>
+
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="_nearthreatened" onchange="updateFilter('_nearthreatened')">
+                      <label class="form-check-label" for="_nearThreatened">Near Threatened</label>
+                    </div>
+
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="_normal" onchange="updateFilter('_normal')">
+                      <label class="form-check-label" for="_normal">Normal</label>
+                    </div>
+
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="_invasive" onchange="updateFilter('_invasive')">
+                      <label class="form-check-label" for="_invasive">Invasive</label>
+                    </div>
+
                   </div>
-                </li>
-                <li>
-                  <div class="form-check form-switch">
-                    <input
-                      class="form-check-input"
-                      type="checkbox"
-                      id="option3"
-                      name="option3"
-                    />
-                    <label class="form-check-label" for="option3"
-                      >Option 3</label
-                    >
-                  </div>
-                </li>
-                <li>
-                  <div class="form-check form-switch">
-                    <input
-                      class="form-check-input"
-                      type="checkbox"
-                      id="option4"
-                      name="option4"
-                    />
-                    <label class="form-check-label" for="option4"
-                      >Option 4</label
-                    >
-                  </div>
-                </li>
-                <li>
-                  <div class="form-check form-switch">
-                    <input
-                      class="form-check-input"
-                      type="checkbox"
-                      id="option5"
-                      name="option5"
-                    />
-                    <label class="form-check-label" for="option5"
-                      >Option 5</label
-                    >
-                  </div>
-                </li>
-                <li>
-                  <div class="form-check form-switch">
-                    <input
-                      class="form-check-input"
-                      type="checkbox"
-                      id="option6"
-                      name="option6"
-                    />
-                    <label class="form-check-label" for="option6"
-                      >Option 6</label
-                    >
-                  </div>
-                </li>
-                <li>
-                  <div class="form-check form-switch">
-                    <input
-                      class="form-check-input"
-                      type="checkbox"
-                      id="option7"
-                      name="option7"
-                    />
-                    <label class="form-check-label" for="option7"
-                      >Option 7</label
-                    >
-                  </div>
-                </li>
-                <li>
-                  <div class="form-check form-switch">
-                    <input
-                      class="form-check-input"
-                      type="checkbox"
-                      id="option8"
-                      name="option8"
-                    />
-                    <label class="form-check-label" for="option8"
-                      >Option 8</label
-                    >
-                  </div>
-                </li>
-              </ul>
+                </div>
+              </div>
             </div>
-          </div>
+
+            <div class="dropdown">
+              <button class="btn btn-secondary dropdown-toggle btn-no-background" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                Animal Simulation
+              </button>
+              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <div class="row">
+                  <div class="col">
+                    
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="reptile" onchange="{updateFilter('reptile')}">
+                      <label class="form-check-label" for="reptile">Reptile</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="bird" onchange="{updateFilter('bird')}">
+                      <label class="form-check-label" for="bird">Bird</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="mammal" onchange="{updateFilter('mammal')}">
+                      <label class="form-check-label" for="mammal">Mammal</label>
+                    </div>
+
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="insect" onchange="{updateFilter('insect')}">
+                      <label class="form-check-label" for="insect">Insect</label>
+                    </div>
+
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="amphibian" onchange="{updateFilter('amphibian')}">
+                      <label class="form-check-label" for="amphibian">Amphibian</label>
+                    </div>
+
+                  </div>
+                  <div class="col-6">
+                    
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="endangered" onchange="{updateFilter('endangered')}">
+                      <label class="form-check-label" for="endangered">Endangered</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="vulnerable" onchange="{updateFilter('vulnerable')}">
+                      <label class="form-check-label" for="vulnerable">Vunerable</label>
+                    </div>
+
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="nearthreatened" onchange="{updateFilter('nearthreatened')}">
+                      <label class="form-check-label" for="nearthreatened">Near Threatened</label>
+                    </div>
+
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="normal" onchange="{updateFilter('normal')}">
+                      <label class="form-check-label" for="Normal" >Normal</label>
+                    </div>
+
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="invasive" onchange="{updateFilter('invasive')}" >
+                      <label class="form-check-label" for="invasive">Invasive</label>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="dropdown">
+              <button class="btn btn-secondary dropdown-toggle btn-no-background" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                Microphones
+              </button>
+              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <div class="row">
+                  <div class="col">
+                    
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="microphones">
+                      <label class="form-check-label" for="microphones">Hide Microphones</label>
+                    </div>
+                   
+                  </div>
+
+                  </div>
+                </div>
+              </div>
+            </div>       
         </div>
       </div>
 
@@ -292,7 +335,7 @@
 
     <div id="menuPanel">
       <a href="javascript:void(0)" class="closebtn" onclick="{closeNav()}">&times;</a>
-      <h2>Sample data with audio</h2>
+      <h2>(Insert Animal Name here)</h2>
       <img src="./images/sample_img.png"></img>
   
   
@@ -301,15 +344,87 @@
       <span><i class="fa fa-volume-up fa-2x" style="color:black;opacity:.5" onclick="{playAudio()}"></i></span>
        <audio hidden controls src="./audio/t-rex-roar.mp3"></audio>
     </div>
+
+
+    <div id="FAQ" class="overlay">
+      <h2>FAQ OVERLAY PAGE</h2>
+    </div>
+
+    <div id="ABOUT" class="overlay">
+      <h2>ABOUT OVERLAY PAGE</h2>
+    </div>
+
 <script>
+
+  var overlay = null;
+  function openFAQ() {
+    if(overlay){
+      closeOverlay(overlay)
+    }
+    console.log('FAQ: ', document.getElementById("FAQ"));
+    document.getElementById("FAQ").style.width = "100%";
+    document.getElementById("FAQ").style.height = "100%";
+    overlay = "OpenFAQ"
+  }
+
+  function closeFAQ() {
+    document.getElementById("FAQ").style.width = "0%";
+    document.getElementById("FAQ").style.height = "0%";
+    overlay = null
+  }
+
+  function openABOUT() {
+    if(overlay){
+      
+      closeOverlay(overlay)
+    }
+    document.getElementById("ABOUT").classList.add("active");
+    console.log('OPEN ABOUT: ', document.getElementById("ABOUT"));
+    document.getElementById("ABOUT").style.width = "100%";
+    document.getElementById("ABOUT").style.height = "100%";
+    overlay = "OpenABOUT"
+  }
+
+  function closeABOUT() {
+    console.log("CLOSING THE ABOUT PAGE...")
+    
+    document.getElementById("ABOUT").style.width = "0%";
+    document.getElementById("ABOUT").style.height = "0%";
+    overlay = null
+  }
+
+  function closeOverlay(overlay){
+
+    console.log("Closing Overlay: ", overlay)
+
+    if (overlay == "OpenFAQ"){
+
+      closeFAQ()
+    }
+    else if (overlay == "OpenABOUT"){
+      closeABOUT()
+    }
+    
+  }
+
+  function openSIMULATOR(){
+
+    if(overlay){
+      closeOverlay(overlay)
+    }
+    console.log("Opening Simulator...")
+
+  }
+
   function openNav() {
     console.log('menuPanel: ', document.getElementById("menuPanel"))
-    document.getElementById("menuPanel").style.width = "300px";
+    document.getElementById("menuPanel").style.width = "30%";
   }
 
   function closeNav() {
     document.getElementById("menuPanel").style.width = "0";
   }
+
   let aud = 0;
   function playAudio() {
     if(aud==0){
@@ -322,10 +437,80 @@
       document.querySelector("i").style.opacity=".5";
     }				
   }
+  
+</script>
+
+<script>
+  
+  //import { updateLayers } from "./js/HMI.js";
+  //selecting the .form-check-input class (all the filter checkboxes fall under this class)                   
+  const myClass = document.querySelectorAll('.form-check-input')
+
+  //An array to store the ID for each checkbox 
+  const checkboxIDs = []
+
+  //Populating the checkbox
+  myClass.forEach(element => {
+    console.log("doingsomething")
+    checkboxIDs.push(element.id);
+  });
+
+  //init variable is set to true before the user has selected any filter options
+  //before a user has checked any filter options, all layers will appear on screen
+  let init = true
+  let filterState = [...checkboxIDs];
+  console.log(filterState, "FilterState:  ")
+  console.log(checkboxIDs)
+
+  function updateFilter(checkbox){
+
+    if (init){
+      filterState = []
+      init = false
+    }
+    if (document.getElementById(checkbox).checked){
+      if(!filterState.includes(checkbox)){
+        filterState.push(checkbox)
+      }
+    }
+    else{
+      let index = filterState.indexOf(checkbox)
+        if (index > -1) {
+          filterState.splice(index, 1);
+        }
+    }
+    console.log("Current filter state:  ", filterState);
+    updateLayers(filterState)
+  }
+
+  // Get all the dropdowns on the page
+  const dropdowns = document.querySelectorAll(".dropdown");
+
+  // Add a click event listener to each dropdown
+  dropdowns.forEach((dropdown) => {
+    const button = dropdown.querySelector(".dropdown-toggle");
+    const menu = dropdown.querySelector(".dropdown-menu");
+    const inputs = dropdown.querySelectorAll(".form-check-input");
+
+    // Toggle the 'show' class on the menu and button when clicked
+    button.addEventListener("click", () => {
+      menu.classList.toggle("show");
+      button.classList.toggle("show");
+    });
+
+    
+  });
+
+</script>
+
+<script type = "module">
+  import { updateLayers } from "./js/HMI.js";
+  window.updateLayers = updateLayers;
 </script>
 
     <script type="module">
       import { initialiseHMI } from "./js/HMI.js";
+
 
       //All global state based info is stored in the hmiState
       let hmiState = {};
@@ -337,7 +522,6 @@
       hmiState.originLon = 143.54741;
       hmiState.defaultZoom = 10;
       hmiState.requestInterval = 1000;
-      hmiState.layerPool = 1000;
 
       const microphoneLocations = [
         { lat: -38.808, lon: 143.554 },
@@ -346,16 +530,36 @@
         { lat: -38.824, lon: 143.51 },
         { lat: -38.812, lon: 143.573 },
       ];
+/*
+      const vocalizationLocations = [
+        {eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Tawny Frogmouth", speciesIdentificationConfidence: 90.98, locationLat:-38.71 ,locationLon:143.000 , locationConfidence:90.98 , animalType:"bird", animalStatus:"normal" ,animalDiet: "omnivore" },
+        {eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Wild boar", speciesIdentificationConfidence: 90.98, locationLat:-38.808 ,locationLon:143.8 , locationConfidence:90.98 , animalType:"amphibian", animalStatus:"invasive" ,animalDiet: "omnivore" },
+        {eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Red fox", speciesIdentificationConfidence: 90.98, locationLat:-38.89 ,locationLon:142.554 , locationConfidence:90.98 , animalType:"mammal", animalStatus:"endangered" ,animalDiet: "omnivore" },
+        {eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Redeye", speciesIdentificationConfidence: 90.98, locationLat:-38.608 ,locationLon:143.254 , locationConfidence:90.98 , animalType:"insect", animalStatus:"near threatened" ,animalDiet: "omnivore" },
+        {eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Brown Rat", speciesIdentificationConfidence: 90.98, locationLat:-38.508 ,locationLon:141.87 , locationConfidence:90.98 , animalType:"reptile", animalStatus:"vulnerable" ,animalDiet: "omnivore" },
+      ];
+*/
 
+      const trueLocations = [
+        {eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Tawny Frogmouth", speciesIdentificationConfidence: 100, locationLat:-38.81905478815439 ,locationLon:143.524 , locationConfidence:100 , animalType:"bird", animalStatus:"normal" ,animalDiet: "omnivore" },
+        {eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Wild boar", speciesIdentificationConfidence: 100, locationLat:-38.80166562762367 ,locationLon:143.540 , locationConfidence:100 , animalType:"amphibian", animalStatus:"invasive" ,animalDiet: "omnivore" },
+        {eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Red fox", speciesIdentificationConfidence: 100, locationLat:-38.82166562762367 ,locationLon:143.550 , locationConfidence:100 , animalType:"mammal", animalStatus:"endangered" ,animalDiet: "omnivore" },
+        //{eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Redeye", speciesIdentificationConfidence: 100, locationLat:-38.80066562762367 ,locationLon:143.555 , locationConfidence:100 , animalType:"insect", animalStatus:"near threatened" ,animalDiet: "omnivore" },
+        {eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Brown Rat", speciesIdentificationConfidence: 100, locationLat:-38.80266562762367 ,locationLon:143.560 , locationConfidence:100 , animalType:"reptile", animalStatus:"vulnerable" ,animalDiet: "omnivore" },
+      ];
 
+      hmiState.trueLocations = trueLocations;
+      //hmiState.vocalizationLocations = vocalizationLocations;
       hmiState.microphoneLocations = microphoneLocations;
       initialiseHMI(hmiState);
 
       const el = (sel) => {return document.getElementById(sel);}
-
       const elArea  = el("basemap");
       // const elPopup = el("popup");
       const elPopup = el("menuPanel");
+      const faqOl = el("nav-faq");
+      const aboutOl = el("nav-about");
+      const simulatorOl = el("nav-simulator")
       //Add popup message at anywhere in map
       // const showPopup = (evt) => {
       // 	const elBtn = evt.currentTarget;
@@ -365,9 +569,10 @@
       // 		display: `block`,
       // 	});
       // };
-
+      simulatorOl.addEventListener("click",openSIMULATOR)
+      aboutOl.addEventListener("click",openABOUT);
       elArea.addEventListener("click", openNav);
-
+      faqOl.addEventListener("click", openFAQ);
       //Add sound listener to icon
       // let a=0;
       // document.getElementsByTagName("i")[0].addEventListener("click",function(){
