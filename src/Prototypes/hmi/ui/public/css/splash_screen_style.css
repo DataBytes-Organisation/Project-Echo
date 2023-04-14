@@ -27,8 +27,9 @@
     border-radius: 1rem;
     background-color: rgb(var(--primary-rgb) / 15%);
     overflow: hidden;
-    position: relative;
+    position: absolute;
     z-index: 10;
+    top: 0;
   }
 
   .change{
