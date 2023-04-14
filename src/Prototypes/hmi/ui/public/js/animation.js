@@ -32,9 +32,9 @@ function fadeAnim(){
     const nav = document.getElementById('nav-container');
     screen.classList.toggle('change');
     blur.classList.toggle('change');
-    
+    nav.style.display = "block";
     setTimeout(()=>{
-        nav.style.display = "block";
+        
         screen.style.display = "none";
         blur.style.display = "none";
         
