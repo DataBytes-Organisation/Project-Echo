@@ -498,7 +498,8 @@
 
   // Get all the dropdowns on the page
   const dropdowns = document.querySelectorAll(".dropdown");
-
+  const buttons = document.querySelectorAll(".dropdown-toggle");
+  const menus = document.querySelectorAll(".dropdown-menu");
   // Add a click event listener to each dropdown
   dropdowns.forEach((dropdown) => {
     const button = dropdown.querySelector(".dropdown-toggle");
@@ -507,6 +508,12 @@
 
     // Toggle the 'show' class on the menu and button when clicked
     button.addEventListener("click", () => {
+      buttons.forEach((ele) => {
+        ele.classList.remove("show");
+      }) 
+      menus.forEach((ele) => {
+        ele.classList.remove("show");
+      }) 
       menu.classList.toggle("show");
       button.classList.toggle("show");
     });
