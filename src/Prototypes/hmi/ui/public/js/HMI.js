@@ -227,6 +227,18 @@ function addmicrophones(hmiState) {
   layerSource.addFeatures(mics);
   
 }
+
+export function showMics(hmiState){
+  let layer = findMapLayerWithName(hmiState, "micLayer");
+  let layerSource = layer.getSource();
+  layer.setVisible(true);
+}
+export function hideMics(hmiState){
+  let layer = findMapLayerWithName(hmiState, "micLayer");
+  let layerSource = layer.getSource();
+  layer.setVisible(false);
+}
+
 /*
 function addDummyMarkers(hmiState) {
   //***Add some sample markers (WIP)***
@@ -294,6 +306,7 @@ function addVectorLayerToBasemap(hmiState, layerName, zIndex) {
     let layer = new ol.layer.Vector({
       name: layerName,
       source: new ol.source.Vector(),
+      visible: true,
     });
 
     if (zIndex != 0) {
