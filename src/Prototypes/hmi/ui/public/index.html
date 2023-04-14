@@ -97,7 +97,7 @@
       <!-- Row 1 with nav spanning the entire width and a fixed top-->
       <div class="row">
         <div class="col-md-12">
-          <nav class="navbar navbar-expand-lg navbar-dark bg-black fixed-top shadow-sm">
+          <nav class="navbar navbar-expand-lg navbar-dark bg-black fixed-top shadow-sm" id="nav-container" style="display: none">
             <div class="container-fluid">
               <!-- Title on the left end -->
               <a class="navbar-brand" href="#">
@@ -312,7 +312,7 @@
                   <div class="col">
                     
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="microphones">
+                      <input class="form-check-input" type="checkbox" value="" id="microphones" onchange="{microphoneDisplay()}">
                       <label class="form-check-label" for="microphones">Hide Microphones</label>
                     </div>
                    
@@ -478,9 +478,14 @@
     updateLayers(filterState)
   }
 
+  function microphoneDisplay(){
+      updateMics()
+  }
+
   // Get all the dropdowns on the page
   const dropdowns = document.querySelectorAll(".dropdown");
-
+  const buttons = document.querySelectorAll(".dropdown-toggle");
+  const menus = document.querySelectorAll(".dropdown-menu");
   // Add a click event listener to each dropdown
   dropdowns.forEach((dropdown) => {
     const button = dropdown.querySelector(".dropdown-toggle");
@@ -489,6 +494,12 @@
 
     // Toggle the 'show' class on the menu and button when clicked
     button.addEventListener("click", () => {
+      buttons.forEach((ele) => {
+        ele.classList.remove("show");
+      }) 
+      menus.forEach((ele) => {
+        ele.classList.remove("show");
+      }) 
       menu.classList.toggle("show");
       button.classList.toggle("show");
     });
@@ -504,7 +515,8 @@
 </script>
 
     <script type="module">
-      import { initialiseHMI } from "./js/HMI.js";
+      import { initialiseHMI, showMics, hideMics } from "./js/HMI.js";
+      window.updateMics = updateMics;
 
 
       //All global state based info is stored in the hmiState
@@ -581,6 +593,17 @@
       // 		document.querySelector("i").style.opacity=".5";
       // 	}
       // });
+
+      //Microphone show/hide
+      function updateMics(){
+        console.log("mic visibility toggled!")
+        let mic = document.getElementById("microphones");
+        if (mic.checked){
+          hideMics(hmiState)
+        } else {
+          showMics(hmiState)
+        }
+      }
 
     </script>
   </body>
