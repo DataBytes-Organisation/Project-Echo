@@ -338,6 +338,12 @@ i {
     
   }
 
+  .btn.show{
+    color: var(--bs-btn-active-color);
+    background-color: var(--bs-btn-active-bg) !important;
+    border-color: var(--bs-btn-active-border-color);
+  }
+
   .btn-no-background:hover,
   .btn-no-background:focus {
     background-color: transparent;
