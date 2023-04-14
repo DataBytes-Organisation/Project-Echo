@@ -29,10 +29,14 @@ function textFlex() {
 function fadeAnim(){
     const screen = document.querySelector('.screen');
     const blur = document.getElementById('blur');
+    const nav = document.getElementById('nav-container');
     screen.classList.toggle('change');
     blur.classList.toggle('change');
+    
     setTimeout(()=>{
+        nav.style.display = "block";
         screen.style.display = "none";
         blur.style.display = "none";
+        
     },1000)
 }

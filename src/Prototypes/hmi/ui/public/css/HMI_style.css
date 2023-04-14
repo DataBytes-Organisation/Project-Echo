@@ -308,7 +308,7 @@ i {
 
   .dropdown-menu {
     display: none;
-    position: absolute;
+    position: relative;
     z-index: 1;
     width: 100%;
     margin-top: 0;
