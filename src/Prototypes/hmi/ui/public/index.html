@@ -361,7 +361,7 @@
     if(overlay){
       closeOverlay(overlay)
     }
-    console.log('FAQ: ', document.getElementById("FAQ"));
+    //console.log('FAQ: ', document.getElementById("FAQ"));
     document.getElementById("FAQ").style.width = "100%";
     document.getElementById("FAQ").style.height = "100%";
     overlay = "OpenFAQ"
@@ -379,14 +379,14 @@
       closeOverlay(overlay)
     }
     document.getElementById("ABOUT").classList.add("active");
-    console.log('OPEN ABOUT: ', document.getElementById("ABOUT"));
+    //console.log('OPEN ABOUT: ', document.getElementById("ABOUT"));
     document.getElementById("ABOUT").style.width = "100%";
     document.getElementById("ABOUT").style.height = "100%";
     overlay = "OpenABOUT"
   }
 
   function closeABOUT() {
-    console.log("CLOSING THE ABOUT PAGE...")
+    //console.log("CLOSING THE ABOUT PAGE...")
     
     document.getElementById("ABOUT").style.width = "0%";
     document.getElementById("ABOUT").style.height = "0%";
@@ -395,7 +395,7 @@
 
   function closeOverlay(overlay){
 
-    console.log("Closing Overlay: ", overlay)
+    //console.log("Closing Overlay: ", overlay)
 
     if (overlay == "OpenFAQ"){
 
@@ -412,12 +412,12 @@
     if(overlay){
       closeOverlay(overlay)
     }
-    console.log("Opening Simulator...")
+    //console.log("Opening Simulator...")
 
   }
 
   function openNav() {
-    console.log('menuPanel: ', document.getElementById("menuPanel"))
+    //console.log('menuPanel: ', document.getElementById("menuPanel"))
     document.getElementById("menuPanel").style.width = "30%";
   }
 
@@ -451,15 +451,15 @@
 
   //Populating the checkbox
   myClass.forEach(element => {
-    console.log("doingsomething")
+    //console.log("doingsomething")
     checkboxIDs.push(element.id);
   });
 
   //init variable is set to true before the user has selected any filter options
   //before a user has checked any filter options, all layers will appear on screen
   let filterState = [...checkboxIDs];
-  console.log(filterState, "FilterState:  ")
-  console.log(checkboxIDs)
+  //console.log(filterState, "FilterState:  ")
+  //console.log(checkboxIDs)
 
   function updateFilter(checkbox){
 
@@ -474,7 +474,7 @@
           filterState.splice(index, 1);
         }
     }
-    console.log("Current filter state:  ", filterState);
+    //console.log("Current filter state:  ", filterState);
     updateLayers(filterState)
   }
 
@@ -591,7 +591,7 @@
 
       //Microphone show/hide
       function updateMics(){
-        console.log("mic visibility toggled!")
+        //console.log("mic visibility toggled!")
         let mic = document.getElementById("microphones");
         if (mic.checked){
           hideMics(hmiState)
