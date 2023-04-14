@@ -76,12 +76,12 @@ function playAudioString(audioDataString) {
 }
 
 export function updateLayers(filterState)  {
-  console.log("Filter applied, updating vocalized layer visibility...");
-  console.log(filterState)
+  //console.log("Filter applied, updating vocalized layer visibility...");
+  //console.log(filterState)
   vocalizedLayers.forEach((entry) => {
     if (filterState.includes(entry.values_.animalType) && 
         filterState.includes(entry.values_.animalStatus)) {
-          console.log("do something in here!");
+          //console.log("do something in here!");
           entry.getStyle().getImage().setOpacity(0.5);
           entry.changed()
     }
@@ -94,7 +94,7 @@ export function updateLayers(filterState)  {
   trueLayers.forEach((entry) => {
     if (filterState.includes(entry.values_.animalType) && 
         filterState.includes(entry.values_.animalStatus)) {
-          console.log("do something in here!");
+          //console.log("do something in here!");
           entry.getStyle().getImage().setOpacity(1);
           entry.changed()
     }
@@ -162,10 +162,10 @@ function printTest(vocalizedLayers){
 */
 
 function addTruthLayers(hmiState) {
-  console.log("addTruthLayers called.")
-  console.log("Truth locs", hmiState.trueLocations);
+  //console.log("addTruthLayers called.")
+  //console.log("Truth locs", hmiState.trueLocations);
   hmiState.trueLocations.forEach((entry) => {
-    console.log("True location found!:  ")
+    //console.log("True location found!:  ")
     var trueLocation = new ol.Feature({
       geometry: new ol.geom.Point(
         ol.proj.fromLonLat([entry.locationLon,entry.locationLat])
@@ -174,7 +174,7 @@ function addTruthLayers(hmiState) {
         animalType: entry.animalType,
         animalStatus: entry.animalStatus
       });
-      console.log(entry.locationLon, " ", entry.locationLat)
+      //console.log(entry.locationLon, " ", entry.locationLat)
     
     var trueIcon = new ol.style.Style({
         image: new ol.style.Icon({
@@ -188,7 +188,7 @@ function addTruthLayers(hmiState) {
     trueLayers.push(trueLocation);
   })
   
-  console.log("Truth Layers (animal locations): ", trueLayers);
+  //console.log("Truth Layers (animal locations): ", trueLayers);
   addVectorLayerTopDown(hmiState, "tLayer");
   let layer = findMapLayerWithName(hmiState, "tLayer");
   let layerSource = layer.getSource();
@@ -199,9 +199,9 @@ function addmicrophones(hmiState) {
   var mics = [];
 
   
-  console.log("locs", hmiState.microphoneLocations);
+  //console.log("locs", hmiState.microphoneLocations);
   hmiState.microphoneLocations.forEach((location) => {
-    console.log("Mic Found")
+    //console.log("Mic Found")
     // Add the marker into the array
     var mic = new ol.Feature({
       geometry: new ol.geom.Point(
@@ -220,7 +220,7 @@ function addmicrophones(hmiState) {
     mics.push(mic);
   });
 
-  console.log("mics: ", mics);
+  //console.log("mics: ", mics);
   addVectorLayerTopDown(hmiState, "micLayer");
   let layer = findMapLayerWithName(hmiState, "micLayer");
   let layerSource = layer.getSource();
@@ -238,41 +238,6 @@ export function hideMics(hmiState){
   let layerSource = layer.getSource();
   layer.setVisible(false);
 }
-
-/*
-function addDummyMarkers(hmiState) {
-  //***Add some sample markers (WIP)***
-  var markers = [];
-
-  for (var i = 0; i < 10; i++) {
-    // Compute a random icon and lon/lat position.
-    var lon = hmiState.originLon + Math.random() * 0.1;
-    var lat = hmiState.originLat + Math.random() * 0.1;
-
-    // Add the marker into the array
-    var mark = new ol.Feature({
-      geometry: new ol.geom.Point(ol.proj.fromLonLat([lon, lat])),
-      name: "marker" + i,
-    });
-    var icon = new ol.style.Style({
-      image: new ol.style.Icon({
-        src: "./../images/" + markups[i % 3],
-        anchor: [0.5, 1],
-        scale: 0.01,
-      }),
-    });
-    mark.setStyle(icon);
-    markers.push(mark);
-  }
-
-  console.log("markers: ", markers);
-
-  addVectorLayerTopDown(hmiState, "markerLayer");
-  let layer = findMapLayerWithName(hmiState, "markerLayer");
-  let layerSource = layer.getSource();
-  layerSource.addFeatures(markers);
-}
-*/
 
 function findMapLayerWithName(hmiState, name) {
   if (!hmiState.basemap) {
@@ -365,7 +330,6 @@ function createBasemap(hmiState) {
   });
 
   hmiState.basemap = basemap;
-  console.log("BASEDMAP XD LMFAO")
   return basemap;
 }
 
