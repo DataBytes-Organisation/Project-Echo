@@ -179,7 +179,7 @@ function addTruthFeatures(hmiState) {
     
     var trueIcon = new ol.style.Style({
         image: new ol.style.Icon({
-          src: `./../images/${entry.animalType+entry.animalStatus}2.png`,
+          src: `./../images/${entry.animalType+"-"+entry.animalStatus}.png`,
           anchor: [0.5, 1],
           scale: 0.75,
           className: 'true-icon'
