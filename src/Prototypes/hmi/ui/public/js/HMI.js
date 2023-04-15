@@ -14,7 +14,7 @@ var statuses = [
 
 var vocalizedLayers = []
 var trueLayers = []
-var animalTypes = ["mammal", "bird", "amphibian", "reptile", "predator"];
+var animalTypes = ["mammal", "bird", "amphibian", "reptile", "insect"];
 
 //For Demo purposes only
 //This plays an awful quailty audio test string
@@ -211,9 +211,9 @@ function addmicrophones(hmiState) {
     });
     var icon = new ol.style.Style({
       image: new ol.style.Icon({
-        src: "./../images/microphone.png",
+        src: "./../images/mic.png",
         anchor: [0.5, 1],
-        scale: 1,
+        scale: 0.01,
       }),
     });
     mic.setStyle(icon);
@@ -294,6 +294,19 @@ function addWildlifeLayers(hmiState) {
     }
   }
 }
+/*
+function addTruthLayers(hmiState) {
+  // Wildlife layers
+  // Invasive, Normal, Near-Threatened, Vulnerable, Endangered
+  // Mammal, Reptile, Predator, Bird, Amphibian
+  for (let stat of statuses) {
+    for (let animalType of animalTypes) {
+      let nextName = stat + "_" + animalType + "_truth";
+
+      addVectorLayerTopDown(hmiState, nextName);
+    }
+  }
+}*/
 
 function deriveLayerName(status, animalType) {
   return status + "_" + animalType;
