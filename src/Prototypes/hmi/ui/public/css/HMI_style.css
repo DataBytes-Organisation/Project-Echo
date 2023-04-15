@@ -344,6 +344,19 @@ i {
     
   }
 
+  .toggle-button {
+    color: white;
+    background-color: blue;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+  }
+
+  .toggle-button:active {
+    background-color: red;
+  }
+  
+
   /* Style the list items */
   .dropdown-menu li {
     padding: 8px 16px;
