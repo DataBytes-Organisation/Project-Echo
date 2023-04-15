@@ -13,7 +13,7 @@ var statuses = [
 ];
 
 var vocalizedLayers = []
-var trueLayers = []
+
 var animalTypes = ["mammal", "bird", "amphibian", "reptile", "insect"];
 
 //For Demo purposes only
@@ -26,13 +26,14 @@ export function initialiseHMI(hmiState) {
   console.log(`initialising`);
 
   createBasemap(hmiState);
-  addWildlifeLayers(hmiState);
-  //addDummyMarkers(hmiState);
-  addmicrophones(hmiState);
-  //addVocalizedLayers(hmiState); !!! Remove and work on in next Update
-  addTruthLayers(hmiState);
-  
 
+  //addWildlifeLayers(hmiState);
+  addTruthLayers(hmiState);
+
+  addTruthFeatures(hmiState);
+  //addVocalizedFeatures(hmiState); !!! Remove and work on in next Update
+  addmicrophones(hmiState);
+  //queueSimUpdate(hmiState);
   //simulateData(hmiState);
 }
 
@@ -78,7 +79,7 @@ function playAudioString(audioDataString) {
 export function updateLayers(filterState)  {
   //console.log("Filter applied, updating vocalized layer visibility...");
   //console.log(filterState)
-  vocalizedLayers.forEach((entry) => {
+  /*vocalizedLayers.forEach((entry) => {
     if (filterState.includes(entry.values_.animalType) && 
         filterState.includes(entry.values_.animalStatus)) {
           //console.log("do something in here!");
@@ -89,21 +90,21 @@ export function updateLayers(filterState)  {
       entry.getStyle().getImage().setOpacity(0);
       entry.changed()
     }
-  })
+  })*/
 
-  trueLayers.forEach((entry) => {
-    if (filterState.includes(entry.values_.animalType) && 
-        filterState.includes(entry.values_.animalStatus)) {
-          //console.log("do something in here!");
-          entry.getStyle().getImage().setOpacity(1);
-          entry.changed()
+  for (let stat of statuses) {
+    for (let animalType of animalTypes) {
+      let layerName = deriveTruthLayerName(stat, animalType);
+      let layer = findMapLayerWithName(hmiState, layerName);
+      if (filterState.includes(stat) && filterState.includes(animalType))
+      {
+        layer.setVisible(true);
+      }
+      else{
+        layer.setVisible(false);
+      }
     }
-    else{
-      entry.getStyle().getImage().setOpacity(0);
-      entry.changed()
-    }
-  })
-
+  }
 }
 
 /* Add Vocalized Layers, work on in next branch
@@ -161,10 +162,10 @@ function printTest(vocalizedLayers){
 }
 */
 
-function addTruthLayers(hmiState) {
+function addTruthFeatures(hmiState) {
   //console.log("addTruthLayers called.")
   //console.log("Truth locs", hmiState.trueLocations);
-  hmiState.trueLocations.forEach((entry) => {
+  for (let entry of hmiState.trueLocations) {
     //console.log("True location found!:  ")
     var trueLocation = new ol.Feature({
       geometry: new ol.geom.Point(
@@ -173,32 +174,34 @@ function addTruthLayers(hmiState) {
         name: 'trueLocation',
         animalType: entry.animalType,
         animalStatus: entry.animalStatus
-      });
+    });
       //console.log(entry.locationLon, " ", entry.locationLat)
     
     var trueIcon = new ol.style.Style({
         image: new ol.style.Icon({
-          src: `./../images/${entry.animalType+entry.animalStatus}.png`,
+          src: `./../images/${entry.animalType+entry.animalStatus}2.png`,
           anchor: [0.5, 1],
-          scale: 0.01,
+          scale: 0.75,
           className: 'true-icon'
         }),
     })
     trueLocation.setStyle(trueIcon);
-    trueLayers.push(trueLocation);
-  })
-  
-  //console.log("Truth Layers (animal locations): ", trueLayers);
-  addVectorLayerTopDown(hmiState, "tLayer");
-  let layer = findMapLayerWithName(hmiState, "tLayer");
-  let layerSource = layer.getSource();
-  layerSource.addFeatures(trueLayers);
+
+    let layerName = deriveTruthLayerName(entry.animalStatus,entry.animalType);
+    let layer = findMapLayerWithName(hmiState, layerName);
+    let layerSource = layer.getSource();
+
+    console.log(layerName);
+
+    layerSource.addFeature(trueLocation);
+    layer.getSource().changed();
+    layer.changed();
+  }
 }
 
 function addmicrophones(hmiState) {
   var mics = [];
 
-  
   //console.log("locs", hmiState.microphoneLocations);
   hmiState.microphoneLocations.forEach((location) => {
     //console.log("Mic Found")
@@ -211,9 +214,9 @@ function addmicrophones(hmiState) {
     });
     var icon = new ol.style.Style({
       image: new ol.style.Icon({
-        src: "./../images/mic.png",
+        src: "./../images/mic2.png",
         anchor: [0.5, 1],
-        scale: 0.01,
+        scale: 0.75,
       }),
     });
     mic.setStyle(icon);
@@ -225,7 +228,8 @@ function addmicrophones(hmiState) {
   let layer = findMapLayerWithName(hmiState, "micLayer");
   let layerSource = layer.getSource();
   layerSource.addFeatures(mics);
-  
+  layer.getSource().changed();
+  layer.changed();
 }
 
 export function showMics(hmiState){
@@ -294,7 +298,7 @@ function addWildlifeLayers(hmiState) {
     }
   }
 }
-/*
+
 function addTruthLayers(hmiState) {
   // Wildlife layers
   // Invasive, Normal, Near-Threatened, Vulnerable, Endangered
@@ -306,7 +310,7 @@ function addTruthLayers(hmiState) {
       addVectorLayerTopDown(hmiState, nextName);
     }
   }
-}*/
+}
 
 function deriveLayerName(status, animalType) {
   return status + "_" + animalType;
@@ -346,13 +350,27 @@ function createBasemap(hmiState) {
   return basemap;
 }
 
-function simulateData(hmiState) {}
+function simulateData(hmiState) {
+
+  queueSimUpdate(hmiState);
+}
 
 let simUpdateTimeout = null;
 
 function queueSimUpdate(hmiState) {
   if (simUpdateTimeout) {
     clearTimeout(simUpdateTimeout);
+  }
+
+  //refresh layers
+  console.log("refreshing");
+  for (let stat of statuses) {
+    for (let animalType of animalTypes) {
+      let layerName = deriveTruthLayerName(stat, animalType);
+      let layer = findMapLayerWithName(hmiState, layerName);
+      layer.changed();
+      layer.getSource().changed();
+    }
   }
 
   simUpdateTimeout = setTimeout(
