@@ -389,4 +389,23 @@ i {
     opacity: .5;
     pointer-events: auto;
   }
-  
+  .toggle-switch-container{
+    margin-top: 20px;
+  }
+  .toggle-label{
+    color:#666;
+    font-family: var(--bs-btn-font-family);
+    font-size: var(--bs-btn-font-size);
+    font-weight: var(--bs-btn-font-weight);
+    line-height: var(--bs-btn-line-height);
+  }
+  .past-data-header{
+    color:#666;
+    font-family: var(--bs-btn-font-family);
+    font-size: var(--bs-btn-font-size);
+    font-weight: var(--bs-btn-font-weight);
+    line-height: var(--bs-btn-line-height);
+  }
+  .past-data-container{
+    margin-bottom: 20px;
+  }
