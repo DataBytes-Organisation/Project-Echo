@@ -148,6 +148,26 @@ body {
     margin-top: 2px;
 }
 
+.vulnerable {
+  border: 3px solid orange !important;
+}
+
+.normal{
+  border: 3px solid green !important;
+}
+
+.endangered{
+  border: 3px solid red !important;
+}
+
+.invasive{
+  border: 3px solid blue !important;
+}
+
+.nearthreatened{
+  border: 3px solid yellow !important;
+}
+
 #content{
     display: flex;
     width: 100%;
