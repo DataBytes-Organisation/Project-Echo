@@ -10,7 +10,6 @@ from entities.sensor_manager import SensorManager
 
 class TestConfig(unittest.TestCase):
     def setUp(self):
-        # Set up the Config object and read the environment variables
         self.config = Config()
 
     def test_valid_logger(self):
@@ -24,20 +23,22 @@ class TestConfig(unittest.TestCase):
         for node in graph.nodes():
             assert len(graph.edges(node)) > 0, f"Node {node} has no edges"
 
+    @unittest.skip
+    def test_database_connection(self):
+        print('no database connection string provided yet')
+        pass
+
 
 class Config:
     def __init__(self):
-        # Read the contents of the config file
         config_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config', '.config')
         with open(config_file_path) as f:
             config_data = f.readlines()
 
-        # Loop through each line in the config file and set the system variable
         for line in [line for line in config_data if line != "\n"]:
             key, value = line.strip().split('=')
             os.environ[key] = value
         
-        # Set up the logger based on the value of DEBUG_LEVEL in the config file
         if 'DEBUG_LEVEL' in os.environ:
             debug_level = os.environ['DEBUG_LEVEL']
             if debug_level in ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']:
@@ -76,5 +77,4 @@ class Config:
         self.SENSOR_MANAGER.generate_sensor_graph()
 
 if __name__ == "__main__":
-    # Run the test case
-    unittest.main()
+    print('Model to be imported, not run')
