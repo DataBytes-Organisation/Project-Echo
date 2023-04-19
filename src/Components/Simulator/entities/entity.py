@@ -11,11 +11,8 @@ import numpy as np
 
 class Entity():
     # constructor
-    def __init__(self, lla) -> None:
-        
-        # Set start position (latitude, longitude, altitude)
-        self.lla = lla
-        
+    def __init__(self, lla) -> None:    
+        self.lla: lla
         # Create a Transformer object for LLA to ECEF conversion
         self.to_ecef = Transformer.from_crs("EPSG:4326", "EPSG:4978", always_xy=True)
         self.from_ecef = Transformer.from_crs("EPSG:4978", "EPSG:4326", always_xy=True)
@@ -62,7 +59,7 @@ class Entity():
 
             # Check if the generated lat/lon values fall within the diamond
             if (lon >= left_diamond[1] and lon <= right_diamond[1] and lat >= bottom_diamond[0] and lat <= top_diamond[0]):
-                return [lat, lon]
+                return (lat, lon, 10)
         
 
     def get_otways_coordinates(self):

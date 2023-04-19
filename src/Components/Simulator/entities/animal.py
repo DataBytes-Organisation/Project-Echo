@@ -9,8 +9,8 @@ import entities.entity
 import datetime
 
 class Animal(entities.entity.Entity):
-    def __init__(self, lla=(0,0,10.0)) -> None:
-        self.species = entities.species.Species.DOG
+    def __init__(self, species, lla=(0,0,10.0)) -> None:
+        self.species = species
         self.sound_produced_time: datetime
 
         super(Animal, self).__init__(lla)

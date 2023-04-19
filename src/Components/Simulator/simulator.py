@@ -1,6 +1,7 @@
 import init
 import unittest
 from entities.clock import Clock
+from entities.animal_factory import AnimalFactory
 
 
 class Simulator():
@@ -20,6 +21,8 @@ class Simulator():
         unittest_runner.run(suite)
 
         self.SystemClock = Clock()
+        self.AnimalFactory = AnimalFactory()
+        print(self.AnimalFactory.create_random_animal().species)
 
 if __name__ == "__main__":
     Simulator()

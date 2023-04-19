@@ -5,7 +5,9 @@
 from enum import Enum
 
 class Species(Enum):
-    DOG = 1
-    BIRD = 2
-    LION = 3
+    brant = 1
+    jabwar = 2
+    sheowl = 3
+    spodov = 4
+    wiltur = 5
     

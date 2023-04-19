@@ -4,11 +4,10 @@
 #############################################################################
 
 import entities.entity
-import uuid
 import datetime
 
 class MicrophoneStation(entities.entity.Entity):
-    def __init__(self, _uuid, name, lla=(0,0,10.0)) -> None:
+    def __init__(self, _uuid, name, lla) -> None:
         self.name = name
         self.unique_identifier = _uuid
 
