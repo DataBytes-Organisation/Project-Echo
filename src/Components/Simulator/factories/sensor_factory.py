@@ -17,3 +17,4 @@ class SensorFactory(object):
     def create(self, _uuid, name, lla):
         instance = MicrophoneStation(_uuid, name, lla)
         return instance
+    
