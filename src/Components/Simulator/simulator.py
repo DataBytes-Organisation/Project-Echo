@@ -13,8 +13,8 @@ class TestConfig(simulator_init.TestConfig):
 class Simulator():
     def __init__(self) -> None:
         self.config = simulator_init.Config()
-        self.clock  = Clock()
-        
+        self.clock  = Clock(200) # 200 step interval 200 milliseconds
+
     # run the live simulator
     def execute(self):
         
@@ -25,7 +25,10 @@ class Simulator():
         self.main_loop(animals, sensors)
         
     def main_loop(self, animals, sensors):
+        
         # update the simulated time
+        # one loop of the simulator represents 200ms of simulated time
+        self.clock.advance_time(self.step_interval*1000, 'microseconds')
         
         for animal in animals:
             # update the animal lla
@@ -42,8 +45,7 @@ class Simulator():
         
         # wait for wall clock to elapse to sync with real time
         self.wait_real_time_sync()
-        
-        
+           
     def render_state_to_map(self):
         # TODO
         pass
@@ -53,9 +55,8 @@ class Simulator():
         pass
     
     def wait_real_time_sync(self):
-        # TODO
-        pass       
-
+        self.clock.wait_real_time_sync()
+      
     # run some simulator test cases
     def test(self):
         suite = unittest.TestSuite()
@@ -68,9 +69,14 @@ class Simulator():
         self.SystemClock = Clock()
         self.AnimalFactory = AnimalFactory()
         self.SensorFactory = SensorFactory()
-        print(self.AnimalFactory.create_random_animal().species)
+        print(f'Random animal create(): {self.AnimalFactory.create().species}')
+        print(f'Random animal create_random_animal(): {self.AnimalFactory.create_random_animal().species}')
 
 if __name__ == "__main__":
+    
+    clock = Clock()
+    clock.test()
+    
     sim = Simulator()
     sim.test()
     
