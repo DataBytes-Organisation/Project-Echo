@@ -16,6 +16,12 @@ class Animal(entities.entity.Entity):
         super(Animal, self).__init__(lla)
         self.set_random_lla()
         self.set_sound_production_time()
+        
+    def update_lla(self) -> None:
+        pass
+    
+    def random_vocalisation(self) -> None:
+        pass    
 
     def set_random_lla(self) -> None:
         x, y, _ = self.randLatLong()
