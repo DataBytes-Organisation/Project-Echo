@@ -1,7 +1,9 @@
 import init
 import unittest
 from entities.clock import Clock
-from entities.animal_factory import AnimalFactory
+
+from factories.animal_factory import AnimalFactory
+from factories.sensor_factory import SensorFactory
 
 class TestConfig(init.TestConfig):
     def __init__(self, *args, config=None, **kwargs):
@@ -27,6 +29,7 @@ class Simulator():
 
         self.SystemClock = Clock()
         self.AnimalFactory = AnimalFactory()
+        self.SensorFactory = SensorFactory()
         print(self.AnimalFactory.create_random_animal().species)
 
 if __name__ == "__main__":
