@@ -10,9 +10,14 @@ def eventEntity(event) -> dict:
         "animalLLAUncertainty": event["animalLLAUncertainty"],
         "confidence": event["confidence"] 
     }
+
 def eventSpeciesEntity(event) -> dict:
     return {
         "_id": str(event["_id"]),
+        "commonName": event["commonName"],
+        "type": event["type"],
+        "status": event["status"],
+        "diet": event["diet"],
         "timestamp": event["timestamp"],
         "sensorId": event["sensorId"],
         "species": event["species"],
@@ -21,7 +26,19 @@ def eventSpeciesEntity(event) -> dict:
         "animalTrueLLA": event["animalTrueLLA"],
         "animalLLAUncertainty": event["animalLLAUncertainty"],
         "confidence": event["confidence"],
-        "info": event["info"]
+    }
+
+def movementEntity(event) -> dict:
+    return {
+        "_id": str(event["_id"]),
+        "commonName": event["commonName"],
+        "type": event["type"],
+        "status": event["status"],
+        "diet": event["diet"],
+        "timestamp": event["timestamp"],
+        "species": event["species"],
+        "animalId": event["animalId"],
+        "animalTrueLLA": event["animalTrueLLA"]
     }
 
 def speciesEntity(species) -> dict:
@@ -47,3 +64,6 @@ def eventSpeciesListEntity(events) -> list:
 
 def audioListEntity(audios) -> list:
     return [audioEntity(audio) for audio in audios]
+
+def movementListEntity(events) -> list:
+    return [movementEntity(event) for event in events]
