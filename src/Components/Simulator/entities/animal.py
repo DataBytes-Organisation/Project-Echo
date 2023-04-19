@@ -9,7 +9,7 @@ import entities.entity
 import datetime
 
 class Animal(entities.entity.Entity):
-    def __init__(self, species, lla=(0,0,10.0)) -> None:
+    def __init__(self, species, lla=None) -> None:
         self.species = species
         self.sound_produced_time: datetime
 
@@ -18,7 +18,7 @@ class Animal(entities.entity.Entity):
         self.set_sound_production_time()
 
     def set_random_lla(self) -> None:
-        x, y = self.randLatLong()
+        x, y, _ = self.randLatLong()
         self.lla = (x, y, 10.0)
     
     def set_sound_production_time(self) -> None:

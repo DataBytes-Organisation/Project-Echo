@@ -5,6 +5,6 @@ import entities.entity
 
 class AnimalFactory():
     @staticmethod
-    def create_random_animal(lla=entities.entity.Entity((0,0,10)).randLatLong()):
+    def create_random_animal():
         species = random.choice(list(Species))
-        return Animal(species, lla)
+        return Animal(species)
