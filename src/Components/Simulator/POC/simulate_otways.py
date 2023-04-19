@@ -47,7 +47,7 @@ class Otways(entities.entity.Entity):
         for mic in self.microphones:
             folium.Marker(location=[mic.getLLA()[0], mic.getLLA()[1]], icon=folium.Icon(icon="microphone", prefix='fa', color="orange")).add_to(m)
 
-        m.save(os.path.join(os.getcwd(),'src/Components/Simulator/outputs/map.html'))
+        m.save(os.path.join(os.getcwd(),'src/Components/Simulator/POC/outputs/map.html'))
         self.folium_map = m
 
 if __name__ == "__main__":

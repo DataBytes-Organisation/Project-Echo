@@ -10,7 +10,6 @@ from geopy.distance import distance
 from math import radians, sin, cos, sqrt, asin, degrees, pi, atan2
 import matplotlib.pyplot as plt
 import folium
-from folium.plugins import MarkerCluster
 from simulate_otways import Otways
 from entities.animal import Animal 
 import numpy as np
@@ -37,9 +36,27 @@ class Simulator():
                     if _distance <= self.NODE_THRESHOLD:
                         self.graph.add_edge(mic1, mic2)
 
+        # Store information about all the microphones in the system to a JSON file
+        mics_info = []
+        for mic in self.SIMULATED_OTWAYS_MAP.microphones:
+            mic_info = {
+                "name": mic.name,
+                "latitude": mic.getLLA()[0],
+                "longitude": mic.getLLA()[1],
+                "elevation": mic.getLLA()[2],
+                "name": mic.name,
+                "unique_identifier": mic.unique_identifier
+            }
+            mics_info.append(mic_info)
+        
+        with open(os.path.join(os.getcwd(),'src/Components/Simulator/POC/outputs/mics_info.json'), 'w') as f:
+            json.dump(mics_info, f)
+
+        input('check json')
+
     def _draw_node_graph(self, plt_noodes: bool = False) -> None:
         nx.draw(self.graph, with_labels=False)
-        plt.savefig(os.path.join(os.getcwd(),'src/Components/Simulator/outputs/mic_node_graph.png'))
+        plt.savefig(os.path.join(os.getcwd(),'src/Components/Simulator/POC/outputs/mic_node_graph.png'))
         if plt_noodes: plt.show()
 
     def reset_mics(self):
@@ -110,7 +127,7 @@ class Simulator():
     def map_intersections(self, predicted_lla, truth_lla) -> None:
         folium.Marker(location=[truth_lla[0], truth_lla[1]], icon=folium.Icon(icon="paw", prefix='fa', color="red"), popup="Animal Truth Location", icon_offset=(0, 0)).add_to(self.SIMULATED_OTWAYS_MAP.folium_map)
         folium.Marker(location=[predicted_lla[0], predicted_lla[1]], icon=folium.Icon(icon="signal", color="green"), popup="Predicted Location", icon_offset=(0, 0)).add_to(self.SIMULATED_OTWAYS_MAP.folium_map)
-        self.SIMULATED_OTWAYS_MAP.folium_map.save(os.path.join(os.getcwd(),'src/Components/Simulator/outputs/map_event_detection.html'))
+        self.SIMULATED_OTWAYS_MAP.folium_map.save(os.path.join(os.getcwd(),'src/Components/Simulator/POC/outputs/map_event_detection.html'))
     
     def broadcast_message(self, predicted_lla, toda_data) -> None:
         _tmp_json_data = {
