@@ -1,18 +1,18 @@
-import init
+import simulator_init
 import unittest
-from entities.clock import Clock
+from clock import Clock
 
 from factories.animal_factory import AnimalFactory
 from factories.sensor_factory import SensorFactory
 
-class TestConfig(init.TestConfig):
+class TestConfig(simulator_init.TestConfig):
     def __init__(self, *args, config=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.config = config
                 
 class Simulator():
     def __init__(self) -> None:
-        self.config = init.Config()
+        self.config = simulator_init.Config()
         
     # run the live simulator
     def execute(self):

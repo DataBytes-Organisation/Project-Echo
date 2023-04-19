@@ -5,7 +5,9 @@ import datetime
 import logging
 from datetime import datetime
 from entities.microphone import MicrophoneStation
-from entities.sensor_manager import SensorManager
+from sensor_manager import SensorManager
+from factories.animal_factory import AnimalFactory
+from factories.sensor_factory import SensorFactory
 
 
 class TestConfig(unittest.TestCase):
@@ -59,7 +61,7 @@ class Config:
         self.create_sensor_graph()
         
         # Create Animal Instances
-        self.create_animal_instances(animal_factory)
+        animal_instances = self.create_animal_instances(animal_factory)
     
     def read_configuration(self):
         config_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config', '.config')
@@ -99,10 +101,12 @@ class Config:
         logger1.setLevel(debug_level)               
     
     def create_animal_factory(self):
-        pass
+        factory = AnimalFactory()
+        return factory
     
     def create_sensor_factory(self):
-        pass
+        factory = SensorFactory()
+        return factory
     
     def create_sensor_instances(self, sensor_factory):
         instances = []
@@ -110,9 +114,10 @@ class Config:
         with open(_path, 'r') as f:
             mics_info = json.load(f)
         for mic_info in mics_info:
-            instance = MicrophoneStation(mic_info["unique_identifier"], 
-                                         mic_info["name"], 
-                                         (mic_info["latitude"], mic_info["longitude"], mic_info["elevation"]))
+            instance = sensor_factory.create(mic_info["unique_identifier"], 
+                                  mic_info["name"], 
+                                  (mic_info["latitude"], mic_info["longitude"], mic_info["elevation"]))
+
             instances.append(instance)
         return instances
         
@@ -125,7 +130,12 @@ class Config:
         self.SENSOR_MANAGER.generate_sensor_graph()
 
     def create_animal_instances(self, animal_factory):
-        pass
+        instances = []
+        # TODO: we should use config for this
+        for a in range(10):
+            animal = animal_factory.create()
+            instances.append(animal)
+        return instances
         
 
 if __name__ == "__main__":

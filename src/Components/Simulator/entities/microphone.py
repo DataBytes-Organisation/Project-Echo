@@ -28,6 +28,5 @@ class MicrophoneStation(entities.entity.Entity):
     def reset(self) -> None:
         self.TRIGGERED = False
         self.event_timestamp = None
-        
 
         
