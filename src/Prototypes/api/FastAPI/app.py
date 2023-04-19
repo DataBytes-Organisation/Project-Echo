@@ -37,8 +37,10 @@ def show_event(species: str):
 
 @app.get("/events_time", response_description="Get detection events within certain duration")
 def show_event_from_time(start: str, end: str):
-    datetime_start = datetime.datetime.fromtimestamp(int(start))
-    datetime_end = datetime.datetime.fromtimestamp(int(end))
+    datetime_start = datetime.datetime.fromtimestamp(int(start), datetime.timezone.utc)
+    datetime_end = datetime.datetime.fromtimestamp(int(end), datetime.timezone.utc)
+    print(datetime_start)
+    print(datetime_end)
     aggregate = [
         {
             '$match':{'timestamp': {'$lt' : datetime_end, '$gte' : datetime_start }}
@@ -83,8 +85,8 @@ def show_audio(id: str):
 
 @app.get("/movement_time", response_description="Get true animal movement data within certain duration")
 def show_event_from_time(start: str, end: str):
-    datetime_start = datetime.datetime.fromtimestamp(int(start))
-    datetime_end = datetime.datetime.fromtimestamp(int(end))
+    datetime_start = datetime.datetime.fromtimestamp(int(start), datetime.timezone.utc)
+    datetime_end = datetime.datetime.fromtimestamp(int(end), datetime.timezone.utc)
     aggregate = [
         {
             '$match':{'timestamp': {'$lt' : datetime_end, '$gte' : datetime_start }}
