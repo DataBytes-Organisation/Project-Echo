@@ -4,6 +4,7 @@ from clock import Clock
 
 from factories.animal_factory import AnimalFactory
 from factories.sensor_factory import SensorFactory
+from message_manager import MessageManager
 
 class TestConfig(simulator_init.TestConfig):
     def __init__(self, *args, config=None, **kwargs):
@@ -84,9 +85,12 @@ if __name__ == "__main__":
     #clock = Clock()
     #clock.test()
     
-    sim = Simulator()
+    mm = MessageManager()
+    mm.test()
+    
+    # sim = Simulator()
     #sim.test()
     
     # by default it will run 10 loops
-    sim.execute()
+    # sim.execute()
     

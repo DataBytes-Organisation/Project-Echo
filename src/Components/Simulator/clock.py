@@ -15,11 +15,6 @@ class Clock:
             cls.last_sync_time = datetime.datetime.now()
         return cls._instance
         
-  #  def __init__(self, step_interval = 0.2, start_time=datetime.datetime.now()):
-  #      self.current_time = start_time
-  #      self.step_interval = step_interval
-  #      self.last_sync_time = datetime.datetime.now()
-    
     def get_time(self):
         return self.current_time
     
