@@ -1,0 +1,901 @@
+[{
+    "timestamp": "2023-03-22 13:45:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.1555,
+        150.2009,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 13:50:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.155692625201354,
+        150.20095777678353,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 13:55:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15558998539116,
+        150.20104711653286,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 14:00:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15555939356287,
+        150.2009432555627,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 14:05:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.155636194256076,
+        150.20112470304986,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 14:10:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15551865995021,
+        150.20130527097982,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 14:15:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.155492578100336,
+        150.201319394768,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 14:20:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.155557010619546,
+        150.20151871147456,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 14:25:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.155616840554714,
+        150.20159490323536,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 14:30:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15556417892185,
+        150.20151460053955,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 14:35:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15554584359358,
+        150.20166948131725,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 14:40:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15547933351845,
+        150.20159711135608,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 14:45:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15529028968751,
+        150.20158217262804,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 14:50:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15534943411299,
+        150.20169389602623,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 14:55:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.155508765427236,
+        150.20183779059022,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 15:00:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15531857585042,
+        150.2020031636971,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 15:05:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.155246754019004,
+        150.2021967213381,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 15:10:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.155263621092494,
+        150.20214942338762,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 15:15:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15528043363662,
+        150.2022500789669,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 15:20:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15512369224675,
+        150.20224962053715,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 15:25:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15496666771701,
+        150.20208124770002,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 15:30:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15512392375071,
+        150.20219461241214,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 15:35:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.155043080963516,
+        150.2021624007866,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 15:40:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15503814470126,
+        150.2020321062287,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 15:45:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.154998690024385,
+        150.2020701869569,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 15:50:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.155159858132954,
+        150.2020942083651,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 15:55:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15506587322145,
+        150.2021108945119,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 16:00:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.154880473830964,
+        150.20214455089655,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 16:05:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.154752336409715,
+        150.2019446610023,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 16:10:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.1549160989293,
+        150.2018774736122,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 16:15:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15489948149266,
+        150.20181846248872,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 16:20:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15472781594478,
+        150.20165822841747,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 16:25:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15483121260974,
+        150.2015455738845,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 16:30:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15494283991853,
+        150.20173129661285,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 16:35:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15503330243037,
+        150.20188825982197,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 16:40:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.155111117559386,
+        150.20180682979822,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 16:45:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15518024898136,
+        150.20176178364574,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 16:50:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15527660029297,
+        150.20195527357598,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 16:55:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.1551081473422,
+        150.2018647472778,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 17:00:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15500504679379,
+        150.20180624925743,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 17:05:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.154820635377845,
+        150.20175100075198,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 17:10:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15478678742775,
+        150.20174600575587,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 17:15:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15497584920383,
+        150.2016774491088,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 17:20:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.155061320343506,
+        150.20182036681007,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 17:25:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15517915569751,
+        150.20167296719472,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 17:30:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15514479589377,
+        150.20156217231357,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 17:35:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.1550866755095,
+        150.20142607157152,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 17:40:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15493071605052,
+        150.20153847077327,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 17:45:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15503761899451,
+        150.20145754416174,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 17:50:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.1550355012397,
+        150.20130886884186,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 17:55:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.155058193435586,
+        150.20117540392098,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 18:00:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15487710356379,
+        150.20122991768932,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 18:05:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.154909240200126,
+        150.20127579655357,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 18:10:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.154758235216065,
+        150.2013233054465,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 18:15:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15490185806692,
+        150.20117474940278,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 18:20:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.155029340578366,
+        150.2010626631542,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 18:25:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.155219439294434,
+        150.20092984992957,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 18:30:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15538988631154,
+        150.20087228472931,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 18:35:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15554857212234,
+        150.20093515160272,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 18:40:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15557427353081,
+        150.20078971431576,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 18:45:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.155590255458414,
+        150.20081397127436,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 18:50:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15558745926719,
+        150.2006999013285,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 18:55:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15566690752011,
+        150.20058678871578,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 19:00:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15552937188739,
+        150.20046133675027,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 19:05:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.1554035529083,
+        150.20036888885014,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 19:10:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.1555908027133,
+        150.20050943972254,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 19:15:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.1556836679782,
+        150.20063469447442,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 19:20:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.155788210525884,
+        150.20049434267005,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 19:25:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.155595401526504,
+        150.20064587083007,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 19:30:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15544834666528,
+        150.20050211253235,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 19:35:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15531898407648,
+        150.20068650650808,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 19:40:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15521651390058,
+        150.20066881192076,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 19:45:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15511998508674,
+        150.20047034603093,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 19:50:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15501614621967,
+        150.20051168151306,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 19:55:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15499283352515,
+        150.20033038062337,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 20:00:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15484399032813,
+        150.20044107802102,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 20:05:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15467738389486,
+        150.20050926145535,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 20:10:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.154651559139296,
+        150.20040230527522,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 20:15:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.1547854103565,
+        150.2004722441681,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 20:20:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15476803318458,
+        150.20031146657914,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 20:25:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.154863282123316,
+        150.2003754103122,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 20:30:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.154881188259765,
+        150.2005268809611,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 20:35:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15470923568773,
+        150.20048922274015,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 20:40:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.1548800982848,
+        150.20039614797093,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 20:45:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15483508585274,
+        150.20041866146605,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 20:50:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15470930928001,
+        150.20053915697503,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 20:55:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15489216109116,
+        150.20059469672572,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 21:00:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15492709068607,
+        150.20049081107084,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 21:05:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15487542266991,
+        150.20045014573668,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 21:10:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.154919197363384,
+        150.20044144701782,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 21:15:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15482928498465,
+        150.20036471064677,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 21:20:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.154660647558615,
+        150.20021061679037,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 21:25:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.154811725835586,
+        150.20026460545196,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 21:30:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.154801050203716,
+        150.20032291135024,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 21:35:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15496315211086,
+        150.20051755586928,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 21:40:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15495885844699,
+        150.2004769273149,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 21:45:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15492421448536,
+        150.2004852863173,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 21:50:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.15492330683282,
+        150.20048649856193,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 21:55:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.154791781593225,
+        150.20046019681325,
+        23
+    ]
+},{
+    "timestamp": "2023-03-22 22:00:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -33.154655302745056,
+        150.20052568619363,
+        23
+    ]
+}]
