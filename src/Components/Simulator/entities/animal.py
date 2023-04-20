@@ -67,12 +67,10 @@ class Animal(entities.entity.Entity):
         dy = delta_lon*np.sqrt(self.clock.step_interval) * np.random.randn(1)
 
         # Compute the cumulative sum of the increments
-        lla = (lla[0] + np.cumsum(dx), lla[1] + np.cumsum(dy), lla[2])
+        lla = ((lla[0] + np.cumsum(dx))[0], (lla[1] + np.cumsum(dy))[0], lla[2])
  
         # update the LLA position
         self.setLLA(lla)
-        
-        pass
     
     def random_vocalisation(self) -> None:
         print(f'Random sample for vocalisation')
