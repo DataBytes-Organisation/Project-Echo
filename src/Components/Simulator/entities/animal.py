@@ -6,8 +6,9 @@
 from clock import Clock
 import entities.species
 import entities.entity
-import datetime
 import numpy as np
+import base64
+import uuid
 
 class Animal(entities.entity.Entity):
     
@@ -21,6 +22,9 @@ class Animal(entities.entity.Entity):
         
         # get the singleton clock handle for time calls
         self.clock = Clock()
+        
+        # allocate a uuid
+        self.uuid = self.short_uuid()
         
         # the animal species
         self.species = species
@@ -42,12 +46,32 @@ class Animal(entities.entity.Entity):
             None)
 
     def describe(self) -> None:
+        print(f'Animal UUID           : {self.uuid}')
         print(f'Animal Species        : {self.species}')
         print(f'Animal LLA            : {self.getLLA()}')
         print(f'Animal Vocal Mean (s) : {self.vocal_interval_mean}')
         print(f'Animal Vocal Std (s)  : {self.vocal_interval_std}')
         
+    # motion is modelled as random brownian motion 
     def update_lla(self) -> None:
+        
+        # get the current lla
+        lla = self.getLLA()
+        
+        # these parameters needs to be tuned
+        delta_lat = 0.00001
+        delta_lon = 0.00001
+        
+        # Generate random increments in x and y directions
+        dx = delta_lat*np.sqrt(self.clock.step_interval) * np.random.randn(1)
+        dy = delta_lon*np.sqrt(self.clock.step_interval) * np.random.randn(1)
+
+        # Compute the cumulative sum of the increments
+        lla = (lla[0] + np.cumsum(dx), lla[1] + np.cumsum(dy), lla[2])
+ 
+        # update the LLA position
+        self.setLLA(lla)
+        
         pass
     
     def random_vocalisation(self) -> None:
@@ -63,20 +87,31 @@ class Animal(entities.entity.Entity):
         if elapsed > self.next_vocal_random_wait:
             
             # TODO: send the vocalisation
-            print(f'simulated vocalisation from Animal {self} time: {sim_time}')
+            print(f'Vocalisation Sent! Animal {self.uuid} time: {sim_time}')
             
             # calculate when next vocalisation will occur
             self.next_vocal_random_wait = np.random.normal(
                 self.vocal_interval_mean,
                 self.vocal_interval_std,
                 None) 
+            
+            # track last vocalisation time
+            self.last_vocalisation_time = sim_time
 
     def set_random_lla(self) -> None:
         x, y, a = self.randLatLong()
         self.lla = (x, y, a)
-    
-    def set_sound_production_time(self) -> None:
-        self.sound_produced_time = datetime.datetime.now()
+        
+    def short_uuid(self):
+        # Generate a new UUID
+        u = uuid.uuid4()
 
-    def get_sound_production_time(self) -> datetime:
-        return self.sound_produced_time
+        # Convert the UUID to a 16-byte string
+        b = u.bytes
+
+        # Encode the byte string using base64 encoding, and remove padding characters
+        encoded = base64.urlsafe_b64encode(b).rstrip(b'=')
+
+        # Decode the byte string to a regular string
+        return encoded.decode('utf-8').upper()
+        
