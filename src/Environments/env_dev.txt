@@ -4,6 +4,7 @@ descartes
 diskcache
 dm-sonnet
 flask
+folium
 google-cloud
 google-cloud-storage
 graphviz

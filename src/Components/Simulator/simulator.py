@@ -117,9 +117,8 @@ if __name__ == "__main__":
     mm = MessageManager()
     mm.test()
     
-    # sim = Simulator()
+    sim = Simulator()
     #sim.test()
+    sim.execute()
     
-    # by default it will run 10 loops
-    # sim.execute()
     
