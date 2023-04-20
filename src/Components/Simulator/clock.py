@@ -2,10 +2,23 @@ import datetime
 import time
 
 class Clock:
-    def __init__(self, step_interval = 0.2, start_time=datetime.datetime.now()):
-        self.current_time = start_time
-        self.step_interval = step_interval
-        self.last_sync_time = datetime.datetime.now()
+    
+    # track the singleton instance of the clock
+    _instance = None
+
+    def __new__(cls, step_interval = 0.2, start_time=datetime.datetime.now()):
+        if cls._instance is None:
+            print('Creating the Clock Once')
+            cls._instance = super(Clock, cls).__new__(cls)
+            cls.current_time = start_time
+            cls.step_interval = step_interval
+            cls.last_sync_time = datetime.datetime.now()
+        return cls._instance
+        
+  #  def __init__(self, step_interval = 0.2, start_time=datetime.datetime.now()):
+  #      self.current_time = start_time
+  #      self.step_interval = step_interval
+  #      self.last_sync_time = datetime.datetime.now()
     
     def get_time(self):
         return self.current_time
@@ -21,7 +34,7 @@ class Clock:
     # step the clock, intended to be called in the simulation loop  
     def update(self):
         self.advance_time(self.step_interval*1000000.0, 'microseconds')
-        print(f'simulated time is now: ', self.current_time)
+        print(f'\n\nsimulated time is now: ', self.current_time)
             
     # supporting the simulation loop, intended to be called at the end of the loop
     def wait_real_time_sync(self):
