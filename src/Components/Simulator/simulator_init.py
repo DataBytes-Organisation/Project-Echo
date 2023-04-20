@@ -34,18 +34,24 @@ class TestConfig(unittest.TestCase):
 
 class Config:
     def __init__(self):
-        pass
+        self.config = self.read_configuration()
+
+    def _get_config(self, CONF_VAR: str):
+        if not CONF_VAR:
+            return self.config
+        else:
+            try:
+                return self.config[CONF_VAR]
+            except:
+                return "INVALID CONFIG VARIABLE"
     
     def initialise(self):
-        
-        # Read the Configuration from local files
-        config = self.read_configuration()
-        
+    
         # Validate the configuration
-        self.validate_configuration(config)
+        self.validate_configuration(self._get_config)
         
         # Initialise logging file
-        self.initiase_logging(config)
+        self.initiase_logging(self._get_config())
         
         # Create the factories
         animal_factory = self.create_animal_factory()
