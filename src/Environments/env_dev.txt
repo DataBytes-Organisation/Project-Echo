@@ -41,6 +41,7 @@ pydot
 pydub
 pyglet
 pyopengl
+pyproj
 pyrender
 pytorch_lightning
 ray

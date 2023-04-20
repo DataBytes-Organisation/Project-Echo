@@ -11,14 +11,15 @@ import numpy as np
 
 class Entity():
     # constructor
-    def __init__(self, lla) -> None:    
-        self.lla: lla
+    def __init__(self, lla=None) -> None:    
+        self.lla = lla
         # Create a Transformer object for LLA to ECEF conversion
         self.to_ecef = Transformer.from_crs("EPSG:4326", "EPSG:4978", always_xy=True)
         self.from_ecef = Transformer.from_crs("EPSG:4978", "EPSG:4326", always_xy=True)
 
     # get the earth-centered earth-fixed coordinates of this entity
     def getECEF(self):
+        assert self.lla is not None, "The lla attribute must not be None"
         # Convert LLA to ECEF coordinates
         return self.to_ecef.transform(self.lla[1], self.lla[0], self.lla[2])
     
@@ -29,6 +30,7 @@ class Entity():
     
     # get the Latitude longitude altitude location
     def getLLA(self):
+        assert self.lla is not None, "The lla attribute must not be None"
         return self.lla
     
     # set the Latitude longitude altitude location
@@ -39,7 +41,8 @@ class Entity():
     def distance(self, other):
         return math.dist(self.getECEF(), other.getECEF())
 
-    def randLatLong(self) -> list[float]:
+    # returns a random lat, lon, alt
+    def randLatLong(self) -> tuple:
         # Define the four corner points of the diamond
         left_diamond = (-38.78648354661556, 143.5445900890966)
         top_diamond = (-38.77310461001655, 143.5769246453492)

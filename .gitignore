@@ -4,3 +4,4 @@
 *.hdf5
 
 tensorboard_logs/
+logs/
