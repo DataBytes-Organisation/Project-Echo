@@ -32,11 +32,14 @@ class Simulator():
             self.clock.update()
             
             for animal in animals:
+                
                 # update the animal lla
                 animal.update_lla()
                 
                 # generate random animal vocalisation
-                animal.random_vocalisation()
+                if animal.random_vocalisation():
+                    pass
+                    # TODO need to process the sensors here
                 
                 animal.describe()
                 

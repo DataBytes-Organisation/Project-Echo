@@ -72,8 +72,9 @@ class Animal(entities.entity.Entity):
         # update the LLA position
         self.setLLA(lla)
     
-    def random_vocalisation(self) -> None:
+    def random_vocalisation(self) -> bool:
         print(f'Random sample for vocalisation')
+        vocalisation_flag = False
         
         # get the current sim time
         sim_time = self.clock.get_time()
@@ -86,6 +87,7 @@ class Animal(entities.entity.Entity):
             
             # TODO: send the vocalisation
             print(f'Vocalisation Sent! Animal {self.uuid} time: {sim_time}')
+            vocalisation_flag = True
             
             # calculate when next vocalisation will occur
             self.next_vocal_random_wait = np.random.normal(
@@ -95,6 +97,8 @@ class Animal(entities.entity.Entity):
             
             # track last vocalisation time
             self.last_vocalisation_time = sim_time
+            
+        return vocalisation_flag   
 
     def set_random_lla(self) -> None:
         x, y, a = self.randLatLong()
