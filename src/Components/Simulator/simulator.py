@@ -13,7 +13,7 @@ class TestConfig(simulator_init.TestConfig):
 class Simulator():
     def __init__(self) -> None:
         self.config = simulator_init.Config()
-        self.clock  = Clock(200) # 200 step interval 200 milliseconds
+        self.clock  = Clock(step_interval=0.200) # 200 step interval 200 milliseconds
 
     # run the live simulator
     def execute(self):
@@ -22,29 +22,30 @@ class Simulator():
         (animals, sensors) = self.config.initialise()
         
         # start the simulator loop
-        self.main_loop(animals, sensors)
+        self.main_loop(animals, sensors, loops=10)
         
-    def main_loop(self, animals, sensors):
+    def main_loop(self, animals, sensors, loops=10):
         
-        # update the simulated time
-        # one loop of the simulator represents 200ms of simulated time
-        self.clock.advance_time(self.step_interval*1000, 'microseconds')
+        for loop in range(loops):
         
-        for animal in animals:
-            # update the animal lla
-            animal.update_lla()
+            # update the simulated time (advance the clock)
+            self.clock.update()
             
-            # generate random animal vocalisation
-            animal.random_vocalisation()
+            for animal in animals:
+                # update the animal lla
+                animal.update_lla()
+                
+                # generate random animal vocalisation
+                animal.random_vocalisation()
+                
+            # render state to map
+            self.render_state_to_map()
             
-        # render state to map
-        self.render_state_to_map()
-        
-        # process API commands
-        self.process_api_commands()
-        
-        # wait for wall clock to elapse to sync with real time
-        self.wait_real_time_sync()
+            # process API commands
+            self.process_api_commands()
+            
+            # wait for wall clock to elapse to sync with real time
+            self.wait_real_time_sync()
            
     def render_state_to_map(self):
         # TODO
@@ -79,4 +80,7 @@ if __name__ == "__main__":
     
     sim = Simulator()
     sim.test()
+    
+    # by default it will run 10 loops
+    sim.execute()
     
