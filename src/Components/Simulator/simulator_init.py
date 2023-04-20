@@ -140,8 +140,11 @@ class Config:
     def create_animal_instances(self, animal_factory):
         instances = []
         # TODO: we should use config for this
-        for a in range(10):
+        for a in range(2):
             animal = animal_factory.create()
+            lla = animal.randLatLong()
+            animal.setLLA(lla)
+            animal.describe()
             instances.append(animal)
         return instances
         

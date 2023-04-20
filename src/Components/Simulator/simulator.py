@@ -58,6 +58,8 @@ class Simulator():
                 # generate random animal vocalisation
                 animal.random_vocalisation()
                 
+                animal.describe()
+                
             # render state to map
             self.render_state_to_map()
             
@@ -95,11 +97,11 @@ class Simulator():
 
 if __name__ == "__main__":
     
-    clock = Clock()
-    clock.test()
+    #clock = Clock()
+    #clock.test()
     
     sim = Simulator()
-    sim.test()
+    #sim.test()
     
     # by default it will run 10 loops
     sim.execute()
