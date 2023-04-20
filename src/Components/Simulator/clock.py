@@ -21,6 +21,7 @@ class Clock:
     # step the clock, intended to be called in the simulation loop  
     def update(self):
         self.advance_time(self.step_interval*1000000.0, 'microseconds')
+        print(f'simulated time is now: ', self.current_time)
             
     # supporting the simulation loop, intended to be called at the end of the loop
     def wait_real_time_sync(self):
@@ -34,7 +35,7 @@ class Clock:
         # print(f'waittime: {waittime}')
         
         if waittime > 0:
-            time.sleep(self.step_interval - timediff)
+            time.sleep(waittime)
             
         # record the last time this sync function was called
         self.last_sync_time = datetime.datetime.now()    
@@ -42,7 +43,7 @@ class Clock:
     def test(self):
         
         # create a clock with wall time now
-        clock = Clock()
+        clock = Clock(0.2)
         
         print(f'sim time is: {clock.get_time()}')
         
