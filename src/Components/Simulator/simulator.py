@@ -17,12 +17,24 @@ class RenderedState(Entity):
     def __init__(self, lla=None) -> None:
         super().__init__(lla)
 
-    def render_initial_sensor_state(self, config):
+    def render_initial_sensor_state(self, config, animals):
         m = folium.Map(location=self.get_otways_coordinates()[0], zoom_start=13)
         for mic in config.SENSOR_MANAGER.MicrophoneObjects:
-            folium.Marker(location=[mic.getLLA()[0], mic.getLLA()[1]], icon=folium.Icon(icon="microphone", prefix='fa', color="orange")).add_to(m)
+            folium.Marker(location=[mic.getLLA()[0], mic.getLLA()[1]], icon=folium.Icon(icon="microphone", prefix='fa', color="black")).add_to(m)
+        for animal in animals:
+            folium.Marker(location=[animal.getLLA()[0], animal.getLLA()[1]], icon=folium.Icon(icon="dove", prefix="fa", color="green"), popup=str(str(animal.species) + '\n' + animal.uuid)).add_to(m)
+
         m.save(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output', 'RenderedState.html'))
         self.folium_map = m
+    
+    def render(self, animals):
+        for animal in animals:
+            folium.Marker(location=[animal.getLLA()[0], animal.getLLA()[1]], icon=folium.Icon(icon="dove", prefix="fa", color="green"), popup=str(str(animal.species) + '\n' + animal.uuid)).add_to(self.folium_map)
+        self.folium_map.save(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output', 'RenderedState.html'))
+    
+    def render_animal_vocalisation(self, animal):
+        folium.Marker(location=[animal.getLLA()[0], animal.getLLA()[1]], icon=folium.Icon(icon="dove", prefix='fa', color="red"), popup="Animal Truth Location vocalisation", icon_offset=(0, 0)).add_to(self.folium_map)
+        self.folium_map.save(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output', 'RenderedState.html'))
                 
 class Simulator():
     def __init__(self) -> None:
@@ -38,7 +50,7 @@ class Simulator():
         # render state
         if bool(self.config._get_config('RENDER_STATES')):
             self.render_state = RenderedState()
-            self.render_state.render_initial_sensor_state(self.config)
+            self.render_state.render_initial_sensor_state(self.config, animals)
     
         # start the simulator loop
         self.main_loop(animals, loops=10)
@@ -57,6 +69,7 @@ class Simulator():
                 
                 # generate random animal vocalisation
                 if animal.random_vocalisation():
+                    self.render_state.render_animal_vocalisation(animal)
                     # self.config.SENSOR_MANAGER.blah()
                     pass
                     # TODO need to process the sensors here
@@ -64,7 +77,7 @@ class Simulator():
                 animal.describe()
                 
             # render state to map
-            self.render_state.render(animal)
+            self.render_state.render(animals)
             
             # process API commands
             self.process_api_commands()
