@@ -69,7 +69,7 @@ class Config:
         # Create Animal Instances
         animal_instances = self.create_animal_instances(animal_factory)
         
-        return (animal_instances, sensor_instances)
+        return animal_instances
     
     def read_configuration(self):
         config_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config', '.config')

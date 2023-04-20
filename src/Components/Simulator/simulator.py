@@ -39,12 +39,12 @@ class Simulator():
     def execute(self):
         
         # initialse the simulator configuration
-        (animals, sensors) = self.config.initialise()
-        
+        animals = self.config.initialise()
+    
         # start the simulator loop
-        self.main_loop(animals, sensors, loops=10)
+        self.main_loop(animals, loops=10)
         
-    def main_loop(self, animals, sensors, loops=10):
+    def main_loop(self, animals, loops=10):
         
         for loop in range(loops):
         
@@ -52,12 +52,16 @@ class Simulator():
             self.clock.update()
             
             for animal in animals:
+                
                 # update the animal lla
                 animal.update_lla()
                 
                 # generate random animal vocalisation
-                animal.random_vocalisation()
-                
+                if animal.random_vocalisation():
+                    # self.config.SENSOR_MANAGER.blah()
+                    pass
+                    # TODO need to process the sensors here
+
                 animal.describe()
                 
             # render state to map
