@@ -83,7 +83,7 @@ class Simulator():
                 # generate random animal vocalisation
                 if animal.random_vocalisation():
                     self.render_state.render_animal_vocalisation(animal)
-                    self.config.SENSOR_MANAGER.vocalisation(animal)
+                    predicted_lla = self.config.SENSOR_MANAGER.vocalisation(animal)
 
                 animal.describe()
                 
@@ -91,13 +91,13 @@ class Simulator():
             self.render_state.render(animals)
             
             # process API commands
-            self.process_api_commands()
+            self.process_api_commands(predicted_lla)
             
             # wait for wall clock to elapse to sync with real time
             self.wait_real_time_sync()
 
         
-    def process_api_commands(self):
+    def process_api_commands(self, predicted_lla):
         # TODO
         pass
     
