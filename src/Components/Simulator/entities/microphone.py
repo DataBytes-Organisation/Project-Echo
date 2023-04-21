@@ -4,29 +4,21 @@
 #############################################################################
 
 import entities.entity
-import datetime
+from clock import Clock
 
 class MicrophoneStation(entities.entity.Entity):
     def __init__(self, _uuid, name, lla) -> None:
         self.name = name
         self.unique_identifier = _uuid
 
-        self.event_timestamp: datetime
-        self.TRIGGERED: bool = False
         super(MicrophoneStation, self).__init__(lla)
 
-    def set_trigger_event_time(self, TT: datetime) -> None:
-        self.event_timestamp = TT
-        self.set_trigger()
-    
-    def get_trigger_event_time(self) -> datetime:
-        return self.event_timestamp
-    
-    def set_trigger(self) -> None:
-        self.TRIGGERED = True
-    
-    def reset(self) -> None:
-        self.TRIGGERED = False
-        self.event_timestamp = None
+        # get the singleton clock handle for time calls
+        self.clock = Clock()
+        self.clock_time = self.clock.get_time()
 
-        
+    def set_trigger_event_time(self, clock_time) -> None:
+        self.triggered_sim_clock_time = clock_time
+
+    def reset_trigger_event_time(self) -> None:
+        self.triggered_sim_clock_time = self.clock.get_time()
