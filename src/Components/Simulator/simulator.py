@@ -48,7 +48,6 @@ class RenderedState(Entity):
             except: pass
 
         self.folium_map.save(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output', 'RenderedState.html'))
-        input('check audio visualisation')
                 
 class Simulator():
     def __init__(self) -> None:
