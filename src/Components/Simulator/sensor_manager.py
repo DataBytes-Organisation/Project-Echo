@@ -48,30 +48,11 @@ class SensorManager(entities.entity.Entity):
         for mic in mics_around_event:
             mic.set_trigger_event_time(animal.last_vocalisation_time + datetime.timedelta(seconds=mic.distance(animal)/self.c))
 
-        predicted_lla_1 = self.solve_animal_lla(mics_around_event)
-        predicted_lla_2 = self.solve_animal_lla_optimized(mics_around_event)        
-        min_error = min(distance((animal.getLLA()[0], animal.getLLA()[1]), (predicted_lla_2[0], predicted_lla_2[1])).m, distance((animal.getLLA()[0], animal.getLLA()[1]), (predicted_lla_1[0], predicted_lla_1[1])).m)
+        predicted_lla = self.solve_animal_lla_optimized(mics_around_event)        
+        min_error = distance((animal.getLLA()[0], animal.getLLA()[1]), (predicted_lla[0], predicted_lla[1])).m
 
-        print(f'Min error: {min_error}')
-
-    def solve_animal_lla(self, list_triggered_mics):
-        estimate_animal = Animal(species=Species.dummy_triangulation)
-        best_err = np.inf
-
-        for lat in np.arange(self.get_otways_coordinates()[3][0], self.get_otways_coordinates()[1][0], 0.001):
-            for lon in np.arange(self.get_otways_coordinates()[4][1], self.get_otways_coordinates()[2][1], 0.001):
-                estimate_animal.setLLA((lat, lon, 10.0))
-
-                st_est = [mic.distance(estimate_animal) / self.c - np.min([m.distance(estimate_animal) / self.c for m in list_triggered_mics]) for mic in list_triggered_mics]
-                st_obs = [(mic.triggered_sim_clock_time - list_triggered_mics[0].triggered_sim_clock_time).total_seconds() for mic in list_triggered_mics]
-
-                err = sum([abs(st_obs[i] - st_est[i]) for i in range(4)])
-
-                if err < best_err:
-                    best_err = err
-                    best_lat, best_lon = lat, lon
-
-        return best_lat, best_lon
+        print(f'Min triangulation error: {min_error}\n')
+        self.predicted_lla = predicted_lla
     
     def func_to_minimize(self, x, list_triggered_mics, c):
         lat, lon, z = x
