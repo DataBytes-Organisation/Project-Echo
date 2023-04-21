@@ -83,9 +83,7 @@ class Simulator():
                 # generate random animal vocalisation
                 if animal.random_vocalisation():
                     self.render_state.render_animal_vocalisation(animal)
-                    # self.config.SENSOR_MANAGER.blah()
-                    pass
-                    # TODO need to process the sensors here
+                    self.config.SENSOR_MANAGER.vocalisation(animal)
 
                 animal.describe()
                 
