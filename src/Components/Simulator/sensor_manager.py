@@ -97,7 +97,6 @@ class SensorManager(entities.entity.Entity):
             error = distance((truth_animal.getLLA()[0], truth_animal.getLLA()[1]), predicted_lla).m
 
             if error < large_error_threshold:
-                print(error)
                 break
             else:
                 # Update the initial guess to try again
