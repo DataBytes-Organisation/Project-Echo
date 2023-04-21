@@ -34,6 +34,7 @@ class RenderedState(Entity):
                     if str(animal.uuid) == str(marker_.options['customId']):
                         marker_.location[0] = animal.getLLA()[0]
                         marker_.location[1] = animal.getLLA()[1]
+                        marker_.icon.options['markerColor'] = 'green'
                 except: pass
 
         self.folium_map.save(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output', 'RenderedState.html'))
@@ -91,13 +92,13 @@ class Simulator():
             self.render_state.render(animals)
             
             # process API commands
-            self.process_api_commands(predicted_lla)
+            self.process_api_commands()
             
             # wait for wall clock to elapse to sync with real time
             self.wait_real_time_sync()
 
         
-    def process_api_commands(self, predicted_lla):
+    def process_api_commands(self):
         # TODO
         pass
     

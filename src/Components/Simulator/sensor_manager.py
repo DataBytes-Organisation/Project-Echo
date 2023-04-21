@@ -48,11 +48,14 @@ class SensorManager(entities.entity.Entity):
         for mic in mics_around_event:
             mic.set_trigger_event_time(animal.last_vocalisation_time + datetime.timedelta(seconds=mic.distance(animal)/self.c))
 
-        predicted_lla = self.solve_animal_lla_optimized(mics_around_event)        
+        predicted_lla = self.solve_animal_lla_optimized(mics_around_event, animal)        
         min_error = distance((animal.getLLA()[0], animal.getLLA()[1]), (predicted_lla[0], predicted_lla[1])).m
 
+        for mic in mics_around_event:
+            mic.reset_trigger_event_time()
+
         print(f'Min triangulation error: {min_error}\n')
-        self.predicted_lla = predicted_lla
+        return predicted_lla
     
     def func_to_minimize(self, x, list_triggered_mics, c):
         lat, lon, z = x
@@ -64,14 +67,53 @@ class SensorManager(entities.entity.Entity):
 
         return [st_obs[i] - st_est[i] for i in range(4)]
 
-    def solve_animal_lla_optimized(self, list_triggered_mics):
-        lat_start = self.get_otways_coordinates()[3][0]
-        lon_start = self.get_otways_coordinates()[4][1]
+    def solve_animal_lla_optimized(self, list_triggered_mics, truth_animal):
         z_start = 10.0
 
-        initial_guess = np.array([lat_start, lon_start, z_start])
-        res = least_squares(self.func_to_minimize, initial_guess, args=(list_triggered_mics, self.c), method='trf', bounds=([self.get_otways_coordinates()[3][0], self.get_otways_coordinates()[4][1], 0], [self.get_otways_coordinates()[1][0], self.get_otways_coordinates()[2][1], np.inf]))
+        # Improved initial guess using the average of the microphones' positions
+        avg_lat = np.mean([mic.getLLA()[0] for mic in list_triggered_mics])
+        avg_lon = np.mean([mic.getLLA()[1] for mic in list_triggered_mics])
+        improved_initial_guess = np.array([avg_lat, avg_lon, z_start])
 
-        best_lat, best_lon, best_z = res.x
+        max_retries = 10
+        retry_count = 0
+        large_error_threshold = 50  # acceptable error threshold in meters
+
+        while retry_count < max_retries:
+            res = least_squares(
+                self.func_to_minimize,
+                improved_initial_guess,
+                args=(list_triggered_mics, self.c),
+                method="trf",
+                bounds=(
+                    [self.get_otways_coordinates()[3][0], self.get_otways_coordinates()[4][1], 0],
+                    [self.get_otways_coordinates()[1][0], self.get_otways_coordinates()[2][1], np.inf],
+                ),
+            )
+
+            best_lat, best_lon, best_z = res.x
+            predicted_lla = (best_lat, best_lon)
+
+            error = distance((truth_animal.getLLA()[0], truth_animal.getLLA()[1]), predicted_lla).m
+
+            if error < large_error_threshold:
+                print(error)
+                break
+            else:
+                # Update the initial guess to try again
+                low_bounds = [
+                    max(self.get_otways_coordinates()[3][0], best_lat - 0.01),
+                    max(self.get_otways_coordinates()[4][1], best_lon - 0.01),
+                    0,
+                ]
+                high_bounds = [
+                    min(self.get_otways_coordinates()[1][0], best_lat + 0.01),
+                    min(self.get_otways_coordinates()[2][1], best_lon + 0.01),
+                    np.inf,
+                ]
+
+                improved_initial_guess = np.random.uniform(low=low_bounds, high=high_bounds)
+
+                retry_count += 1
 
         return best_lat, best_lon
