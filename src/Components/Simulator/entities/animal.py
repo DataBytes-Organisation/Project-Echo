@@ -47,7 +47,7 @@ class Animal(entities.entity.Entity):
 
     def describe(self) -> None:
         print(f'Animal UUID           : {self.uuid}')
-        print(f'Animal Species        : {self.species}')
+        print(f'Animal Species        : {self.species.getName()}')
         print(f'Animal LLA            : {self.getLLA()}')
         print(f'Animal Vocal Mean (s) : {self.vocal_interval_mean}')
         print(f'Animal Vocal Std (s)  : {self.vocal_interval_std}')
