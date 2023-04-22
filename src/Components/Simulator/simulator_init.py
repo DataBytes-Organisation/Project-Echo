@@ -8,6 +8,7 @@ from entities.microphone import MicrophoneStation
 from sensor_manager import SensorManager
 from factories.animal_factory import AnimalFactory
 from factories.sensor_factory import SensorFactory
+from comms_manager import CommsManager
 
 
 class TestConfig(unittest.TestCase):
@@ -55,8 +56,14 @@ class Config:
         # Initialise logging file
         self.initiase_logging(self._get_config())
         
+        # Create the communications manager
+        self.comms_manager = CommsManager()
+        
+        # Use google cloud to initialise species list
+        species_list = self.comms_manager.gcp_load_species_list()
+        
         # Create the factories
-        animal_factory = self.create_animal_factory()
+        animal_factory = self.create_animal_factory(species_list)
         sensor_factory = self.create_sensor_factory()
         
         # Create Sensor Instances
@@ -110,8 +117,8 @@ class Config:
         logging.getLogger('_sys_logger').addHandler(handler1)
         logger1.setLevel(debug_level)               
     
-    def create_animal_factory(self):
-        factory = AnimalFactory()
+    def create_animal_factory(self, species_list):
+        factory = AnimalFactory(species_list)
         return factory
     
     def create_sensor_factory(self):
