@@ -1,5 +1,7 @@
+
 *.DS_Store
 *.pyc
 *.hdf5
-*.env
+
 tensorboard_logs/
+*.env
