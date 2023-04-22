@@ -1,4 +1,8 @@
 
+# Small test application to test messages arriving on MQTT
+# Adapted from: https://github.com/DataBytes-Organisation/Project-Echo/blob/main/src/Prototypes/api/mqtt/subscriber.py
+# Author: akudilczak
+
 import paho.mqtt.client as paho
 import json
 
@@ -8,10 +12,8 @@ def on_subscribe(client, userdata, mid, granted_qos):
 
 def on_message(client, userdata, msg):
     print(msg.topic+" "+str(msg.qos)+" "+str(msg.payload))    
-    #mycol = mydb["movements"]
     json_object = json.loads(msg.payload)
     print(json_object)
-    #mycol.insert_one(json_object)
 
 client = paho.Client()
 client.on_subscribe = on_subscribe

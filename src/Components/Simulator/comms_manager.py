@@ -89,6 +89,9 @@ class CommsManager():
         # Encode the audio data as a string
         audio_str = self.audio_to_string(audio)
         
+        # For now, send filename across for format information
+        audio_file = sample_blob.name.split('/')[1]
+        
         # TODO create the audio message in correct format
         MQTT_MSG = f'''
         {{
@@ -104,7 +107,8 @@ class CommsManager():
                 {animal_true_lla[2]}
             ],
             "animalLLAUncertainty": 0.0,
-            "audioClip": "{audio_str}"
+            "audioClip": "{audio_str}",
+            "audioFile": "{audio_file}"
         }}
         '''
   
@@ -112,12 +116,6 @@ class CommsManager():
         (rc, mid) = self.mqtt_client.publish('projectecho/engine/1', MQTT_MSG, qos=1)
         
         print(f'Vocalisation Published! Animal {animal.getUUID()} time: {timestamp}')
- 
-    # this method takes in binary audio data and encodes to string
-    def string_to_audio(self, audio_string) -> bytes:
-        base64_img_bytes = audio_string.encode('utf-8')
-        decoded_data = base64.decodebytes(base64_img_bytes)
-        return decoded_data
         
     # this method takes in binary audio data and encodes to string
     def audio_to_string(self, audio_binary) -> str:
