@@ -30,15 +30,57 @@ export function initialiseHMI(hmiState) {
   //addWildlifeLayers(hmiState);
   addTruthLayers(hmiState);
 
-  addTruthFeatures(hmiState);
+  addAllTruthFeatures(hmiState);
   //addVocalizedFeatures(hmiState); !!! Remove and work on in next Update
   addmicrophones(hmiState);
-  //queueSimUpdate(hmiState);
+  queueSimUpdate(hmiState);
   //simulateData(hmiState);
 }
 
 function updateFilters(){
   
+}
+
+export function updateAnimalMovementLayerFromPastData(hmiState, results){
+
+  clearAllTruthLayers();
+
+  hmiState.trueLocations = [];
+
+  for (let data of results) {
+    hmiState.trueLocations.push(convertJSONtoAnimalMovementEvent(data));
+  }
+
+  addAllTruthFeatures(hmiState);
+}
+
+export function clearAllTruthLayers(){
+  for (let stat of statuses) {
+    for (let animalType of animalTypes) {
+      let nextName = stat + "_" + animalType + "_truth";
+      let layer = findMapLayerWithName(hmiState, nextName);
+      layer.getSource().clear();
+    }
+  }
+}
+
+export function convertJSONtoAnimalMovementEvent(data){
+    let movementEvent = {};
+
+    movementEvent.animalId = data.animalId;
+    movementEvent.timestamp = data.timestamp;
+    movementEvent.speciesScientificName = data.species.toLowerCase();
+    movementEvent.speciesIdentificationConfidence = 100.0;
+    movementEvent.locationLat = data.animalTrueLLA[0];
+    movementEvent.locationLon = data.animalTrueLLA[1];
+    movementEvent.locationConfidence = 100.0;
+    movementEvent.animalType = data.type.toLowerCase();
+    movementEvent.animalStatus = data.status.toLowerCase();
+    movementEvent.animalDiet = data.diet.toLowerCase();
+
+    console.log(movementEvent);
+
+    return movementEvent;
 }
 
 function playAudioString(audioDataString) {
@@ -162,7 +204,7 @@ function printTest(vocalizedLayers){
 }
 */
 
-function addTruthFeatures(hmiState) {
+function addAllTruthFeatures(hmiState) {
   //console.log("addTruthLayers called.")
   //console.log("Truth locs", hmiState.trueLocations);
   for (let entry of hmiState.trueLocations) {
@@ -224,8 +266,8 @@ function addmicrophones(hmiState) {
   });
 
   //console.log("mics: ", mics);
-  addVectorLayerTopDown(hmiState, "micLayer");
-  let layer = findMapLayerWithName(hmiState, "micLayer");
+  addVectorLayerTopDown(hmiState, "mic_layer");
+  let layer = findMapLayerWithName(hmiState, "mic_layer");
   let layerSource = layer.getSource();
   layerSource.addFeatures(mics);
   layer.getSource().changed();
@@ -252,7 +294,7 @@ function findMapLayerWithName(hmiState, name) {
 
     for (let i = 0; i < mapLayers.getLength(); ++i) {
       let currentLayer = mapLayers.item(i);
-      if (currentLayer.get("name") == name) {
+      if (currentLayer.get("name") == name.toLowerCase()) {
         return currentLayer;
       }
     }
@@ -336,7 +378,7 @@ function createBasemap(hmiState) {
         name: "mapTileLayer",
         source: new ol.source.XYZ({
           url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-          maxZoom: 19,
+          maxZoom: 18,
         }),
       }),
     ],
