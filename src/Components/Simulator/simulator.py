@@ -128,9 +128,9 @@ if __name__ == "__main__":
     #clock = Clock()
     #clock.test()
     
-    mm = CommsManager()
-    mm.initialise_communications()
-    mm.test()
+    #mm = CommsManager()
+    #mm.initialise_communications()
+    #mm.test()
     
     sim = Simulator()
     #sim.test()
