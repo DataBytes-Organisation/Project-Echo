@@ -1,0 +1,257 @@
+{
+	"name": "sample_data",
+	"version": "1",
+	"format": "json",
+	"origin": "RB/Bios - Bios-Rohit.txt",
+	"data": [{
+			"id": "1",
+			"species": "Litoria Myola",
+			"common": "Myola treefrog",
+			"danger_level": 1,
+			"summary": "Litoria myola, or the Myola treefrog, is a species of tree frog found in the wet sclerophyll forests of New South Wales, Australia.",
+			"description": [
+				"The Myola treefrog has a distinctive olive green or brown coloration with a white belly and a bright yellow stripe running from the corner of its mouth to its shoulder.",
+				"This species is relatively small, with adults typically measuring around 3 cm in length. They have a broad and flattened body shape that helps them to blend in with the leaf litter on the forest floor.",
+				"Myola treefrogs are nocturnal and feed on a variety of insects and other small invertebrates. They have been known to climb trees to hunt for prey, but generally prefer to forage on the ground.",
+				"Unlike some other tree frog species, the Myola treefrog has a simple trill call that is usually produced while the frog is sitting on a leaf or twig.",
+				"This species is considered to be threatened due to habitat loss and degradation, with much of its forest habitat being cleared for agriculture and urban development."
+			],
+			"img": [],
+			"audio": ""
+
+		},
+		{
+			"id": "2",
+			"species": "Litoria peronii",
+			"common": "Emerald-spotted treefrog",
+			"danger_level": 1,
+			"summary": "Litoria peronii, or the Emerald-spotted treefrog, is a species of tree frog found in the eastern and northern parts of Australia, as well as in Papua New Guinea and some nearby islands.",
+			"description": [
+				"The Emerald-spotted treefrog gets its name from the bright green spots on its back and legs, which stand out against its dark brown or black body coloration.",
+				"This species is relatively large, with adults typically measuring around 6-7 cm in length. They have a slender and streamlined body shape that helps them to move through the trees with ease.",
+				"These frogs have a distinctive `tok` call that is usually produced while perched on a tree trunk or branch. Males will often call in chorus, creating a loud and raucous chorus during the breeding season.",
+				"Emerald-spotted treefrogs are nocturnal and feed on a variety of insects and other small invertebrates. They are also known to be cannibalistic and will eat other smaller frogs.",
+				"Emerald-spotted treefrogs are adaptable and can survive in a range of habitats, including forests, woodlands, and suburban gardens. However, like many other frog species, they are threatened by habitat loss and degradation, pollution, and introduced predators such as feral cats and foxes."
+			],
+			"img": [],
+			"audio": ""
+
+		},
+		{
+			"id": "3",
+			"species": "Litoria serrata",
+			"common": "Green-eyed treefrog",
+			"danger_level": 1,
+			"summary": "Litoria serrata, or the Green-eyed treefrog, is a species of tree frog found in the rainforests and wet sclerophyll forests of eastern Australia.",
+			"description": [
+				"The Green-eyed treefrog is named for its striking bright green eyes, which contrast with its dark green or brown body coloration.",
+				"This species is relatively large, with adults typically measuring around 6-7 cm in length. They have a robust and muscular body shape that helps them to climb and move through the trees with ease.",
+				"Green-eyed treefrogs are nocturnal and feed on a variety of insects and other small invertebrates. They have a distinctive hunting behavior where they sit and wait on leaves or other surfaces for prey to come close, then pounce on them with lightning-fast reflexes.",
+				"These frogs have a loud and distinctive `wark` call that is usually produced while perched on."
+			],
+			"img": [],
+			"audio": ""
+
+		},
+		{
+			"id": "4",
+			"species": "Macropus giganteus",
+			"common": "Eastern Grey Kangaroo",
+			"danger_level": 2,
+			"summary": "The Macropus giganteus, commonly known as the Eastern Grey Kangaroo, is a marsupial species found in eastern Australia.",
+			"description": [
+				"The Eastern Grey Kangaroo is the largest marsupial in Australia and the second largest in the world, with males weighing up to 66 kg and standing over 2 metres tall.",
+				"This species is primarily herbivorous and feeds on a variety of plants, including grasses, shrubs, and leaves. They have a unique digestive system, which allows them to regurgitate and re-chew their food to aid in digestion.",
+				"This species is highly adaptable and can be found in a variety of habitats, including grassland, woodland, and scrubland. They are known to congregate in large groups, known as mobs, which can number in the hundreds.",
+				"The Eastern Grey Kangaroo has a unique reproductive system, with females giving birth to tiny, underdeveloped joeys that crawl into their mother's pouch to complete their development. Once fully developed, the joey will leave the pouch and begin to explore its surroundings.",
+				"The Eastern Grey Kangaroo is known for its powerful legs and muscular tail, which it uses for balance and support while hopping. They are capable of hopping at speeds of up to 56 km/h and can cover great distances in a single bound."
+			],
+			"img": [],
+			"audio": ""
+
+		},
+
+		{
+			"id": "5",
+			"species": "Notamacropus rufogriseus",
+			"common": "Red-necked Wallaby",
+			"danger_level": 1,
+			"summary": "The Red-necked Wallaby is a medium-sized marsupial found in eastern Australia.",
+			"description": [
+				"They have a distinctive red-brown neck and shoulders, with grayish-brown fur on the rest of their body.",
+				"They primarily feed on grasses and leaves.",
+				"They are known for their powerful hind legs which allow them to hop at high speeds.",
+				"The Red-necked Wallaby is a popular animal for hunting and meat consumption."
+			],
+			"img": [],
+			"audio": ""
+
+		},
+		{
+			"id": "6",
+			"species": "Osphranter robustus",
+			"common": "Wallaroo",
+			"danger_level": 1,
+			"summary": "The Wallaroo is a marsupial found in Australia.",
+			"description": [
+				"They are larger than wallabies but smaller than kangaroos.",
+				"They have a thick, shaggy coat that helps them regulate their body temperature.",
+				"They primarily feed on grasses and other vegetation.",
+				"Wallaroos are solitary animals and are often found in rocky areas and open"
+			],
+			"img": [],
+			"audio": ""
+
+		},
+		{
+			"id": "7",
+			"species": "Pachycephala inornata",
+			"common": "Gilbert's Whistler",
+			"danger_level": 1,
+			"summary": "Gilbert's Whistler is a species of bird found in northern and central Australia, known for its melodic whistling calls.",
+			"description": [
+				"The male and female birds have different plumage - males have a black head and upperparts with a white belly, while females are duller with brown upperparts and a paler belly.",
+				"They are found in a range of habitats, including woodlands, savannas, and shrublands.",
+				"They are skilled at catching insects on the wing, and will often perch in a prominent spot to watch for prey.",
+				"They are monogamous birds, forming long-term pairs during breeding season.",
+				"They have a distinctive and melodic whistling call, often heard in the early morning or late afternoon."
+			],
+			"img": [],
+			"audio": ""
+
+		},
+		{
+			"id": "8",
+			"species": "Pachycephala pectoralis",
+			"common": "Golden Whistler",
+			"danger_level": 1,
+			"summary": "The Golden Whistler is a small bird species found in eastern and southeastern Australia, known for its bright plumage and sweet, warbling songs.",
+			"description": [
+				"They have a striking appearance, with males having bright yellow or orange plumage and black markings on the head, wings, and tail, while females are duller with olive-green upperparts and yellowish underparts.",
+				"They are found in a variety of habitats, including forests, woodlands, and scrublands.",
+				"They are skilled at catching insects and spiders on the wing, and will also eat fruit and nectar.",
+				"They have a sweet and melodic warbling song, often heard in the early morning or late afternoon.",
+				"They are monogamous birds, with pairs often forming long-term bonds."
+			],
+			"img": [],
+			"audio": ""
+
+		},
+		{
+			"id": "9",
+			"species": "Pachycephala rufiventris",
+			"common": "Rufous Whistler",
+			"danger_level": 1,
+			"summary": "The Rufous Whistler is a small bird species found in eastern and southeastern Australia, known for its distinctive call and rusty-red belly.",
+			"description": [
+				"They have a striking appearance, with males having a grey-brown head, back and wings, a black face and bib, and a rusty-red belly and rump, while females are duller with olive-green upperparts and yellowish underparts.",
+				"They are found in a range of habitats, including forests, woodlands, and scrublands.",
+				"They are skilled at catching insects and spiders on the wing, and will also eat fruit and nectar.",
+				"They have a distinctive whistling call, often described as `pew pew pew`.",
+				"They are monogamous birds, with pairs often forming long-term bonds."
+			],
+			"img": [],
+			"audio": ""
+
+		},
+		{
+			"id": "10",
+			"species": "Petroica boodang",
+			"common": "Scarlet Robin",
+			"danger_level": 1,
+			"summary": "Petroica boodang, commonly known as the Scarlet Robin, is a small passerine bird that is native to southeastern Australia.",
+			"description": [
+				"The Scarlet Robin is sexually dimorphic, with the male having a bright red cap and breast and the female having a grey-brown cap and breast.",
+				"These birds are found in a variety of habitats, including open forests, woodlands, and shrublands.",
+				"The Scarlet Robin feeds mainly on insects and other small invertebrates that it finds by hopping along the ground or perching on low branches.",
+				"These birds are territorial and will defend their nesting area aggressively against intruders.",
+				"The Scarlet Robin has a sweet, melodic song that can be heard throughout the breeding season."
+			],
+			"img": [],
+			"audio": ""
+
+		},
+		{
+			"id": "11",
+			"species": "Petroica goodenovii",
+			"common": "Red-capped Robin",
+			"danger_level": 1,
+			"summary": "Petroica goodenovii, commonly known as the Red-capped Robin, is a small passerine bird that is native to Australia.",
+			"description": [
+				"The Red-capped Robin is sexually dimorphic, with the male having a bright red cap and breast and the female having a grey-brown cap and breast.",
+				"These birds are found in a variety of habitats, including open forests, woodlands, and shrublands.",
+				"The Red-capped Robin feeds mainly on insects and other small invertebrates that it finds by hopping along the ground or perching on low branches.",
+				"These birds are territorial and will defend their nesting area aggressively against intruders.",
+				"The Red-capped Robin has a sweet, melodic song that can be heard throughout the breeding season."
+			],
+			"img": [],
+			"audio": ""
+
+		},
+		{
+			"id": "12",
+			"species": "Petroica phoenicea",
+			"common": "Flame Robin",
+			"danger_level": 1,
+			"summary": "Petroica phoenicea, commonly known as the Flame Robin, is a small passerine bird that is native to southeastern Australia.",
+			"description": [
+				"The Flame Robin is sexually dimorphic, with the male having a bright red cap and breast and the female having a grey-brown cap and breast.",
+				"These birds are found in a variety of habitats, including open forests, woodlands, and shrublands.",
+				"The Flame Robin feeds mainly on insects and other small invertebrates that it finds by hopping along the ground or perching on low branches.",
+				"These birds are territorial and will defend their nesting area aggressively against intruders.",
+				"The Flame Robin has a sweet, melodic song that can be heard throughout the breeding season."
+			],
+			"img": [],
+			"audio": ""
+
+		},
+		{
+			"id": "13",
+			"species": "Philemon argenticeps",
+			"common": "Silver-crowned Friarbird",
+			"danger_level": 1,
+			"summary": "The Silver-crowned Friarbird is a large, greyish-brown honeyeater found in Australia and Papua New Guinea.",
+			"description": [
+				"They are known for their distinctive silver crown of feathers on their head and their loud, chattering calls.",
+				"Silver-crowned Friarbirds feed primarily on nectar and insects, and can often be seen perched on flowers or hunting for insects in trees.",
+				"During the breeding season, males can be seen performing elaborate courtship displays, including aerial chases and displays of their colorful throat pouches.",
+				"Silver-crowned Friarbirds are social birds and can often be found in groups, sometimes competing with other bird species for food and territory."
+			],
+			"img": [],
+			"audio": ""
+
+		},
+		{
+			"id": "14",
+			"species": "Philemon buceroides",
+			"common": "Helmeted Friarbird",
+			"danger_level": 1,
+			"summary": "The Helmeted Friarbird is a large, greyish-brown honeyeater found in Australia and Papua New Guinea.",
+			"description": [
+				"They are known for their distinctive helmet-like crest of feathers on their head and their loud, chattering calls.",
+				"Helmeted Friarbirds feed primarily on nectar and insects, and can often be seen perched on flowers or hunting for insects in trees.",
+				"During the breeding season, males can be seen performing elaborate courtship displays, including aerial chases and displays of their colorful throat pouches.",
+				"Helmeted Friarbirds are social birds and can often be found in groups, sometimes competing with other bird species for food"
+			],
+			"img": [],
+			"audio": ""
+
+		},
+		{
+			"id": "15",
+			"species": "Philemon citreogularis",
+			"common": "Little Friarbird",
+			"danger_level": 1,
+			"summary": "The Little Friarbird is a small passerine bird found in northern Australia and New Guinea.",
+			"description": [
+				"They have a distinct yellow patch on their throat and a gray-brown body.",
+				"Little Friarbirds are known for their loud and distinctive calls, which they use to communicate with each other.",
+				"They primarily feed on nectar, fruit, and insects.",
+				"These birds are often found in small groups and are common in urban and suburban areas."
+			],
+			"img": [],
+			"audio": ""
+
+		}
+	]
+}
