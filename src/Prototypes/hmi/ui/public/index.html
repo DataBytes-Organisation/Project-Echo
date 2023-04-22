@@ -206,55 +206,62 @@
                   <div class="col">
                     
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="_reptile" onchange="updateFilter('_reptile')" checked>
+                      <input class="form-check-input v"  type="checkbox" value="" id="_reptile" onchange="updateFilter('_reptile')" checked>
                       <label class="form-check-label" for="_reptile">Reptile</label>
                     </div>
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="_bird" onchange="updateFilter('_bird')" checked>
+                      <input class="form-check-input v"  type="checkbox" value="" id="_bird" onchange="updateFilter('_bird')" checked>
                       <label class="form-check-label" for="_bird">Bird</label>
                     </div>
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="_mammal" onchange="updateFilter('_mammal')" checked>
+                      <input class="form-check-input v"  type="checkbox" value="" id="_mammal" onchange="updateFilter('_mammal')" checked>
                       <label class="form-check-label" for="_mammal">Mammal</label>
                     </div>
 
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="_insect" onchange="updateFilter('_insect')" checked>
+                      <input class="form-check-input v"  type="checkbox" value="" id="_insect" onchange="updateFilter('_insect')" checked>
                       <label class="form-check-label" for="_insect">Insect</label>
                     </div>
 
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="_amphibian" onchange="updateFilter('_amphibian')" checked>
+                      <input class="form-check-input v"  type="checkbox" value="" id="_amphibian" onchange="updateFilter('_amphibian')" checked>
                       <label class="form-check-label" for="_amphibian">Amphibian</label>
+                    </div>
+
+                    <div class="form-check">
+                      <button onclick="{selectAll('_all')}" class="toggle-button">Select All</button>
                     </div>
 
                   </div>
                   <div class="col-6">
                     
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="_endangered" onchange="updateFilter('_endangered')" checked>
+                      <input class="form-check-input v"  type="checkbox" value="" id="_endangered" onchange="updateFilter('_endangered')" checked>
                       <label class="form-check-label" for="_endangered" onchange="">Endangered</label>
                     </div>
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="_vulnerable" onchange="updateFilter('_vulnerable')" checked>
+                      <input class="form-check-input v"  type="checkbox" value="" id="_vulnerable" onchange="updateFilter('_vulnerable')" checked>
                       <label class="form-check-label" for="_vulnerable">Vunerable</label>
                     </div>
 
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="_nearthreatened" onchange="updateFilter('_nearthreatened')" checked>
+                      <input class="form-check-input v"  type="checkbox" value="" id="_nearthreatened" onchange="updateFilter('_nearthreatened')" checked>
                       <label class="form-check-label" for="_nearThreatened">Near Threatened</label>
                     </div>
 
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="_normal" onchange="updateFilter('_normal')" checked>
+                      <input class="form-check-input v"  type="checkbox" value="" id="_normal" onchange="updateFilter('_normal')" checked>
                       <label class="form-check-label" for="_normal">Normal</label>
                     </div>
 
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="_invasive" onchange="updateFilter('_invasive')" checked>
+                      <input class="form-check-input v"  type="checkbox" value="" id="_invasive" onchange="updateFilter('_invasive')" checked>
                       <label class="form-check-label" for="_invasive">Invasive</label>
                     </div>
 
+                    <div class="form-check">
+                      <button onclick="{selectAll('_clear')}" class="toggle-button">Clear</button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -269,53 +276,60 @@
                   <div class="col">
                     
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="reptile" onchange="{updateFilter('reptile')}" checked>
+                      <input class="form-check-input s"  type="checkbox" value="" id="reptile" onchange="{updateFilter('reptile')}" checked>
                       <label class="form-check-label" for="reptile">Reptile</label>
                     </div>
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="bird" onchange="{updateFilter('bird')}" checked>
+                      <input class="form-check-input s"  type="checkbox" value="" id="bird" onchange="{updateFilter('bird')}" checked>
                       <label class="form-check-label" for="bird">Bird</label>
                     </div>
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="mammal" onchange="{updateFilter('mammal')}" checked>
+                      <input class="form-check-input s"  type="checkbox" value="" id="mammal" onchange="{updateFilter('mammal')}" checked>
                       <label class="form-check-label" for="mammal">Mammal</label>
                     </div>
 
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="insect" onchange="{updateFilter('insect')}" checked>
+                      <input class="form-check-input s"  type="checkbox" value="" id="insect" onchange="{updateFilter('insect')}" checked>
                       <label class="form-check-label" for="insect">Insect</label>
                     </div>
 
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="amphibian" onchange="{updateFilter('amphibian')}" checked>
+                      <input class="form-check-input s"  type="checkbox" value="" id="amphibian" onchange="{updateFilter('amphibian')}" checked>
                       <label class="form-check-label" for="amphibian">Amphibian</label>
+                    </div>
+
+                    <div class="form-check">
+                      <button onclick="{selectAll('all')}" class="toggle-button">Select All</button>
                     </div>
 
                   </div>
                   <div class="col-6">
                     
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="endangered" onchange="{updateFilter('endangered')}" checked>
+                      <input class="form-check-input s"  type="checkbox" value="" id="endangered" onchange="{updateFilter('endangered')}" checked>
                       <label class="form-check-label" for="endangered">Endangered</label>
                     </div>
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="vulnerable" onchange="{updateFilter('vulnerable')}" checked>
+                      <input class="form-check-input s"  type="checkbox" value="" id="vulnerable" onchange="{updateFilter('vulnerable')}" checked>
                       <label class="form-check-label" for="vulnerable">Vunerable</label>
                     </div>
 
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="nearthreatened" onchange="{updateFilter('nearthreatened')}" checked>
+                      <input class="form-check-input s"  type="checkbox" value="" id="nearthreatened" onchange="{updateFilter('nearthreatened')}" checked>
                       <label class="form-check-label" for="nearthreatened">Near Threatened</label>
                     </div>
 
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="normal" onchange="{updateFilter('normal')}" checked>
+                      <input class="form-check-input s"  type="checkbox" value="" id="normal" onchange="{updateFilter('normal')}" checked>
                       <label class="form-check-label" for="Normal" >Normal</label>
                     </div>
 
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="invasive" onchange="{updateFilter('invasive')}" checked>
+                      <input class="form-check-input s" type="checkbox" value="" id="invasive" onchange="{updateFilter('invasive')}" checked>
                       <label class="form-check-label" for="invasive">Invasive</label>
+                    </div>
+                    <div class="form-check">
+                      <button onclick="selectAll('clear')" class="toggle-button">Clear All</button>
                     </div>
 
                   </div>
@@ -465,23 +479,29 @@
   //import { updateLayers } from "./js/HMI.js";
   //selecting the .form-check-input class (all the filter checkboxes fall under this class)                   
   const myClass = document.querySelectorAll('.form-check-input')
-
+  const sim = document.querySelectorAll('.s')
+  const voc = document.querySelectorAll('.v')
   //An array to store the ID for each checkbox 
   const checkboxIDs = []
-
+  const simIds = []
+  
   //Populating the checkbox
   myClass.forEach(element => {
     //console.log("doingsomething")
     checkboxIDs.push(element.id);
   });
 
+  sim.forEach(element => {
+    console.log("doingsomething with it")
+    simIds.push(element.id);
+  });
   //init variable is set to true before the user has selected any filter options
   //before a user has checked any filter options, all layers will appear on screen
   let filterState = [...checkboxIDs];
   //console.log(filterState, "FilterState:  ")
   //console.log(checkboxIDs)
 
-  function updateFilter(checkbox){
+  function updateFilter(checkbox){ 
 
     if (document.getElementById(checkbox).checked){
       if(!filterState.includes(checkbox)){
@@ -500,6 +520,48 @@
 
   function microphoneDisplay(){
       updateMics()
+  }
+
+  function selectAll(filter){
+  
+    if (filter == 'clear'){
+      sim.forEach(id => {
+        filterState.splice(filterState.indexOf(id.id), 1)
+        id.checked = false;
+      })
+      
+    }
+  
+    else if (filter == '_clear'){
+      voc.forEach(id => {
+        filterState.splice(filterState.indexOf(id.id), 1)
+        id.checked = false;
+      })
+    }
+
+    else if (filter == 'all'){
+      sim.forEach(id => {
+        if (!filterState.includes(id.id)){
+          console.log("Filter state doesn't include: ",id.id)
+          filterState.push(id.id)
+        }
+        id.checked = true;
+      })
+      
+    
+    }
+    else if (filter == '_all'){
+      console.log(filter)
+      voc.forEach(id => {
+        if (!filterState.includes(id.id)){
+          console.log("Filter state doesn't include: ",id.id)
+          filterState.push(id.id)
+        }
+        id.checked = true;
+      })
+    }
+
+    updateLayers(filterState)
   }
 
   // Get all the dropdowns on the page
