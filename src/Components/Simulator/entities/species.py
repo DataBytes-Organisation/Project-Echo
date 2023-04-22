@@ -10,4 +10,5 @@ class Species(Enum):
     sheowl = 3
     spodov = 4
     wiltur = 5
+    dummy_triangulation = 6
     
