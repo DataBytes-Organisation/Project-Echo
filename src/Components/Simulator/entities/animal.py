@@ -44,6 +44,12 @@ class Animal(entities.entity.Entity):
             self.vocal_interval_mean,
             self.vocal_interval_std,
             None)
+        
+    def getSpecies(self):
+        return self.species
+    
+    def getUUID(self):
+        return self.uuid
 
     def describe(self) -> None:
         print(f'Animal UUID           : {self.uuid}')
@@ -84,9 +90,6 @@ class Animal(entities.entity.Entity):
         
         # determine if we have hit the threshold for this animal
         if elapsed > self.next_vocal_random_wait:
-            
-            # TODO: send the vocalisation
-            print(f'Vocalisation Sent! Animal {self.uuid} time: {sim_time}')
             vocalisation_flag = True
             
             # calculate when next vocalisation will occur

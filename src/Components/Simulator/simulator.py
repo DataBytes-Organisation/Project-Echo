@@ -86,6 +86,8 @@ class Simulator():
                 if animal.random_vocalisation():
                     self.render_state.render_animal_vocalisation(animal)
                     predicted_lla = self.config.SENSOR_MANAGER.vocalisation(animal)
+                    
+                    self.config.comms_manager.mqtt_send_random_audio_msg(animal, predicted_lla)
 
                 animal.describe()
                 
@@ -127,6 +129,7 @@ if __name__ == "__main__":
     #clock.test()
     
     mm = CommsManager()
+    mm.initialise_communications()
     mm.test()
     
     sim = Simulator()

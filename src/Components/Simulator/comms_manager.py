@@ -12,19 +12,25 @@ import json
 from google.cloud import storage
 import os
 from entities.species import Species
+import random
+from clock import Clock
         
 class CommsManager():
     
     def __init__(self) -> None:
         self.audio_blobs = {}
+        self.clock = Clock()
     
+    #def on_mqtt_publish(client, userdata, mid):
+    #    print("MQTT mid: "+str(mid))
+            
     # Initialise communication with MQTT endpoints
     def initialise_communications(self):
-        def on_publish(client, userdata, mid):
-            print("mid: "+str(mid))
-            
+        
+        print(f'Initialising Communications')
+        
         self.mqtt_client = paho.Client()
-        self.mqtt_client.on_publish = on_publish
+        #self.mqtt_client.on_publish = on_mqtt_publish
         # we are using an insure public server for now
         self.mqtt_client.connect('broker.mqttdashboard.com', 1883)
         self.mqtt_client.loop_start()
@@ -53,12 +59,6 @@ class CommsManager():
             else:
                 self.audio_blobs[folder_name] = []
                 self.audio_blobs[folder_name].append(blob)
-            
-            #file_name = blob.name.split('/')[1]
-            #path = os.path.join(dl_dir, folder_name)
-            #if not os.path.exists(path):
-            #    os.makedirs(path)
-            #blob.download_to_filename(os.path.join(dl_dir, folder_name, file_name))
         
         # using the names loaded from GCP, construct the Species objects
         species_list = []
@@ -68,17 +68,50 @@ class CommsManager():
             
         return species_list
  
-    # send a random audio message for the given species
-    def mqtt_send_random_audio_msg(self, species) -> None:
+    # send a random audio message for the given animal at the predicted lla
+    def mqtt_send_random_audio_msg(self, animal, predicted_lla) -> None:
+        
+        # get the timestamp for this event
+        timestamp = self.clock.get_time()
         
         # get the species name
-        name = species.getName()
+        species_name    = animal.getSpecies().getName()
+        animal_true_lla = animal.getLLA()
         
-        # TODO create the audio message
-        MQTT_MSG = json.dumps(data[i])
-
+        # randomly sample from available audio blobs from this species
+        sample_blob = random.sample(self.audio_blobs[species_name], k=1)[0]
+        
+        # Read the blob's content as a byte array
+        print("Retrieving audio from bucket...")
+        audio = sample_blob.download_as_bytes()
+        print("Audio clip download complete.")
+        
+        # Encode the audio data as a string
+        audio_str = self.audio_to_string(audio)
+        
+        # TODO create the audio message in correct format
+        MQTT_MSG = f'''
+        {{
+            "timestamp": "{timestamp}",
+            "animalEstLLA": [
+                {predicted_lla[0]},
+                {predicted_lla[1]},
+                {predicted_lla[2]}
+            ],
+            "animalTrueLLA": [
+                {animal_true_lla[0]},
+                {animal_true_lla[1]},
+                {animal_true_lla[2]}
+            ],
+            "animalLLAUncertainty": 0.0,
+            "audioClip": "{audio_str}"
+        }}
+        '''
+  
         # publish the audio message on the queue
         (rc, mid) = self.mqtt_client.publish('projectecho/1', MQTT_MSG, qos=1)
+        
+        print(f'Vocalisation Published! Animal {animal.getUUID()} time: {timestamp}')
  
     # this method takes in binary audio data and encodes to string
     def string_to_audio(self, audio_string) -> bytes:

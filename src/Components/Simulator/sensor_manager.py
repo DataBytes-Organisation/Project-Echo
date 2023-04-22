@@ -115,4 +115,4 @@ class SensorManager(entities.entity.Entity):
 
                 retry_count += 1
 
-        return best_lat, best_lon
+        return best_lat, best_lon, best_z

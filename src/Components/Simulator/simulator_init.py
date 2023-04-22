@@ -59,6 +59,9 @@ class Config:
         # Create the communications manager
         self.comms_manager = CommsManager()
         
+        # Initialise the communications manager
+        self.comms_manager.initialise_communications()
+        
         # Use google cloud to initialise species list
         species_list = self.comms_manager.gcp_load_species_list()
         
