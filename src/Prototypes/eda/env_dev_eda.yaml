@@ -1,0 +1,26 @@
+
+# In c:\ProgramData\pip\pip.ini
+#
+# [global]
+# extra-index-url = https://download.pytorch.org/whl/cu117
+
+# [install]
+# trusted-host = download.pytorch.org
+
+# see compatibility matrix here: https://www.tensorflow.org/install/source#tested_build_configurations
+
+name: eda
+channels:
+ - conda-forge
+ - nvidia
+ - pytorch
+ - defaults
+dependencies:
+ - python=3.8.16
+ - cudatoolkit=11.7                        
+ - cudnn
+ - ipykernel
+ - git
+ - ffmpeg
+ - sox
+ - pip
