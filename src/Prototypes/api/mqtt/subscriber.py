@@ -15,7 +15,8 @@ connection_string=f"mongodb+srv://projectechodeakin:YjGHDjNsEijhytYG@cluster0.gu
 myclient = pymongo.MongoClient(connection_string)
 mydb = myclient["mydatabase"]
 print(myclient.list_database_names())
-mydb["events"].drop()
+# may need to empty collection to avoid doubling up on entries
+# mydb["events"].drop()
 mycol = mydb["events"]
 
 def on_subscribe(client, userdata, mid, granted_qos):
