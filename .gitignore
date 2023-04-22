@@ -1,6 +1,4 @@
 
 *.DS_Store
 *.pyc
-src\Prototypes\data\database\.env
-src\Prototypes\api\FastAPI\.env
-src\Prototypes\api\mqtt\.env
+*.env
