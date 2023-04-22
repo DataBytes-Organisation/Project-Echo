@@ -402,6 +402,7 @@ i {
     opacity: .5;
     pointer-events: auto;
   }
+
   .toggle-switch-container{
     margin-top: 20px;
   }
@@ -422,3 +423,14 @@ i {
   .past-data-container{
     margin-bottom: 20px;
   }
+
+.show + .dropdown-menu {
+  display: inline-block !important;
+  overflow: hidden !important;
+}
+
+.select-all-btn{
+  height: 40px !important;
+  background-color:#adb5bd !important;
+  margin-top: 5px !important;
+}
