@@ -59,7 +59,7 @@ class SensorManager(entities.entity.Entity):
     
     def func_to_minimize(self, x, list_triggered_mics, c):
         lat, lon, z = x
-        estimate_animal = Animal(species=Species.dummy_triangulation)
+        estimate_animal = Animal(species=Species("dummy_triangulation"))
         estimate_animal.setLLA((lat, lon, z))
         
         st_est = [mic.distance(estimate_animal) / c - np.min([m.distance(estimate_animal) / c for m in list_triggered_mics]) for mic in list_triggered_mics]
