@@ -18,9 +18,17 @@ class CommsManager():
     def __init__(self) -> None:
         self.audio_blobs = {}
     
+    # Initialise communication with MQTT endpoints
     def initialise_communications(self):
-        pass
-    
+        def on_publish(client, userdata, mid):
+            print("mid: "+str(mid))
+            
+        self.mqtt_client = paho.Client()
+        self.mqtt_client.on_publish = on_publish
+        # we are using an insure public server for now
+        self.mqtt_client.connect('broker.mqttdashboard.com', 1883)
+        self.mqtt_client.loop_start()
+
     # This function uses the google bucket with audio files and
     # leverages the folder names as the official species names
     # Note: to run this you will need to first authenticate
@@ -52,27 +60,25 @@ class CommsManager():
             #    os.makedirs(path)
             #blob.download_to_filename(os.path.join(dl_dir, folder_name, file_name))
         
+        # using the names loaded from GCP, construct the Species objects
         species_list = []
         for name in species_names:
             species = Species(name)
             species_list.append(species)
+            
         return species_list
  
-    def mqtt_send_audio_msg(self) -> None:
+    # send a random audio message for the given species
+    def mqtt_send_random_audio_msg(self, species) -> None:
         
-        def on_publish(client, userdata, mid):
-            print("mid: "+str(mid))
+        # get the species name
+        name = species.getName()
         
-        client = paho.Client()
-        client.on_publish = on_publish
-        client.connect('broker.mqttdashboard.com', 1883)
-        client.loop_start()
-
         # TODO create the audio message
         MQTT_MSG = json.dumps(data[i])
 
-        (rc, mid) = client.publish('projectecho/1', MQTT_MSG, qos=1)
-
+        # publish the audio message on the queue
+        (rc, mid) = self.mqtt_client.publish('projectecho/1', MQTT_MSG, qos=1)
  
     # this method takes in binary audio data and encodes to string
     def string_to_audio(self, audio_string) -> bytes:
