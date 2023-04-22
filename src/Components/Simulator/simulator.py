@@ -7,7 +7,7 @@ from entities.entity import Entity
 
 from factories.animal_factory import AnimalFactory
 from factories.sensor_factory import SensorFactory
-from message_manager import MessageManager
+from comms_manager import CommsManager
 
 class TestConfig(simulator_init.TestConfig):
     def __init__(self, *args, config=None, **kwargs):
@@ -126,7 +126,7 @@ if __name__ == "__main__":
     #clock = Clock()
     #clock.test()
     
-    mm = MessageManager()
+    mm = CommsManager()
     mm.test()
     
     sim = Simulator()

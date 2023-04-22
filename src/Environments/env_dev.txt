@@ -5,6 +5,7 @@ diskcache
 dm-sonnet
 flask
 folium
+geopy
 google-cloud
 google-cloud-storage
 graphviz
@@ -31,6 +32,7 @@ museval
 notebook
 numpy
 opencv-python
+paho-mqtt
 pandas
 pandas-profiling
 path
