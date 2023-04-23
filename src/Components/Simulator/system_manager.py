@@ -8,9 +8,8 @@ import simulator
 class SystemManager:
     def __init__(self):
         self.read_configuration()
-        self.simulator = None
-        self.simulator_running = False
-        self.simulator_task = None
+        self.sim_running = False
+        self.sim_task = None
         self.command_queue = asyncio.Queue()
 
     def read_configuration(self):
@@ -40,16 +39,23 @@ class SystemManager:
 
     async def run_loop(self):
         while True:
-            print('waiting for next command', flush=True)
             command = await self.command_queue.get()
-            print(command)
             if command == "Start":
-                print('Simulator start', flush=True)
-                self.sim_task = asyncio.create_task(self.run_sim())
-                print('Simulator started', flush=True)
-            if command == "Stop":
-                print('Simulator stop', flush=True)
-                self.sim_task.cancel()
+                if self.sim_running:
+                    print("Simulator is already running", flush=True)
+                else:
+                    print("Starting Simulator....", flush=True)
+                    self.sim_task = asyncio.create_task(self.run_sim())
+                    self.sim_running = True
+                    print("Simulator Running....", flush=True)
+            elif command == "Stop":
+                if not self.sim_running:
+                    print("Simulator is not running", flush=True)
+                else:
+                    print("Stopping Simulator", flush=True)
+                    self.sim_task.cancel()
+                    self.sim_running = False
+                    print("Simulator has stopped.", flush=True)
 
     async def run_sim(self):
         self.simulator = simulator.Simulator()
