@@ -58,7 +58,7 @@ def show_event_from_time(start: str, end: str):
             "$replaceRoot": { "newRoot": { "$mergeObjects": [ { "$arrayElemAt": [ "$info", 0 ] }, "$$ROOT" ] } }
         },
         {
-            '$project': { "audioClip": 0}
+            '$project': { "audioClip": 0, "sampleRate": 0, "fileFormat": 0}
         },
         {
             "$addFields": {
