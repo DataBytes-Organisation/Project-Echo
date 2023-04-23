@@ -68,6 +68,7 @@ tensorflow-metadata
 tensorflow_hub
 tensorflow_gnn
 tensorflow_io==0.27.0
+tensorflow-serving-api
 tf-explain
 tfimm
 tflite-support

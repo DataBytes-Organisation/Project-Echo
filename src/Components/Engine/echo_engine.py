@@ -16,6 +16,7 @@ import warnings
 
 warnings.filterwarnings("ignore")
 
+import requests
 import base64
 import io
 import json
@@ -287,17 +288,22 @@ class EchoEngine():
         image = self.combined_pipeline(audio_file, audio_clip)
         
         image = tf.expand_dims(image, 0) 
-                
-        predictions = self.model(image)
         
-        # Iterate over each item in the batch
-        for batch_idx in range(predictions.shape[0]):
+        image_list = image.numpy().tolist()
+        
+        data = json.dumps({"signature_name": "serving_default", "inputs": image_list})
 
-            # Predict class and probability using the prediction function
-            predicted_class, predicted_probability = self.predict_class(predictions[batch_idx])
+        url = "http://localhost:8501/v1/models/generic_engine_pipeline_model/versions/1:predict"
+        headers = {"content-type": "application/json"}
+        json_response = requests.post(url, data=data, headers=headers)
+    
+        predictions = json.loads(json_response.text)['outputs'][0]
+                
+        # Predict class and probability using the prediction function
+        predicted_class, predicted_probability = self.predict_class(predictions)
 
-            print(f'Predicted class : {predicted_class}')
-            print(f'Predicted probability : {predicted_probability}')
+        print(f'Predicted class : {predicted_class}')
+        print(f'Predicted probability : {predicted_probability}')
         
 
     ########################################################################################
@@ -319,9 +325,9 @@ class EchoEngine():
             print(f" class name {cs}")
 
         print("Building classifer model")
-        self.model = self.build_model_with_weights()
+        #self.model = self.build_model_with_weights()
         # Display the model summary
-        self.model.summary()
+        #self.model.summary()
 
         print("Engine waiting for audio to arrive...")
         client.loop_forever()
