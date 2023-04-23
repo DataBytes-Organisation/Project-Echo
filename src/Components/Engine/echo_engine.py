@@ -276,7 +276,7 @@ class EchoEngine():
     ########################################################################################
     ########################################################################################
     def on_message(self, client, userdata, msg):
-        # print(msg.topic+" "+str(msg.qos)+" "+str(msg.payload))    
+        print("Recieved audio message, processing via engine model...")    
         json_object = json.loads(msg.payload)
         print(json_object['timestamp'])
         
