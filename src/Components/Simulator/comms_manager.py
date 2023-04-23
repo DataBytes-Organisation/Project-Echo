@@ -20,10 +20,7 @@ class CommsManager():
     def __init__(self) -> None:
         self.audio_blobs = {}
         self.clock = Clock()
-    
-    #def on_mqtt_publish(client, userdata, mid):
-    #    print("MQTT mid: "+str(mid))
-            
+       
     # Initialise communication with MQTT endpoints
     def initialise_communications(self):
         
@@ -119,6 +116,11 @@ class CommsManager():
         base64_encoded_data = base64.b64encode(audio_binary)
         base64_message = base64_encoded_data.decode('utf-8')
         return base64_message
+    
+    def string_to_audio(self, audio_string) -> bytes:
+        base64_img_bytes = audio_string.encode('utf-8')
+        decoded_data = base64.decodebytes(base64_img_bytes)
+        return decoded_data
     
     def test(self):
         print(f'testing MessageManager')

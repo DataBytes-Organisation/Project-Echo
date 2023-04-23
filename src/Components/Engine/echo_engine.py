@@ -13,74 +13,45 @@
 
 # disable warnings
 import warnings
+
 warnings.filterwarnings("ignore")
 
-# generic libraries
-import paho.mqtt.client as paho
-from google.cloud import storage
-import json
-import time
-import io
 import base64
-from platform import python_version
-import functools
-from functools import lru_cache
-import diskcache as dc
-import hashlib
-import numpy as np
+import io
+import json
 import os
-import datetime
-import random
-import matplotlib.pyplot as plt
+from platform import python_version
 
-# tensor flow / keras related libraries
-import tensorflow as tf
-import tensorflow_io as tfio
-import tensorflow_hub as hub
-import tensorflow_addons as tfa 
-from keras.utils import dataset_utils
-
+import diskcache as dc
 # image processing related libraries
 import librosa
-
-# audio processing libraries
-import audiomentations
-from audiomentations import Compose, AddGaussianNoise, TimeStretch, PitchShift, Shift
+import numpy as np
+# generic libraries
+import paho.mqtt.client as paho
+# tensor flow / keras related libraries
+import tensorflow as tf
+import tensorflow_addons as tfa
+import tensorflow_hub as hub
+import tensorflow_io as tfio
+from google.cloud import storage
+from keras.utils import dataset_utils
 
 # print system information
 print('Python Version           : ', python_version())
 print('TensorFlow Version       : ', tf.__version__)
 print('TensorFlow IO Version    : ', tfio.__version__)
 print('Librosa Version          : ', librosa.__version__)
-print('Audiomentations Version  : ', audiomentations.__version__)
 
 
 ##################################################################################################
 # system constants copied from generic pipeline
 ##################################################################################################
-SC = {
-    'AUDIO_DATA_DIRECTORY': "d:\\data\\b3",
-    'CACHE_DIRETORY': "d:\\pipeline_cache",
 
-    'AUDIO_CLIP_DURATION': 5, # 5 second clips
-    'AUDIO_NFFT': 2000,
-    'AUDIO_WINDOW': 500,
-    'AUDIO_STRIDE': 200,
-    'AUDIO_SAMPLE_RATE': 32000,  # int(44100/2)
-    'AUDIO_MELS': 260,
-    'AUDIO_FMIN': 10,
-    'AUDIO_FMAX': int(32000 / 2),
-    'AUDIO_TOP_DB': 80,
-
-    'MODEL_INPUT_IMAGE_WIDTH': 260,
-    'MODEL_INPUT_IMAGE_HEIGHT': 260,
-    'MODEL_INPUT_IMAGE_CHANNELS': 3,
-
-    'USE_DISK_CACHE': True,
-    'SAMPLE_VARIANTS': 20,
-    'CLASSIFIER_BATCH_SIZE': 16
-}
-
+# Load the JSON file into a dictionary
+config_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'echo_engine.json')
+with open(config_file_path, 'r') as f:
+    SC = json.load(f)
+    
 
 class EchoEngine():
 
@@ -99,8 +70,8 @@ class EchoEngine():
 
         species_names = set()
 
-        bucket_name = 'project_echo_bucket_3'
-        os.environ["GCLOUD_PROJECT"] = "sit-23t1-project-echo-25288b9"
+        bucket_name = SC['BUCKET_NAME']
+        os.environ["GCLOUD_PROJECT"] = SC['GCLOUD_PROJECT']
 
         storage_client = storage.Client()
         bucket = storage_client.get_bucket(bucket_name)
@@ -108,8 +79,11 @@ class EchoEngine():
         for blob in blobs:
             folder_name = blob.name.split('/')[0]
             species_names.add(folder_name)
-            
-        return list(species_names)
+        
+        result = list(species_names)
+        result.sort()
+        
+        return result
     
 
     ########################################################################################
@@ -179,7 +153,7 @@ class EchoEngine():
         full_model = self.build_model()
         
         # Load the saved weights into the model
-        full_model.load_weights('src/Components/Engine/models/generic_engine_pipeline_model.hdf5')
+        full_model.load_weights(SC["MODEL_WEIGHTS"])
         
         return full_model
 
@@ -254,7 +228,7 @@ class EchoEngine():
         
         # if we didn't get exactly 5 seconds worth, this will choose a random subsection to process
         # ultimately, this ensures the image sizes are fixed when passed to the classifier
-        tmp_audio_t = self.load_random_subsection(tmp_audio_t, 5.0)
+        tmp_audio_t = self.load_random_subsection(tmp_audio_t, SC['AUDIO_CLIP_DURATION'])
     
         # Convert to spectrogram
         image = tfio.audio.spectrogram(
@@ -295,7 +269,7 @@ class EchoEngine():
     ########################################################################################
     ########################################################################################
     def on_subscribe(self, client, userdata, mid, granted_qos):
-        print("Subscribed: "+str(mid)+" "+str(granted_qos))
+        print(f"Subscribed: message id {mid} with qos {granted_qos}")
 
 
     ########################################################################################
@@ -333,11 +307,16 @@ class EchoEngine():
         client = paho.Client()
         client.on_subscribe = self.on_subscribe
         client.on_message = self.on_message
-        client.connect('broker.mqttdashboard.com', 1883)
-        client.subscribe('projectecho/engine/1', qos=1)
+        client.connect(SC['MQTT_CLIENT_URL'], SC['MQTT_CLIENT_PORT'])
+        
+        print(f'Subscribing to MQTT: {SC["MQTT_CLIENT_URL"]} {SC["MQTT_PUBLISH_URL"]}')
+        client.subscribe(SC['MQTT_PUBLISH_URL'], qos=1)
         
         print("Retrieving species names from GCP")
         self.class_names = self.gcp_load_species_list()
+        
+        for cs in self.class_names:
+            print(f" class name {cs}")
 
         print("Building classifer model")
         self.model = self.build_model_with_weights()
