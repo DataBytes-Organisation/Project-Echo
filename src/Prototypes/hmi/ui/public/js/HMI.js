@@ -13,6 +13,15 @@ var statuses = [
   "invasive",
 ];
 
+function matchStatus(status){
+  if (status == "least concern"){
+    return "normal";
+  }
+  else{
+    return status;
+  }
+}
+
 var vocalizedLayers = []
 
 var animalTypes = ["mammal", "bird", "amphibian", "reptile", "insect"];
@@ -28,8 +37,8 @@ export function initialiseHMI(hmiState) {
 
   createBasemap(hmiState);
 
-  //addWildlifeLayers(hmiState);
   addTruthLayers(hmiState);
+  addVocalisationLayers(hmiState);
 
   addAllTruthFeatures(hmiState);
   //addVocalizedFeatures(hmiState); !!! Remove and work on in next Update
@@ -109,7 +118,7 @@ export function convertJSONtoAnimalMovementEvent(hmiState, data){
     movementEvent.locationLon = data.animalTrueLLA[1];
     movementEvent.locationConfidence = 100.0;
     movementEvent.animalType = data.type.toLowerCase();
-    movementEvent.animalStatus = data.status.toLowerCase();
+    movementEvent.animalStatus = matchStatus(data.status.toLowerCase());
     movementEvent.animalDiet = data.diet.toLowerCase();
 
     console.log(movementEvent);
@@ -401,7 +410,7 @@ function addVectorLayerToBasemap(hmiState, layerName, zIndex) {
   }
 }
 
-function addWildlifeLayers(hmiState) {
+function addVocalisationLayers(hmiState) {
   // Wildlife layers
   // Invasive, Normal, Near-Threatened, Vulnerable, Endangered
   // Mammal, Reptile, Predator, Bird, Amphibian
