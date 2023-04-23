@@ -2,6 +2,7 @@ import simulator_init
 import os
 import unittest
 from clock import Clock
+import ast
 
 from factories.animal_factory import AnimalFactory
 from factories.sensor_factory import SensorFactory
@@ -24,7 +25,7 @@ class Simulator():
         animals = self.config.initialise()
 
         # render state
-        if bool(os.environ['SIMULATOR_LOOPS']):
+        if ast.literal_eval(os.environ['RENDER_STATES']):
             self.render_state = RenderedState()
             self.render_state.render_initial_sensor_state(self.config, animals)
     
@@ -32,9 +33,7 @@ class Simulator():
         self.main_loop(animals, loops=int(os.environ['SIMULATOR_LOOPS']))
         
     def main_loop(self, animals, loops=10):
-        
-        for loop in range(loops):
-        
+        for _ in range(loops):
             # update the simulated time (advance the clock)
             self.clock.update()
             
@@ -45,15 +44,15 @@ class Simulator():
                 
                 # generate random animal vocalisation
                 if animal.random_vocalisation():
-                    self.render_state.render_animal_vocalisation(animal)
+                    if ast.literal_eval(os.environ['RENDER_STATES']):  self.render_state.render_animal_vocalisation(animal)
                     predicted_lla = self.config.SENSOR_MANAGER.vocalisation(animal)
                     
                     self.config.comms_manager.mqtt_send_random_audio_msg(animal, predicted_lla)
 
                 animal.describe()
-                
+            
             # render state to map
-            self.render_state.render(animals)
+            if ast.literal_eval(os.environ['RENDER_STATES']): self.render_state.render(animals)
             
             # process API commands
             self.process_api_commands()

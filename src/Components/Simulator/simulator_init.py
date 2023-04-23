@@ -9,6 +9,7 @@ from sensor_manager import SensorManager
 from factories.animal_factory import AnimalFactory
 from factories.sensor_factory import SensorFactory
 from comms_manager import CommsManager
+from system_manager import SystemManager
 
 
 class TestConfig(unittest.TestCase):
@@ -26,6 +27,14 @@ class TestConfig(unittest.TestCase):
         graph = self.config.SENSOR_MANAGER.GRAPH
         for node in graph.nodes():
             assert len(graph.edges(node)) > 0, f"Node {node} has no edges"
+
+    def test_valid_system_params(self):
+        true_count = 0
+        for var in ['SYSTEM_START', 'SYSTEM_PAUSE', 'SYSTEM_RESTART', 'SYSTEM_STOP']:
+            if bool(os.environ[var]):
+                true_count += 1
+        
+        assert true_count == 1, f'System Variables are INVALID. Only one can be true at once.'
 
     @unittest.skip
     def test_database_connection(self):
@@ -49,6 +58,9 @@ class Config:
         
         # Create the communications manager
         self.comms_manager = CommsManager()
+
+        # Create the system manager
+        self.system_manager = SystemManager()
         
         # Initialise the communications manager
         self.comms_manager.initialise_communications()
