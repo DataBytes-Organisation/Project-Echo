@@ -21,5 +21,6 @@
     "MQTT_PUBLISH_URL": "projectecho/engine/2",
     "GCLOUD_PROJECT": "sit-23t1-project-echo-25288b9",
     "BUCKET_NAME": "project_echo_bucket_3",
-    "MODEL_WEIGHTS": "src/Components/engine/models/generic_engine_pipeline_model.hdf5"
+    "MODEL_WEIGHTS": "src/Components/engine/models/generic_engine_pipeline_model.hdf5",
+    "MODEL_SERVER": "http://ts-echo-model-cont:8501/v1/models/generic_engine_pipeline_model/versions/1:predict"
 }

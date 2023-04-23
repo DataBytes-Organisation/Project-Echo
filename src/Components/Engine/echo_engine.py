@@ -293,7 +293,7 @@ class EchoEngine():
         
         data = json.dumps({"signature_name": "serving_default", "inputs": image_list})
 
-        url = "http://localhost:8501/v1/models/generic_engine_pipeline_model/versions/1:predict"
+        url = SC['MODEL_SERVER']
         headers = {"content-type": "application/json"}
         json_response = requests.post(url, data=data, headers=headers)
     
