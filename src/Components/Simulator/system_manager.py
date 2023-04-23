@@ -13,7 +13,6 @@ class SystemManager:
         self.simulator_task = None
         self.command_queue = asyncio.Queue()
 
-    #     while bool(os.environ['SYSTEM_PAUSE']):
     def read_configuration(self):
         config_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config', '.config')
         with open(config_file_path) as f:
