@@ -42,3 +42,4 @@ dependencies:
     - folium
     - shapely
     - ipympl
+    - paho-mqtt

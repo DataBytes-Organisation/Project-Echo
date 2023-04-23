@@ -27,7 +27,9 @@ class CommsManager():
         print(f'Initialising Communications')
         
         self.mqtt_client = paho.Client()
-        self.mqtt_client.connect('broker.mqttdashboard.com', 1883)
+        #self.mqtt_client.on_publish = on_mqtt_publish
+        # we are using an insure public server for now
+        self.mqtt_client.connect(os.environ['MQTT_CLIENT_URL'], int(os.environ['MQTT_CLIENT_PORT']))
         self.mqtt_client.loop_start()
 
     # This function uses the google bucket with audio files and
@@ -37,12 +39,9 @@ class CommsManager():
     def gcp_load_species_list(self):
  
         species_names = set()
- 
-        bucket_name = 'project_echo_bucket_3'
-        os.environ["GCLOUD_PROJECT"] = "sit-23t1-project-echo-25288b9"
 
         storage_client = storage.Client()
-        bucket = storage_client.get_bucket(bucket_name)
+        bucket = storage_client.get_bucket(os.environ['BUCKET_NAME'])
         blobs = bucket.list_blobs()  # Get list of files
         for blob in blobs:
             folder_name = blob.name.split('/')[0]
@@ -108,7 +107,7 @@ class CommsManager():
         '''
   
         # publish the audio message on the queue
-        (rc, mid) = self.mqtt_client.publish('projectecho/engine/2', MQTT_MSG, qos=1)
+        (rc, mid) = self.mqtt_client.publish(os.environ['MQTT_PUBLISH_URL'], MQTT_MSG, qos=1)
         
         print(f'Vocalisation Published! Animal {animal.getUUID()} time: {timestamp}')
         

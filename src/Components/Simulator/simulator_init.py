@@ -35,21 +35,12 @@ class TestConfig(unittest.TestCase):
 
 class Config:
     def __init__(self):
-        pass
-
-    def _get_config(self, CONF_VAR: str = None):
-        if not CONF_VAR:
-            return self.config
-        else:
-            try:
-                return self.config[CONF_VAR]
-            except:
-                return "INVALID CONFIG VARIABLE"
-    
-    def initialise(self):
-        # Read Config
         self.config = self.read_configuration()
+
+    def _get_config(self):
+        return self.config
     
+    def initialise(self):    
         # Validate the configuration
         self.validate_configuration(self._get_config)
         
