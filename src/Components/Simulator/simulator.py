@@ -32,34 +32,37 @@ class Simulator():
         self.main_loop(animals, loops=int(os.environ['SIMULATOR_LOOPS']))
         
     def main_loop(self, animals, loops=10):
-        
-        for loop in range(loops):
-        
-            # update the simulated time (advance the clock)
-            self.clock.update()
-            
-            for animal in animals:
+        while self.config.system_manager.state:
+            for _ in range(loops):
+                if bool(os.environ['SYSTEM_PAUSE']): self.config.system_manager.pause()
+                # update the simulated time (advance the clock)
+                self.clock.update()
                 
-                # update the animal lla
-                animal.update_lla()
-                
-                # generate random animal vocalisation
-                if animal.random_vocalisation():
-                    self.render_state.render_animal_vocalisation(animal)
-                    predicted_lla = self.config.SENSOR_MANAGER.vocalisation(animal)
+                for animal in animals:
                     
-                    self.config.comms_manager.mqtt_send_random_audio_msg(animal, predicted_lla)
+                    # update the animal lla
+                    animal.update_lla()
+                    
+                    # generate random animal vocalisation
+                    if animal.random_vocalisation():
+                        self.render_state.render_animal_vocalisation(animal)
+                        predicted_lla = self.config.SENSOR_MANAGER.vocalisation(animal)
+                        
+                        self.config.comms_manager.mqtt_send_random_audio_msg(animal, predicted_lla)
 
-                animal.describe()
+                    animal.describe()
                 
-            # render state to map
-            self.render_state.render(animals)
-            
-            # process API commands
-            self.process_api_commands()
-            
-            # wait for wall clock to elapse to sync with real time
-            self.wait_real_time_sync()
+                # render state to map
+                self.render_state.render(animals)
+                
+                # process API commands
+                self.process_api_commands()
+                
+                # wait for wall clock to elapse to sync with real time
+                self.wait_real_time_sync()
+
+                if bool(os.environ['SYSTEM_STOP']):
+                    break
 
         
     def process_api_commands(self):

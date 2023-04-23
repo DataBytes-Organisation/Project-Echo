@@ -97,22 +97,22 @@ class SensorManager(entities.entity.Entity):
 
             error = distance((truth_animal.getLLA()[0], truth_animal.getLLA()[1]), predicted_lla).m
 
-            if error < large_error_threshold:
-                break
-            else:
-                # Update the initial guess to try again
-                low_bounds = [
-                    min(self.get_otways_coordinates()[3][0], best_lat - 0.01),
-                    min(self.get_otways_coordinates()[4][1], best_lon - 0.01),
-                    0,
-                ]
-                high_bounds = [
-                    max(self.get_otways_coordinates()[1][0], best_lat + 0.01),
-                    max(self.get_otways_coordinates()[2][1], best_lon + 0.01),
-                    np.inf,
-                ]
-                improved_initial_guess = np.random.uniform(low=low_bounds, high=high_bounds)
+            # if error < large_error_threshold:
+            #     break
+            # else:
+            #     # Update the initial guess to try again
+            #     low_bounds = [
+            #         min(self.get_otways_coordinates()[3][0], best_lat - 0.01),
+            #         min(self.get_otways_coordinates()[4][1], best_lon - 0.01),
+            #         0,
+            #     ]
+            #     high_bounds = [
+            #         max(self.get_otways_coordinates()[1][0], best_lat + 0.01),
+            #         max(self.get_otways_coordinates()[2][1], best_lon + 0.01),
+            #         np.inf,
+            #     ]
+            #     improved_initial_guess = np.random.uniform(low=low_bounds, high=high_bounds)
 
-                retry_count += 1
+            #     retry_count += 1
 
         return best_lat, best_lon, best_z
