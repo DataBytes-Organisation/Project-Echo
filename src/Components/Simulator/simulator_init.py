@@ -96,7 +96,7 @@ class Config:
         _main_log_filename = _path_to_logger+'sys_log_'+datetime.now().date().isoformat()+'_.log'
 
         logger1 = logging.getLogger('_sys_logger')
-        handler1 = logging.FileHandler(filename=_main_log_filename, mode="w", encoding='utf-8')
+        handler1 = logging.FileHandler(filename=_main_log_filename, mode="a", encoding='utf-8')
         handler1.setLevel(debug_level)
         handler1.setFormatter(logging.Formatter('%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s', datefmt='%H:%M:%S'))
         logging.getLogger('_sys_logger').addHandler(handler1)

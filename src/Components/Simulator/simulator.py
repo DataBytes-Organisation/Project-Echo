@@ -9,6 +9,7 @@ logger1 = logging.getLogger('_sys_logger')
 from factories.animal_factory import AnimalFactory
 from factories.sensor_factory import SensorFactory
 from render_manager import RenderedState
+import asyncio
 
 class TestConfig(simulator_init.TestConfig):
     def __init__(self, *args, config=None, **kwargs):
@@ -21,8 +22,7 @@ class Simulator():
         self.clock  = Clock(step_interval=float(os.environ['STEP_INTERVAL'])) # 200 step interval 200 milliseconds
 
     # run the live simulators
-    def execute(self):
-        
+    async def execute(self):
         # initialse the simulator configuration
         animals = self.config.initialise()
 
@@ -32,37 +32,46 @@ class Simulator():
             self.render_state.render_initial_sensor_state(self.config, animals)
     
         # start the simulator loop
-        self.main_loop(animals, loops=int(os.environ['SIMULATOR_LOOPS']))
+        await self.main_loop(animals, loops=int(os.environ['SIMULATOR_LOOPS']))
         
-    def main_loop(self, animals, loops=10):
+    async def main_loop(self, animals, loops=10):
         for _ in range(loops):
-            # update the simulated time (advance the clock)
-            self.clock.update()
-            
-            for animal in animals:
+            try:
+                # we need this - dont delete
+                await asyncio.sleep(0)
+
+                # update the simulated time (advance the clock)
+                self.clock.update()
                 
-                # update the animal lla
-                animal.update_lla()
-                
-                # generate random animal vocalisation
-                if animal.random_vocalisation():
-                    if ast.literal_eval(os.environ['RENDER_STATES']):  self.render_state.render_animal_vocalisation(animal)
-                    predicted_lla = self.config.SENSOR_MANAGER.vocalisation(animal)
+                for animal in animals:
                     
-                    self.config.comms_manager.mqtt_send_random_audio_msg(animal, predicted_lla)
+                    # update the animal lla
+                    animal.update_lla()
+                    
+                    # generate random animal vocalisation
+                    if animal.random_vocalisation():
+                        if ast.literal_eval(os.environ['RENDER_STATES']):  self.render_state.render_animal_vocalisation(animal)
+                        predicted_lla = self.config.SENSOR_MANAGER.vocalisation(animal)
+                        
+                        self.config.comms_manager.mqtt_send_random_audio_msg(animal, predicted_lla)
 
-                animal.describe()
-            
-            # render state to map
-            if ast.literal_eval(os.environ['RENDER_STATES']): self.render_state.render(animals)
-            
-            # process API commands
-            self.process_api_commands()
-            
-            # wait for wall clock to elapse to sync with real time
-            self.wait_real_time_sync()
+                    animal.describe()
+                
+                # render state to map
+                if ast.literal_eval(os.environ['RENDER_STATES']): self.render_state.render(animals)
+                
+                # process API commands
+                self.process_api_commands()
+                
+                # wait for wall clock to elapse to sync with real time
+                self.wait_real_time_sync()
+            except asyncio.CancelledError:
+                logger1.critical('Asyncio error formed')
+                break
+            finally:
+                pass
+                
 
-        
     def process_api_commands(self):
         # TODO
         pass

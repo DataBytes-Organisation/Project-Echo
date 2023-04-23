@@ -32,7 +32,7 @@ class CommsManager():
         #self.mqtt_client.on_publish = on_mqtt_publish
         # we are using an insure public server for now
         self.mqtt_client.connect(os.environ['MQTT_CLIENT_URL'], int(os.environ['MQTT_CLIENT_PORT']))
-        self.mqtt_client.loop_start()
+        # self.mqtt_client.loop_start()
 
     # This function uses the google bucket with audio files and
     # leverages the folder names as the official species names

@@ -25,7 +25,7 @@ class SystemManager:
     async def initialise_communications(self):
         async with MqttClient(os.environ['MQTT_CLIENT_URL'], int(os.environ['MQTT_CLIENT_PORT'])) as mqtt_client:
             await mqtt_client.subscribe("Simulator_Controls")
-            await asyncio.gather(self.handle_messages(mqtt_client), self.run_simulator())
+            await asyncio.gather(self.handle_messages(mqtt_client), self.run_loop())
 
     async def handle_messages(self, mqtt_client):
         topic_filter = "Simulator_Controls"
@@ -38,22 +38,22 @@ class SystemManager:
         message = msg.payload.decode('utf-8')
         await self.command_queue.put(message)
 
-    async def run_simulator(self):
+    async def run_loop(self):
         while True:
+            print('waiting for next command', flush=True)
             command = await self.command_queue.get()
-            if command == 'Start':
-                if not self.simulator_running:
-                    print('Starting simulator')
-                    self.simulator = simulator.Simulator()
-                    await self.simulator.execute()
-                    print('Back to listening ')
-                    self.simulator_running = True
-            elif command == 'Stop':
-                if self.simulator_running:
-                    print('Stopping simulator')
-                    self.simulator_running = False
-                    self.simulator = None
-                    gc.collect()
+            print(command)
+            if command == "Start":
+                print('Simulator start', flush=True)
+                self.sim_task = asyncio.create_task(self.run_sim())
+                print('Simulator started', flush=True)
+            if command == "Stop":
+                print('Simulator stop', flush=True)
+                self.sim_task.cancel()
+
+    async def run_sim(self):
+        self.simulator = simulator.Simulator()
+        await self.simulator.execute()
 
 async def main():
     system_manager = SystemManager()
