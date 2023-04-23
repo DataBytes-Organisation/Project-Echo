@@ -652,7 +652,7 @@
   ];
 
   hmiState.movementEvents = movementEvents;
-  //hmiState.vocalizationEvents = vocalizationEvents;
+  hmiState.vocalizationEvents = [];
   hmiState.microphoneLocations = microphoneLocations;
 
   const el = (sel) => {return document.getElementById(sel);}
@@ -714,14 +714,14 @@
 
   toggleSwitch.addEventListener('change', function() {
     if (this.checked) {
-      resetWildlifeLayers();
+      resetWildlifeLayers(hmiState);
       hmiState.currentTime = Math.floor((Date.now() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
       hmiState.previousUpdate = Math.floor((Date.now() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
       hmiState.liveMode = true;
       console.log("Live mode enabled");
       pastDataContainer.style.maxHeight = '0';
     } else {
-      resetWildlifeLayers();
+      resetWildlifeLayers(hmiState);
       hmiState.liveMode = false;
       console.log("Live mode disabled");
       pastDataContainer.style.maxHeight = pastDataContainer.scrollHeight + 'px';
