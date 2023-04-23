@@ -3,6 +3,8 @@ import os
 import unittest
 from clock import Clock
 import ast
+import logging
+logger1 = logging.getLogger('_sys_logger')
 
 from factories.animal_factory import AnimalFactory
 from factories.sensor_factory import SensorFactory
@@ -80,20 +82,12 @@ class Simulator():
         self.SystemClock = Clock()
         self.AnimalFactory = AnimalFactory()
         self.SensorFactory = SensorFactory()
-        print(f'Random animal create(): {self.AnimalFactory.create().species}')
-        print(f'Random animal create_random_animal(): {self.AnimalFactory.create_random_animal().species}')
+        logger1.info(f'Random animal create(): {self.AnimalFactory.create().species}')
+        logger1.info(f'Random animal create_random_animal(): {self.AnimalFactory.create_random_animal().species}')
 
 if __name__ == "__main__":
-    
-    #clock = Clock()
-    #clock.test()
-    
-    #mm = CommsManager()
-    #mm.initialise_communications()
-    #mm.test()
-    
-    sim = Simulator()
-    #sim.test()
-    sim.execute()
+    print('Meant to be imported by System Manager - not run otherwise cant be controlled.')
+    # sim = Simulator()
+    # sim.execute()
     
     

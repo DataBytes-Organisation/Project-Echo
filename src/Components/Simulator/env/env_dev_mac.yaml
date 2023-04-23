@@ -43,3 +43,4 @@ dependencies:
     - shapely
     - ipympl
     - paho-mqtt
+    - asyncio-mqtt
