@@ -23,6 +23,7 @@ class SensorManager(entities.entity.Entity):
         self.GRAPH = nx.Graph()
         self.NODE_THRESHOLD = 0.008
         self.c = 343
+        
 
     def add_sensor_object(self, MicObj: entities.microphone) -> None:
         self.MicrophoneObjects.append(MicObj)
@@ -101,16 +102,15 @@ class SensorManager(entities.entity.Entity):
             else:
                 # Update the initial guess to try again
                 low_bounds = [
-                    max(self.get_otways_coordinates()[3][0], best_lat - 0.01),
-                    max(self.get_otways_coordinates()[4][1], best_lon - 0.01),
+                    min(self.get_otways_coordinates()[3][0], best_lat - 0.01),
+                    min(self.get_otways_coordinates()[4][1], best_lon - 0.01),
                     0,
                 ]
                 high_bounds = [
-                    min(self.get_otways_coordinates()[1][0], best_lat + 0.01),
-                    min(self.get_otways_coordinates()[2][1], best_lon + 0.01),
+                    max(self.get_otways_coordinates()[1][0], best_lat + 0.01),
+                    max(self.get_otways_coordinates()[2][1], best_lon + 0.01),
                     np.inf,
                 ]
-
                 improved_initial_guess = np.random.uniform(low=low_bounds, high=high_bounds)
 
                 retry_count += 1
