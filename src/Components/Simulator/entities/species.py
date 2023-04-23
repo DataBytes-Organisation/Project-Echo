@@ -2,13 +2,14 @@
 #############################################################################
 # This class represents a simulated species
 #############################################################################
-from enum import Enum
 
-class Species(Enum):
-    brant = 1
-    jabwar = 2
-    sheowl = 3
-    spodov = 4
-    wiltur = 5
-    dummy_triangulation = 6
+class Species():
+    # constructor
+    def __init__(self, name) -> None:    
+        self.name = name
     
+    # get the name of the species
+    def getName(self):
+        return self.name
+    
+    # TODO: there may be other models here on how this species moves    

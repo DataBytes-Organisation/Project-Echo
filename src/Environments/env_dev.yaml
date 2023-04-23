@@ -21,6 +21,7 @@ dependencies:
  - cudnn
  - cuda-cupti
  - ipykernel
+ - ipympl
  - go
  - git
  - ffmpeg
