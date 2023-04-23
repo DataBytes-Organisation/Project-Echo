@@ -179,7 +179,7 @@ class EchoEngine():
         full_model = self.build_model()
         
         # Load the saved weights into the model
-        full_model.load_weights('src/Components/Engine/models/generic_engine_pipeline_model.hdf5')
+        full_model.load_weights('src/Components/Engine/models/checkpoint_generic_model.hdf5')
         
         return full_model
 
@@ -254,7 +254,7 @@ class EchoEngine():
         
         # if we didn't get exactly 5 seconds worth, this will choose a random subsection to process
         # ultimately, this ensures the image sizes are fixed when passed to the classifier
-        tmp_audio_t = self.load_random_subsection(tmp_audio_t, 5.0)
+        tmp_audio_t = self.load_random_subsection(tmp_audio_t, SC['AUDIO_CLIP_DURATION'])
     
         # Convert to spectrogram
         image = tfio.audio.spectrogram(
@@ -334,7 +334,7 @@ class EchoEngine():
         client.on_subscribe = self.on_subscribe
         client.on_message = self.on_message
         client.connect('broker.mqttdashboard.com', 1883)
-        client.subscribe('projectecho/engine/1', qos=1)
+        client.subscribe('projectecho/engine/2', qos=1)
         
         print("Retrieving species names from GCP")
         self.class_names = self.gcp_load_species_list()

@@ -108,7 +108,7 @@ class CommsManager():
         '''
   
         # publish the audio message on the queue
-        (rc, mid) = self.mqtt_client.publish('projectecho/engine/1', MQTT_MSG, qos=1)
+        (rc, mid) = self.mqtt_client.publish('projectecho/engine/2', MQTT_MSG, qos=1)
         
         print(f'Vocalisation Published! Animal {animal.getUUID()} time: {timestamp}')
         
