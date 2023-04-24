@@ -324,7 +324,7 @@ class EchoEngine():
         for cs in self.class_names:
             print(f" class name {cs}")
 
-        print("Building classifer model")
+        #print("Building classifer model")
         #self.model = self.build_model_with_weights()
         # Display the model summary
         #self.model.summary()
