@@ -361,6 +361,7 @@ export function showMics(hmiState){
   let layerSource = layer.getSource();
   layer.setVisible(true);
 }
+
 export function hideMics(hmiState){
   let layer = findMapLayerWithName(hmiState, "mic_layer");
   let layerSource = layer.getSource();
@@ -525,7 +526,6 @@ function queueSimUpdate(hmiState) {
   }
 
   //refresh layers
-  //console.log("refreshing");
   for (let stat of statuses) {
     for (let animalType of animalTypes) {
       let layerName = deriveTruthLayerName(stat, animalType);

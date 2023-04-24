@@ -149,6 +149,44 @@ body {
     margin-top: 2px;
 }
 
+input[type="checkbox"]:checked{
+  background-color: grey !important;
+  border: solid 2px white;
+}
+
+input[type="checkbox"]{
+  background-color: black;
+  border-color: white;
+  outline: none;
+}
+
+.vulnerable {
+  
+  border-color :orange !important;
+ 
+}
+
+
+.normal{
+  
+  border-color: green !important;
+}
+
+.endangered{
+  
+  border-color: red !important;
+}
+
+.invasive{
+  border-color :blue !important;
+  
+}
+
+.nearthreatened{
+  
+  border-color :yellow !important;
+}
+
 #content{
     display: flex;
     width: 100%;
