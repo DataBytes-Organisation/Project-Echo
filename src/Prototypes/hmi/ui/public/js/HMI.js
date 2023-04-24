@@ -357,12 +357,12 @@ function addmicrophones(hmiState) {
 }
 
 export function showMics(hmiState){
-  let layer = findMapLayerWithName(hmiState, "micLayer");
+  let layer = findMapLayerWithName(hmiState, "mic_layer");
   let layerSource = layer.getSource();
   layer.setVisible(true);
 }
 export function hideMics(hmiState){
-  let layer = findMapLayerWithName(hmiState, "micLayer");
+  let layer = findMapLayerWithName(hmiState, "mic_layer");
   let layerSource = layer.getSource();
   layer.setVisible(false);
 }
