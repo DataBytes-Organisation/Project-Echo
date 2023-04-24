@@ -9,8 +9,6 @@ from sensor_manager import SensorManager
 from factories.animal_factory import AnimalFactory
 from factories.sensor_factory import SensorFactory
 from comms_manager import CommsManager
-from system_manager import SystemManager
-
 
 class TestConfig(unittest.TestCase):
     def setUp(self):
@@ -44,23 +42,15 @@ class TestConfig(unittest.TestCase):
 
 class Config:
     def __init__(self):
-        self.config = self.read_configuration()
-
-    def _get_config(self):
-        return self.config
+        # System Manger will read in the config file.
+        pass
     
-    def initialise(self):    
-        # Validate the configuration
-        self.validate_configuration(self._get_config)
-        
+    def initialise(self):           
         # Initialise logging file
-        self.initiase_logging(self._get_config())
+        self.initiase_logging()
         
         # Create the communications manager
         self.comms_manager = CommsManager()
-
-        # Create the system manager
-        self.system_manager = SystemManager()
         
         # Initialise the communications manager
         self.comms_manager.initialise_communications()
@@ -84,24 +74,13 @@ class Config:
         # Create Animal Instances
         animal_instances = self.create_animal_instances(animal_factory)
         
-        return animal_instances
-    
-    def read_configuration(self):
-        config_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config', '.config')
-        with open(config_file_path) as f:
-            config_data = f.readlines()
-
-        for line in [line for line in config_data if line != "\n"]:
-            key, value = line.strip().split('=')
-            os.environ[key] = value   
-        return config_data        
+        return animal_instances    
     
     def validate_configuration(self, config):
         # TODO
         pass
     
-    def initiase_logging(self, config):
-         
+    def initiase_logging(self):
         debug_level = 'INFO'
         if 'DEBUG_LEVEL' in os.environ:
             debug_level = os.environ['DEBUG_LEVEL']

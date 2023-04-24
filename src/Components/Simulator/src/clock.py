@@ -1,5 +1,7 @@
 import datetime
 import time
+import logging
+logger1 = logging.getLogger('_sys_logger')
 
 class Clock:
     
@@ -8,7 +10,7 @@ class Clock:
 
     def __new__(cls, step_interval = 0.2, start_time=datetime.datetime.now()):
         if cls._instance is None:
-            print('Creating the Clock Once')
+            logger1.info('Creating the Clock Once')
             cls._instance = super(Clock, cls).__new__(cls)
             cls.current_time = start_time
             cls.step_interval = step_interval
@@ -29,7 +31,7 @@ class Clock:
     # step the clock, intended to be called in the simulation loop  
     def update(self):
         self.advance_time(self.step_interval*1000000.0, 'microseconds')
-        print(f'\n\nsimulated time is now: ', self.current_time)
+        logger1.info(f'\n\nsimulated time is now: {str(self.current_time)}')
             
     # supporting the simulation loop, intended to be called at the end of the loop
     def wait_real_time_sync(self):
@@ -53,9 +55,9 @@ class Clock:
         # create a clock with wall time now
         clock = Clock(0.2)
         
-        print(f'sim time is: {clock.get_time()}')
+        logger1.info(f'sim time is: {clock.get_time()}')
         
         clock.advance_time(200000, 'microseconds')
         
-        print(f'sim time is: {clock.get_time()}')
+        logger1.info(f'sim time is: {clock.get_time()}')
 

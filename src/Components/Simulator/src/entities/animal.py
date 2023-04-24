@@ -9,6 +9,8 @@ import entities.entity
 import numpy as np
 import base64
 import uuid
+import logging
+logger1 = logging.getLogger('_sys_logger')
 
 class Animal(entities.entity.Entity):
     
@@ -52,11 +54,11 @@ class Animal(entities.entity.Entity):
         return self.uuid
 
     def describe(self) -> None:
-        print(f'Animal UUID           : {self.uuid}')
-        print(f'Animal Species        : {self.species.getName()}')
-        print(f'Animal LLA            : {self.getLLA()}')
-        print(f'Animal Vocal Mean (s) : {self.vocal_interval_mean}')
-        print(f'Animal Vocal Std (s)  : {self.vocal_interval_std}')
+        logger1.info(f'Animal UUID           : {self.uuid}')
+        logger1.info(f'Animal Species        : {self.species.getName()}')
+        logger1.info(f'Animal LLA            : {self.getLLA()}')
+        logger1.info(f'Animal Vocal Mean (s) : {self.vocal_interval_mean}')
+        logger1.info(f'Animal Vocal Std (s)  : {self.vocal_interval_std}')
         
     # motion is modelled as random brownian motion 
     def update_lla(self) -> None:
@@ -79,7 +81,7 @@ class Animal(entities.entity.Entity):
         self.setLLA(lla)
     
     def random_vocalisation(self) -> bool:
-        print(f'Random sample for vocalisation')
+        logger1.info(f'Random sample for vocalisation')
         vocalisation_flag = False
         
         # get the current sim time

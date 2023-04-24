@@ -14,6 +14,8 @@ import os
 from entities.species import Species
 import random
 from clock import Clock
+import logging
+logger1 = logging.getLogger('_sys_logger')
         
 class CommsManager():
     
@@ -24,13 +26,13 @@ class CommsManager():
     # Initialise communication with MQTT endpoints
     def initialise_communications(self):
         
-        print(f'Initialising Communications')
+        logger1.info(f'Initialising Communications')
         
         self.mqtt_client = paho.Client()
         #self.mqtt_client.on_publish = on_mqtt_publish
         # we are using an insure public server for now
         self.mqtt_client.connect(os.environ['MQTT_CLIENT_URL'], int(os.environ['MQTT_CLIENT_PORT']))
-        self.mqtt_client.loop_start()
+        # self.mqtt_client.loop_start()
 
     # This function uses the google bucket with audio files and
     # leverages the folder names as the official species names
@@ -76,9 +78,9 @@ class CommsManager():
         sample_blob = random.sample(self.audio_blobs[species_name], k=1)[0]
         
         # Read the blob's content as a byte array
-        print("Retrieving audio from bucket...")
+        logger1.info("Retrieving audio from bucket...")
         audio = sample_blob.download_as_bytes()
-        print("Audio clip download complete.")
+        logger1.info("Audio clip download complete.")
         
         # Encode the audio data as a string
         audio_str = self.audio_to_string(audio)
@@ -109,7 +111,7 @@ class CommsManager():
         # publish the audio message on the queue
         (rc, mid) = self.mqtt_client.publish(os.environ['MQTT_PUBLISH_URL'], MQTT_MSG, qos=1)
         
-        print(f'Vocalisation Published! Animal {animal.getUUID()} time: {timestamp}')
+        logger1.info(f'Vocalisation Published! Animal {animal.getUUID()} time: {timestamp}')
         
     # this method takes in binary audio data and encodes to string
     def audio_to_string(self, audio_binary) -> str:
@@ -123,19 +125,19 @@ class CommsManager():
         return decoded_data
     
     def test(self):
-        print(f'testing MessageManager')
+        logger1.info(f'testing MessageManager')
         
-        print(f'Testing GCP endpoint')
+        logger1.info(f'Testing GCP endpoint')
         
         species_list = self.gcp_load_species_list()
         for species in species_list:
-            print(f'Found species : {species.getName()}')
+            logger1.info(f'Found species : {species.getName()}')
         
         # load a test json file containing audio data
         with open('src\Prototypes\data\database\sample_data\events.json', 'r') as file:
             test_json = json.load(file)
             msg = test_json[0]
-            print(f' Loaded message timestamp: {msg["timestamp"]}')
+            logger1.info(f' Loaded message timestamp: {msg["timestamp"]}')
             
             audio_b1 = self.string_to_audio(msg['audioClip'])
             audio_s1 = self.audio_to_string(audio_b1)
@@ -148,6 +150,6 @@ class CommsManager():
             
             assert audio_s3 == audio_s1, "Strings are not matching!"
             
-            print(f'test completed successfully')
+            logger1.info(f'test completed successfully')
     
         

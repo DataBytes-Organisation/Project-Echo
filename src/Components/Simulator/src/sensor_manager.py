@@ -13,6 +13,8 @@ import itertools
 import numpy as np
 from geopy.distance import distance
 from scipy.optimize import least_squares
+import logging
+logger1 = logging.getLogger('_sys_logger')
 
 
 class SensorManager(entities.entity.Entity):
@@ -55,7 +57,7 @@ class SensorManager(entities.entity.Entity):
         for mic in mics_around_event:
             mic.reset_trigger_event_time()
 
-        print(f'Min triangulation error: {min_error}\n')
+        logger1.info(f'Min triangulation error: {min_error}\n')
         return predicted_lla
     
     def func_to_minimize(self, x, list_triggered_mics, c):
