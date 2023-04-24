@@ -315,7 +315,7 @@
                     </div>
 
                     <div class="form-check">
-                      <input class="form-check-input s nearthreatened"  type="checkbox" value="" id="nearthreatened" onchange="{updateFilter('nearthreatened')}" checked style="border: 2px solid red;">
+                      <input class="form-check-input s nearthreatened"  type="checkbox" value="" id="nearthreatened" onchange="{updateFilter('nearthreatened')}" checked>
                       <label class="form-check-label" for="nearthreatened">Near Threatened</label>
                     </div>
 
@@ -346,8 +346,8 @@
                   <div class="col">
                     
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="microphones" onchange="{microphoneDisplay()}">
-                      <label class="form-check-label" for="microphones">Hide Microphones</label>
+                      <input class="form-check-input" type="checkbox" value="" id="microphones" onchange="{microphoneDisplay()}" checked>
+                      <label class="form-check-label" for="microphones">Microphones </label>
                     </div>
                    
                   </div>
@@ -681,10 +681,10 @@
   //console.log("mic visibility toggled!")
   let mic = document.getElementById("microphones");
     if (mic.checked){
-      hideMics(hmiState)
+      showMics(hmiState)
     } 
     else {
-      showMics(hmiState)
+      hideMics(hmiState)
     }
   }
 
