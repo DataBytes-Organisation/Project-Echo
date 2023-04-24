@@ -1,0 +1,901 @@
+[{
+    "timestamp": "2023-03-22 13:45:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -38.8214807580445,
+        143.55769541441353,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 13:50:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -38.821518071195825,
+        143.5578853634493,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 13:55:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -38.821368502074684,
+        143.55798378854513,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 14:00:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -38.82134833608708,
+        143.55797421588957,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 14:05:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -38.82124405235385,
+        143.55811924525753,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 14:10:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -38.8211694049637,
+        143.55796922241558,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 14:15:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -38.82102677386787,
+        143.55809308725753,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 14:20:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -38.821046292647104,
+        143.5580559483372,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 14:25:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -38.82116030236126,
+        143.55804836892747,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 14:30:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -38.82131285300032,
+        143.55787173737443,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 14:35:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -38.82135120667123,
+        143.55790171167592,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 14:40:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -38.82122555563459,
+        143.55804363397422,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 14:45:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -38.821042246156324,
+        143.55796874308191,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 14:50:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -38.821154023499865,
+        143.55804086948106,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 14:55:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -38.820970803134735,
+        143.55823057312415,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 15:00:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -38.821146563574985,
+        143.55829763082573,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 15:05:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -38.82105272683032,
+        143.55842049720926,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 15:10:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -38.821005304111395,
+        143.55824384860634,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 15:15:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -38.820892114716266,
+        143.5583169463401,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 15:20:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -38.82080850394278,
+        143.55815701479858,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 15:25:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -38.82065053199251,
+        143.55831047789707,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 15:30:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -38.82046028724058,
+        143.55811628732977,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 15:35:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -38.82034674104292,
+        143.55808211522813,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 15:40:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -38.820196306534704,
+        143.55816399658804,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 15:45:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -38.820195469990274,
+        143.55806313340344,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 15:50:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -38.820152093579104,
+        143.558231881394,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 15:55:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -38.82020978947095,
+        143.558331782583,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 16:00:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -38.820101636225715,
+        143.55824548091505,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 16:05:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -38.81999311399817,
+        143.5580924516003,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 16:10:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -38.81998780412608,
+        143.55798549294252,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 16:15:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -38.820119644001025,
+        143.55809840079573,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 16:20:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -38.81997995541082,
+        143.55820633835322,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 16:25:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -38.82008428347941,
+        143.55823173520716,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 16:30:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -38.81994390261708,
+        143.5582743627223,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 16:35:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -38.81998292534259,
+        143.55833147762365,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 16:40:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -38.819943047845285,
+        143.5584545291952,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 16:45:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -38.81976173256993,
+        143.55833906693312,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 16:50:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -38.81963735123684,
+        143.55827572513786,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 16:55:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -38.819827870314136,
+        143.55843958194174,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 17:00:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -38.81975240420719,
+        143.55843746065315,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 17:05:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -38.819651860294336,
+        143.558552939965,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 17:10:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -38.819777086418945,
+        143.55858419609012,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 17:15:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -38.819927317241955,
+        143.55848851819337,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 17:20:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -38.81986450169389,
+        143.55862869230174,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 17:25:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -38.81973644028988,
+        143.55867781303527,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 17:30:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -38.81956366956097,
+        143.55861297605549,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 17:35:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -38.81938557650938,
+        143.55850318924792,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 17:40:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -38.81953855827671,
+        143.55840107085274,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 17:45:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -38.8193902126944,
+        143.5585970472169,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 17:50:00",
+    "species": "Sus Scrofa",
+    "animalId": 1,
+    "animalTrueLLA": [
+        -38.81954315412694,
+        143.5586612451391,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 13:45:00",
+    "species": "Alauda Arvensis",
+    "animalId": 2,
+    "animalTrueLLA": [
+        -38.819705064887664,
+        143.55871454368227,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 13:50:00",
+    "species": "Alauda Arvensis",
+    "animalId": 2,
+    "animalTrueLLA": [
+        -38.819865786748124,
+        143.55864405674984,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 13:55:00",
+    "species": "Alauda Arvensis",
+    "animalId": 2,
+    "animalTrueLLA": [
+        -38.819815617430585,
+        143.55883008014402,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 14:00:00",
+    "species": "Alauda Arvensis",
+    "animalId": 2,
+    "animalTrueLLA": [
+        -38.8196548738103,
+        143.55884765173732,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 14:05:00",
+    "species": "Alauda Arvensis",
+    "animalId": 2,
+    "animalTrueLLA": [
+        -38.819841712565406,
+        143.55903778849077,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 14:10:00",
+    "species": "Alauda Arvensis",
+    "animalId": 2,
+    "animalTrueLLA": [
+        -38.819775058901094,
+        143.559071527501,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 14:15:00",
+    "species": "Alauda Arvensis",
+    "animalId": 2,
+    "animalTrueLLA": [
+        -38.81961045994232,
+        143.5588796272157,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 14:20:00",
+    "species": "Alauda Arvensis",
+    "animalId": 2,
+    "animalTrueLLA": [
+        -38.8195241318777,
+        143.558873971835,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 14:25:00",
+    "species": "Alauda Arvensis",
+    "animalId": 2,
+    "animalTrueLLA": [
+        -38.819661939197935,
+        143.55897659001002,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 14:30:00",
+    "species": "Alauda Arvensis",
+    "animalId": 2,
+    "animalTrueLLA": [
+        -38.81977934492675,
+        143.55897728892592,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 14:35:00",
+    "species": "Alauda Arvensis",
+    "animalId": 2,
+    "animalTrueLLA": [
+        -38.81983669536907,
+        143.5587966864236,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 14:40:00",
+    "species": "Alauda Arvensis",
+    "animalId": 2,
+    "animalTrueLLA": [
+        -38.81995867257095,
+        143.5589232515565,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 14:45:00",
+    "species": "Alauda Arvensis",
+    "animalId": 2,
+    "animalTrueLLA": [
+        -38.82014170570639,
+        143.55903681868588,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 14:50:00",
+    "species": "Alauda Arvensis",
+    "animalId": 2,
+    "animalTrueLLA": [
+        -38.82021424174261,
+        143.55899269063622,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 14:55:00",
+    "species": "Alauda Arvensis",
+    "animalId": 2,
+    "animalTrueLLA": [
+        -38.82007294334029,
+        143.55890285583197,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 15:00:00",
+    "species": "Alauda Arvensis",
+    "animalId": 2,
+    "animalTrueLLA": [
+        -38.81998888328719,
+        143.55882838440965,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 15:05:00",
+    "species": "Alauda Arvensis",
+    "animalId": 2,
+    "animalTrueLLA": [
+        -38.81991415643157,
+        143.55875341546874,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 15:10:00",
+    "species": "Alauda Arvensis",
+    "animalId": 2,
+    "animalTrueLLA": [
+        -38.81991618529718,
+        143.55867723290945,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 15:15:00",
+    "species": "Alauda Arvensis",
+    "animalId": 2,
+    "animalTrueLLA": [
+        -38.81983320646488,
+        143.55880772660643,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 15:20:00",
+    "species": "Alauda Arvensis",
+    "animalId": 2,
+    "animalTrueLLA": [
+        -38.81995746476131,
+        143.55861448296875,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 15:25:00",
+    "species": "Alauda Arvensis",
+    "animalId": 2,
+    "animalTrueLLA": [
+        -38.819961235411085,
+        143.55845828672935,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 15:30:00",
+    "species": "Alauda Arvensis",
+    "animalId": 2,
+    "animalTrueLLA": [
+        -38.81987942770235,
+        143.55856904114248,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 15:35:00",
+    "species": "Alauda Arvensis",
+    "animalId": 2,
+    "animalTrueLLA": [
+        -38.82003361031077,
+        143.55867814705462,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 15:40:00",
+    "species": "Alauda Arvensis",
+    "animalId": 2,
+    "animalTrueLLA": [
+        -38.8198420334097,
+        143.55884784045017,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 15:45:00",
+    "species": "Alauda Arvensis",
+    "animalId": 2,
+    "animalTrueLLA": [
+        -38.819724904152594,
+        143.55890245806393,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 15:50:00",
+    "species": "Alauda Arvensis",
+    "animalId": 2,
+    "animalTrueLLA": [
+        -38.81962891028743,
+        143.5588993438771,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 15:55:00",
+    "species": "Alauda Arvensis",
+    "animalId": 2,
+    "animalTrueLLA": [
+        -38.81981297909092,
+        143.55889635986898,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 16:00:00",
+    "species": "Alauda Arvensis",
+    "animalId": 2,
+    "animalTrueLLA": [
+        -38.81994634494132,
+        143.55878171038285,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 16:05:00",
+    "species": "Alauda Arvensis",
+    "animalId": 2,
+    "animalTrueLLA": [
+        -38.819881024345335,
+        143.55895434240503,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 16:10:00",
+    "species": "Alauda Arvensis",
+    "animalId": 2,
+    "animalTrueLLA": [
+        -38.81973243678938,
+        143.55899503362957,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 16:15:00",
+    "species": "Alauda Arvensis",
+    "animalId": 2,
+    "animalTrueLLA": [
+        -38.81969988182919,
+        143.55902489465194,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 16:20:00",
+    "species": "Alauda Arvensis",
+    "animalId": 2,
+    "animalTrueLLA": [
+        -38.81977018616557,
+        143.55920989923865,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 16:25:00",
+    "species": "Alauda Arvensis",
+    "animalId": 2,
+    "animalTrueLLA": [
+        -38.81993219871551,
+        143.5591021003123,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 16:30:00",
+    "species": "Alauda Arvensis",
+    "animalId": 2,
+    "animalTrueLLA": [
+        -38.81995484465692,
+        143.55919483992108,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 16:35:00",
+    "species": "Alauda Arvensis",
+    "animalId": 2,
+    "animalTrueLLA": [
+        -38.81999821537576,
+        143.55926117492982,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 16:40:00",
+    "species": "Alauda Arvensis",
+    "animalId": 2,
+    "animalTrueLLA": [
+        -38.81997535102893,
+        143.55924866299145,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 16:45:00",
+    "species": "Alauda Arvensis",
+    "animalId": 2,
+    "animalTrueLLA": [
+        -38.82016156019821,
+        143.55933089786532,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 16:50:00",
+    "species": "Alauda Arvensis",
+    "animalId": 2,
+    "animalTrueLLA": [
+        -38.82005890799397,
+        143.5594121605813,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 16:55:00",
+    "species": "Alauda Arvensis",
+    "animalId": 2,
+    "animalTrueLLA": [
+        -38.81994615715798,
+        143.55946523725157,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 17:00:00",
+    "species": "Alauda Arvensis",
+    "animalId": 2,
+    "animalTrueLLA": [
+        -38.81994231152094,
+        143.55959585542908,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 17:05:00",
+    "species": "Alauda Arvensis",
+    "animalId": 2,
+    "animalTrueLLA": [
+        -38.82011947772941,
+        143.55968112654423,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 17:10:00",
+    "species": "Alauda Arvensis",
+    "animalId": 2,
+    "animalTrueLLA": [
+        -38.820163485561665,
+        143.55954827428266,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 17:15:00",
+    "species": "Alauda Arvensis",
+    "animalId": 2,
+    "animalTrueLLA": [
+        -38.82004355885919,
+        143.55952343194738,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 17:20:00",
+    "species": "Alauda Arvensis",
+    "animalId": 2,
+    "animalTrueLLA": [
+        -38.82002710204829,
+        143.55971346023262,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 17:25:00",
+    "species": "Alauda Arvensis",
+    "animalId": 2,
+    "animalTrueLLA": [
+        -38.82010205661633,
+        143.5596186139052,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 17:30:00",
+    "species": "Alauda Arvensis",
+    "animalId": 2,
+    "animalTrueLLA": [
+        -38.82019734195431,
+        143.5595941710302,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 17:35:00",
+    "species": "Alauda Arvensis",
+    "animalId": 2,
+    "animalTrueLLA": [
+        -38.82004549390005,
+        143.55962584139164,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 17:40:00",
+    "species": "Alauda Arvensis",
+    "animalId": 2,
+    "animalTrueLLA": [
+        -38.81998374287106,
+        143.5596734305617,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 17:45:00",
+    "species": "Alauda Arvensis",
+    "animalId": 2,
+    "animalTrueLLA": [
+        -38.81993104769332,
+        143.55964045665326,
+        24
+    ]
+},{
+    "timestamp": "2023-03-22 17:50:00",
+    "species": "Alauda Arvensis",
+    "animalId": 2,
+    "animalTrueLLA": [
+        -38.81974798079661,
+        143.55966736960278,
+        24
+    ]
+}]
