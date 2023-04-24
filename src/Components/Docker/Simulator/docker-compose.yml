@@ -1,7 +1,0 @@
-version: '3'
-services:
-  app:
-    build: .
-    volumes:
-      - ./src:/app/src
-    command: python src/system_manager.py
