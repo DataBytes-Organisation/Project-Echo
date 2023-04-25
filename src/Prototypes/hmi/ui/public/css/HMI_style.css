@@ -1,466 +1,519 @@
-@import url('https://fonts.googleapis.com/css2?family=Stick+No+Bills:wght@300&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap');
-
+@import url("https://fonts.googleapis.com/css2?family=Stick+No+Bills:wght@300&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap");
 
 body {
-    background: #1a1a1a;
+  background: #1a1a1a;
 }
 
 .title {
-    font-size: 30px; /* Increase font size */
-    text-align: center; /* Center the text within its container */
-    top: 0px;
-    left: 0px;
-    font-size: 20px;
-    height: 10%;
-    font-family: 'Stick No Bills', sans-serif;
+  font-size: 30px; /* Increase font size */
+  text-align: center; /* Center the text within its container */
+  top: 0px;
+  left: 0px;
+  font-size: 20px;
+  height: 10%;
+  font-family: "Stick No Bills", sans-serif;
 }
 
 .logo {
-    margin-right: 10px;
+  margin-right: 10px;
 }
 
 #blur {
-    background-color: #1a1a1a;
+  background-color: #1a1a1a;
 }
 
 #basemap {
-    /*height: 70%;*/
-    width: 100%;
-    padding: 0;
-    /*border: 1px solid #e7e7e7;*/
-    /*border-radius: 10px;*/
+  /*height: 70%;*/
+  width: 100%;
+  padding: 0;
+  /*border: 1px solid #e7e7e7;*/
+  /*border-radius: 10px;*/
 }
 
 .main {
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    
+  left: 0;
+  width: 100vw;
+  height: 100vh;
 }
 
 #filter-menu {
-    height: 0%;
-    width: 0%;
-    position: fixed;
-    z-index: 998;
-    top: 0;
-    right: 0;
-    background-color: rgba(0,0,0,0.5);
-    overflow-x: hidden;
-    position: fixed; 
+  height: 80% !important;
+  width: 100% !important;
+  z-index: 998;
+  background-color: transparent;
+  overflow-x: hidden;
+  padding: 20px;
 }
 
-  /* Style the scrollbar for WebKit browsers */
+/* Style the scrollbar for WebKit browsers */
 
-  .hamburger-icon {
-    display: block;
-    width: 30px;
-    height: 20px;
-    position: relative;
-    cursor: pointer;
-    position: absolute;
-    position: absolute;
-    top: 10px; /* adjust this value to set the distance from the top of the container */
-    right: 10px; /* adjust this value to set the distance from the right of the container */
-    z-index: 999; /* ensure the icon is on top of other content */
-  }
-  
-  .hamburger-icon span {
-    display: block;
-    position: absolute;
-    height: 3px;
-    width: 100%;
-    background: white;
-    border-radius: 3px;
-    opacity: 1;
-    left: 0;
-    transform: rotate(0deg);
-    transition: all 0.1s ease-out;
-  }
-  
-  .hamburger-icon span:nth-child(1) {
-    top: 0px;
-  }
-  
-  .hamburger-icon span:nth-child(2) {
-    top: 8px;
-  }
-  
-  .hamburger-icon span:nth-child(3) {
-    top: 16px;
-  }
-  
-  .hamburger-icon.active span:nth-child(1) {
-    top: 8px;
-    transform: rotate(45deg);
-  }
-  
-  .hamburger-icon.active span:nth-child(2) {
-    opacity: 0;
-  }
-  
-  .hamburger-icon.active span:nth-child(3) {
-    top: 8px;
-    transform: rotate(-45deg);
-  }
-
-  .dropdown-menu {
-    width: auto;
-    max-width: none;
-    white-space: nowrap;
-    overflow: hidden;
-  }
-  
-  .dropdown-menu .col {
-    
-    vertical-align: top;
-    width: 1%;
-    
-    padding: 0 10px;
-  }
-
-.dropdown {
-    background-color: rgba(0,0,0,0.5);
+.hamburger-icon {
+  display: block;
+  width: 30px;
+  height: 20px;
+  position: relative;
+  cursor: pointer;
+  position: absolute;
+  position: absolute;
+  top: 10px; /* adjust this value to set the distance from the top of the container */
+  right: 10px; /* adjust this value to set the distance from the right of the container */
+  z-index: 999; /* ensure the icon is on top of other content */
 }
 
-.dropdown-toggle {
-    display: flex;
-    align-items: center;
-    border-radius: 0;
-    background-color:rgba(0,0,0,0.5);
-    color: black;
+.hamburger-icon span {
+  display: block;
+  position: absolute;
+  height: 3px;
+  width: 100%;
+  background: white;
+  border-radius: 3px;
+  opacity: 1;
+  left: 0;
+  transform: rotate(0deg);
+  transition: all 0.1s ease-out;
 }
 
-.dropdown-toggle i {
-    margin-right: 5px;
-    border-radius: 0;
-    background-color: rgba(0,0,0,0.5);
-    color: black;
+.hamburger-icon span:nth-child(1) {
+  top: 0px;
+}
+
+.hamburger-icon span:nth-child(2) {
+  top: 8px;
+}
+
+.hamburger-icon span:nth-child(3) {
+  top: 16px;
+}
+
+.hamburger-icon.active span:nth-child(1) {
+  top: 8px;
+  transform: rotate(45deg);
+}
+
+.hamburger-icon.active span:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger-icon.active span:nth-child(3) {
+  top: 8px;
+  transform: rotate(-45deg);
 }
 
 .dropdown-menu {
-    max-height: 200px;
-    overflow-y: auto;
-    border-radius: 0;
-    
+  width: auto;
+  max-width: none;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.dropdown-menu .col {
+  vertical-align: top;
+  width: 1%;
+
+  padding: 0 10px;
+}
+
+.dropdown {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.dropdown-toggle {
+  display: flex;
+  align-items: center;
+  border-radius: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: black;
+}
+
+.dropdown-toggle i {
+  margin-right: 5px;
+  border-radius: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: black;
+}
+
+.dropdown-menu {
+  max-height: 200px;
+  /* overflow-y: scroll; */
+  border-radius: 0;
 }
 
 .dropdown-menu li {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 5px;
-    border-radius: 0;
-    
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 5px;
+  border-radius: 0;
 }
 
 .form-check-input {
-    margin-top: 2px;
+  margin-top: 2px;
 }
 
-input[type="checkbox"]:checked{
+input[type="checkbox"]:checked {
   background-color: grey !important;
   border: solid 2px white;
 }
 
-input[type="checkbox"]{
+input[type="checkbox"] {
   background-color: black;
   border-color: white;
   outline: none;
 }
 
 .vulnerable {
-  
-  border-color :orange !important;
- 
+  border-color: orange !important;
 }
 
-
-.normal{
-  
+.normal {
   border-color: green !important;
 }
 
-.endangered{
-  
+.endangered {
   border-color: red !important;
 }
 
-.invasive{
-  border-color :blue !important;
-  
+.invasive {
+  border-color: blue !important;
 }
 
-.nearthreatened{
-  
-  border-color :yellow !important;
+.nearthreatened {
+  border-color: yellow !important;
 }
 
-#content{
-    display: flex;
-    width: 100%;
-    height: 100%;
-    justify-content: center;
-    align-items: center;
-    font-family: 'Roboto', sans-serif;
+#content {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+  font-family: "Roboto", sans-serif;
 }
 
+#ABOUT {
+  height: 0;
+  width: 0;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  right: 0;
+  background-color: black;
+  color: white;
+  overflow-x: hidden;
 
-#ABOUT{
-    height: 0;
-    width: 0;
-    position: fixed;
-    z-index: 1;
-    top: 0;
-    right: 0;
-    background-color: black;
-    color: white;
-    overflow-x: hidden;
-    
-    padding-top: 60px;
-    margin-top: 30px;
-
+  padding-top: 60px;
+  margin-top: 30px;
 }
 
-
-#FAQ{
-    height: 0;
-    width: 0;
-    position: fixed;
-    z-index: 1;
-    top: 0;
-    right: 0;
-    background-color: black;
-    color: white;
-    overflow-x: hidden;
-    padding-top: 60px;
-    margin-top: 30px;
+#FAQ {
+  height: 0;
+  width: 0;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  right: 0;
+  background-color: black;
+  color: white;
+  overflow-x: hidden;
+  padding-top: 60px;
+  margin-top: 30px;
 }
 
-
-#FAQ a{
-
-    padding: 8px 8px 8px 32px;
-    text-decoration: none;
-    font-size: 14px;
-    color:  white;
-    display: block;
-    transition: 0.3s;
-    font-family: 'Roboto', sans-serif;
+#FAQ a {
+  padding: 8px 8px 8px 32px;
+  text-decoration: none;
+  font-size: 14px;
+  color: white;
+  display: block;
+  transition: 0.3s;
+  font-family: "Roboto", sans-serif;
 }
 
-#menuPanel{
-    height: 100%;
-    width: 0%;
-    position: fixed;
-    z-index: 1;
-    top: 0;
-    right: 0;
-    background-color: black;
-    color: white;
-    overflow-x: hidden;
-    transition: 0.5s;
-    padding-top: 60px;
-    margin-top: 30px;
+#menuPanel {
+  height: 100%;
+  width: 0%;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  right: 0;
+  background-color: black;
+  color: white;
+  overflow-x: hidden;
+  transition: 0.5s;
+  padding-top: 60px;
+  margin-top: 30px;
 }
 
-
-
-#menuPanel a , #menuPanel h2{
-    padding: 8px 8px 8px 32px;
-    text-decoration: none;
-    font-size: 27px;
-    color: white;
-    display: block;
-    transition: 0.3s;
-    font-family: 'Helvetica', sans-serif;
+#menuPanel a,
+#menuPanel h2 {
+  padding: 8px 8px 8px 32px;
+  text-decoration: none;
+  font-size: 27px;
+  color: white;
+  display: block;
+  transition: 0.3s;
+  font-family: "Helvetica", sans-serif;
 }
 
-#menuPanel div{
-    padding: 8px 8px 8px 32px;
-    text-decoration: none;
-    font-size: 14px;
-    color:  white;
-    display: block;
-    transition: 0.3s;
-    font-family: 'Roboto', sans-serif;
+#menuPanel div {
+  padding: 8px 8px 8px 32px;
+  text-decoration: none;
+  font-size: 14px;
+  color: white;
+  display: block;
+  transition: 0.3s;
+  font-family: "Roboto", sans-serif;
 }
 
-#menuPanel img{
-    padding: 8px 8px 8px 32px;
-    display: block;
-    width: 100%;
-    height: auto;
-    transition: 0.3s;
-    font-family: 'Stick No Bills', sans-serif;
+#menuPanel img {
+  padding: 8px 8px 8px 32px;
+  display: block;
+  width: 100%;
+  height: auto;
+  transition: 0.3s;
+  font-family: "Stick No Bills", sans-serif;
 }
 
 #menuPanel a:hover {
-    color: rgb(var(--background-rgb));
+  color: rgb(var(--background-rgb));
 }
 
 #area {
-    position: relative;  /* this is needed! */  
-    height: 150px;
-    background: #eee;
-    margin: 40px;
+  position: relative; /* this is needed! */
+  height: 150px;
+  background: #eee;
+  margin: 40px;
 }
 
 #popup {
-    position: absolute;
-    height: 10vh;
-    width: 20vw;
-    background: rgb(39, 39, 39);
-    display: none;
-    z-index: 2;
-    opacity: 0.8;
-    color:rgb(19, 101, 19);
+  position: absolute;
+  height: 10vh;
+  width: 20vw;
+  background: rgb(39, 39, 39);
+  display: none;
+  z-index: 2;
+  opacity: 0.8;
+  color: rgb(19, 101, 19);
 }
 
 i {
-    color: white;
+  color: white;
 }
 
 .dropdown-toggle {
-    background-color: #fff;
-    border: 1px solid #e7e7e7;
-    color: #666;
-    padding: 8px 16px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    cursor: pointer;
-  }
+  background-color: #fff;
+  border: 1px solid #e7e7e7;
+  color: #666;
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  cursor: pointer;
+}
 
-  .dropdown-toggle:hover {
-    background-color: none;
-  }
+.dropdown-toggle:hover {
+  background-color: none;
+}
 
-  .dropdown-menu {
-    display: none;
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    margin-top: 0;
-    
-    border-top: none;
-    background-color:rgba(0,0,0,0.2);
-    color: white;
-    padding: 0;
-    list-style: none;
-  }
+.dropdown-menu {
+  display: none;
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  margin-top: 0;
 
-  /* Show the dropdown menu when the button is clicked */
-  .show + .dropdown-menu {
-    display: block;
-    padding: 20px;
-  }
+  border-top: none;
+  background-color: rgba(0, 0, 0, 0.2);
+  color: white;
+  padding: 0;
+  list-style: none;
+}
 
-  button {
-    background-color: transparent;
-  }
+/* Show the dropdown menu when the button is clicked */
+.show + .dropdown-menu {
+  display: block;
+  padding: 20px;
+}
 
-  .btn-no-background {
-    background-color: transparent;
-    border: none;
-    border-bottom: 1px solid white;
-    
-  }
+button {
+  background-color: transparent;
+}
 
-  .btn.show{
-    color: var(--bs-btn-active-color);
-    background-color: var(--bs-btn-active-bg) !important;
-    border-color: var(--bs-btn-active-border-color);
-  }
+.btn-no-background {
+  background-color: transparent;
+  border: none;
+  border-bottom: 1px solid white;
+}
 
-  .btn-no-background:hover,
-  .btn-no-background:focus {
-    background-color: transparent;
-    border-bottom: 1px solid white;
-    
-  }
+.btn.show {
+  color: var(--bs-btn-active-color);
+  background-color: var(--bs-btn-active-bg) !important;
+  border-color: var(--bs-btn-active-border-color);
+}
 
-  .toggle-button {
-    color: white;
-    background-color: blue;
-    border: none;
-    padding: 10px 20px;
-    font-size: 16px;
-  }
+.btn-no-background:hover,
+.btn-no-background:focus {
+  background-color: transparent;
+  border-bottom: 1px solid white;
+}
 
-  .toggle-button:active {
-    background-color: red;
-  }
-  
+.toggle-button {
+  color: white;
+  background-color: blue;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+}
 
-  /* Style the list items */
-  .dropdown-menu li {
-    padding: 8px 16px;
-    cursor: pointer;
-  }
+.toggle-button:active {
+  background-color: red;
+}
 
-  .dropdown-menu li:hover {
-    opacity: 0.5;
-  }
+/* Style the list items */
+.dropdown-menu li {
+  padding: 8px 16px;
+  cursor: pointer;
+}
 
+.dropdown-menu li:hover {
+  opacity: 0.5;
+}
 
+/* Style the checkboxes */
+.form-check-input {
+  margin-right: 8px;
+}
 
-  /* Style the checkboxes */
-  .form-check-input {
-    margin-right: 8px;
-  }
+.form-check {
+  padding-right: 1em;
+}
 
-  .form-check {
-    padding-right: 1em;
-  }
+.col {
+  padding-top: 1em;
+  padding-left: 1em;
+}
 
-  .col {
-    padding-top: 1em;
-    padding-left: 1em;
-  }
+.form-check-label {
+  font-size: 0.8em;
+}
+.voc-icon {
+  z-index: 9999;
+}
+.voc-icon:hover {
+  cursor: pointer;
+  opacity: 0.5;
+  pointer-events: auto;
+}
 
-  .form-check-label {
-    font-size: .8em;
-  }
-  .voc-icon {
-    z-index: 9999;
-    
-  }
-  .voc-icon:hover {
-    cursor: pointer;
-    opacity: .5;
-    pointer-events: auto;
-  }
-
-  .toggle-switch-container{
-    margin-top: 20px;
-  }
-  .toggle-label{
-    color:#666;
-    font-family: var(--bs-btn-font-family);
-    font-size: var(--bs-btn-font-size);
-    font-weight: var(--bs-btn-font-weight);
-    line-height: var(--bs-btn-line-height);
-  }
-  .past-data-header{
-    color:#666;
-    font-family: var(--bs-btn-font-family);
-    font-size: var(--bs-btn-font-size);
-    font-weight: var(--bs-btn-font-weight);
-    line-height: var(--bs-btn-line-height);
-  }
-  .past-data-container{
-    margin-bottom: 20px;
-  }
+.toggle-switch-container {
+  margin-top: 20px;
+}
+.toggle-label {
+  color: #666;
+  font-family: var(--bs-btn-font-family);
+  font-size: var(--bs-btn-font-size);
+  font-weight: var(--bs-btn-font-weight);
+  line-height: var(--bs-btn-line-height);
+}
+.past-data-header {
+  color: #666;
+  font-family: var(--bs-btn-font-family);
+  font-size: var(--bs-btn-font-size);
+  font-weight: var(--bs-btn-font-weight);
+  line-height: var(--bs-btn-line-height);
+}
+.past-data-container {
+  margin-bottom: 20px;
+}
 
 .show + .dropdown-menu {
   display: inline-block !important;
   overflow: hidden !important;
 }
 
-.select-all-btn{
+.select-all-btn {
   height: 40px !important;
-  background-color:#adb5bd !important;
+  background-color: #adb5bd !important;
   margin-top: 5px !important;
+}
+
+.tab-container {
+  background-color: #1a1a1aaf;
+  height: 100px;
+  width: 500px;
+  z-index: 10000;
+  position: fixed;
+  top: 0;
+  right: 0;
+  display: flex;
+  align-items: end;
+  padding: 10px;
+}
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  position: fixed;
+}
+
+.tabs button {
+  background: none;
+  background-color: rgba(128, 128, 128, 0.699);
+  border: none;
+  color: #cccccc;
+  font-size: larger;
+  cursor: pointer;
+  outline: none;
+  height: 30px;
+  width: max-content;
+}
+
+.tabs button.active {
+  background-color: #e48595;
+  transform: translateY(-10px);
+}
+
+.tab-content {
+  position: relative;
+}
+
+#app {
+  display: none;
+  margin-top: 100px;
+}
+
+#app.is-active {
+  display: block;
+  position: fixed;
+  width: 500px;
+  height: 100%;
+  top: 0px;
+  right: 0px;
+  background-color: #1a1a1aaf;
+  color: #e48595;
+  padding: 20px;
+  overflow-y: scroll;
+}
+
+/* Width and height of the scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+/* Background color of the scrollbar track */
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Color of the scrollbar thumb */
+::-webkit-scrollbar-thumb {
+  background: #e48595c7;
+  border-radius: 6px;
+}
+
+/* On hover, highlight the thumb */
+::-webkit-scrollbar-thumb:hover {
+  background: #e48595;
 }
