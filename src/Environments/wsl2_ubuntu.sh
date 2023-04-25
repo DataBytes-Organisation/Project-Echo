@@ -31,7 +31,7 @@ apt-get upgrade -y
 # create a dev conda environment
 conda activate base
 conda env remove -v -n dev
-conda create -y -v -n dev python=3.9
+conda create -y -v -n dev python=3.10.6
 
 # ensure pip is up-to-date
 conda activate dev
@@ -41,8 +41,9 @@ pip install --upgrade pip
 # setup a GPU environment deps via conda
 conda activate dev
 conda install -y -c conda-forge cudatoolkit=11.8.0
-python3 -m pip install nvidia-cudnn-cu11==8.6.0.163 tensorflow==2.12.*
+python3 -m pip install nvidia-cudnn-cu11 tensorflow==2.12.*
 
+# ensure environment paths are right on dev env activation
 mkdir -p $CONDA_PREFIX/etc/conda/activate.d
 echo 'CUDNN_PATH=$(dirname $(python -c "import nvidia.cudnn;print(nvidia.cudnn.__file__)"))' >> $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh
 echo 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CONDA_PREFIX/lib/:$CUDNN_PATH/lib' >> $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh
