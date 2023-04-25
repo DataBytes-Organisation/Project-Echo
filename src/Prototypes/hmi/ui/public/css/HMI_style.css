@@ -39,16 +39,93 @@ body {
     
 }
 
+#menu{
+  height: 0%;
+  width: 0%;
+  position: fixed;
+  z-index: 998;
+  top: 0;
+  right: 0;
+  background-color: rgba(19, 19, 52, 0.5);
+  overflow-x: hidden;
+  position: fixed; 
+}
+
+.navbar {
+  display: flex;
+  justify-content: left;
+  align-items: left;
+  z-index: 997;
+}
+
+.nav-item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid black;
+  background-color: rgb(245, 179, 179);
+}
+
+.nav-item:hover{
+  cursor: pointer;
+}
+
+#FAQ {
+  
+  height: 100%;
+  width: 0%;
+  position: fixed;
+  z-index: 994;
+  top: 0;
+  right: 0;
+  background-color: none;
+  color: white;
+  overflow-x: hidden;
+  
+  padding-top: 60px;
+  margin-top: 30px;
+  margin-left: 30px;
+}
+
+#FAQ-contents{
+  margin-left: 30px;
+}
+
 #filter-menu {
-    height: 0%;
-    width: 0%;
-    position: fixed;
-    z-index: 998;
-    top: 0;
-    right: 0;
-    background-color: rgba(0,0,0,0.5);
-    overflow-x: hidden;
-    position: fixed; 
+  padding: 0px 0px 0px 0px;
+  height: 100%;
+  width: 0%;
+  position: fixed;
+  z-index: 995;
+  top: 0;
+  right: 0;
+  background-color: none;
+  color: white;
+  overflow-x: hidden;
+  
+  padding-top: 60px;
+  margin-top: 30px;
+  
+}
+
+#filter-menu-contents{
+  margin-left: 30px;
+}
+
+#I {
+  height: 100%;
+  width: 0%;
+  position: fixed;
+  z-index: 994;
+  top: 0;
+  right: 0;
+  background-color: none;
+  color: white;
+  overflow-x: hidden;
+  padding-top: 60px;
+  margin-top: 30px;
 }
 
   /* Style the scrollbar for WebKit browsers */
@@ -121,7 +198,7 @@ body {
   }
 
 .dropdown {
-    background-color: rgba(0,0,0,0.5);
+    background-color: none;
 }
 
 .dropdown-toggle {
@@ -223,60 +300,37 @@ input[type="checkbox"]{
 }
 
 
-#FAQ{
-    height: 0;
-    width: 0;
-    position: fixed;
-    z-index: 1;
-    top: 0;
-    right: 0;
-    background-color: black;
-    color: white;
-    overflow-x: hidden;
-    padding-top: 60px;
-    margin-top: 30px;
-}
 
 
-#FAQ a{
 
-    padding: 8px 8px 8px 32px;
-    text-decoration: none;
-    font-size: 14px;
-    color:  white;
-    display: block;
-    transition: 0.3s;
-    font-family: 'Roboto', sans-serif;
-}
 
-#menuPanel{
+
+#animalPopup{
     height: 100%;
     width: 0%;
     position: fixed;
     z-index: 1;
     top: 0;
     right: 0;
-    background-color: black;
+    background-color: none;
     color: white;
     overflow-x: hidden;
-    transition: 0.5s;
     padding-top: 60px;
     margin-top: 30px;
 }
 
 
 
-#menuPanel a , #menuPanel h2{
+#animalPopup a , #animalPopup h2{
     padding: 8px 8px 8px 32px;
     text-decoration: none;
     font-size: 27px;
     color: white;
     display: block;
-    transition: 0.3s;
     font-family: 'Helvetica', sans-serif;
 }
 
-#menuPanel div{
+#animalPopup div{
     padding: 8px 8px 8px 32px;
     text-decoration: none;
     font-size: 14px;
@@ -286,7 +340,7 @@ input[type="checkbox"]{
     font-family: 'Roboto', sans-serif;
 }
 
-#menuPanel img{
+#animalPopup img{
     padding: 8px 8px 8px 32px;
     display: block;
     width: 100%;
@@ -295,7 +349,7 @@ input[type="checkbox"]{
     font-family: 'Stick No Bills', sans-serif;
 }
 
-#menuPanel a:hover {
+#animalPopup a:hover {
     color: rgb(var(--background-rgb));
 }
 
@@ -345,7 +399,7 @@ i {
     margin-top: 0;
     
     border-top: none;
-    background-color:rgba(0,0,0,0.2);
+    background-color:rgba(0,0,0,0);
     color: white;
     padding: 0;
     list-style: none;
