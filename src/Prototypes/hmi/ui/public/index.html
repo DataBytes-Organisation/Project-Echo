@@ -119,16 +119,17 @@
 
           <div id="menu">
             <div class="navbar">
-              <a class="nav-item" onclick="openTab('filter-menu')">f</a>
-              <a class="nav-item" onclick="openTab('animalPopup')">l</a>
-              <a class="nav-item" onclick="openTab('FAQ')">i</a>
+              <a id="filter-menu-btn" class="tabs-button active" onclick="openTab('filter-menu')">f</a>
+              <a id="popup-menu-btn" class="tabs-button" onclick="openTab('animal-popup')">l</a>
+              <a id="FAQ-menu-btn" class="tabs-button" onclick="openTab('FAQ')">i</a>
+              <span style="position: fixed; border-top: 3px solid #e48595; height: 2px; width: 80%; margin-top: 30px;"></span>
             </div>
           <div id="FAQ">
             <div id="FAQ-contents">
             <h3>FAQ TAB</h3>
             </div>
           </div>
-          <div id="animalPopup">
+          <div id="animal-popup">
             <h2 id="desc_name" class="title">(Insert Animal Name here)</h2>
             <img id= "desc_img" src="./images/bio/Apostlebird.png"></img>
             <div id="desc_species" class="subtitle">(Insert animal scientific name)</div>
@@ -141,7 +142,7 @@
           </div>
           <div id="filter-menu">
             <div id="filter-menu-contents">
-            <h3 style="text-align: left; color: white;">
+            <h3 style="text-align: left; color: #e48595 !important;">
               Filter Menu
             </h3>
             <div class="toggle-switch-container">
@@ -377,6 +378,40 @@
   }
 
   function openTab(tab) {
+
+    if(tab == 'filter-menu'){
+      if(!document.getElementById("filter-menu-btn").classList.contains("active")){
+        document.getElementById("filter-menu-btn").classList.add("active");
+      }
+      if(document.getElementById("popup-menu-btn").classList.contains("active")){
+        document.getElementById("popup-menu-btn").classList.remove("active");
+      }
+      if(document.getElementById("FAQ-menu-btn").classList.contains("active")){
+        document.getElementById("FAQ-menu-btn").classList.remove("active");
+      }
+    }
+    else if(tab == 'animal-popup'){
+      if(document.getElementById("filter-menu-btn").classList.contains("active")){
+        document.getElementById("filter-menu-btn").classList.remove("active");
+      }
+      if(!document.getElementById("popup-menu-btn").classList.contains("active")){
+        document.getElementById("popup-menu-btn").classList.add("active");
+      }
+      if(document.getElementById("FAQ-menu-btn").classList.contains("active")){
+        document.getElementById("FAQ-menu-btn").classList.remove("active");
+      }
+    }
+    else if(tab == 'FAQ'){
+      if(document.getElementById("filter-menu-btn").classList.contains("active")){
+        document.getElementById("filter-menu-btn").classList.remove("active");
+      }
+      if(document.getElementById("popup-menu-btn").classList.contains("active")){
+        document.getElementById("popup-menu-btn").classList.remove("active");
+      }
+      if(!document.getElementById("FAQ-menu-btn").classList.contains("active")){
+        document.getElementById("FAQ-menu-btn").classList.add("active");
+      }
+    }
     if (tab != null){
       if (currentTab != document.getElementById(tab)){
         //console.log("Yo")
@@ -390,6 +425,7 @@
 
   function closeTab() {
     console.log("Closing Current Tab")
+    
     currentTab.style.width = "0%"
     currentTab.style.height = "0%"
   }
@@ -411,7 +447,7 @@
       toggleNav();
     }
 
-    openTab('animalPopup')
+    openTab('animal-popup')
   }
 
   /*function closeNav() {
