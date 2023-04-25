@@ -43,7 +43,7 @@ export function initialiseHMI(hmiState) {
   addAllTruthFeatures(hmiState);
   //addVocalizedFeatures(hmiState); !!! Remove and work on in next Update
   addmicrophones(hmiState);
-  queueSimUpdate(hmiState);
+  //queueSimUpdate(hmiState);
   //simulateData(hmiState);
 }
 
