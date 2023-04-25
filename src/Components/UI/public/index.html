@@ -343,11 +343,12 @@
 
     <div id="menuPanel">
       <a href="javascript:void(0)" class="closebtn" onclick="{closeNav()}">&times;</a>
-      <h2>(Insert Animal Name here)</h2>
-      <img src="./images/sample_img.png"></img>
+      <h2 id="desc_name" class="title">(Insert Animal Name here)</h2>
+      <img id= "desc_img" src="./images/sample_img.png"></img>
+      <div id="desc_species" class="subtitle">(Insert animal scientific name)</div>
   
-  
-      <div>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</div>
+      <div id="desc_summary" class="desc">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</div>
+      <div id="desc_details" class="desc"></div>
       <h2>Audio</h2>
       <span><i class="fa fa-volume-up fa-2x" style="color:black;opacity:.5" onclick="{playAudio()}"></i></span>
        <audio hidden controls src="./audio/t-rex-roar.mp3"></audio>
@@ -424,7 +425,7 @@
 
   }
 
-  function openNav() {
+  export function openNav() {
     console.log('menuPanel: ', document.getElementById("menuPanel"))
     document.getElementById("menuPanel").style.width = "30%";
   }

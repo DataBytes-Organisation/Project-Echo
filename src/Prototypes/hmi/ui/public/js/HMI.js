@@ -2,6 +2,7 @@
 
 import { getAudioTestString } from "./HMI-utils.js";
 import { retrieveTruthEventsInTimeRange } from "./routes.js";
+import data from "./sample_data.json" assert { type: 'json' };
 
 var markups = ["elephant.png", "monkey.png", "tiger.png"];
 
@@ -26,21 +27,29 @@ var vocalizedLayers = []
 
 var animalTypes = ["mammal", "bird", "amphibian", "reptile", "insect"];
 
+var sample_data = data.data;
+
+var animal_data = []
+
+export var animal_toggled = false;
+
 //For Demo purposes only
 //This plays an awful quailty audio test string
 document.addEventListener('click', function() {
   //playAudioString(getAudioTestString());  
 });
 
+
 export function initialiseHMI(hmiState) {
   console.log(`initialising`);
-
   createBasemap(hmiState);
-
+  console.log("Get sample element from document: ", document.getElementById("menuPanel"))
   addTruthLayers(hmiState);
   addVocalisationLayers(hmiState);
 
   addAllTruthFeatures(hmiState);
+
+  createMapClickEvent(hmiState);
   //addVocalizedFeatures(hmiState); !!! Remove and work on in next Update
   addmicrophones(hmiState);
   queueSimUpdate(hmiState);
@@ -121,7 +130,7 @@ export function convertJSONtoAnimalMovementEvent(hmiState, data){
     movementEvent.animalStatus = matchStatus(data.status.toLowerCase());
     movementEvent.animalDiet = data.diet.toLowerCase();
 
-    console.log(movementEvent);
+    console.log("Movement Event:", movementEvent);
 
     return movementEvent;
 }
@@ -256,9 +265,10 @@ function addAllTruthFeatures(hmiState) {
       geometry: new ol.geom.Point(
         ol.proj.fromLonLat([entry.locationLon,entry.locationLat])
       ),
-        name: 'trueLocation',
+        name: 'trueLocation_' + entry.speciesScientificName,
         animalType: entry.animalType,
-        animalStatus: entry.animalStatus
+        animalStatus: entry.animalStatus,
+        animalSpecies: entry.speciesScientificName 
     });
       //console.log(entry.locationLon, " ", entry.locationLat)
     
@@ -278,6 +288,7 @@ function addAllTruthFeatures(hmiState) {
     let layerSource = layer.getSource();
 
     console.log(layerName);
+    console.log("animal type: ", entry.speciesScientificName);
 
     layerSource.addFeature(trueLocation);
     layer.getSource().changed();
@@ -294,9 +305,10 @@ function addNewTruthFeatures(hmiState, events) {
       geometry: new ol.geom.Point(
         ol.proj.fromLonLat([entry.locationLon, entry.locationLat])
       ),
-        name: 'trueLocation',
+        name: 'trueLocation_' + entry.speciesScientificName,
         animalType: entry.animalType,
-        animalStatus: entry.animalStatus
+        animalStatus: entry.animalStatus,
+        animalSpecies: entry.speciesScientificName 
     });
       //console.log(entry.locationLon, " ", entry.locationLat)
     
@@ -473,6 +485,48 @@ function createBasemap(hmiState) {
 
   hmiState.basemap = basemap;
   return basemap;
+}
+
+function createMapClickEvent(hmiState){
+  hmiState.basemap.on("click", function (evt) {
+    const feature = hmiState.basemap.forEachFeatureAtPixel(evt.pixel, function (feature) {
+      return feature;
+    });
+    if (feature){
+      let values = feature.getProperties();
+      if (values.animalSpecies){
+          var result = sample_data.find(({ common }) => common.toUpperCase() === values.animalSpecies.toUpperCase())
+          if (result) {
+            animal_data = result;
+            document.getElementById("desc_name").innerText = result.common;
+            document.getElementById("desc_species").innerText = result.species;
+            document.getElementById("desc_summary").innerText = result.summary;
+            document.getElementById("desc_img").src = "../../images/bio/" + result.common + ".png";
+            let summary = document.getElementById("desc_details");
+            summary.innerHTML = '';
+            result.description.forEach(content => {
+              var p = document.createElement('p');
+              p.className = "desc_ul";
+              p.innerText = content;
+              summary.appendChild(p);
+            })
+          animal_toggled = true;
+          }
+
+      }
+    }
+  });
+}
+
+export function MapOpenNav() {
+  if (animal_toggled){
+    document.getElementById("menuPanel").style.width = "30%";
+  }
+}
+
+export function MapCloseNav() {
+  document.getElementById("menuPanel").style.width = "0";
+  animal_toggled = false;
 }
 
 function updateTruthEvents(hmiState){
