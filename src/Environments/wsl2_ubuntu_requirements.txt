@@ -1,5 +1,8 @@
 audiomentations
 tensorflow-serving-api
+tensorflow_addons
 tensorflow_io
+tensorflow_hub
 paho-mqtt
 diskcache
+matplotlib
