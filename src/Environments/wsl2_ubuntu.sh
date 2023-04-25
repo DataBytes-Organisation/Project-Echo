@@ -28,6 +28,9 @@ conda update -y -n base -c defaults conda
 apt-get update
 apt-get upgrade -y
 
+# install the lambda stack as base os python env
+wget -nv -O- https://lambdalabs.com/install-lambda-stack.sh | sh -
+
 # create a dev conda environment
 conda activate base
 conda env remove -v -n dev
@@ -47,11 +50,12 @@ python3 -m pip install nvidia-cudnn-cu11 tensorflow==2.12.*
 mkdir -p $CONDA_PREFIX/etc/conda/activate.d
 echo 'CUDNN_PATH=$(dirname $(python -c "import nvidia.cudnn;print(nvidia.cudnn.__file__)"))' >> $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh
 echo 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CONDA_PREFIX/lib/:$CUDNN_PATH/lib' >> $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh
+echo 'export XLA_FLAGS="--xla_gpu_cuda_data_dir=/usr/lib/cuda"' >> $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh
 source $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh
 
 # create the full dev environment
 conda activate dev
-pip install -r wsl2_ubuntu_requirements.txt
+pip install --no-deps -r wsl2_ubuntu_requirements.txt
 
 # Verify install:
 python3 -c "import tensorflow as tf; print(tf.config.list_physical_devices('GPU'))"
