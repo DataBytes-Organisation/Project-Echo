@@ -114,9 +114,33 @@
       <!-- Row 2 with main contents spanning the entire width-->
       
       <div class="row main bg-black" style="padding: 0px !important;">
-        <div class="col-md-12 col-main" style="padding: 0px !important;">
+        <div class="col-md-12 col-main" style="padding: 0px !important;"> 
           <div id="basemap" onclick="openNav()"></div>
+
+          <div id="menu">
+            <div class="navbar">
+              <a class="nav-item" onclick="openTab('filter-menu')">f</a>
+              <a class="nav-item" onclick="openTab('animalPopup')">l</a>
+              <a class="nav-item" onclick="openTab('FAQ')">i</a>
+            </div>
+          <div id="FAQ">
+            <div id="FAQ-contents">
+            <h3>FAQ TAB</h3>
+            </div>
+          </div>
+          <div id="animalPopup">
+            <h2 id="desc_name" class="title">(Insert Animal Name here)</h2>
+            <img id= "desc_img" src="./images/bio/Apostlebird.png"></img>
+            <div id="desc_species" class="subtitle">(Insert animal scientific name)</div>
+        
+            <div id="desc_summary" class="desc">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</div>
+            <div id="desc_details" class="desc"></div>
+            <h2>Audio</h2>
+            <span><i class="fa fa-volume-up fa-2x" style="color:black;opacity:.5" onclick="{playAudio()}"></i></span>
+            <audio hidden controls src="./audio/t-rex-roar.mp3"></audio>
+          </div>
           <div id="filter-menu">
+            <div id="filter-menu-contents">
             <h3 style="text-align: left; color: white;">
               Filter Menu
             </h3>
@@ -289,12 +313,15 @@
                   </div>
                 </div>
               </div>
-            </div>       
+            </div> 
+          </div>
+          </div>      
         
       </div>
 
     </div>
 
+<!--
     <div id="menuPanel">
       <a href="javascript:void(0)" class="closebtn" onclick="{closeNav()}">&times;</a>
       <h2 id="desc_name" class="title">(Insert Animal Name here)</h2>
@@ -316,9 +343,12 @@
     <div id="ABOUT" class="overlay">
       <h2>ABOUT OVERLAY PAGE</h2>
     </div>
+-->
 
 <script>
   var hamburgerStatus = false;
+  var currentTab = document.getElementById('filter-menu'); 
+
   function toggleNav() {
     var hamburger = document.querySelector('.hamburger-icon');
     
@@ -333,67 +363,37 @@
   }
 
   function openMenu() {
-    document.getElementById("filter-menu").style.width = "30%";
-    document.getElementById("filter-menu").style.height = "100%";
+    document.getElementById("menu").style.width = "30%";
+    document.getElementById("menu").style.height = "100%";
     hamburgerStatus = true;
+    openTab(null)
   }
 
   function closeMenu() {
-    document.getElementById("filter-menu").style.width = "0%";
-    document.getElementById("filter-menu").style.height = "0%";
+    document.getElementById("menu").style.width = "0%";
+    document.getElementById("menu").style.height = "0%";
     hamburgerStatus = false;
+    closeTab()
   }
 
+  function openTab(tab) {
+    if (tab != null){
+      if (currentTab != document.getElementById(tab)){
+        //console.log("Yo")
+        closeTab()
+      }
+      currentTab = document.getElementById(tab)
+    }
+    currentTab.style.width = "30%";
+    currentTab.style.height = "90%";
+  }
+
+  function closeTab() {
+    console.log("Closing Current Tab")
+    currentTab.style.width = "0%"
+    currentTab.style.height = "0%"
+  }
   var overlay = null;
-  function openFAQ() {
-    if(overlay){
-      closeOverlay(overlay)
-    }
-    //console.log('FAQ: ', document.getElementById("FAQ"));
-    document.getElementById("FAQ").style.width = "100%";
-    document.getElementById("FAQ").style.height = "100%";
-    overlay = "OpenFAQ"
-  }
-
-  function closeFAQ() {
-    document.getElementById("FAQ").style.width = "0%";
-    document.getElementById("FAQ").style.height = "0%";
-    overlay = null
-  }
-
-  function openABOUT() {
-    if(overlay){
-      
-      closeOverlay(overlay)
-    }
-    document.getElementById("ABOUT").classList.add("active");
-    //console.log('OPEN ABOUT: ', document.getElementById("ABOUT"));
-    document.getElementById("ABOUT").style.width = "100%";
-    document.getElementById("ABOUT").style.height = "100%";
-    overlay = "OpenABOUT"
-  }
-
-  function closeABOUT() {
-    //console.log("CLOSING THE ABOUT PAGE...")
-    
-    document.getElementById("ABOUT").style.width = "0%";
-    document.getElementById("ABOUT").style.height = "0%";
-    overlay = null
-  }
-
-  function closeOverlay(overlay){
-
-    //console.log("Closing Overlay: ", overlay)
-
-    if (overlay == "OpenFAQ"){
-
-      closeFAQ()
-    }
-    else if (overlay == "OpenABOUT"){
-      closeABOUT()
-    }
-    
-  }
 
   function openSIMULATOR(){
 
@@ -405,12 +405,18 @@
   }
 
   function openNav() {
-    MapOpenNav()
+    var hamburger = document.querySelector('.hamburger-icon');
+    
+    if(!hamburger.classList.contains('active')){
+      toggleNav();
+    }
+
+    openTab('animalPopup')
   }
 
-  function closeNav() {
+  /*function closeNav() {
     MapCloseNav()
-  }
+  }*/
 
   let aud = 0;
   function playAudio() {
@@ -547,7 +553,7 @@
   import {retrieveTruthEventsInTimeRange} from "./js/routes.js";
   window.updateMics = updateMics;
   window.updateLayers = updateLayers;
-  window.openNav = MapOpenNav;
+  //window.openNav = MapOpenNav;
   window.closeNav = MapCloseNav;
 
 
@@ -614,7 +620,9 @@
   const el = (sel) => {return document.getElementById(sel);}
   const elArea  = el("basemap");
   // const elPopup = el("popup");
-  const elPopup = el("menuPanel");
+
+  //nb/menuTabs 
+  //const elPopup = el("menuPanel");
   //const faqOl = el("nav-faq");
   //const aboutOl = el("nav-about");
   const simulatorOl = el("screen")
@@ -629,7 +637,7 @@
   // };
   simulatorOl.addEventListener("click",openSIMULATOR)
   //aboutOl.addEventListener("click",openABOUT);
-  elArea.addEventListener("click", openNav);
+  //elArea.addEventListener("click", openNav);
   //faqOl.addEventListener("click", openFAQ);
   //Add sound listener to icon
   // let a=0;
