@@ -39,8 +39,6 @@ body {
     
 }
 
-
-
 #filter-menu {
     height: 0%;
     width: 0%;
@@ -48,7 +46,7 @@ body {
     z-index: 998;
     top: 0;
     right: 0;
-    background-color: black;
+    background-color: rgba(0,0,0,0.5);
     overflow-x: hidden;
     position: fixed; 
 }
@@ -107,7 +105,6 @@ body {
     transform: rotate(-45deg);
   }
 
-
   .dropdown-menu {
     width: auto;
     max-width: none;
@@ -123,21 +120,21 @@ body {
   }
 
 .dropdown {
-    background-color: black;
+    background-color: rgba(0,0,0,0.5);
 }
 
 .dropdown-toggle {
     display: flex;
     align-items: center;
     border-radius: 0;
-    background-color: black;
+    background-color:rgba(0,0,0,0.5);
     color: black;
 }
 
 .dropdown-toggle i {
     margin-right: 5px;
     border-radius: 0;
-    background-color: black;
+    background-color: rgba(0,0,0,0.5);
     color: black;
 }
 
@@ -347,7 +344,7 @@ i {
     margin-top: 0;
     
     border-top: none;
-    background-color: black;
+    background-color:rgba(0,0,0,0.2);
     color: white;
     padding: 0;
     list-style: none;
