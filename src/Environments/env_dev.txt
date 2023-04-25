@@ -28,6 +28,7 @@ lightgbm
 ffio
 ffprobe
 matplotlib
+mmh3
 museval
 notebook
 numpy
