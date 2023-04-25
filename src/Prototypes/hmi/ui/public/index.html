@@ -114,10 +114,8 @@
       <!-- Row 2 with main contents spanning the entire width-->
       
       <div class="row main bg-black" style="padding: 0px !important;">
-        
-          <div id="basemap" onclick="{openNav}"></div>
-
-          
+        <div class="col-md-12 col-main" style="padding: 0px !important;">
+          <div id="basemap" onclick="openNav()"></div>
           <div id="filter-menu">
             <h3 style="text-align: left; color: white;">
               Filter Menu
@@ -299,11 +297,12 @@
 
     <div id="menuPanel">
       <a href="javascript:void(0)" class="closebtn" onclick="{closeNav()}">&times;</a>
-      <h2>(Insert Animal Name here)</h2>
-      <img src="./images/sample_img.png"></img>
+      <h2 id="desc_name" class="title">(Insert Animal Name here)</h2>
+      <img id= "desc_img" src="./images/bio/Apostlebird.png"></img>
+      <div id="desc_species" class="subtitle">(Insert animal scientific name)</div>
   
-  
-      <div>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</div>
+      <div id="desc_summary" class="desc">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</div>
+      <div id="desc_details" class="desc"></div>
       <h2>Audio</h2>
       <span><i class="fa fa-volume-up fa-2x" style="color:black;opacity:.5" onclick="{playAudio()}"></i></span>
        <audio hidden controls src="./audio/t-rex-roar.mp3"></audio>
@@ -406,12 +405,11 @@
   }
 
   function openNav() {
-    //console.log('menuPanel: ', document.getElementById("menuPanel"))
-    document.getElementById("menuPanel").style.width = "30%";
+    MapOpenNav()
   }
 
   function closeNav() {
-    document.getElementById("menuPanel").style.width = "0";
+    MapCloseNav()
   }
 
   let aud = 0;
@@ -428,6 +426,8 @@
   }
   
 </script>
+
+
 
 <script>
   
@@ -543,10 +543,13 @@
 
 <script type="module">
   import { updateLayers, initialiseHMI, showMics, hideMics, updateAnimalMovementLayerFromPastData,
-  resetWildlifeLayers } from "./js/HMI.js";
+  resetWildlifeLayers, MapOpenNav, MapCloseNav } from "./js/HMI.js";
   import {retrieveTruthEventsInTimeRange} from "./js/routes.js";
   window.updateMics = updateMics;
   window.updateLayers = updateLayers;
+  window.openNav = MapOpenNav;
+  window.closeNav = MapCloseNav;
+
 
   //All global state based info is stored in the hmiState
   let hmiState = {};

@@ -15,6 +15,8 @@
     "jquery": "^3.6.4",
     "nodemon": "^2.0.22",
     "ol": "^7.3.0",
-    "requirejs": "^2.3.6"
+    "path": "^0.12.7",
+    "requirejs": "^2.3.6",
+    "serve-index": "^1.9.1"
   }
 }
