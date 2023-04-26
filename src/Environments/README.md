@@ -51,5 +51,5 @@ sudo apt-get install -y python-is-python3
 install python dependencies:
 
 ```
-pip install -c contraints_wsl2.txt -r env_dev_wsl2.txt
+pip install -c constraints_wsl2.txt -r env_dev_wsl2.txt
 ```
