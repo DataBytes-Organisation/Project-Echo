@@ -56,6 +56,12 @@ def audioEntity(audio) -> dict:
         "audioClip": audio["audioClip"]
     }
     
+def microphoneEntity(microphone) -> dict:
+    return{
+        "_id": str(microphone["_id"]),
+        "microphoneLLA": microphone["microphoneLLA"]
+    }
+
 def eventListEntity(events) -> list:
     return [eventEntity(event) for event in events]
     
@@ -67,3 +73,6 @@ def audioListEntity(audios) -> list:
 
 def movementListEntity(events) -> list:
     return [movementEntity(event) for event in events]
+
+def microphoneListEntity(microphones) -> list:
+    return [microphoneEntity(microphone) for microphone in microphones]

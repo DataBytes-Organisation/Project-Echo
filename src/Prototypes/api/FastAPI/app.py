@@ -23,18 +23,6 @@ client = pymongo.MongoClient(connection_string)
 db = client.mydatabase
 
 
-@app.get("/events", response_description="List all events")
-def list_events():
-    
-    events = serializers.eventListEntity(db["events"].find())
-    return events
-
-
-@app.get("/species", response_description="Get events from certain species")
-def show_event(species: str):
-    events = serializers.eventListEntity(db["events"].find({"species": species}))
-    return events
-
 @app.get("/events_time", response_description="Get detection events within certain duration")
 def show_event_from_time(start: str, end: str):
     datetime_start = datetime.datetime.fromtimestamp(int(start), datetime.timezone.utc)
@@ -113,3 +101,18 @@ def show_event_from_time(start: str, end: str):
     ]
     events = serializers.movementListEntity(db["movements"].aggregate(aggregate))
     return events
+
+@app.get("/microphones", response_description="returns location of all microphones")
+def list_microphones():
+    aggregate = [
+        {
+            "$group":
+            {
+            "_id": "$sensorId",
+            "microphoneLLA": { "$first": "$microphoneLLA" }
+            }
+        }
+    ]
+    results = list(db["events"].aggregate(aggregate))
+    microphones = serializers.microphoneListEntity(results)
+    return microphones
