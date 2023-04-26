@@ -1,5 +1,13 @@
 # Engine
 
+## Generic Engine Pipeline
+
+This is an entry point and sample code for how to build an end to end pipeline from loading raw audio data and generating a model
+
+## Optimised Engine Pipeline
+
+This is a variant of the generic engine pipeline that execute a parallel pipeline - this is ready for producing the production model.
+
 ## Docker
 
 Run these steps to execute the engine in docker
