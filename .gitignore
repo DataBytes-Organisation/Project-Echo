@@ -5,3 +5,5 @@
 *.env
 
 tensorboard_logs/
+logs/
+models/

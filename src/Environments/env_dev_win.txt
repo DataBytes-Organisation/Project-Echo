@@ -4,6 +4,8 @@ descartes
 diskcache
 dm-sonnet
 flask
+folium
+geopy
 google-cloud
 google-cloud-storage
 graphviz
@@ -31,6 +33,7 @@ museval
 notebook
 numpy
 opencv-python
+paho-mqtt
 pandas
 pandas-profiling
 path
@@ -42,6 +45,7 @@ pydot
 pydub
 pyglet
 pyopengl
+pyproj
 pyrender
 pytorch_lightning
 ray
@@ -65,6 +69,7 @@ tensorflow-metadata
 tensorflow_hub
 tensorflow_gnn
 tensorflow_io==0.27.0
+tensorflow-serving-api
 tf-explain
 tfimm
 tflite-support

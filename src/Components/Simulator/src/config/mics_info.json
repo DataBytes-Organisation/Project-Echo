@@ -1,0 +1,702 @@
+[
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.78887916150244,
+        "longitude": 143.57048185218233,
+        "elevation": 10.0,
+        "unique_identifier": "077d2fc9-103a-4d70-b433-9c742690741d"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.79124064752813,
+        "longitude": 143.58041298645503,
+        "elevation": 10.0,
+        "unique_identifier": "b4f96559-7215-4db1-bfe2-d7c07248cc94"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.77621456566989,
+        "longitude": 143.5746174295855,
+        "elevation": 10.0,
+        "unique_identifier": "85258dca-d51d-4d2f-a7ae-e3c8dba9f51a"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.78288772444106,
+        "longitude": 143.5758025595199,
+        "elevation": 10.0,
+        "unique_identifier": "87b27315-ff52-44cc-841b-dd20a166e245"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.787796385343064,
+        "longitude": 143.56965697399085,
+        "elevation": 10.0,
+        "unique_identifier": "6abfb761-a89d-48fe-9a06-a02903faa45a"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.785268153777885,
+        "longitude": 143.56503339561482,
+        "elevation": 10.0,
+        "unique_identifier": "f8162637-f290-4d85-879f-bdd2a600fc9b"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.77668345952059,
+        "longitude": 143.56320116799907,
+        "elevation": 10.0,
+        "unique_identifier": "10784fdf-473c-4cff-819c-76a38dc1c4ec"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.77975657138575,
+        "longitude": 143.58575817921843,
+        "elevation": 10.0,
+        "unique_identifier": "4f68f7a9-c6af-4978-99fa-2bbb42b231e3"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.782578149919416,
+        "longitude": 143.5957210717571,
+        "elevation": 10.0,
+        "unique_identifier": "66aed46d-3d91-4bb7-b3e0-31c2c6526d3f"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.78988479381514,
+        "longitude": 143.56412188859716,
+        "elevation": 10.0,
+        "unique_identifier": "473e0252-b7b5-42bb-afa3-8bb70a2242f3"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.7928574740655,
+        "longitude": 143.60275907273373,
+        "elevation": 10.0,
+        "unique_identifier": "3d984c18-4307-4741-a335-0ddb5f2ee798"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.78453823210232,
+        "longitude": 143.57198589562762,
+        "elevation": 10.0,
+        "unique_identifier": "30d9f520-b5ce-4e2b-b0ef-10e782198f02"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.788530079128414,
+        "longitude": 143.58141955813022,
+        "elevation": 10.0,
+        "unique_identifier": "42d3bfa6-72f9-45f1-909d-457d2ccbe757"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.79416386167778,
+        "longitude": 143.59824861355204,
+        "elevation": 10.0,
+        "unique_identifier": "c20f1342-48d5-4869-995b-b4f075b787f4"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.78695234248457,
+        "longitude": 143.55972555829263,
+        "elevation": 10.0,
+        "unique_identifier": "6e7a05ee-6fec-4db1-889c-45ff7e8d68ea"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.78296683180401,
+        "longitude": 143.57364908695934,
+        "elevation": 10.0,
+        "unique_identifier": "483eceb7-702d-4588-9db2-cf6d99f2fbf0"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.77772401795165,
+        "longitude": 143.55118557292673,
+        "elevation": 10.0,
+        "unique_identifier": "ad61579f-4554-4813-af71-f5882a069fa1"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.78105525796315,
+        "longitude": 143.5563416499619,
+        "elevation": 10.0,
+        "unique_identifier": "cb3e04f1-b787-41aa-b2c4-d06529c78429"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.786934181788894,
+        "longitude": 143.56426327347108,
+        "elevation": 10.0,
+        "unique_identifier": "15a5d31c-4ab9-4582-9842-a245c769a27e"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.79106247952014,
+        "longitude": 143.595461083557,
+        "elevation": 10.0,
+        "unique_identifier": "d11285bb-2180-4e01-9ee8-7a6be05c9b5d"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.78817935587181,
+        "longitude": 143.55705701398884,
+        "elevation": 10.0,
+        "unique_identifier": "11f25699-2cbb-4bc3-9280-c4dc1323cd98"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.78805874529353,
+        "longitude": 143.59001875750562,
+        "elevation": 10.0,
+        "unique_identifier": "5d2a470e-5992-4394-8121-2e65339ff90c"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.79535365394449,
+        "longitude": 143.58806066921932,
+        "elevation": 10.0,
+        "unique_identifier": "c19b9aa8-27ef-46cf-9cbf-a20ce04e1446"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.79608971985654,
+        "longitude": 143.59773619790062,
+        "elevation": 10.0,
+        "unique_identifier": "526d7f13-f422-42a5-9884-67657c332e18"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.77951632750566,
+        "longitude": 143.58707705568798,
+        "elevation": 10.0,
+        "unique_identifier": "2d89bbfd-2456-43ea-920b-46350be2f8ec"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.78895992550002,
+        "longitude": 143.60612055009958,
+        "elevation": 10.0,
+        "unique_identifier": "73271cfe-753c-41d3-827f-a445d9d281ea"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.78523119138398,
+        "longitude": 143.57423808928957,
+        "elevation": 10.0,
+        "unique_identifier": "6c481f40-486c-48a0-a275-ea34bdab07dc"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.77861963439504,
+        "longitude": 143.57186152846583,
+        "elevation": 10.0,
+        "unique_identifier": "84a4f9fd-ae8d-4f91-a5e6-cefc60ab71db"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.788554192759456,
+        "longitude": 143.56495184343905,
+        "elevation": 10.0,
+        "unique_identifier": "5e011b64-7456-48e0-8163-e4aca34403f1"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.779864391385786,
+        "longitude": 143.5547254156756,
+        "elevation": 10.0,
+        "unique_identifier": "c90e8949-3694-409c-948a-de0e75cd0267"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.78834031704479,
+        "longitude": 143.59486851641827,
+        "elevation": 10.0,
+        "unique_identifier": "fb034d4b-e21c-4e4d-b2a7-9e335a45e68a"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.795261329306655,
+        "longitude": 143.5860624226683,
+        "elevation": 10.0,
+        "unique_identifier": "64e0d4a3-bebe-40e9-a60d-4136f507f904"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.78390488425077,
+        "longitude": 143.5917455128359,
+        "elevation": 10.0,
+        "unique_identifier": "652875b5-b92d-408e-a075-3c33df7f3b19"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.78513116793931,
+        "longitude": 143.59825907895484,
+        "elevation": 10.0,
+        "unique_identifier": "9c0b2d04-c7b2-4097-8591-83b9f72529ec"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.78212822982144,
+        "longitude": 143.5567590500892,
+        "elevation": 10.0,
+        "unique_identifier": "24c7b424-1bdd-46e4-bbac-57573f003c0f"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.778546297339375,
+        "longitude": 143.57066177418136,
+        "elevation": 10.0,
+        "unique_identifier": "1624b247-de3e-4afc-b148-e1673b35b810"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.77784149155654,
+        "longitude": 143.57570572333725,
+        "elevation": 10.0,
+        "unique_identifier": "487a6be5-0595-4c66-a42c-a160cca6fb03"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.77482110418193,
+        "longitude": 143.5570707443359,
+        "elevation": 10.0,
+        "unique_identifier": "00234ba9-2494-4078-8df8-c8a8e87a54a6"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.7915122096502,
+        "longitude": 143.5692525255941,
+        "elevation": 10.0,
+        "unique_identifier": "7f790514-5bed-409d-b6a4-61d059bceae0"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.78371132444791,
+        "longitude": 143.54982656307246,
+        "elevation": 10.0,
+        "unique_identifier": "9d67379c-fa84-4702-bb65-a971425b08e4"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.787387524744766,
+        "longitude": 143.59281696799135,
+        "elevation": 10.0,
+        "unique_identifier": "537e6cf8-532a-4626-90dc-e8fbbe51189d"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.797176280294195,
+        "longitude": 143.5984049817785,
+        "elevation": 10.0,
+        "unique_identifier": "df3acf6a-499b-4d8c-ba64-61b2f9121223"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.78067582508992,
+        "longitude": 143.57047006407703,
+        "elevation": 10.0,
+        "unique_identifier": "63c3658a-cfd6-448f-aff2-0736b60b1b9e"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.78338378204509,
+        "longitude": 143.59895807445315,
+        "elevation": 10.0,
+        "unique_identifier": "6efc1d35-e1a1-4229-9e3f-7e0a4604b19b"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.79201608848013,
+        "longitude": 143.57815894362014,
+        "elevation": 10.0,
+        "unique_identifier": "2c368119-29f3-49be-a37d-1d2b2254e028"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.78786374576712,
+        "longitude": 143.5784026976335,
+        "elevation": 10.0,
+        "unique_identifier": "1b868300-679f-4b37-b267-742ee8c20fad"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.776838425000214,
+        "longitude": 143.55528633130817,
+        "elevation": 10.0,
+        "unique_identifier": "75ed4e7d-8ab9-4391-8ba3-8fa314204a1e"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.79432569638658,
+        "longitude": 143.5935602196393,
+        "elevation": 10.0,
+        "unique_identifier": "31257444-ff45-4474-8c7b-e8e95134eafa"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.78396277212635,
+        "longitude": 143.5822660232911,
+        "elevation": 10.0,
+        "unique_identifier": "bdd21c30-8701-45d7-823f-4da7dc2cdbf5"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.78757108423012,
+        "longitude": 143.58267683780159,
+        "elevation": 10.0,
+        "unique_identifier": "c02fb5eb-85f3-445f-83ac-0e4f28349c63"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.793997987195276,
+        "longitude": 143.60612044891172,
+        "elevation": 10.0,
+        "unique_identifier": "f2f66711-ae37-4763-8865-543f7a345c15"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.791764553650424,
+        "longitude": 143.5709063876647,
+        "elevation": 10.0,
+        "unique_identifier": "990f2745-eae0-4c0a-9207-2fdb76fd166f"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.79546397564013,
+        "longitude": 143.6042005829208,
+        "elevation": 10.0,
+        "unique_identifier": "3e7a5380-1ba9-44ab-9e65-4f6a3fbbf695"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.77794931870162,
+        "longitude": 143.55902526540527,
+        "elevation": 10.0,
+        "unique_identifier": "56ef724c-0713-4203-ae47-47d245c0e46a"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.77748140759776,
+        "longitude": 143.55718539357454,
+        "elevation": 10.0,
+        "unique_identifier": "cf39e5fe-f166-4d25-bc76-eb9a71914bb3"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.77576637733414,
+        "longitude": 143.5650977405893,
+        "elevation": 10.0,
+        "unique_identifier": "0b58e86d-e6cd-4f3c-a748-dd745c22721b"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.78100355626151,
+        "longitude": 143.58110542069397,
+        "elevation": 10.0,
+        "unique_identifier": "a2be17f6-03a2-4b50-a3db-141945fd809a"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.792042256602,
+        "longitude": 143.6059643416454,
+        "elevation": 10.0,
+        "unique_identifier": "ce966666-6420-41a4-9c88-d1cc7ca77297"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.77925736759101,
+        "longitude": 143.55122679168105,
+        "elevation": 10.0,
+        "unique_identifier": "c2d9d4e8-e20f-48fa-8bdf-44bc60bcc070"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.782262075212316,
+        "longitude": 143.5518629215728,
+        "elevation": 10.0,
+        "unique_identifier": "bfd79a2c-5ccf-4eb1-ba66-aa19450104fc"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.78971838113193,
+        "longitude": 143.59490382647718,
+        "elevation": 10.0,
+        "unique_identifier": "69f5546a-1fc5-4d19-90bb-cf6bf8c16798"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.777459454714176,
+        "longitude": 143.5870036657053,
+        "elevation": 10.0,
+        "unique_identifier": "965e4032-623f-4c5f-bc6b-80ffe82375a2"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.794573441737676,
+        "longitude": 143.58492140458853,
+        "elevation": 10.0,
+        "unique_identifier": "f1b05f61-ddc1-4dac-88ed-13c9f3310be3"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.7771001426095,
+        "longitude": 143.58934001480543,
+        "elevation": 10.0,
+        "unique_identifier": "e1d9a405-b802-4b1d-90e1-aa03d702da7f"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.79027100895191,
+        "longitude": 143.58820692276902,
+        "elevation": 10.0,
+        "unique_identifier": "9396abce-1da3-4975-8ede-82021172ef66"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.775219384589484,
+        "longitude": 143.55543904893585,
+        "elevation": 10.0,
+        "unique_identifier": "25a49587-e877-4119-8cc6-de352e6762b6"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.78677978883105,
+        "longitude": 143.6030105961561,
+        "elevation": 10.0,
+        "unique_identifier": "c7e02087-c788-41ae-8751-cdbf7eb988f3"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.77767919788108,
+        "longitude": 143.5636861508662,
+        "elevation": 10.0,
+        "unique_identifier": "1a8133ff-1c47-4e3d-8130-2d134bf449cc"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.79188514049826,
+        "longitude": 143.5917386893034,
+        "elevation": 10.0,
+        "unique_identifier": "c10f57b0-2cef-4d22-bad8-a399a4c96f99"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.77686888706596,
+        "longitude": 143.58279582284388,
+        "elevation": 10.0,
+        "unique_identifier": "e6712582-45ab-4973-aae3-b2cbca36fea2"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.78722990784002,
+        "longitude": 143.58678650735922,
+        "elevation": 10.0,
+        "unique_identifier": "cbd5c225-0191-4ffa-a9fa-629eb3fd5e6c"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.77745627630718,
+        "longitude": 143.54944154762907,
+        "elevation": 10.0,
+        "unique_identifier": "eb62d686-d1d6-40f6-bf39-4c06acddeee1"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.78278549129688,
+        "longitude": 143.5463039729847,
+        "elevation": 10.0,
+        "unique_identifier": "103e5213-3d9b-4724-9659-8dbd594ce6a3"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.775722989132035,
+        "longitude": 143.5720000846291,
+        "elevation": 10.0,
+        "unique_identifier": "2fb448b9-a2d6-440f-a149-bdeeb52f16ba"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.79127852874011,
+        "longitude": 143.59813676359244,
+        "elevation": 10.0,
+        "unique_identifier": "30a18b30-4211-42ca-9b59-d805ca0fca0a"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.793913672709465,
+        "longitude": 143.60085991209368,
+        "elevation": 10.0,
+        "unique_identifier": "0aa5b08d-354b-4e16-ace1-cad3b2327c90"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.78506769782253,
+        "longitude": 143.5763792947238,
+        "elevation": 10.0,
+        "unique_identifier": "9e31930c-a791-43c4-a0d6-c3d63ba8001d"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.78894799466385,
+        "longitude": 143.5582186210766,
+        "elevation": 10.0,
+        "unique_identifier": "c7ad8789-498e-4bc3-a259-9749f13462cc"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.78031999800264,
+        "longitude": 143.56775614669337,
+        "elevation": 10.0,
+        "unique_identifier": "0e575a57-b37b-4cf3-8f3d-745023373373"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.78427934774171,
+        "longitude": 143.57372796592307,
+        "elevation": 10.0,
+        "unique_identifier": "8403ea2f-9698-4c6a-a14c-b588e5c62ef9"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.786934191106496,
+        "longitude": 143.57763900438445,
+        "elevation": 10.0,
+        "unique_identifier": "4f1f1c26-48cc-4c95-8f0d-230a08cb8373"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.784910113739556,
+        "longitude": 143.55003058801793,
+        "elevation": 10.0,
+        "unique_identifier": "2156ae86-1c8d-4282-a5af-41336960640d"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.78749986202266,
+        "longitude": 143.59778298314055,
+        "elevation": 10.0,
+        "unique_identifier": "9ba2dbf5-1810-46f0-aa7d-f426a31ac90d"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.78317017831231,
+        "longitude": 143.60584738774537,
+        "elevation": 10.0,
+        "unique_identifier": "b79099be-b443-42cf-917d-ace9b62d9128"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.78564399797978,
+        "longitude": 143.59439405584334,
+        "elevation": 10.0,
+        "unique_identifier": "fc24bf3c-8861-4b80-892e-e3e5e9cf9c21"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.783095875617796,
+        "longitude": 143.56723229079662,
+        "elevation": 10.0,
+        "unique_identifier": "d0a926e6-afee-47b3-a45a-846c778af0ff"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.78065527401103,
+        "longitude": 143.5885153439884,
+        "elevation": 10.0,
+        "unique_identifier": "f52e5737-1e35-42ec-bd57-04a9528a2d0e"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.77983893342809,
+        "longitude": 143.56392773796074,
+        "elevation": 10.0,
+        "unique_identifier": "0b816e84-3e87-41ae-9571-47bd740695d8"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.78387464106871,
+        "longitude": 143.54715206994436,
+        "elevation": 10.0,
+        "unique_identifier": "86ba1e72-2805-4e68-84cb-6754e71a901f"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.779226377259334,
+        "longitude": 143.5523967711113,
+        "elevation": 10.0,
+        "unique_identifier": "c3e68819-0fe6-47f9-b5ac-5fd801e2f90f"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.78359573903825,
+        "longitude": 143.56382884382404,
+        "elevation": 10.0,
+        "unique_identifier": "3d5934c1-0f72-482e-8695-46c953a90694"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.79876820535701,
+        "longitude": 143.6036203238879,
+        "elevation": 10.0,
+        "unique_identifier": "3f5171ea-bd7c-4ca5-9677-57491dfa6b3b"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.78550023337453,
+        "longitude": 143.55430451409208,
+        "elevation": 10.0,
+        "unique_identifier": "63bf196e-262e-4af5-88ec-c492a57db849"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.77343382910258,
+        "longitude": 143.565764387603,
+        "elevation": 10.0,
+        "unique_identifier": "2610e4f4-0f2f-487f-85e3-0f27d43449fd"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.78118423030125,
+        "longitude": 143.5447251195282,
+        "elevation": 10.0,
+        "unique_identifier": "6055589b-5d64-4cd6-9e6c-73d3b36e2ad1"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.78295408458525,
+        "longitude": 143.59438758557408,
+        "elevation": 10.0,
+        "unique_identifier": "904ca6db-c28a-4052-b42d-92949c9f13d0"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.78163263776762,
+        "longitude": 143.59767007822728,
+        "elevation": 10.0,
+        "unique_identifier": "5f093aa6-4cd0-475a-ba7b-f7422b5e2fa8"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.78937215037975,
+        "longitude": 143.5764160789394,
+        "elevation": 10.0,
+        "unique_identifier": "507903bf-721c-45c6-afdc-2f9d229c8e38"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.79699424098233,
+        "longitude": 143.59440861691178,
+        "elevation": 10.0,
+        "unique_identifier": "28d33511-779a-4880-96ae-544dccccbf73"
+    },
+    {
+        "name": "OnField-Microphone",
+        "latitude": -38.775195665916065,
+        "longitude": 143.57642998679793,
+        "elevation": 10.0,
+        "unique_identifier": "d8e088f7-d1cd-4cef-8bbc-10f9efd30d24"
+    }
+]
