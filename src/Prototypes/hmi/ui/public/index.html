@@ -115,7 +115,7 @@
       
       <div class="row main bg-black" style="padding: 0px !important;">
         <div class="col-md-12 col-main" style="padding: 0px !important;"> 
-          <div id="basemap" onclick="openNav()"></div>
+          <div id="basemap"></div>
 
           <div id="menu">
             <div class="navbar">
@@ -379,42 +379,53 @@
 
   function openTab(tab) {
 
-    if(tab == 'filter-menu'){
-      if(!document.getElementById("filter-menu-btn").classList.contains("active")){
+    // if(tab == 'filter-menu'){
+    //   if(!document.getElementById("filter-menu-btn").classList.contains("active")){
+    //     document.getElementById("filter-menu-btn").classList.add("active");
+    //   }
+    //   if(document.getElementById("popup-menu-btn").classList.contains("active")){
+    //     document.getElementById("popup-menu-btn").classList.remove("active");
+    //   }
+    //   if(document.getElementById("FAQ-menu-btn").classList.contains("active")){
+    //     document.getElementById("FAQ-menu-btn").classList.remove("active");
+    //   }
+    // }
+    // else if(tab == 'animal-popup'){
+    //   if(document.getElementById("filter-menu-btn").classList.contains("active")){
+    //     document.getElementById("filter-menu-btn").classList.remove("active");
+    //   }
+    //   if(!document.getElementById("popup-menu-btn").classList.contains("active")){
+    //     document.getElementById("popup-menu-btn").classList.add("active");
+    //   }
+    //   if(document.getElementById("FAQ-menu-btn").classList.contains("active")){
+    //     document.getElementById("FAQ-menu-btn").classList.remove("active");
+    //   }
+    // }
+    // else if(tab == 'FAQ'){
+    //   if(document.getElementById("filter-menu-btn").classList.contains("active")){
+    //     document.getElementById("filter-menu-btn").classList.remove("active");
+    //   }
+    //   if(document.getElementById("popup-menu-btn").classList.contains("active")){
+    //     document.getElementById("popup-menu-btn").classList.remove("active");
+    //   }
+    //   if(!document.getElementById("FAQ-menu-btn").classList.contains("active")){
+    //     document.getElementById("FAQ-menu-btn").classList.add("active");
+    //   }
+    // }
+    $(".tabs-button").removeClass("active");
+    switch (tab){
+      case "filter-menu":
         document.getElementById("filter-menu-btn").classList.add("active");
-      }
-      if(document.getElementById("popup-menu-btn").classList.contains("active")){
-        document.getElementById("popup-menu-btn").classList.remove("active");
-      }
-      if(document.getElementById("FAQ-menu-btn").classList.contains("active")){
-        document.getElementById("FAQ-menu-btn").classList.remove("active");
-      }
-    }
-    else if(tab == 'animal-popup'){
-      if(document.getElementById("filter-menu-btn").classList.contains("active")){
-        document.getElementById("filter-menu-btn").classList.remove("active");
-      }
-      if(!document.getElementById("popup-menu-btn").classList.contains("active")){
+        break;
+      case "animal-popup":
         document.getElementById("popup-menu-btn").classList.add("active");
-      }
-      if(document.getElementById("FAQ-menu-btn").classList.contains("active")){
-        document.getElementById("FAQ-menu-btn").classList.remove("active");
-      }
-    }
-    else if(tab == 'FAQ'){
-      if(document.getElementById("filter-menu-btn").classList.contains("active")){
-        document.getElementById("filter-menu-btn").classList.remove("active");
-      }
-      if(document.getElementById("popup-menu-btn").classList.contains("active")){
-        document.getElementById("popup-menu-btn").classList.remove("active");
-      }
-      if(!document.getElementById("FAQ-menu-btn").classList.contains("active")){
+        break;
+      case "FAQ":
         document.getElementById("FAQ-menu-btn").classList.add("active");
-      }
+        break;
     }
     if (tab != null){
       if (currentTab != document.getElementById(tab)){
-        //console.log("Yo")
         closeTab()
       }
       currentTab = document.getElementById(tab)
@@ -440,15 +451,22 @@
 
   }
 
-  function openNav() {
+  function openNav(tab) {
     var hamburger = document.querySelector('.hamburger-icon');
-    
     if(!hamburger.classList.contains('active')){
       toggleNav();
     }
-
-    openTab('animal-popup')
+    if (tab){
+      openTab(tab)
+    } else {
+      openTab('filter-menu')
+    } 
   }
+
+  document.addEventListener('animalToggled', function(event){
+    currentTab = document.getElementById('animal-popup')
+    openNav('animal-popup')
+  })
 
   /*function closeNav() {
     MapCloseNav()

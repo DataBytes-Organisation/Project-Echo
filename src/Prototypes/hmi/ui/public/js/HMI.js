@@ -511,6 +511,13 @@ function createMapClickEvent(hmiState){
               summary.appendChild(p);
             })
           animal_toggled = true;
+          const toggled_animal = new CustomEvent('animalToggled',{
+            detail: {
+              message: "Animal toggled: " + result.common,
+            }
+          })
+
+          document.dispatchEvent(toggled_animal);
           }
 
       }
