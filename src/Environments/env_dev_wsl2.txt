@@ -1,0 +1,45 @@
+#
+# Note: this assumes you have created an ubuntu 22.04 WSL2 console
+# Add also you have installed the Lambda Stack already.
+# These are the additional dependencies required by project echo
+# Tested on this version:
+# Linux 5.15.90.1-microsoft-standard-WSL2 #1 SMP Fri Jan 27 02:56:13 UTC 2023 x86_64 x86_64 x86_64 GNU/Linux
+#
+audiomentations
+geopy
+google-cloud
+google-cloud-storage
+keras
+keras-datasets
+keras-models
+keras-nlp
+keras-rl
+keras-toolbox
+keras-unet
+keras-util
+librosa
+matplotlib
+scikit-image
+scikit-learn
+scipy
+tensorboard_plugin_profile
+tensorflow-addons
+tensorflow-datasets
+tensorflow-estimator
+tensorflow-graphics
+tensorflow-metadata
+tensorflow_hub
+tensorflow_gnn
+tf-explain
+tfimm
+timm
+torch 
+torchvision 
+torchaudio
+torchsummary
+torchlibrosa
+traci
+transformers
+unzip
+widgetsnbextension 
+xgboost
