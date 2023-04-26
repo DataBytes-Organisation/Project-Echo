@@ -8,12 +8,5 @@
 # Tested on this version:
 # Linux 5.15.90.1-microsoft-standard-WSL2 #1 SMP Fri Jan 27 02:56:13 UTC 2023 x86_64 x86_64 x86_64 GNU/Linux
 #
-audiomentations
-google-cloud
-google-cloud-storage
-ipykernel
-librosa
-matplotlib
-tensorflow-addons
-tensorflow_hub
-xgboost
+tensorflow==2.11.0
+tensorflow-gpu==2.11.0
