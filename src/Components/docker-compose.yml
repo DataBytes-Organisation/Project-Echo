@@ -39,6 +39,21 @@ services:
       - echo-net
     stdin_open: false
     tty: true
+    ports:
+      - "1883:1883"
+      - "8000:8000"
+      - "8080:8080"
+
+  echo_simulator:
+    build:
+      context: Simulator/
+      dockerfile: Simulator.Dockerfile
+    image: ts-simulator
+    container_name: ts-simulator-cont
+    networks:
+      - echo-net
+    stdin_open: false
+    tty: true
 
 networks:
   echo-net:
