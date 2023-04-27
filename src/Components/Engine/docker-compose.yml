@@ -11,6 +11,10 @@ services:
       - echo-net
     ports:
       - "8501:8501"
+    volumes:
+      - credentials_volume:/root/.config/gcloud/
+    stdin_open: false
+    tty: false
 
   echo_engine:
     build:
@@ -21,7 +25,7 @@ services:
     networks:
       - echo-net
     volumes:
-      - myvolume:/root
+      - credentials_volume:/root/.config/gcloud/
     stdin_open: true
     tty: true
 
@@ -30,4 +34,4 @@ networks:
     driver: bridge
 
 volumes:
-  myvolume:
+  credentials_volume:
