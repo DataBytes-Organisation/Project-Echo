@@ -4,7 +4,7 @@ FROM tensorflow/serving:2.3.0
 RUN apt-get update && apt-get install -y build-essential
 
 # Copy the model to the container
-COPY models/generic_engine_pipeline_model/1 /models/generic_engine_pipeline_model/1
+COPY models/ ./models/
 
 # make the container directory for credentials
 RUN mkdir -p ~/.config/gcloud/
