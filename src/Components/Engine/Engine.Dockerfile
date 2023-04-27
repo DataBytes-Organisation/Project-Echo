@@ -30,9 +30,4 @@ COPY ./echo_engine.json ./
 # EXPOSE PORT_NUMBER
 
 # Define the default command to run when the container starts
-
-# CMD ["bash"]
-
 CMD ["/app/echo_engine.sh"]
-
-# CMD ["python3", "echo_engine.py"]
