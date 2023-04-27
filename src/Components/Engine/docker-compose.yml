@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  model_server:
+    build:
+      context: .
+      dockerfile: Model.Dockerfile
+    image: ts-echo-model
+    container_name: ts-echo-model-cont
+    networks:
+      - echo-net
+    ports:
+      - "8501:8501"
+
+  echo_engine:
+    build:
+      context: .
+      dockerfile: Engine.Dockerfile
+    image: ts-echo-engine
+    container_name: ts-echo-engine-cont
+    networks:
+      - echo-net
+    volumes:
+      - myvolume:/root
+    stdin_open: true
+    tty: true
+
+networks:
+  echo-net:
+    driver: bridge
+
+volumes:
+  myvolume:
