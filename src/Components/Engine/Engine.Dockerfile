@@ -11,7 +11,7 @@ COPY requirements.txt ./
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update
-RUN apt-get install -y libopenexr-dev
+RUN apt-get install -y libopenexr-dev dos2unix
 RUN python3 -m pip install --upgrade pip
 
 RUN pip download -r requirements.txt
@@ -25,9 +25,7 @@ COPY ./echo_engine.py ./
 COPY ./echo_engine.sh ./
 COPY ./echo_engine.json ./
 
-# Expose the required port for your application (if needed)
-# Replace 'PORT_NUMBER' with the actual port number your application uses
-# EXPOSE PORT_NUMBER
+RUN chmod +x ./echo_engine.sh
+RUN dos2unix ./echo_engine.sh
 
-# Define the default command to run when the container starts
 CMD ["/app/echo_engine.sh"]
