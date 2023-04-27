@@ -52,7 +52,7 @@ print('Librosa Version          : ', librosa.__version__)
 config_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'echo_engine.json')
 with open(config_file_path, 'r') as f:
     SC = json.load(f)
-    
+SC['AUDIO_WINDOW'] = None    
 
 class EchoEngine():
 
@@ -100,63 +100,6 @@ class EchoEngine():
         # Round the probability to 2 decimal places
         predicted_probability = str(round(predicted_probability, 2))
         return predicted_class, predicted_probability
-
-
-    ########################################################################################
-    ########################################################################################
-    def build_model(self):
-        # Build a classification model using a pre-trained EfficientNetV2
-        model = tf.keras.Sequential(
-            [
-                # Input layer with specified image dimensions
-                tf.keras.layers.InputLayer(input_shape=(SC['MODEL_INPUT_IMAGE_HEIGHT'], 
-                                                        SC['MODEL_INPUT_IMAGE_WIDTH'], 
-                                                        SC['MODEL_INPUT_IMAGE_CHANNELS'])),
-
-                # Use the EfficientNetV2 model as a feature generator (needs 260x260x3 images)
-                hub.KerasLayer("https://tfhub.dev/google/imagenet/efficientnet_v2_imagenet1k_b0/classification/2", False),
-
-                # Add the classification layers
-                tf.keras.layers.Flatten(),
-                tf.keras.layers.BatchNormalization(),
-
-                # Fully connected layer with multiple of the number of classes
-                tf.keras.layers.Dense(len(self.class_names) * 8,
-                                    activation="relu"),
-                tf.keras.layers.BatchNormalization(),
-
-                # Another fully connected layer with multiple of the number of classes
-                tf.keras.layers.Dense(len(self.class_names) * 4,
-                                    activation="relu"),
-                tf.keras.layers.BatchNormalization(),
-
-                # Add dropout to reduce overfitting
-                tf.keras.layers.Dropout(0.50),
-
-                # Output layer with one node per class, without activation
-                tf.keras.layers.Dense(len(self.class_names), activation=None),
-            ]
-        )
-        # Set the input shape for the model
-        model.build([None, 
-                    SC['MODEL_INPUT_IMAGE_HEIGHT'],
-                    SC['MODEL_INPUT_IMAGE_WIDTH'], 
-                    SC['MODEL_INPUT_IMAGE_CHANNELS']])
-
-        return model
-
-
-    ########################################################################################
-    ########################################################################################
-    def build_model_with_weights(self):
-
-        # Build a new model for inference
-        full_model = self.build_model()
-        
-        # Load the saved weights into the model
-        full_model.load_weights(SC["MODEL_WEIGHTS"])
-        
-        return full_model
 
 
     ########################################################################################
@@ -216,35 +159,31 @@ class EchoEngine():
     # this function is adapted from generic_engine_pipeline.ipynb
     # TODO: need to create a pipeline library and link same code into engine
     ########################################################################################
-    def combined_pipeline(self, audio_file, audio_clip):
+    def combined_pipeline(self, audio_clip):
 
-        # Use BytesIO to create a file-like object from the binary data
-        file_like_audio_data = io.BytesIO(audio_clip)
+        # Compute the mel-spectrogram
+        image = librosa.feature.melspectrogram(
+            y=audio_clip, 
+            sr=SC['AUDIO_SAMPLE_RATE'], 
+            n_fft=SC['AUDIO_NFFT'], 
+            hop_length=SC['AUDIO_STRIDE'], 
+            n_mels=SC['AUDIO_MELS'],
+            fmin=SC['AUDIO_FMIN'],
+            fmax=SC['AUDIO_FMAX'],
+            win_length=SC['AUDIO_WINDOW'])
 
-        # Load the audio data with librosa
-        tmp_audio_t, sample_rate = librosa.load(file_like_audio_data, sr=None)
-        
-        # resample the sample rate
-        tmp_audio_t = tfio.audio.resample(tmp_audio_t, sample_rate, SC['AUDIO_SAMPLE_RATE'])
-        
-        # if we didn't get exactly 5 seconds worth, this will choose a random subsection to process
-        # ultimately, this ensures the image sizes are fixed when passed to the classifier
-        tmp_audio_t = self.load_random_subsection(tmp_audio_t, SC['AUDIO_CLIP_DURATION'])
-    
-        # Convert to spectrogram
-        image = tfio.audio.spectrogram(
-            tmp_audio_t,
-            nfft=SC['AUDIO_NFFT'], 
-            window=SC['AUDIO_WINDOW'], 
-            stride=SC['AUDIO_STRIDE'])
-
-        # Convert to melspectrogram
-        image = tfio.audio.melscale(
+        # Optionally convert the mel-spectrogram to decibel scale
+        image = librosa.power_to_db(
             image, 
-            rate=SC['AUDIO_SAMPLE_RATE'], 
-            mels=SC['AUDIO_MELS'], 
-            fmin=SC['AUDIO_FMIN'], 
-            fmax=SC['AUDIO_FMAX'])
+            top_db=SC['AUDIO_TOP_DB'], 
+            ref=1.0)
+        
+        # Calculate the expected number of samples in a clip
+        expected_clip_samples = int(SC['AUDIO_CLIP_DURATION'] * SC['AUDIO_SAMPLE_RATE'] / SC['AUDIO_STRIDE'])
+        
+        # swap axis and clip to expected samples to avoid rounding errors
+        image = np.moveaxis(image, 1, 0)
+        image = image[0:expected_clip_samples,:]
         
         # reshape into standard 3 channels to add the color channel
         image = tf.expand_dims(image, -1)
@@ -283,9 +222,7 @@ class EchoEngine():
         # convert to string representation of audio to binary for processing
         audio_clip = self.string_to_audio(json_object['audioClip'])
         
-        audio_file = json_object['audioFile']
-        
-        image = self.combined_pipeline(audio_file, audio_clip)
+        image = self.combined_pipeline(audio_clip)
         
         image = tf.expand_dims(image, 0) 
         
@@ -323,11 +260,6 @@ class EchoEngine():
         
         for cs in self.class_names:
             print(f" class name {cs}")
-
-        #print("Building classifer model")
-        #self.model = self.build_model_with_weights()
-        # Display the model summary
-        #self.model.summary()
 
         print("Engine waiting for audio to arrive...")
         client.loop_forever()
