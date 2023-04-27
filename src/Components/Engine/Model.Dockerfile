@@ -10,7 +10,7 @@ COPY models/ ./models/
 RUN mkdir -p ~/.config/gcloud/
 
 # Set the environment variable for the model name and version
-ENV MODEL_NAME=generic_engine_pipeline_model
+ENV MODEL_NAME=echo_model
 ENV MODEL_VERSION=1
 
 # Expose the port for TensorFlow serving
