@@ -46,13 +46,13 @@ class Simulator():
                 self.clock.update()
                 
                 for animal in animals:
-                    print("Animals Loop....", flush=True)
+                    # print("Animals Loop....", flush=True)
                     # update the animal lla
                     animal.update_lla()
                     
                     # generate random animal vocalisation
                     if animal.random_vocalisation():
-                        print("Animal Vocal....", flush=True)
+                        # print("Animal Vocal....", flush=True)
                         if ast.literal_eval(os.environ['RENDER_STATES']):  self.render_state.render_animal_vocalisation(animal)
                         predicted_lla = self.config.SENSOR_MANAGER.vocalisation(animal)
                         
