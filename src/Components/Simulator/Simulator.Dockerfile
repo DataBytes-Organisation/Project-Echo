@@ -8,4 +8,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY src/ .
 
-CMD ["python", "src/system_manager.py"]
+CMD ["python", "system_manager.py"]

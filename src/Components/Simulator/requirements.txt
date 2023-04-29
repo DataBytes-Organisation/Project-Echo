@@ -10,3 +10,17 @@ tensorflow-addons
 tensorflow_hub
 tensorflow_io
 xgboost
+numpy
+pandas
+pydot
+pydub
+pyproj
+scipy
+unzip
+geopy
+folium
+shapely
+ipympl
+paho-mqtt
+asyncio-mqtt
+networkx

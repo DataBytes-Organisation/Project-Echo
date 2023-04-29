@@ -39,6 +39,7 @@ class Simulator():
             try:
                 # we need this - dont delete
                 await asyncio.sleep(0)
+                print(self.clock.get_time())
 
                 # update the simulated time (advance the clock)
                 self.clock.update()

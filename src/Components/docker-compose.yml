@@ -52,6 +52,8 @@ services:
     container_name: ts-simulator-cont
     networks:
       - echo-net
+    volumes:
+      - credentials_volume:/root/.config/gcloud/
     stdin_open: false
     tty: true
 
