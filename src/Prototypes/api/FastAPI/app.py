@@ -5,7 +5,6 @@ from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel, Field, EmailStr
 from bson import ObjectId
 from typing import Optional, List
-import motor.motor_asyncio
 import datetime
 import serializers
 import models
@@ -22,18 +21,6 @@ connection_string=f"mongodb+srv://{id}:{password}@cluster0.gu2idc8.mongodb.net/t
 client = pymongo.MongoClient(connection_string)
 db = client.mydatabase
 
-
-@app.get("/events", response_description="List all events")
-def list_events():
-    
-    events = serializers.eventListEntity(db["events"].find())
-    return events
-
-
-@app.get("/species", response_description="Get events from certain species")
-def show_event(species: str):
-    events = serializers.eventListEntity(db["events"].find({"species": species}))
-    return events
 
 @app.get("/events_time", response_description="Get detection events within certain duration")
 def show_event_from_time(start: str, end: str):
@@ -113,3 +100,18 @@ def show_event_from_time(start: str, end: str):
     ]
     events = serializers.movementListEntity(db["movements"].aggregate(aggregate))
     return events
+
+@app.get("/microphones", response_description="returns location of all microphones")
+def list_microphones():
+    aggregate = [
+        {
+            "$group":
+            {
+            "_id": "$sensorId",
+            "microphoneLLA": { "$first": "$microphoneLLA" }
+            }
+        }
+    ]
+    results = list(db["events"].aggregate(aggregate))
+    microphones = serializers.microphoneListEntity(results)
+    return microphones
