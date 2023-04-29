@@ -1,4 +1,4 @@
-audiomentations
+audiomentations==0.29.0
 catboost
 descartes
 diskcache
@@ -23,7 +23,7 @@ keras-rl
 keras-toolbox
 keras-unet
 keras-util
-librosa==0.10.0.post2
+librosa
 lightgbm
 ffio
 ffprobe

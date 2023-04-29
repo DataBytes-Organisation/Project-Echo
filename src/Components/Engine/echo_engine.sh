@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/bash
 
 FILE=/root/.config/gcloud/application_default_credentials.json
 if [ -f "$FILE" ]; then

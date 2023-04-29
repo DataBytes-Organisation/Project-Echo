@@ -1,1 +1,0 @@
-FROM hivemq/hivemq4:latest

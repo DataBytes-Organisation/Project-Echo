@@ -78,10 +78,8 @@ class CommsManager():
         sample_blob = random.sample(self.audio_blobs[species_name], k=1)[0]
         
         # Read the blob's content as a byte array
-        logger1.info("Retrieving audio from bucket...")
         audio = sample_blob.download_as_bytes()
-        logger1.info("Audio clip download complete.")
-        
+ 
         # Encode the audio data as a string
         audio_str = self.audio_to_string(audio)
         
@@ -111,7 +109,8 @@ class CommsManager():
         # publish the audio message on the queue
         (rc, mid) = self.mqtt_client.publish(os.environ['MQTT_PUBLISH_URL'], MQTT_MSG, qos=1)
         
-        logger1.info(f'Vocalisation Published! Animal {animal.getUUID()} time: {timestamp}')
+        logger1.info(f'Vocal message sent {animal.getUUID()} time: {timestamp} species: {species_name}')
+        print(f'Vocal message sent {animal.getUUID()} time: {timestamp} species: {species_name}', flush=True)
         
     # this method takes in binary audio data and encodes to string
     def audio_to_string(self, audio_binary) -> str:

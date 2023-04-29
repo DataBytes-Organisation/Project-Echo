@@ -1,0 +1,12 @@
+audiomentations
+diskcache 
+google-cloud
+google-cloud-storage
+ipykernel
+librosa
+matplotlib
+paho-mqtt
+tensorflow-addons
+tensorflow_hub
+tensorflow_io
+xgboost
