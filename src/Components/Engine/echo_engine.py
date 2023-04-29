@@ -13,6 +13,7 @@
 
 # disable warnings
 import warnings
+import time
 
 warnings.filterwarnings("ignore")
 
@@ -103,7 +104,7 @@ class EchoEngine():
 
 
     ########################################################################################
-    # this method takes in binary audio data and encodes to string
+    # this method takes in string and ecodes to audio binary data
     ########################################################################################
     def string_to_audio(self, audio_string) -> bytes:
         base64_img_bytes = audio_string.encode('utf-8')
@@ -160,6 +161,19 @@ class EchoEngine():
     # TODO: need to create a pipeline library and link same code into engine
     ########################################################################################
     def combined_pipeline(self, audio_clip):
+        
+        # Create a file-like object from the bytes.
+        file = io.BytesIO(audio_clip)
+
+        # Load the audio data with librosa
+        audio_clip, _ = librosa.load(file, sr=SC['AUDIO_SAMPLE_RATE'])
+        
+        # keep right channel only
+        if audio_clip.ndim == 2 and audio_clip.shape[0] == 2:
+            audio_clip = audio_clip[1, :]
+        
+        # cast to float32 type
+        audio_clip = audio_clip.astype(np.float32)
 
         # Compute the mel-spectrogram
         image = librosa.feature.melspectrogram(
@@ -233,8 +247,9 @@ class EchoEngine():
         url = SC['MODEL_SERVER']
         headers = {"content-type": "application/json"}
         json_response = requests.post(url, data=data, headers=headers)
-    
-        predictions = json.loads(json_response.text)['outputs'][0]
+        json_object   = json.loads(json_response.text)
+        #print(f" model response: {json_response.text}", flush=True)
+        predictions = json_object['outputs'][0]
                 
         # Predict class and probability using the prediction function
         predicted_class, predicted_probability = self.predict_class(predictions)
@@ -250,7 +265,15 @@ class EchoEngine():
         client = paho.Client()
         client.on_subscribe = self.on_subscribe
         client.on_message = self.on_message
-        client.connect(SC['MQTT_CLIENT_URL'], SC['MQTT_CLIENT_PORT'])
+        
+        # retry connection until this succeeds
+        connected = False
+        while not connected:
+            try:
+                client.connect(SC['MQTT_CLIENT_URL'], SC['MQTT_CLIENT_PORT'])
+                connected=True
+            except:
+                time.sleep(1)    
         
         print(f'Subscribing to MQTT: {SC["MQTT_CLIENT_URL"]} {SC["MQTT_PUBLISH_URL"]}')
         client.subscribe(SC['MQTT_PUBLISH_URL'], qos=1)

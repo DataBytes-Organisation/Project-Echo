@@ -34,8 +34,9 @@ class Simulator():
         # start the simulator loop
         await self.main_loop(animals, loops=int(os.environ['SIMULATOR_LOOPS']))
         
-    async def main_loop(self, animals, loops=10):
+    async def main_loop(self, animals, loops=100000):
         for _ in range(loops):
+            print("Simulator Loop....", flush=True)
             try:
                 # we need this - dont delete
                 await asyncio.sleep(0)
@@ -45,12 +46,13 @@ class Simulator():
                 self.clock.update()
                 
                 for animal in animals:
-                    
+                    print("Animals Loop....", flush=True)
                     # update the animal lla
                     animal.update_lla()
                     
                     # generate random animal vocalisation
                     if animal.random_vocalisation():
+                        print("Animal Vocal....", flush=True)
                         if ast.literal_eval(os.environ['RENDER_STATES']):  self.render_state.render_animal_vocalisation(animal)
                         predicted_lla = self.config.SENSOR_MANAGER.vocalisation(animal)
                         
