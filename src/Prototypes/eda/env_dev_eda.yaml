@@ -23,4 +23,5 @@ dependencies:
  - git
  - ffmpeg
  - sox
+ - dvc
  - pip
