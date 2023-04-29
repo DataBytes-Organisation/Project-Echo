@@ -27,9 +27,29 @@ var vocalizedLayers = []
 
 var animalTypes = ["mammal", "bird", "amphibian", "reptile", "insect"];
 
+var statusIconLookup = {
+  "endangered" : "1",
+  "vulnerable": "2",
+  "near-threatened" : "3",
+  "normal" : "4",
+  "invasive" : "5"
+};
+
+var animalTypeIconLookup = {
+  "mammal" : "Mammals",
+  "bird" : "Bird",
+  "amphibian" : "Amphibians",
+  "insect" : "insects",
+  "reptile" : "reptiles"
+};
+
+function getIconName(status, type){
+  return animalTypeIconLookup[type] + statusIconLookup[status] + "-01.png";
+}
+
 var sample_data = data.data;
 
-var animal_data = []
+var animal_data = [];
 
 export var animal_toggled = false;
 
@@ -87,12 +107,26 @@ export function updateAnimalMovementLayerFromPastData(hmiState, results){
     }
   }
 
-  for(var key in updateDict){
+  for(const key in updateDict){
     let event = convertJSONtoAnimalMovementEvent(hmiState, latestSimAnimals[key]);
     hmiState.movementEvents[event.animalId] = event;
   }
 
   addAllTruthFeatures(hmiState);
+}
+
+export function updateVocalizationLayerFromPastData(hmiState, results){
+
+  clearAllVocalizationLayers();
+
+  hmiState.vocalizationEvents = [];
+
+  for (let data of results) {
+    let event = convertJSONtoAnimalVocalizationEvent(hmiState, data);
+    hmiState.vocalizationEvents.push(event);
+  }
+
+  addAllVocalizationFeatures(hmiState);
 }
 
 
@@ -118,7 +152,7 @@ export function updateAnimalMovementLayerFromLiveData(hmiState, results){
     }
   }
 
-  for(var key in updateDict){
+  for(const key in updateDict){
     let event = convertJSONtoAnimalMovementEvent(hmiState, latestSimAnimals[key]);
     hmiState.movementEvents[event.animalId] = event;
     updatedMovementEvents.push(event); 
@@ -137,14 +171,27 @@ export function updateAnimalMovementLayerFromLiveData(hmiState, results){
   addNewTruthFeatures(hmiState, newMovementEvents);
 }
 
+export function updateVocalizationLayerFromLiveData(hmiState, results){
+
+  let newVocalizationEvents = [];
+
+  for (let data of results) {
+    let event = convertJSONtoAnimalVocalizationEvent(hmiState, data);
+    hmiState.vocalizationEvents.push(event);
+    newVocalizationEvents.push(event);
+  }
+
+  addNewVocalizationFeatures(hmiState, newVocalizationEvents);
+}
+
 export function resetWildlifeLayers(hmiState){
   hmiState.vocalizationEvents = [];
   hmiState.movementEvents = {};
-  clearAllVocalisationLayers();
+  clearAllVocalizationLayers();
   clearAllTruthLayers();
 }
 
-export function clearAllVocalisationLayers(){
+export function clearAllVocalizationLayers(){
   for (let stat of statuses) {
     for (let animalType of animalTypes) {
       let nextName = stat + "_" + animalType;
@@ -165,20 +212,44 @@ export function clearAllTruthLayers(){
 }
 
 export function convertJSONtoAnimalMovementEvent(hmiState, data){
-    let movementEvent = {};
+  let movementEvent = {};
 
-    movementEvent.animalId = data.animalId;
-    movementEvent.timestamp = hmiState.currentTime;
-    movementEvent.speciesScientificName = data.species.toLowerCase();
-    movementEvent.speciesIdentificationConfidence = 100.0;
-    movementEvent.locationLat = data.animalTrueLLA[0];
-    movementEvent.locationLon = data.animalTrueLLA[1];
-    movementEvent.locationConfidence = 100.0;
-    movementEvent.animalType = data.type.toLowerCase();
-    movementEvent.animalStatus = matchStatus(data.status.toLowerCase());
-    movementEvent.animalDiet = data.diet.toLowerCase();
+  console.log(data);
 
-    return movementEvent;
+  movementEvent.animalId = data.animalId;
+  movementEvent.eventId = data._id;
+  movementEvent.timestamp = hmiState.currentTime;
+  movementEvent.speciesScientificName = data.species.toLowerCase();
+  movementEvent.speciesIdentificationConfidence = 100.0;
+  movementEvent.locationLat = data.animalTrueLLA[0];
+  movementEvent.locationLon = data.animalTrueLLA[1];
+  movementEvent.locationConfidence = 100.0;
+  movementEvent.animalType = data.type.toLowerCase();
+  movementEvent.animalStatus = matchStatus(data.status.toLowerCase());
+  movementEvent.animalDiet = data.diet.toLowerCase();
+
+  return movementEvent;
+}
+
+//TODO update external data properties
+export function convertJSONtoAnimalVocalizationEvent(hmiState, data){
+  let vocalizationEvent = {};
+
+  console.log(data);
+
+  vocalizationEvent.animalId = data.animalId;
+  vocalizationEvent.eventId = data._id;
+  vocalizationEvent.timestamp = hmiState.currentTime;
+  vocalizationEvent.speciesScientificName = data.species.toLowerCase();
+  vocalizationEvent.speciesIdentificationConfidence = 100.0;
+  vocalizationEvent.locationLat = data.animalTrueLLA[0];
+  vocalizationEvent.locationLon = data.animalTrueLLA[1];
+  vocalizationEvent.locationConfidence = 100.0;
+  vocalizationEvent.animalType = data.type.toLowerCase();
+  vocalizationEvent.animalStatus = matchStatus(data.status.toLowerCase());
+  vocalizationEvent.animalDiet = data.diet.toLowerCase();
+
+  return vocalizationEvent;
 }
 
 function playAudioString(audioDataString) {
@@ -217,20 +288,20 @@ function playAudioString(audioDataString) {
 }
 
 export function updateLayers(filterState)  {
-  //console.log("Filter applied, updating vocalized layer visibility...");
-  //console.log(filterState)
-  /*vocalizedLayers.forEach((entry) => {
-    if (filterState.includes(entry.values_.animalType) && 
-        filterState.includes(entry.values_.animalStatus)) {
-          //console.log("do something in here!");
-          entry.getStyle().getImage().setOpacity(0.5);
-          entry.changed()
+
+  for (let stat of statuses) {
+    for (let animalType of animalTypes) {
+      let layerName = deriveLayerName(stat, animalType);
+      let layer = findMapLayerWithName(hmiState, layerName);
+      if (filterState.includes("_" + stat) && filterState.includes("_" + animalType))
+      {
+        layer.setVisible(true);
+      }
+      else{
+        layer.setVisible(false);
+      }
     }
-    else{
-      entry.getStyle().getImage().setOpacity(0);
-      entry.changed()
-    }
-  })*/
+  }
 
   for (let stat of statuses) {
     for (let animalType of animalTypes) {
@@ -246,61 +317,6 @@ export function updateLayers(filterState)  {
     }
   }
 }
-
-/* Add Vocalized Layers, work on in next branch
-function addVocalizedLayers(hmiState) {
-  console.log("addVocalizedLayers called.")
-  console.log("voc locs", hmiState.vocalizationEvents);
-  hmiState.vocalizationEvents.forEach((entry) => {
-    console.log("Vocalization Found")
-    var vocalization = new ol.Feature({
-      geometry: new ol.geom.Point(
-        ol.proj.fromLonLat([entry.locationLon,entry.locationLat])
-      ),
-        name: 'vocalization',
-        animalType: entry.animalType,
-        animalStatus: entry.animalStatus
-      });
-      console.log(entry.locationLon, " ", entry.locationLat)
-    
-    var vocIcon = new ol.style.Style({
-        image: new ol.style.Icon({
-          src: `./../images/${entry.animalType+entry.animalStatus}.png`,
-          opacity: 0.5,
-          anchor: [0.5, 1],
-          scale: 0.01,
-          className: 'voc-icon'
-        }),
-    })
-    vocalization.setStyle(vocIcon);
-    vocalizedLayers.push(vocalization);
-  })
-  
-  console.log("Vocalized Layers (vocals): ", vocalizedLayers);
-  addVectorLayerTopDown(hmiState, "vocLayer");
-  let layer = findMapLayerWithName(hmiState, "vocLayer");
-  let layerSource = layer.getSource();
-  layerSource.addFeatures(vocalizedLayers);
-
-  //setting visibility
-  //vocalizedLayers[0].getStyle().getImage().setOpacity(0.5);
-  //vocalizedLayers[2].getStyle().getImage().setOpacity(0.5);
-  //vocalizedLayers[1].on('click', () => {
- //   console.log("Element clicked");
-  //});
-}
-
-//TESTING TO SEE IF CORRECTLY OUTPUT
-
-function printTest(vocalizedLayers){
-
-  vocalizedLayers.forEach((layer) => {
-    console.log("Animal type: ",layer.values_.animalType)
-    console.log("Animal status: ",layer.values_.animalStatus)
-  })
-
-}
-*/
 
 function addAllTruthFeatures(hmiState) {
   //console.log("addTruthLayers called.")
@@ -321,7 +337,7 @@ function addAllTruthFeatures(hmiState) {
     
     var trueIcon = new ol.style.Style({
         image: new ol.style.Icon({
-          src: `./../images/${entry.animalType+"-"+entry.animalStatus}.png`,
+          src: './../images/sim/' + getIconName(entry.animalStatus, entry.animalType),
           anchor: [0.5, 1],
           scale: 0.75,
           className: 'true-icon'
@@ -361,7 +377,7 @@ function addNewTruthFeatures(hmiState, events) {
     
     var trueIcon = new ol.style.Style({
         image: new ol.style.Icon({
-          src: `./../images/${entry.animalType+"-"+entry.animalStatus}.png`,
+          src: './../images/sim/' + getIconName(entry.animalStatus, entry.animalType),
           anchor: [0.5, 1],
           scale: 0.75,
           className: 'true-icon'
@@ -377,6 +393,86 @@ function addNewTruthFeatures(hmiState, events) {
     //console.log(layerName);
 
     layerSource.addFeature(trueLocation);
+    layer.getSource().changed();
+    layer.changed();
+  }
+}
+
+function addAllVocalizationFeatures(hmiState) {
+  //console.log("addTruthLayers called.")
+  //console.log("Truth locs", hmiState.movementEvents);
+  for (let entry of hmiState.vocalizationEvents) {
+    //console.log("True location found!:  ")
+    var evtLocation = new ol.Feature({
+      geometry: new ol.geom.Point(
+        ol.proj.fromLonLat([entry.locationLon,entry.locationLat])
+      ),
+        name: 'vocalisation_' + entry.speciesScientificName,
+        animalType: entry.animalType,
+        animalStatus: entry.animalStatus,
+        animalSpecies: entry.speciesScientificName 
+    });
+      //console.log(entry.locationLon, " ", entry.locationLat)
+    
+    var icon = new ol.style.Style({
+        image: new ol.style.Icon({
+          src: './../images/vocalization/' + getIconName(entry.animalStatus, entry.animalType),
+          anchor: [0.5, 1],
+          scale: 0.75,
+          className: 'vocalization-icon'
+        }),
+    })
+    evtLocation.setStyle(icon);
+    evtLocation.setId(entry.animalId);
+
+    let layerName = deriveLayerName(entry.animalStatus,entry.animalType);
+    let layer = findMapLayerWithName(hmiState, layerName);
+    let layerSource = layer.getSource();
+
+    //console.log(layerName);
+    //console.log("animal type: ", entry.speciesScientificName);
+
+    layerSource.addFeature(evtLocation);
+    layer.getSource().changed();
+    layer.changed();
+  }
+}
+
+function addNewVocalizationFeatures(hmiState, events) {
+  //console.log("addTruthLayers called.")
+  //console.log("Truth locs", hmiState.movementEvents);
+  for (let entry of events) {
+    //console.log("True location found!:  ")
+    var evtLocation = new ol.Feature({
+      geometry: new ol.geom.Point(
+        ol.proj.fromLonLat([entry.locationLon,entry.locationLat])
+      ),
+        name: 'vocalisation_' + entry.speciesScientificName,
+        animalType: entry.animalType,
+        animalStatus: entry.animalStatus,
+        animalSpecies: entry.speciesScientificName 
+    });
+      //console.log(entry.locationLon, " ", entry.locationLat)
+    
+    var icon = new ol.style.Style({
+        image: new ol.style.Icon({
+          src: './../images/vocalization/' + getIconName(entry.animalStatus, entry.animalType),
+          anchor: [0.5, 1],
+          scale: 0.75,
+          className: 'vocalization-icon'
+        }),
+    })
+    evtLocation.setStyle(icon);
+    evtLocation.setId(entry.animalId);
+
+    let layerName = deriveLayerName(entry.animalStatus,entry.animalType);
+    let layer = findMapLayerWithName(hmiState, layerName);
+    let layerSource = layer.getSource();
+
+    //console.log(layerName);
+    //console.log("animal type: ", entry.speciesScientificName);
+
+    layerSource.addFeature(evtLocation);
     layer.getSource().changed();
     layer.changed();
   }
@@ -591,12 +687,20 @@ function updateTruthEvents(hmiState){
   })
 }
 
+//TODO Implement this
+function updateVocalizationEvents(hmiState){
+  retrieveTruthEventsInTimeRange(hmiState.previousUpdateTime, hmiState.currentTime).then((res) => {
+    updateAnimalMovementLayerFromLiveData(hmiState, res.data);
+    //TODO also update vocalisation layer here.
+  })
+}
+
 function purgeTruthEvents(hmiState){
   let persistEvents = {};
   //console.log("purging");
 
   //console.log(hmiState.liveEventCutoff);
-  for(const key of hmiState.movementEvents){
+  for(const key in hmiState.movementEvents){
     let event = hmiState.movementEvents[key];
     //console.log(event);
 
@@ -615,6 +719,29 @@ function purgeTruthEvents(hmiState){
   hmiState.movementEvents = persistEvents;
 }
 
+function purgeVocalizationEvents(hmiState){
+  let persistEvents = [];
+  //console.log("purging");
+
+  //console.log(hmiState.liveEventCutoff);
+  for(let event of hmiState.vocalizationEvents){
+    //console.log(event);
+
+    if(hmiState.liveEventCutoff > event.timestamp){
+      let layerName = deriveLayerName(event.animalStatus, event.animalType);
+      let layer = findMapLayerWithName(hmiState, layerName);
+      const featureToPurge = layer.getSource().getFeatureById(event.eventId);
+      //console.log(featureToPurge);
+      layer.getSource().removeFeature(featureToPurge);
+    }
+    else{
+      persistEvents[event.animalId] = event;
+    }
+  }
+
+  hmiState.vocalizationEvents = persistEvents;
+}
+
 function simulateData(hmiState) {
 
   queueSimUpdate(hmiState);
@@ -627,7 +754,9 @@ function queueSimUpdate(hmiState) {
     hmiState.currentTime = Math.floor((Date.now() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
     hmiState.liveEventCutoff = Math.floor((Date.now() - hmiState.timeOffset - hmiState.simUpdateDelay - hmiState.liveWindow) / 1000);
     purgeTruthEvents(hmiState);
+    purgeVocalizationEvents(hmiState);
     updateTruthEvents(hmiState);
+    //updateVocalizationEvents(hmiState);
     hmiState.previousUpdateTime = hmiState.currentTime;
   }
 

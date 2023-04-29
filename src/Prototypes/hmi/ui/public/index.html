@@ -27,43 +27,10 @@
 
     <link
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.2/css/bootstrap.min.css"
-      integrity="sha512-03lLgNjzF8a/9Ioxp/xxsVlF1rzKjzBDeZmREIwzIF4nTBm4L9bUy+HViFfj45Sb6pwgV7Izjq0wU3qJ4+zpFw=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    />
-    <link
-      rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
     />
 
-    <!-- JavaScript Bundle with Popper -->
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"
-      integrity="sha512-7JJuAfpfZHWvpo+Fd6W8x+b1/ECNdgfMsG+OoJOAR8dKIHrwszNnZdLQaw+nvRfX9ZHJn1ucy3q5m5/Z8smGpg=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    ></script>
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.10.2/umd/popper.min.js"
-      integrity="sha512-Plh5C5l5yoh+5r5JhOOfWOkDeJ7wPy1c4nq3FzPAMoJ6mSDU6aA2mHxE+6kTQ1ZwU/XTzNvEeG19fij33V9EBw=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    ></script>
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.2/js/bootstrap.min.js"
-      integrity="sha512-X6GLVKwrWY4Y4z4DC+DW9dJ8sqqZfT6I06T6TQ2ffvD8WwFLY4OekP6z9XcE8BlWp0MZ3qG1HCKiup7xg8LEBQ=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    ></script>
-
     <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
-
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
-      integrity="sha384-FS6uHvInSKC7Kufo3qZ2roVZ1HWTAMjzVgBV+oHYy8TD/Ptw33DTN2cEjfyxNn5f"
-      crossorigin="anonymous"
-    ></script>
 
     <!-- SplashScreen Styling -->
 		<link rel="stylesheet" type="text/css" href="./css/splash_screen_style.css">
@@ -400,7 +367,7 @@
   }
 
   function closeTab() {
-    console.log("Closing Current Tab")
+    //console.log("Closing Current Tab")
     currentTab.style.width = "0%"
     currentTab.style.height = "0%"
   }
@@ -454,7 +421,7 @@
   });
 
   sim.forEach(element => {
-    console.log("doingsomething with it")
+    //console.log("doingsomething with it")
     simIds.push(element.id);
   });
   //init variable is set to true before the user has selected any filter options
@@ -584,8 +551,9 @@
   hmiState.simUpdateDelay = 5000;
   hmiState.liveWindow = 60000;
 
-  const replayDate = new Date('March 22, 2023 13:45:00');
-  const replayTimestamp = replayDate.getTime();
+  //const replayDate = new Date('March 22, 2023 13:45:00');
+  //const replayTimestamp = replayDate.getTime();
+  const replayTimestamp = Date.now();
 
   hmiState.timeOffset = Date.now() - replayTimestamp;
   hmiState.currentTime = Math.floor((Date.now() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
@@ -606,7 +574,7 @@
     { lat: -38.824, lon: 143.51 },
     { lat: -38.812, lon: 143.573 },
   ];
-  /*
+  
   const vocalizationEvents = [
     {eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Tawny Frogmouth", speciesIdentificationConfidence: 90.98, locationLat:-38.71 ,locationLon:143.000 , locationConfidence:90.98 , animalType:"bird", animalStatus:"normal" ,animalDiet: "omnivore" },
     {eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Wild boar", speciesIdentificationConfidence: 90.98, locationLat:-38.808 ,locationLon:143.8 , locationConfidence:90.98 , animalType:"amphibian", animalStatus:"invasive" ,animalDiet: "omnivore" },
@@ -614,7 +582,7 @@
     {eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Redeye", speciesIdentificationConfidence: 90.98, locationLat:-38.608 ,locationLon:143.254 , locationConfidence:90.98 , animalType:"insect", animalStatus:"near threatened" ,animalDiet: "omnivore" },
     {eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Brown Rat", speciesIdentificationConfidence: 90.98, locationLat:-38.508 ,locationLon:141.87 , locationConfidence:90.98 , animalType:"reptile", animalStatus:"vulnerable" ,animalDiet: "omnivore" },
   ];
-  */
+  
 
   const movementEvents = {
     "M_1":{animalId: "M_1", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Brown Rat", speciesIdentificationConfidence: 100, locationLat:-38.80266562762367 ,locationLon:143.560 , locationConfidence:100 , animalType:"reptile", animalStatus:"vulnerable" , animalDiet: "omnivore" },
@@ -630,7 +598,7 @@
   };
 
   hmiState.movementEvents = movementEvents;
-  hmiState.vocalizationEvents = [];
+  hmiState.vocalizationEvents = vocalizationEvents;
 
   hmiState.microphoneLocations = microphoneLocations;
 
@@ -691,7 +659,7 @@
 
   const toggleSwitch = document.querySelector('#liveModeToggle');
   const pastDataContainer = document.querySelector('.past-data-container');
-  console.log("Live mode enabled");
+  //console.log("Live mode enabled");
 
   toggleSwitch.addEventListener('change', function() {
     if (this.checked) {
@@ -699,12 +667,12 @@
       hmiState.currentTime = Math.floor((Date.now() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
       hmiState.previousUpdate = Math.floor((Date.now() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
       hmiState.liveMode = true;
-      console.log("Live mode enabled");
+      //console.log("Live mode enabled");
       pastDataContainer.style.maxHeight = '0';
     } else {
       resetWildlifeLayers(hmiState);
       hmiState.liveMode = false;
-      console.log("Live mode disabled");
+      //console.log("Live mode disabled");
       pastDataContainer.style.maxHeight = pastDataContainer.scrollHeight + 'px';
     }
   });
