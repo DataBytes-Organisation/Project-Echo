@@ -22,6 +22,8 @@ class SystemManager:
             os.environ[key] = value
 
     async def initialise_communications(self):
+        # sleep and wait for MQTT server to initialise
+        await asyncio.sleep(10)
         async with MqttClient(os.environ['MQTT_CLIENT_URL'], int(os.environ['MQTT_CLIENT_PORT'])) as mqtt_client:
             await mqtt_client.subscribe("Simulator_Controls")
             await asyncio.gather(self.handle_messages(mqtt_client), self.run_loop())
