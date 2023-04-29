@@ -510,7 +510,12 @@ function createMapClickEvent(hmiState){
               p.innerText = content;
               summary.appendChild(p);
             })
-          animal_toggled = true;
+            const toggleEvent = new CustomEvent('animalToggled', { 
+              detail: {
+                message: 'toggled'
+              }
+            });
+            document.dispatchEvent(toggleEvent);
           }
 
       }
@@ -524,8 +529,11 @@ export function MapOpenNav() {
   }
 }
 
+export function getAnimalToggled(){
+  return animal_toggled;
+}
+
 export function MapCloseNav() {
-  document.getElementById("menuPanel").style.width = "0";
   animal_toggled = false;
 }
 
