@@ -116,19 +116,6 @@ class EchoEngine():
     # this function is adapted from generic_engine_pipeline.ipynb
     # TODO: need to create a pipeline library and link same code into engine
     ########################################################################################
-    def try_decode_audio(file_contents, decode_func):
-        try:
-            return decode_func(input=file_contents)
-        except Exception as e:
-            # print(f"An error occurred while decoding the audio file using {decode_func.__name__}:")
-            # print(str(e))
-            return None
-    
-    
-    ########################################################################################
-    # this function is adapted from generic_engine_pipeline.ipynb
-    # TODO: need to create a pipeline library and link same code into engine
-    ########################################################################################
     def load_random_subsection(self, tmp_audio_t, duration_secs):
     
         # Determine the audio file's duration in seconds
@@ -174,6 +161,9 @@ class EchoEngine():
         
         # cast to float32 type
         audio_clip = audio_clip.astype(np.float32)
+        
+        # analyse a random 5 second subsection
+        audio_clip = self.load_random_subsection(audio_clip, duration_secs=SC['AUDIO_CLIP_DURATION'])
 
         # Compute the mel-spectrogram
         image = librosa.feature.melspectrogram(
