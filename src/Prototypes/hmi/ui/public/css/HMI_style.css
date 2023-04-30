@@ -100,7 +100,6 @@ body {
     width: auto;
     max-width: none;
     white-space: nowrap;
-    overflow: hidden;
   }
   
   .dropdown-menu .col {
@@ -309,7 +308,7 @@ i {
 
   .dropdown-menu {
     display: none;
-    position: relative;
+    position: absolute;
     z-index: 1;
     width: 100%;
     margin-top: 0;
@@ -336,12 +335,6 @@ i {
     border: none;
     border-bottom: 1px solid white;
     
-  }
-
-  .btn.show{
-    color: var(--bs-btn-active-color);
-    background-color: var(--bs-btn-active-bg) !important;
-    border-color: var(--bs-btn-active-border-color);
   }
 
   .btn-no-background:hover,
@@ -402,23 +395,16 @@ i {
     opacity: .5;
     pointer-events: auto;
   }
-  .toggle-switch-container{
-    margin-top: 20px;
-  }
-  .toggle-label{
-    color:#666;
-    font-family: var(--bs-btn-font-family);
-    font-size: var(--bs-btn-font-size);
-    font-weight: var(--bs-btn-font-weight);
-    line-height: var(--bs-btn-line-height);
-  }
-  .past-data-header{
-    color:#666;
-    font-family: var(--bs-btn-font-family);
-    font-size: var(--bs-btn-font-size);
-    font-weight: var(--bs-btn-font-weight);
-    line-height: var(--bs-btn-line-height);
-  }
-  .past-data-container{
-    margin-bottom: 20px;
-  }
+
+.show + .dropdown-menu {
+  display: inline-block !important;
+  overflow: hidden !important;
+}
+
+.select-all-btn{
+  height: 40px !important;
+  background-color:#adb5bd !important;
+  margin-top: 5px !important;
+}
+
+  
