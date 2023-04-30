@@ -9,6 +9,7 @@
 import paho.mqtt.client as paho
 import base64
 import json
+import pymongo
 from google.cloud import storage
 import os
 from entities.species import Species
@@ -29,10 +30,28 @@ class CommsManager():
         logger1.info(f'Initialising Communications')
         
         self.mqtt_client = paho.Client()
-        #self.mqtt_client.on_publish = on_mqtt_publish
-        # we are using an insure public server for now
         self.mqtt_client.connect(os.environ['MQTT_CLIENT_URL'], int(os.environ['MQTT_CLIENT_PORT']))
-        # self.mqtt_client.loop_start()
+       
+        # Load the project echo credentials into a dictionary
+        try:
+            file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'echo_credentials.json')
+            with open(file_path, 'r') as f:
+                self.credentials = json.load(f)
+            print(f"Echo Engine credentials successfully loaded", flush=True)
+        except:
+            print(f"Could not engine credentials : {file_path}") 
+                   
+        # Setup database client and connect
+        try:
+            # database connection string
+            self.connection_string=f"mongodb://{self.credentials['DB_USERNAME']}:{self.credentials['DB_PASSWORD']}@{os.environ['MONGODB_HOSTNAME']}/EchoNet"
+
+            myclient = pymongo.MongoClient(self.connection_string)
+            self.echo_store = myclient["EchoNet"]
+            print(f"Found echo store database names: {myclient.list_database_names()}", flush=True)
+        except:
+            print(f"Failed to establish database connection", flush=True)
+
 
     # This function uses the google bucket with audio files and
     # leverages the folder names as the official species names
@@ -74,6 +93,9 @@ class CommsManager():
         species_name    = animal.getSpecies().getName()
         animal_true_lla = animal.getLLA()
         
+        # microphone LLA TODO
+        microphone_lla  = [0.0,0.0,0.0]
+        
         # randomly sample from available audio blobs from this species
         sample_blob = random.sample(self.audio_blobs[species_name], k=1)[0]
         
@@ -85,33 +107,50 @@ class CommsManager():
         
         # For now, send filename across for format information
         audio_file = sample_blob.name.split('/')[1]
+         
+        # Define the format string
+        format_string = "%Y-%m-%d %H:%M:%S"
+
+        # Convert the datetime object to a string
+        datetime_string = timestamp.strftime(format_string)
         
-        # TODO create the audio message in correct format
-        MQTT_MSG = f'''
-        {{
-            "timestamp": "{timestamp}",
-            "animalEstLLA": [
-                {predicted_lla[0]},
-                {predicted_lla[1]},
-                {predicted_lla[2]}
-            ],
-            "animalTrueLLA": [
-                {animal_true_lla[0]},
-                {animal_true_lla[1]},
-                {animal_true_lla[2]}
-            ],
+        # TODO: populate the nearest sensor ID information
+        # Create the vocalisation event
+        vocalisation_event = {
+            "timestamp": datetime_string,
+            "sensorId": "TBD",
+            "microphoneLLA": microphone_lla,
+            "animalEstLLA": list(predicted_lla),
+            "animalTrueLLA": list(animal_true_lla),
             "animalLLAUncertainty": 0.0,
-            "audioClip": "{audio_str}",
-            "audioFile": "{audio_file}"
-        }}
-        '''
-  
+            "audioClip" : audio_str, 
+            "audioFile" : audio_file      
+        }    
+        
+        MQTT_MSG = json.dumps(vocalisation_event)
+     
         # publish the audio message on the queue
-        (rc, mid) = self.mqtt_client.publish(os.environ['MQTT_PUBLISH_URL'], MQTT_MSG, qos=1)
+        (rc, mid) = self.mqtt_client.publish(os.environ['MQTT_PUBLISH_URL'], MQTT_MSG)
         
         logger1.info(f'Vocal message sent {animal.getUUID()} time: {timestamp} species: {species_name}')
         print(f'Vocal message sent {animal.getUUID()} time: {timestamp} species: {species_name}', flush=True)
+
+
+    ########################################################################################
+    # this function populates the database with animal movement events
+    ########################################################################################
+    def echo_store_send_animal_movement(self, animal):
         
+        movement_event = {
+            "timestamp": self.clock.get_time(),
+            "species": animal.getSpecies().getName(),
+            "animalId": animal.getUUID(),
+            "animalTrueLLA": list(animal.getLLA())    
+        }
+        
+        movements = self.echo_store["movements"]
+        movements.insert_one(movement_event)
+
     # this method takes in binary audio data and encodes to string
     def audio_to_string(self, audio_binary) -> str:
         base64_encoded_data = base64.b64encode(audio_binary)

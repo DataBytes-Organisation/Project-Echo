@@ -3,6 +3,7 @@
 *.pyc
 *.hdf5
 *.env
+echo_credentials.json
 
 tensorboard_logs/
 logs/

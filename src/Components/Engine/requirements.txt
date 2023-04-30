@@ -1,11 +1,12 @@
 audiomentations
-diskcache 
+diskcache
 google-cloud
 google-cloud-storage
 ipykernel
 librosa
 matplotlib
 paho-mqtt
+pymongo[srv]
 tensorflow-addons
 tensorflow_hub
 tensorflow_io

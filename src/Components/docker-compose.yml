@@ -58,9 +58,28 @@ services:
     stdin_open: false
     tty: true
 
+  echo_store:
+    build:
+      context: MongoDB/
+      dockerfile: MongoDB.Dockerfile
+    restart: always
+    image: ts-mongodb
+    container_name: ts-mongodb-cont
+    networks:
+      - echo-net
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root_password
+      MONGO_INITDB_DATABASE: EchoNet
+    ports:
+      - "27017:27017"
+    volumes:
+      - db-data:/data/db
+
 networks:
   echo-net:
     driver: bridge
 
 volumes:
   credentials_volume:
+  db-data:
