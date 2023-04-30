@@ -31,21 +31,11 @@ class CommsManager():
         
         self.mqtt_client = paho.Client()
         self.mqtt_client.connect(os.environ['MQTT_CLIENT_URL'], int(os.environ['MQTT_CLIENT_PORT']))
-
-        # Load the project echo credentials into a dictionary
-        try:
-            file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'echo_credentials.json')
-            with open(file_path, 'r') as f:
-                self.credentials = json.load(f)
-            print(f"Echo Engine credentials successfully loaded", flush=True)
-        except:
-            print(f"Could not engine credentials : {file_path}") 
-         
+       
         # Setup database client and connect
         try:
             # database connection string
-            # TODO: MAKE HOSTNAME CONFIGURABLE
-            self.connection_string=f"mongodb+srv://{self.credentials['DB_USERNAME']}:{self.credentials['DB_PASSWORD']}@cluster0.gu2idc8.mongodb.net/test"
+            self.connection_string=f"mongodb+srv://{os.environ['DB_USERNAME']}:{os.environ['DB_PASSWORD']}@cluster0.gu2idc8.mongodb.net/test"
 
             myclient = pymongo.MongoClient(self.connection_string)
             self.echo_store = myclient["mydatabase"]
