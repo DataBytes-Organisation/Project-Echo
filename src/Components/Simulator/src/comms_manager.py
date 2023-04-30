@@ -149,8 +149,8 @@ class CommsManager():
             "animalTrueLLA": list(animal.getLLA())    
         }
         
-        events = self.echo_store["events"]
-        events.insert_one(movement_event)
+        movements = self.echo_store["movements"]
+        movements.insert_one(movement_event)
 
     # this method takes in binary audio data and encodes to string
     def audio_to_string(self, audio_binary) -> str:
