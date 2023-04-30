@@ -2,10 +2,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap');
 
 
-body {
-    background: #1a1a1a;
-}
-
 .title {
     font-size: 30px; /* Increase font size */
     text-align: center; /* Center the text within its container */
@@ -29,7 +25,8 @@ body {
 }
 
 .nav_item > .navbar-brand.selected {
-    
+    border-bottom: 3px solid #4D934D;
+    background: linear-gradient(0deg, rgba(77,147,77,1) 0%, rgba(0,212,255,0) 40%);
 }
 
 .navbar-toggle {
@@ -56,10 +53,6 @@ body {
     margin-right: 10px;
 }
 
-#blur {
-    background-color: #1a1a1a;
-}
-
 #basemap {
     /*height: 70%;*/
     width: 70%;
@@ -84,65 +77,47 @@ body {
 
 #filter-menu {
     width: 25%;
-    height: 80%;
+    height: 450px;
     margin-left: 20px;
     padding: 20px;
-    background-color: black;
-    
+    border: 1px solid #e7e7e7;
+    border-radius: 10px;
+    overflow-y: scroll;
 }
 
   /* Style the scrollbar for WebKit browsers */
-
-
-
-
-  .dropdown-menu {
-    width: auto;
-    max-width: none;
-    white-space: nowrap;
-    overflow: hidden;
-  }
-  
-  .dropdown-menu .col {
-    
-    vertical-align: top;
-    width: 1%;
-    
-    padding: 0 10px;
-  }
-
-.dropdown {
-    background-color: black;
+#filter-menu::-webkit-scrollbar {
+    width: 7px;
 }
 
+#filter-menu::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    margin: 3px;
+    border-radius: 20px;
+}
+
+#filter-menu::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 20px;
+}
 .dropdown-toggle {
     display: flex;
     align-items: center;
-    border-radius: 0;
-    background-color: black;
-    color: black;
 }
 
 .dropdown-toggle i {
     margin-right: 5px;
-    border-radius: 0;
-    background-color: black;
-    color: black;
 }
 
 .dropdown-menu {
     max-height: 200px;
     overflow-y: auto;
-    border-radius: 0;
-    
 }
 
 .dropdown-menu li {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 5px;
-    border-radius: 0;
-    
 }
 
 .form-check-input {
@@ -174,82 +149,35 @@ body {
     position: relative;
 }
 
-
-#ABOUT{
-    height: 0;
-    width: 0;
-    position: fixed;
-    z-index: 1;
-    top: 0;
-    right: 0;
-    background-color: black;
-    color: white;
-    overflow-x: hidden;
-    
-    padding-top: 60px;
-    margin-top: 30px;
-
-}
-
-
-#FAQ{
-    height: 0;
-    width: 0;
-    position: fixed;
-    z-index: 1;
-    top: 0;
-    right: 0;
-    background-color: black;
-    color: white;
-    overflow-x: hidden;
-    padding-top: 60px;
-    margin-top: 30px;
-}
-
-
-#FAQ a{
-
-    padding: 8px 8px 8px 32px;
-    text-decoration: none;
-    font-size: 14px;
-    color:  white;
-    display: block;
-    transition: 0.3s;
-    font-family: 'Roboto', sans-serif;
-}
-
 #menuPanel{
     height: 100%;
-    width: 0%;
+    width: 0;
     position: fixed;
     z-index: 1;
     top: 0;
     right: 0;
-    background-color: black;
-    color: white;
+    background-color: #d7d5d5;
     overflow-x: hidden;
     transition: 0.5s;
     padding-top: 60px;
     margin-top: 30px;
 }
 
-
-
 #menuPanel a , #menuPanel h2{
     padding: 8px 8px 8px 32px;
     text-decoration: none;
     font-size: 27px;
-    color: white;
+    color: #1a1a1a;
     display: block;
     transition: 0.3s;
-    font-family: 'Helvetica', sans-serif;
+    font-family: 'Stick No Bills', sans-serif;
 }
 
 #menuPanel div{
     padding: 8px 8px 8px 32px;
     text-decoration: none;
     font-size: 14px;
-    color:  white;
+    color: #1a1a1a;
     display: block;
     transition: 0.3s;
     font-family: 'Roboto', sans-serif;
@@ -288,149 +216,4 @@ body {
 
 i {
     color: white;
-}
-
-
-.dropdown-toggle {
-    background-color: #fff;
-    border: 1px solid #e7e7e7;
-    color: #666;
-    padding: 8px 16px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    cursor: pointer;
-  }
-
-  .dropdown-toggle:hover {
-    background-color: none;
-  }
-
-  .dropdown-menu {
-    display: none;
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    margin-top: 0;
-    
-    border-top: none;
-    background-color: black;
-    color: white;
-    padding: 0;
-    list-style: none;
-  }
-
-  /* Show the dropdown menu when the button is clicked */
-  .show + .dropdown-menu {
-    display: block;
-    padding: 20px;
-  }
-
-  button {
-    background-color: transparent;
-  }
-
-  .btn-no-background {
-    background-color: transparent;
-    border: none;
-    border-bottom: 1px solid white;
-    
-  }
-
-  .btn.show{
-    color: var(--bs-btn-active-color);
-    background-color: var(--bs-btn-active-bg) !important;
-    border-color: var(--bs-btn-active-border-color);
-  }
-
-  .btn-no-background:hover,
-  .btn-no-background:focus {
-    background-color: transparent;
-    border-bottom: 1px solid white;
-    
-  }
-
-  .toggle-button {
-    color: white;
-    background-color: blue;
-    border: none;
-    padding: 10px 20px;
-    font-size: 16px;
-  }
-
-  .toggle-button:active {
-    background-color: red;
-  }
-  
-
-  /* Style the list items */
-  .dropdown-menu li {
-    padding: 8px 16px;
-    cursor: pointer;
-  }
-
-  .dropdown-menu li:hover {
-    opacity: 0.5;
-  }
-
-
-
-  /* Style the checkboxes */
-  .form-check-input {
-    margin-right: 8px;
-  }
-
-  .form-check {
-    padding-right: 1em;
-  }
-
-  .col {
-    padding-top: 1em;
-    padding-left: 1em;
-  }
-
-  .form-check-label {
-    font-size: .8em;
-  }
-  .voc-icon {
-    z-index: 9999;
-    
-  }
-  .voc-icon:hover {
-    cursor: pointer;
-    opacity: .5;
-    pointer-events: auto;
-  }
-
-  .toggle-switch-container{
-    margin-top: 20px;
-  }
-  .toggle-label{
-    color:#666;
-    font-family: var(--bs-btn-font-family);
-    font-size: var(--bs-btn-font-size);
-    font-weight: var(--bs-btn-font-weight);
-    line-height: var(--bs-btn-line-height);
-  }
-  .past-data-header{
-    color:#666;
-    font-family: var(--bs-btn-font-family);
-    font-size: var(--bs-btn-font-size);
-    font-weight: var(--bs-btn-font-weight);
-    line-height: var(--bs-btn-line-height);
-  }
-  .past-data-container{
-    margin-bottom: 20px;
-  }
-
-.show + .dropdown-menu {
-  display: inline-block !important;
-  overflow: hidden !important;
-}
-
-.select-all-btn{
-  height: 40px !important;
-  background-color:#adb5bd !important;
-  margin-top: 5px !important;
 }
