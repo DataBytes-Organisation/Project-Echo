@@ -129,7 +129,7 @@
             </div>
           <div id="FAQ">
             <div id="FAQ-contents">
-              <h3>FAQs</h3>
+              <h3>About Project Echo</h3>
             </div>
             <section id="offcanvas" >
               <div style="align-self:center;">
@@ -172,16 +172,46 @@
 
                 <div class="offcanvas offcanvas-bottom popup_bottom_tab" tabindex="-1" id="offcanvas_data" aria-labelledby="offcanvasBottomLabel">
                   <div class="offcanvas-header">
-                    <h1 class="offcanvas-title" id="offcanvasBottomLabel">Data Pooling and Sourcing</h1>
+                    <h1 class="offcanvas-title" id="offcanvasBottomLabel">Data Sourcing</h1>
                     <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                   </div>
                   <div class="offcanvas-body small">
                     <h2>Audio data</h2>
                     <p>
-                      The audio data, which contains information about the animal species, are collected from...
+                      In the early process of the project, the audio data is collected and extracted through the existing online researches. The data source can be categorized under two areas:
+                    </p>
+
+                    <h3>Research Paper sourced Data</h3>
+                    
+                    <p>
+                      Consistent with the systematic reviews of the literature, many papers are not following open science practices and are protecting their data. 
+                      However one promising public resource of animal audio data emerged from papers produced by Phillips and Towsey (2018) and Teixeira et al (2019); 
+                      Ecosounds (n.d.) is a repository of environmental audio recordings that provides publicly sourced annotations of animal sounds in Australia and other parts of the world. 
+                    </p>
+                    
+                    <h3>Internet Search</h3>
+
+                    <p>
+
+                      An internet search using the Google search engine using various combinations of terms such as ‘animal sound’ ‘database’ ‘repository’ ‘Australia’ ‘data set’ ‘dataset’, yielded useful results. 
+                      A non-exhaustive list of promising sources are provided in the appendix to this report.
+                      <br>
+                      The challenges for these sources is that data mining and scraping will be required to gain access to the audio files. This will be a required skill in Project Echo going forward. 
+
+                    </p>
+
                     <h2>Image and biographical data</h2>
                     <p>
-                      Currently, both biographical and imagery data of the animals species are generated using Generative AI in order to avoid copyrights.
+                      The names of the species respective to the available audio data are found in the <strong>Otways from the book: Grant Palmer. Wildlife of the Otways and Shipwreck Coast. Clayton, VIC: CSIRO PUBLISHING, 2019</strong>.
+                    </p>
+                    
+                    <p>
+                      Currently, the species biographical data is generated using Generative AI in order to avoid copyrights issue. The images are generated using Dall-E, and then compare to the real visualization of the real picture to select the most similar and realistic image.
+                      <br>
+                      The summary and description of each species is generated using ChatGPT, which provide a succinct and brief information about the animal and its habitat.
+                    </p>
+                    <p>
+                      As the project is still in development, the biological information of the species can be improved further.
                     </p>
                   </div>
                 </div>
@@ -195,21 +225,21 @@
                     <h2>Filling form</h2>
                     <p>
                       You can submit your query by filling the below form:
-                      <form>
+                      <form method="post" action="/send_email" method="POST">
                         <div class="form-group row">
-                            <label class="col-sm-2 col-form-label" for="usr">Your email</label>
+                            <label class="col-sm-2 col-form-label" for="email">Your email</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" id="usr"
-                                    placeholder="Enter your email" name="name">
+                                <input type="text" class="form-control" id="email"
+                                    placeholder="Enter your email" name="email">
                             </div>
                         </div>
                         
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label"
-                                for="comment">Question:</label>
+                                for="query">Question:</label>
                             <div class="col-sm-10">
-                                <textarea rows="5" class="form-control" id="comment"
-                                    name="comment"
+                                <textarea rows="5" class="form-control" id="query"
+                                    name="query"
                                     placeholder="Please type your query here..."></textarea>
                             </div>
                         </div>
