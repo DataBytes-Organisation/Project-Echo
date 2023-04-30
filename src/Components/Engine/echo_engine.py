@@ -79,7 +79,7 @@ class EchoEngine():
         # Setup database client and connect
         try:
             # database connection string
-            self.connection_string=f"mongodb+srv://{self.credentials['DB_USERNAME']}:{self.credentials['DB_PASSWORD']}@cluster0.gu2idc8.mongodb.net/test"
+            self.connection_string=f"mongodb+srv://{self.credentials['DB_USERNAME']}:{self.credentials['DB_PASSWORD']}@{self.config['DB_HOSTNAME']}"
 
             myclient = pymongo.MongoClient(self.connection_string)
             self.echo_store = myclient["mydatabase"]
@@ -258,14 +258,13 @@ class EchoEngine():
         
         image_list = image.numpy().tolist()
         
+        # Run the model via tensorflow serve
         data = json.dumps({"signature_name": "serving_default", "inputs": image_list})
-
         url = self.config['MODEL_SERVER']
         headers = {"content-type": "application/json"}
         json_response = requests.post(url, data=data, headers=headers)
-        audio_event   = json.loads(json_response.text)
-        #print(f" model response: {json_response.text}", flush=True)
-        predictions = audio_event['outputs'][0]
+        model_result   = json.loads(json_response.text)
+        predictions = model_result['outputs'][0]
                 
         # Predict class and probability using the prediction function
         predicted_class, predicted_probability = self.predict_class(predictions)
@@ -297,9 +296,8 @@ class EchoEngine():
             "audioClip": audio_event["audioClip"],        
         }
         
-        mycol = self.mydb["events"]
-        json_object = json.dump(detection_event)
-        mycol.insert_one(json_object)
+        events = self.echo_store["events"]
+        events.insert_one(detection_event)
 
 
     ########################################################################################
