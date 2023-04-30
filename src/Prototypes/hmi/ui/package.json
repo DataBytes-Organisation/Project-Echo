@@ -10,9 +10,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "axios": "^1.3.6",
     "express": "^4.18.2",
     "jquery": "^3.6.4",
     "nodemon": "^2.0.22",
-    "ol": "^7.3.0"
+    "ol": "^7.3.0",
+    "path": "^0.12.7",
+    "requirejs": "^2.3.6",
+    "serve-index": "^1.9.1"
   }
 }
