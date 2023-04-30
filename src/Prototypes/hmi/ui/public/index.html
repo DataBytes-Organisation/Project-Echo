@@ -68,12 +68,6 @@
     <!-- SplashScreen Styling -->
 		<link rel="stylesheet" type="text/css" href="./css/splash_screen_style.css">
 
-    <!--jQuery-->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script> 
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
-    <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
-    
 		<!-- HMI -->
 		<link rel="stylesheet" href="./css/HMI_style.css" type="text/css">
 		<script type="text/javascript" src="./js/audio.js"></script>
@@ -103,7 +97,7 @@
       <!-- Row 1 with nav spanning the entire width and a fixed top-->
       <div class="row">
         <div class="col-md-12">
-          <nav class="navbar navbar-expand-lg navbar-dark bg-black fixed-top shadow-sm" id="nav-container" style="display: none">
+          <nav class="navbar navbar-expand-lg navbar-dark bg-black fixed-top shadow-sm">
             <div class="container-fluid">
               <!-- Title on the left end -->
               <a class="navbar-brand" href="#">
@@ -183,20 +177,6 @@
             <h3 style="text-align: left; color: white;">
               Filter Menu
             </h3>
-            <div class="toggle-switch-container">
-              <label for="toggle-switch" class="toggle-label">Live Mode:</label>
-              <label class="toggle-switch">
-                <input id="liveModeToggle" type="checkbox" checked>
-                <span class="slider round"></span>
-              </label>
-            </div>
-            
-            <div class="past-data-container">
-              <div class="past-data-header">View Past Data:</div>
-              <div class="time-range-picker">
-                <input type="text" id="datetime-range" name="datetime-range" style="width:100%" value="" />
-              </div>
-            </div>
             <div class="dropdown">
               <button class="btn btn-secondary dropdown-toggle btn-no-background" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
                 Animal Vocalizations
@@ -206,55 +186,62 @@
                   <div class="col">
                     
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="_reptile" onchange="updateFilter('_reptile')" checked>
+                      <input class="form-check-input v"  type="checkbox" value="" id="_reptile" onchange="updateFilter('_reptile')" checked>
                       <label class="form-check-label" for="_reptile">Reptile</label>
                     </div>
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="_bird" onchange="updateFilter('_bird')" checked>
+                      <input class="form-check-input v"  type="checkbox" value="" id="_bird" onchange="updateFilter('_bird')" checked>
                       <label class="form-check-label" for="_bird">Bird</label>
                     </div>
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="_mammal" onchange="updateFilter('_mammal')" checked>
+                      <input class="form-check-input v"  type="checkbox" value="" id="_mammal" onchange="updateFilter('_mammal')" checked>
                       <label class="form-check-label" for="_mammal">Mammal</label>
                     </div>
 
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="_insect" onchange="updateFilter('_insect')" checked>
+                      <input class="form-check-input v"  type="checkbox" value="" id="_insect" onchange="updateFilter('_insect')" checked>
                       <label class="form-check-label" for="_insect">Insect</label>
                     </div>
 
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="_amphibian" onchange="updateFilter('_amphibian')" checked>
+                      <input class="form-check-input v"  type="checkbox" value="" id="_amphibian" onchange="updateFilter('_amphibian')" checked>
                       <label class="form-check-label" for="_amphibian">Amphibian</label>
+                    </div>
+
+                    <div class="form-check">
+                      <button onclick="{selectAll('_all')}" class="toggle-button">Select All</button>
                     </div>
 
                   </div>
                   <div class="col-6">
                     
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="_endangered" onchange="updateFilter('_endangered')" checked>
+                      <input class="form-check-input v"  type="checkbox" value="" id="_endangered" onchange="updateFilter('_endangered')" checked>
                       <label class="form-check-label" for="_endangered" onchange="">Endangered</label>
                     </div>
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="_vulnerable" onchange="updateFilter('_vulnerable')" checked>
+                      <input class="form-check-input v"  type="checkbox" value="" id="_vulnerable" onchange="updateFilter('_vulnerable')" checked>
                       <label class="form-check-label" for="_vulnerable">Vunerable</label>
                     </div>
 
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="_nearthreatened" onchange="updateFilter('_nearthreatened')" checked>
+                      <input class="form-check-input v"  type="checkbox" value="" id="_nearthreatened" onchange="updateFilter('_nearthreatened')" checked>
                       <label class="form-check-label" for="_nearThreatened">Near Threatened</label>
                     </div>
 
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="_normal" onchange="updateFilter('_normal')" checked>
+                      <input class="form-check-input v"  type="checkbox" value="" id="_normal" onchange="updateFilter('_normal')" checked>
                       <label class="form-check-label" for="_normal">Normal</label>
                     </div>
 
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="_invasive" onchange="updateFilter('_invasive')" checked>
+                      <input class="form-check-input v"  type="checkbox" value="" id="_invasive" onchange="updateFilter('_invasive')" checked>
                       <label class="form-check-label" for="_invasive">Invasive</label>
                     </div>
 
+                    <div class="form-check">
+                      <button onclick="{selectAll('_clear')}" class="toggle-button">Clear</button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -269,53 +256,60 @@
                   <div class="col">
                     
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="reptile" onchange="{updateFilter('reptile')}" checked>
+                      <input class="form-check-input s"  type="checkbox" value="" id="reptile" onchange="{updateFilter('reptile')}" checked>
                       <label class="form-check-label" for="reptile">Reptile</label>
                     </div>
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="bird" onchange="{updateFilter('bird')}" checked>
+                      <input class="form-check-input s"  type="checkbox" value="" id="bird" onchange="{updateFilter('bird')}" checked>
                       <label class="form-check-label" for="bird">Bird</label>
                     </div>
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="mammal" onchange="{updateFilter('mammal')}" checked>
+                      <input class="form-check-input s"  type="checkbox" value="" id="mammal" onchange="{updateFilter('mammal')}" checked>
                       <label class="form-check-label" for="mammal">Mammal</label>
                     </div>
 
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="insect" onchange="{updateFilter('insect')}" checked>
+                      <input class="form-check-input s"  type="checkbox" value="" id="insect" onchange="{updateFilter('insect')}" checked>
                       <label class="form-check-label" for="insect">Insect</label>
                     </div>
 
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="amphibian" onchange="{updateFilter('amphibian')}" checked>
+                      <input class="form-check-input s"  type="checkbox" value="" id="amphibian" onchange="{updateFilter('amphibian')}" checked>
                       <label class="form-check-label" for="amphibian">Amphibian</label>
+                    </div>
+
+                    <div class="form-check">
+                      <button onclick="{selectAll('all')}" class="toggle-button">Select All</button>
                     </div>
 
                   </div>
                   <div class="col-6">
                     
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="endangered" onchange="{updateFilter('endangered')}" checked>
+                      <input class="form-check-input s"  type="checkbox" value="" id="endangered" onchange="{updateFilter('endangered')}" checked>
                       <label class="form-check-label" for="endangered">Endangered</label>
                     </div>
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="vulnerable" onchange="{updateFilter('vulnerable')}" checked>
+                      <input class="form-check-input s"  type="checkbox" value="" id="vulnerable" onchange="{updateFilter('vulnerable')}" checked>
                       <label class="form-check-label" for="vulnerable">Vunerable</label>
                     </div>
 
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="nearthreatened" onchange="{updateFilter('nearthreatened')}" checked>
+                      <input class="form-check-input s"  type="checkbox" value="" id="nearthreatened" onchange="{updateFilter('nearthreatened')}" checked>
                       <label class="form-check-label" for="nearthreatened">Near Threatened</label>
                     </div>
 
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="normal" onchange="{updateFilter('normal')}" checked>
+                      <input class="form-check-input s"  type="checkbox" value="" id="normal" onchange="{updateFilter('normal')}" checked>
                       <label class="form-check-label" for="Normal" >Normal</label>
                     </div>
 
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="invasive" onchange="{updateFilter('invasive')}" checked>
+                      <input class="form-check-input s" type="checkbox" value="" id="invasive" onchange="{updateFilter('invasive')}" checked>
                       <label class="form-check-label" for="invasive">Invasive</label>
+                    </div>
+                    <div class="form-check">
+                      <button onclick="selectAll('clear')" class="toggle-button">Clear All</button>
                     </div>
 
                   </div>
@@ -332,7 +326,7 @@
                   <div class="col">
                     
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="microphones" onchange="{microphoneDisplay()}">
+                      <input class="form-check-input" type="checkbox" value="" id="microphones">
                       <label class="form-check-label" for="microphones">Hide Microphones</label>
                     </div>
                    
@@ -381,7 +375,7 @@
     if(overlay){
       closeOverlay(overlay)
     }
-    //console.log('FAQ: ', document.getElementById("FAQ"));
+    console.log('FAQ: ', document.getElementById("FAQ"));
     document.getElementById("FAQ").style.width = "100%";
     document.getElementById("FAQ").style.height = "100%";
     overlay = "OpenFAQ"
@@ -399,14 +393,14 @@
       closeOverlay(overlay)
     }
     document.getElementById("ABOUT").classList.add("active");
-    //console.log('OPEN ABOUT: ', document.getElementById("ABOUT"));
+    console.log('OPEN ABOUT: ', document.getElementById("ABOUT"));
     document.getElementById("ABOUT").style.width = "100%";
     document.getElementById("ABOUT").style.height = "100%";
     overlay = "OpenABOUT"
   }
 
   function closeABOUT() {
-    //console.log("CLOSING THE ABOUT PAGE...")
+    console.log("CLOSING THE ABOUT PAGE...")
     
     document.getElementById("ABOUT").style.width = "0%";
     document.getElementById("ABOUT").style.height = "0%";
@@ -415,7 +409,7 @@
 
   function closeOverlay(overlay){
 
-    //console.log("Closing Overlay: ", overlay)
+    console.log("Closing Overlay: ", overlay)
 
     if (overlay == "OpenFAQ"){
 
@@ -432,12 +426,12 @@
     if(overlay){
       closeOverlay(overlay)
     }
-    //console.log("Opening Simulator...")
+    console.log("Opening Simulator...")
 
   }
 
   function openNav() {
-    //console.log('menuPanel: ', document.getElementById("menuPanel"))
+    console.log('menuPanel: ', document.getElementById("menuPanel"))
     document.getElementById("menuPanel").style.width = "30%";
   }
 
@@ -465,23 +459,29 @@
   //import { updateLayers } from "./js/HMI.js";
   //selecting the .form-check-input class (all the filter checkboxes fall under this class)                   
   const myClass = document.querySelectorAll('.form-check-input')
-
+  const sim = document.querySelectorAll('.s')
+  const voc = document.querySelectorAll('.v')
   //An array to store the ID for each checkbox 
   const checkboxIDs = []
-
+  const simIds = []
+  
   //Populating the checkbox
   myClass.forEach(element => {
-    //console.log("doingsomething")
+    console.log("doingsomething")
     checkboxIDs.push(element.id);
   });
 
+  sim.forEach(element => {
+    console.log("doingsomething with it")
+    simIds.push(element.id);
+  });
   //init variable is set to true before the user has selected any filter options
   //before a user has checked any filter options, all layers will appear on screen
   let filterState = [...checkboxIDs];
-  //console.log(filterState, "FilterState:  ")
-  //console.log(checkboxIDs)
+  console.log(filterState, "FilterState:  ")
+  console.log(checkboxIDs)
 
-  function updateFilter(checkbox){
+  function updateFilter(checkbox){ 
 
     if (document.getElementById(checkbox).checked){
       if(!filterState.includes(checkbox)){
@@ -494,17 +494,56 @@
           filterState.splice(index, 1);
         }
     }
-    //console.log("Current filter state:  ", filterState);
+    console.log("Current filter state:  ", filterState);
     updateLayers(filterState)
   }
 
-  function microphoneDisplay(){
-      updateMics()
+  function selectAll(filter){
+  
+    if (filter == 'clear'){
+      sim.forEach(id => {
+        filterState.splice(filterState.indexOf(id.id), 1)
+        id.checked = false;
+      })
+      
+    }
+  
+    else if (filter == '_clear'){
+      voc.forEach(id => {
+        filterState.splice(filterState.indexOf(id.id), 1)
+        id.checked = false;
+      })
+    }
+
+    else if (filter == 'all'){
+      sim.forEach(id => {
+        if (!filterState.includes(id.id)){
+          console.log("Filter state doesn't include: ",id.id)
+          filterState.push(id.id)
+        }
+        id.checked = true;
+      })
+      
+    
+    }
+    else if (filter == '_all'){
+      console.log(filter)
+      voc.forEach(id => {
+        if (!filterState.includes(id.id)){
+          console.log("Filter state doesn't include: ",id.id)
+          filterState.push(id.id)
+        }
+        id.checked = true;
+      })
+    }
+
+    updateLayers(filterState)
   }
+
 
   // Get all the dropdowns on the page
   const dropdowns = document.querySelectorAll(".dropdown");
-  
+
   // Add a click event listener to each dropdown
   dropdowns.forEach((dropdown) => {
     const button = dropdown.querySelector(".dropdown-toggle");
@@ -513,10 +552,8 @@
 
     // Toggle the 'show' class on the menu and button when clicked
     button.addEventListener("click", () => {
-      
       menu.classList.toggle("show");
       button.classList.toggle("show");
-      
     });
 
     
@@ -524,142 +561,90 @@
 
 </script>
 
-<script type="module">
-  import { updateLayers, initialiseHMI, showMics, hideMics } from "./js/HMI.js";
-  window.updateMics = updateMics;
+<script type = "module">
+  import { updateLayers } from "./js/HMI.js";
   window.updateLayers = updateLayers;
-
-  //All global state based info is stored in the hmiState
-  let hmiState = {};
-  window.hmiState = hmiState; 
-  hmiState.liveMode = true;
-
-  //Basemap config
-  //pls do not change origin lat long, these are set to target wild otways region
-  hmiState.originLat = -38.8078;
-  hmiState.originLon = 143.54741;
-  hmiState.defaultZoom = 10;
-  hmiState.requestInterval = 1000;
-
-  const microphoneLocations = [
-    { lat: -38.808, lon: 143.554 },
-    { lat: -38.813, lon: 143.537 },
-    { lat: -38.794, lon: 143.52 },
-    { lat: -38.824, lon: 143.51 },
-    { lat: -38.812, lon: 143.573 },
-  ];
-  /*
-  const vocalizationLocations = [
-    {eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Tawny Frogmouth", speciesIdentificationConfidence: 90.98, locationLat:-38.71 ,locationLon:143.000 , locationConfidence:90.98 , animalType:"bird", animalStatus:"normal" ,animalDiet: "omnivore" },
-    {eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Wild boar", speciesIdentificationConfidence: 90.98, locationLat:-38.808 ,locationLon:143.8 , locationConfidence:90.98 , animalType:"amphibian", animalStatus:"invasive" ,animalDiet: "omnivore" },
-    {eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Red fox", speciesIdentificationConfidence: 90.98, locationLat:-38.89 ,locationLon:142.554 , locationConfidence:90.98 , animalType:"mammal", animalStatus:"endangered" ,animalDiet: "omnivore" },
-    {eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Redeye", speciesIdentificationConfidence: 90.98, locationLat:-38.608 ,locationLon:143.254 , locationConfidence:90.98 , animalType:"insect", animalStatus:"near threatened" ,animalDiet: "omnivore" },
-    {eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Brown Rat", speciesIdentificationConfidence: 90.98, locationLat:-38.508 ,locationLon:141.87 , locationConfidence:90.98 , animalType:"reptile", animalStatus:"vulnerable" ,animalDiet: "omnivore" },
-  ];
-  */
-
-  const trueLocations = [
-    {eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Brown Rat", speciesIdentificationConfidence: 100, locationLat:-38.80266562762367 ,locationLon:143.560 , locationConfidence:100 , animalType:"reptile", animalStatus:"vulnerable" , animalDiet: "omnivore" },
-    {eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Tawny Frogmouth", speciesIdentificationConfidence: 100, locationLat:-38.81905478815439 ,locationLon:143.524 , locationConfidence:100 , animalType:"bird", animalStatus:"normal" ,animalDiet: "omnivore" },
-    {eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Cane toad", speciesIdentificationConfidence: 100, locationLat:-38.80166562762367 ,locationLon:143.540 , locationConfidence:100 , animalType:"amphibian", animalStatus:"invasive" ,animalDiet: "omnivore" },
-    {eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Red fox", speciesIdentificationConfidence: 100, locationLat:-38.82166562762367 ,locationLon:143.550 , locationConfidence:100 , animalType:"mammal", animalStatus:"endangered" ,animalDiet: "omnivore" },
-    {eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Brown Rat", speciesIdentificationConfidence: 100, locationLat:-38.80266562762367 ,locationLon:143.570 , locationConfidence:100 , animalType:"reptile", animalStatus:"vulnerable" , animalDiet: "omnivore" },
-    {eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Tawny Frogmouth", speciesIdentificationConfidence: 100, locationLat:-38.81905478815439 ,locationLon:143.580 , locationConfidence:100 , animalType:"bird", animalStatus:"normal" ,animalDiet: "omnivore" },
-    {eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Cane toad", speciesIdentificationConfidence: 100, locationLat:-38.80166562762367 ,locationLon:143.510 , locationConfidence:100 , animalType:"amphibian", animalStatus:"invasive" ,animalDiet: "omnivore" },
-    {eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Red fox", speciesIdentificationConfidence: 100, locationLat:-38.82166562762367 ,locationLon:143.520 , locationConfidence:100 , animalType:"mammal", animalStatus:"endangered" ,animalDiet: "omnivore" },
-    //{eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Redeye", speciesIdentificationConfidence: 100, locationLat:-38.80066562762367 ,locationLon:143.555 , locationConfidence:100 , animalType:"insect", animalStatus:"near-threatened" ,animalDiet: "omnivore" },
-
-  ];
-
-  hmiState.trueLocations = trueLocations;
-  //hmiState.vocalizationLocations = vocalizationLocations;
-  hmiState.microphoneLocations = microphoneLocations;
-
-  const el = (sel) => {return document.getElementById(sel);}
-  const elArea  = el("basemap");
-  // const elPopup = el("popup");
-  const elPopup = el("menuPanel");
-  const faqOl = el("nav-faq");
-  const aboutOl = el("nav-about");
-  const simulatorOl = el("nav-simulator")
-  //Add popup message at anywhere in map
-  // const showPopup = (evt) => {
-  // 	const elBtn = evt.currentTarget;
-  // 	Object.assign(elPopup.style, {
-  // 		left: `${evt.pageX + elBtn.scrollLeft - elBtn.offsetLeft - 320}px`,
-  // 		top:  `${evt.pageY + elBtn.scrollTop - elBtn.offsetTop - 180}px`,
-  // 		display: `block`,
-  // 	});
-  // };
-  simulatorOl.addEventListener("click",openSIMULATOR)
-  aboutOl.addEventListener("click",openABOUT);
-  elArea.addEventListener("click", openNav);
-  faqOl.addEventListener("click", openFAQ);
-  //Add sound listener to icon
-  // let a=0;
-  // document.getElementsByTagName("i")[0].addEventListener("click",function(){
-  // 	if(a==0){
-  // 		document.getElementsByTagName("audio")[0].play();
-  // 		a++;
-  // 		document.querySelector("i").style.opacity="1";
-  // 	} else {
-  // 		document.querySelector("audio").pause();
-  // 		a--;
-  // 		document.querySelector("i").style.opacity=".5";
-  // 	}
-  // });
-
-  window.onload = function() {
-    console.log("Website loaded!");
-    initialiseHMI(hmiState);
-  };
-
-  //Microphone show/hide
-  function updateMics(){
-  //console.log("mic visibility toggled!")
-  let mic = document.getElementById("microphones");
-    if (mic.checked){
-      hideMics(hmiState)
-    } 
-    else {
-      showMics(hmiState)
-    }
-  }
-
-  //Live mode and date range picker
-
-  const toggleSwitch = document.querySelector('#liveModeToggle');
-  const pastDataContainer = document.querySelector('.past-data-container');
-  console.log("Live mode enabled");
-
-  toggleSwitch.addEventListener('change', function() {
-    if (this.checked) {
-      hmiState.liveMode = true;
-      console.log("Live mode enabled");
-      pastDataContainer.style.maxHeight = '0';
-    } else {
-      hmiState.liveMode = false;
-      console.log("Live mode disabled");
-      pastDataContainer.style.maxHeight = pastDataContainer.scrollHeight + 'px';
-    }
-  });
-
-  $(function() {
-    $('#datetime-range').daterangepicker({
-      timePicker: true,
-      timePicker24Hour: true,
-      timePickerIncrement: 1,
-      locale: {
-        format: 'YYYY-MM-DD HH:mm:ss'
-      }
-    }, function(start, end, label) {
-      // Callback function that executes when the date and time range is changed
-      hmiState.startTime = start.unix(); 
-      hmiState.endTime = end.unix();
-      console.log("date range updated: " + hmiState.startTime + " to " + hmiState.endTime); 
-    });
-  });
-
 </script>
+
+    <script type="module">
+      import { initialiseHMI } from "./js/HMI.js";
+
+
+      //All global state based info is stored in the hmiState
+      let hmiState = {};
+      window.hmiState = hmiState; 
+
+      //Basemap config
+      //pls do not change origin lat long, these are set to target wild otways region
+      hmiState.originLat = -38.8078;
+      hmiState.originLon = 143.54741;
+      hmiState.defaultZoom = 10;
+      hmiState.requestInterval = 1000;
+
+      const microphoneLocations = [
+        { lat: -38.808, lon: 143.554 },
+        { lat: -38.813, lon: 143.537 },
+        { lat: -38.794, lon: 143.52 },
+        { lat: -38.824, lon: 143.51 },
+        { lat: -38.812, lon: 143.573 },
+      ];
+/*
+      const vocalizationLocations = [
+        {eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Tawny Frogmouth", speciesIdentificationConfidence: 90.98, locationLat:-38.71 ,locationLon:143.000 , locationConfidence:90.98 , animalType:"bird", animalStatus:"normal" ,animalDiet: "omnivore" },
+        {eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Wild boar", speciesIdentificationConfidence: 90.98, locationLat:-38.808 ,locationLon:143.8 , locationConfidence:90.98 , animalType:"amphibian", animalStatus:"invasive" ,animalDiet: "omnivore" },
+        {eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Red fox", speciesIdentificationConfidence: 90.98, locationLat:-38.89 ,locationLon:142.554 , locationConfidence:90.98 , animalType:"mammal", animalStatus:"endangered" ,animalDiet: "omnivore" },
+        {eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Redeye", speciesIdentificationConfidence: 90.98, locationLat:-38.608 ,locationLon:143.254 , locationConfidence:90.98 , animalType:"insect", animalStatus:"near threatened" ,animalDiet: "omnivore" },
+        {eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Brown Rat", speciesIdentificationConfidence: 90.98, locationLat:-38.508 ,locationLon:141.87 , locationConfidence:90.98 , animalType:"reptile", animalStatus:"vulnerable" ,animalDiet: "omnivore" },
+      ];
+*/
+
+      const trueLocations = [
+        {eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Tawny Frogmouth", speciesIdentificationConfidence: 100, locationLat:-38.81905478815439 ,locationLon:143.524 , locationConfidence:100 , animalType:"bird", animalStatus:"normal" ,animalDiet: "omnivore" },
+        {eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Wild boar", speciesIdentificationConfidence: 100, locationLat:-38.80166562762367 ,locationLon:143.540 , locationConfidence:100 , animalType:"amphibian", animalStatus:"invasive" ,animalDiet: "omnivore" },
+        {eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Red fox", speciesIdentificationConfidence: 100, locationLat:-38.82166562762367 ,locationLon:143.550 , locationConfidence:100 , animalType:"mammal", animalStatus:"endangered" ,animalDiet: "omnivore" },
+        //{eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Redeye", speciesIdentificationConfidence: 100, locationLat:-38.80066562762367 ,locationLon:143.555 , locationConfidence:100 , animalType:"insect", animalStatus:"near threatened" ,animalDiet: "omnivore" },
+        {eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Brown Rat", speciesIdentificationConfidence: 100, locationLat:-38.80266562762367 ,locationLon:143.560 , locationConfidence:100 , animalType:"reptile", animalStatus:"vulnerable" ,animalDiet: "omnivore" },
+      ];
+
+      hmiState.trueLocations = trueLocations;
+      //hmiState.vocalizationLocations = vocalizationLocations;
+      hmiState.microphoneLocations = microphoneLocations;
+      initialiseHMI(hmiState);
+
+      const el = (sel) => {return document.getElementById(sel);}
+      const elArea  = el("basemap");
+      // const elPopup = el("popup");
+      const elPopup = el("menuPanel");
+      const faqOl = el("nav-faq");
+      const aboutOl = el("nav-about");
+      const simulatorOl = el("nav-simulator")
+      //Add popup message at anywhere in map
+      // const showPopup = (evt) => {
+      // 	const elBtn = evt.currentTarget;
+      // 	Object.assign(elPopup.style, {
+      // 		left: `${evt.pageX + elBtn.scrollLeft - elBtn.offsetLeft - 320}px`,
+      // 		top:  `${evt.pageY + elBtn.scrollTop - elBtn.offsetTop - 180}px`,
+      // 		display: `block`,
+      // 	});
+      // };
+      simulatorOl.addEventListener("click",openSIMULATOR)
+      aboutOl.addEventListener("click",openABOUT);
+      elArea.addEventListener("click", openNav);
+      faqOl.addEventListener("click", openFAQ);
+      //Add sound listener to icon
+      // let a=0;
+      // document.getElementsByTagName("i")[0].addEventListener("click",function(){
+      // 	if(a==0){
+      // 		document.getElementsByTagName("audio")[0].play();
+      // 		a++;
+      // 		document.querySelector("i").style.opacity="1";
+      // 	} else {
+      // 		document.querySelector("audio").pause();
+      // 		a--;
+      // 		document.querySelector("i").style.opacity=".5";
+      // 	}
+      // });
+
+    </script>
   </body>
 </html>
