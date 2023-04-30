@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 name: echo-net
 services:
@@ -53,6 +53,22 @@ services:
     container_name: ts-simulator-cont
     networks:
       - echo-net
+    volumes:
+      - credentials_volume:/root/.config/gcloud/
+    stdin_open: false
+    tty: true
+
+  echo_api:
+    build:
+      context: API/
+      dockerfile: API.Dockerfile
+    image: ts-api
+    container_name: ts-api-cont
+    networks:
+      - echo-net
+    environment:
+      DB_USERNAME: "username"
+      DB_PASSWORD: "password"
     volumes:
       - credentials_volume:/root/.config/gcloud/
     stdin_open: false
