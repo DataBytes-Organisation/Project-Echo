@@ -1,7 +1,7 @@
 "use strict";
 
 import { getAudioTestString } from "./HMI-utils.js";
-import { retrieveTruthEventsInTimeRange } from "./routes.js";
+import { retrieveTruthEventsInTimeRange, retrieveVocalizationEventsInTimeRange, retrieveMicrophones } from "./routes.js";
 import data from "./sample_data.json" assert { type: 'json' };
 
 var markups = ["elephant.png", "monkey.png", "tiger.png"];
@@ -66,13 +66,18 @@ export function initialiseHMI(hmiState) {
   //console.log("Get sample element from document: ", document.getElementById("menuPanel"))
   addTruthLayers(hmiState);
   addVocalisationLayers(hmiState);
+  addVectorLayerTopDown(hmiState, "mic_layer");
 
   addAllTruthFeatures(hmiState);
   addAllVocalizationFeatures(hmiState);
 
   createMapClickEvent(hmiState);
-  //addVocalizedFeatures(hmiState); !!! Remove and work on in next Update
-  addmicrophones(hmiState);
+
+  retrieveMicrophones().then((res) => {
+    
+    updateMicrophoneLayer(hmiState, res.data);
+  })
+  
   queueSimUpdate(hmiState);
   //simulateData(hmiState);
 }
@@ -121,6 +126,7 @@ export function updateVocalizationLayerFromPastData(hmiState, results){
   clearAllVocalizationLayers();
 
   hmiState.vocalizationEvents = [];
+  console.log(results);
 
   for (let data of results) {
     let event = convertJSONtoAnimalVocalizationEvent(hmiState, data);
@@ -128,6 +134,23 @@ export function updateVocalizationLayerFromPastData(hmiState, results){
   }
 
   addAllVocalizationFeatures(hmiState);
+}
+
+export function updateMicrophoneLayer(hmiState, results){
+
+  clearMicrophoneLayer();
+
+  hmiState.microphoneLocations = [];
+  //console.log(results);
+
+  for (let data of results) {
+    let location = convertJSONtoMicrophone(hmiState, data);
+    if(location !== null){
+      hmiState.microphoneLocations.push(location);
+    }
+  }
+
+  addmicrophones(hmiState);
 }
 
 
@@ -212,14 +235,20 @@ export function clearAllTruthLayers(){
   }
 }
 
+export function clearMicrophoneLayer(){
+  let layer = findMapLayerWithName(hmiState, "mic_layer");
+  layer.getSource().clear();
+}
+
 export function convertJSONtoAnimalMovementEvent(hmiState, data){
   let movementEvent = {};
 
-  console.log(data);
+  //console.log(data);
 
   movementEvent.animalId = data.animalId;
   movementEvent.eventId = data._id;
   movementEvent.timestamp = hmiState.currentTime;
+  movementEvent.eventTimestamp = data.timestamp;
   movementEvent.speciesScientificName = data.species.toLowerCase();
   movementEvent.speciesIdentificationConfidence = 100.0;
   movementEvent.locationLat = data.animalTrueLLA[0];
@@ -238,20 +267,46 @@ export function convertJSONtoAnimalVocalizationEvent(hmiState, data){
 
   console.log(data);
 
-  vocalizationEvent.animalId = data.animalId;
-  vocalizationEvent.eventId = data._id;
   vocalizationEvent.timestamp = hmiState.currentTime;
+  vocalizationEvent.eventTimestamp = data.timestamp;
+  vocalizationEvent.eventId = data._id;
+  
+  vocalizationEvent.speciesIdentificationConfidence = data.confidence;
   vocalizationEvent.speciesScientificName = data.species.toLowerCase();
-  vocalizationEvent.speciesIdentificationConfidence = 100.0;
-  vocalizationEvent.locationLat = data.animalTrueLLA[0];
-  vocalizationEvent.locationLon = data.animalTrueLLA[1];
-  vocalizationEvent.locationConfidence = 100.0;
+  vocalizationEvent.commonName = data.commonName.toLowerCase();
   vocalizationEvent.animalType = data.type.toLowerCase();
   vocalizationEvent.animalStatus = matchStatus(data.status.toLowerCase());
   vocalizationEvent.animalDiet = data.diet.toLowerCase();
 
+  vocalizationEvent.locationConfidence = 100 - data.animalLLAUncertainty;
+  vocalizationEvent.estLat = data.animalEstLLA[0];
+  vocalizationEvent.estLon = data.animalEstLLA[1];
+  vocalizationEvent.locationLat = data.animalTrueLLA[0];
+  vocalizationEvent.locationLon = data.animalTrueLLA[1];
+
+  vocalizationEvent.sensorId = data.sensorId;
+  vocalizationEvent.sensorLat = data.microphoneLLA[0];
+  vocalizationEvent.sensorLon = data.microphoneLLA[1];
+
   return vocalizationEvent;
 }
+
+export function convertJSONtoMicrophone(hmiState, data){
+  let mic = {};
+
+  if(data.microphoneLLA !== null){
+    //console.log(data);
+    mic.id = data._id;
+    mic.lat = data.microphoneLLA[0];
+    mic.lon = data.microphoneLLA[1];
+    return mic;
+  }
+  else{
+    return null;
+  }
+}
+
+
 
 function playAudioString(audioDataString) {
   // Convert the binary audio data string into a typed array
@@ -294,6 +349,7 @@ export function updateLayers(filterState)  {
     for (let animalType of animalTypes) {
       let layerName = deriveLayerName(stat, animalType);
       let layer = findMapLayerWithName(hmiState, layerName);
+      
       if (filterState.includes("_" + stat) && filterState.includes("_" + animalType))
       {
         layer.setVisible(true);
@@ -430,7 +486,7 @@ function addAllVocalizationFeatures(hmiState) {
     let layer = findMapLayerWithName(hmiState, layerName);
     let layerSource = layer.getSource();
 
-    console.log(layerName);
+    //console.log(layerName);
     //console.log("animal type: ", entry.speciesScientificName);
 
     layerSource.addFeature(evtLocation);
@@ -484,7 +540,7 @@ function addmicrophones(hmiState) {
 
   //console.log("locs", hmiState.microphoneLocations);
   hmiState.microphoneLocations.forEach((location) => {
-    //console.log("Mic Found")
+    //console.log(location);
     // Add the marker into the array
     var mic = new ol.Feature({
       geometry: new ol.geom.Point(
@@ -504,7 +560,6 @@ function addmicrophones(hmiState) {
   });
 
   //console.log("mics: ", mics);
-  addVectorLayerTopDown(hmiState, "mic_layer");
   let layer = findMapLayerWithName(hmiState, "mic_layer");
   let layerSource = layer.getSource();
   layerSource.addFeatures(mics);
@@ -690,8 +745,8 @@ function updateTruthEvents(hmiState){
 
 //TODO Implement this
 function updateVocalizationEvents(hmiState){
-  retrieveTruthEventsInTimeRange(hmiState.previousUpdateTime, hmiState.currentTime).then((res) => {
-    updateAnimalMovementLayerFromLiveData(hmiState, res.data);
+  retrieveVocalizationEventsInTimeRange(hmiState.previousUpdateTime, hmiState.currentTime).then((res) => {
+    updateVocalizationLayerFromLiveData(hmiState, res.data);
     //TODO also update vocalisation layer here.
   })
 }
@@ -757,7 +812,7 @@ function queueSimUpdate(hmiState) {
     purgeTruthEvents(hmiState);
     purgeVocalizationEvents(hmiState);
     updateTruthEvents(hmiState);
-    //updateVocalizationEvents(hmiState);
+    updateVocalizationEvents(hmiState);
     hmiState.previousUpdateTime = hmiState.currentTime;
   }
 

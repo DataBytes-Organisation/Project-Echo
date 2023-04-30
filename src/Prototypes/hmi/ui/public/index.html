@@ -173,7 +173,7 @@
                       <label class="form-check-label" for="_vulnerable">Vunerable</label>
                     </div>
                     <div class="form-check">
-                      <input class="form-check-input v nearthreatened"  type="checkbox" value="" id="_nearthreatened" onchange="updateFilter('_nearthreatened')" checked>
+                      <input class="form-check-input v nearthreatened"  type="checkbox" value="" id="_near-threatened" onchange="updateFilter('_near-threatened')" checked>
                       <label class="form-check-label" for="_nearThreatened">Near Threatened</label>
                     </div>
                     <div class="form-check">
@@ -242,7 +242,7 @@
                     </div>
 
                     <div class="form-check">
-                      <input class="form-check-input s nearthreatened"  type="checkbox" value="" id="nearthreatened" onchange="{updateFilter('nearthreatened')}" checked>
+                      <input class="form-check-input s nearthreatened"  type="checkbox" value="" id="near-threatened" onchange="{updateFilter('near-threatened')}" checked>
                       <label class="form-check-label" for="nearthreatened">Near Threatened</label>
                     </div>
 
@@ -455,16 +455,19 @@
   
     if (filter == 'clear'){
       sim.forEach(id => {
-        filterState.splice(filterState.indexOf(id.id), 1)
-        id.checked = false;
+        if(filterState.includes(id.id)){
+          filterState.splice(filterState.indexOf(id.id), 1)
+          id.checked = false;
+        }
       })
-      
     }
   
     else if (filter == '_clear'){
       voc.forEach(id => {
-        filterState.splice(filterState.indexOf(id.id), 1)
-        id.checked = false;
+        if(filterState.includes(id.id)){
+          filterState.splice(filterState.indexOf(id.id), 1)
+          id.checked = false;
+        }
       })
     }
 
@@ -516,9 +519,9 @@
 </script>
 
 <script type="module">
-  import { updateLayers, initialiseHMI, showMics, hideMics, updateAnimalMovementLayerFromPastData,
+  import { updateLayers, initialiseHMI, showMics, hideMics, updateAnimalMovementLayerFromPastData, updateVocalizationLayerFromPastData,
   resetWildlifeLayers, MapOpenNav, MapCloseNav, getAnimalToggled } from "./js/HMI.js";
-  import {retrieveTruthEventsInTimeRange} from "./js/routes.js";
+  import {retrieveTruthEventsInTimeRange, retrieveVocalizationEventsInTimeRange} from "./js/routes.js";
   window.updateMics = updateMics;
   window.updateLayers = updateLayers;
   //window.openNav = openNav;
@@ -551,8 +554,10 @@
   hmiState.simUpdateDelay = 5000;
   hmiState.liveWindow = 60000;
 
-  //const replayDate = new Date('March 22, 2023 13:45:00');
-  //const replayTimestamp = replayDate.getTime();
+  //NOTE: Use the replay date to replay past data as though it were live
+    //const replayDate = new Date('March 23, 2023 20:35:00');
+    //const replayTimestamp = replayDate.getTime();
+  
   const replayTimestamp = Date.now();
 
   hmiState.timeOffset = Date.now() - replayTimestamp;
@@ -692,7 +697,10 @@
       console.log("date range updated: " + hmiState.startTime + " to " + hmiState.endTime); 
       retrieveTruthEventsInTimeRange(hmiState.startTime, hmiState.endTime).then((res) => {
         updateAnimalMovementLayerFromPastData(hmiState, res.data);
-        //TODO also update vocalisation layer here.
+      })
+
+      retrieveVocalizationEventsInTimeRange(hmiState.startTime, hmiState.endTime).then((res) => {
+        updateVocalizationLayerFromPastData(hmiState, res.data);
       })
     });
   });

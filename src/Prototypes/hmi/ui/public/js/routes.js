@@ -23,6 +23,16 @@ export function retrieveTruthEventsInTimeRange(from, to) {
   return axios.get(`${MESSAGE_API_URL}/movement_time?start=${start}&end=${end}`);
 }
 
+export function retrieveVocalizationEventsInTimeRange(from, to) {
+  var start = parseInt(from);
+  var end = parseInt(to);
+  return axios.get(`${MESSAGE_API_URL}/events_time?start=${start}&end=${end}`);
+}
+
+export function retrieveMicrophones() {
+  return axios.get(`${MESSAGE_API_URL}/microphones`);
+}
+
 /*
 export function retrieveAllMessages() {
   return axios.get(`${MESSAGE_API_URL}/messages`);
