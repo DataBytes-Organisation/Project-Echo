@@ -93,11 +93,11 @@
 		
 		<div id="blur"></div>
 
-    <div class="container" style="margin-left: 0px !important;">
+    <div class="container" style="margin-left: 0px !important">
       <!-- Row 1 with nav spanning the entire width and a fixed top-->
       <div class="row">
         <div class="col-md-12">
-          <nav class="navbar navbar-expand-lg navbar-dark bg-black fixed-top shadow-sm" id="nav-container" style="display: none">
+          <nav class="navbar navbar-expand-lg navbar-dark bg-black fixed-top shadow-sm">
             <div class="container-fluid">
               <!-- Title on the left end -->
               <a class="navbar-brand" href="#">
@@ -249,25 +249,25 @@
                   <div class="col">
                     
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="reptile" onchange="{updateFilter('reptile')}" checked>
+                      <input class="form-check-input" type="checkbox" value="" id="reptile" onchange="updateFilter('reptile')">
                       <label class="form-check-label" for="reptile">Reptile</label>
                     </div>
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="bird" onchange="{updateFilter('bird')}" checked>
+                      <input class="form-check-input" type="checkbox" value="" id="bird" onchange="{updateFilter('bird')}">
                       <label class="form-check-label" for="bird">Bird</label>
                     </div>
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="mammal" onchange="{updateFilter('mammal')}" checked>
+                      <input class="form-check-input" type="checkbox" value="" id="mammal" onchange="{updateFilter('mammal')}">
                       <label class="form-check-label" for="mammal">Mammal</label>
                     </div>
 
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="insect" onchange="{updateFilter('insect')}" checked>
+                      <input class="form-check-input" type="checkbox" value="" id="insect" onchange="{updateFilter('insect')}">
                       <label class="form-check-label" for="insect">Insect</label>
                     </div>
 
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="amphibian" onchange="{updateFilter('amphibian')}" checked>
+                      <input class="form-check-input" type="checkbox" value="" id="amphibian" onchange="{updateFilter('amphibian')}">
                       <label class="form-check-label" for="amphibian">Amphibian</label>
                     </div>
 
@@ -275,26 +275,26 @@
                   <div class="col-6">
                     
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="endangered" onchange="{updateFilter('endangered')}" checked>
+                      <input class="form-check-input" type="checkbox" value="" id="endangered" onchange="{updateFilter('endangered')}">
                       <label class="form-check-label" for="endangered">Endangered</label>
                     </div>
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="vulnerable" onchange="{updateFilter('vulnerable')}" checked>
+                      <input class="form-check-input" type="checkbox" value="" id="vulnerable" onchange="{updateFilter('vulnerable')}">
                       <label class="form-check-label" for="vulnerable">Vunerable</label>
                     </div>
 
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="nearthreatened" onchange="{updateFilter('nearthreatened')}" checked>
+                      <input class="form-check-input" type="checkbox" value="" id="nearthreatened" onchange="{updateFilter('nearthreatened')}">
                       <label class="form-check-label" for="nearthreatened">Near Threatened</label>
                     </div>
 
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="normal" onchange="{updateFilter('normal')}" checked>
+                      <input class="form-check-input" type="checkbox" value="" id="normal" onchange="{updateFilter('normal')}">
                       <label class="form-check-label" for="Normal" >Normal</label>
                     </div>
 
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="invasive" onchange="{updateFilter('invasive')}" checked>
+                      <input class="form-check-input" type="checkbox" value="" id="invasive" onchange="{updateFilter('invasive')}" >
                       <label class="form-check-label" for="invasive">Invasive</label>
                     </div>
 
@@ -312,7 +312,7 @@
                   <div class="col">
                     
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="microphones" onchange="{microphoneDisplay()}">
+                      <input class="form-check-input" type="checkbox" value="" id="microphones">
                       <label class="form-check-label" for="microphones">Hide Microphones</label>
                     </div>
                    
@@ -491,15 +491,9 @@
     updateLayers(filterState)
   }
 
-  function microphoneDisplay(){
-      updateMics()
-  }
-
-
   // Get all the dropdowns on the page
   const dropdowns = document.querySelectorAll(".dropdown");
-  const buttons = document.querySelectorAll(".dropdown-toggle");
-  const menus = document.querySelectorAll(".dropdown-menu");
+
   // Add a click event listener to each dropdown
   dropdowns.forEach((dropdown) => {
     const button = dropdown.querySelector(".dropdown-toggle");
@@ -508,12 +502,6 @@
 
     // Toggle the 'show' class on the menu and button when clicked
     button.addEventListener("click", () => {
-      buttons.forEach((ele) => {
-        ele.classList.remove("show");
-      }) 
-      menus.forEach((ele) => {
-        ele.classList.remove("show");
-      }) 
       menu.classList.toggle("show");
       button.classList.toggle("show");
     });
@@ -529,8 +517,8 @@
 </script>
 
     <script type="module">
-      import { initialiseHMI, showMics, hideMics } from "./js/HMI.js";
-      window.updateMics = updateMics;
+      import { initialiseHMI } from "./js/HMI.js";
+
 
       //All global state based info is stored in the hmiState
       let hmiState = {};
@@ -606,17 +594,6 @@
       // 		document.querySelector("i").style.opacity=".5";
       // 	}
       // });
-
-      //Microphone show/hide
-      function updateMics(){
-        console.log("mic visibility toggled!")
-        let mic = document.getElementById("microphones");
-        if (mic.checked){
-          hideMics(hmiState)
-        } else {
-          showMics(hmiState)
-        }
-      }
 
     </script>
   </body>
