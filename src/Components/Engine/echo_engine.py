@@ -13,15 +13,18 @@
 
 # disable warnings
 import warnings
-import time
-
 warnings.filterwarnings("ignore")
 
+# os environment
+import os
+os.environ['PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION'] = 'python'
+
+import time
 import requests
 import base64
 import io
 import json
-import os
+
 from platform import python_version
 
 import diskcache as dc
@@ -38,6 +41,9 @@ import tensorflow_io as tfio
 from google.cloud import storage
 from keras.utils import dataset_utils
 
+# database libraries
+import pymongo
+
 # print system information
 print('Python Version           : ', python_version())
 print('TensorFlow Version       : ', tf.__version__)
@@ -45,22 +51,42 @@ print('TensorFlow IO Version    : ', tfio.__version__)
 print('Librosa Version          : ', librosa.__version__)
 
 
-##################################################################################################
-# system constants copied from generic pipeline
-##################################################################################################
-
-# Load the JSON file into a dictionary
-config_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'echo_engine.json')
-with open(config_file_path, 'r') as f:
-    SC = json.load(f)
-SC['AUDIO_WINDOW'] = None    
-
 class EchoEngine():
 
     ##################################################################################################
     ##################################################################################################
     def __init__(self) -> None:  
-        pass
+        
+        # Load the engine config JSON file into a dictionary
+        try:
+            file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'echo_engine.json')
+            with open(file_path, 'r') as f:
+                self.config = json.load(f)
+            self.config['AUDIO_WINDOW'] = None 
+            print(f"Echo Engine configuration successfully loaded", flush=True)
+        except:
+            print(f"Could not engine config : {file_path}") 
+        
+        # Load the project echo credentials into a dictionary
+        try:
+            file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'echo_credentials.json')
+            with open(file_path, 'r') as f:
+                self.credentials = json.load(f)
+            print(f"Echo Engine credentials successfully loaded", flush=True)
+        except:
+            print(f"Could not engine credentials : {file_path}") 
+         
+        # Setup database client and connect
+        try:
+            # database connection string
+            self.connection_string=f"mongodb+srv://{self.credentials['DB_USERNAME']}:{self.credentials['DB_PASSWORD']}@cluster0.gu2idc8.mongodb.net/test"
+
+            myclient = pymongo.MongoClient(self.connection_string)
+            self.echo_store = myclient["mydatabase"]
+            print(f"Found echo store database names: {myclient.list_database_names()}", flush=True)
+        except:
+            print(f"Failed to establish database connection", flush=True)
+
     
     ##################################################################################################
     # This function uses the google bucket with audio files and
@@ -72,8 +98,8 @@ class EchoEngine():
 
         species_names = set()
 
-        bucket_name = SC['BUCKET_NAME']
-        os.environ["GCLOUD_PROJECT"] = SC['GCLOUD_PROJECT']
+        bucket_name = self.config['BUCKET_NAME']
+        os.environ["GCLOUD_PROJECT"] = self.config['GCLOUD_PROJECT']
 
         storage_client = storage.Client()
         bucket = storage_client.get_bucket(bucket_name)
@@ -119,7 +145,7 @@ class EchoEngine():
     def load_random_subsection(self, tmp_audio_t, duration_secs):
     
         # Determine the audio file's duration in seconds
-        audio_duration_secs = tf.shape(tmp_audio_t)[0] / SC['AUDIO_SAMPLE_RATE']
+        audio_duration_secs = tf.shape(tmp_audio_t)[0] / self.config['AUDIO_SAMPLE_RATE']
         
         if audio_duration_secs>duration_secs:
         
@@ -127,16 +153,16 @@ class EchoEngine():
             max_start = tf.cast(audio_duration_secs - duration_secs, tf.float32)
             start_time_secs = tf.random.uniform((), 0.0, max_start, dtype=tf.float32)
             
-            start_index = tf.cast(start_time_secs * SC['AUDIO_SAMPLE_RATE'], dtype=tf.int32)
+            start_index = tf.cast(start_time_secs * self.config['AUDIO_SAMPLE_RATE'], dtype=tf.int32)
     
             # Load the 5-second subsection
-            end_index = tf.cast(start_index + tf.cast(duration_secs, tf.int32) * SC['AUDIO_SAMPLE_RATE'], tf.int32)
+            end_index = tf.cast(start_index + tf.cast(duration_secs, tf.int32) * self.config['AUDIO_SAMPLE_RATE'], tf.int32)
             
             subsection = tmp_audio_t[start_index : end_index]
         
         else:
             # Pad the subsection with silence if it's shorter than 5 seconds
-            padding_length = duration_secs * SC['AUDIO_SAMPLE_RATE'] - tf.shape(tmp_audio_t)[0]
+            padding_length = duration_secs * self.config['AUDIO_SAMPLE_RATE'] - tf.shape(tmp_audio_t)[0]
             padding = tf.zeros([padding_length], dtype=tmp_audio_t.dtype)
             subsection = tf.concat([tmp_audio_t, padding], axis=0).numpy()
 
@@ -153,7 +179,7 @@ class EchoEngine():
         file = io.BytesIO(audio_clip)
 
         # Load the audio data with librosa
-        audio_clip, _ = librosa.load(file, sr=SC['AUDIO_SAMPLE_RATE'])
+        audio_clip, _ = librosa.load(file, sr=self.config['AUDIO_SAMPLE_RATE'])
         
         # keep right channel only
         if audio_clip.ndim == 2 and audio_clip.shape[0] == 2:
@@ -163,27 +189,27 @@ class EchoEngine():
         audio_clip = audio_clip.astype(np.float32)
         
         # analyse a random 5 second subsection
-        audio_clip = self.load_random_subsection(audio_clip, duration_secs=SC['AUDIO_CLIP_DURATION'])
+        audio_clip = self.load_random_subsection(audio_clip, duration_secs=self.config['AUDIO_CLIP_DURATION'])
 
         # Compute the mel-spectrogram
         image = librosa.feature.melspectrogram(
             y=audio_clip, 
-            sr=SC['AUDIO_SAMPLE_RATE'], 
-            n_fft=SC['AUDIO_NFFT'], 
-            hop_length=SC['AUDIO_STRIDE'], 
-            n_mels=SC['AUDIO_MELS'],
-            fmin=SC['AUDIO_FMIN'],
-            fmax=SC['AUDIO_FMAX'],
-            win_length=SC['AUDIO_WINDOW'])
+            sr=self.config['AUDIO_SAMPLE_RATE'], 
+            n_fft=self.config['AUDIO_NFFT'], 
+            hop_length=self.config['AUDIO_STRIDE'], 
+            n_mels=self.config['AUDIO_MELS'],
+            fmin=self.config['AUDIO_FMIN'],
+            fmax=self.config['AUDIO_FMAX'],
+            win_length=self.config['AUDIO_WINDOW'])
 
         # Optionally convert the mel-spectrogram to decibel scale
         image = librosa.power_to_db(
             image, 
-            top_db=SC['AUDIO_TOP_DB'], 
+            top_db=self.config['AUDIO_TOP_DB'], 
             ref=1.0)
         
         # Calculate the expected number of samples in a clip
-        expected_clip_samples = int(SC['AUDIO_CLIP_DURATION'] * SC['AUDIO_SAMPLE_RATE'] / SC['AUDIO_STRIDE'])
+        expected_clip_samples = int(self.config['AUDIO_CLIP_DURATION'] * self.config['AUDIO_SAMPLE_RATE'] / self.config['AUDIO_STRIDE'])
         
         # swap axis and clip to expected samples to avoid rounding errors
         image = np.moveaxis(image, 1, 0)
@@ -193,14 +219,14 @@ class EchoEngine():
         image = tf.expand_dims(image, -1)
         
         # most pre-trained model classifer model expects 3 color channels
-        image = tf.repeat(image, SC['MODEL_INPUT_IMAGE_CHANNELS'], axis=2)
+        image = tf.repeat(image, self.config['MODEL_INPUT_IMAGE_CHANNELS'], axis=2)
         
         # calculate the image shape and ensure it is correct
-        expected_clip_samples = int(SC['AUDIO_CLIP_DURATION'] * SC['AUDIO_SAMPLE_RATE'] / SC['AUDIO_STRIDE'])
-        image = tf.ensure_shape(image, [expected_clip_samples, SC['AUDIO_MELS'], SC['MODEL_INPUT_IMAGE_CHANNELS']])
+        expected_clip_samples = int(self.config['AUDIO_CLIP_DURATION'] * self.config['AUDIO_SAMPLE_RATE'] / self.config['AUDIO_STRIDE'])
+        image = tf.ensure_shape(image, [expected_clip_samples, self.config['AUDIO_MELS'], self.config['MODEL_INPUT_IMAGE_CHANNELS']])
         
         # note here a high quality LANCZOS5 is applied to resize the image to match model image input size
-        image = tf.image.resize(image, (SC['MODEL_INPUT_IMAGE_WIDTH'],SC['MODEL_INPUT_IMAGE_HEIGHT']), 
+        image = tf.image.resize(image, (self.config['MODEL_INPUT_IMAGE_WIDTH'],self.config['MODEL_INPUT_IMAGE_HEIGHT']), 
                                 method=tf.image.ResizeMethod.LANCZOS5)
 
         # rescale to range [0,1]
@@ -220,11 +246,11 @@ class EchoEngine():
     ########################################################################################
     def on_message(self, client, userdata, msg):
         print("Recieved audio message, processing via engine model...")    
-        json_object = json.loads(msg.payload)
-        print(json_object['timestamp'])
+        audio_event = json.loads(msg.payload)
+        print(audio_event['timestamp'])
         
         # convert to string representation of audio to binary for processing
-        audio_clip = self.string_to_audio(json_object['audioClip'])
+        audio_clip = self.string_to_audio(audio_event['audioClip'])
         
         image = self.combined_pipeline(audio_clip)
         
@@ -234,12 +260,12 @@ class EchoEngine():
         
         data = json.dumps({"signature_name": "serving_default", "inputs": image_list})
 
-        url = SC['MODEL_SERVER']
+        url = self.config['MODEL_SERVER']
         headers = {"content-type": "application/json"}
         json_response = requests.post(url, data=data, headers=headers)
-        json_object   = json.loads(json_response.text)
+        audio_event   = json.loads(json_response.text)
         #print(f" model response: {json_response.text}", flush=True)
-        predictions = json_object['outputs'][0]
+        predictions = audio_event['outputs'][0]
                 
         # Predict class and probability using the prediction function
         predicted_class, predicted_probability = self.predict_class(predictions)
@@ -247,8 +273,37 @@ class EchoEngine():
         print(f'Predicted class : {predicted_class}')
         print(f'Predicted probability : {predicted_probability}')
         
+        # populate the database with the result
+        self.populate_echo_store_results(
+            audio_event,
+            predicted_class,
+            predicted_probability)
+
 
     ########################################################################################
+    # this function populates the database with the prediction results
+    ########################################################################################
+    def populate_echo_store_results(self, audio_event, predicted_class, predicted_probability):
+        
+        detection_event = {
+            "timestamp": audio_event["timestamp"],
+            "species": predicted_class,
+            "confidence": predicted_probability, 
+            "sensorId": audio_event["sensorId"],
+            "microphoneLLA": audio_event["microphoneLLA"],
+            "animalEstLLA": audio_event["animalEstLLA"], 
+            "animalTrueLLA": audio_event["animalTrueLLA"], 
+            "animalLLAUncertainty": audio_event["animalLLAUncertainty"],
+            "audioClip": audio_event["audioClip"],        
+        }
+        
+        mycol = self.mydb["events"]
+        json_object = json.dump(detection_event)
+        mycol.insert_one(json_object)
+
+
+    ########################################################################################
+    # Execute the main engine loop (which waits for messages to arrive from MQTT)
     ########################################################################################
     def execute(self):
         print("Engine started.")
@@ -260,13 +315,13 @@ class EchoEngine():
         connected = False
         while not connected:
             try:
-                client.connect(SC['MQTT_CLIENT_URL'], SC['MQTT_CLIENT_PORT'])
+                client.connect(self.config['MQTT_CLIENT_URL'], self.config['MQTT_CLIENT_PORT'])
                 connected=True
             except:
                 time.sleep(1)    
         
-        print(f'Subscribing to MQTT: {SC["MQTT_CLIENT_URL"]} {SC["MQTT_PUBLISH_URL"]}')
-        client.subscribe(SC['MQTT_PUBLISH_URL'], qos=1)
+        print(f'Subscribing to MQTT: {self.config["MQTT_CLIENT_URL"]} {self.config["MQTT_PUBLISH_URL"]}')
+        client.subscribe(self.config['MQTT_PUBLISH_URL'], qos=1)
         
         print("Retrieving species names from GCP")
         self.class_names = self.gcp_load_species_list()

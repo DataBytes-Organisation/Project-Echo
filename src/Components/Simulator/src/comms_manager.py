@@ -74,6 +74,9 @@ class CommsManager():
         species_name    = animal.getSpecies().getName()
         animal_true_lla = animal.getLLA()
         
+        # microphone LLA TODO
+        microphone_lla  = [0,0,0]
+        
         # randomly sample from available audio blobs from this species
         sample_blob = random.sample(self.audio_blobs[species_name], k=1)[0]
         
@@ -86,26 +89,20 @@ class CommsManager():
         # For now, send filename across for format information
         audio_file = sample_blob.name.split('/')[1]
         
-        # TODO create the audio message in correct format
-        MQTT_MSG = f'''
-        {{
-            "timestamp": "{timestamp}",
-            "animalEstLLA": [
-                {predicted_lla[0]},
-                {predicted_lla[1]},
-                {predicted_lla[2]}
-            ],
-            "animalTrueLLA": [
-                {animal_true_lla[0]},
-                {animal_true_lla[1]},
-                {animal_true_lla[2]}
-            ],
+        # Create the vocalisation event
+        vocalisation_event = {
+            "timestamp": timestamp,
+            "sensorId": "TBD",
+            "microphoneLLA": microphone_lla,
+            "animalEstLLA": list(predicted_lla),
+            "animalTrueLLA": list(animal_true_lla),
             "animalLLAUncertainty": 0.0,
-            "audioClip": "{audio_str}",
-            "audioFile": "{audio_file}"
-        }}
-        '''
-  
+            "audioClip" : audio_str, 
+            "audioFile" : audio_file      
+        }        
+          
+        MQTT_MSG = json.dumps(vocalisation_event)
+        
         # publish the audio message on the queue
         (rc, mid) = self.mqtt_client.publish(os.environ['MQTT_PUBLISH_URL'], MQTT_MSG, qos=1)
         
