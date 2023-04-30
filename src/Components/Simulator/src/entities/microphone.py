@@ -22,3 +22,6 @@ class MicrophoneStation(entities.entity.Entity):
 
     def reset_trigger_event_time(self) -> None:
         self.triggered_sim_clock_time = self.clock.get_time()
+        
+    def getID(self):
+        return self.unique_identifier

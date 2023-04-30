@@ -58,7 +58,7 @@ class SensorManager(entities.entity.Entity):
             mic.reset_trigger_event_time()
 
         logger1.info(f'Min triangulation error: {min_error}\n')
-        return predicted_lla
+        return predicted_lla, mics_around_event[0],min_error
     
     def func_to_minimize(self, x, list_triggered_mics, c):
         lat, lon, z = x
