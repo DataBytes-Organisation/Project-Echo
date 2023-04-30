@@ -68,6 +68,7 @@ export function initialiseHMI(hmiState) {
   addVocalisationLayers(hmiState);
 
   addAllTruthFeatures(hmiState);
+  addAllVocalizationFeatures(hmiState);
 
   createMapClickEvent(hmiState);
   //addVocalizedFeatures(hmiState); !!! Remove and work on in next Update
@@ -429,7 +430,7 @@ function addAllVocalizationFeatures(hmiState) {
     let layer = findMapLayerWithName(hmiState, layerName);
     let layerSource = layer.getSource();
 
-    //console.log(layerName);
+    console.log(layerName);
     //console.log("animal type: ", entry.speciesScientificName);
 
     layerSource.addFeature(evtLocation);
