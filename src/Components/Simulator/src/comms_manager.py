@@ -108,15 +108,14 @@ class CommsManager():
         
         # For now, send filename across for format information
         audio_file = sample_blob.name.split('/')[1]
-        
-        print("1111",flush=True)
-        
+         
         # Define the format string
         format_string = "%Y-%m-%d %H:%M:%S"
 
         # Convert the datetime object to a string
         datetime_string = timestamp.strftime(format_string)
         
+        # TODO: populate the nearest sensor ID information
         # Create the vocalisation event
         vocalisation_event = {
             "timestamp": datetime_string,
@@ -129,12 +128,8 @@ class CommsManager():
             "audioFile" : audio_file      
         }    
         
-        #print("2222 {vocalisation_event}",flush=True)    
-         
         MQTT_MSG = json.dumps(vocalisation_event)
      
-        #print(f"3333 {MQTT_MSG}",flush=True)
-        
         # publish the audio message on the queue
         (rc, mid) = self.mqtt_client.publish(os.environ['MQTT_PUBLISH_URL'], MQTT_MSG, qos=1)
         
