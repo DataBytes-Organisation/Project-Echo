@@ -28,9 +28,14 @@ router = APIRouter()
 dotenv.load_dotenv()
 id = os.getenv("DB_USERNAME")
 password = os.getenv("DB_PASSWORD")
+
 connection_string=f"mongodb+srv://{id}:{password}@cluster0.gu2idc8.mongodb.net/test"
 client = pymongo.MongoClient(connection_string)
 db = client.mydatabase
+
+@app.get("/", response_description="api-root")
+def show_home():
+    return 'Welcome to echo api, move to /docs for more'
 
 
 @app.get("/events_time", response_description="Get detection events within certain duration")
