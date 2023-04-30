@@ -3,7 +3,7 @@ from bson.objectid import ObjectId
 import datetime
 
 # Replace <hostname> with the actual hostname where MongoDB is running
-client = MongoClient("mongodb://modelUser:EchoNetAccess2023@<hostname>:27017/EchoNet")
+client = MongoClient("mongodb://modelUser:EchoNetAccess2023@localhost:27017/EchoNet")
 
 db = client["EchoNet"]
 
