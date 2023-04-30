@@ -323,7 +323,7 @@ class EchoEngine():
                 time.sleep(1)    
         
         print(f'Subscribing to MQTT: {self.config["MQTT_CLIENT_URL"]} {self.config["MQTT_PUBLISH_URL"]}')
-        client.subscribe(self.config['MQTT_PUBLISH_URL'], qos=1)
+        client.subscribe(self.config['MQTT_PUBLISH_URL'])
         
         print("Retrieving species names from GCP")
         self.class_names = self.gcp_load_species_list()
