@@ -17,6 +17,9 @@
     <!-- Bootstrap -->
 		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
 		<script src="https://kit.fontawesome.com/8aa980d912.js" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+    <script src="./js/bootstrap.bundle.min.js"></script>
 
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
@@ -126,8 +129,101 @@
             </div>
           <div id="FAQ">
             <div id="FAQ-contents">
-            <h3>FAQ TAB</h3>
+              <h3>FAQs</h3>
             </div>
+            <section id="offcanvas" >
+              <div style="align-self:center;">
+                <div class="faq_question" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvas_aboutus" aria-controls="offcanvas_aboutus">What is this project about?</div>
+                <div class="faq_question" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvas_data" aria-controls="offcanvas_data">Where does the data come from?</div>
+                <div class="faq_question" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvas_contactus" aria-controls="offcanvas_contactus">How can I contact the organization?</div>
+                
+                <div class="offcanvas offcanvas-bottom popup_bottom_tab" tabindex="-1" id="offcanvas_aboutus" aria-labelledby="offcanvasBottomLabel">
+                  <div class="offcanvas-header">
+                    <h1 class="offcanvas-title" id="offcanvasBottomLabel">About Project Echo</h1>
+                    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                  </div>
+                  <div class="offcanvas-body small">
+                    <h2>The Project</h2>
+                    <p>
+                      Project Echo, is a <strong>a bioacoustics classification tool</strong> that use AI/ML solution for understanding the density and classification of noise-producing animals in rainforests. 
+                      Echo’s vision is to help ecologists and environmentalists to survey the environment in a non-destructive and efficient way to track threatened animal species population numbers over time.
+                      This research input will provide conservationists the information they need to make informed conservation decisions to protect our precious native fauna. 
+                    </p>
+                    
+                    <h2>Who we are?</h2>
+                    <p>
+                      We are <strong>DataBytes</strong>, a cutting-edge, data-driven company that focuses on designing and implementing custom, cloud-based data collection and analytics platforms. 
+                      With a team of experienced data scientists and software engineers, we specialize in developing intelligent systems that optimize business processes and automate task management for increased efficiency across various industries. 
+                      From image recognition to language translation, our AI-driven technologies aim to transform the way businesses operate and enhance their capabilities for a brighter, more prosperous future. 
+                    </p>
+                    <p>
+                      Having worked with companies across the country in the retail vertical, financial services, healthcare, e-commerce, and even telecom, we’re well versed in a wide variety of data needs. 
+                      Our goal is to democratize AI and provide affordable, accessible solutions that enable our clients to accelerate their growth and improve their bottom line. 
+                      With a passion for innovation and a commitment to excellence, we are the go-to AI partner for businesses looking to unlock the full potential of their data. 
+                    </p>
+
+                    <p>
+                      We believe that sound analysis can revolutionize the way we monitor animal populations, and we aim to make our solution widely available to conservationists and researchers. 
+                      Project Echo leverages machine learning to understand the density and classifications of animals in a survey area, using our curated sound datasets. 
+                      Our team is making solid and comprehensive progress in the analysis of labeled data and its predictive ability using Artificial Intelligence and Machine Learning.
+                    </p>
+                  </div>
+                </div>
+
+                <div class="offcanvas offcanvas-bottom popup_bottom_tab" tabindex="-1" id="offcanvas_data" aria-labelledby="offcanvasBottomLabel">
+                  <div class="offcanvas-header">
+                    <h1 class="offcanvas-title" id="offcanvasBottomLabel">Data Pooling and Sourcing</h1>
+                    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                  </div>
+                  <div class="offcanvas-body small">
+                    <h2>Audio data</h2>
+                    <p>
+                      The audio data, which contains information about the animal species, are collected from...
+                    <h2>Image and biographical data</h2>
+                    <p>
+                      Currently, both biographical and imagery data of the animals species are generated using Generative AI in order to avoid copyrights.
+                    </p>
+                  </div>
+                </div>
+
+                <div class="offcanvas offcanvas-bottom popup_bottom_tab" tabindex="-1" id="offcanvas_contactus" aria-labelledby="offcanvasBottomLabel">
+                  <div class="offcanvas-header">
+                    <h1 class="offcanvas-title" id="offcanvasBottomLabel">Contact Us</h1>
+                    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                  </div>
+                  <div class="offcanvas-body small">
+                    <h2>Filling form</h2>
+                    <p>
+                      You can submit your query by filling the below form:
+                      <form>
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label" for="usr">Your email</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="usr"
+                                    placeholder="Enter your email" name="name">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label"
+                                for="comment">Question:</label>
+                            <div class="col-sm-10">
+                                <textarea rows="5" class="form-control" id="comment"
+                                    name="comment"
+                                    placeholder="Please type your query here..."></textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group row">
+                            <div class="col-sm-10 offset-sm-2">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </div>
+                        </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </section>
           </div>
           <div id="animal-popup">
             <h2 id="desc_name" class="title">(Insert Animal Name here)</h2>
