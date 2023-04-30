@@ -79,10 +79,10 @@ class EchoEngine():
         # Setup database client and connect
         try:
             # database connection string
-            self.connection_string=f"mongodb+srv://{self.credentials['DB_USERNAME']}:{self.credentials['DB_PASSWORD']}@{self.config['DB_HOSTNAME']}"
+            self.connection_string=f"mongodb://{self.credentials['DB_USERNAME']}:{self.credentials['DB_PASSWORD']}@{self.config['DB_HOSTNAME']}/EchoNet"
 
             myclient = pymongo.MongoClient(self.connection_string)
-            self.echo_store = myclient["mydatabase"]
+            self.echo_store = myclient["EchoNet"]
             print(f"Found echo store database names: {myclient.list_database_names()}", flush=True)
         except:
             print(f"Failed to establish database connection", flush=True)
@@ -245,39 +245,43 @@ class EchoEngine():
     ########################################################################################
     ########################################################################################
     def on_message(self, client, userdata, msg):
-        print("Recieved audio message, processing via engine model...")    
-        audio_event = json.loads(msg.payload)
-        print(audio_event['timestamp'])
-        
-        # convert to string representation of audio to binary for processing
-        audio_clip = self.string_to_audio(audio_event['audioClip'])
-        
-        image = self.combined_pipeline(audio_clip)
-        
-        image = tf.expand_dims(image, 0) 
-        
-        image_list = image.numpy().tolist()
-        
-        # Run the model via tensorflow serve
-        data = json.dumps({"signature_name": "serving_default", "inputs": image_list})
-        url = self.config['MODEL_SERVER']
-        headers = {"content-type": "application/json"}
-        json_response = requests.post(url, data=data, headers=headers)
-        model_result   = json.loads(json_response.text)
-        predictions = model_result['outputs'][0]
-                
-        # Predict class and probability using the prediction function
-        predicted_class, predicted_probability = self.predict_class(predictions)
+        print("Recieved audio message, processing via engine model...") 
+        try:   
+            audio_event = json.loads(msg.payload)
+            print(audio_event['timestamp'])
+            
+            # convert to string representation of audio to binary for processing
+            audio_clip = self.string_to_audio(audio_event['audioClip'])
+            
+            image = self.combined_pipeline(audio_clip)
+            
+            image = tf.expand_dims(image, 0) 
+            
+            image_list = image.numpy().tolist()
+            
+            # Run the model via tensorflow serve
+            data = json.dumps({"signature_name": "serving_default", "inputs": image_list})
+            url = self.config['MODEL_SERVER']
+            headers = {"content-type": "application/json"}
+            json_response = requests.post(url, data=data, headers=headers)
+            model_result   = json.loads(json_response.text)
+            predictions = model_result['outputs'][0]
+                    
+            # Predict class and probability using the prediction function
+            predicted_class, predicted_probability = self.predict_class(predictions)
 
-        print(f'Predicted class : {predicted_class}')
-        print(f'Predicted probability : {predicted_probability}')
-        
-        # populate the database with the result
-        self.populate_echo_store_results(
-            audio_event,
-            predicted_class,
-            predicted_probability)
-
+            print(f'Predicted class : {predicted_class}')
+            print(f'Predicted probability : {predicted_probability}')
+            
+            # populate the database with the result
+            self.populate_echo_store_results(
+                audio_event,
+                predicted_class,
+                predicted_probability)
+            
+        except Exception as e:
+            # Catch the exception and print it to the console
+            print(f"An error occurred: {e}", flush=True)
 
     ########################################################################################
     # this function populates the database with the prediction results
