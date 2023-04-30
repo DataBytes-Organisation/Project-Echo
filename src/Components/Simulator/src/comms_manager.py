@@ -130,7 +130,7 @@ class CommsManager():
         MQTT_MSG = json.dumps(vocalisation_event)
      
         # publish the audio message on the queue
-        (rc, mid) = self.mqtt_client.publish(os.environ['MQTT_PUBLISH_URL'], MQTT_MSG, qos=1)
+        (rc, mid) = self.mqtt_client.publish(os.environ['MQTT_PUBLISH_URL'], MQTT_MSG)
         
         logger1.info(f'Vocal message sent {animal.getUUID()} time: {timestamp} species: {species_name}')
         print(f'Vocal message sent {animal.getUUID()} time: {timestamp} species: {species_name}', flush=True)
