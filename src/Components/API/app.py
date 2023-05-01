@@ -34,9 +34,11 @@ try:
 except:
     print(f"Could not API echo_config : {file_path}") 
 
-connection_string=f"mongodb://{echo_config['DB_USERNAME']}:{echo_config['DB_PASSWORD']}@{echo_config['DB_HOSTNAME']}"
+connection_string=f"mongodb://{echo_config['DB_USERNAME']}:{echo_config['DB_PASSWORD']}@{echo_config['DB_HOSTNAME']}/EchoNet"
 client = pymongo.MongoClient(connection_string)
 db = client['EchoNet']
+
+print(f" database names: {client.list_database_names()}")
 
 @app.get("/", response_description="api-root")
 def show_home():
