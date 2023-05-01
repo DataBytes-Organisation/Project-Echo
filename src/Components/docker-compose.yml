@@ -66,9 +66,9 @@ services:
     container_name: ts-api-cont
     networks:
       - echo-net
-    environment:
-      DB_USERNAME: "username"
-      DB_PASSWORD: "password"
+    ports:
+      - "9000:9000"
+      - "9080:9080"      
     volumes:
       - credentials_volume:/root/.config/gcloud/
     stdin_open: false

@@ -31,7 +31,7 @@ password = os.getenv("DB_PASSWORD")
 
 connection_string=f"mongodb+srv://{id}:{password}@cluster0.gu2idc8.mongodb.net/test"
 client = pymongo.MongoClient(connection_string)
-db = client.mydatabase
+db = client['EchoNet']
 
 @app.get("/", response_description="api-root")
 def show_home():

@@ -37,9 +37,9 @@ class CommsManager():
             file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'echo_credentials.json')
             with open(file_path, 'r') as f:
                 self.credentials = json.load(f)
-            print(f"Echo Engine credentials successfully loaded", flush=True)
+            print(f"Echo Simulator credentials successfully loaded", flush=True)
         except:
-            print(f"Could not engine credentials : {file_path}") 
+            print(f"Could not load Echo Simulator credentials : {file_path}") 
                    
         # Setup database client and connect
         try:
@@ -84,7 +84,7 @@ class CommsManager():
         return species_list
  
     # send a random audio message for the given animal at the predicted lla
-    def mqtt_send_random_audio_msg(self, animal, predicted_lla) -> None:
+    def mqtt_send_random_audio_msg(self, animal, predicted_lla, closest_mic, min_error) -> None:
         
         # get the timestamp for this event
         timestamp = self.clock.get_time()
@@ -94,7 +94,7 @@ class CommsManager():
         animal_true_lla = animal.getLLA()
         
         # microphone LLA TODO
-        microphone_lla  = [0.0,0.0,0.0]
+        microphone_lla  = closest_mic.getLLA()
         
         # randomly sample from available audio blobs from this species
         sample_blob = random.sample(self.audio_blobs[species_name], k=1)[0]
@@ -108,21 +108,14 @@ class CommsManager():
         # For now, send filename across for format information
         audio_file = sample_blob.name.split('/')[1]
          
-        # Define the format string
-        format_string = "%Y-%m-%d %H:%M:%S"
-
-        # Convert the datetime object to a string
-        datetime_string = timestamp.strftime(format_string)
-        
-        # TODO: populate the nearest sensor ID information
         # Create the vocalisation event
         vocalisation_event = {
-            "timestamp": datetime_string,
-            "sensorId": "TBD",
-            "microphoneLLA": microphone_lla,
+            "timestamp": timestamp.isoformat(),
+            "sensorId": closest_mic.getID(),
+            "microphoneLLA": list(microphone_lla),
             "animalEstLLA": list(predicted_lla),
             "animalTrueLLA": list(animal_true_lla),
-            "animalLLAUncertainty": 0.0,
+            "animalLLAUncertainty": min_error,
             "audioClip" : audio_str, 
             "audioFile" : audio_file      
         }    
