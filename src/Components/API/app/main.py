@@ -7,8 +7,8 @@ from pydantic import BaseModel, Field, EmailStr
 from bson import ObjectId
 from typing import Optional, List
 import datetime
-import serializers
-import models
+from app import serializers
+from app import schemas
 import pymongo
 import dotenv
 
@@ -114,7 +114,7 @@ def show_event_from_time(start: str, end: str):
         }       
 
     ]
-    events = serializers.movementListEntity(db["movements"].aggregate(aggregate))
+    events = serializers.movementSpeciesListEntity(db["movements"].aggregate(aggregate))
     return events
 
 @app.get("/microphones", response_description="returns location of all microphones")
@@ -131,3 +131,23 @@ def list_microphones():
     results = list(db["events"].aggregate(aggregate))
     microphones = serializers.microphoneListEntity(results)
     return microphones
+
+@app.post("/event", status_code=status.HTTP_201_CREATED)
+def create_event(event: schemas.EventSchema):
+
+    result = db["events"].insert_one(event.dict())
+    pipeline = [
+            {'$match': {'_id': result.inserted_id}},
+        ]
+    new_post = serializers.eventListEntity(db["events"].aggregate(pipeline))[0]
+    return new_post
+
+@app.post("/movement", status_code=status.HTTP_201_CREATED)
+def create_movement(movement: schemas.MovementSchema):
+
+    result = db["movements"].insert_one(movement.dict())
+    pipeline = [
+            {'$match': {'_id': result.inserted_id}},
+        ]
+    new_post = serializers.movementListEntity(db["movements"].aggregate(pipeline))[0]
+    return new_post

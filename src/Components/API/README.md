@@ -13,6 +13,6 @@ set the variable in app.py client = pymongo.MongoClient("mongodb://localhost:270
 
 open conda shell and cd to the api folder, then run:
 
-python -m uvicorn app:app --reload
+python -m uvicorn app.main:app --reload
 
 Head to localhost:8000/docs to read the documentation for API 
