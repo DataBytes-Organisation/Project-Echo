@@ -10,14 +10,14 @@ import datetime
 from app import serializers
 from app import schemas
 import pymongo
-import dotenv
+import json
 
 app = FastAPI()
 
 # Add the CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:8080"],  # Replace with your own allowed origins
+    allow_origins=["http://localhost:9080"],  # Replace with your own allowed origins
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -25,13 +25,20 @@ app.add_middleware(
 
 router = APIRouter()
 
-dotenv.load_dotenv()
-id = os.getenv("DB_USERNAME")
-password = os.getenv("DB_PASSWORD")
+# Load the project echo credentials into a dictionary
+try:
+    file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'echo_config.json')
+    with open(file_path, 'r') as f:
+        echo_config = json.load(f)
+    print(f"Echo API echo_config successfully loaded", flush=True)
+except:
+    print(f"Could not API echo_config : {file_path}") 
 
-connection_string=f"mongodb+srv://{id}:{password}@cluster0.gu2idc8.mongodb.net/test"
+connection_string=f"mongodb://{echo_config['DB_USERNAME']}:{echo_config['DB_PASSWORD']}@{echo_config['DB_HOSTNAME']}/EchoNet"
 client = pymongo.MongoClient(connection_string)
-db = client.mydatabase
+db = client['EchoNet']
+
+print(f" database names: {client.list_database_names()}")
 
 @app.get("/", response_description="api-root")
 def show_home():

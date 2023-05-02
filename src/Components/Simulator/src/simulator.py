@@ -57,9 +57,9 @@ class Simulator():
                     if animal.random_vocalisation():
                         print("Animal Vocal....", flush=True)
                         if ast.literal_eval(os.environ['RENDER_STATES']):  self.render_state.render_animal_vocalisation(animal)
-                        predicted_lla = self.config.SENSOR_MANAGER.vocalisation(animal)
-                        
-                        self.config.comms_manager.mqtt_send_random_audio_msg(animal, predicted_lla)
+                        predicted_lla, closest_mic, min_error = self.config.SENSOR_MANAGER.vocalisation(animal)
+           
+                        self.config.comms_manager.mqtt_send_random_audio_msg(animal, predicted_lla, closest_mic, min_error)
                         print("Animal Vocal....Complete.", flush=True)
 
                     animal.describe()
@@ -75,6 +75,8 @@ class Simulator():
             except asyncio.CancelledError:
                 logger1.critical('Asyncio error formed')
                 break
+            except Exception as e:
+                print(f"An error occurred: {e}", flush=True)
             finally:
                 pass
                 
