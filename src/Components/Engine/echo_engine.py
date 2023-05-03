@@ -125,7 +125,7 @@ class EchoEngine():
         # Calculate the predicted probability for the selected class
         predicted_probability = 100.0 * tf.nn.softmax(predictions)[predicted_index].numpy()
         # Round the probability to 2 decimal places
-        predicted_probability = str(round(predicted_probability, 2))
+        predicted_probability = round(predicted_probability, 2)
         return predicted_class, predicted_probability
 
 
