@@ -8,7 +8,8 @@ def eventEntity(event) -> dict:
         "animalEstLLA": event["animalEstLLA"],
         "animalTrueLLA": event["animalTrueLLA"],
         "animalLLAUncertainty": event["animalLLAUncertainty"],
-        "confidence": event["confidence"] 
+        "confidence": event["confidence"],
+        "file_name": event["file_name"]
     }
 
 def eventSpeciesEntity(event) -> dict:
@@ -29,6 +30,15 @@ def eventSpeciesEntity(event) -> dict:
     }
 
 def movementEntity(event) -> dict:
+    return {
+        "_id": str(event["_id"]),
+        "timestamp": event["timestamp"],
+        "species": event["species"],
+        "animalId": event["animalId"],
+        "animalTrueLLA": event["animalTrueLLA"]
+    }
+
+def movementSpeciesEntity(event) -> dict:
     return {
         "_id": str(event["_id"]),
         "commonName": event["commonName"],
@@ -73,6 +83,9 @@ def audioListEntity(audios) -> list:
 
 def movementListEntity(events) -> list:
     return [movementEntity(event) for event in events]
+
+def movementSpeciesListEntity(events) -> list:
+    return [movementSpeciesEntity(event) for event in events]
 
 def microphoneListEntity(microphones) -> list:
     return [microphoneEntity(microphone) for microphone in microphones]
