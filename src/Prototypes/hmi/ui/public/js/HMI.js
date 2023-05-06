@@ -14,6 +14,8 @@ var statuses = [
   "invasive",
 ];
 
+
+
 function matchStatus(status){
   if (status == "least concern"){
     return "normal";

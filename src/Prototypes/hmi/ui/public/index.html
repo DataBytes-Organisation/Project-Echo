@@ -55,6 +55,7 @@
     <title>Echo | Welcome</title>
   </head>
   <body>
+    
     <div class="screen" id="screen" onclick="fadeAnim(); openSIMULATOR()">  
 			<div class="screen-image"></div>  
 			<div class="screen-overlay"></div>  
@@ -68,6 +69,13 @@
 		</div>
 		
 		<div id="blur"></div>
+    <div id="content"></div>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+      document.getElementById('content').innerHTML =
+        marked.parse('# Marked in the browser\n\nRendered by **marked**.');
+    </script>
+
 
     <div class="container" style="margin-left: 0px !important">
       <!-- Row 1 with nav spanning the entire width and a fixed top-->
@@ -82,6 +90,7 @@
       
       <div class="row main bg-black" style="padding: 0px !important;">
         <div class="col-md-12 col-main" style="padding: 0px !important;"> 
+          
           <div id="basemap"></div>
 
           <div id="menu" class="menu">
@@ -289,7 +298,9 @@
 
     </div>
 
+
 <script>
+
   var hamburgerStatus = false;
   var currentTab = document.getElementById('filter-menu'); 
 
@@ -305,6 +316,10 @@
       closeMenu();
     }
   }
+  
+
+
+
 
   function closeMenu() {
     document.getElementById("menu").style.width = "0%";
