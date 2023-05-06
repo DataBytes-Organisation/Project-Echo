@@ -1432,6 +1432,744 @@
                 ""
             ],
             "img": ""
+        },
+        {
+            "species": "Acanthagenys rufogularis",
+            "common": "Spiny-cheeked Honeyeater",
+            "summary": "Acanthagenys rufogularis is a small bird species, commonly known as Spiny-cheeked Honeyeater.",
+            "description": [
+                "Spiny-cheeked Honeyeater is known for its distinctive spiny cheek feathers and rusty-red throat patch.",
+                "Acanthagenys rufogularis inhabits the dry montane forests, scrublands, and even agricultural areas, where it feeds on nectar, insects, and small fruits.",
+                "The males display unique plumage with black and white stripes on the head, a bluish gray back, and a rufous throat and underparts, while the females have a more uniform grayish-brown coloration.",
+                "Acanthagenys rufogularis is not considered endangered, although its population is threatened by deforestation, habitat fragmentation, and pesticide use in agricultural areas."
+            ],
+            "img": ""
+        },
+        
+        
+        
+        {
+            "species": "Acanthiza apicalis",
+            "common": "Inland thornbill",
+            "summary": "Acanthiza apicalis is a small bird species, commonly known as Inland Thornbill.",
+            "description": [
+                "The Inland thornbill is named for its preference for arid inland habitats of Australia.",
+                "They have a distinctive high-pitched call that can be heard from a long distance.",
+                "These small birds are skilled at hopping along branches and twigs in search of food.",
+                "The Inland thornbill is threatened by habitat loss due to land clearing for agriculture.",
+                "They are monogamous and form lasting pairs, with both partners involved in nest building and caring for young."
+            ],
+            "img": ""
+        },
+        
+        {
+            "species": "Acanthiza chrysorrhoa",
+            "common": "Yellow-rumped thornbill",
+            "summary": "Acanthiza chrysorrhoa is a small bird species, commonly known as Yellow-rumped thornbill.",
+            "description": [
+                "This bird is named for the bright yellow patch of feathers on its rump.",
+                "They can survive in a range of habitats, from forests to semi-arid scrublands.",
+                "Yellow-rumped thornbills are known for their energetic, acrobatic movements as they forage for insects.",
+                "They have been observed making use of tools, such as using sticks to pry open bark to expose insects.",
+                "This thornbill has a clutch size of only 2 eggs, and they often lay multiple clutches per year."
+            ],
+            "img": ""
+        },
+        
+        {
+            "species": "Acanthiza lineata",
+            "common": "Striated thornbill",
+            "summary": "Acanthiza lineata is a small bird species, commonly known as Striated thornbill.",
+            "description": [
+                "The Striated thornbill is named for the distinctive markings on its wings and back.",
+                "They are found throughout most of southern Australia, from rainforests to arid scrublands.",
+                "These birds are highly territorial and aggressive towards other bird species.",
+                "Young Striated thornbills remain in the nest for up to 3 weeks after hatching, and are fed by both parents.",
+                "They have a varied diet that includes insects, nectar, and fruit."
+            ],
+            "img": ""
+        },
+        
+        {
+            "species": "Acanthiza pusilla",
+            "common": "Brown thornbill",
+            "summary": "Acanthiza pusilla is a small bird species, commonly known as Brown thornbill.",
+            "description": [
+                "The Brown thornbill is named for its overall brownish-grey plumage.",
+                "They are highly vocal, with a range of calls used for communication within a group.",
+                "These birds are able to hover in mid-air while foraging for insects.",
+                "Brown thornbills build dome-shaped nests made of grass, bark and spiderwebs, often hidden in dense vegetation.",
+                "They are widespread throughout Australia, from Tasmania to the Gulf of Carpentaria."
+            ],
+            "img": ""
+        },
+        
+        {
+            "species": "Acanthiza nana",
+            "common": "Yellow thornbill",
+            "summary": "Acanthiza nana is a small bird species, commonly known as Yellow thornbill",
+            "description": [
+                "This thornbill is named for its bright yellow plumage on the head and underparts.",
+                "They are the smallest thornbill species, weighing only around 6 grams.",
+                "Yellow thornbills are socially monogamous, but males may mate with multiple females.",
+                "These birds are able to survive in a range of habitats, including eucalypt forests and mangroves.",
+                "They have been observed using feathers to line their nests, which are constructed in tree forks or other hidden locations."
+            ],
+            "img": ""
+        },
+        
+        {
+            "species": "Acanthiza reguloides",
+            "common": "Buff-rumped thornbill",
+            "summary": "Acanthiza reguloides is a small bird species, commonly known as Buff-rumped thornbill",
+            "description": [
+                "The buff-rumped thornbill is a small bird native to Australia.",
+                "They are found in woodland habitats across most of eastern Australia.",
+                "These birds are known for their distinctive black and white streaked head and back, and buff-colored rump.",
+                "Buff-rumped thornbills feed primarily on insects and spiders, which they glean from tree bark and foliage.",
+                "They are known to build intricate dome-shaped nests made of grass, bark, and spider webs."
+            ],
+            "img": ""
+        },
+        
+        {
+            "species": "Acanthiza uropygialis",
+            "common": "Chestnut-rumped thornbill",
+            "summary": "Acanthiza uropygialis is a small bird species, commonly known as Chestnut-rumped thornbill",
+            "description": [
+                "The chestnut-rumped thornbill is a small bird found in southeastern Australia.",
+                "They inhabit a variety of forested habitats including eucalyptus forests and woodlands.",
+                "These birds are named for their chestnut-colored rump, and are olive-green and grey in color overall.",
+                "Chestnut-rumped thornbills feed on insects and spiders, which they obtain by gleaning from tree bark and foliage.",
+                "They are known to breed opportunistically, with some pairs producing up to three broods per year."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Acanthorhynchus tenuirostris",
+            "common": "Eastern spinebill",
+            "summary": "Acanthorhynchus tenuirostris is a small bird species, commonly known as Eastern spinebill",
+            "description": [
+                "The eastern spinebill is a small bird found in southeastern Australia, primarily in woodland habitats.",
+                "They are known for their distinctive long, slender beaks, which are adapted for feeding on nectar from flowers.",
+                "Eastern spinebills are also known to eat insects and spiders.",
+                "They are named for the prominent spine-like feathers on their throat, which are used in territorial displays.",
+                "These birds are known to breed in late winter and early spring, when they construct small cup-shaped nests made of grass and other materials."
+            ],
+            "img": ""
+        },
+        
+        {
+            "species": "Accipiter cirrocephalus",
+            "common": "Collared sparrowhawk",
+            "summary": "Accipiter cirrocephalus, or Collared sparrowhawk is a bird of prey found throughout much of Australia and some parts of southeast Asia",
+            "description": [
+                "They inhabit a variety of forested habitats, and are known for their adaptability to human-modified landscapes.",
+                "Collared sparrowhawks mainly feed on small birds and mammals, which they capture by surprise attack.",
+                "They are named for the distinctive collar of feathers on their neck.",
+                "These hawks are known to breed in the spring and summer, with females laying up to four eggs per clutch."
+            ],
+            "img": ""
+        },
+        
+        {
+            "species": "Accipiter fasciatus",
+            "common": "Brown Goshawk",
+            "summary": "Accipiter fasciatus, or brown goshawk is a medium-sized bird of prey found in Australia, New Guinea, and nearby islands.",
+            "description": [ 
+            "They inhabit a variety of forested habitats, including eucalyptus forests, and are known for their agile flight and swift attacks on prey.",
+            "Brown goshawks feed mainly on birds, but they will also eat mammals and reptiles.",
+            "They are named for their brown feathers, and for the distinctive white and black bands on their tail feathers.",
+            "These birds are known to breed in the spring and summer, and females lay up to four eggs per clutch."
+        ],
+        "img": ""
+        },
+        
+        {
+            "species": "Accipiter cooperi",
+            "common": "Cooper's hawk",
+            "summary": "Accipiter cooperi or Cooper's hawk is a bird of prey is found in North and Central America",
+            "description": [
+                "They are known for their agile flight and strong talons.",
+                "Cooper's hawks primarily hunt small birds and rodents.",
+                "They are able to navigate through forests with ease due to their long tail feathers.",
+                "Females are larger than males and can weigh up to 1kg."
+            ],
+            "img": ""
+        },
+        
+        {
+            "species": "Acrocephalus australis",
+            "common": "Australian reed warbler",
+            "summary": "Acrocephalus australis or Australian reed warbler is a small bird can be found in Australia, Papua New Guinea, and Indonesia.",
+            "description": [
+                "They mainly inhabit wetlands and reed beds.",
+                "Australian reed warblers have a distinctive chirping call.",
+                "They are an important food source for predators such as snakes and raptors.",
+                "The male and female of this species look similar in appearance."
+            ],
+            "img": ""
+        },
+        
+        {
+            "species": "Aegotheles cristatus",
+            "common": "Australian owlet-nightjar",
+            "summary": "Aegotheles cristatus or Australian owlet-nightjar is a nocturnal bird, endemic to Australia",
+            "description": [
+                "They are known for their wide mouths and large eyes.",
+                "Australian owlet-nightjars feed on insects and spiders.",
+                "They are able to camouflage themselves on trees during the day.",
+                "Males have a distinct courtship display where they puff up their throat and make a booming call."
+            ],
+            "img": ""
+        },
+        
+        {
+            "species": "Aidemosyne modesta",
+            "common": "Plum-headed finch",
+            "summary": "Aidemosyne modesta or Plum-headed finch is a small bird native to Australia and can be found in grasslands and savannas",
+            "description": [
+                "They are named after the male's distinctive plum-colored head.",
+                "Plum-headed finches feed on seeds and insects.",
+                "They are often kept as pets due to their colorful appearance.",
+                "They have a short lifespan of only 4-5 years in the wild."
+            ],
+            "img": ""
+        },
+        
+        {
+            "species": "Alisterus scapularis",
+            "common": "Australian king parrot",
+            "summary": "Alisterus scapularis or Australian king parrot is found in eastern Australia and parts of Indonesia.",
+            "description": [
+                "The male has a bright red head and body while the female is mostly green.",
+                "Australian king parrots feed on seeds, fruit, and insects.",
+                "They are known for their loud, screeching call.",
+                "They form long-term pair bonds and mate for life."
+            ],
+            "img": ""
+        },
+        
+        {
+            "species": "Alauda Arvensis",
+            "common": "Eurasian skylark",
+            "summary": "Alauda Arvensis or Eurasian skylark is a small a small passerine bird found across Europe, Asia, and northern Africa.",
+            "description": [
+                "These birds are known for their beautiful songs and can often be heard singing while flying high in the sky.",
+                "Eurasian Skylarks have brownish upperparts, a streaked breast, and a white belly.",
+                "They are ground-nesting birds and lay 2-5 eggs in a simple scrape in the ground.",
+                "Eurasian Skylarks feed on insects, seeds, and other small invertebrates."
+            ],
+            "img": ""
+        },
+        
+        {
+            "species": "Amytornis purnelli",
+            "common": "Dusky grasswren",
+            "summary": "Amytornis purnelli or Dusky grasswren  is a small bird found in the arid regions of Australia.",
+            "description": [
+                "This bird has a dark brown plumage and a distinctive white eyebrow.",
+                "Dusky Grasswrens are non-migratory and are adapted to living in harsh desert environments.",
+                "They typically nest in low bushes and feed on insects and seeds.",
+                "Due to habitat loss and degradation, the Dusky Grasswren is listed as Vulnerable on the IUCN Red List."
+            ],
+            "img": ""
+        },
+        
+        {
+            "species": "Anas superciliosa",
+            "common": "Pacific black duck",
+            "summary": "Anas superciliosa or Pacific black duck is a medium-sized dabbling duck found throughout Australia, New Zealand, and many Pacific islands.",
+            "description": [
+                "They have a glossy black head, brown body, and a striking blue speculum on their wings.",
+                "Pacific Black Ducks are adaptable and can be found in a wide range of freshwater habitats.",
+                "They are omnivorous and feed on a variety of plant and animal matter.",
+                "Pacific Black Ducks are important game birds and are also hunted for their meat and feathers."
+            ],
+            "img": ""
+        },
+        
+        {
+            "species": "Anhinga novaehollandiae",
+            "common": "Australasian darter",
+            "summary": "Anhinga novaehollandiae or Australasian darter is a large waterbird found in Australia, New Guinea, and some Pacific islands.",
+            "description": [
+                "They have long, snake-like necks and streamlined bodies adapted for swimming and diving underwater.",
+                "Australasian Darters are skilled hunters and feed on fish, crustaceans, and other aquatic animals.",
+                "They have a distinctive courtship display where the male stretches out his neck and wings and emits a loud croaking sound.",
+                "These birds are also known as `snakebirds` due to their long, slim necks and sinuous movements."
+            ],
+            "img": ""
+        },
+        
+        {
+            "species": "Anseranas semipalmata",
+            "common": "Magpie goose",
+            "summary": "Anseranas semipalmata or Magpie goose is a large waterbird found in northern Australia and southern New Guinea.",
+            "description": [
+                "They have distinctive black and white plumage with a large knob on their bill.",
+                "Magpie Geese are nomadic and move around in large flocks to find food and water.",
+                "They have a unique feeding strategy where they use their serrated bills to filter algae and plankton from the water.",
+                "Magpie Geese are culturally significant to many Indigenous communities in Australia and are an important source of food and feathers."
+            ],
+            "img": ""
+        },
+        
+        {
+            "species": "Anthochaera carunculata",
+            "common": "Red wattlebird",
+            "summary": "Anthochaera carunculata or Red wattlebird a large honeyeater native to southeastern Australia.",
+            "description": [
+                "They are known for their prominent red caruncle (a fleshy ornament) on their throat.",
+                "Red wattlebirds use their long bills to extract nectar and insects from flowers.",
+                "They are noisy and territorial birds, defending their favorite feeding spots from others.",
+                "Their population has declined due to loss of habitat and competition with introduced bird species."
+            ],
+            "img": ""
+        },
+        
+        {
+            "species": "Anthochaera chrysoptera",
+            "common": "Little wattlebird",
+            "summary": "Anthochaera chrysoptera or Little wattlebird is a smaller honeyeater found in southern Australia.",
+            "description": [
+                "They have pale yellow wattles (fleshy ornaments) on their cheeks and neck.",
+                "Little wattlebirds feed mainly on nectar, but also eat insects and fruit.",
+                "They can mimic the calls of other birds and even mimic human speech.",
+                "Little wattlebirds are sometimes seen hovering in front of flowers while feeding, similar to hummingbirds."
+            ],
+            "img": ""
+        },
+        
+        {
+            "species": "Anthochaera phrygia",
+            "common": "Regent honeyeater",
+            "summary": "Anthochaera phrygia or Regent honeyeater is a critically endangered bird found in southeastern Australia.",
+            "description": [
+                "They have a distinctive black and yellow plumage with a bright yellow patch on their back.",
+                "Regent honeyeaters mainly feed on nectar from eucalyptus flowers, but also eat insects and fruit.",
+                "The loss of habitat due to deforestation and fragmentation has caused a rapid decline in their population.",
+                "Conservation efforts include habitat restoration and captive breeding programs."
+            ],
+            "img": ""
+        },
+        
+        {
+            "species": "Anthus novaeseelandiae",
+            "common": "Australian pipit",
+            "summary": "Anthus novaeseelandiae or Australian pipit is a small, brown-colored bird found throughout most of Australia.",
+            "description": [
+                "They have a long, slender bill for probing invertebrates in the soil.",
+                "Pipits are often seen perched on fence posts or flying low over open grassland.",
+                "They have a distinctive territorial song, which they sing from a high perch.",
+                "Australian pipits are not considered threatened, but their populations may be affected by habitat loss."
+            ],
+            "img": ""
+        },
+        
+        {
+            "species": "Antigone antigone",
+            "common": "Sarus crane",
+            "summary": "Antigone antigone or Sarus crane is a large, graceful bird found in parts of Asia and Australia.",
+            "description": [
+                "They have a distinctive red head and neck, with blue-gray wings and body.",
+                "Sarus cranes are highly territorial and form strong bonds with their mates.",
+                "They feed mainly on plant material and insects found in wetland habitats.",
+                "The loss of wetlands due to human activities is a major threat to Sarus crane populations."
+            ],
+            "img": ""
+        },
+        
+        {
+            "species": "Antigone rubicunda",
+            "common": "Brolga",
+            "summary": "Antigone rubicunda or Brolga is a large species of crane native to Australia and New Guinea.",
+            "description": [
+                "They are known for their elaborate dances, which are often performed in pairs or groups.",
+                "Brolgas can live up to 30 years in the wild.",
+                "They are omnivorous, feeding on a variety of animals and plants.",
+                "Brolgas are one of the official symbols of the state of Queensland."
+            ],
+            "img": ""
+        },
+        
+        {
+            "species": "Aphelocephala leucopsis",
+            "common": "Southern whiteface",
+            "summary": "Aphelocephala leucopsis or Southern whiteface is a small bird native to Australia.",
+            "description": [
+                "They are known for their distinctive white face and black throat.",
+                "These birds are found in a variety of habitats, from forests to open country.",
+                "Southern whitefaces are social birds that often form flocks.",
+                "They mainly feed on insects and other small invertebrates."
+            ],
+            "img": ""
+        },
+        
+        {
+            "species": "Aprosmictus erythropterus",
+            "common": "Red-winged parrot",
+            "summary": "Aprosmictus erythropterus or Red-winged parrot is a brightly colored parrot found in Australia.",
+            "description": [
+                "They are social birds that often form large flocks in the wild.",
+                "These parrots communicate with each other through a variety of calls and songs.",
+                "Red-winged parrots are known for their intelligence and problem-solving abilities.",
+                "They have a varied diet that includes seeds, fruit, and insects."
+            ],
+            "img": ""
+        },
+        
+        {
+            "species": "Aquila audax",
+            "common": "Wedge-tailed eagle",
+            "summary": "Aquila audax or Wedge-tailed eagle is a large bird of prey found in Australia.",
+            "description": [
+                "They are known for their impressive wingspan and powerful talons.",
+                "Wedge-tailed eagles are apex predators, feeding on a variety of prey including mammals, birds, and reptiles.",
+                "These eagles are often seen soaring high in the sky.",
+                "They are an important cultural symbol for many Indigenous Australian groups."
+            ],
+            "img": ""
+        },
+        
+        {
+            "species": "Artamus cinereus",
+            "common": "Black-faced woodswallow",
+            "summary": "Artamus cinereus or Black-faced woodswallow is a small bird found in Australia and New Guinea.",
+            "description": [
+                "They are known for their distinctive black face and characteristic call.",
+                "These birds are social and often form flocks, even during breeding season.",
+                "Black-faced woodswallows feed mainly on insects.",
+                "They are often found perched on power lines or other man-made structures."
+            ],
+            "img": ""
+        },
+        
+        
+        
+        {
+            "species": "Artamus cyanopterus",
+            "common": "Dusky woodswallow",
+            "summary": "Artamus cyanopterus or Dusky woodswallow is a small Australian bird known for its distinctive black and silver plumage.",
+            "description": [
+                "They have a unique foraging strategy where they catch insects in mid-air with their beaks while flying.",
+                "These birds are known to be highly social and often form large flocks during the breeding season.",
+                "The Dusky woodswallow is monogamous and pairs are known to mate for life.",
+                "They are often found in open areas like fields, savannas, and grasslands."
+            ],
+            "img": ""
+        },
+        
+        {
+            "species": "Artamus minor",
+            "common": "Little woodswallow",
+            "summary": "Artamus minor or Little woodswallow is a small birds native to Australia.",
+            "description": [
+                "They are known for their striking blue-grey plumage, which makes them easy to spot.",
+                "These birds are highly social and feed in large flocks, often flying in complex formations.",
+                "Little woodswallows build cup-shaped nests in trees and shrubs, using grasses, bark, and feathers.",
+                "They are also known for their beautiful and melodic songs, which they use to attract mates during the breeding season."
+            ],
+            "img": ""
+        },
+        
+        {
+            "species": "Artamus superciliosus",
+            "common": "White-browed woodswallow",
+            "summary": "Artamus superciliosus or White-browed woodswallow is a species of bird native to Australia and New Guinea.",
+            "description": [
+                "They are known for their distinctive black and white plumage, with a white eyebrow stripe above the eye.",
+                "These birds are highly adaptable and can be found in a variety of habitats, including woodlands, savannas, and semi-arid areas.",
+                "White-browed woodswallows are social birds and often feed in flocks of several hundred individuals.",
+                "They are known to be long-distance migrators and can travel hundreds of kilometers during the non-breeding season."
+            ],
+            "img": ""
+        },
+        
+        {
+            "species": "Atrapsalta encaustica",
+            "common": "Black Squeaker",
+            "summary": "Atrapsalta encaustica or Black Squeaker is a species of cicada native to Australia.",
+            "description": [
+                "They are known for their distinctive vocalizations, which can reach up to 120 decibels.",
+                "Black Squeakers are often found in woodlands and forests, where they feed on sap and plant fluids.",
+                "They spend most of their life underground as nymphs, before emerging as adults during the warmer months.",
+                "These cicadas play an important ecological role by providing a food source for many bird and mammal species."
+            ],
+            "img": ""
+        },
+        
+        {
+            "species": "Auscala spinosa",
+            "common": "Creaking Branch Cicada",
+            "summary": "Auscala spinosa or Creaking Branch Cicada is a species of cicada native to Australia.",
+            "description": [
+                "They are known for their creaking, rattling calls, which sound like two pieces of hard wood being rubbed together.",
+                "These cicadas are often found in forests and woodlands, where they feed on sap and plant fluids.",
+                "Creaking Branch Cicadas spend most of their life underground as nymphs, before emerging as adults during the warmer months.",
+                "These cicadas are important for ecosystem health, as they help to recycle nutrients and provide food for many bird and mammal species."
+            ],
+            "img": ""
+        },
+        
+        {
+            "species": "Austrochaperina pluvialis",
+            "common": "Whitebrowed whistle frog",
+            "summary": "Austrochaperina pluvialis or Whitebrowed whistle frog is a small frog species found in the rainforests of Australia and Papua New Guinea.",
+            "description": [
+                "They are named after their distinct white eyebrow-like markings above their eyes.",
+                "These frogs are known for their loud and high-pitched whistling calls that they use to communicate with other frogs.",
+                "Unlike most other frogs, this species lays their eggs on land instead of in water.",
+                "The whitebrowed whistle frog is currently considered a vulnerable species due to habitat loss and fragmentation."
+            ],
+            "img": ""
+        },
+        
+        {
+            "species": "Austronomus australis",
+            "common": "White-striped free-tailed bat",
+            "summary": "Austronomus australis or White-striped free-tailed bat is a small insect-eating bat species found in Australia and New Guinea.",
+            "description": [
+                "They are named after the white stripes on their wings and tail.",
+                "These bats use a unique echolocation system to navigate and locate prey in complete darkness.",
+                "They are primarily nocturnal and roost in small groups in caves or tree hollows during the day.",
+                "The white-striped free-tailed bat is considered a widespread and common species but may face threats from habitat loss and human disturbances."
+            ],
+            "img": ""
+        },
+        
+        {
+            "species": "Aythya australis",
+            "common": "White-eyed duck",
+            "summary": "Aythya australis, also known as White-eyed duck or hardhead, is a diving duck species found in freshwater habitats throughout Australia and Southeast Asia.",
+            "description": [
+                "They are named after their distinct white eyes which stand out against their dark head and body.",
+                "These ducks are adapted for diving and can swim underwater for up to 30 seconds to forage for food.",
+                "Male white-eyed ducks have a distinct whistle-like call that they use to attract females during breeding season.",
+                "This species is considered a vulnerable species due to habitat loss, hunting, and introduction of non-native predators."
+            ],
+            "img": ""
+        },
+        
+        {
+            "species": "Barnardius zonarius",
+            "common": "Australian ringneck",
+            "summary": "Barnardius zonarius or Australian ringneck is a parrot species found in a wide range of habitats throughout Australia.",
+            "description": [
+                "They are named after the distinct ring-like markings on their necks.",
+                "These birds are known for their loud, screeching calls that can be heard from a distance.",
+                "Australian ringnecks have a varied diet that includes seeds, nuts, fruits, flowers, and insects.",
+                "In captivity, Australian ringnecks can be trained to mimic human speech and perform tricks."
+            ],
+            "img": ""
+        },
+        
+        {
+            "species": "Biziura lobata",
+            "common": "Musk duck",
+            "summary": "Biziura lobata or Musk duck is a bird species found in freshwater lakes and swamps throughout southeastern Australia.",
+            "description": [
+                "They are named after the musky odor produced by the males during breeding season.",
+                "Musk ducks are known for their distinctive courtship displays which include head movements and bubble blowing.",
+                "This species is one of the few birds that have been observed using tools, such as sticks and feathers, to attract females during courtship.",
+                "The musk duck is currently considered a least concern species, but may face threats from habitat loss and human disturbances."
+            ],
+            "img": ""
+        },
+        
+        {
+            "species": "Burhinus grallarius",
+            "common": "Bush stone-curlew",
+            "summary": "Burhinus grallarius or Bush stone-curlew is a ground-dwelling bird species endemic to Australia.",
+            "description": [
+                "It has a distinctive and eerie night-time call that has been described as sounding like a woman screaming.",
+                "Bush stone-curlews will freeze in place and use their plumage to blend into their surroundings as a defense mechanism against predators.",
+                "They primarily eat insects, and have been known to consume their own feathers to help digest them.",
+                "The Bush stone-curlew is listed as near threatened due to habitat loss and predation from introduced species."
+            ],
+            "img": ""
+        },
+        
+        {
+            "species": "Cacatua galerita",
+            "common": "Sulphur-crested cockatoo",
+            "summary": "Cacatua galerita or Sulphur-crested cockatoo is one of the most common and recognizable bird species in Australia.",
+            "description": [
+                "They are highly intelligent and sociable, often forming large flocks in urban areas.",
+                "Their distinctive crest can be raised or lowered to communicate mood or intent.",
+                "Sulphur-crested cockatoos have a powerful beak that they use to crack open seeds and nuts.",
+                "They are also known for their ability to imitate human speech and sounds."
+            ],
+            "img": ""
+        },
+        
+        {
+            "species": "Cacatua sanguinea",
+            "common": "Little corella",
+            "summary": "Cacatua sanguinea or Little corella is a small white cockatoo species found primarily in arid regions of Australia.",
+            "description": [
+                "They are highly social and noisy, often gathering in large flocks to feed and roost.",
+                "Little corellas are relatively common and widespread, but are sometimes considered pests due to their habit of damaging crops and trees.",
+                "They primarily eat seeds and nuts, and have been known to raid agricultural crops such as wheat and maize.",
+                "The Little corella is sometimes kept as a pet, but they require a lot of attention and interaction to stay healthy and happy."
+            ],
+            "img": ""
+        },
+        
+        {
+            "species": "Cacomantis flabelliformis",
+            "common": "Fan-tailed cuckoo",
+            "summary": "Cacomantis flabelliformis or Fan-tailed cuckoo is a small and elusive bird species found in Australia and parts of Southeast Asia.",
+            "description": [
+                "They are named for their distinctive fan-shaped tail, which they use to balance and move through dense forest foliage.",
+                "Fan-tailed cuckoos are obligate brood parasites, meaning they lay their eggs in the nests of other bird species.",
+                "They primarily feed on insects and insect larvae, which they catch while in flight or by picking them off leaves and branches.",
+                "The Fan-tailed cuckoo has been declining in some parts of its range due to habitat loss and fragmentation."
+            ],
+            "img": ""
+        },
+        
+        {
+            "species": "Cacomantis variolosus",
+            "common": "Brush cuckoo",
+            "summary": "Cacomantis variolosus or Brush cuckoo is a small and secretive bird species found in Australia and parts of Southeast Asia.",
+            "description": [
+                "They are named for their brown and streaked plumage, which allows them to blend into forest understory habitats.",
+                "Despite being a cuckoo species, Brush cuckoos do not lay their eggs in the nests of other bird species.",
+                "Instead, they build their own nests in shrubs and brush piles, and lay their eggs there.",
+                "Brush cuckoos feed primarily on insects, and are known for their quick and agile flight patterns."
+            ],
+            "img": ""
+        },
+        
+        {
+            "species": "Caligavis chrysops",
+            "common": "Yellow-faced honeyeater",
+            "summary": "Caligavis chrysops or Yellow-faced honeyeater is a small bird native to eastern and southeastern Australia.",
+            "description": [
+                "They are known for their bright yellow face and distinctive black and white bands on their wings.",
+                "These birds feed on nectar, insects, and fruit.",
+                "They are often found in eucalyptus forests and woodlands.",
+                "Yellow-faced honeyeaters play an important role in pollination and seed dispersal."
+            ],
+            "img": ""
+        },
+        
+        {
+            "species": "Callocephalon fimbriatum",
+            "common": "Gang-gang cockatoo",
+            "summary": "Callocephalon fimbriatum or Gang-gang cockatoo is a small, brightly colored parrot native to southeast Australia.",
+            "description": [
+                "They are easily recognized by the male's distinctive red head and crest.",
+                "These birds feed on seeds, fruits, and insects.",
+                "Gang-gang cockatoos are known for their quiet calls and social nature.",
+                "Due to habitat loss and poaching, the Gang-gang cockatoo is listed as a vulnerable species."
+            ],
+            "img": ""
+        },
+        
+        {
+            "species": "Calyptorhynchus banksii",
+            "common": "Red-tailed black cockatoo",
+            "summary": "Calyptorhynchus banksii or Red-tailed black cockatoo is a large, black parrot native to Australia.",
+            "description": [
+                "They are named for their red tail feathers, which can be seen when they fly.",
+                "These birds feed on the seeds of eucalyptus trees and other plants.",
+                "Red-tailed black cockatoos are known for their loud calls and distinctive crest.",
+                "Due to habitat loss and hunting, the Red-tailed black cockatoo is listed as a vulnerable species."
+            ],
+            "img": ""
+        },
+        
+        {
+            "species": "Calyptorhynchus lathami",
+            "common": "Glossy black cockatoo",
+            "summary": "Calyptorhynchus lathami or Glossy black cockatoo is a small, black parrot native to eastern Australia.",
+            "description": [
+                "They are named for their glossy, black feathers and red tail band.",
+                "These birds feed on the seeds of casuarina trees.",
+                "Glossy black cockatoos are known for their distinctive calls and nesting habits.",
+                "Due to habitat loss and disease, the Glossy black cockatoo is listed as a vulnerable species."
+            ],
+            "img": ""
+        },
+        
+        {
+            "species": "Capra hircus",
+            "common": "Goat",
+            "summary": "Capra hircus, or goat is a are animals that have been used for their milk, meat, and wool for thousands of years.",
+            "description": [
+                "They are known for their beards and horns, which can vary in length and shape.",
+                "Goats are intelligent animals and can learn to recognize their human caregivers.",
+                "They are social animals and enjoy being around other goats.",
+                "Goats are adaptable and can thrive in a variety of environments, including mountains, deserts, and grasslands."
+            ],
+            "img": ""
+        },
+        
+        {
+            "species": "Carduelis carduelis",
+            "common": "European goldfinch",
+            "summary": "Carduelis carduelis or European goldfinch is songbird species known for their sweet and melodious voice.",
+            "description": [
+                "Their brightly colored feathers make them one of the most beautiful birds in Europe.",
+                "They feed on seeds, especially thistle and teasel, and may occasionally eat insects.",
+                "These small birds are well adapted to cold temperatures and can withstand harsh winters.",
+                "European goldfinches are highly social birds and often form large flocks during the non-breeding season."
+            ],
+            "img": ""
+        },
+        
+        {
+            "species": "Carterornis leucotis",
+            "common": "White-eared monarch",
+            "summary": "Carterornis leucotis or White-eared monarch is a small, insect-eating bird species that are found in the tropical rainforests of Asia and Australia.",
+            "description": [
+                "They have a distinctive white ear patch, which gives them their common name.",
+                "These birds are highly territorial and will aggressively defend their nesting sites.",
+                "White-eared monarchs have a unique courtship display, where males perform acrobatic flights and sing complex songs to woo females.",
+                "The female monarchs build a cup-shaped nest out of sticks, moss, spiderwebs, and other materials, and lay 2-3 eggs per clutch."
+            ],
+            "img": ""
+        },
+        
+        {
+            "species": "Centropus phasianinus",
+            "common": "Pheasant coucal",
+            "summary": "Centropus phasianinus or Pheasant coucal is a large, ground-dwelling bird species found in the forests and grasslands of Southeast Asia and Australasia.",
+            "description": [
+                "These birds have a distinctive black head, red eyes, and a long, curved bill.",
+                "Pheasant coucals primarily feed on insects, small mammals, reptiles, and birds, and may occasionally eat fruits and seeds.",
+                "They are highly territorial birds that will defend their territory from other coucals and predators.",
+                "Pheasant coucals have a unique nesting behavior, where the female lays her eggs in the nests of other birds and lets them raise her chicks."
+            ],
+            "img": ""
+        },
+        
+        {
+            "species": "Cervus Unicolour",
+            "common": "Sambar deer",
+            "summary": "Cervus Unicolour or Sambar deer is a large, majestic animal species found in the forests of South and Southeast Asia.",
+            "description": [
+                "These deer have a dark brown coat, large antlers, and a distinctive white rump patch.",
+                "Sambar deer primarily feed on grasses, leaves, fruits, and bark, and may occasionally eat insects, birds, and small mammals.",
+                "They are highly adaptable animals that can survive in a variety of habitats, from tropical rainforests to dry savannas.",
+                "Sambar deer have a unique mating behavior, where males emit loud bellowing calls to attract females during the breeding season."
+            ],
+            "img": ""
+        },
+        
+        {
+            "species": "Ceyx azureus",
+            "common": "Azure kingfisher",
+            "summary": "Ceyx azureus or Azure kingfisher is a small, brightly colored bird species found near freshwater streams and rivers in Australia and New Guinea.",
+            "description": [
+                "They have a distinctive azure-blue plumage, with a white belly and a black bill.",
+                "Azure kingfishers are expert fish hunters, diving into the water to catch small fish and crustaceans.",
+                "They are highly territorial birds that will defend their nesting sites from other kingfishers and predators.",
+                "Azure kingfishers have a unique mating behavior, where the male and female work together to excavate a nest in a riverbank."
+            ],
+            "img": ""
         }
     ]
 }
