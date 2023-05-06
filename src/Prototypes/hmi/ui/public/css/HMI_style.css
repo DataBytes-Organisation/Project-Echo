@@ -69,23 +69,24 @@ h2 {
 }
 
 #FAQ {  
-  height: 100%;
+  height: 85%;
   width: 0%;
   position: fixed;
   z-index: 994;
-  top: 0;
+  bottom: 0;
   right: 0;
   background-color: none;
   color: white;
   overflow-x: hidden;
-  
   padding-top: 60px;
   margin-top: 30px;
   margin-left: 30px;
 }
 
 #FAQ-contents{
-  margin-left: 30px;
+  padding: 0;
+  height: 100%;
+  overflow-wrap: break-word;
 }
 
 #filter-menu {
@@ -126,7 +127,7 @@ h2 {
   /* Style the scrollbar for WebKit browsers */
 
   .hamburger-icon {
-    display: block;
+    display: none;
     width: 30px;
     height: 20px;
     position: relative;
@@ -136,6 +137,7 @@ h2 {
     top: 10px; /* adjust this value to set the distance from the top of the container */
     right: 10px; /* adjust this value to set the distance from the right of the container */
     z-index: 999; /* ensure the icon is on top of other content */
+    transition: 1s all ease-in-out;
   }
   
   .hamburger-icon span {
@@ -182,6 +184,7 @@ h2 {
     max-width: none;
     white-space: nowrap;
     overflow: hidden;
+    overflow-wrap: break-word;
   }
   
   .dropdown-menu .col {
@@ -308,9 +311,39 @@ input[type="checkbox"]{
     margin-top: 30px;
 }
 
+#animal-popup #animal-popup-content{
+  display: none;
+  height: 85vh;
+  position: fixed;
+  bottom: 0;
+  overflow-y:scroll !important;
+}
+
+#animal-popup #animal-popup-content #desc_species {
+  text-align: end;
+  size: 20px;
+  font-style: italic;
+  font-weight: bold;
+}
+
+#animal-popup #animal-popup-content .desc {
+  text-align: start;
+  size: 16px;
+  margin-left: 8px;
+  margin-bottom: 5px;
+}
+
+#animal-popup #animal-popup-content .desc .desc_ul{
+  text-align: start;
+  size: 16px;
+  margin-left: 8px;
+  margin-bottom: 5px;
+  border-bottom: 1px solid white;
+}
+
 
 #animal-popup a , #animal-popup h2{
-    padding: 8px 8px 8px 32px;
+    /* padding: 8px 8px 8px 32px; */
     text-decoration: none;
     font-size: 27px;
     color: white;
@@ -319,7 +352,7 @@ input[type="checkbox"]{
 }
 
 #animal-popup div{
-    padding: 8px 8px 8px 32px;
+    /* padding: 8px 8px 8px 32px; */
     text-decoration: none;
     font-size: 14px;
     color:  white;
@@ -329,7 +362,7 @@ input[type="checkbox"]{
 }
 
 #animal-popup img{
-    padding: 8px 8px 8px 32px;
+    /* padding: 8px 8px 8px 32px; */
     display: block;
     width: 100%;
     height: auto;
@@ -404,6 +437,15 @@ i {
     background-color: none;
   }
 
+  .dropdown-content {
+    display: none;
+  }
+
+  .show + .dropdown-content {
+    display: block;
+    padding: 20px;
+  }
+
   .dropdown-menu {
     display: none;
     position: relative;
@@ -471,6 +513,17 @@ i {
     opacity: 0.5;
   }
 
+  .dropdown-menu.faq-content {
+    width: 100%;
+    height: 40vh;
+    overflow-y: scroll !important;
+    max-height: 40vh !important;
+  }
+  .dropdown-menu.faq-content div + p {
+    overflow-wrap: break-word;
+    display: inline-block;
+  }
+
 
 
   /* Style the checkboxes */
@@ -522,8 +575,9 @@ i {
   }
 
 .show + .dropdown-menu {
-  display: inline-block !important;
-  overflow: hidden !important;
+  display: block !important;
+  overflow: hidden;
+  white-space: normal;
 }
 
 .select-all-btn{

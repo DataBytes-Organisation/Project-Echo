@@ -492,7 +492,11 @@ function createMapClickEvent(hmiState){
     const feature = hmiState.basemap.forEachFeatureAtPixel(evt.pixel, function (feature) {
       return feature;
     });
+    let active_content = $("#animal-popup-content");
+    let default_content = $("#animal-default-content");
     if (feature){
+      active_content.show();
+      default_content.hide();
       let values = feature.getProperties();
       if (values.animalSpecies){
           var result = sample_data.find(({ common }) => common.toUpperCase() === values.animalSpecies.toUpperCase())
@@ -510,6 +514,7 @@ function createMapClickEvent(hmiState){
               p.innerText = content;
               summary.appendChild(p);
             })
+            
           animal_toggled = true;
           const toggled_animal = new CustomEvent('animalToggled',{
             detail: {
@@ -521,6 +526,9 @@ function createMapClickEvent(hmiState){
           }
 
       }
+    } else {
+      active_content.hide();
+      default_content.show();
     }
   });
 }

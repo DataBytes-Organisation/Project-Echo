@@ -17,9 +17,6 @@
     <!-- Bootstrap -->
 		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
 		<script src="https://kit.fontawesome.com/8aa980d912.js" crossorigin="anonymous"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-	  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
-    <script src="./js/bootstrap.bundle.min.js"></script>
 
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
@@ -129,143 +126,139 @@
             </div>
           <div id="FAQ">
             <div id="FAQ-contents">
-              <h3>About Project Echo</h3>
-            </div>
-            <section id="offcanvas" >
-              <div style="align-self:center;">
-                <div class="faq_question" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvas_aboutus" aria-controls="offcanvas_aboutus">What is this project about?</div>
-                <div class="faq_question" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvas_data" aria-controls="offcanvas_data">Where does the data come from?</div>
-                <div class="faq_question" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvas_contactus" aria-controls="offcanvas_contactus">How can I contact the organization?</div>
-                
-                <div class="offcanvas offcanvas-bottom popup_bottom_tab" tabindex="-1" id="offcanvas_aboutus" aria-labelledby="offcanvasBottomLabel">
-                  <div class="offcanvas-header">
-                    <h1 class="offcanvas-title" id="offcanvasBottomLabel">About Project Echo</h1>
-                    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-                  </div>
-                  <div class="offcanvas-body small">
-                    <h2>The Project</h2>
-                    <p>
-                      Project Echo, is a <strong>a bioacoustics classification tool</strong> that use AI/ML solution for understanding the density and classification of noise-producing animals in rainforests. 
-                      Echo’s vision is to help ecologists and environmentalists to survey the environment in a non-destructive and efficient way to track threatened animal species population numbers over time.
-                      This research input will provide conservationists the information they need to make informed conservation decisions to protect our precious native fauna. 
-                    </p>
-                    
-                    <h2>Who we are?</h2>
-                    <p>
-                      We are <strong>DataBytes</strong>, a cutting-edge, data-driven company that focuses on designing and implementing custom, cloud-based data collection and analytics platforms. 
-                      With a team of experienced data scientists and software engineers, we specialize in developing intelligent systems that optimize business processes and automate task management for increased efficiency across various industries. 
-                      From image recognition to language translation, our AI-driven technologies aim to transform the way businesses operate and enhance their capabilities for a brighter, more prosperous future. 
-                    </p>
-                    <p>
-                      Having worked with companies across the country in the retail vertical, financial services, healthcare, e-commerce, and even telecom, we’re well versed in a wide variety of data needs. 
-                      Our goal is to democratize AI and provide affordable, accessible solutions that enable our clients to accelerate their growth and improve their bottom line. 
-                      With a passion for innovation and a commitment to excellence, we are the go-to AI partner for businesses looking to unlock the full potential of their data. 
-                    </p>
-
-                    <p>
-                      We believe that sound analysis can revolutionize the way we monitor animal populations, and we aim to make our solution widely available to conservationists and researchers. 
-                      Project Echo leverages machine learning to understand the density and classifications of animals in a survey area, using our curated sound datasets. 
-                      Our team is making solid and comprehensive progress in the analysis of labeled data and its predictive ability using Artificial Intelligence and Machine Learning.
-                    </p>
-                  </div>
-                </div>
-
-                <div class="offcanvas offcanvas-bottom popup_bottom_tab" tabindex="-1" id="offcanvas_data" aria-labelledby="offcanvasBottomLabel">
-                  <div class="offcanvas-header">
-                    <h1 class="offcanvas-title" id="offcanvasBottomLabel">Data Sourcing</h1>
-                    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-                  </div>
-                  <div class="offcanvas-body small">
-                    <h2>Audio data</h2>
-                    <p>
-                      In the early process of the project, the audio data is collected and extracted through the existing online researches. The data source can be categorized under two areas:
-                    </p>
-
-                    <h3>Research Paper sourced Data</h3>
-                    
-                    <p>
-                      Consistent with the systematic reviews of the literature, many papers are not following open science practices and are protecting their data. 
-                      However one promising public resource of animal audio data emerged from papers produced by Phillips and Towsey (2018) and Teixeira et al (2019); 
-                      Ecosounds (n.d.) is a repository of environmental audio recordings that provides publicly sourced annotations of animal sounds in Australia and other parts of the world. 
-                    </p>
-                    
-                    <h3>Internet Search</h3>
-
-                    <p>
-
-                      An internet search using the Google search engine using various combinations of terms such as ‘animal sound’ ‘database’ ‘repository’ ‘Australia’ ‘data set’ ‘dataset’, yielded useful results. 
-                      A non-exhaustive list of promising sources are provided in the appendix to this report.
-                      <br>
-                      The challenges for these sources is that data mining and scraping will be required to gain access to the audio files. This will be a required skill in Project Echo going forward. 
-
-                    </p>
-
-                    <h2>Image and biographical data</h2>
-                    <p>
-                      The names of the species respective to the available audio data are found in the <strong>Otways from the book: Grant Palmer. Wildlife of the Otways and Shipwreck Coast. Clayton, VIC: CSIRO PUBLISHING, 2019</strong>.
-                    </p>
-                    
-                    <p>
-                      Currently, the species biographical data is generated using Generative AI in order to avoid copyrights issue. The images are generated using Dall-E, and then compare to the real visualization of the real picture to select the most similar and realistic image.
-                      <br>
-                      The summary and description of each species is generated using ChatGPT, which provide a succinct and brief information about the animal and its habitat.
-                    </p>
-                    <p>
-                      As the project is still in development, the biological information of the species can be improved further.
-                    </p>
-                  </div>
-                </div>
-
-                <div class="offcanvas offcanvas-bottom popup_bottom_tab" tabindex="-1" id="offcanvas_contactus" aria-labelledby="offcanvasBottomLabel">
-                  <div class="offcanvas-header">
-                    <h1 class="offcanvas-title" id="offcanvasBottomLabel">Contact Us</h1>
-                    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-                  </div>
-                  <div class="offcanvas-body small">
-                    <h2>Filling form</h2>
-                    <p>
-                      You can submit your query by filling the below form:
-                      <form method="post" action="/send_email" method="POST">
-                        <div class="form-group row">
-                            <label class="col-sm-2 col-form-label" for="email">Your email</label>
-                            <div class="col-sm-10">
-                                <input type="text" class="form-control" id="email"
-                                    placeholder="Enter your email" name="email">
-                            </div>
-                        </div>
-                        
-                        <div class="form-group row">
-                            <label class="col-sm-2 col-form-label"
-                                for="query">Question:</label>
-                            <div class="col-sm-10">
-                                <textarea rows="5" class="form-control" id="query"
-                                    name="query"
-                                    placeholder="Please type your query here..."></textarea>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group row">
-                            <div class="col-sm-10 offset-sm-2">
-                                <button type="submit" class="btn btn-primary">Submit</button>
-                            </div>
-                        </div>
-                    </form>
-                  </div>
+              <div class="dropdown">
+                <button class="btn btn-secondary btn-no-background dropdown-toggle" id="about_us_toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                  About Project Echo
+                </button>
+                <div class="dropdown-menu faq-content" id="about_us_content" aria-label="about_us_toggle">
+                  <h2>The Project</h2>
+                      <p>
+                        Project Echo, is a <strong>a bioacoustics classification tool</strong> that use AI/ML solution for understanding the density and classification of noise-producing animals in rainforests. 
+                        Echo’s vision is to help ecologists and environmentalists to survey the environment in a non-destructive and efficient way to track threatened animal species population numbers over time.
+                        This research input will provide conservationists the information they need to make informed conservation decisions to protect our precious native fauna. 
+                      </p>
+                      
+                      <h2>Who we are?</h2>
+                      <p>
+                        We are <strong>DataBytes</strong>, a cutting-edge, data-driven company that focuses on designing and implementing custom, cloud-based data collection and analytics platforms. 
+                        With a team of experienced data scientists and software engineers, we specialize in developing intelligent systems that optimize business processes and automate task management for increased efficiency across various industries. 
+                        From image recognition to language translation, our AI-driven technologies aim to transform the way businesses operate and enhance their capabilities for a brighter, more prosperous future. 
+                      </p>
+                      <p>
+                        Having worked with companies across the country in the retail vertical, financial services, healthcare, e-commerce, and even telecom, we’re well versed in a wide variety of data needs. 
+                        Our goal is to democratize AI and provide affordable, accessible solutions that enable our clients to accelerate their growth and improve their bottom line. 
+                        With a passion for innovation and a commitment to excellence, we are the go-to AI partner for businesses looking to unlock the full potential of their data. 
+                      </p>
+  
+                      <p>
+                        We believe that sound analysis can revolutionize the way we monitor animal populations, and we aim to make our solution widely available to conservationists and researchers. 
+                        Project Echo leverages machine learning to understand the density and classifications of animals in a survey area, using our curated sound datasets. 
+                        Our team is making solid and comprehensive progress in the analysis of labeled data and its predictive ability using Artificial Intelligence and Machine Learning.
+                      </p>
                 </div>
               </div>
-            </section>
+              
+              <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle btn-no-background" id="data_src_toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                  Data Sourcing and Pooling
+                </button>
+                <div class="dropdown-menu faq-content" id="data_src_content" aria-labelledby="data_src_toggle">
+                  <h2>Audio data</h2>
+                  <p>
+                    In the early process of the project, the audio data is collected and extracted through the existing online researches. The data source can be categorized under two areas:
+                  </p>
+  
+                  <h3>Research Paper sourced Data</h3>
+                  
+                  <p>
+                    Consistent with the systematic reviews of the literature, many papers are not following open science practices and are protecting their data. 
+                    However one promising public resource of animal audio data emerged from papers produced by Phillips and Towsey (2018) and Teixeira et al (2019); 
+                    Ecosounds (n.d.) is a repository of environmental audio recordings that provides publicly sourced annotations of animal sounds in Australia and other parts of the world. 
+                  </p>
+                  
+                  <h3>Internet Search</h3>
+  
+                  <p>
+  
+                    An internet search using the Google search engine using various combinations of terms such as ‘animal sound’ ‘database’ ‘repository’ ‘Australia’ ‘data set’ ‘dataset’, yielded useful results. 
+                    A non-exhaustive list of promising sources are provided in the appendix to this report.
+                    <br>
+                    The challenges for these sources is that data mining and scraping will be required to gain access to the audio files. This will be a required skill in Project Echo going forward. 
+  
+                  </p>
+  
+                  <h2>Image and biographical data</h2>
+                  <p>
+                    The names of the species respective to the available audio data are found in the <strong>Otways from the book: Grant Palmer. Wildlife of the Otways and Shipwreck Coast. Clayton, VIC: CSIRO PUBLISHING, 2019</strong>.
+                  </p>
+                  
+                  <p>
+                    Currently, the species biographical data is generated using Generative AI in order to avoid copyrights issue. The images are generated using Dall-E, and then compare to the real visualization of the real picture to select the most similar and realistic image.
+                    <br>
+                    The summary and description of each species is generated using ChatGPT, which provide a succinct and brief information about the animal and its habitat.
+                  </p>
+                  <p>
+                    As the project is still in development, the biological information of the species can be improved further.
+                  </p>
+                </div>
+              </div>
+              
+              <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle btn-no-background" id="contact_us_toggle">
+                  Contact Us
+                </button>
+                <div class="dropdown-menu faq-content" id="contact_us_content" aria-labelledby="contact_us_toggle">
+                  <h2>Filling form</h2>
+                  <p>
+                    You can submit your query by filling the below form:
+                    <form method="post" action="/send_email" method="POST">
+                      <div class="form-group row">
+                          <label class="col-sm-2 col-form-label" for="email">Your email</label>
+                          <div class="col-sm-10">
+                              <input type="text" class="form-control" id="email"
+                                  placeholder="Enter your email" name="email">
+                          </div>
+                      </div>
+                      
+                      <div class="form-group row">
+                          <label class="col-sm-2 col-form-label"
+                              for="query">Question:</label>
+                          <div class="col-sm-10">
+                              <textarea rows="5" class="form-control" id="query"
+                                  name="query"
+                                  placeholder="Please type your query here..."></textarea>
+                          </div>
+                      </div>
+                      
+                      <div class="form-group row">
+                          <div class="col-sm-10 offset-sm-2">
+                              <button type="submit" class="btn btn-primary">Submit</button>
+                          </div>
+                      </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+            
           </div>
           <div id="animal-popup">
-            <h2 id="desc_name" class="title">(Insert Animal Name here)</h2>
-            <img id= "desc_img" src="./images/bio/Apostlebird.png"></img>
-            <div id="desc_species" class="subtitle">(Insert animal scientific name)</div>
-        
-            <div id="desc_summary" class="desc">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</div>
-            <div id="desc_details" class="desc"></div>
-            <h2>Audio</h2>
-            <span><i class="fa fa-volume-up fa-2x" style="color:black;opacity:.5" onclick="{playAudio()}"></i></span>
-            <audio hidden controls src="./audio/t-rex-roar.mp3"></audio>
+            <div id="animal-popup-content">
+              <h2 id="desc_name" class="title"></h2>
+              <img id= "desc_img" src=""></img>
+              <div id="desc_species" class="subtitle"></div>
+              <h2>Animal Summary</h2>
+              <div id="desc_summary" class="desc"></div>
+              <div id="desc_details" class="desc"></div>
+              <h2>Audio</h2>
+              <span><i class="fa fa-volume-up fa-2x" style="color:black;opacity:.5" onclick="{playAudio()}"></i></span>
+              <audio hidden controls src="./audio/t-rex-roar.mp3"></audio>
+            </div>
+
+            <div id="animal-default-content">
+              Please click on an animal markup icon
+            </div>
           </div>
+          
           <div id="filter-menu">
             <div id="filter-menu-contents">
             <h3 style="text-align: left; color: #e48595 !important;">
@@ -590,8 +583,10 @@
   }
 
   document.addEventListener('animalToggled', function(event){
-    currentTab = document.getElementById('animal-popup')
+    currentTab = document.getElementById('animal-popup') 
+
     openNav('animal-popup')
+
   })
 
   /*function closeNav() {
@@ -707,6 +702,7 @@
 
   // Get all the dropdowns on the page
   const dropdowns = document.querySelectorAll(".dropdown");
+  console.log('dropdowns: ', dropdowns)
   
   // Add a click event listener to each dropdown
   dropdowns.forEach((dropdown) => {
