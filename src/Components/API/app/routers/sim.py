@@ -1,7 +1,9 @@
 from fastapi import FastAPI, Body, HTTPException, status, APIRouter
+from fastapi.encoders import jsonable_encoder
+from fastapi.responses import JSONResponse
 from app import serializers
 from app import schemas
-from app.database import Movements
+from app.database import Movements, Microphones
 
 router = APIRouter()
 
@@ -15,3 +17,14 @@ def create_movement(movement: schemas.MovementSchema):
         ]
     new_post = serializers.movementListEntity(Movements.aggregate(pipeline))[0]
     return new_post
+
+@router.post("/microphones", status_code=status.HTTP_201_CREATED)
+def create_microphones(microphones: list[schemas.MicrophoneSchema]):
+    microphone_list = []
+    for microphone in microphones:
+        print(microphone)
+
+        Microphones.insert_one(microphone.dict())
+        microphone_list.append(microphone.dict())
+        
+    return JSONResponse(content = microphone_list)

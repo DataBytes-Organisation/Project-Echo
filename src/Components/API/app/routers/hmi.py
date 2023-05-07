@@ -3,7 +3,7 @@ from bson import ObjectId
 import datetime
 from app import serializers
 from app import schemas
-from app.database import Events, Movements
+from app.database import Events, Movements, Microphones
 import paho.mqtt.publish as publish
 
 
@@ -94,16 +94,7 @@ def show_event_from_time(start: str, end: str):
 
 @router.get("/microphones", response_description="returns location of all microphones")
 def list_microphones():
-    aggregate = [
-        {
-            "$group":
-            {
-            "_id": "$sensorId",
-            "microphoneLLA": { "$first": "$microphoneLLA" }
-            }
-        }
-    ]
-    results = list(Events.aggregate(aggregate))
+    results = Microphones.find()
     microphones = serializers.microphoneListEntity(results)
     return microphones
 

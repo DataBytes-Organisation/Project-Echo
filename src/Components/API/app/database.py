@@ -8,3 +8,4 @@ db = client['mydatabase']
 Events = db.events
 Movements = db.movements
 Species = db.species
+Microphones = db.microphones
