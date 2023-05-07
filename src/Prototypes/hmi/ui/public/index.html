@@ -218,8 +218,11 @@
               <div id="desc_summary" class="desc"></div>
               <div id="desc_details" class="desc"></div>
               <h2>Audio</h2>
-              <span><i class="fa fa-volume-up fa-2x" style="color:black;opacity:.5" onclick="{playAudio()}"></i></span>
-              <audio hidden controls src="./audio/t-rex-roar.mp3"></audio>
+              <!-- <span><i class="fa fa-volume-up fa-2x" style="color:black;opacity:.5" onclick="{playAudio()}"></i></span> -->
+              
+              <audio id="player" controls>
+                <source src="./audio/t-rex-roar.mp3">
+              </audio>
             </div>
 
             <div id="animal-default-content">
