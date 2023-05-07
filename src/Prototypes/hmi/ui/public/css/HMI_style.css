@@ -60,6 +60,106 @@ h2 {
   position: fixed; 
 }
 
+@keyframes quiet {
+  25%{
+    transform: scaleY(.6);
+  }
+  50%{
+    transform: scaleY(.4);
+  }
+  75%{
+    transform: scaleY(.8);
+  }
+}
+
+@keyframes normal {
+  25%{
+    transform: scaleY(1);
+  }
+  50%{
+    transform: scaleY(.4);
+  }
+  75%{
+    transform: scaleY(.6);
+  }
+}
+@keyframes loud {
+  25%{
+    transform: scaleY(1);
+  }
+  50%{
+    transform: scaleY(.4);
+  }
+  75%{
+    transform: scaleY(1.2);
+  }
+}
+
+@keyframes silence {
+  25% {transform: scaleY(.01) !important}
+  50%{transform: scaleY(.01) !important}
+  75% {transform: scaleY(.01) !important}
+}
+
+body{
+  display: flex;
+  justify-content: center;
+  background: black;
+  margin: 0;padding: 0;
+  align-items: center;
+  height: 100vh;
+}
+#animal-popup .audio_component {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+}
+
+#animal-popup .audio_component .audioContainer{
+  display: flex;
+  justify-content: space-between;
+  height: 64px;
+  --boxSize: 8px;
+  --gutter: 8px;
+  width: calc((var(--boxSize) + var(--gutter)) * 10);
+}
+
+#animal-popup .audioContainer .box{
+  transform: scaleY(.01);
+  height: 100%;
+  width: var(--boxSize);
+  background: #e48595 !important;
+  animation-duration: 1.5s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  border-radius: 8px;
+}
+
+.box1 , .box6 {
+  animation-name: quiet ;
+}
+
+.box2 , .box7 {
+  animation-name: normal ;
+}
+.box3 , .box8 {
+  animation-name: quiet ;
+}
+
+.box4 , .box9{
+  animation-name: loud ;
+}
+
+.box5 , .box10{
+  animation-name: quiet ;
+}
+
+.boxmuted {
+  animation-name: silence;
+}
+
 @media (min-width: 768px) {
   #menu {
     max-width: 500px;

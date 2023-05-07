@@ -218,11 +218,27 @@
               <div id="desc_summary" class="desc"></div>
               <div id="desc_details" class="desc"></div>
               <h2>Audio</h2>
-              <!-- <span><i class="fa fa-volume-up fa-2x" style="color:black;opacity:.5" onclick="{playAudio()}"></i></span> -->
               
-              <audio id="player" controls>
+              
+              <!-- <audio id="player" controls>
                 <source src="./audio/t-rex-roar.mp3">
-              </audio>
+              </audio> -->
+              <div class="audio_component">
+                <span><i class="fa fa-volume-up fa-2x" style="color:white;opacity:.5" onclick="{playAudio()}"></i></span>
+                <div class="audioContainer">
+                  <div class="box box1"></div>
+                  <div class="box box2"></div>
+                  <div class="box box3"></div>
+                  <div class="box box4"></div>
+                  <div class="box box5"></div>
+                  <div class="box box6"></div>
+                  <div class="box box7"></div>
+                  <div class="box box8"></div>
+                  <div class="box box9"></div>
+                  <div class="box box10"></div>
+                </div>
+              </div>
+              
             </div>
 
             <div id="animal-default-content">
@@ -568,11 +584,11 @@
   let aud = 0;
   function playAudio() {
     if(aud==0){
-      document.getElementsByTagName("audio")[0].play();
+      $(".box").addClass("boxmuted");
       aud++;
       document.querySelector("i").style.opacity="1";
     } else {
-      document.querySelector("audio").pause();
+      $(".boxmuted").removeClass("boxmuted");
       aud--;
       document.querySelector("i").style.opacity=".5";
     }				

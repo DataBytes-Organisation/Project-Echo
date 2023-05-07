@@ -316,7 +316,8 @@ function playAudioString(audioDataString) {
 
   // Create an audio context
   const audioContext = new AudioContext();
-
+  
+  const el = document.getElementById("player");
   // Create a new audio buffer
   const numChannels = 1;
   const sampleRate = 44100;
