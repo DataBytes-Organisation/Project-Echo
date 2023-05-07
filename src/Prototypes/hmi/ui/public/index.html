@@ -236,6 +236,16 @@
                   <div class="box box8"></div>
                   <div class="box box9"></div>
                   <div class="box box10"></div>
+                  <div class="box box1"></div>
+                  <div class="box box2"></div>
+                  <div class="box box3"></div>
+                  <div class="box box4"></div>
+                  <div class="box box5"></div>
+                  <div class="box box6"></div>
+                  <div class="box box7"></div>
+                  <div class="box box8"></div>
+                  <div class="box box9"></div>
+                  <div class="box box10"></div>
                 </div>
               </div>
               
@@ -581,36 +591,50 @@
     MapCloseNav()
   }*/
 
-  let aud = 0;
+  let aud = false;
   function animateAudioPlay() {
     $(".boxmuted").removeClass("boxmuted");
-      aud--;
+      aud = true;
       document.querySelector("i").style.opacity=".5";
-      /*
-      const play_audio = new CustomEvent('animalToggled',{
-            detail: {
-              message: "Animal toggled: " + result.common,
-            }
-          })
-
-      document.dispatchEvent(play_audio);*/
   }
 
   function animateAudioMute(){
     $(".box").addClass("boxmuted");
-      aud++;
+      aud = false;
       document.querySelector("i").style.opacity="1";
   }
 
   function toggleAudio() {
-    if(aud==0){
-      animateAudioMute();
-    } else {
+    if(aud==false){
+      const play_audio = new CustomEvent('playAudio',{
+            detail: {
+              message: "play audio"
+            }
+          })
+
+      document.dispatchEvent(play_audio);
+
       animateAudioPlay();
+    } 
+    else {
+      console.log()
+      const stop_audio = new CustomEvent('stopAudio',{
+            detail: {
+              message: "stop audio"
+            }
+          })
+
+      document.dispatchEvent(stop_audio);
+
+      animateAudioMute();
     }			
   }
 
   toggleAudio();
+
+  document.addEventListener('muteAnimation', function(event){
+    animateAudioMute();
+  })
   
 </script>
 
@@ -762,6 +786,7 @@
   window.hmiState = hmiState; 
   hmiState.truthEventId = 10;
 
+
   //update config
   hmiState.liveMode = true;
   hmiState.simUpdateDelay = 5000;
@@ -795,11 +820,11 @@
   ];
   
   const vocalizationEvents = [
-    {eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Tawny Frogmouth", speciesIdentificationConfidence: 90.98, locationLat:-38.80266562762370,locationLon:143.563 , locationConfidence:90.98 , animalType:"bird", animalStatus:"normal" ,animalDiet: "omnivore" },
-    {eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Wild boar", speciesIdentificationConfidence: 90.98, locationLat:-38.81905478815443 ,locationLon:143.529, locationConfidence:90.98 , animalType:"amphibian", animalStatus:"invasive" ,animalDiet: "omnivore" },
-    {eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Red fox", speciesIdentificationConfidence: 90.98, locationLat:-38.80166562762364 ,locationLon:143.545  , locationConfidence:90.98 , animalType:"mammal", animalStatus:"endangered" ,animalDiet: "omnivore" },
-    {eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Redeye", speciesIdentificationConfidence: 90.98, locationLat:-38.82166562762360 ,locationLon:143.545 , locationConfidence:90.98 , animalType:"insect", animalStatus:"near-threatened" ,animalDiet: "omnivore" },
-    {eventID: 1, timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Brown Rat", speciesIdentificationConfidence: 90.98, locationLat:-38.80266562762380 ,locationLon:143.565 , locationConfidence:90.98 , animalType:"reptile", animalStatus:"vulnerable" ,animalDiet: "omnivore" },
+    {eventId: "6457a315e03129cb130fa270", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Tawny Frogmouth", speciesIdentificationConfidence: 90.98, locationLat:-38.80266562762370,locationLon:143.563 , locationConfidence:90.98 , animalType:"bird", animalStatus:"normal" ,animalDiet: "omnivore" },
+    {eventId: "6457a315e03129cb130fa271", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Wild boar", speciesIdentificationConfidence: 90.98, locationLat:-38.81905478815443 ,locationLon:143.529, locationConfidence:90.98 , animalType:"amphibian", animalStatus:"invasive" ,animalDiet: "omnivore" },
+    {eventId: "6457a315e03129cb130fa272", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Red fox", speciesIdentificationConfidence: 90.98, locationLat:-38.80166562762364 ,locationLon:143.545  , locationConfidence:90.98 , animalType:"mammal", animalStatus:"endangered" ,animalDiet: "omnivore" },
+    {eventId: "6457a315e03129cb130fa273", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Redeye", speciesIdentificationConfidence: 90.98, locationLat:-38.82166562762360 ,locationLon:143.545 , locationConfidence:90.98 , animalType:"insect", animalStatus:"near-threatened" ,animalDiet: "omnivore" },
+    {eventId: "6457a315e03129cb130fa274", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Brown Rat", speciesIdentificationConfidence: 90.98, locationLat:-38.80266562762380 ,locationLon:143.565 , locationConfidence:90.98 , animalType:"reptile", animalStatus:"vulnerable" ,animalDiet: "omnivore" },
   ];
   
 

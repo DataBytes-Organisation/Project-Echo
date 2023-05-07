@@ -1,7 +1,7 @@
 "use strict";
 
 import { getAudioTestString } from "./HMI-utils.js";
-import { retrieveTruthEventsInTimeRange, retrieveVocalizationEventsInTimeRange, retrieveMicrophones } from "./routes.js";
+import { retrieveTruthEventsInTimeRange, retrieveVocalizationEventsInTimeRange, retrieveMicrophones, retrieveAudio } from "./routes.js";
 import data from "./sample_data.json" assert { type: 'json' };
 
 var markups = ["elephant.png", "monkey.png", "tiger.png"];
@@ -42,6 +42,8 @@ var animalTypeIconLookup = {
   "insect" : "insects",
   "reptile" : "reptiles"
 };
+
+var selectedVocalizationEventId = null;
 
 function getIconName(status, type){
   return animalTypeIconLookup[type] + statusIconLookup[status] + "-01.png";
@@ -265,11 +267,13 @@ export function convertJSONtoAnimalMovementEvent(hmiState, data){
 export function convertJSONtoAnimalVocalizationEvent(hmiState, data){
   let vocalizationEvent = {};
 
-  console.log(data);
+  //console.log(data);
 
   vocalizationEvent.timestamp = hmiState.currentTime;
   vocalizationEvent.eventTimestamp = data.timestamp;
   vocalizationEvent.eventId = data._id;
+
+  console.log(vocalizationEvent.eventId);
   
   vocalizationEvent.speciesIdentificationConfidence = data.confidence;
   vocalizationEvent.speciesScientificName = data.species.toLowerCase();
@@ -306,6 +310,34 @@ export function convertJSONtoMicrophone(hmiState, data){
   }
 }
 
+export function muteAudioAnimation(){
+  const mute_audio = new CustomEvent('muteAnimation',{
+    detail: {
+      message: "mute animation"
+    }
+  })
+
+  document.dispatchEvent(mute_audio);
+}
+
+var activeAudioNode = null;
+var audioAnimTimeout = null;
+var playNextTrack = false;
+
+export function stopAudioPlayback(){
+  muteAudioAnimation();
+
+  if(audioAnimTimeout){
+    clearTimeout(audioAnimTimeout);
+  }
+  if(activeAudioNode != null){
+    console.log("calling stop");
+    activeAudioNode.stop();
+  }
+
+  activeAudioNode = null;
+}
+
 function playAudioString(audioDataString) {
   // Convert the binary audio data string into a typed array
   const audioData = new Uint8Array(
@@ -322,6 +354,7 @@ function playAudioString(audioDataString) {
   const numChannels = 1;
   const sampleRate = 44100;
   const bufferLength = audioData.length / 2;
+
   const audioBuffer = audioContext.createBuffer(
     numChannels,
     bufferLength,
@@ -331,15 +364,26 @@ function playAudioString(audioDataString) {
   // Copy the binary audio data into the audio buffer
   audioBuffer.copyToChannel(new Float32Array(audioData.buffer), 0);
 
+  let duration = audioBuffer.duration;
+  console.log(duration);
+
   // Create a new audio buffer source node and set its buffer
-  const sourceNode = audioContext.createBufferSource();
-  sourceNode.buffer = audioBuffer;
+  activeAudioNode = audioContext.createBufferSource();
+  activeAudioNode.buffer = audioBuffer;
 
   // Connect the source node to the destination node of the audio context
-  sourceNode.connect(audioContext.destination);
+  activeAudioNode.connect(audioContext.destination);
 
-  // Start playing the audio
-  sourceNode.start();
+  if(playNextTrack){
+    // Start playing the audio
+    activeAudioNode.start();
+
+    audioAnimTimeout = setTimeout(
+      muteAudioAnimation,
+      duration*1000,
+      hmiState
+    );
+  }
 }
 
 export function updateLayers(filterState)  {
@@ -466,7 +510,8 @@ function addAllVocalizationFeatures(hmiState) {
         name: 'vocalisation_' + entry.speciesScientificName,
         animalType: entry.animalType,
         animalStatus: entry.animalStatus,
-        animalSpecies: entry.speciesScientificName 
+        animalSpecies: entry.speciesScientificName,
+        eventId: entry.eventId
     });
       //console.log(entry.locationLon, " ", entry.locationLat)
     
@@ -506,7 +551,8 @@ function addNewVocalizationFeatures(hmiState, events) {
         name: 'vocalisation_' + entry.speciesScientificName,
         animalType: entry.animalType,
         animalStatus: entry.animalStatus,
-        animalSpecies: entry.speciesScientificName 
+        animalSpecies: entry.speciesScientificName,
+        eventId: entry.eventId 
     });
       //console.log(entry.locationLon, " ", entry.locationLat)
     
@@ -694,10 +740,16 @@ function createMapClickEvent(hmiState){
     let active_content = $("#animal-popup-content");
     let default_content = $("#animal-default-content");
     if (feature){
+      stopAudioPlayback();
+
       active_content.show();
       default_content.hide();
 
       let values = feature.getProperties();
+      if (values.eventId){
+        console.log("saving " + values.eventId);
+        selectedVocalizationEventId = values.eventId;
+      }
       if (values.animalSpecies){
           var result = sample_data.find(({ common }) => common.toUpperCase() === values.animalSpecies.toUpperCase())
           if (result) {
@@ -850,3 +902,19 @@ function queueSimUpdate(hmiState) {
     hmiState
   );
 }
+
+document.addEventListener('playAudio', function(event){
+  console.log("play audio");
+  playNextTrack = true;
+  if(selectedVocalizationEventId != null){
+    retrieveAudio(selectedVocalizationEventId).then((res) => {
+      playAudioString(res.data.audioClip);
+    })
+  }
+})
+
+document.addEventListener('stopAudio', function(event){
+  console.log("stop audio");
+  playNextTrack = false;
+  stopAudioPlayback();
+})
