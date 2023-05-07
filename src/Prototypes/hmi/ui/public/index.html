@@ -84,6 +84,7 @@
         <div class="col-md-12 col-main" style="padding: 0px !important;"> 
           <div id="basemap"></div>
 
+
           <div id="menu" class="menu">
             <div class="navbar">
               <a id="filter-menu-btn" class="tabs-button active" onclick="openTab('filter-menu')">f</a>
@@ -93,19 +94,137 @@
             </div>
           <div id="FAQ">
             <div id="FAQ-contents">
-            <h3>FAQ TAB</h3>
+              <div class="dropdown">
+                <button class="btn btn-secondary btn-no-background dropdown-toggle" id="about_us_toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                  About Project Echo
+                </button>
+                <div class="dropdown-menu faq-content" id="about_us_content" aria-label="about_us_toggle">
+                  <h2>The Project</h2>
+                      <p>
+                        Project Echo, is a <strong>a bioacoustics classification tool</strong> that use AI/ML solution for understanding the density and classification of noise-producing animals in rainforests. 
+                        Echo’s vision is to help ecologists and environmentalists to survey the environment in a non-destructive and efficient way to track threatened animal species population numbers over time.
+                        This research input will provide conservationists the information they need to make informed conservation decisions to protect our precious native fauna. 
+                      </p>
+                      
+                      <h2>Who we are?</h2>
+                      <p>
+                        We are <strong>DataBytes</strong>, a cutting-edge, data-driven company that focuses on designing and implementing custom, cloud-based data collection and analytics platforms. 
+                        With a team of experienced data scientists and software engineers, we specialize in developing intelligent systems that optimize business processes and automate task management for increased efficiency across various industries. 
+                        From image recognition to language translation, our AI-driven technologies aim to transform the way businesses operate and enhance their capabilities for a brighter, more prosperous future. 
+                      </p>
+                      <p>
+                        Having worked with companies across the country in the retail vertical, financial services, healthcare, e-commerce, and even telecom, we’re well versed in a wide variety of data needs. 
+                        Our goal is to democratize AI and provide affordable, accessible solutions that enable our clients to accelerate their growth and improve their bottom line. 
+                        With a passion for innovation and a commitment to excellence, we are the go-to AI partner for businesses looking to unlock the full potential of their data. 
+                      </p>
+  
+                      <p>
+                        We believe that sound analysis can revolutionize the way we monitor animal populations, and we aim to make our solution widely available to conservationists and researchers. 
+                        Project Echo leverages machine learning to understand the density and classifications of animals in a survey area, using our curated sound datasets. 
+                        Our team is making solid and comprehensive progress in the analysis of labeled data and its predictive ability using Artificial Intelligence and Machine Learning.
+                      </p>
+                </div>
+              </div>
+              
+              <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle btn-no-background" id="data_src_toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                  Data Sourcing and Pooling
+                </button>
+                <div class="dropdown-menu faq-content" id="data_src_content" aria-labelledby="data_src_toggle">
+                  <h2>Audio data</h2>
+                  <p>
+                    In the early process of the project, the audio data is collected and extracted through the existing online researches. The data source can be categorized under two areas:
+                  </p>
+  
+                  <h3>Research Paper sourced Data</h3>
+                  
+                  <p>
+                    Consistent with the systematic reviews of the literature, many papers are not following open science practices and are protecting their data. 
+                    However one promising public resource of animal audio data emerged from papers produced by Phillips and Towsey (2018) and Teixeira et al (2019); 
+                    Ecosounds (n.d.) is a repository of environmental audio recordings that provides publicly sourced annotations of animal sounds in Australia and other parts of the world. 
+                  </p>
+                  
+                  <h3>Internet Search</h3>
+  
+                  <p>
+  
+                    An internet search using the Google search engine using various combinations of terms such as ‘animal sound’ ‘database’ ‘repository’ ‘Australia’ ‘data set’ ‘dataset’, yielded useful results. 
+                    A non-exhaustive list of promising sources are provided in the appendix to this report.
+                    <br>
+                    The challenges for these sources is that data mining and scraping will be required to gain access to the audio files. This will be a required skill in Project Echo going forward. 
+  
+                  </p>
+  
+                  <h2>Image and biographical data</h2>
+                  <p>
+                    The names of the species respective to the available audio data are found in the <strong>Otways from the book: Grant Palmer. Wildlife of the Otways and Shipwreck Coast. Clayton, VIC: CSIRO PUBLISHING, 2019</strong>.
+                  </p>
+                  
+                  <p>
+                    Currently, the species biographical data is generated using Generative AI in order to avoid copyrights issue. The images are generated using Dall-E, and then compare to the real visualization of the real picture to select the most similar and realistic image.
+                    <br>
+                    The summary and description of each species is generated using ChatGPT, which provide a succinct and brief information about the animal and its habitat.
+                  </p>
+                  <p>
+                    As the project is still in development, the biological information of the species can be improved further.
+                  </p>
+                </div>
+              </div>
+              
+              <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle btn-no-background" id="contact_us_toggle">
+                  Contact Us
+                </button>
+                <div class="dropdown-menu faq-content" id="contact_us_content" aria-labelledby="contact_us_toggle">
+                  <h2>Send a Message to Project Echo</h2>
+                  <p>
+                    You can submit your query or feedback by filling the below form:
+                    <form method="post" action="/send_email" method="POST">
+                      <div class="form-group row">
+                          <label class="col-sm-2 col-form-label" for="email">Your email</label>
+                          <div class="col-sm-10">
+                              <input type="text" class="form-control" id="email"
+                                  placeholder="Enter your email" name="email">
+                          </div>
+                      </div>
+                      
+                      <div class="form-group row">
+                          <label class="col-sm-2 col-form-label"
+                              for="query">Question:</label>
+                          <div class="col-sm-10">
+                              <textarea rows="5" class="form-control" id="query"
+                                  name="query"
+                                  placeholder="Please type your query here..."></textarea>
+                          </div>
+                      </div>
+                      
+                      <div class="form-group row">
+                          <div class="col-sm-10 offset-sm-2">
+                              <button type="submit" class="btn btn-primary">Submit</button>
+                          </div>
+                      </div>
+                  </form>
+                </div>
+              </div>
             </div>
+            
           </div>
           <div id="animal-popup">
-            <h2 id="desc_name" class="title">(Insert Animal Name here)</h2>
-            <img id= "desc_img" src="./images/bio/Apostlebird.png"></img>
-            <div id="desc_species" class="subtitle">(Insert animal scientific name)</div>
-        
-            <div id="desc_summary" class="desc">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</div>
-            <div id="desc_details" class="desc"></div>
-            <h2>Audio</h2>
-            <span><i class="fa fa-volume-up fa-2x" style="color:black;opacity:.5" onclick="{playAudio()}"></i></span>
-            <audio hidden controls src="./audio/t-rex-roar.mp3"></audio>
+            <div id="animal-popup-content">
+              <h2 id="desc_name" class="title"></h2>
+              <img id= "desc_img" src=""></img>
+              <div id="desc_species" class="subtitle"></div>
+              <h2>Animal Summary</h2>
+              <div id="desc_summary" class="desc"></div>
+              <div id="desc_details" class="desc"></div>
+              <h2>Audio</h2>
+              <span><i class="fa fa-volume-up fa-2x" style="color:black;opacity:.5" onclick="{playAudio()}"></i></span>
+              <audio hidden controls src="./audio/t-rex-roar.mp3"></audio>
+            </div>
+
+            <div id="animal-default-content">
+              Please click on an animal markup icon
+            </div>
           </div>
           <div id="filter-menu">
             <div id="filter-menu-contents">
@@ -286,8 +405,32 @@
           </div>      
         
       </div>
-
     </div>
+
+<!--
+    <div id="menuPanel">
+      <a href="javascript:void(0)" class="closebtn" onclick="{closeNav()}">&times;</a>
+      <h2 id="desc_name" class="title">(Insert Animal Name here)</h2>
+      <img id= "desc_img" src="./images/bio/Apostlebird.png"></img>
+      <div id="desc_species" class="subtitle">(Insert animal scientific name)</div>
+  
+      <div id="desc_summary" class="desc">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</div>
+      <div id="desc_details" class="desc"></div>
+      <h2>Audio</h2>
+      <span><i class="fa fa-volume-up fa-2x" style="color:black;opacity:.5" onclick="{playAudio()}"></i></span>
+       <audio hidden controls src="./audio/t-rex-roar.mp3"></audio>
+    </div>
+
+
+    <div id="FAQ" class="overlay">
+      <h2>FAQ OVERLAY PAGE</h2>
+    </div>
+
+    <div id="ABOUT" class="overlay">
+      <h2>ABOUT OVERLAY PAGE</h2>
+>>>>>>> TN/about-page
+    </div>
+-->
 
 <script>
   var hamburgerStatus = false;
@@ -306,58 +449,68 @@
     }
   }
 
-  function closeMenu() {
-    document.getElementById("menu").style.width = "0%";
-    document.getElementById("menu").style.height = "0%";
-    hamburgerStatus = false;
-    closeTab();
-  }
-
   function openMenu() {
     document.getElementById("menu").style.width = "30%";
     document.getElementById("menu").style.height = "100%";
     hamburgerStatus = true;
-    openTab(null)
+    openTab("filter-menu")
+  }
+
+  function closeMenu() {
+    document.getElementById("menu").style.width = "0%";
+    document.getElementById("menu").style.height = "0%";
+    hamburgerStatus = false;
+    closeTab()
   }
 
   function openTab(tab) {
-
-    if(tab == 'filter-menu'){
-      if(!document.getElementById("filter-menu-btn").classList.contains("active")){
+    // if(tab == 'filter-menu'){
+    //   if(!document.getElementById("filter-menu-btn").classList.contains("active")){
+    //     document.getElementById("filter-menu-btn").classList.add("active");
+    //   }
+    //   if(document.getElementById("popup-menu-btn").classList.contains("active")){
+    //     document.getElementById("popup-menu-btn").classList.remove("active");
+    //   }
+    //   if(document.getElementById("FAQ-menu-btn").classList.contains("active")){
+    //     document.getElementById("FAQ-menu-btn").classList.remove("active");
+    //   }
+    // }
+    // else if(tab == 'animal-popup'){
+    //   if(document.getElementById("filter-menu-btn").classList.contains("active")){
+    //     document.getElementById("filter-menu-btn").classList.remove("active");
+    //   }
+    //   if(!document.getElementById("popup-menu-btn").classList.contains("active")){
+    //     document.getElementById("popup-menu-btn").classList.add("active");
+    //   }
+    //   if(document.getElementById("FAQ-menu-btn").classList.contains("active")){
+    //     document.getElementById("FAQ-menu-btn").classList.remove("active");
+    //   }
+    // }
+    // else if(tab == 'FAQ'){
+    //   if(document.getElementById("filter-menu-btn").classList.contains("active")){
+    //     document.getElementById("filter-menu-btn").classList.remove("active");
+    //   }
+    //   if(document.getElementById("popup-menu-btn").classList.contains("active")){
+    //     document.getElementById("popup-menu-btn").classList.remove("active");
+    //   }
+    //   if(!document.getElementById("FAQ-menu-btn").classList.contains("active")){
+    //     document.getElementById("FAQ-menu-btn").classList.add("active");
+    //   }
+    // }
+    $(".tabs-button").removeClass("active");
+    switch (tab){
+      case "filter-menu":
         document.getElementById("filter-menu-btn").classList.add("active");
-      }
-      if(document.getElementById("popup-menu-btn").classList.contains("active")){
-        document.getElementById("popup-menu-btn").classList.remove("active");
-      }
-      if(document.getElementById("FAQ-menu-btn").classList.contains("active")){
-        document.getElementById("FAQ-menu-btn").classList.remove("active");
-      }
-    }
-    else if(tab == 'animal-popup'){
-      if(document.getElementById("filter-menu-btn").classList.contains("active")){
-        document.getElementById("filter-menu-btn").classList.remove("active");
-      }
-      if(!document.getElementById("popup-menu-btn").classList.contains("active")){
+        break;
+      case "animal-popup":
         document.getElementById("popup-menu-btn").classList.add("active");
-      }
-      if(document.getElementById("FAQ-menu-btn").classList.contains("active")){
-        document.getElementById("FAQ-menu-btn").classList.remove("active");
-      }
-    }
-    else if(tab == 'FAQ'){
-      if(document.getElementById("filter-menu-btn").classList.contains("active")){
-        document.getElementById("filter-menu-btn").classList.remove("active");
-      }
-      if(document.getElementById("popup-menu-btn").classList.contains("active")){
-        document.getElementById("popup-menu-btn").classList.remove("active");
-      }
-      if(!document.getElementById("FAQ-menu-btn").classList.contains("active")){
+        break;
+      case "FAQ":
         document.getElementById("FAQ-menu-btn").classList.add("active");
-      }
+        break;
     }
     if (tab != null){
       if (currentTab != document.getElementById(tab)){
-        //console.log("Yo")
         closeTab()
       }
       currentTab = document.getElementById(tab)
@@ -381,6 +534,29 @@
     //console.log("Opening Simulator...")
 
   }
+
+
+  function openNav(tab) {
+    var hamburger = document.querySelector('.hamburger-icon');
+    if(!hamburger.classList.contains('active')){
+      toggleNav();
+    }
+    if (tab){
+      openTab(tab)
+    } else {
+      openTab('filter-menu')
+    } 
+  }
+
+  document.addEventListener('animalToggled', function(event){
+    closeTab()
+    setTimeout(()=> {
+      currentTab = document.getElementById('animal-popup') 
+      openNav('animal-popup')
+    },10)
+    
+
+  })
 
   /*function closeNav() {
     MapCloseNav()
@@ -498,6 +674,7 @@
 
   // Get all the dropdowns on the page
   const dropdowns = document.querySelectorAll(".dropdown");
+  console.log('dropdowns: ', dropdowns)
   
   // Add a click event listener to each dropdown
   dropdowns.forEach((dropdown) => {
@@ -526,8 +703,9 @@
   window.updateLayers = updateLayers;
   //window.openNav = openNav;
   //window.closeNav = MapCloseNav;
+  window.closeNav = MapCloseNav;
 
-  export function openNav() {
+  /*export function openNav() {
 
       var hamburger = document.querySelector('.hamburger-icon');
     
@@ -540,9 +718,7 @@
 
   document.addEventListener('animalToggled', function(event) {
     openNav()
-  });
-
-
+  });*/
 
   //All global state based info is stored in the hmiState
   let hmiState = {};
@@ -559,6 +735,7 @@
     //const replayTimestamp = replayDate.getTime();
   
   const replayTimestamp = Date.now();
+
 
   hmiState.timeOffset = Date.now() - replayTimestamp;
   hmiState.currentTime = Math.floor((Date.now() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
@@ -599,12 +776,10 @@
     "M_7":{animalId: "M_7", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Cane toad", speciesIdentificationConfidence: 100, locationLat:-38.80166562762367 ,locationLon:143.510 , locationConfidence:100 , animalType:"amphibian", animalStatus:"invasive" ,animalDiet: "omnivore" },
     "M_8":{animalId: "M_8", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Red fox", speciesIdentificationConfidence: 100, locationLat:-38.82166562762367 ,locationLon:143.520 , locationConfidence:100 , animalType:"mammal", animalStatus:"endangered" ,animalDiet: "omnivore" },
     "M_9":{animalId: "M_9", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, speciesScientificName: "Redeye", speciesIdentificationConfidence: 100, locationLat:-38.80066562762367 ,locationLon:143.555 , locationConfidence:100 , animalType:"insect", animalStatus:"near-threatened" ,animalDiet: "omnivore" },
-
   };
 
   hmiState.movementEvents = movementEvents;
   hmiState.vocalizationEvents = vocalizationEvents;
-
   hmiState.microphoneLocations = microphoneLocations;
 
   const el = (sel) => {return document.getElementById(sel);}

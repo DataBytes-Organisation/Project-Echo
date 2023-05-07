@@ -306,8 +306,6 @@ export function convertJSONtoMicrophone(hmiState, data){
   }
 }
 
-
-
 function playAudioString(audioDataString) {
   // Convert the binary audio data string into a typed array
   const audioData = new Uint8Array(
@@ -691,7 +689,13 @@ function createMapClickEvent(hmiState){
     const feature = hmiState.basemap.forEachFeatureAtPixel(evt.pixel, function (feature) {
       return feature;
     });
+
+    let active_content = $("#animal-popup-content");
+    let default_content = $("#animal-default-content");
     if (feature){
+      active_content.show();
+      default_content.hide();
+
       let values = feature.getProperties();
       if (values.animalSpecies){
           var result = sample_data.find(({ common }) => common.toUpperCase() === values.animalSpecies.toUpperCase())
@@ -704,20 +708,28 @@ function createMapClickEvent(hmiState){
             let summary = document.getElementById("desc_details");
             summary.innerHTML = '';
             result.description.forEach(content => {
-              var p = document.createElement('p');
-              p.className = "desc_ul";
-              p.innerText = content;
-              summary.appendChild(p);
-            })
-            const toggleEvent = new CustomEvent('animalToggled', { 
-              detail: {
-                message: 'toggled'
+              if (content){
+                var p = document.createElement('p');
+                p.className = "desc_ul";
+                p.innerText = content;
+                summary.appendChild(p);
               }
-            });
-            document.dispatchEvent(toggleEvent);
+            })
+            
+          animal_toggled = true;
+          const toggled_animal = new CustomEvent('animalToggled',{
+            detail: {
+              message: "Animal toggled: " + result.common,
+            }
+          })
+
+          document.dispatchEvent(toggled_animal);
           }
 
       }
+    } else {
+      active_content.hide();
+      default_content.show();
     }
   });
 }
@@ -733,6 +745,7 @@ export function getAnimalToggled(){
 }
 
 export function MapCloseNav() {
+  document.getElementById("menuPanel").style.width = "0";
   animal_toggled = false;
 }
 
