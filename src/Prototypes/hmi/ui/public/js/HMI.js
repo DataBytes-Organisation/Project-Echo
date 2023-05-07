@@ -509,10 +509,12 @@ function createMapClickEvent(hmiState){
             let summary = document.getElementById("desc_details");
             summary.innerHTML = '';
             result.description.forEach(content => {
-              var p = document.createElement('p');
-              p.className = "desc_ul";
-              p.innerText = content;
-              summary.appendChild(p);
+              if (content){
+                var p = document.createElement('p');
+                p.className = "desc_ul";
+                p.innerText = content;
+                summary.appendChild(p);
+              }
             })
             
           animal_toggled = true;

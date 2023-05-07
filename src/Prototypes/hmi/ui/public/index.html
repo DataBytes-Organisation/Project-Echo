@@ -583,9 +583,12 @@
   }
 
   document.addEventListener('animalToggled', function(event){
-    currentTab = document.getElementById('animal-popup') 
-
-    openNav('animal-popup')
+    closeTab()
+    setTimeout(()=> {
+      currentTab = document.getElementById('animal-popup') 
+      openNav('animal-popup')
+    },10)
+    
 
   })
 
