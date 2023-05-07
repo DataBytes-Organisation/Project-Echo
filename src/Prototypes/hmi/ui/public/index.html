@@ -224,7 +224,7 @@
                 <source src="./audio/t-rex-roar.mp3">
               </audio> -->
               <div class="audio_component">
-                <span><i class="fa fa-volume-up fa-2x" style="color:white;opacity:.5" onclick="{playAudio()}"></i></span>
+                <span><i class="fa fa-volume-up fa-2x" style="color:white;opacity:.5" onclick="{toggleAudio()}"></i></span>
                 <div class="audioContainer">
                   <div class="box box1"></div>
                   <div class="box box2"></div>
@@ -582,17 +582,35 @@
   }*/
 
   let aud = 0;
-  function playAudio() {
-    if(aud==0){
-      $(".box").addClass("boxmuted");
-      aud++;
-      document.querySelector("i").style.opacity="1";
-    } else {
-      $(".boxmuted").removeClass("boxmuted");
+  function animateAudioPlay() {
+    $(".boxmuted").removeClass("boxmuted");
       aud--;
       document.querySelector("i").style.opacity=".5";
-    }				
+      /*
+      const play_audio = new CustomEvent('animalToggled',{
+            detail: {
+              message: "Animal toggled: " + result.common,
+            }
+          })
+
+      document.dispatchEvent(play_audio);*/
   }
+
+  function animateAudioMute(){
+    $(".box").addClass("boxmuted");
+      aud++;
+      document.querySelector("i").style.opacity="1";
+  }
+
+  function toggleAudio() {
+    if(aud==0){
+      animateAudioMute();
+    } else {
+      animateAudioPlay();
+    }			
+  }
+
+  toggleAudio();
   
 </script>
 
