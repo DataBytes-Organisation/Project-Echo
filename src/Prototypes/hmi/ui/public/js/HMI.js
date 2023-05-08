@@ -787,7 +787,7 @@ function createMapClickEvent(hmiState){
             //Animal Bio specific session
             animal_data = result;
             document.getElementById("desc_name").innerText = result.common;
-            document.getElementById("markup_img_2").src = values.animalIcon;
+            //document.getElementById("markup_img_2").src = values.animalIcon;
             document.getElementById("desc_confidence").innerText = values.animalLocConfidence + "%";
             document.getElementById("desc_species").innerText = result.species;
             document.getElementById("desc_summary").innerText = result.summary;
