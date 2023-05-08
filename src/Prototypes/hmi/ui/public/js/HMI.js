@@ -438,6 +438,7 @@ function addAllTruthFeatures(hmiState) {
         animalLat: entry.locationLat,
         animalDiet: entry.animalDiet,
         animalConfidence: entry.speciesIdentificationConfidence,
+        animalLocConfidence: entry.locationConfidence,
         animalIcon: './../images/sim/' + getIconName(entry.animalStatus, entry.animalType),
         animalRecordDate: entry.timestamp
     });
@@ -484,6 +485,7 @@ function addNewTruthFeatures(hmiState, events) {
         animalLat: entry.locationLat,
         animalDiet: entry.animalDiet,
         animalConfidence: entry.speciesIdentificationConfidence,
+        animalLocConfidence: entry.locationConfidence,
         animalIcon: './../images/sim/' + getIconName(entry.animalStatus, entry.animalType),
         animalRecordDate: entry.timestamp
     });
@@ -528,6 +530,7 @@ function addAllVocalizationFeatures(hmiState) {
         animalLon: entry.locationLon,
         animalLat: entry.locationLat,
         animalConfidence: entry.speciesIdentificationConfidence,
+        animalLocConfidence: entry.locationConfidence,
         animalDiet: entry.animalDiet,
         animalIcon: './../images/vocalization/' + getIconName(entry.animalStatus, entry.animalType),
         animalRecordDate: entry.timestamp,
@@ -575,6 +578,7 @@ function addNewVocalizationFeatures(hmiState, events) {
         animalLon: entry.locationLon,
         animalLat: entry.locationLat,
         animalConfidence: entry.speciesIdentificationConfidence,
+        animalLocConfidence: entry.locationConfidence,
         animalDiet: entry.animalDiet,
         animalIcon: './../images/vocalization/' + getIconName(entry.animalStatus, entry.animalType),
         animalRecordDate: entry.timestamp,
@@ -783,6 +787,8 @@ function createMapClickEvent(hmiState){
             //Animal Bio specific session
             animal_data = result;
             document.getElementById("desc_name").innerText = result.common;
+            document.getElementById("markup_img_2").src = values.animalIcon;
+            document.getElementById("desc_confidence").innerText = values.animalLocConfidence + "%";
             document.getElementById("desc_species").innerText = result.species;
             document.getElementById("desc_summary").innerText = result.summary;
             document.getElementById("desc_img").src = "../../images/bio/" + result.common + ".png";
@@ -799,7 +805,6 @@ function createMapClickEvent(hmiState){
             //Markup details specific session
             let dateFormat = new Date(values.animalRecordDate);
             document.getElementById("markup_img").src = values.animalIcon;
-            document.getElementById("markup_img_2").src = values.animalIcon;
             document.getElementById("markup_details").innerHTML = values.animalType + " | " + values.animalDiet + " | " + values.animalStatus;
             document.getElementById("markup_loc_lon").innerHTML = values.animalLon;
             document.getElementById("markup_loc_lat").innerHTML = values.animalLat;
