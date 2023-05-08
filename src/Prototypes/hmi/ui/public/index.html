@@ -69,7 +69,7 @@
 		</div>
 		
 		<div id="blur"></div>
-    <div id="content"></div>
+    <!--div id="content"></div-->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <!--script>
       document.getElementById('content').innerHTML =
@@ -99,13 +99,15 @@
               <a id="filter-menu-btn" class="tabs-button active" onclick="openTab('filter-menu')">f</a>
               <a id="popup-menu-btn" class="tabs-button" onclick="openTab('animal-popup')">l</a>
               <a id="FAQ-menu-btn" class="tabs-button" onclick="openTab('FAQ')">i</a>
+              <a id="SIM-menu-btn" class="tabs-button" onclick="openTab('SIM')">s</a>
               <span style="position: fixed; border-top: 3px solid #e48595; height: 2px; width: 80%; margin-top: 30px;"></span>
             </div>
           <div id="FAQ">
             <div id="FAQ-contents">
+              <h2>About Us</h2>
               <div class="dropdown">
                 <button class="btn btn-secondary btn-no-background dropdown-toggle" id="about_us_toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                  About Project Echo
+                  Project Echo
                 </button>
                 <div class="dropdown-menu faq-content" id="about_us_content" aria-label="about_us_toggle">
                   <h2>The Project</h2>
@@ -134,7 +136,6 @@
                       </p>
                 </div>
               </div>
-              
               <div class="dropdown">
                 <button class="btn btn-secondary dropdown-toggle btn-no-background" id="data_src_toggle" data-bs-toggle="dropdown" aria-expanded="false">
                   Data Sourcing and Pooling
@@ -190,17 +191,14 @@
                     You can submit your query or feedback by filling the below form:
                     <form method="post" action="/send_email" method="POST">
                       <div class="form-group row">
-                          <label class="col-sm-2 col-form-label" for="email">Your email</label>
-                          <div class="col-sm-10">
+                          <div>
                               <input type="text" class="form-control" id="email"
                                   placeholder="Enter your email" name="email">
                           </div>
                       </div>
                       
                       <div class="form-group row">
-                          <label class="col-sm-2 col-form-label"
-                              for="query">Question:</label>
-                          <div class="col-sm-10">
+                          <div>
                               <textarea rows="5" class="form-control" id="query"
                                   name="query"
                                   placeholder="Please type your query here..."></textarea>
@@ -208,7 +206,7 @@
                       </div>
                       
                       <div class="form-group row">
-                          <div class="col-sm-10 offset-sm-2">
+                          <div>
                               <button type="submit" class="btn btn-primary">Submit</button>
                           </div>
                       </div>
@@ -218,9 +216,24 @@
             </div>
             
           </div>
+          <div id="SIM">
+            <div id="SIM-contents">
+              <h2>The Project</h2>
+                  <p>
+                    <strong>The Echo Simulator</strong> - an innovative system - aims to replicates the Otway’s National Forest environment by creating virtual microphone sensors strategically placed and interconnected in a mesh-like network. This advanced system effectively monitors semi-random simulated animal production events, contributing to wildlife research and conservation efforts. Upon detecting a sound, the simulator shows how our end-to-end solution is able to leverage the trigger times from the nearest microphones by employing a brute-force optimisation technique to accurately triangulate the source location of the sound based on latitude and longitude coordinates. With minimal error, the audio sample and associated microphone IDs are seamlessly integrated and communicated throughout Echo-Net, a comprehensive framework comprising a bioacoustics engine, store, processing server, communications servers, and APIs. This rich data is then visually represented on our (HMI), allowing researchers and wildlife enthusiasts to analyse and better understand the complex acoustic interactions within the simulated Otway’s National Forest ecosystem.
+                  </p>
+                  <div class="toggle-switch-container">
+                    <label for="toggle-switch" class="toggle-label">Simulator:</label>
+                    <label class="toggle-switch">
+                      <input id="simulatorToggle" type="checkbox" checked>
+                      <span class="slider round"></span>
+                    </label>
+                  </div>
+            </div>
+          </div> 
           <div id="animal-popup">
             <div id="animal-popup-content">
-              <h2 id="desc_name" class="title"></h2>
+              <h2 id="desc_name"></h2>
               <img id= "desc_img" src=""></img>
               <div id="desc_species" class="subtitle"></div>
               <h2>Animal Summary</h2>
@@ -261,14 +274,15 @@
             </div>
 
             <div id="animal-default-content">
-              Please click on an animal markup icon
+              <h2 style="text-align: left; color: #e48595 !important;">Animal Bio Data</h2>
+                <p>Please click on a map marker to view bio data.</p>
             </div>
           </div>
           <div id="filter-menu">
             <div id="filter-menu-contents">
-            <h3 style="text-align: left; color: #e48595 !important;">
+            <h2 style="text-align: left; color: #e48595 !important;">
               Filter Menu
-            </h3>
+            </h2>
             <div class="toggle-switch-container">
               <label for="toggle-switch" class="toggle-label">Live Mode:</label>
               <label class="toggle-switch">
@@ -525,6 +539,9 @@
         break;
       case "FAQ":
         document.getElementById("FAQ-menu-btn").classList.add("active");
+        break;
+      case "SIM":
+        document.getElementById("SIM-menu-btn").classList.add("active");
         break;
     }
     if (tab != null){
