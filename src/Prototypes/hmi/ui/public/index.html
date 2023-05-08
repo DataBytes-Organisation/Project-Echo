@@ -233,18 +233,84 @@
           </div> 
           <div id="animal-popup">
             <div id="animal-popup-content">
-              <h2 id="desc_name"></h2>
+              <div class="markup_form">
+                <!-- markup_icon -->
+                <div class="markup_column">
+                  <div class="markup_row_left markup_row_title">
+                    <h2 id="desc_name"></h2>
+                  </div>
+                  <div class="markup_row_right markup_row_icon">
+                    <img id="markup_img_2" src=""></img>
+                  </div>
+                </div>
+              </div>
+              
               <img id= "desc_img" src=""></img>
               <div id="desc_species" class="subtitle"></div>
               <h2>Animal Summary</h2>
               <div id="desc_summary" class="desc"></div>
               <div id="desc_details" class="desc"></div>
+              
+              <h2>Event Details</h2>
+              <div class="markup_form">
+                <!-- markup_icon -->
+                <div class="markup_column">
+                  <div class="markup_row_left">
+                    <img id="markup_img" src=""></img>
+                  </div>
+                  <div class="markup_row_right">
+                    <div id="markup_details"></div>
+                  </div>
+                </div>
+                <!-- markup_location -->
+                <div class="markup_column">
+                  <div class="markup_row_left">
+                    <div>Longitude</div>
+                  </div>
+                  <div class="markup_row_right">
+                    <div id="markup_loc_lon"></div>
+                  </div>
+                </div>
+                <div class="markup_column">
+                  <div class="markup_row_left">
+                    <div>Latitude</div>
+                  </div>
+                  <div class="markup_row_right">
+                    <div id="markup_loc_lat"></div>
+                  </div>
+                </div>
+
+                <!-- markup_date -->
+                <div class="markup_column">
+                  <div class="markup_row_left">
+                    <div>Date</div>
+                  </div>
+                  <div class="markup_row_right">
+                    <div id="markup_date"></div>
+                  </div>
+                </div>
+
+                <!-- markup_confidence -->
+                <div class="markup_column">
+                  <div class="markup_row_left">
+                    <div>Confidence</div>
+                  </div>
+                  <div class="markup_row_right">
+                    <div id="markup_confidence"></div>
+                  </div>
+                </div>
+
+                
+                
+                
+                
+              </div>
+              
               <h2>Audio</h2>
-              
-              
               <!-- <audio id="player" controls>
                 <source src="./audio/t-rex-roar.mp3">
               </audio> -->
+
               <div class="audio_component">
                 <span><i class="fa fa-volume-up fa-2x" style="color:white;opacity:.5" onclick="{toggleAudio()}"></i></span>
                 <div class="audioContainer">

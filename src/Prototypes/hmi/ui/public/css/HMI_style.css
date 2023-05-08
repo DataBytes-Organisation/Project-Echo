@@ -341,6 +341,7 @@ body{
     transform: rotate(-45deg);
   }
 
+
   .dropdown-menu {
     width: auto;
     max-width: none;
@@ -490,6 +491,63 @@ input[type="checkbox"]{
   overflow-y:scroll !important;
   font-family: 'Roboto', sans-serif;
 }
+
+#animal-popup #animal-popup-content img#markup_img {
+  height: 5vh;
+  width: auto;
+  aspect-ratio: 1;
+
+}
+
+#animal-popup #animal-popup-content img#markup_img_2 {
+  height: 5vh;
+  width: auto;
+  aspect-ratio: 1;
+
+}
+
+#animal-popup #animal-popup-content .markup_form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+
+}
+
+#animal-popup #animal-popup-content .markup_form .markup_column {
+  height: 7vh;
+  display: flex;
+  flex-direction: row;
+  border-bottom: 1px dotted white;
+  align-items: center;
+}
+
+#animal-popup #animal-popup-content .markup_form .markup_column .markup_row_left {
+  width: 40%;
+  display: flex;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-left: 10px;
+}
+
+#animal-popup #animal-popup-content .markup_form .markup_column .markup_row_title {
+  width: 80% !important;
+}
+
+#animal-popup #animal-popup-content .markup_form .markup_column .markup_row_icon {
+  width: 20% !important;
+}
+
+#animal-popup #animal-popup-content .markup_form .markup_column .markup_row_right {
+  width: 60%;
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 10px;
+
+}
+
+
+
 
 #animal-popup #animal-popup-content #desc_species {
   text-align: end;
