@@ -214,11 +214,11 @@ body{
 
 #SIM {  
   padding: 0px 0px 0px 0px;
-  height: 100%;
+  height: 85%;
   width: 0%;
   position: fixed;
   z-index: 995;
-  top: 0;
+  bottom: 0;
   right: 0;
   background-color: none;
   color: white;
@@ -232,9 +232,12 @@ body{
   padding-top: 20px;
   margin-left: 30px;
   margin-right: 30px;
-  height: 100%;
+  height: 85%;
   overflow-wrap: break-word;
   font-family: 'Roboto', sans-serif;
+  position: fixed;
+  bottom: 0;
+  overflow-y: scroll;
 }
 
 #filter-menu {
@@ -255,10 +258,15 @@ body{
 }
 
 #filter-menu-contents{
-  padding-top: 20px;
-  margin-left: 30px;
-  margin-right: 30px;
+  /* padding-top: 20px; */
+  /* margin-left: 30px;
+  margin-right: 30px; */
   font-family: 'Roboto', sans-serif;
+  position: fixed;
+  bottom: 0;
+  overflow-y: scroll;
+  height: 85%;
+  width: 30%;
 }
 
 #I {
@@ -341,6 +349,7 @@ body{
     top: 8px;
     transform: rotate(-45deg);
   }
+
 
   .dropdown-menu {
     width: auto;
@@ -492,9 +501,70 @@ input[type="checkbox"]{
   font-family: 'Roboto', sans-serif;
 }
 
+#animal-popup #animal-popup-content img#markup_img {
+  height: 5vh;
+  width: auto;
+  aspect-ratio: 1;
+
+}
+
+#animal-popup #animal-popup-content img#markup_img_2 {
+  height: 5vh;
+  width: auto;
+  aspect-ratio: 1;
+
+}
+
+#animal-popup #animal-popup-content .markup_form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+
+}
+
+#animal-popup #animal-popup-content .markup_form .markup_column {
+  height: 7vh;
+  display: flex;
+  flex-direction: row;
+  border-bottom: 1px dotted white;
+  align-items: center;
+}
+
+#animal-popup #animal-popup-content #desc_confidence {
+  transform: translateY(1vh);
+}
+
+#animal-popup #animal-popup-content .markup_form .markup_column .markup_row_left {
+  width: 40%;
+  display: flex;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-left: 10px;
+}
+
+#animal-popup #animal-popup-content .markup_form .markup_column .markup_row_title {
+  width: 80% !important;
+}
+
+#animal-popup #animal-popup-content .markup_form .markup_column .markup_row_icon {
+  width: 20% !important;
+}
+
+#animal-popup #animal-popup-content .markup_form .markup_column .markup_row_right {
+  width: 60%;
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 10px;
+
+}
+
+
+
+
 #animal-popup #animal-popup-content #desc_species {
   text-align: end;
-  size: 20px;
+  size: 24px;
   font-style: italic;
   font-weight: bold;
 }
@@ -786,11 +856,13 @@ i {
   height: 50px;
   text-align: center;
   transform: translateY(-10px);
+  border-radius: 10px;
 }
 
 .tabs-button.active {
   background-color: #e48595;
-  /*transform: translateY(-10px);*/
+  transform: translateY(-20px);
+  transition: 0.5s ease-in-out;
 }
 
 #app {

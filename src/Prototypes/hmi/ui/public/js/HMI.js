@@ -433,7 +433,14 @@ function addAllTruthFeatures(hmiState) {
         name: 'trueLocation_' + entry.speciesScientificName,
         animalType: entry.animalType,
         animalStatus: entry.animalStatus,
-        animalSpecies: entry.speciesScientificName 
+        animalSpecies: entry.speciesScientificName,
+        animalLon: entry.locationLon,
+        animalLat: entry.locationLat,
+        animalDiet: entry.animalDiet,
+        animalConfidence: entry.speciesIdentificationConfidence,
+        animalLocConfidence: entry.locationConfidence,
+        animalIcon: './../images/sim/' + getIconName(entry.animalStatus, entry.animalType),
+        animalRecordDate: entry.timestamp
     });
       //console.log(entry.locationLon, " ", entry.locationLat)
     
@@ -473,7 +480,14 @@ function addNewTruthFeatures(hmiState, events) {
         name: 'trueLocation_' + entry.speciesScientificName,
         animalType: entry.animalType,
         animalStatus: entry.animalStatus,
-        animalSpecies: entry.speciesScientificName 
+        animalSpecies: entry.speciesScientificName,
+        animalLon: entry.locationLon,
+        animalLat: entry.locationLat,
+        animalDiet: entry.animalDiet,
+        animalConfidence: entry.speciesIdentificationConfidence,
+        animalLocConfidence: entry.locationConfidence,
+        animalIcon: './../images/sim/' + getIconName(entry.animalStatus, entry.animalType),
+        animalRecordDate: entry.timestamp
     });
       //console.log(entry.locationLon, " ", entry.locationLat)
     
@@ -513,6 +527,13 @@ function addAllVocalizationFeatures(hmiState) {
         animalType: entry.animalType,
         animalStatus: entry.animalStatus,
         animalSpecies: entry.speciesScientificName,
+        animalLon: entry.locationLon,
+        animalLat: entry.locationLat,
+        animalConfidence: entry.speciesIdentificationConfidence,
+        animalLocConfidence: entry.locationConfidence,
+        animalDiet: entry.animalDiet,
+        animalIcon: './../images/vocalization/' + getIconName(entry.animalStatus, entry.animalType),
+        animalRecordDate: entry.timestamp,
         eventId: entry.eventId
     });
       //console.log(entry.locationLon, " ", entry.locationLat)
@@ -554,6 +575,13 @@ function addNewVocalizationFeatures(hmiState, events) {
         animalType: entry.animalType,
         animalStatus: entry.animalStatus,
         animalSpecies: entry.speciesScientificName,
+        animalLon: entry.locationLon,
+        animalLat: entry.locationLat,
+        animalConfidence: entry.speciesIdentificationConfidence,
+        animalLocConfidence: entry.locationConfidence,
+        animalDiet: entry.animalDiet,
+        animalIcon: './../images/vocalization/' + getIconName(entry.animalStatus, entry.animalType),
+        animalRecordDate: entry.timestamp,
         eventId: entry.eventId 
     });
       //console.log(entry.locationLon, " ", entry.locationLat)
@@ -742,6 +770,7 @@ function createMapClickEvent(hmiState){
     let active_content = $("#animal-popup-content");
     let default_content = $("#animal-default-content");
     if (feature){
+      // console.log('feature: ', feature);
       stopAudioPlayback();
 
       active_content.show();
@@ -755,8 +784,11 @@ function createMapClickEvent(hmiState){
       if (values.animalSpecies){
           var result = sample_data.find(({ common }) => common.toUpperCase() === values.animalSpecies.toUpperCase())
           if (result) {
+            //Animal Bio specific session
             animal_data = result;
             document.getElementById("desc_name").innerText = result.common;
+            document.getElementById("markup_img_2").src = values.animalIcon;
+            document.getElementById("desc_confidence").innerText = values.animalLocConfidence + "%";
             document.getElementById("desc_species").innerText = result.species;
             document.getElementById("desc_summary").innerText = result.summary;
             document.getElementById("desc_img").src = "../../images/bio/" + result.common + ".png";
@@ -770,15 +802,23 @@ function createMapClickEvent(hmiState){
                 summary.appendChild(p);
               }
             })
-            
-          animal_toggled = true;
-          const toggled_animal = new CustomEvent('animalToggled',{
-            detail: {
-              message: "Animal toggled: " + result.common,
-            }
-          })
+            //Markup details specific session
+            let dateFormat = new Date(values.animalRecordDate);
+            document.getElementById("markup_img").src = values.animalIcon;
+            document.getElementById("markup_details").innerHTML = values.animalType + " | " + values.animalDiet + " | " + values.animalStatus;
+            document.getElementById("markup_loc_lon").innerHTML = values.animalLon;
+            document.getElementById("markup_loc_lat").innerHTML = values.animalLat;
+            document.getElementById("markup_confidence").innerHTML = values.animalConfidence + "%";
+            document.getElementById("markup_date").innerHTML = dateFormat.toUTCString()
 
-          document.dispatchEvent(toggled_animal);
+            animal_toggled = true;
+            const toggled_animal = new CustomEvent('animalToggled',{
+              detail: {
+                message: "Animal toggled: " + result.common,
+              }
+            })
+
+            document.dispatchEvent(toggled_animal);
           }
 
       }
