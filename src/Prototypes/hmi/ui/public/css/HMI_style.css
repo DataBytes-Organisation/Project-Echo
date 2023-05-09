@@ -161,7 +161,7 @@ body{
   animation-name: silence;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 0px) {
   #menu {
     max-width: 500px;
   }
@@ -523,13 +523,13 @@ input[type="checkbox"]{
 }
 
 #animal-popup #animal-popup-content img#markup_img {
-  height: 4vh;
+  height: 80px;
   width: auto;
   aspect-ratio: 1;
 }
 
 #animal-popup #animal-popup-content img#markup_img_2 {
-  height: 4vh;
+  height: 80px;
   width: auto;
   aspect-ratio: 1;
 }
@@ -541,7 +541,7 @@ input[type="checkbox"]{
 }
 
 #animal-popup #animal-popup-content .markup_form .markup_column {
-  height: 4vh;
+  height: 80px;
   display: flex;
   flex-direction: row;
   border-bottom: 1px dotted white;
@@ -549,7 +549,7 @@ input[type="checkbox"]{
 }
 
 #animal-popup #animal-popup-content {
-  transform: translateY(1vh);
+  transform: translateY(5px);
 }
 
 #animal-popup #animal-popup-content .markup_form .markup_column .markup_row_left {
