@@ -187,95 +187,7 @@ body{
   z-index: 997;
 }
 
-#FAQ {  
-  padding: 0px 0px 0px 0px;
-  height: 100%;
-  width: 0%;
-  position: fixed;
-  z-index: 995;
-  top: 0;
-  right: 0;
-  background-color: none;
-  color: white;
-  overflow-x: hidden;
-  
-  padding-top: 60px;
-  margin-top: 30px;
-}
 
-#FAQ-contents{
-  padding-top: 20px;
-  margin-left: 30px;
-  margin-right: 30px;
-  height: 85%;
-  position: fixed;
-  width: 440px;
-  top: 110px;
-  overflow-wrap: break-word;
-  font-family: 'Roboto', sans-serif;
-  overflow-y: scroll;
-  overflow-x: hidden;
-}
-
-#SIM {  
-  padding: 0px 0px 0px 0px;
-  height: 100%;
-  width: 0%;
-  position: fixed;
-  z-index: 995;
-  bottom: 0;
-  right: 0;
-  background-color: none;
-  color: white;
-  overflow-x: hidden;
-  
-  padding-top: 60px;
-  margin-top: 30px;
-}
-
-#SIM-contents{
-  padding-top: 20px;
-  margin-left: 30px;
-  margin-right: 30px;
-  height: 85%;
-  position: fixed;
-  width: 440px;
-  top: 110px;
-  overflow-wrap: break-word;
-  font-family: 'Roboto', sans-serif;
-  overflow-y: scroll;
-}
-
-#filter-menu {
-  padding: 0px 0px 0px 0px;
-  height: 100%;
-  width: 0%;
-  position: fixed;
-  z-index: 995;
-  top: 0;
-  right: 0;
-  background-color: none;
-  color: white;
-  overflow-x: hidden;
-  
-  padding-top: 60px;
-  margin-top: 30px;
-  
-}
-
-#filter-menu-contents{
-  padding-top: 20px;
-  margin-left: 30px;
-  margin-right: 30px;
-  height: 85%;
-  position: fixed;
-  width: 440px;
-  top: 110px;
-  overflow-wrap: break-word;
-  font-family: 'Roboto', sans-serif;
-  overflow-y: scroll;
-  overflow-x: hidden;
-}
 
 #I {
   height: 100%;
@@ -475,7 +387,38 @@ input[type="checkbox"]{
 
 }
 
-#animal-popup{
+
+
+#SIM {  
+  padding: 0px 0px 0px 0px;
+  height: 100%;
+  width: 0%;
+  position: fixed;
+  z-index: 995;
+  bottom: 0;
+  right: 0;
+  background-color: none;
+  color: white;
+  overflow-x: hidden;
+  
+  padding-top: 60px;
+  margin-top: 30px;
+}
+
+#SIM-contents{
+  padding-top: 20px;
+  margin-left: 30px;
+  margin-right: 30px;
+  height: 85%;
+  position: fixed;
+  width: 440px;
+  top: 110px;
+  overflow-wrap: break-word;
+  font-family: 'Roboto', sans-serif;
+  overflow-y: scroll;
+}
+
+#filter-menu {
   padding: 0px 0px 0px 0px;
   height: 100%;
   width: 0%;
@@ -489,9 +432,10 @@ input[type="checkbox"]{
   
   padding-top: 60px;
   margin-top: 30px;
+  
 }
 
-#animal-default-content{
+#filter-menu-contents{
   padding-top: 20px;
   margin-left: 30px;
   margin-right: 30px;
@@ -505,7 +449,65 @@ input[type="checkbox"]{
   overflow-x: hidden;
 }
 
+#FAQ {  
+  padding: 0px 0px 0px 0px;
+  height: 100%;
+  width: 0%;
+  position: fixed;
+  z-index: 995;
+  top: 0;
+  right: 0;
+  background-color: none;
+  color: white;
+  overflow-x: hidden;
+  
+  padding-top: 80px;
+  margin-top: 30px;
+}
+
+#FAQ-contents{
+  padding-top: 20px;
+  margin-left: 30px;
+  margin-right: 30px;
+  height: 85%;
+  /*position: fixed;*/
+  width: 440px;
+  /*top: 110px;*/
+  overflow-wrap: break-word;
+  font-family: 'Roboto', sans-serif;
+  /*overflow-y: scroll;
+  overflow-x: hidden;*/
+}
+
+#animal-popup{
+  padding: 0px 0px 0px 0px;
+  height: 100%;
+  width: 0%;
+  position: fixed;
+  z-index: 995;
+  top: 0;
+  right: 0;
+  background-color: none;
+  color: white;
+  overflow-x: hidden;
+  
+  padding-top: 80px;
+  margin-top: 30px;
+}
+
 #animal-popup #animal-popup-content{
+  padding-top: 20px;
+  margin-left: 30px;
+  margin-right: 30px;
+  height: 85%;
+  /*position: fixed;*/
+  width: 440px;
+  /*top: 110px;*/
+  overflow-wrap: break-word;
+  font-family: 'Roboto', sans-serif;
+  /*overflow-y: scroll;
+  overflow-x: hidden;*/
+/*
   margin-top: 25px;
   display: none;
   margin-left: 30px;
@@ -517,6 +519,20 @@ input[type="checkbox"]{
   overflow-wrap: break-word;
   font-family: 'Roboto', sans-serif;
   overflow-y: scroll !important;
+  overflow-x: hidden;*/
+}
+
+#animal-default-content{
+  padding-top: 20px;
+  margin-left: 30px;
+  margin-right: 30px;
+  height: 85%;
+  position: fixed;
+  width: 440px;
+  top: 110px;
+  overflow-wrap: break-word;
+  font-family: 'Roboto', sans-serif;
+  overflow-y: scroll;
   overflow-x: hidden;
 }
 
@@ -547,7 +563,7 @@ input[type="checkbox"]{
 }
 
 #animal-popup #animal-popup-content {
-  transform: translateY(5px);
+  transform: translateY(0px);
 }
 
 #animal-popup #animal-popup-content .markup_form .markup_column .markup_row_left {
@@ -894,32 +910,49 @@ i {
   padding: 20px;
   overflow-y: scroll;
 }
-
+.wrapper{
+  position: relative;
+  width: 500px; 
+  height: 100%; 
+  padding: 0; 
+  overflow-y: scroll; 
+  overflow-x: hidden; 
+}
 /* Width and height of the scrollbar */
-::-webkit-scrollbar {
-  width: 5px;
-  height: 5px !important;
+.wrapper::-webkit-scrollbar {
+  display: block;
+  width: 5px !important;
 }
 
 /* Background color of the scrollbar track */
-::-webkit-scrollbar-track {
+.wrapper::-webkit-scrollbar-track {
   background: transparent;
   height: 200px !important;
 }
 
 /* Color of the scrollbar thumb */
-::-webkit-scrollbar-thumb {
+.wrapper::-webkit-scrollbar-thumb {
   background: #e48595c7;
   border-radius: 6px;
-  border-top: 50% solid transparent;
-  border-bottom: 50% solid transparent;
-  background-clip: padding-box;  
+  border-top: 90% solid transparent !important;
+  border-bottom: 90% solid transparent !important;
+  background-clip: padding-box !important;  
 }
 
 /* On hover, highlight the thumb */
-::-webkit-scrollbar-thumb:hover {
+.wrapper::-webkit-scrollbar-thumb:hover {
   background: #e48595;
-  border-top: 50% solid transparent;
-  border-bottom: 50% solid transparent;
-  background-clip: padding-box;  
+  border-top: 90% solid transparent !important;
+  border-bottom: 90% solid transparent !important;
+  background-clip: padding-box !important;  
+}
+
+.wrapper::-webkit-scrollbar-track-piece:end {
+  background: transparent;
+  margin-bottom: 300px; 
+}
+
+.wrapper::-webkit-scrollbar-track-piece:start {
+  background: transparent;
+  margin-top: 300px;
 }
