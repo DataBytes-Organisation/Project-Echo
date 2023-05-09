@@ -2951,6 +2951,262 @@
                 "Mole crickets are known for their distinctive chirping sound, which they produce by rubbing their front wings together. This sound is used to attract mates and communicate with other crickets."
             ],
             "img": ""
+        },
+        {
+            "species": "Chalcites basalis",
+            "common": "Horsfield's bronze cuckoo",
+            "summary": "Horsfield's bronze cuckoo (Chalcites basalis) is a small bird found in Australia, Indonesia, and Papua New Guinea. It is a brood parasite, laying its eggs in the nests of other bird species.",
+            "description": [
+            "The Horsfield's bronze cuckoo is a small bird, measuring about 14cm in length, with a brownish-black plumage on its back and wings, and a bronze-green sheen on its head and breast. The belly is white with dark streaks.",
+            "This species is a brood parasite, laying its eggs in the nests of other bird species such as thornbills, scrubwrens, and gerygones. The host birds raise the cuckoo chicks, often at the expense of their own offspring.",
+            "Horsfield's bronze cuckoo feeds on insects and other small invertebrates, which it catches in flight or gleans from vegetation.",
+            "The call of Horsfield's bronze cuckoo is a series of high-pitched, descending notes, repeated at intervals.",
+            "This species is widespread and relatively common, and is not currently considered to be threatened. However, its reliance on other bird species for reproduction means that it may be affected by habitat loss and other factors that impact its host species."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Chalcites lucidus",
+            "common": "Shining bronze cuckoo",
+            "summary": "The Shining bronze cuckoo (Chalcites lucidus) is a small bird found in Australia, New Zealand, and some Pacific islands. It is a brood parasite, laying its eggs in the nests of other bird species.",
+            "description": [
+            "The Shining bronze cuckoo is a small bird, measuring about 12cm in length, with a metallic greenish-bronze plumage on its upperparts and a white belly. The male has a distinctive purple crown patch.",
+            "This species is a brood parasite, laying its eggs in the nests of other bird species such as gerygones, silvereyes, and thornbills. The host birds raise the cuckoo chicks, often at the expense of their own offspring.",
+            "Shining bronze cuckoo feeds on insects and other small invertebrates, which it catches in flight or gleans from vegetation.",
+            "The call of Shining bronze cuckoo is a distinctive descending whistle, often heard in the forest during the breeding season.",
+            "This species is widespread and relatively common, and is not currently considered to be threatened. However, its reliance on other bird species for reproduction means that it may be affected by habitat loss and other factors that impact its host species."
+            ],
+            "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/Shining_bronze_cuckoo%2C_male.jpg/440px-Shining_bronze_cuckoo%2C_male.jpg"
+        },
+        {
+            "species": "Chalcites osculans",
+            "common": "Black-eared cuckoo",
+            "summary": "The Black-eared cuckoo is a species of cuckoo bird found in eastern and southeastern Australia. They are known for their distinctive black ear patches and their preference for parasitizing the nests of other bird species.",
+            "description": [
+              "The Black-eared cuckoo is a medium-sized cuckoo, measuring around 21 cm in length. They have a dark brown back and wings, with a white belly and a white-tipped tail. They are most easily identified by the distinctive black patches behind their eyes, which give them their name.",
+              "Black-eared cuckoos are known to be brood parasites, laying their eggs in the nests of other bird species such as thornbills and fairy-wrens. The eggs of the cuckoo often closely resemble those of the host bird, allowing them to avoid detection. Once hatched, the cuckoo chick will often outcompete the host's chicks for food.",
+              "These birds are generally silent, but have been known to produce a soft, high-pitched whistle that is often given in flight.",
+              "Black-eared cuckoos are found in a range of forest and woodland habitats, and are known to undertake seasonal migrations. They are considered to be of least concern in terms of conservation status.",
+              "The Black-eared cuckoo has been observed to consume a range of insects, including caterpillars and grasshoppers. They have also been known to consume small lizards and spiders."
+            ],
+            "img": ""
+          },
+          {
+            "species": "Chenonetta jubata",
+            "common": "Australian wood duck",
+            "summary": "The Australian wood duck, also known as maned duck, is a medium-sized dabbling duck found throughout much of Australia. They are usually found in pairs or small flocks near water, and have distinctive chestnut and black plumage with a white speckled neck and head.",
+            "description": [
+                "The Australian wood duck is a medium-sized duck, with males being slightly larger than females. They have a distinctive chestnut brown head and neck with a black crown and nape, white speckling on their head and neck, and a speckled white and black lower neck and upper chest.",
+                "Their wings are grey with a white edge and their underbelly is mostly white with a small black patch on the lower belly. They have a short, black bill and grey feet.",
+                "Australian wood ducks are found throughout much of Australia, from northern Tasmania to the Kimberley region in Western Australia. They are usually found in pairs or small flocks near water, such as in wetlands, swamps, and rivers.",
+                "These ducks are primarily herbivores, feeding on seeds, grasses, and aquatic plants, but they will also eat insects and small invertebrates.",
+                "The Australian wood duck is a common species and is not considered to be threatened. They are often hunted for sport and are also bred in captivity for meat and eggs."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Cherax destructor",
+            "common": "Common Yabby",
+            "summary": "The Common Yabby is a freshwater crustacean species native to Australia. It is found in inland waterways and swamps across the eastern half of the continent.",
+            "description": [
+            "The Common Yabby has a dark brown or greenish-brown carapace with a pointed rostrum and two large claws. The claws are used for burrowing, self-defense, and capturing food.",
+            "Adult Common Yabbies typically grow to around 10-20 cm in length, although some specimens may reach up to 30 cm. They are omnivores, feeding on a range of aquatic plants and animals, as well as carrion and detritus.",
+            "The species is commercially harvested for food and aquaculture, and is also popular with recreational anglers. It is considered to be of least concern in terms of conservation status.",
+            "Common Yabbies breed during the warmer months, with females carrying their eggs in a pouch on their abdomen until they hatch. The young Yabbies undergo several molts as they grow, and may take several years to reach maturity.",
+            "The species is able to tolerate a wide range of environmental conditions, and can survive in low oxygen environments by burrowing into the mud. It is also known to aestivate during periods of drought."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Chlamydera guttata",
+            "common": "Western bowerbird",
+            "summary": "The western bowerbird is a species of bowerbird found in the arid and semi-arid regions of Western Australia. The species is known for its unique courtship behavior and the elaborate structures, known as bowers, that males build to attract mates.",
+            "description": [
+            "The western bowerbird is a medium-sized bird, measuring around 25 to 28 cm in length. The male has a black head and nape, with a yellow throat, chest, and belly. The wings and back are olive green, and the tail is black. The female is similar in appearance, but has a brown head and nape instead of black.",
+            "One of the most notable characteristics of the western bowerbird is its courtship behavior. Males build elaborate bowers on the ground, consisting of two parallel walls of sticks, decorated with shells, stones, and other objects. The male will then perform a series of courtship displays in and around the bower to attract a female.",
+            "Western bowerbirds are omnivorous, feeding on a variety of plant and animal matter. Their diet includes fruits, seeds, insects, and small vertebrates. They are also known to scavenge carrion.",
+            "The western bowerbird is generally found in arid and semi-arid regions of Western Australia, where it inhabits open woodland, scrubland, and mallee. The species is considered to be of Least Concern by the IUCN, although populations may be threatened by habitat loss and degradation."
+            ],
+            "img": ""
+        },
+        
+        {
+                "species": "Chlamydera nuchalis",
+                "common": "Great Bowerbird",
+                "summary": "The Great Bowerbird is a species of bowerbird found in northern Australia. It is known for its unique courtship behavior and elaborate bowers, which are used to attract mates.",
+                "description": [
+                "The Great Bowerbird has a brown and grey plumage with a distinctive black band across its throat. Males are larger than females and can grow up to 33 cm in length.",
+                "These birds are known for their unique courtship behavior, where males create elaborate bowers on the ground using twigs, leaves, and other materials. The bowers are decorated with a variety of objects, including shells, stones, and even discarded human items such as bottle caps and plastic straws.",
+                "Female Great Bowerbirds visit the bowers and select mates based on the quality and attractiveness of the bower and its decorations.",
+                "Great Bowerbirds are omnivores and feed on a variety of insects, fruits, and seeds. They are also known to scavenge for carrion and hunt small lizards and mammals.",
+                "Despite their widespread distribution, the Great Bowerbird is considered to be a species of least concern by the International Union for Conservation of Nature (IUCN)."
+                ],
+                "img": ""
+        },
+        {
+            "species": "Cincloramphus mathewsi",
+            "common": "Rufous songlark",
+            "summary": "The rufous songlark is a medium-sized brown passerine bird found throughout mainland Australia. It has distinctive streaks on its feathers, a dark line through its eye, and a rufous upper tail and rump.",
+            "description": [
+            "The male rufous songlark can grow up to 19 cm in length, while the female reaches about 16 cm. Outside of breeding season, they form small flocks and hunt close to the ground for insects and small arthropods. During breeding season, the male sings almost continuously and performs showy display flights.",
+            "This species is most often found in grasslands, grassy woodlands, agricultural areas, and mulga habitats. They migrate south in the summer to breed and are typically seen only in the warmer months.",
+            "The rufous songlark is sometimes called the red-rumped songlark, rufous singing lark, or skylark. It was first described by English ornithologist Tom Iredale in 1911 and is a member of the Locustellidae family, which includes grass warblers and grassbirds."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Cinnamon Quail-thrush",
+            "common": "Cinclosoma cinnamomeum",
+            "summary": "The Cinnamon Quail-thrush is a small to medium-sized bird species found in arid and semi-arid regions of central Australia.",
+            "description": [
+            "Adults of this species have a body length of 20 cm and can weigh up to 50 grams.",
+            "Male Cinnamon Quail-thrushes have a black face, a white eyebrow, and a broad white streak down the sides of their black throat. The upperparts of their body are plain cinnamon-rufous with buff-white patches on the upper breast and a broad black band below. Females have similar features but are duller in color.",
+            "These birds are ground foragers, feeding on a variety of invertebrates such as grasshoppers, beetles, and flies, as well as seeds of native and introduced flora species.",
+            "Breeding of the Cinnamon Quail-thrush takes place on the ground, with cup-shaped nests being built in depressions and lined with strips of bark, fine grass, or sticks. The clutch can contain two or three eggs.",
+            "The species is evaluated as least concern on the IUCN Red List of Threatened Species, but it is thought that the population is slowly declining due to ongoing habitat degradation caused by livestock and introduced herbivores."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Cinclosoma punctatum",
+            "common": "Spotted Quail-thrush",
+            "summary": "Cinclosoma punctatum, commonly known as the Spotted Quail-thrush, is a species of bird that is endemic to the Mount Lofty Ranges in South Australia.",
+            "description": [
+            "The Spotted Quail-thrush is a medium-sized bird, measuring about 24 to 30 cm in length, with a wingspan of 32 to 40 cm, and a weight of 85 to 145 g.",
+            "Both male and female birds have olive-brown feathers with bold black streaks, and white undersides with a grey breast, yellow-brown flanks and bold black streaks and spots along the sides of the body.",
+            "This species has been recorded singly, in pairs, and in small family groups in the Mount Lofty Ranges.",
+            "Unfortunately, there have been no confirmed sightings of the Spotted Quail-thrush since 1981, which suggests that the species is likely extinct.",
+            "The primary threat to the Spotted Quail-thrush is habitat loss and degradation due to agriculture and urban development in its native range."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Cisticola exilis",
+            "common": "Golden-headed cisticola",
+            "summary": "The golden-headed cisticola is a small warbler species found in Australia and thirteen Asian countries. It is an omnivore, constructs nests out of plants and spider threads, and has a distinctive appearance during the breeding season.",
+            "description": [
+            "The golden-headed cisticola is a small bird that grows to about 9-11.5 cm in length and weighs 6-10 g. Its appearance is brown and cream, with streaks of black or dark brown on the upper part of its body.",
+            "During the breeding season, the male of the species has a golden body colour, a golden-orange head, and a shorter tail. Females and males outside of the breeding season are similar in appearance.",
+            "The golden-headed cisticola is an omnivore that primarily feeds on invertebrates like insects and small slugs, but also eats grass seeds. It usually forages on the ground, hiding from its prey among various plants, such as grass, and moving slowly.",
+            "The bird is known for its ability to construct nests out of plants and spider threads, earning it the nickname 'finest tailor of all birds'. It mates during the rainy season.",
+            "The golden-headed cisticola has a variety of distinct vocalizations, ranging from a 'teewip' to a 'wheezz, whit-whit'. It is often found single or in small flocks, but outside of the breeding season, groups can be larger."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Climacteris erythrops",
+            "common": "Red-browed treecreeper",
+            "summary": "Climacteris erythrops is a bird species found in temperate and subtropical eastern Australia, endemic to the region. It inhabits mature eucalypt forests and woodlands in both coastal and mountainous areas.",
+            "description": [
+            "The Red-browed treecreeper is a small bird with a distinctive red-brown eyebrow that runs above its eye. Its body is streaked with shades of brown and white, and it has a thin, pointed bill.",
+            "These birds are known for their unique way of foraging, climbing trees in a spiral pattern while searching for insects hidden in the bark. They are also known to probe into crevices with their bills to extract insects.",
+            "Red-browed treecreepers are monogamous and form pairs for life. Both the male and female build the nest, which is a cup-shaped structure made of bark and grass, lined with feathers and spider webs.",
+            "The species is relatively common in its range, but is vulnerable to habitat loss and degradation due to clearing of eucalypt forests for agriculture and urbanization.",
+            "The Red-browed treecreeper has a melodic song consisting of clear, musical notes that are repeated in a series. Its calls are often heard during the breeding season."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Climacteris picumnus",
+            "common": "Brown treecreeper",
+            "summary": "Climacteris picumnus, or the Brown treecreeper, is the largest Australasian treecreeper that inhabits eucalypt-dominated woodland habitats in eastern Australia. The species is listed as 'least concern' by the IUCN, but the subspecies victoriae is considered Vulnerable under the Threatened Species Conservation Act (1995).",
+            "description": [
+            "Brown treecreepers are endemic to eastern Australia, and occupy areas from Cape York, Queensland, throughout New South Wales and Victoria to Port Augusta and the Flinders Ranges, South Australia. The population has declined in Adelaide and Cape York, and is currently prevalent between 16˚S and 38˚S.",
+            "These birds are found in a diverse range of habitats varying from coastal forests to mallee shrub-lands, but they prefer eucalypt-dominated woodland habitats up to 1,000 metres (3,300 ft) without a dense shrubby understorey.",
+            "Adult brown treecreepers are around 16.5 centimetres (6.5 in) long, with light grey-brown plumage above and a light grey face and neck. The throat is cream to white and the breast is pale brown streaked with fine black-grey and white. The wings have a dark bar visible in flight.",
+            "The subspecies victoriae is listed as nationally Vulnerable by DCCEEW, under the Environment Protection and Biodiversity Conservation Act (1999), while the species is considered of 'least concern' by the IUCN.",
+            "The call of the brown treecreeper has been described as a spink spink."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Colluricincla harmonica",
+            "common": "Grey shrikethrush",
+            "summary": "The grey shrikethrush, a songbird of Australasia, is a moderately common bird found in most parts of Australia and New Guinea. It is known for its ringing melody.",
+            "description": [
+            "The grey shrikethrush is a medium-sized bird, about 24 cm long, and is not known for its bright colors. However, it has a unique talent for a beautiful, ringing melody that rivals other Australasian species, such as the lyrebirds and the sandstone shrikethrush.",
+            "Formerly known as the grey thrush, it has several alternate names, including the brown shrike-thrush, buff-bellied shrike-thrush, grey shrike-flycatcher, northern shrike-thrush, and south-western shrike-thrush.",
+            "There are five recognized subspecies of the grey shrikethrush, each with its own distinct range. These subspecies include C. h. brunnea, C. h. superciliosa, C. h. harmonica, C. h. strigata, and C. h. rufiventris.",
+            "Although the grey shrikethrush is not known for its bright colors, it is still a beautiful and remarkable bird. Its unique ability to produce a beautiful, ringing melody has earned it a special place in the hearts of many birdwatchers and nature lovers.",
+            "The grey shrikethrush is considered to be of least concern on the IUCN Red List of Threatened Species, indicating that it is not currently at risk of extinction. However, like many species of birds, it is threatened by habitat loss and degradation."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Colluricincla megarhyncha",
+            "common": "Arafura shrikethrush",
+            "summary": "The Arafura shrikethrush is a bird species found in New Guinea and Australia. It is part of the Pachycephalidae family.",
+            "description": [
+            "The Arafura shrikethrush has a distinctive rufous coloration with a white belly and a long tail. They have a strong, sharp beak used for catching insects.",
+            "These birds are typically found in subtropical or tropical moist lowland and montane forests. They are known to forage in the understory and lower canopy of the forest.",
+            "During a study of bird toxicity, traces of batrachotoxins were found in some specimens of the Arafura shrikethrush, similar to the ones found in Central and South American poison dart frogs.",
+            "The Arafura shrikethrush is not considered to be a threatened species and is listed as Least Concern on the IUCN Red List.",
+            "There are three recognized subspecies of the Arafura shrikethrush, found in different regions of New Guinea and Australia."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Colluricincla woodwardi",
+            "common": "Sandstone shrikethrush",
+            "summary": "The Sandstone shrikethrush, also known as the brown-breasted shrike-thrush, is a species of bird endemic to Australia and belongs to the family Pachycephalidae.",
+            "description": [
+            "This species has a distinctive brown breast, and a grey head and back. The male and female are similar in appearance, with the female being slightly smaller in size.",
+            "Sandstone shrikethrushes are known for their loud, melodious calls that can be heard in the forests where they live. They have a varied diet that includes insects, spiders, and small vertebrates like lizards and frogs.",
+            "These birds are found in rocky, forested areas and are known for their agility in hopping and climbing among the rocky outcrops. They build their nests in crevices and hollows in the rocks.",
+            "The Sandstone shrikethrush is not considered to be a threatened species, although populations may be affected by habitat loss due to deforestation and mining.",
+            "Breeding season for the Sandstone shrikethrush is from August to December, with pairs forming lifelong bonds and both parents caring for the chicks until they fledge."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Conocephalus (Chloroxiphidion) albescens",
+            "common": "Whitish Meadow Katydid",
+            "summary": "The Whitish Meadow Katydid is a member of the family Tettigoniidae, and is found in the Brisbane area of Queensland, Australia. They can have fully developed wings or un-developed wings.",
+            "description": [
+            "The Whitish Meadow Katydid is a pale brown colour and can range in size from 10 to 27mm in length.",
+            "This species can be distinguished from others in the Conocephalus genus by their pale brown colour and short-winged form.",
+            "Whitish Meadow Katydids are primarily herbivorous, feeding on leaves, flowers, pollen and seeds of grasses and forbs. They may also occasionally prey on other insects.",
+            "Female katydids in this species lay their eggs in grass stems.",
+            "Whitish Meadow Katydids have been found near Bulimba Creek in the Mt Gravatt section, with observations in May 2007."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Conocephalus semivittatus",
+            "common": "Blackish Meadow Katydid",
+            "summary": "The Blackish Meadow Katydid is a common insect found in urban areas, forests and woodlands in Australia.",
+            "description": [
+            "Adult Blackish Meadow Katydids are typically 1-2.5 cm in size and vary in color throughout their distribution, with darker individuals occurring in the southern part of their range.",
+            "These katydids feed on flowers and seeds of plants with large, narrow leaves like Lomandra and Dianella species and can be found among grasses and reeds.",
+            "During the summer, the low buzzing calls of Blackish Meadow Katydids can be commonly heard when they occur in large numbers.",
+            "The Blackish Meadow Katydid is found in Queensland, Lord Howe Island and New South Wales.",
+            "The species belongs to the order Orthoptera and the family Tettagonidae, and is classified under the genus Conocephalus and the species semivittatus."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Conocephalu upoluensis",
+            "common": "Greenish Meadow Katydid",
+            "summary": "Conocephalus upoluensis, also known as Greenish Meadow Katydid, is a common katydid found in the Brisbane area of Queensland, Australia. They have a bright green body with dark brown on the back, and can grow up to 20mm in length.",
+            "description": [
+            "Greenish Meadow Katydids are active at night and hide among long grasses or reeds. They feed on flowers and seeds and produce low buzzing calls throughout the summer season.",
+            "These katydids are shy and ready to hide in dense grasses when approached. They usually hold tightly to the stem on which they are resting and move to the opposite side for hiding.",
+            "The female has a long sword-like ovipositor, and the antennae of the katydid are about four times the length of their body.",
+            "These Greenish Meadow Katydids can look at us from their back, and when approached they jump away. They are commonly found in Eight Mile Plains and Karawatha Forest.",
+            "Their bright green coloration and dark brown on the back makes them easily recognizable. However, habitat loss and degradation pose a threat to their population."
+            ],
+            "img": ""
         }
+
+
+
+            
+            
+            
+            
+            
+            
+            
+            
     ]
 }
