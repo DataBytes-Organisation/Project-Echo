@@ -2346,17 +2346,17 @@
       "img": ""
     },
     {
-      "species": "Sus scrofa",
-      "common": "Wild Boar",
-      "summary": "Sus scrofa , commonly known as the wild boar, is a large, omnivorous mammal found in forests and grasslands across Europe, Asia, and North Africa.",
-      "description": [
-        "They have a distinctive appearance with a muscular body, long snout, and prominent tusks.",
-        "Wild boars are known for their intelligence and adaptability, able to survive in a range of habitats from forests to suburban areas.",
-        "They are considered a pest in many areas due to their habit of rooting up crops and damaging property.",
-        "",
-        ""
-      ],
-      "img": ""
+        "species": "Sus scrofa",
+        "common": "Wild Boar",
+        "summary": "Sus scrofa , commonly known as the wild pig/wild boar, is a large, omnivorous mammal found in forests and grasslands across Europe, Asia, and North Africa.",
+        "description": [
+          "They have a distinctive appearance with a muscular body, long snout, and prominent tusks.",
+          "Wild boars are known for their intelligence and adaptability, able to survive in a range of habitats from forests to suburban areas.",
+          "They are considered a pest in many areas due to their habit of rooting up crops and damaging property.",
+          "",
+          ""
+        ],
+        "img": ""
     },
     {
       "species": "Symposiachrus trivirgatus",
@@ -3342,7 +3342,7 @@
 
     {
       "species": "Capra hircus",
-      "common": "Goat",
+      "common": "Feral Goat",
       "summary": "Capra hircus, or goat is a are animals that have been used for their milk, meat, and wool for thousands of years.",
       "description": [
         "They are known for their beards and horns, which can vary in length and shape.",
@@ -3352,7 +3352,6 @@
       ],
       "img": ""
     },
-
     {
       "species": "Carduelis carduelis",
       "common": "European goldfinch",
@@ -3365,7 +3364,6 @@
       ],
       "img": ""
     },
-
     {
       "species": "Carterornis leucotis",
       "common": "White-eared monarch",

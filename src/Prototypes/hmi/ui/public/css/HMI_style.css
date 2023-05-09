@@ -494,6 +494,7 @@ input[type="checkbox"]{
 }
 
 #animal-default-content{
+  padding-top: 20px;
   margin-left: 30px;
   margin-right: 30px;
   height: 85%;
@@ -507,6 +508,7 @@ input[type="checkbox"]{
 }
 
 #animal-popup #animal-popup-content{
+  padding-top: 25px;
   display: none;
   margin-left: 30px;
   margin-right: 30px;
@@ -521,28 +523,25 @@ input[type="checkbox"]{
 }
 
 #animal-popup #animal-popup-content img#markup_img {
-  height: 5vh;
+  height: 4vh;
   width: auto;
   aspect-ratio: 1;
-
 }
 
 #animal-popup #animal-popup-content img#markup_img_2 {
-  height: 5vh;
+  height: 4vh;
   width: auto;
   aspect-ratio: 1;
-
 }
 
 #animal-popup #animal-popup-content .markup_form {
   width: 100%;
   display: flex;
   flex-direction: column;
-
 }
 
 #animal-popup #animal-popup-content .markup_form .markup_column {
-  height: 7vh;
+  height: 4vh;
   display: flex;
   flex-direction: row;
   border-bottom: 1px dotted white;

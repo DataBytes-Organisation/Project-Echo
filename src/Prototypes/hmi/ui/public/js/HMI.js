@@ -782,8 +782,10 @@ function createMapClickEvent(hmiState){
         selectedVocalizationEventId = values.eventId;
       }
       if (values.animalSpecies){
-          var result = sample_data.find(({ common }) => common.toUpperCase() === values.animalSpecies.toUpperCase())
+          console.log(values.animalSpecies)
+          var result = sample_data.find(({ species }) => species.toLowerCase() === values.animalSpecies.toLowerCase())
           if (result) {
+            console.log("found")
             //Animal Bio specific session
             animal_data = result;
             document.getElementById("desc_name").innerText = result.common;
