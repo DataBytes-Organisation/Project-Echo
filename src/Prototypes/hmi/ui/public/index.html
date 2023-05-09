@@ -95,6 +95,7 @@
 
 
           <div id="menu" class="menu">
+            <div class="menu-header"></div>
             <div class="navbar">
               <a id="filter-menu-btn" class="tabs-button active" onclick="openTab('filter-menu')">f</a>
               <a id="popup-menu-btn" class="tabs-button" onclick="openTab('animal-popup')">l</a>
@@ -189,7 +190,7 @@
                 <div class="dropdown-menu faq-content" id="contact_us_content" aria-labelledby="contact_us_toggle">
                   <h2>Send a Message to Project Echo</h2>
                   <p>
-                    You can submit your query or feedback by filling the below form:
+                    You can submit your query or feedback using the form below:
                     <form method="post" action="/send_email" method="POST">
                       <div class="form-group row">
                           <div>
@@ -223,7 +224,7 @@
             <div id="SIM-contents">
               <h2>Simulator</h2>
                   <p>
-                    <strong>The Echo Simulator</strong> - an innovative system - aims to replicates the Otway’s National Forest environment by creating virtual microphone sensors strategically placed and interconnected in a mesh-like network. This advanced system effectively monitors semi-random simulated animal production events, contributing to wildlife research and conservation efforts. Upon detecting a sound, the simulator shows how our end-to-end solution is able to leverage the trigger times from the nearest microphones by employing a brute-force optimisation technique to accurately triangulate the source location of the sound based on latitude and longitude coordinates. With minimal error, the audio sample and associated microphone IDs are seamlessly integrated and communicated throughout Echo-Net, a comprehensive framework comprising a bioacoustics engine, store, processing server, communications servers, and APIs. This rich data is then visually represented on our (HMI), allowing researchers and wildlife enthusiasts to analyse and better understand the complex acoustic interactions within the simulated Otway’s National Forest ecosystem.
+                    <strong>The Echo Simulator</strong> - an innovative system - aims to replicate the Otway’s National Forest environment by creating virtual microphone sensors strategically placed and interconnected in a mesh-like network. This advanced system effectively monitors semi-random simulated animal production events, contributing to wildlife research and conservation efforts. Upon detecting a sound, the simulator shows how our end-to-end solution is able to leverage the trigger times from the nearest microphones, employing a brute-force optimisation technique to accurately triangulate the source location of the sound. With minimal error, the audio sample and associated microphone IDs are seamlessly integrated and communicated throughout Echo-Net, a comprehensive framework comprising a bioacoustics engine, store, processing server, communications servers, and APIs. This rich data is then visually represented on our (HMI), allowing researchers and wildlife enthusiasts to analyse and better understand the complex acoustic interactions within the simulated Otway’s National Forest ecosystem.
                   </p>
                   <div class="toggle-switch-container">
                     <label for="toggle-switch" class="toggle-label">Simulator:</label>
@@ -261,10 +262,10 @@
               <div class="markup_form">
                 <!-- markup_icon -->
                 <div class="markup_column">
-                  <div class="markup_row_left">
+                  <div class="markup_row_left" style="width: 100px !important">
                     <img id="markup_img" src=""></img>
                   </div>
-                  <div class="markup_row_right">
+                  <div class="markup_row_right" style="text-align: right !important; width: 400px !important">
                     <div id="markup_details"></div>
                   </div>
                 </div>
@@ -288,10 +289,10 @@
 
                 <!-- markup_date -->
                 <div class="markup_column">
-                  <div class="markup_row_left">
+                  <div class="markup_row_left" style="width: 100px !important">
                     <div>Date</div>
                   </div>
-                  <div class="markup_row_right">
+                  <div class="markup_row_right" style="text-align: right !important; width: 400px !important">
                     <div id="markup_date"></div>
                   </div>
                 </div>
@@ -345,7 +346,7 @@
               
             </div>
             <div id="animal-default-content">
-              <h2 style="text-align: left; color: #e48595 !important;">Animal Bio Data</h2>
+              <h2 style="text-align: left; color: rgba(247, 186, 206, 1) !important;">Animal Bio Data</h2>
                 <p>Please click on a map marker to view bio data.</p>
             </div>
             </div>
@@ -353,7 +354,7 @@
           <div id="filter-menu">
             <div class="wrapper">
             <div id="filter-menu-contents">
-            <h2 style="text-align: left; color: #e48595 !important;">
+            <h2 style="text-align: left; color: rgba(247, 186, 206, 1) !important;">
               Filter Menu
             </h2>
             <div class="toggle-switch-container">

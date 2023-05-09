@@ -4,6 +4,8 @@
 
 body {
     background: #1a1a1a;
+    font-size: 17px;
+    font-weight: bold;
 }
 
 .title {
@@ -47,6 +49,13 @@ h2 {
     width: 100vw;
     height: 100vh;
     
+}
+
+.menu-header{
+  display: block;
+  width: 100%;
+  height: 100px;
+  background-color: rgb(13, 12, 23, 0.8);
 }
 
 #menu{
@@ -308,10 +317,9 @@ body{
 }
 
 .dropdown-menu {
-    max-height: 200px;
+    max-height: 250px;
     overflow-y: auto;
     border-radius: 0;
-    
 }
 
 .dropdown-menu li {
@@ -319,7 +327,6 @@ body{
     grid-template-columns: repeat(2, 1fr);
     gap: 5px;
     border-radius: 0;
-    
 }
 
 .form-check-input {
@@ -327,41 +334,75 @@ body{
 }
 
 input[type="checkbox"]:checked{
-  background-color: grey !important;
+  background-color: rgba(247, 186, 206, 1) !important;
   border: solid 2px white;
 }
 
 input[type="checkbox"]{
+  width: 20px;
+  height: 20px;
+  background-color: rgba(247, 186, 206, 0.6);
+  border-color: white;
+  outline: none;
+}
+
+/* Hide the default checkbox tick icon 
+input[type="checkbox"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  outline: none;
+  cursor: pointer;
+  height: 20px;
+  width: 20px;
+  position: relative;
+  border-radius: 4px;
+  border: 1px solid #ccc;
   background-color: black;
   border-color: white;
   outline: none;
 }
 
-.vulnerable {
-  
-  border-color :orange !important;
- 
+input[type="checkbox"]::before,
+input[type="checkbox"]::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  width: 50%;
+  height: 2px;
+  background-color: #555;
 }
 
+input[type="checkbox"]::before {
+  transform: rotate(45deg);
+}
+
+input[type="checkbox"]::after {
+  transform: rotate(-45deg);
+}*/
+
+.vulnerable {
+  border-color :rgb(211, 100, 42) !important; 
+}
 
 .normal{
-  
-  border-color: green !important;
+  border-color: rgb(101, 188, 71) !important;
 }
 
 .endangered{
-  
-  border-color: red !important;
+  border-color: rgb(216, 30, 66)!important;
 }
 
 .invasive{
-  border-color :blue !important;
-  
+  border-color :rgb(61, 88, 167) !important;
 }
 
 .nearthreatened{
-  
-  border-color :yellow !important;
+  border-color :rgb(209, 184, 43) !important;
 }
 
 #content{
@@ -404,7 +445,7 @@ input[type="checkbox"]{
   color: rgb(141, 141, 141, 1.0);
   overflow-x: hidden;
   
-  padding-top: 80px;
+  padding-top: 180px;
   margin-top: 30px;
 }
 
@@ -432,7 +473,7 @@ input[type="checkbox"]{
   color: rgb(141, 141, 141, 1.0);
   overflow-x: hidden;
   
-  padding-top: 80px;
+  padding-top: 180px;
   margin-top: 30px;
   
 }
@@ -461,7 +502,7 @@ input[type="checkbox"]{
   color: rgb(141, 141, 141, 1.0);
   overflow-x: hidden;
   
-  padding-top: 80px;
+  padding-top: 180px;
   margin-top: 30px;
 }
 
@@ -491,7 +532,7 @@ input[type="checkbox"]{
   color: rgb(141, 141, 141, 1.0);
   overflow-x: hidden;
   
-  padding-top: 80px;
+  padding-top: 180px;
   margin-top: 30px;
 }
 
@@ -526,10 +567,10 @@ input[type="checkbox"]{
   padding-top: 20px;
   margin-left: 30px;
   margin-right: 30px;
-  height: 85%;
-  position: fixed;
+  height: 3000px;
+  /*position: fixed;*/
   width: 440px;
-  top: 110px;
+  /*top: 110px;*/
   overflow-wrap: break-word;
   font-family: 'Roboto', sans-serif;
 }
@@ -764,7 +805,7 @@ i {
     background-color: blue;
     border: none;
     padding: 10px 20px;
-    font-size: 16px;
+    font-size: 17px;
   }
 
   .toggle-button:active {
@@ -807,7 +848,7 @@ i {
   }
 
   .form-check-label {
-    font-size: .8em;
+    font-size: 17px;
   }
   .voc-icon {
     z-index: 9999;
@@ -824,15 +865,15 @@ i {
   }
   .toggle-label{
     color: rgb(141, 141, 141, 1.0);
-    font-family: var(--bs-btn-font-family);
-    font-size: var(--bs-btn-font-size);
+    font-family: 'Roboto', sans-serif;
+    font-size: 17px;
     font-weight: var(--bs-btn-font-weight);
     line-height: var(--bs-btn-line-height);
   }
   .past-data-header{
     color: rgb(141, 141, 141, 1.0);
-    font-family: var(--bs-btn-font-family);
-    font-size: var(--bs-btn-font-size);
+    font-family: 'Roboto', sans-serif;
+    font-size: 17px;
     font-weight: var(--bs-btn-font-weight);
     line-height: var(--bs-btn-line-height);
   }
@@ -848,7 +889,8 @@ i {
 
 .select-all-btn{
   height: 40px !important;
-  background-color:#adb5bd !important;
+  background-color:rgb(13, 12, 23, 0.8) !important;
+  border: 1px solid rgba(247, 186, 206, 0.6) !important;
   margin-top: 5px !important;
 }
 
@@ -917,12 +959,12 @@ i {
 /* Width and height of the scrollbar */
 .wrapper::-webkit-scrollbar {
   display: block;
-  width: 5px !important;
+  width: 7px !important;
 }
 
 /* Background color of the scrollbar track */
 .wrapper::-webkit-scrollbar-track {
-  background: rgb(141, 141, 141, 0.8);
+  background: rgb(141, 141, 141, 0.2);
   height: 200px !important;
 }
 
