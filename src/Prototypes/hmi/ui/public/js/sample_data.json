@@ -2695,7 +2695,6 @@
       ],
       "img": ""
     },
-
     {
       "species": "Acanthiza apicalis",
       "common": "Inland thornbill",
@@ -4195,6 +4194,1318 @@
         "Mole crickets are known for their distinctive chirping sound, which they produce by rubbing their front wings together. This sound is used to attract mates and communicate with other crickets."
       ],
       "img": ""
-    }
-  ]
+    },
+        {
+            "species": "Conopophila albogularis",
+            "common": "Rufous-Banded Honeyeater",
+            "summary": "The Rufous-banded Honeyeater is a small bird species that is found in the northern parts of Australia, specifically in the Kimberley region of Western Australia and the Top End of the Northern Territory.",
+            "description": [
+                "They are about 12 to 14 cm in length and have a distinctive rufous-colored band across their throat and upper breast, with a greyish-brown head and upperparts, and paler underparts.",
+                "Rufous-banded Honeyeaters are primarily insectivorous, feeding on small insects and spiders, but will also occasionally feed on nectar from flowering plants",
+                "They are known for their acrobatic flying abilities, darting and hovering among foliage and flowers to catch their prey.",
+                "These honeyeaters are highly territorial during breeding season, and will defend their nests aggressively against intruders.",
+                "Despite their territorial nature, they may also join mixed-species flocks with other honeyeaters and small birds outside of breeding season."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Cophixalus bombiens",
+            "common": "Buzzing Frog",
+            "summary": "Cophixalus bombiens, commonly known as the Buzzing Frog, is a small, dull brownish-yellow colored frog species found in the rainforests of northeastern Queensland, Australia.",
+            "description": [
+                "They are about 1.5 cm in length and have distinctive black markings on their head, back, and legs.",
+                "As their name suggests, Buzzing Frogs are known for their loud, buzzing calls that sound like an insect rather than a frog.",
+                "Buzzing Frogs are unique among frog species in that they do not have a vocal sac. Instead, they produce their calls by rapidly vibrating their vocal cords.",
+                "They are a ground-dwelling species and are typically found in damp, shaded areas on the forest floor, often near streams or other sources of water.",
+                "Buzzing Frogs are insectivores, feeding primarily on small insects and other arthropods."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Cophixalus exiguus",
+            "common": "Dainty Nurseryfrog",
+            "summary": "Cophixalus exiguus, also known as the Dainty Nurseryfrog, is a small frog species that is endemic to the coastal regions of eastern Australia, specifically the areas of Queensland and New South Wales.",
+            "description": [
+                "Adult Dainty Nurseryfrogs typically measure around 1.5 cm in length, making them one of the smallest frog species in Australia.",
+                "This species is known for its distinctive high-pitched squeaking call, which is used primarily during the breeding season to attract mates.",
+                "Dainty Nurseryfrogs are typically found in moist, shaded areas near streams and rivers, as well as in rainforests and wet sclerophyll forests.",
+                "Unlike most frog species, Dainty Nurseryfrogs do not have a tadpole stage. Instead, the females lay eggs on land, and the young hatch as miniature versions of the adults, bypassing the aquatic phase of development.",
+                "While Dainty Nurseryfrogs are not considered to be threatened at the moment, habitat loss and degradation due to human activities, as well as climate change and disease, could pose a threat to their populations in the future."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Cophixalus infacetus",
+            "common": "Dull Frog",
+            "summary": "Cophixalus infacetus, also known as the Dull Frog, is a small species of frog found in eastern Australia, specifically in the regions of Queensland and possibly the northeastern corner of New South Wales.",
+            "description": [
+                "Despite their name, Dull Frogs have a distinctive appearance. They are usually brown or grey with a white or cream underbelly and have small, granular skin.",
+                "Dull Frogs are a type of ground-dwelling frog and are usually found in moist, shaded habitats such as rainforests and wet sclerophyll forests.",
+                "Dull Frogs are often difficult to spot due to their cryptic coloration and small size, which typically ranges from 20-30 mm in length.",
+                "Like many frog species, Dull Frogs have a unique call that they use to communicate with other frogs. Their call is described as a short, sharp 'click' or 'tick'.",
+                "The breeding habits of Dull Frogs are not well-known, but it is believed that they lay their eggs in small pools or streams."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Cophixalus ornatus",
+            "common": "Ornate Frog",
+            "summary": "Cophixalus ornatus, commonly known as the Ornate Frog, is a small, arboreal frog species belonging to the family Microhylidae. They are endemic to Papua New Guinea and can be found in both lowland and mountain forests.",
+            "description": [
+                "The males of this species can reach a maximum size of 25mm, while females can grow up to 28mm in length.",
+                "They have a brown or greyish-brown base color, with intricate black markings and spots covering their bodies, and have distinctively bright red irises.",
+                "These frogs are known for their unique calling behavior, where they produce a series of high- pitched, bird-like chirping sounds.",
+                "Ornate Frogs are primarily arboreal and are found living in the forest canopy, where they lay their eggs in tree holes or in moist crevices of bark.",
+                "This species is not currently considered threatened, but due to their small size and cryptic coloration, they can be difficult to spot in the wild."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Coracina novaehollandiae ",
+            "common": "Black-Faced Cuckoo-Shrike",
+            "summary": "The Black-Faced Cuckoo-Shrike (Coracina novaehollandiae) is a medium-sized bird found throughout Australia and parts of Southeast Asia. They are easily identifiable by their striking black and white plumage, with a distinctive black mask across their face.",
+            "description": [
+                "Black-Faced Cuckoo-Shrikes are known for their unique vocalizations, which include a range of whistles, warbles, and trills. They are particularly well-known for their ‘kow-kow’ call,which sounds similar to a squeaky toy.",
+                "These birds are typically found in forested areas, but are also known to frequent parks and gardens in urban areas. They feed on insects and other small invertebrates, which they catch by swooping down from trees and bushes.",
+                "During breeding season, Black-Faced Cuckoo-Shrikes build cup-shaped nests made of twigs, grass, and bark. They lay 2-4 eggs per clutch, which are incubated for around two weeks before hatching. Both male and female birds take turns incubating the eggs and feeding the chicks.",
+                "",
+                ""
+            ],
+            "img": ""
+        },
+        {
+            "species": "Coracina papuensis",
+            "common": "White-Bellied Cuckoo-Shrike",
+            "summary": "The White-Bellied Cuckoo-Shrike is a medium-sized bird species found in Australia, Indonesia, and Papua New Guinea. They have a distinct appearance with a white belly, black head and wings, and greyish-blue back and tail.",
+            "description": [
+                "They are known for their loud, melodic songs that are often sung in pairs or groups.",
+                "These birds have a unique breeding strategy where the males build the nest and incubate the eggs while the females defend the territory.",
+                "White-Bellied Cuckoo-Shrikes are omnivorous and feed on a variety of insects, fruit, and nectar.",
+                "They are considered a common bird species in their range and are not currently listed as threatened.",
+                "In some areas, the White-Bellied Cuckoo-Shrike is believed to have cultural significance and is featured in the mythology of some Indigenous Australian communities."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Corcorax melanorhamphos ",
+            "common": "White-Winged Chough",
+            "summary": "Corcorax melanorhamphos, commonly known as the White-Winged Chough, is a species of bird native to southeastern Australia. They have a distinctive appearance, with glossy black feathers, a curved black bill, and white wing patches that are visible in flight.",
+            "description": [
+                "White-Winged Choughs are known for their complex social behavior, living in large family groups of up to 20 individuals that work together to forage for food and build complex stick nests. They communicate with a range of vocalizations, including melodious songs and harsh calls.",
+                "Interestingly, the White-Winged Chough has convergently evolved similar physical traits with the unrelated New World Choughs of the genus Pyrrhocorax, such as their curved bill andglossy black feathers. They also have a unique foraging behavior known as ‘foot-tapping’, where they use their feet to disturb leaf litter and uncover insects.",
+                "White-Winged Choughs are considered to be a species of least concern, although their populations are declining due to habitat loss and fragmentation. Conservation efforts are underway to protect their remaining habitat and promote their recovery.",
+                "",
+                ""
+            ],
+            "img": ""
+        },
+        {
+            "species": "Cormobates leucophaea ",
+            "common": "White-Throated Treecreeper",
+            "summary": "Cormobates leucophaea is a small passerine bird about 15cm, native to eastern Australia, including Tasmania. It is part of the treecreeper family and is known for its distinctive white throat and black and white barred wings. The upperparts of the bird are brown with a streaked appearance, while the underparts are white.",
+            "description": [
+                "White-Throated Treecreepers are found in eucalyptus forests and woodlands, where they use their strong, curved bills to search for insects and spiders in the crevices of bark. They also have a unique habit of spiraling up tree trunks as they forage, using their stiffened tail feathers and long toes to prop themselves up.",
+                "During the breeding season, the male and female work together to construct a nest made of bark and grass, which is usually placed behind a flap of loose bark. The female lays 2-3 eggs, which are incubated by both parents.",
+                "One interesting fact about the White-Throated Treecreeper is that it has a unique adaptation for perching on vertical surfaces - the stiffened tail feathers and long toes that allow it to prop itself up while foraging also help it cling to tree trunks and branches. Another interesting fact is that the White-Throated Treecreeper has a similar appearance and behavior to the Brown Creeper found in North America, showing an example of convergent evolution in these distantly related species.",
+                "",
+                ""
+            ],
+            "img": ""
+        },
+        {
+            "species": "Corvus bennetti",
+            "common": "Little Crow",
+            "summary": "Corvus bennetti, commonly known as the Little Crow, is a species of bird belonging to the Corvidae family. It is a small-sized crow found in various regions of Australia, including the southern coastal regions of Western Australia, South Australia, Victoria, New South Wales, and Queensland.",
+            "description": [
+                "The Little Crow measures approximately 36-43 cm in length and has a wingspan of 75-85 cm. They have a glossy black plumage with a slender bill, and their eyes are brown. The males are usually slightly larger than the females.",
+                "The Little Crow is known for its distinctive and melodious calls, which are complex and varied. They are highly social birds that often gather in large flocks, and they are opportunistic feeders, feeding on insects, fruits, seeds, small animals, and carrion.",
+                "Interestingly, the Little Crow has been observed exhibiting tool use behavior, where it uses sticks to pry insects out of bark or crevices. This behavior is relatively rare among birds and is considered a sign of high intelligence.",
+                "The Little Crow is not considered to be a threatened species, although its population may be declining in some regions due to habitat loss and fragmentation.",
+                ""
+            ],
+            "img": ""
+        },
+        {
+            "species": "Corvus coronoides ",
+            "common": "Australian Raven",
+            "summary": "The Australian Raven (Corvus coronoides) is a large, black bird found throughout mainland Australia and Tasmania.",
+            "description": [
+                "They have a distinctive deep, resonant call that can be described as a ‘cronk’ or ‘korrk’ sound.",
+                "Their diet consists of a wide variety of food, including insects, small mammals, reptiles, fruits, and carrion.",
+                "They are known to form lifelong pair bonds and mate for life, and can live up to 30 years in the wild.",
+                "Australian Ravens are intelligent birds and have been observed using tools, playing games, and even engaging in deception. They have also been known to mimic other bird species and human speech.",
+                "These birds are an important part of Indigenous Australian culture and are featured in many Dreamtime stories and Aboriginal artwork."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Corvus mellori",
+            "common": "",
+            "summary": "The Little Raven (Corvus mellori) is a passerine bird native to southeastern Australia, particularly the coastal and sub-coastal areas of Victoria, New South Wales, and South Australia.",
+            "description": [
+                "It is smaller than the Australian Raven, measuring about 42-46 cm in length and weighing around 350-500 g.",
+                "They are social birds and are often seen in groups or pairs, particularly during the breeding season. They are also known for their acrobatic flight and playful behavior.",
+                "Little Ravens are omnivorous and feed on a wide variety of foods, including insects, small mammals, birds, eggs, carrion, and fruit.",
+                "They build their nests in trees, typically using sticks and other plant material, and lining the interior with softer materials like fur or feathers.",
+                "Little Ravens have been known to exhibit some interesting behaviors, including using tools to access food sources, like using sticks to extract insects from tree bark."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Corvus orru ",
+            "common": "Torresian Crow",
+            "summary": "The Torresian Crow is a large, all-black bird found throughout northern and eastern Australia, as well as parts of New Guinea and Indonesia.",
+            "description": [
+                "They have a distinctive loud and raucous call that is often heard in the early morning and late afternoon, as well as a variety of other vocalizations.",
+                "Torresian Crows are known for their intelligence and problem-solving abilities, with some individuals observed using tools to obtain food.",
+                "They are opportunistic feeders, eating a wide range of food including insects, small mammals, reptiles, and fruit.",
+                "Torresian Crows are social birds, often seen in groups or pairs, and have been known to form lifelong partnerships with their mates.",
+                "In some Aboriginal cultures, the Torresian Crow is considered a sacred bird, associated with creation and the afterlife."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Coturnix pectoralis ",
+            "common": "Stubble Quail",
+            "summary": "Coturnix pectoralis, also known as the Stubble Quail, is a small ground-dwelling bird species native to Australia, including Tasmania. ",
+            "description": [
+                "Stubble quails are often found in grasslands, farmlands, and other open habitats across their range.",
+                "They are sexually dimorphic, with males having a chestnut-brown breast and a bluish-grey head, while females have a brownish breast and a brown head.",
+                "Stubble quails are omnivorous, feeding on a variety of seeds, insects, and small invertebrates.",
+                "These birds are known for their distinctive ‘chuck-chuck’ calls, which can be heard throughout their range.",
+                "Stubble quails are highly migratory, and populations in the southern parts of their range will move north during winter in search of more favourable conditions."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Cracticus nigrogularis ",
+            "common": "Pied Butcherbird",
+            "summary": "The Pied Butcherbird (Cracticus nigrogularis) is a medium-sized songbird found in Australia.",
+            "description": [
+                "Pied Butcherbirds are known for their beautiful and complex songs, which consist of a series of melodious notes that can last for several minutes.",
+                "They are also skilled predators, feeding on a variety of insects, small reptiles, and mammals, which they catch by swooping down from perches in trees and bushes.",
+                "Pied Butcherbirds are highly territorial and will defend their territory vigorously against other birds and animals.",
+                "They are monogamous and form long-term pair bonds, with both parents participating in the care of their young.",
+                "In some Aboriginal cultures, the Pied Butcherbird is considered a spiritual animal and is associated with creation stories and the cycle of life."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Cracticus torquatus ",
+            "common": "Grey Butcherbird",
+            "summary": "Cracticus torquatus, commonly known as the Grey Butcherbird, is a species of bird native to Australia.",
+            "description": [
+                "They are medium-sized birds, with males typically measuring 28–32 cm (11–13 in) in length and females measuring 25–28 cm (10–11 in) in length.",
+                "They are known for their beautiful and melodic calls, which are often heard in the early morning and late afternoon.",
+                "Grey Butcherbirds are carnivorous and feed on insects, small mammals, reptiles, and other birds.",
+                "They are skilled hunters and are known to impale their prey on thorns or sharp branches to make it easier to consume.",
+                "Grey Butcherbirds are also known to be highly intelligent birds. They have been observed using tools, such as twigs and sticks, to extract insects from tree bark."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Crinia signifera ",
+            "common": "Common Froglet",
+            "summary": "Crinia signifera, commonly known as the Common Froglet, is a small species of ground- dwelling frog found throughout southern and eastern Australia. ",
+            "description": [
+                "The Common Froglet is one of the smallest frog species in Australia, measuring only 1-2.5 cm in length.",
+                "Despite its small size, the Common Froglet has a loud and distinctive call that can be heard during the breeding season. The call is described as a 'clicking' or 'ticking' sound.",
+                "These frogs are highly adaptable and can be found in a variety of habitats, including wetlands, grasslands, and forests.",
+                "During the breeding season, males will establish small territories and call to attract females. Once the female has laid her eggs, the male will guard them until they hatch.",
+                "The Common Froglet is an important indicator species for wetland health, as it is highly sensitive to changes in water quality and habitat degradation."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Cygnus atratus ",
+            "common": "Black Swan",
+            "summary": "The Black Swan is a large waterbird native to Australia. ",
+            "description": [
+                "They are the only swan species that is entirely black, with the exception of a small patch of white feathers on their wingtips.",
+                "Black Swans are monogamous and mate for life, often staying together even outside of breeding season.",
+                "They are herbivorous and feed on a variety of aquatic plants, including algae and submerged vegetation.",
+                "Black Swans are highly territorial during the breeding season and will aggressively defend their nests and young from predators.",
+                "In Indigenous Australian culture, the Black Swan is seen as a symbol of beauty, grace, and loyalty."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Dacelo leachii ",
+            "common": "Blue-Winged Kookaburra",
+            "summary": "The Blue-Winged Kookaburra (Dacelo leachii) is a large bird native to northern and eastern Australia and southern New Guinea.",
+            "description": [
+                "They are about 40-45 cm (16-18 in) in length and have a wingspan of around 60-65 cm (24- 26 in).",
+                "Like other members of the kingfisher family, Blue-Winged Kookaburras are carnivorous and primarily feed on insects, small mammals, lizards, and snakes.",
+                "They are also known for their loud, raucous laughter-like call, which is often used as a territorial display.",
+                "Blue-Winged Kookaburras are cooperative breeders, with family groups consisting of a breeding pair and several of their offspring from previous years assisting with nesting and caring for young.",
+                "They are found in a variety of habitats, including open woodland, savannah, and urban areas, and are generally not considered threatened."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Dacelo novaeguineae ",
+            "common": "Kookaburra",
+            "summary": "The Laughing Kookaburra is a large bird that is native to Australia and is also known simply as the Kookaburra.",
+            "description": [
+                "They are famous for their distinctive call, which sounds like a loud, echoing laugh, and is often used in movies and TV shows to represent jungle or wilderness sounds.",
+                "The Kookaburra is a carnivorous bird, and they feed on a variety of prey, including insects, lizards, snakes, and small mammals. They are also known to eat other birds and even snakes up to one meter long. ",
+                "Kookaburras are monogamous and mate for life. They nest in tree hollows, and both parents incubate the eggs and feed the chicks.",
+                "In addition to their iconic laugh, Kookaburras are also known for their territorial behavior, and will defend their nesting sites vigorously against other birds and animals.",
+                "The Kookaburra has been featured in Australian culture for centuries, and is often associated with the Australian bush and the outback. They are also the subject of a popular children's song, ‘Kookaburra sits in the old gum tree.’"
+            ],
+            "img": ""
+        },
+        {
+            "species": "Dama Dama ",
+            "common": "Fallow Deer",
+            "summary": "Dama Dama is a medium-sized deer species native to Western Eurasia but has been introduced to other parts of the world, including Australia and North America.",
+            "description": [
+                "Fallow Deer are known for their distinctive palmate antlers, which are flattened and shaped like a hand with fingers. These antlers are shed and regrown each year.",
+                "Fallow Deer are primarily grazers, feeding on a variety of vegetation, including grasses, leaves, and shoots.",
+                "During the breeding season, males engage in a behavior known as ‘rutting,’ where they compete with each other for access to females. This behavior includes vocalizations, posturing, and antler-wrestling.",
+                "Fallow Deer have been hunted for their meat and antlers for centuries, and are also commonly kept in parks and game reserves for their aesthetic appeal.",
+                "The coat of the Fallow Deer is typically brown with white spots, although some individuals may have a darker coat or even be completely white."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Daphoenositta chrysoptera ",
+            "common": "Varied Sittella",
+            "summary": "Daphoenositta chrysoptera, commonly known as the Varied Sittella, is a small passerine bird native to Australia. ",
+            "description": [
+                "The Varied Sittella is known for its unique feeding behavior. It moves along the branches of trees, often hanging upside down like a chickadee, to feed on insects and spiders.",
+                "The species has a distinctive black, white, and chestnut plumage. The male and female have a similar appearance, but the female has a slightly smaller bill.",
+                "The Varied Sittella is a cooperative breeder, with a breeding pair assisted by several helper birds that are typically their offspring from previous seasons. These helpers aid in feeding and caring for the young.",
+                "This species is found in a range of habitats, from woodlands and forests to arid scrublands, across much of Australia except for the far north and southwest of the country.",
+                "The Varied Sittella has a unique call that sounds like a high-pitched, rapid trill. It is often heard in small flocks as they move through the treetops."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Dendrocygna arcuate ",
+            "common": "Wandering Whistling-Duck",
+            "summary": "Dendrocygna arcuata, commonly known as the Wandering Whistling-Duck, is a species of whistling duck found in parts of Australia, Indonesia, Papua New Guinea, and the Solomon Islands. They inhabit freshwater wetlands, swamps, and rice fields, and are known for their distinctive whistling calls, which can be heard during flight.",
+            "description": [
+                "The Wandering Whistling-Duck is a medium-sized duck, measuring around 50-60 cm in length and weighing up to 1 kg.",
+                "They have a striking appearance, with a chestnut-brown head and neck, a white eye-ring, and a buff-colored body with black spots.",
+                "These ducks are mostly herbivorous, feeding on aquatic plants, seeds, and grasses.",
+                "They are known for their unique breeding habits, as they form large communal nests made from reeds and grasses in areas of flooded wetlands. These nests can house up to 50 eggs and are tended by both males and females.",
+                "The Wandering Whistling-Duck is considered a game bird in Australia and is sometimes hunted for sport or food, but their populations are generally stable and not considered threatened."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Dicaeum hirundinaceum ",
+            "common": "Mistletoebird",
+            "summary": "The Mistletoebird is a small, plump, and active bird found across much of Australia and parts of Southeast Asia.",
+            "description": [
+                "They are about 8-10 cm in length and weigh around 6-9 grams.",
+                "Mistletoebirds are named after their unique feeding habit of eating the sticky white berries of mistletoe plants. They are the only bird species in the world that is completely dependent on mistletoe for their survival.",
+                "Mistletoebirds are able to digest mistletoe berries very quickly, sometimes even while still in flight, which allows them to consume large quantities of the fruit in a short amount of time.",
+                "They build their small, cup-shaped nests using fine twigs and grasses, often weaving them into the dense foliage of mistletoe plants.",
+                "Mistletoebirds are known for their sweet and melodious song, which is often heard during the breeding season. Males have a more complex song than females and may even mimic the songs of other bird species."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Dicrurus bracteatus ",
+            "common": "Spangled Drongo",
+            "summary": "The Spangled Drongo is a medium-sized bird found in the forests and woodlands of Australia and Southeast Asia.",
+            "description": [
+                "They are known for their glossy black plumage and striking, iridescent blue-green spangles on their tail.",
+                "Spangled Drongos are highly vocal and have a wide repertoire of calls, including mimicry of other bird species and even mechanical sounds like car alarms.",
+                "They are insectivorous and often hunt insects in flight, using their acrobatic flying abilities to catch their prey.",
+                "During the breeding season, Spangled Drongos are known to form cooperative breeding groups where non-breeding birds help raise the offspring of breeding pairs.",
+                "In some Indigenous Australian cultures, the Spangled Drongo is considered a trickster figure, often depicted in stories as using its intelligence and cunning to outsmart other animals."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Ducula spilorrhoa ",
+            "common": "Torresian imperial pigeon",
+            "summary": "The Torresian imperial pigeon is a large, plump pigeon found throughout northern and eastern Australia and in parts of New Guinea.",
+            "description": [
+                "They are known for their loud and distinctive calls, which can be heard echoing through the forests where they live.",
+                "Torresian imperial pigeons are frugivores, feeding primarily on the fruits of rainforest trees.",
+                "They are considered an important seed disperser for many of these trees, as they can swallow fruits whole and pass the seeds intact through their digestive system, allowing them to be spread over large distances.",
+                "During breeding season, males perform elaborate courtship displays, puffing out their chest feathers and cooing to attract a mate.",
+                "Females typically lay a single egg, which both parents take turns incubating for around 24 days."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Edolisoma tenuirostre",
+            "common": "Common cicadabird",
+            "summary": "The Common Cicadabird is a small bird found in tropical and subtropical forests of Southeast Asia and Australia.",
+            "description": [
+                "It is known for its loud, distinctive call, which sounds like the whirring of a cicada.",
+                "The males have a striking black and white plumage, while the females are duller with brownish-grey feathers.",
+                "They feed mainly on insects, including cicadas, which they catch on the wing.",
+                "During breeding season, the male Cicadabirds perform elaborate courtship displays, such as puffing up their chests and singing loudly.",
+                "The Common Cicadabird is considered to be of Least Concern by the IUCN, as it has a wide range and stable population."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Egretta novaehollandiae ",
+            "common": "White-Faced Heron",
+            "summary": "The White-Faced Heron is a medium-sized heron found throughout most of Australia and parts of New Zealand and New Caledonia.",
+            "description": [
+                "They are typically found in wetlands, swamps, estuaries, and other waterways, where they feed on a variety of small aquatic animals, such as fish, frogs, and crustaceans.",
+                "White-Faced Herons are very adaptable and can also be found in urban areas, such as parks and gardens, where they may feed on insects and small vertebrates.",
+                "During breeding season, they develop long, wispy plumes on their back and neck, which they use in courtship displays.",
+                "White-Faced Herons are generally solitary birds, although they may form small flocks during the non-breeding season.",
+                "They are known for their slow, graceful flight, and may soar high in the sky on thermal currents."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Elanus axillaris ",
+            "common": "Black-Shouldered Kite",
+            "summary": "Elanus axillaris, commonly known as the Black-Shouldered Kite, is a small and graceful raptor found in parts of Australia, New Guinea, and Indonesia.",
+            "description": [
+                "They are small, measuring about 30-35 cm in length with a wingspan of 80-100 cm, and weighing only around 200-300 grams.",
+                "These birds are highly skilled hunters, preying mainly on small rodents such as mice and voles, as well as insects and small birds.",
+                "Unlike most other birds of prey, the Black-Shouldered Kite is known to hover in one spot in the air for extended periods of time, scanning the ground below for prey before swooping down to catch it.",
+                "These kites are also known for their vocalizations, which include high-pitched whistles and screeches.",
+                "Black-Shouldered Kites are not considered threatened and have a large range, but habitat loss and degradation could pose a threat to their populations in the future."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Elseyornis melanops ",
+            "common": "Black-Fronted Dotterel",
+            "summary": "Elseyornis melanops, commonly known as the Black-Fronted Dotterel, is a small bird species native to Australia, New Zealand, and New Guinea. They are typically found near bodies of water such as rivers, lakes, and wetlands.",
+            "description": [
+                "They are small birds, measuring only about 15-18 cm in length and weighing around 25-45 grams.",
+                "The males and females have similar plumage, with a distinctive black ‘V’ shape on their breast and a white belly.",
+                "They are known for their distinctive call, which is described as a high-pitched ‘weet-weet- weet’ sound.",
+                "Elseyornis melanops are ground-nesting birds, laying their eggs in shallow scrapes on sandy or muddy areas near the water's edge.",
+                "They feed on small invertebrates such as insects, crustaceans, and mollusks, which they find by probing their bills into the mud or sand."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Entomyzon cyanotis ",
+            "common": "Blue-Faced Honeyeater",
+            "summary": "The Blue-Faced Honeyeater is a species of honeyeater found in Australia, particularly in the northern and eastern parts of the country. It is characterized by its distinctive blue skin around the eyes and beak, which gives it its name. The Blue-Faced Honeyeater has a wide range of habitats, from rainforests to woodlands, and feeds on nectar, insects, and fruit.",
+            "description": [
+                "The Blue-Faced Honeyeater is known for its impressive ability to mimic the calls of other birds and even other animals, including dogs and cats.",
+                "This bird is often seen in groups, sometimes consisting of up to 20 individuals, and they are known for their vocal communication with each other.",
+                "The Blue-Faced Honeyeater is an important pollinator of flowers, particularly those with tubular shapes that other birds may have difficulty accessing.",
+                "During the breeding season, males will display their blue facial skin more prominently in order to attract mates.",
+                "The Blue-Faced Honeyeater has been known to visit gardens and even homes in search of food, particularly sugary treats like jam and honey."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Eolophus roseicapilla ",
+            "common": "Galah",
+            "summary": "The Galah is a common and widespread bird, found in open country throughout most of Australia.",
+            "description": [
+                "Galahs are highly social birds and often form large flocks of up to several hundred individuals, which can be quite noisy.",
+                "Galahs are capable of mimicking human speech and can also learn to imitate other sounds, such as car alarms and telephone ringtones.",
+                "In the wild, Galahs feed on a variety of seeds, fruits, and insects, and are particularly fond of eating the seeds of the eucalyptus tree.",
+                "Galahs are a popular pet bird and are often kept in captivity due to their playful and affectionate personalities.",
+                "In some Indigenous Australian cultures, the Galah has mythological significance and is associated with storytelling and traditional medicine."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Eopsaltria australis ",
+            "common": "Eastern Yellow Robin",
+            "summary": "The Eastern Yellow Robin (Eopsaltria australis) is a small passerine bird found in eastern and southeastern Australia.",
+            "description": [
+                "They are insectivorous and mostly feed on insects and spiders, which they hunt by hopping along the ground and low branches of trees.",
+                "The Eastern Yellow Robin has a wide repertoire of songs and calls, including a clear, ringing whistle that is often heard in Australian forests.",
+                "They are territorial birds and live in pairs, with each pair occupying and defending a specific territory throughout the year.",
+                "Eastern Yellow Robins are known for their close association with humans and are often seen around gardens and parks.",
+                "Overall, the Eastern Yellow Robin is a beloved and familiar bird of the Australian bushland, known for its bright plumage and sweet song."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Ephippitytha trigintiduoguttata ",
+            "common": "Spotted Katydid",
+            "summary": "The Spotted Katydid is a type of bush cricket found in eastern Australia.",
+            "description": [
+                "They are named for the distinctive spots on their body, which can vary in color from green to brown.",
+                "These insects are known for their loud and persistent chirping, which is produced by rubbing their wings together.",
+                "The Spotted Katydid feeds on a variety of plant matter, including leaves, flowers, and fruits.",
+                "Females lay their eggs in the soil or on plant stems, and the young nymphs undergo several molts before reaching adulthood.",
+                "Spotted Katydids are preyed upon by a variety of predators, including birds, reptiles, and mammals."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Eudynamys orientalis ",
+            "common": "Eastern Koel",
+            "summary": "The Eastern Koel is a species of cuckoo found throughout Australia, as well as parts of Indonesia and Papua New Guinea.",
+            "description": [
+                "The male Eastern Koel has striking black plumage with bright red eyes, while the female is brown with white spots.",
+                "The Eastern Koel is known for its distinctive and loud call, which is often heard during the breeding season. It has a loud, descending whistle, which has been described as sounding like ‘ko-el’.",
+                "The Eastern Koel is a brood parasite, meaning it lays its eggs in the nests of other bird species, such as the Red Wattlebird and the Magpie-lark. The young Koel will often push the host bird's eggs or chicks out of the nest, to ensure it receives all the parental care and food.",
+                "The Eastern Koel is often associated with the start of the wet season in northern Australia, as it begins breeding during this time. In some Aboriginal cultures, the arrival of the Eastern Koel is seen as a sign of the coming of the wet season and the time to gather food.",
+                ""
+            ],
+            "img": ""
+        },
+        {
+            "species": "Eurostopodus argus ",
+            "common": "Spotted Nightjar",
+            "summary": "The Spotted Nightjar is a nocturnal bird found in parts of Australia, Indonesia, Papua New Guinea, and the Solomon Islands.",
+            "description": [
+                "It has a distinctive spotted pattern on its plumage, which provides camouflage during the day when the bird rests on the ground.",
+                "The Spotted Nightjar has a unique feeding behavior. It feeds on insects by flying up from the ground and catching them in its mouth mid-air.",
+                "Males have a distinctive territorial call, a loud and monotonous ‘chop chop chop’ sound, which is repeated for hours during the night.",
+                "Despite their common name, nightjars are not related to true ‘jars’ or containers. The name comes from the old English word ‘nihtceare,’ meaning ‘night-chatterer.’",
+                ""
+            ],
+            "img": ""
+        },
+        {
+            "species": "Eurostopodus mystacalis ",
+            "common": "White-Throated Nightjar",
+            "summary": "The White-throated Nightjar (Eurostopodus mystacalis) is a small nocturnal bird found in various habitats across northern and eastern Australia, including woodlands, savannas, and forests.",
+            "description": [
+                "They have a cryptic plumage with brown, black, and white streaks that camouflages them well against tree trunks and branches.",
+                "They feed on flying insects, such as moths, beetles, and termites, which they catch in flight using their wide gape and bristle-like rictal bristles.",
+                "Male White-throated Nightjars have a distinctive courtship display, in which they clap their wings together above their back, producing a loud and distinctive sound.",
+                "They are known to be silent and difficult to detect during the day, but their presence can be detected by their distinctive call, a series of repeated, monotonous ‘chop-chop-chop’ notes.",
+                ""
+            ],
+            "img": ""
+        },
+        {
+            "species": "Eurystomus orientalis ",
+            "common": "Dollarbird",
+            "summary": "The Eurystomus orientalis, commonly known as the Dollarbird, is a medium-sized bird in the roller family that is found throughout Australia, Indonesia, and Papua New Guinea.",
+            "description": [
+                "They get their name from the distinctive circular patches of bright blue feathers on their throat, which resemble silver dollar coins.",
+                "The Dollarbird is a migratory species, with populations moving south during the winter months and returning north in the summer to breed.",
+                "They are known for their acrobatic flight displays, which involve swooping, gliding and soaring through the air.",
+                "These birds are primarily insectivorous, feeding on a variety of insects including beetles, crickets, and cicadas.",
+                "The Dollarbird is also known for its unique breeding habits, with pairs working together to excavate a nest hole in a tree, usually high up in a eucalyptus or acacia tree."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Falco berigora ",
+            "common": "Brown Falcon",
+            "summary": "The Brown Falcon (Falco berigora) is a medium-sized bird of prey found in Australia and Papua New Guinea. They have a wingspan of around 90-105cm and can weigh up to 700g.",
+            "description": [
+                "The Brown Falcon is a highly adaptable species, and can be found in a wide range of habitats, including forests, grasslands, and deserts.",
+                "They are skilled hunters and can catch prey in mid-air, often swooping down from a height to surprise their target.",
+                "The Brown Falcon is a solitary bird, except during breeding season when they form pairs. They are known for their elaborate courtship displays, which involve aerial acrobatics and loud calls.",
+                "This species is not considered to be globally threatened, although habitat loss and hunting can pose a threat in some areas.",
+                "In Indigenous Australian culture, the Brown Falcon is often seen as a symbol of strength and resilience."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Falco cenchroides ",
+            "common": "Nankeen kestrel",
+            "summary": "The Nankeen kestrel is one of the most common and widespread raptors in Australia, and can be found in a variety of habitats including forests, grasslands, and urban areas.",
+            "description": [
+                "This species is named after its distinctive coloration, which resembles the yellowish-brown color of Nankeen cloth, a type of cotton fabric that was once common in Australia.",
+                "Nankeen kestrels are versatile hunters and feed on a variety of prey, including insects, small mammals, reptiles, and birds.",
+                "Unlike many other raptors, Nankeen kestrels are diurnal, meaning they are active during the day and hunt primarily in the early morning and late afternoon.",
+                "Male and female Nankeen kestrels look very similar, but females are generally larger and have a more heavily streaked breast.",
+                "The Nankeen kestrel is known for its distinctive hovering flight, where it remains stationary in the air by rapidly flapping its wings."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Falco peregrinus ",
+            "common": "Peregrine falcon",
+            "summary": "Falco peregrinus, also known as the Peregrine falcon, is a large bird of prey found worldwide.",
+            "description": [
+                "They are famous for being the fastest bird in the world, capable of reaching speeds of up to 240 mph (386 km/h) during a dive.",
+                "Peregrine falcons have a distinctive black ‘moustache’ marking on their face, and their upper parts are blue-gray with dark bars.",
+                "They mainly feed on other birds, catching them in mid-air with stunning speed and agility.",
+                "Peregrine falcons have made a remarkable comeback in many parts of the world after their populations were decimated by the widespread use of pesticides such as DDT. Conservation efforts have helped their numbers to recover, and they are now classified as a species of least concern by the IUCN. ",
+                ""
+            ],
+            "img": ""
+        },
+        {
+            "species": "Falcunculus frontatus ",
+            "common": "Crested Shrike-Tit",
+            "summary": "The Crested Shrike-tit (Falcunculus frontatus) is a small, insectivorous bird native to Australia. ",
+            "description": [
+                "They are about 16-18 cm long and have a distinctive crest on their head, as well as a yellow- orange breast and belly, black wings and tail, and a grey back. Males and females have similar plumage. ",
+                "They also have a unique hunting technique where they use their bill to probe into bark crevices to catch prey, rather than impaling it like some other shrike species.",
+                "These birds are found in a range of habitats including woodlands, forests, and scrublands throughout much of mainland Australia, except for Tasmania. They are also known for their loud, musical calls, which can often be heard from a distance. ",
+                "",
+                ""
+            ],
+            "img": ""
+        },
+        {
+            "species": "Felis Catus ",
+            "common": "Domestic Cat",
+            "summary": "Domestic cats are a member of the Felidae family, which includes all cats - big and small.",
+            "description": [
+                "Domestic cats are skilled hunters and can pose a threat to local wildlife populations. It is important for cat owners to keep their pets indoors or supervise them when outside to prevent them from hunting and causing ecological damage.",
+                "Cats are known for their grooming behavior, spending up to 50% of their waking hours grooming themselves. This helps to keep their fur clean and free of debris, and also helps them regulate their body temperature.",
+                "Cats are known for their agility, grace, and ability to jump up to six times their body length in a single bound.",
+                "They are crepuscular animals, meaning they are most active during dawn and dusk. They sleep for an average of 12-16 hours per day, with some cats sleeping up to 20 hours.",
+                "Cats have a keen sense of hearing and can hear sounds up to two octaves higher than humans. They also have excellent night vision and can see in low light conditions."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Froggattina australis",
+            "common": "Froggatt's Buzzer",
+            "summary": "Froggattina australis, commonly known as Froggatt's Buzzer or the Victorian Buzzer, is a species of small cicada found in eastern Australia.",
+            "description": [
+                "These cicadas have a green and brown mottled body, with a distinctive black ‘W’ marking on their wings. They are typically found in wet sclerophyll forests, where they feed on sap from the roots of eucalyptus trees.",
+                "Froggatt's Buzzers are notable for their unique buzzing call, which can be heard from late November to early January during the breeding season. ",
+                "They are one of the few cicada species that call during the day, and their call has been described as sounding like a ‘buzz- saw in the distance.’ Males produce the loud buzzing call to attract females for mating.",
+                "Interestingly, Froggatt's Buzzers have a symbiotic relationship with the ants that live in the same environment. The cicadas produce a sugary waste product called ‘honeydew,’ which the ants consume as a food source. In return, the ants provide protection for the cicadas from predators, such as birds and spiders.",
+                "Overall, Froggattina australis is a fascinating insect species with unique characteristics that make it an important component of the Australian ecosystem."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Fulica atra ",
+            "common": "Eurasian Coot",
+            "summary": "The Eurasian Coot, Fulica atra, is a medium-sized waterbird that belongs to the rail family. They are widespread across Australia, Europe, Asia, and parts of North Africa. They are mostly black with a distinctive white beak and a small patch of white feathers on their forehead.",
+            "description": [
+                "The Eurasian Coot is a strong swimmer and diver. They use their large feet to paddle through the water and can stay underwater for up to 30 seconds while searching for food.",
+                "They are known for their aggressive behavior during breeding season, often engaging in territorial fights with other coots. They will also steal nesting material from neighboring coots.",
+                "The Eurasian Coot has an unusual nesting habit, as they build their nests in the water. They construct a platform of reeds and other aquatic vegetation, anchored to underwater plants or objects.",
+                "Despite their aggressive behavior towards other coots, they are often seen in large flocks during the non-breeding season, which can number in the thousands.",
+                "The call of the Eurasian Coot is a loud, nasal ‘kowt’ or ‘kerruk’ sound that can be heard throughout the day and night."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Galanga labeculata ",
+            "common": "Double-Spotted Cicada",
+            "summary": "Galanga labeculata, commonly known as the Double-Spotted Cicada, is a species of cicada found in parts of Australia, including New South Wales and Queensland.",
+            "description": [
+                "The Double-Spotted Cicada gets its name from the two distinct spots on the base of its wings.",
+                "Adult Double-Spotted Cicadas are usually around 30 mm long and have a wingspan of about 55 mm.",
+                "Male Double-Spotted Cicadas produce loud calls by vibrating their tymbals, which are specialized membranes on their abdomens. These calls can be heard from a distance of up to 500 meters away.",
+                "Female Double-Spotted Cicadas lay their eggs in the bark of trees. When the eggs hatch, the nymphs drop to the ground and burrow into the soil, where they will remain for several years before emerging as adults.",
+                "The Double-Spotted Cicada is not considered a pest, as it does not cause significant damage to crops or trees. However, its loud calls can be a nuisance in urban areas."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Gallinula tenebrosa ",
+            "common": "Dusky Moorhen",
+            "summary": "The Dusky Moorhen is a medium-sized waterbird that belongs to the family Rallidae. It is native to Australia, New Zealand, and some Pacific Islands.",
+            "description": [
+                "The Dusky Moorhen is a blackish-purple bird with a red frontal shield and beak. They have long, green legs with long toes that enable them to walk on floating vegetation.",
+                "Dusky Moorhens are omnivores and feed on a variety of food, including aquatic plants, insects, small fish, and frogs. They have been known to raid crops, particularly rice fields, causing damage to the crop.",
+                "During breeding season, the Dusky Moorhen builds a nest of dead reeds and rushes, often in the dense vegetation surrounding the water body. Both parents incubate the eggs and care for the young.",
+                "The Dusky Moorhen is a strong swimmer and is capable of diving to escape predators. They are known to be territorial and aggressive towards other birds that invade their space.",
+                "In some areas, the Dusky Moorhen is considered a pest species due to its habit of feeding on crops and the damage it causes. However, they are also valued for their role in controlling aquatic plant growth and serving as a food source for predators such as snakes and birds of prey."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Gavicalis virescens ",
+            "common": "Singing Honeyeater",
+            "summary": "Gavicalis virescens, commonly known as the Singing Honeyeater, is a small bird species found in Australia. They are primarily found in open woodlands, forests, and scrublands.",
+            "description": [
+                "Singing Honeyeaters are known for their beautiful and melodious singing abilities, which can often be heard in the early morning hours. Their songs are rich and complex and can include a range of different notes and trills.",
+                "These birds feed mainly on nectar, insects, and fruit. They have a specialized brush-tipped tongue that allows them to extract nectar from flowers with ease.",
+                "Singing Honeyeaters are known for their unique breeding habits. They form breeding pairs during the breeding season, and the female lays two to three eggs in a small cup-shaped nest made of twigs and bark.",
+                "Unlike other honeyeater species, Singing Honeyeaters are not territorial and will often feed in flocks. They have also been known to form mixed-species flocks with other bird species.",
+                "The Singing Honeyeater is an important cultural symbol for many Indigenous Australians, who often use their feathers in ceremonial dress and art."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Geopelia cuneata ",
+            "common": "Diamond Dove",
+            "summary": "In the wild, Diamond Doves are found in arid and semi-arid regions of Australia, including scrublands, grasslands, and open woodlands.",
+            "description": [
+                "The Diamond Dove is named after the distinctive diamond-shaped markings on its wings and back.",
+                "Diamond Doves are known for their soft cooing calls, which are often used as a calming sound in aviaries and bird sanctuaries.",
+                "Diamond Doves have a unique courtship display where the male will walk around the female with his wings drooped, cooing softly.",
+                "They are ground-dwelling birds that forage for seeds, insects, and other small invertebrates on the ground.",
+                "Diamond Doves have been known to breed throughout the year, with both parents taking turns incubating the eggs and caring for the chicks once they hatch."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Geopelia humeralis ",
+            "common": "Bar-Shouldered Dove",
+            "summary": "Geopelia humeralis is a small, ground-dwelling dove native to Australia, Papua New Guinea, and nearby islands. It has a distinctive barred pattern on its wings and shoulders, hence its common name. ",
+            "description": [
+                "These doves are typically found in open forests, woodlands, and savannas, and are known for their distinctive cooing call.",
+                "Bar-shouldered doves are monogamous and pairs form strong bonds, with the male performing courtship displays to attract a mate. They build flimsy nests out of twigs and lay 2 eggs at a time. The male helps incubate the eggs and care for the chicks.",
+                "These doves are granivores, feeding mainly on seeds and grains, but they also eat insects and small invertebrates. They are important seed dispersers in their native habitats.",
+                "In some areas, the Bar-shouldered Dove is considered a pest because of their fondness for agricultural crops. They are also a popular bird for aviary enthusiasts due to their striking appearance and calm demeanor.",
+                ""
+            ],
+            "img": ""
+        },
+        {
+            "species": "Geopelia placida",
+            "common": "Peaceful dove",
+            "summary": "Geopelia placida, commonly known as the Peaceful dove, is a small, plump dove native to Australia and nearby islands. ",
+            "description": [
+                "They are named for their peaceful and gentle nature, often seen perched calmly on branches or pecking at seeds on the ground.",
+                "Peaceful doves have a distinctive brownish-gray plumage, with a white belly and chestnut- colored wings. They also have a distinctive blue eye ring, which adds to their unique appearance. ",
+                "These birds are found in a variety of habitats, including open woodland, grasslands, and urban areas. They are typically non-migratory and can be seen year-round in many parts of Australia.",
+                "Peaceful doves are known for their soft cooing calls, which they use to communicate with one another. They primarily feed on seeds and insects, and will often forage on the ground in flocks.",
+                "Interestingly, Peaceful doves have been known to form close bonds with their mates and will often remain monogamous for many breeding seasons. They build their nests out of twigs and grasses in trees or shrubs, and will typically lay two eggs at a time."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Geophaps plumifera ",
+            "common": "Spinifex Pigeon",
+            "summary": "The Geophaps plumifera, also known as the Spinifex Pigeon, is a species of pigeon that is native to Australia.",
+            "description": [
+                "The Spinifex Pigeon is well adapted to living in arid and semi-arid areas, with its feathers being specially designed to help regulate its body temperature in hot and dry environments.",
+                "They have a unique habit of using their wings to fan themselves, which helps them stay cool and regulate their body temperature.",
+                "Spinifex Pigeons are predominantly herbivorous, feeding on seeds, fruits, and leaves of various plants found in their habitat.",
+                "These pigeons are known for their intricate mating rituals, which involve the male puffing up his feathers and cooing to attract a mate.",
+                "The Spinifex Pigeon is a ground-dwelling bird and has a distinctive way of walking by taking small steps and nodding its head as it walks."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Gerygone fusca ",
+            "common": "Western Gerygone",
+            "summary": "The Western Gerygone, also known as the Western Warbler, is a small bird species found in Australia. They have a distinct olive-green back, grey head, and white underparts. The Western Gerygone is known for its melodic song and can often be found in woodlands, parks, and gardens.",
+            "description": [
+                "They are very active and restless birds, often flicking their wings and tail while foraging for insects and spiders.",
+                "The Western Gerygone is a skilled singer and can produce a wide range of musical notes in their song, which they use to communicate with other members of their species.",
+                "These birds are monogamous and will mate for life. They build small, cup-shaped nests out of bark and grass, often located in the fork of a tree or shrub.",
+                "The Western Gerygone has a unique adaptation in its skull, with a hinge-like joint that allows it to open its beak wider than other bird species of its size. This enables them to catch larger prey items, such as beetles and caterpillars.",
+                "Although they are common and widespread throughout much of Australia, the Western Gerygone has experienced a decline in population in some areas due to habitat loss and degradation."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Gerygone mouki ",
+            "common": "Brown Gerygone",
+            "summary": "The Gerygone mouki, also known as the Brown Gerygone, is a small bird species that is native to Australia.",
+            "description": [
+                "The Brown Gerygone is a small bird, measuring only about 11 cm in length and weighing around 6-8 grams. They have a brownish-grey upper body with a lighter underbelly and a distinctive white eye ring.",
+                "These birds are insectivores, feeding on a variety of small insects and spiders. They can be found foraging for food in the understory of forests and woodlands.",
+                "The Brown Gerygone is known for its beautiful and complex song, which is a series of high- pitched and melodious notes. They are often heard singing during the breeding season, which occurs between August and January.",
+                "This species is known to be monogamous, with pairs forming long-lasting bonds. They build small, cup-shaped nests made of grasses, bark, and spider webs, which are typically hidden in the foliage of trees or shrubs.",
+                "The Brown Gerygone is generally found in coastal and subcoastal areas of eastern and southeastern Australia, but can also be found in Tasmania and nearby islands. They are considered to be a species of least concern by the IUCN, with a stable population and a wide distribution range."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Gerygone olivacea ",
+            "common": "White-Throated Gerygone",
+            "summary": "The White-Throated Gerygone (Gerygone olivacea) is a small, insectivorous bird found in Australia and New Guinea. It is commonly found in forested areas and woodland habitats.",
+            "description": [
+                "They are very active and acrobatic, often seen flitting through foliage and hanging upside down to search for insects.",
+                "They have a distinctive call, which sounds like a high-pitched ‘zit-zit-zit’.",
+                "White-Throated Gerygones build a pear-shaped nest, which is often suspended from a thin branch or vine.",
+                "They are known to exhibit cooperative breeding behavior, with offspring from previous years helping to raise the young of the current breeding season.",
+                "In some parts of their range, White-Throated Gerygones are known to form mixed-species flocks with other bird species, which may provide additional protection from predators."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Glossopsitta concinna ",
+            "common": "Musk Lorikeet",
+            "summary": "The Glossopsitta concinna, also known as the Musk Lorikeet, is a species of parrot native to Australia. These small, brightly colored birds are typically found in eucalyptus forests, woodlands, and urban areas along the eastern coast of Australia.",
+            "description": [
+                "The Musk Lorikeet is named for the musky odor it emits, which is thought to help protect it from predators by masking its scent.",
+                "These birds are known for their acrobatic flight patterns, which involve fast and erratic movements as they dart through the trees in search of food.",
+                "Musk Lorikeets feed on nectar and pollen from a variety of flowers, and are important pollinators in their native habitats.",
+                "Like other lorikeets, Musk Lorikeets have a brush-like tongue that allows them to extract nectar from flowers.",
+                "These birds are highly social and often form large flocks, which can number in the hundreds or even thousands."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Grallina cyanoleuca ",
+            "common": "Magpie-Lark",
+            "summary": "The Grallina cyanoleuca, commonly known as the Magpie-Lark or Pee Wee, is a small passerine bird found throughout Australia.",
+            "description": [
+                "Despite its name, the Magpie-Lark is not related to magpies or larks, but is instead a member of the family Monarchidae, which also includes flycatchers and monarchs.",
+                "The Magpie-Lark is a distinctive bird, with its black and white plumage and long, slender legs. It has a broad, flat beak that is adapted for catching insects in mid-air.",
+                "Magpie-Larks are known for their beautiful and complex songs, which consist of a range of whistles, warbles, and trills. They are often heard singing from high perches such as tree branches or power lines.",
+                "Magpie-Larks are monogamous and form strong pair bonds. They build cup-shaped nests out of mud and grass, which are often attached to the side of buildings or other structures. They will aggressively defend their nests against any perceived threats, including humans.",
+                "The Magpie-Lark has a close relationship with Indigenous Australian culture, and is known by many different names in different Indigenous languages. It is considered a sacred bird by some Indigenous communities, and is believed to have powerful spiritual and healing properties."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Grantiella picta ",
+            "common": "Painted Honeyeater",
+            "summary": "The Painted Honeyeater (Grantiella picta) is a small bird found in various parts of Australia, including woodlands, forests and shrublands. ",
+            "description": [
+                "It has a striking black and white plumage with yellow wing patches. Males and females have similar markings, but males have a slightly longer bill.",
+                "Painted Honeyeaters are known for their sweet and melodious calls, often performed by males during courtship displays. ",
+                "They feed mainly on nectar and insects, using their brush- tipped tongues to extract nectar from flowers. They also catch insects by hawking them in the air or gleaning them from vegetation.",
+                "The Painted Honeyeater is a relatively uncommon bird, with a patchy distribution across its range. It is considered to be a species of least concern, but is threatened by habitat loss and fragmentation caused by land clearing and changes in fire regimes. Conservation efforts are being made to protect and restore its habitat.",
+                ""
+            ],
+            "img": ""
+        },
+        {
+            "species": "Gryllidae sp.",
+            "common": "Wood Cricket",
+            "summary": "Gryllidae sp. refers to the family of insects commonly known as wood crickets.",
+            "description": [
+                "These insects are found all over the world and are known for their distinctive chirping sound, which is produced by rubbing their wings together.",
+                "Crickets are typically nocturnal and feed on a variety of foods, including plant matter, insects, and even other crickets.",
+                "They are often kept as pets and are also used as food for humans and other animals in some cultures.",
+                "Male crickets are the ones that produce the characteristic chirping sound, which they use to attract females. The sound is created by rubbing the serrated edges of their front wings together. ",
+                "Each species of cricket has a unique chirping pattern, allowing individuals to identify their own species and avoid mating with other species."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Gryllotalpidae sp.",
+            "common": "Mole Cricket",
+            "summary": "The Gryllotalpidae sp., commonly known as mole crickets, are burrowing insects found in various parts of the world. These crickets are named for their ability to burrow underground like moles, using their large, shovel-like front legs to dig tunnels in the soil.",
+            "description": [
+                "Mole crickets are found in many parts of the world, including Australia, Asia, Africa, Europe, North America, and South America.",
+                "There are several species of mole cricket, but all share similar characteristics, such as a large, round body and long, powerful legs.",
+                "Mole crickets are nocturnal, spending the day burrowed underground and coming out at night to feed on plant roots and other insects.",
+                "These insects are considered pests in some areas, as they can cause significant damage to lawns, gardens, and crops.",
+                "Mole crickets are known for their distinctive chirping sound, which they produce by rubbing their front wings together. This sound is used to attract mates and communicate with other crickets."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Chalcites basalis",
+            "common": "Horsfield's bronze cuckoo",
+            "summary": "Horsfield's bronze cuckoo (Chalcites basalis) is a small bird found in Australia, Indonesia, and Papua New Guinea. It is a brood parasite, laying its eggs in the nests of other bird species.",
+            "description": [
+            "The Horsfield's bronze cuckoo is a small bird, measuring about 14cm in length, with a brownish-black plumage on its back and wings, and a bronze-green sheen on its head and breast. The belly is white with dark streaks.",
+            "This species is a brood parasite, laying its eggs in the nests of other bird species such as thornbills, scrubwrens, and gerygones. The host birds raise the cuckoo chicks, often at the expense of their own offspring.",
+            "Horsfield's bronze cuckoo feeds on insects and other small invertebrates, which it catches in flight or gleans from vegetation.",
+            "The call of Horsfield's bronze cuckoo is a series of high-pitched, descending notes, repeated at intervals.",
+            "This species is widespread and relatively common, and is not currently considered to be threatened. However, its reliance on other bird species for reproduction means that it may be affected by habitat loss and other factors that impact its host species."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Chalcites lucidus",
+            "common": "Shining bronze cuckoo",
+            "summary": "The Shining bronze cuckoo (Chalcites lucidus) is a small bird found in Australia, New Zealand, and some Pacific islands. It is a brood parasite, laying its eggs in the nests of other bird species.",
+            "description": [
+            "The Shining bronze cuckoo is a small bird, measuring about 12cm in length, with a metallic greenish-bronze plumage on its upperparts and a white belly. The male has a distinctive purple crown patch.",
+            "This species is a brood parasite, laying its eggs in the nests of other bird species such as gerygones, silvereyes, and thornbills. The host birds raise the cuckoo chicks, often at the expense of their own offspring.",
+            "Shining bronze cuckoo feeds on insects and other small invertebrates, which it catches in flight or gleans from vegetation.",
+            "The call of Shining bronze cuckoo is a distinctive descending whistle, often heard in the forest during the breeding season.",
+            "This species is widespread and relatively common, and is not currently considered to be threatened. However, its reliance on other bird species for reproduction means that it may be affected by habitat loss and other factors that impact its host species."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Chalcites osculans",
+            "common": "Black-eared cuckoo",
+            "summary": "The Black-eared cuckoo is a species of cuckoo bird found in eastern and southeastern Australia. They are known for their distinctive black ear patches and their preference for parasitizing the nests of other bird species.",
+            "description": [
+              "The Black-eared cuckoo is a medium-sized cuckoo, measuring around 21 cm in length. They have a dark brown back and wings, with a white belly and a white-tipped tail. They are most easily identified by the distinctive black patches behind their eyes, which give them their name.",
+              "Black-eared cuckoos are known to be brood parasites, laying their eggs in the nests of other bird species such as thornbills and fairy-wrens. The eggs of the cuckoo often closely resemble those of the host bird, allowing them to avoid detection. Once hatched, the cuckoo chick will often outcompete the host's chicks for food.",
+              "These birds are generally silent, but have been known to produce a soft, high-pitched whistle that is often given in flight.",
+              "Black-eared cuckoos are found in a range of forest and woodland habitats, and are known to undertake seasonal migrations. They are considered to be of least concern in terms of conservation status.",
+              "The Black-eared cuckoo has been observed to consume a range of insects, including caterpillars and grasshoppers. They have also been known to consume small lizards and spiders."
+            ],
+            "img": ""
+          },
+          {
+            "species": "Chenonetta jubata",
+            "common": "Australian wood duck",
+            "summary": "The Australian wood duck, also known as maned duck, is a medium-sized dabbling duck found throughout much of Australia. They are usually found in pairs or small flocks near water, and have distinctive chestnut and black plumage with a white speckled neck and head.",
+            "description": [
+                "The Australian wood duck is a medium-sized duck, with males being slightly larger than females. They have a distinctive chestnut brown head and neck with a black crown and nape, white speckling on their head and neck, and a speckled white and black lower neck and upper chest.",
+                "Their wings are grey with a white edge and their underbelly is mostly white with a small black patch on the lower belly. They have a short, black bill and grey feet.",
+                "Australian wood ducks are found throughout much of Australia, from northern Tasmania to the Kimberley region in Western Australia. They are usually found in pairs or small flocks near water, such as in wetlands, swamps, and rivers.",
+                "These ducks are primarily herbivores, feeding on seeds, grasses, and aquatic plants, but they will also eat insects and small invertebrates.",
+                "The Australian wood duck is a common species and is not considered to be threatened. They are often hunted for sport and are also bred in captivity for meat and eggs."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Cherax destructor",
+            "common": "Common Yabby",
+            "summary": "The Common Yabby is a freshwater crustacean species native to Australia. It is found in inland waterways and swamps across the eastern half of the continent.",
+            "description": [
+            "The Common Yabby has a dark brown or greenish-brown carapace with a pointed rostrum and two large claws. The claws are used for burrowing, self-defense, and capturing food.",
+            "Adult Common Yabbies typically grow to around 10-20 cm in length, although some specimens may reach up to 30 cm. They are omnivores, feeding on a range of aquatic plants and animals, as well as carrion and detritus.",
+            "The species is commercially harvested for food and aquaculture, and is also popular with recreational anglers. It is considered to be of least concern in terms of conservation status.",
+            "Common Yabbies breed during the warmer months, with females carrying their eggs in a pouch on their abdomen until they hatch. The young Yabbies undergo several molts as they grow, and may take several years to reach maturity.",
+            "The species is able to tolerate a wide range of environmental conditions, and can survive in low oxygen environments by burrowing into the mud. It is also known to aestivate during periods of drought."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Chlamydera guttata",
+            "common": "Western bowerbird",
+            "summary": "The western bowerbird is a species of bowerbird found in the arid and semi-arid regions of Western Australia. The species is known for its unique courtship behavior and the elaborate structures, known as bowers, that males build to attract mates.",
+            "description": [
+            "The western bowerbird is a medium-sized bird, measuring around 25 to 28 cm in length. The male has a black head and nape, with a yellow throat, chest, and belly. The wings and back are olive green, and the tail is black. The female is similar in appearance, but has a brown head and nape instead of black.",
+            "One of the most notable characteristics of the western bowerbird is its courtship behavior. Males build elaborate bowers on the ground, consisting of two parallel walls of sticks, decorated with shells, stones, and other objects. The male will then perform a series of courtship displays in and around the bower to attract a female.",
+            "Western bowerbirds are omnivorous, feeding on a variety of plant and animal matter. Their diet includes fruits, seeds, insects, and small vertebrates. They are also known to scavenge carrion.",
+            "The western bowerbird is generally found in arid and semi-arid regions of Western Australia, where it inhabits open woodland, scrubland, and mallee. The species is considered to be of Least Concern by the IUCN, although populations may be threatened by habitat loss and degradation."
+            ],
+            "img": ""
+        },
+        
+        {
+                "species": "Chlamydera nuchalis",
+                "common": "Great Bowerbird",
+                "summary": "The Great Bowerbird is a species of bowerbird found in northern Australia. It is known for its unique courtship behavior and elaborate bowers, which are used to attract mates.",
+                "description": [
+                "The Great Bowerbird has a brown and grey plumage with a distinctive black band across its throat. Males are larger than females and can grow up to 33 cm in length.",
+                "These birds are known for their unique courtship behavior, where males create elaborate bowers on the ground using twigs, leaves, and other materials. The bowers are decorated with a variety of objects, including shells, stones, and even discarded human items such as bottle caps and plastic straws.",
+                "Female Great Bowerbirds visit the bowers and select mates based on the quality and attractiveness of the bower and its decorations.",
+                "Great Bowerbirds are omnivores and feed on a variety of insects, fruits, and seeds. They are also known to scavenge for carrion and hunt small lizards and mammals.",
+                "Despite their widespread distribution, the Great Bowerbird is considered to be a species of least concern by the International Union for Conservation of Nature (IUCN)."
+                ],
+                "img": ""
+        },
+        {
+            "species": "Cincloramphus mathewsi",
+            "common": "Rufous songlark",
+            "summary": "The rufous songlark is a medium-sized brown passerine bird found throughout mainland Australia. It has distinctive streaks on its feathers, a dark line through its eye, and a rufous upper tail and rump.",
+            "description": [
+            "The male rufous songlark can grow up to 19 cm in length, while the female reaches about 16 cm. Outside of breeding season, they form small flocks and hunt close to the ground for insects and small arthropods. During breeding season, the male sings almost continuously and performs showy display flights.",
+            "This species is most often found in grasslands, grassy woodlands, agricultural areas, and mulga habitats. They migrate south in the summer to breed and are typically seen only in the warmer months.",
+            "The rufous songlark is sometimes called the red-rumped songlark, rufous singing lark, or skylark. It was first described by English ornithologist Tom Iredale in 1911 and is a member of the Locustellidae family, which includes grass warblers and grassbirds."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Cinnamon Quail-thrush",
+            "common": "Cinclosoma cinnamomeum",
+            "summary": "The Cinnamon Quail-thrush is a small to medium-sized bird species found in arid and semi-arid regions of central Australia.",
+            "description": [
+            "Adults of this species have a body length of 20 cm and can weigh up to 50 grams.",
+            "Male Cinnamon Quail-thrushes have a black face, a white eyebrow, and a broad white streak down the sides of their black throat. The upperparts of their body are plain cinnamon-rufous with buff-white patches on the upper breast and a broad black band below. Females have similar features but are duller in color.",
+            "These birds are ground foragers, feeding on a variety of invertebrates such as grasshoppers, beetles, and flies, as well as seeds of native and introduced flora species.",
+            "Breeding of the Cinnamon Quail-thrush takes place on the ground, with cup-shaped nests being built in depressions and lined with strips of bark, fine grass, or sticks. The clutch can contain two or three eggs.",
+            "The species is evaluated as least concern on the IUCN Red List of Threatened Species, but it is thought that the population is slowly declining due to ongoing habitat degradation caused by livestock and introduced herbivores."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Cinclosoma punctatum",
+            "common": "Spotted Quail-thrush",
+            "summary": "Cinclosoma punctatum, commonly known as the Spotted Quail-thrush, is a species of bird that is endemic to the Mount Lofty Ranges in South Australia.",
+            "description": [
+            "The Spotted Quail-thrush is a medium-sized bird, measuring about 24 to 30 cm in length, with a wingspan of 32 to 40 cm, and a weight of 85 to 145 g.",
+            "Both male and female birds have olive-brown feathers with bold black streaks, and white undersides with a grey breast, yellow-brown flanks and bold black streaks and spots along the sides of the body.",
+            "This species has been recorded singly, in pairs, and in small family groups in the Mount Lofty Ranges.",
+            "Unfortunately, there have been no confirmed sightings of the Spotted Quail-thrush since 1981, which suggests that the species is likely extinct.",
+            "The primary threat to the Spotted Quail-thrush is habitat loss and degradation due to agriculture and urban development in its native range."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Cisticola exilis",
+            "common": "Golden-headed cisticola",
+            "summary": "The golden-headed cisticola is a small warbler species found in Australia and thirteen Asian countries. It is an omnivore, constructs nests out of plants and spider threads, and has a distinctive appearance during the breeding season.",
+            "description": [
+            "The golden-headed cisticola is a small bird that grows to about 9-11.5 cm in length and weighs 6-10 g. Its appearance is brown and cream, with streaks of black or dark brown on the upper part of its body.",
+            "During the breeding season, the male of the species has a golden body colour, a golden-orange head, and a shorter tail. Females and males outside of the breeding season are similar in appearance.",
+            "The golden-headed cisticola is an omnivore that primarily feeds on invertebrates like insects and small slugs, but also eats grass seeds. It usually forages on the ground, hiding from its prey among various plants, such as grass, and moving slowly.",
+            "The bird is known for its ability to construct nests out of plants and spider threads, earning it the nickname 'finest tailor of all birds'. It mates during the rainy season.",
+            "The golden-headed cisticola has a variety of distinct vocalizations, ranging from a 'teewip' to a 'wheezz, whit-whit'. It is often found single or in small flocks, but outside of the breeding season, groups can be larger."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Climacteris erythrops",
+            "common": "Red-browed treecreeper",
+            "summary": "Climacteris erythrops is a bird species found in temperate and subtropical eastern Australia, endemic to the region. It inhabits mature eucalypt forests and woodlands in both coastal and mountainous areas.",
+            "description": [
+            "The Red-browed treecreeper is a small bird with a distinctive red-brown eyebrow that runs above its eye. Its body is streaked with shades of brown and white, and it has a thin, pointed bill.",
+            "These birds are known for their unique way of foraging, climbing trees in a spiral pattern while searching for insects hidden in the bark. They are also known to probe into crevices with their bills to extract insects.",
+            "Red-browed treecreepers are monogamous and form pairs for life. Both the male and female build the nest, which is a cup-shaped structure made of bark and grass, lined with feathers and spider webs.",
+            "The species is relatively common in its range, but is vulnerable to habitat loss and degradation due to clearing of eucalypt forests for agriculture and urbanization.",
+            "The Red-browed treecreeper has a melodic song consisting of clear, musical notes that are repeated in a series. Its calls are often heard during the breeding season."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Climacteris picumnus",
+            "common": "Brown treecreeper",
+            "summary": "Climacteris picumnus, or the Brown treecreeper, is the largest Australasian treecreeper that inhabits eucalypt-dominated woodland habitats in eastern Australia. The species is listed as 'least concern' by the IUCN, but the subspecies victoriae is considered Vulnerable under the Threatened Species Conservation Act (1995).",
+            "description": [
+            "Brown treecreepers are endemic to eastern Australia, and occupy areas from Cape York, Queensland, throughout New South Wales and Victoria to Port Augusta and the Flinders Ranges, South Australia. The population has declined in Adelaide and Cape York, and is currently prevalent between 16˚S and 38˚S.",
+            "These birds are found in a diverse range of habitats varying from coastal forests to mallee shrub-lands, but they prefer eucalypt-dominated woodland habitats up to 1,000 metres (3,300 ft) without a dense shrubby understorey.",
+            "Adult brown treecreepers are around 16.5 centimetres (6.5 in) long, with light grey-brown plumage above and a light grey face and neck. The throat is cream to white and the breast is pale brown streaked with fine black-grey and white. The wings have a dark bar visible in flight.",
+            "The subspecies victoriae is listed as nationally Vulnerable by DCCEEW, under the Environment Protection and Biodiversity Conservation Act (1999), while the species is considered of 'least concern' by the IUCN.",
+            "The call of the brown treecreeper has been described as a spink spink."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Colluricincla harmonica",
+            "common": "Grey shrikethrush",
+            "summary": "The grey shrikethrush, a songbird of Australasia, is a moderately common bird found in most parts of Australia and New Guinea. It is known for its ringing melody.",
+            "description": [
+            "The grey shrikethrush is a medium-sized bird, about 24 cm long, and is not known for its bright colors. However, it has a unique talent for a beautiful, ringing melody that rivals other Australasian species, such as the lyrebirds and the sandstone shrikethrush.",
+            "Formerly known as the grey thrush, it has several alternate names, including the brown shrike-thrush, buff-bellied shrike-thrush, grey shrike-flycatcher, northern shrike-thrush, and south-western shrike-thrush.",
+            "There are five recognized subspecies of the grey shrikethrush, each with its own distinct range. These subspecies include C. h. brunnea, C. h. superciliosa, C. h. harmonica, C. h. strigata, and C. h. rufiventris.",
+            "Although the grey shrikethrush is not known for its bright colors, it is still a beautiful and remarkable bird. Its unique ability to produce a beautiful, ringing melody has earned it a special place in the hearts of many birdwatchers and nature lovers.",
+            "The grey shrikethrush is considered to be of least concern on the IUCN Red List of Threatened Species, indicating that it is not currently at risk of extinction. However, like many species of birds, it is threatened by habitat loss and degradation."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Colluricincla megarhyncha",
+            "common": "Arafura shrikethrush",
+            "summary": "The Arafura shrikethrush is a bird species found in New Guinea and Australia. It is part of the Pachycephalidae family.",
+            "description": [
+            "The Arafura shrikethrush has a distinctive rufous coloration with a white belly and a long tail. They have a strong, sharp beak used for catching insects.",
+            "These birds are typically found in subtropical or tropical moist lowland and montane forests. They are known to forage in the understory and lower canopy of the forest.",
+            "During a study of bird toxicity, traces of batrachotoxins were found in some specimens of the Arafura shrikethrush, similar to the ones found in Central and South American poison dart frogs.",
+            "The Arafura shrikethrush is not considered to be a threatened species and is listed as Least Concern on the IUCN Red List.",
+            "There are three recognized subspecies of the Arafura shrikethrush, found in different regions of New Guinea and Australia."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Colluricincla woodwardi",
+            "common": "Sandstone shrikethrush",
+            "summary": "The Sandstone shrikethrush, also known as the brown-breasted shrike-thrush, is a species of bird endemic to Australia and belongs to the family Pachycephalidae.",
+            "description": [
+            "This species has a distinctive brown breast, and a grey head and back. The male and female are similar in appearance, with the female being slightly smaller in size.",
+            "Sandstone shrikethrushes are known for their loud, melodious calls that can be heard in the forests where they live. They have a varied diet that includes insects, spiders, and small vertebrates like lizards and frogs.",
+            "These birds are found in rocky, forested areas and are known for their agility in hopping and climbing among the rocky outcrops. They build their nests in crevices and hollows in the rocks.",
+            "The Sandstone shrikethrush is not considered to be a threatened species, although populations may be affected by habitat loss due to deforestation and mining.",
+            "Breeding season for the Sandstone shrikethrush is from August to December, with pairs forming lifelong bonds and both parents caring for the chicks until they fledge."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Conocephalus (Chloroxiphidion) albescens",
+            "common": "Whitish Meadow Katydid",
+            "summary": "The Whitish Meadow Katydid is a member of the family Tettigoniidae, and is found in the Brisbane area of Queensland, Australia. They can have fully developed wings or un-developed wings.",
+            "description": [
+            "The Whitish Meadow Katydid is a pale brown colour and can range in size from 10 to 27mm in length.",
+            "This species can be distinguished from others in the Conocephalus genus by their pale brown colour and short-winged form.",
+            "Whitish Meadow Katydids are primarily herbivorous, feeding on leaves, flowers, pollen and seeds of grasses and forbs. They may also occasionally prey on other insects.",
+            "Female katydids in this species lay their eggs in grass stems.",
+            "Whitish Meadow Katydids have been found near Bulimba Creek in the Mt Gravatt section, with observations in May 2007."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Conocephalus semivittatus",
+            "common": "Blackish Meadow Katydid",
+            "summary": "The Blackish Meadow Katydid is a common insect found in urban areas, forests and woodlands in Australia.",
+            "description": [
+            "Adult Blackish Meadow Katydids are typically 1-2.5 cm in size and vary in color throughout their distribution, with darker individuals occurring in the southern part of their range.",
+            "These katydids feed on flowers and seeds of plants with large, narrow leaves like Lomandra and Dianella species and can be found among grasses and reeds.",
+            "During the summer, the low buzzing calls of Blackish Meadow Katydids can be commonly heard when they occur in large numbers.",
+            "The Blackish Meadow Katydid is found in Queensland, Lord Howe Island and New South Wales.",
+            "The species belongs to the order Orthoptera and the family Tettagonidae, and is classified under the genus Conocephalus and the species semivittatus."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Conocephalu upoluensis",
+            "common": "Greenish Meadow Katydid",
+            "summary": "Conocephalus upoluensis, also known as Greenish Meadow Katydid, is a common katydid found in the Brisbane area of Queensland, Australia. They have a bright green body with dark brown on the back, and can grow up to 20mm in length.",
+            "description": [
+            "Greenish Meadow Katydids are active at night and hide among long grasses or reeds. They feed on flowers and seeds and produce low buzzing calls throughout the summer season.",
+            "These katydids are shy and ready to hide in dense grasses when approached. They usually hold tightly to the stem on which they are resting and move to the opposite side for hiding.",
+            "The female has a long sword-like ovipositor, and the antennae of the katydid are about four times the length of their body.",
+            "These Greenish Meadow Katydids can look at us from their back, and when approached they jump away. They are commonly found in Eight Mile Plains and Karawatha Forest.",
+            "Their bright green coloration and dark brown on the back makes them easily recognizable. However, habitat loss and degradation pose a threat to their population."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Gymnorhina tibicen",
+            "common": "Australian Magpie",
+            "summary": "The Australian magpie is a passerine bird native to Australia, New Zealand and southern New Guinea. It is a highly regarded songbird with a wide variety of calls, many of which are complex.",
+            "description": [
+            "The Australian magpie is a black and white bird with a robust, wedge-shaped bill that is bluish-white bordered with black, and black legs that are long and strong. The plumage is pure glossy black and white, and both sexes have black heads, wings, and underparts with white shoulders.",
+            "Juveniles have lighter greys and browns amidst the starker blacks and whites of their plumage, while two or three-year-old birds closely resemble and are difficult to distinguish from adult females.",
+            "The Australian magpie is unlikely to be confused with any other species, although the pied butcherbird has a similar build and plumage, but has white underparts, and the magpie-lark is a much smaller and more delicate bird with complex and very different banded black and white plumage.",
+            "One of the most familiar Australian bird sounds is the complex, musical, warbling call of the Australian magpie. The bird has a wide variety of calls, many of which are complex, and it can mimic over 35 species of native and introduced bird species, as well as dogs and horses. Magpies have even been noted to mimic human speech when living in close proximity to humans.",
+            "The Australian magpie generally lives to around 25 years of age, though ages of up to 30 years have been recorded. The reported age of first breeding has varied according to area, but the average is between the ages of three and five years."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Haliastur sphenurus",
+            "common": "Whistling Kite",
+            "summary": "The Whistling Kite is a medium-sized raptor found throughout Australia, New Caledonia, and much of New Guinea, named for its loud whistling call.",
+            "description": [
+            "The Whistling Kite has a wingspan between 123 to 146 cm, and weighs between 380 to 1,050 g. Females are generally larger and heavier than males.",
+            "This species is a pale buff on the head, breast and tail, with browner wings and black flight feathers. Immature birds are heavily streaked reddish-brown with prominent pale spots on the wings.",
+            "The Whistling Kite is a noisy species, calling regularly in flight and while perched. Its most common call is a clear descending whistle, often followed by a rapid series of rising notes.",
+            "A species of open or lightly wooded areas, the Whistling Kite is typically found near water, at elevations ranging from sea level to 1400 meters. They are known to be nomadic, wandering to coastal areas in northern Australia during the dry season.",
+            "Whistling kites are indiscriminate in their tastes, taking small mammals, birds, fish, reptiles, amphibians, crustaceans, insects, and carrion. Most food items are taken either from the ground or from the water surface."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Henicopsaltria eydouxii",
+            "common": "Razor grinder",
+            "summary": "Henicopsaltria eydouxii, or the Razor grinder, is a large species of cicada found in the eastern forests of Australia. It is known for its harsh call that has been likened to the noise of a metal grinder.",
+            "description": [
+            "The Razor grinder is a large cicada with a forewing measuring 50-55 mm. Males and females are similar in color and markings, predominantly brown with black markings on the head and thorax.",
+            "They sing in large groups on the main trunks of tall eucalypts, especially spotted gum, and are most visible in December and January in dry and wet sclerophyll forest.",
+            "Their call lasts for a few seconds, increases in volume, suddenly stops, and then suddenly starts again. They usually feed throughout the afternoon and then call at maximum volume around dusk.",
+            "Razor grinders can also emit a distress call, a fragmented irregular noise, upon being seized by a predator.",
+            "Adult razor grinders are fast flyers, and they are wary and flighty, especially at dusk, making them difficult to approach."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Cacomantis pallidus",
+            "common": "Pallid cuckoo",
+            "summary": "The Pallid cuckoo is a species of cuckoo found in Australia, with some migration to the islands of Timor and Papua New Guinea. It is between 28 and 33 cm in size, with distinctive markings such as a dark bill, a dark eye with a gold eye-ring and olive grey feet which differentiate it from other cuckoos.",
+            "description": [
+            "The Pallid cuckoo can have various morphs including light rufous morph or dark rufous morph. It has a distinctive appearance with a dark bill, a dark eye with a gold eye-ring, and olive grey feet. It also has a white (or buff) mark on the nape, and white (or buff) toothing along the tail.",
+            "The Pallid cuckoo is widely distributed throughout mainland Australia and Tasmania. It prefers lightly timbered country with trees and shrubs and a sparse under-story where it can best hunt for prey. It is a generalist brood parasite, laying its eggs in the nests of other species and exploiting over 100 different species of passerines.",
+            "The pallid cuckoo preys primarily on insects such as caterpillars, by hopping down from vantage points to seize their prey either on trees or in the grass. It prefers to eat hairy caterpillars.",
+            "English ornithologist John Latham described the pallid cuckoo in 1801 as Columba pallida 'pale pigeon'. 'Pallid cuckoo' has been designated the official name by the International Ornithological Committee (IOC). Other common names include unadorned cuckoo, semitone-bird, scale-bird, and brain-fever bird.",
+            "The pallid cuckoo is a rare vagrant to New Zealand. It spends the winter months in central inland Australia and the Northern Territory before migrating to South East Australia's coastal region and Tasmania, arriving generally around September or October."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Hieraaetus morphnoides",
+            "common": "Little eagle",
+            "summary": "The little eagle is a small bird of prey native to Australia, measuring 45-55 cm in length and weighing roughly 815 g. It inhabits open woodland, grassland, and arid regions, and is a relative of both the booted eagle and the extinct Haast's eagle of New Zealand.",
+            "description": [
+            "The little eagle is a small and stocky bird with a broad head, fully feathered legs, and a square-cut, barred tail. It has a wingspan of about 120 cm, and during flight, it displays strong wing beats, glides on flat wings, and soars on slightly raised or flat wings.",
+            "This species occurs in light and dark color forms, with the most common being the light form that is dark brown on the back and wings with black streaks on the head and neck, and a sandy to pale underbody. The dark form is similar, except the head and underbody are usually darker brown or rich rufous. Juveniles are more strongly rufous in color with less contrast in patterns.",
+            "Little eagles inhabit open woodland, grassland, and arid regions, and avoid dense forest. They are powerful birds of prey that feed on small mammals, reptiles, birds, and insects.",
+            "This species was first described by John Gould in 1841, and the pygmy eagle, previously thought to be a subspecies, has now been recognized as a distinct species based on genetic studies.",
+            "Little eagles have fully feathered legs, a distinctive trait among eagles, and the males have longer wings in proportion to their bodies, but are nearly half the weight of females."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Himantopus himantopus",
+            "common": "Black-winged Stilt",
+            "summary": "The Black-winged Stilt is a long-legged wader bird belonging to the avocet and stilt family. It is a widespread species found in Europe, Asia, Africa, and America.",
+            "description": [
+            "The Black-winged Stilt is a long-legged bird with pink legs, a long thin black bill, and blackish upperparts. The underside is white, and the head and neck are white with varying amounts of black. Males have black backs with a greenish gloss, while females have brownish backs with black remiges.",
+            "Adults measure 33-36 cm in length, while immature birds are greyish in color. The wings of immature birds have a sandy hue with light feather fringes appearing as a whitish line in flight.",
+            "These birds feed on insects and crustaceans, which they pick up from sand or water. The nest site is a bare spot on the ground near water, and they often nest in small groups with avocets.",
+            "Breeding habitat of the Black-winged Stilt includes marshes, shallow lakes, and ponds. Some populations migrate to the ocean coasts in winter, while those in warmer regions are generally resident or short-range vagrants.",
+            "The taxonomy of this bird is still somewhat contentious, with one species and 5-7 subspecies. In Europe, the Black-winged Stilt is a regular spring overshoot vagrant north of its normal range, occasionally remaining to breed in northern European countries."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Hirundo neoxena",
+            "common": "Welcome swallow",
+            "summary": "The welcome swallow is a small passerine bird in the swallow family native to Australia and nearby islands, with populations self-introduced into New Zealand. They have a large distributional range and are mostly migratory in the eastern regions but are mainly sedentary in the western and New Zealand populations.",
+            "description": [
+            "The welcome swallow is a small, fast-flying bird with a graceful shape and flight. They are often seen flying singly, in couples or in clusters, with circular patterns and swift darting motions.",
+            "This species is metallic blue-black above, light grey below on the breast and belly, and rusty on the forehead, throat and upper breast. It has a long forked tail, with a row of white spots on the individual feathers.",
+            "Welcome swallows are commonly found on wires, posts and other perches and readily breed close to human habitation, especially in southern and eastern Australia.",
+            "The welcome swallow has a mixture of twittering and soft warbling notes, and a sharp whistle in alarm, as its call. However, their call is normally quiet and does not carry very far.",
+            "The welcome swallow has a very large distributional range because they are a cross-regional species. They live mostly in eastern, western, southern and central Australia, and those in eastern Australia are largely migratory, wintering in northern Australia. Western birds and those in New Zealand are mainly sedentary."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Hylacola Pyrrhopygia",
+            "common": "Chestnut-rumped Heathwren",
+            "summary": "The Chestnut-rumped Heathwren is a small bushland bird with a reddish-brown rump and tail coverts, found in temperate and subtropical forests and heathlands of Australia.",
+            "description": [
+            "The Chestnut-rumped Heathwren was first described in 1827 by Nicholas Aylward Vigors and Thomas Horsfield. It is also known as the Scrub Warbler and has three subspecies.",
+            "This species measures 14 cm in length, has an olive-brown back, and a streaked brown-on-white chest. The belly and rear flanks are grey-buff with a dark subterminal band on the tail.",
+            "Chestnut-rumped Heathwrens occur in southeastern Australia from southeast Queensland through eastern New South Wales, Victoria, and southeast South Australia. They prefer heaths of coastal, mountain and hinterland areas, and the dense undergrowth of forests and woodland.",
+            "Chestnut-rumped Heathwrens are usually shy and secretive except during the breeding season from July to November, when both sexes will sing from a perch on a bush. Their song is a rich, melodious warbling chi-chi-tu-weet, kwe-reep, blended with mimicry of other birds.",
+            "The Chestnut-rumped Heathwren builds a domed or globular nest on or near the ground in tussocks or dense shrubs. A clutch of three or four eggs is laid and usually incubated by the female for 14-16 days."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Irediparra gallinacea",
+            "common": "Comb-crested jacana",
+            "summary": "The comb-crested jacana, also known as the lotusbird or lilytrotter, is the only species of jacana in the genus Irediparra. It is adapted to the floating vegetation of tropical freshwater wetlands.",
+            "description": [
+            "The comb-crested jacana is easily recognizable by its black crown and hindneck, fleshy red wattle covering the forehead and forecrown, white face and throat, and pink or orange comb. It has a broad black band on the lower breast with white belly, and black underwing and flight feathers.",
+            "This bird can be found in southeast Borneo, southern Philippines, Sulawesi, Moluccas, Lesser Sunda Islands, north and southeast New Guinea, New Britain, and northern and eastern Australia. It inhabits large freshwater wetlands, swamps, and lakes with abundant floating vegetation, such as water-lilies or water hyacinth, forming a mat on the water surface which it is able to walk on.",
+            "The comb-crested jacana walks slowly and deliberately, and often congregates in flocks. It flies low over water and lands on open vegetation when disturbed.",
+            "The comb-crested jacana is polyandrous and builds a flimsy nest on floating or emergent vegetation, in which the female lays four lustrous, pale brown eggs covered by black markings. Only males incubate the eggs, and the young hatch well-developed and soon leave the nest.",
+            "This bird feeds on seeds and aquatic insects gleaned from floating vegetation on the water surface. It gives a squeaky, high-pitched chittering, also described as a shrill trill with an explosive soft bugle."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Iridomyrmex Purpureus",
+            "common": "Meat ant",
+            "summary": "The meat ant, also known as the gravel ant or southern meat ant, is a species of ant found throughout Australia. It is a medium to large species characterised by its dark-bluish body and red head, and it builds large oval-shaped mounds in open and warm areas.",
+            "description": [
+            "Meat ants are diurnal and forage on trees, collecting sweet substances such as honeydew and nectar, as well as capturing insects or collecting the remains of animals. They are also competitors of the banded sugar ant and establish territorial borders with neighbouring colonies, solving disputes through ritualised fighting.",
+            "Meat ants have formed symbiotic relationships with many insects, play an important role in dispersing over 300,000 plant seeds, and can be used as a form of pest control to kill the invasive species of cane toad.",
+            "The meat ant is monomorphic and is characterised by its enormous distribution, aggression and ecological importance, which have made this ant a dominant species.",
+            "Meat ant colonies range in size, varying between 11,000 individuals to over 300,000. Queens mate with a single male and colonies may have more than one queen until the workers arrive, where they both exhibit antagonism.",
+            "Despite their ecological benefits, meat ants can sometimes be pests around urban areas, and eradicating them is difficult. However, farmers can use them to remove animal carcasses by consuming and reducing them to bones in a matter of weeks."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Lalage leucomela",
+            "common": "Varied triller",
+            "summary": "Lalage leucomela, or the Varied triller, is a smaller member of the cuckoo-shrike family, Campephagidae. It prefers warm, reasonably moist environments and can be found in New Guinea, the Bismarck Archipelago, and eastern Australia.",
+            "description": [
+            "The Varied triller is typically found in rainforest, vine forest, riverine thickets, eucalypt forest, and woodland habitats, with a particular preference for the border areas between closed and open forests.",
+            "This species is common in the north and uncommon to rare in the colder south. It works its way slowly and methodically through foliage at any level, searching for insects and fruit in pairs or small groups.",
+            "Varied trillers make repeated rolling contact calls almost continuously while foraging, and can be heard throughout their habitat.",
+            "They are smaller than their better-known relative, the White-winged triller, and have a distinctive coloration with a black head, white throat, and olive-green upperparts.",
+            "Formerly, the Mussau triller was considered a subspecies of the Varied triller."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Lalage tricolor",
+            "common": "White-winged triller",
+            "summary": "The white-winged triller is a member of the cuckooshrike family found throughout mainland Australia and possibly on the islands to the north.",
+            "description": [
+            "The white-winged triller is fairly common in woodland and open scrub through most of its range, and close to riverbeds in the central arid zone.",
+            "The male bird, with its black and white breeding plumage, trills cheerfully through much of the day during the breeding season and frequently rises on fluttering wings in song flight.",
+            "The female is similarly patterned but in dull fawns and white, and in the non-breeding season, male birds appear similar to the female, retaining blackish feathers only on the wings and tail.",
+            "Typically 16 to 18 cm long, white-winged trillers eat a variety of insects, which are taken on the ground, from foliage, or in the air.",
+            "The correct classification of the white-winged triller and its close northern relative, the white-shouldered triller, is uncertain. Some authorities regard them as two races of a single species."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Lathamus discolor",
+            "common": "Swift parrot",
+            "summary": "The Swift parrot is a critically endangered species of broad-tailed parrot that breeds in Tasmania during the summer and migrates north to south eastern mainland Australia from Griffith-Warialda in New South Wales and west to Adelaide in the winter.",
+            "description": [
+            "The Swift parrot is mainly green with a bluish crown and red on the face above and below the beak. It is about 25 cm long, has long pointed wings and long tapering tail feathers.",
+            "The species is critically endangered, with a population of fewer than 300 individuals. Habitat destruction due to logging and predation by introduced sugar gliders are the major threats to its survival.",
+            "Swift parrots are nomadic migrants, settling in an area only when food is available. They are noisy, always active and showy, and have a very direct flight.",
+            "The species was first described by the surgeon John White in 1790 as the red-shouldered paroquet (Psittacus discolor). It was later placed in the genus Lathamus by René Primevère Lesson in 1830.",
+            "A 2011 genetic study found that the swift parrot diverged from a lineage giving rise to the genera Prosopeia, Eunymphicus and Cyanoramphus, around 14 million years ago."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Leucosarcia melanoleuca",
+            "common": "Wonga pigeon",
+            "summary": "The Wonga pigeon is a large, plump pigeon that inhabits areas in eastern Australia. Its range is from Central Queensland to Gippsland, eastern Victoria, Australia.",
+            "description": [
+            "The Wonga pigeon has pastel blue-grey back feathers, a creamy-white head, and white underside with dotted dark grey spots forming a white V on its chest. It has a short neck, broad wings, and a long tail. The eyes are a dark red-brown colour and they have pink eye-rings that encircle them.",
+            "They are very elusive birds, more often being heard but not seen, producing explosive wing claps when disturbed. They tend to occur on the ground foraging and are located in rainforests, wet eucalypt forests, coastal forests, picnic areas, walking tracks, car parks and gardens.",
+            "Their diet consists of fruit, berries, seeds from native forest trees and the odd insect. They are monogamous and breed between October and January. The Wonga pigeon builds a twig platform nest with a diameter of about 30 centimetres, from about 3 to 20 metres above the ground, defended by breeding pairs.",
+            "The call of the Wonga pigeon is a loud, high-pitched 'coo' repeated over long periods of time for a number of seconds. When males are displaying mating, bowing occurs with a soft, trilling coo.",
+            "Previously, the Wonga pigeon could be found as far north as Cairns and as far south as the Dandenongs, but due to land clearance, shootings in the 1940s for crop protection, and fox predation, they are rarely seen in these areas, but their populations have improved."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Lichenostomus melanops",
+            "common": "Yellow-tufted honeyeater",
+            "summary": "The yellow-tufted honeyeater is a predominantly black and yellow passerine bird found in the south-east ranges of Australia. It is split into four subspecies and belongs to the honeyeater family Meliphagidae.",
+            "description": [
+            "The yellow-tufted honeyeater is a medium-sized bird, measuring 17-23 cm in length, with females being smaller than males. It has a bright yellow forehead, crown, and throat, with a glossy black mask and golden ear-tufts.",
+            "The bird's back is olive-green to olive-brown on wings and tail, and the underparts are more olive-yellow. It has black bill and gape, brown eyes, and grey-brown legs.",
+            "The yellow-tufted honeyeater was first described by John Latham in 1801, and given two different binomial names: Muscicapa auricomis and Turdus melanops. It belongs to the honeyeater family Meliphagidae and is split into four subspecies.",
+            "The four subspecies of the yellow-tufted honeyeater are L. m. cassidix, L. m. gippslandicus, L. m. melanops, and L. m. meltoni. Each subspecies has its own unique characteristics.",
+            "L. m. cassidix, also known as the helmeted honeyeater, is the brightest and largest subspecies. It is restricted to a 5 km length of remnant bushland along two streams in the Yellingbo Nature Conservation Reserve, 50 km east of Melbourne, in Victoria. It is considered to be critically endangered."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Lichmera indistincta",
+            "common": "Brown honeyeater",
+            "summary": "The brown honeyeater is a medium-small bird that belongs to the honeyeaters, a group of birds with highly developed brush-tipped tongues adapted for nectar feeding. It is found mainly in Australia, New Guinea, and parts of Indonesia, but is unique in that it also occurs on the island of Bali, making it the only honeyeater to be found west of the Wallace Line.",
+            "description": [
+            "The brown honeyeater is brownish in color, with yellow-olive panels in the tail and wing, and a yellow tuft behind the eye. It occupies a range of habitats from mangroves to eucalypt woodlands and is seasonally nomadic within its local area, following flowering food plants. Its diet consists of nectar and insects.",
+            "This species usually forages alone, but also feeds in small groups or flocks of mixed honeyeater species. It occupies the same breeding territory each year and lays two or three eggs in a cup-shaped nest woven from grass and soft bark. Both sexes contribute to nest building and feeding the young. The brown honeyeater has a loud, clear, musical song, which is described as the best of all the honeyeaters.",
+            "The brown honeyeater is declining in some areas, such as the Wheatbelt region of Western Australia. However, overall its population levels and distribution are sufficient to have it described by the IUCN as being of least concern for conservation.",
+            "The brown honeyeater was originally described by Nicholas Aylward Vigors and Thomas Horsfield in 1827 as Meliphaga indistincta. It is now classified as a member of the genus Lichmera, from the Greek word meaning 'to lick' or 'to dart the tongue'. As well as the nominate race Lichmera indistincta indistincta, a number of other subspecies are recognised: ocularis, melvillensis, limbatus and nupta. The Indonesian honeyeater (subspecies limbatus) was previously considered a distinct species but is now treated as a subspecies of L. indistincta by major taxonomic authorities.",
+            "Molecular analysis has shown honeyeaters to be related to the Pardalotidae, Acanthizidae, and the Maluridae in the large superfamily Meliphagoidea."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Limnodynastes dumerilii",
+            "common": "Eastern Banjo Frog",
+            "summary": "Limnodynastes dumerilii, commonly known as the Eastern Banjo Frog or Bull Frog, is a frog species native to eastern Australia with five subspecies distinguished by their skin coloration.",
+            "description": [
+            "The Eastern Banjo Frog is roughly seven to eight centimetres long with dark warty backs, fleshy metatarsal tubercules and a smooth white or mottled belly. The tadpole stage is relatively long, lasting up to fifteen months.",
+            "There are five subspecies of Limnodynastes dumerilii, each with different skin coloration and inhabiting different regions of Australia. The species is mostly associated with woodland, heathland, farmland, and coastal swamps, dams and ponds.",
+            "Males of the subspecies Limnodynastes dumerilii dumerilii have the most characteristic banjo-like 'bonk' of all the subspecies, while the call of Limnodynastes dumerilii grayi sounds more like a 'tok'.",
+            "The Snowy Mountains banjo frog, Limnodynastes dumerilii fryi, is the most restricted of the subspecies, while Limnodynastes dumerilii insularis, found in Tasmania, is characterised by blue coloration present on the flank and often a pale mid-dorsal stripe.",
+            "While the Eastern Banjo Frog is common in its native range, there was one occurrence in New Zealand when tadpoles of the species were found in 1999 and destroyed."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Limnodynastes Peronii",
+            "common": "Striped Marsh Frog",
+            "summary": "The Striped Marsh Frog, also known as Brown-Striped Frog, is a predominantly aquatic frog species found in coastal Eastern Australia. It is a common species in urban habitats.",
+            "description": [
+            "Females can grow up to 75 millimetres (3.0 in) in length, while males can grow up to 70 millimetres (2.8 in). Their dorsal surface is brown in color, ranging from light to dark, with distinct darker stripes running down their back. They have a white belly, and a black 'mask' running from their nostrils to their shoulders, followed by a thick golden line that runs underneath and terminates at the end of the mouth.",
+            "Breeding males develop thick arms used in wrestling matches with other frogs, and have yellow throats. The Striped Marsh Frog is predominantly aquatic in nature, and can be found in a range of habitats including ponds, swamps, and streams.",
+            "It is distributed from the southern parts of the Cape York Peninsula in North Queensland to southeastern South Australia and Northern Tasmania. While it is common in coastal New South Wales, it is rare in Tasmania and listed as such. The species is well adapted to urban habitats, and can be found in parks and gardens, making it a common sight in many Australian cities.",
+            "The Striped Marsh Frog is active during the night and feeds on a variety of invertebrates, including insects and spiders. They are known to breed in spring and summer, with females laying up to 1,500 eggs at a time.",
+            "Despite being a common species, the Striped Marsh Frog is still threatened by habitat loss and degradation, as many wetland habitats have been drained or degraded due to urbanization and agriculture."
+            ],
+            "img": ""
+        },
+        
+        {
+            "species": "Limnodynastes Tasmaniensis",
+            "common": "Spotted Grass Frog",
+            "summary": "The Spotted Grass Frog is a terrestrial frog species native to Australia, found in various habitats including farmland, woodland, and coastal areas.",
+            "description": [
+            "The Spotted Grass Frog is a small frog species that grows up to 45mm in length, with an olive-green to light brown coloration and large, irregular shaped green or brown spots on its back. It may also have a pale cream, yellow or bright orange stripe running from its snout to vent.",
+            "This frog species is commonly found in various habitats including permanent or temporary dams, roadside ditches, ponds, flooded grassland, and slow-moving creeks, often near a still water source.",
+            "The Spotted Grass Frog is one of the first frog species to inhabit new dams and ditches, and it spends a minimum of 3 months in the tadpole stage.",
+            "Breeding occurs pretty much all year round, with the male and female frogs sexed by the presence of a flap of skin around the thumbs of the females. The tadpoles are comparatively large (up to 6 cm) and are laid in a floating foamy nest created by the female.",
+            "The call of this frog varies from a staccato machine gun sounding burst to a single 'Tok' sound, depending on the call race, which varies geographically. The machine gun call is the northern call race throughout NSW and QLD, while the 'tok' call is the southern call race, occurring in southern VIC and TAS."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Ranoidea caerulea",
+            "common": "Australian green tree frog",
+            "summary": "The Australian green tree frog is a popular and docile species of tree frog native to Australia and New Guinea, with introduced populations in the United States and New Zealand. It is larger than most Australian frogs, reaching over 10 cm (4 in) in length and has a long lifespan compared to most frogs.",
+            "description": [
+            "The Australian green tree frog is known for its green colouration, although specimens sent to England for scientific study were damaged by preservatives and appeared blue. Its colour is caused by blue and green pigments covered in a yellow layer.",
+            "Docile and well-suited to living near human dwellings, these frogs are often found on window sills or inside houses, eating insects drawn by the light. When in danger, they will scream to scare off their foe and squeak when touched.",
+            "The skin secretions of the Australian green tree frog have antibacterial and antiviral properties, which may be useful in pharmaceutical preparations and have rendered it relatively immune to population declines experienced by many species of amphibian.",
+            "The green tree frog is a popular exotic pet worldwide due to its appearance and behavioural traits. However, it is also a common species in the wild and has been assessed as least concern by the International Union for Conservation of Nature.",
+            "Belonging to the family Hylidae, the Australian green tree frog is a member of the subfamily Pelodryadinae, which includes over 100 species in the genera Ranoidea and Nyctimystes. It was the first Australian frog to be scientifically described and is sometimes referred to as Pelodryas caerulea in the scientific literature."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Ranoidea Gracilenta",
+            "common": "Dainty Green Tree Frog",
+            "summary": "Ranoidea gracilenta, also known as the Dainty Green Tree Frog, is a slender, medium-sized tree frog species found in eastern Queensland and northeastern New South Wales, Australia.",
+            "description": [
+            "The Dainty Green Tree Frog has a beautiful bright green dorsal surface with a yellow ventral surface, bright orange eyes, and a coarse, granular skin. It has a thin yellow or white line running from its nostril to its eye that distinguishes it from closely related species.",
+            "This species is often found near human developments, gardens, or farms and can be accidentally transported around Australia, becoming a lost frog. It is a concern as this can contribute to the spread of disease.",
+            "Dainty Green Tree Frogs commonly emerge from water vegetation in streams and swamps and can be found in rainforest, woodland, and forest. It breeds in flooded grasslands and small ponds.",
+            "During the breeding season, males will call out with a long 'waa' or 'wee' sound, forming noisy choruses. The tadpoles develop over about 14 weeks and have a dark brown color with a clear yellow tinge on the body wall.",
+            "If kept as a pet, appropriate permits are required in Australia."
+            ],
+            "img": ""
+        },
+        {
+            "species": "Litoria inermis",
+            "common": "Bumpy rocket frog",
+            "summary": "The bumpy rocket frog, also known as Peters' frog, is a species of frog found in Australia, from northern Australia to Maryborough, Queensland. They are brown or grey with many small warts on their backs and are about 35 mm in length as adults.",
+            "description": [
+            "The bumpy rocket frog has a distinctive appearance, with a brown or grey body covered in many small warts and darker patches on their back. As adults, they are about 35 mm in length and have half to three-quarters webbed toes and non-webbed fingers.",
+            "These frogs have a unique vocalization pattern, similar to the striped rocket frog. They produce a few 'clucks', followed by a rapid series of 'weks' for several seconds, and then a few more 'clucks'.",
+            "They are found in various habitats, including subtropical or tropical swamps, dry savannas, and intermittent freshwater marshes, especially around rain-filled pools.",
+            "The bumpy rocket frog lays their eggs in clumps of approximately 96 to 330 brown eggs on temporary pool surfaces.",
+            "This species is considered abundant and endemic to Australia, but habitat loss and degradation are potential threats to their population."
+            ],
+            "img": ""
+            }
+    ]
 }
