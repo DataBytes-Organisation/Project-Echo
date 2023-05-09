@@ -665,6 +665,20 @@ function findMapLayerWithName(hmiState, name) {
     console.log(`findMapLayerWithName: invalid basemap`);
     return null;
   } else {
+    if(hmiState.layers.hasOwnProperty(name)){
+      return hmiState.layers[name];
+    }
+  }
+
+  console.log(`findMapLayerWithName: layer not found: ` + name);
+  return null;
+}
+
+function findMapLayerWithName_Deprecated(hmiState, name) {
+  if (!hmiState.basemap) {
+    console.log(`findMapLayerWithName: invalid basemap`);
+    return null;
+  } else {
     let mapLayers = hmiState.basemap.getLayers();
 
     for (let i = 0; i < mapLayers.getLength(); ++i) {
@@ -700,6 +714,7 @@ function addVectorLayerToBasemap(hmiState, layerName, zIndex) {
     }
 
     hmiState.basemap.addLayer(layer);
+    hmiState.layers[layerName] = layer;
   }
 }
 

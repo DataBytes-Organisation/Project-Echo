@@ -101,7 +101,7 @@
               <a id="popup-menu-btn" class="tabs-button" onclick="openTab('animal-popup')">l</a>
               <a id="FAQ-menu-btn" class="tabs-button" onclick="openTab('FAQ')">i</a>
               <a id="SIM-menu-btn" class="tabs-button" onclick="openTab('SIM')">s</a>
-              <span style="position: fixed; border-top: 6px solid rgba(247, 186, 206, 0.8); height: 2px; width: 80%; margin-top: 30px;"></span>
+              <span style="position: fixed; border-top: 6px solid rgba(247, 186, 206, 0.8); height: 2px; width: 80%; margin-top: 36px;"></span>
             </div>
           <div id="FAQ">
             <div class="wrapper">
@@ -305,18 +305,10 @@
                   <div class="markup_row_right">
                     <div id="markup_confidence"></div>
                   </div>
-                </div>
-
-                
-                
-                
-                
+                </div>             
               </div>
               
               <h2 style="margin-top: 20px !important;">Audio</h2>
-              <!-- <audio id="player" controls>
-                <source src="./audio/t-rex-roar.mp3">
-              </audio> -->
 
               <div class="audio_component">
                 <span><i class="fa fa-volume-up fa-2x" style="color:rgba(247, 186, 206, 0.6);" onclick="{toggleAudio()}"></i></span>
@@ -552,10 +544,6 @@
     }
   }
   
-
-
-
-
   function openMenu() {
     document.getElementById("menu").style.width = "500px";
     document.getElementById("menu").style.height = "100%";
@@ -571,39 +559,6 @@
   }
 
   function openTab(tab) {
-    // if(tab == 'filter-menu'){
-    //   if(!document.getElementById("filter-menu-btn").classList.contains("active")){
-    //     document.getElementById("filter-menu-btn").classList.add("active");
-    //   }
-    //   if(document.getElementById("popup-menu-btn").classList.contains("active")){
-    //     document.getElementById("popup-menu-btn").classList.remove("active");
-    //   }
-    //   if(document.getElementById("FAQ-menu-btn").classList.contains("active")){
-    //     document.getElementById("FAQ-menu-btn").classList.remove("active");
-    //   }
-    // }
-    // else if(tab == 'animal-popup'){
-    //   if(document.getElementById("filter-menu-btn").classList.contains("active")){
-    //     document.getElementById("filter-menu-btn").classList.remove("active");
-    //   }
-    //   if(!document.getElementById("popup-menu-btn").classList.contains("active")){
-    //     document.getElementById("popup-menu-btn").classList.add("active");
-    //   }
-    //   if(document.getElementById("FAQ-menu-btn").classList.contains("active")){
-    //     document.getElementById("FAQ-menu-btn").classList.remove("active");
-    //   }
-    // }
-    // else if(tab == 'FAQ'){
-    //   if(document.getElementById("filter-menu-btn").classList.contains("active")){
-    //     document.getElementById("filter-menu-btn").classList.remove("active");
-    //   }
-    //   if(document.getElementById("popup-menu-btn").classList.contains("active")){
-    //     document.getElementById("popup-menu-btn").classList.remove("active");
-    //   }
-    //   if(!document.getElementById("FAQ-menu-btn").classList.contains("active")){
-    //     document.getElementById("FAQ-menu-btn").classList.add("active");
-    //   }
-    // }
     $(".tabs-button").removeClass("active");
     switch (tab){
       case "filter-menu":
@@ -637,14 +592,11 @@
   var overlay = null;
 
   function openSIMULATOR(){
-
     if(overlay){
       closeOverlay(overlay)
     }
     //console.log("Opening Simulator...")
-
   }
-
 
   function openNav(tab) {
     var hamburger = document.querySelector('.hamburger-icon');
@@ -664,13 +616,7 @@
       currentTab = document.getElementById('animal-popup') 
       openNav('animal-popup')
     },10)
-    
-
   })
-
-  /*function closeNav() {
-    MapCloseNav()
-  }*/
 
   let aud = false;
   function animateAudioPlay() {
@@ -718,8 +664,6 @@
   })
   
 </script>
-
-
 
 <script>
   
@@ -843,24 +787,7 @@
   import {retrieveTruthEventsInTimeRange, retrieveVocalizationEventsInTimeRange} from "./js/routes.js";
   window.updateMics = updateMics;
   window.updateLayers = updateLayers;
-  //window.openNav = openNav;
-  //window.closeNav = MapCloseNav;
   window.closeNav = MapCloseNav;
-
-  /*export function openNav() {
-
-      var hamburger = document.querySelector('.hamburger-icon');
-    
-      if(!hamburger.classList.contains('active')){
-        toggleNav();
-      }
-
-      openTab('animal-popup')
-  }
-
-  document.addEventListener('animalToggled', function(event) {
-    openNav()
-  });*/
 
   //All global state based info is stored in the hmiState
   let hmiState = {};
@@ -891,6 +818,7 @@
   hmiState.originLon = 143.54741;
   hmiState.defaultZoom = 10;
   hmiState.requestInterval = 1000;
+  hmiState.layers = {};
 
   const microphoneLocations = [
     { lat: -38.808, lon: 143.554 },
@@ -927,39 +855,10 @@
 
   const el = (sel) => {return document.getElementById(sel);}
   const elArea  = el("basemap");
-  // const elPopup = el("popup");
 
-  //nb/menuTabs 
-  //const elPopup = el("menuPanel");
-  //const faqOl = el("nav-faq");
-  //const aboutOl = el("nav-about");
   const simulatorOl = el("screen")
-  //Add popup message at anywhere in map
-  // const showPopup = (evt) => {
-  // 	const elBtn = evt.currentTarget;
-  // 	Object.assign(elPopup.style, {
-  // 		left: `${evt.pageX + elBtn.scrollLeft - elBtn.offsetLeft - 320}px`,
-  // 		top:  `${evt.pageY + elBtn.scrollTop - elBtn.offsetTop - 180}px`,
-  // 		display: `block`,
-  // 	});
-  // };
+
   simulatorOl.addEventListener("click",openSIMULATOR)
-  //aboutOl.addEventListener("click",openABOUT);
-  //elArea.addEventListener("click", openNav);
-  //faqOl.addEventListener("click", openFAQ);
-  //Add sound listener to icon
-  // let a=0;
-  // document.getElementsByTagName("i")[0].addEventListener("click",function(){
-  // 	if(a==0){
-  // 		document.getElementsByTagName("audio")[0].play();
-  // 		a++;
-  // 		document.querySelector("i").style.opacity="1";
-  // 	} else {
-  // 		document.querySelector("audio").pause();
-  // 		a--;
-  // 		document.querySelector("i").style.opacity=".5";
-  // 	}
-  // });
 
   window.onload = function() {
     console.log("Website loaded!");

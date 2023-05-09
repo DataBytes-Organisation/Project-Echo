@@ -195,6 +195,7 @@ body{
 
 .navbar {
   margin-top: 50px;
+  height: 80px;
   display: flex;
   justify-content: left;
   align-items: left;
@@ -922,12 +923,14 @@ i {
   height: 50px;
   text-align: center;
   transform: translateY(-10px);
-  border-radius: 10px;
+  border-radius: 5px;
 }
 
 .tabs-button.active {
   background-color: rgba(247, 186, 206, 0.8);
-  transform: translateY(-20px);
+  height: 58px;
+  width: 58px;
+  transform: translateY(-13px);
   transition: 0.5s ease-in-out;
 }
 
