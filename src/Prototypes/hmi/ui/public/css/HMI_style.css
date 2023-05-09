@@ -14,15 +14,15 @@ body {
     font-size: 20px;
     height: 10%;
     font-family: 'Stick No Bills', sans-serif;
-    color: #e48595 !important;
+    color: rgba(247, 186, 206, 1) !important;
 }
 
 h3 {
-  color: #e48595 !important;
+  color: rgba(247, 186, 206, 1) !important;
 }
 
 h2 {
-  color: #e48595 !important;
+  color: rgba(247, 186, 206, 1) !important;
   font-weight: bold;
 }
 
@@ -56,7 +56,7 @@ h2 {
   z-index: 998;
   top: 0;
   right: 0;
-  background-color: rgba(19, 19, 52, 0.5);
+  background-color: rgb(10, 10, 25, 0.8);
   overflow-x: hidden;
   position: fixed; 
 }
@@ -110,6 +110,11 @@ body{
   align-items: center;
   height: 100vh;
 }
+
+#desc_confidence{
+  color: rgba(247, 186, 206, 1);
+}
+
 #animal-popup .audio_component {
   width: 100%;
   display: flex;
@@ -131,7 +136,7 @@ body{
   transform: scaleY(.01);
   height: 100%;
   width: var(--boxSize);
-  background: #e48595 !important;
+  background: rgba(247, 186, 206, 0.6) !important;
   animation-duration: 1.5s;
   animation-timing-function: ease-in-out;
   animation-iteration-count: infinite;
@@ -187,8 +192,6 @@ body{
   z-index: 997;
 }
 
-
-
 #I {
   height: 100%;
   width: 0%;
@@ -197,7 +200,7 @@ body{
   top: 0;
   right: 0;
   background-color: none;
-  color: white;
+  color: rgb(141, 141, 141, 1.0);
   overflow-x: hidden;
   padding-top: 60px;
   margin-top: 30px;
@@ -222,7 +225,7 @@ body{
     position: absolute;
     height: 3px;
     width: 100%;
-    background: white;
+    background: rgb(141, 141, 141, 0.8);
     border-radius: 3px;
     opacity: 1;
     left: 0;
@@ -379,7 +382,7 @@ input[type="checkbox"]{
     top: 0;
     right: 0;
     background-color: black;
-    color: white;
+    color: rgb(141, 141, 141, 1.0);
     overflow-x: hidden;
     
     padding-top: 60px;
@@ -398,7 +401,7 @@ input[type="checkbox"]{
   top: 0;
   right: 0;
   background-color: none;
-  color: white;
+  color: rgb(141, 141, 141, 1.0);
   overflow-x: hidden;
   
   padding-top: 80px;
@@ -426,7 +429,7 @@ input[type="checkbox"]{
   top: 0;
   right: 0;
   background-color: none;
-  color: white;
+  color: rgb(141, 141, 141, 1.0);
   overflow-x: hidden;
   
   padding-top: 80px;
@@ -455,7 +458,7 @@ input[type="checkbox"]{
   top: 0;
   right: 0;
   background-color: none;
-  color: white;
+  color: rgb(141, 141, 141, 1.0);
   overflow-x: hidden;
   
   padding-top: 80px;
@@ -485,7 +488,7 @@ input[type="checkbox"]{
   top: 0;
   right: 0;
   background-color: none;
-  color: white;
+  color: rgb(141, 141, 141, 1.0);
   overflow-x: hidden;
   
   padding-top: 80px;
@@ -553,7 +556,7 @@ input[type="checkbox"]{
   height: 80px;
   display: flex;
   flex-direction: row;
-  border-bottom: 1px dotted white;
+  border-bottom: 1px dotted rgb(141, 141, 141, 1.0);
   align-items: center;
 }
 
@@ -605,14 +608,14 @@ input[type="checkbox"]{
   size: 16px;
   margin-left: 8px;
   margin-bottom: 5px;
-  border-bottom: 1px solid white;
+  border-bottom: 1px solid rgb(141, 141, 141, 1.0);
 }
 
 #animal-popup a , #animal-popup h2{
     /* padding: 8px 8px 8px 32px; */
     text-decoration: none;
     /*font-size: 27px;*/
-    color: white;
+    color: rgb(141, 141, 141, 1.0);
     display: block;
     /*font-family: 'Helvetica', sans-serif;*/
 }
@@ -621,7 +624,7 @@ input[type="checkbox"]{
     /* padding: 8px 8px 8px 32px; */
     text-decoration: none;
     /*font-size: 14px;*/
-    color:  white;
+    color:  rgb(141, 141, 141, 1.0);
     display: block;
     transition: 0.3s;
     /*font-family: 'Roboto', sans-serif;*/
@@ -643,7 +646,7 @@ input[type="checkbox"]{
 #area {
     position: relative;  /* this is needed! */  
     height: 150px;
-    background: #eee;
+    background: rgb(141, 141, 141, 1.0);
     margin: 40px;
 }
 
@@ -664,7 +667,7 @@ input[type="checkbox"]{
 }
 
 .faq_question {
-  color: white;
+  color: rgb(141, 141, 141, 1.0);
   background-color: transparent;
   width: 100%;
   height: 30px;
@@ -679,12 +682,12 @@ input[type="checkbox"]{
 .faq_question:hover {
   background-color: #666;
   opacity: 0.2;
-  border-bottom: 2px solid white;
+  border-bottom: 2px solid rgb(141, 141, 141, 1.0);
   transition: all 0.1s ease-out;
 }
 
 i {
-    color: white;
+    color: rgb(141, 141, 141, 1.0);
 }
 
 .dropdown-toggle {
@@ -721,7 +724,7 @@ i {
     
     border-top: none;
     background-color:rgba(0,0,0,0);
-    color: white;
+    color: rgb(141, 141, 141, 1.0);
     padding: 0;
     list-style: none;
   }
@@ -820,14 +823,14 @@ i {
     margin-top: 20px;
   }
   .toggle-label{
-    color: white;
+    color: rgb(141, 141, 141, 1.0);
     font-family: var(--bs-btn-font-family);
     font-size: var(--bs-btn-font-size);
     font-weight: var(--bs-btn-font-weight);
     line-height: var(--bs-btn-line-height);
   }
   .past-data-header{
-    color: white;
+    color: rgb(141, 141, 141, 1.0);
     font-family: var(--bs-btn-font-family);
     font-size: var(--bs-btn-font-size);
     font-weight: var(--bs-btn-font-weight);
@@ -865,7 +868,7 @@ i {
 
 .tabs-button {
   background: none;
-  background-color: rgba(128, 128, 128, 0.699);
+  background-color: rgba(247, 186, 206, 0.4);
   border: none;
   color: #cccccc;
   font-size: 30px;
@@ -881,7 +884,7 @@ i {
 }
 
 .tabs-button.active {
-  background-color: #e48595;
+  background-color: rgba(247, 186, 206, 0.8);
   transform: translateY(-20px);
   transition: 0.5s ease-in-out;
 }
@@ -919,13 +922,13 @@ i {
 
 /* Background color of the scrollbar track */
 .wrapper::-webkit-scrollbar-track {
-  background: transparent;
+  background: rgb(141, 141, 141, 0.8);
   height: 200px !important;
 }
 
 /* Color of the scrollbar thumb */
 .wrapper::-webkit-scrollbar-thumb {
-  background: #e48595c7;
+  background: rgba(247, 186, 206, 0.6);
   border-radius: 6px;
   border-top: 90% solid transparent !important;
   border-bottom: 90% solid transparent !important;
@@ -934,7 +937,7 @@ i {
 
 /* On hover, highlight the thumb */
 .wrapper::-webkit-scrollbar-thumb:hover {
-  background: #e48595;
+  background: rgba(247, 186, 206, 0.8);
   border-top: 90% solid transparent !important;
   border-bottom: 90% solid transparent !important;
   background-clip: padding-box !important;  
