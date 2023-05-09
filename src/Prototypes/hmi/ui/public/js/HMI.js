@@ -14,8 +14,6 @@ var statuses = [
   "invasive",
 ];
 
-
-
 function matchStatus(status){
   if (status == "least concern"){
     return "normal";
@@ -24,6 +22,14 @@ function matchStatus(status){
     return status;
   }
 }
+
+var statusPrintLookup = {
+  "endangered" : "endangered",
+  "vulnerable": "vulnerable",
+  "near-threatened" : "near-threatened",
+  "normal" : "least concern",
+  "invasive" : "invasive"
+};
 
 var vocalizedLayers = []
 
@@ -782,10 +788,21 @@ function createMapClickEvent(hmiState){
         selectedVocalizationEventId = values.eventId;
       }
       if (values.animalSpecies){
-          console.log(values.animalSpecies)
+          //console.log(values.animalSpecies)
           var result = sample_data.find(({ species }) => species.toLowerCase() === values.animalSpecies.toLowerCase())
           if (result) {
-            console.log("found")
+            const img = new Image();
+            img.onload = function() {
+              //console.log('Image exists!');
+              // Set the source of the img tag
+              document.getElementById("desc_img").src = "../../images/bio/" + result.common + ".png";
+            }
+            img.onerror = function() {
+              let dice = Math.floor(Math.random() * 6) + 1;
+              document.getElementById("desc_img").src = "../../images/bio/not_available_" + dice + ".png";
+            }
+            img.src = "../../images/bio/" + result.common + ".png";
+            //console.log("found")
             //Animal Bio specific session
             animal_data = result;
             document.getElementById("desc_name").innerText = result.common;
@@ -793,7 +810,7 @@ function createMapClickEvent(hmiState){
             document.getElementById("desc_confidence").innerText = values.animalLocConfidence + "%";
             document.getElementById("desc_species").innerText = result.species;
             document.getElementById("desc_summary").innerText = result.summary;
-            document.getElementById("desc_img").src = "../../images/bio/" + result.common + ".png";
+
             let summary = document.getElementById("desc_details");
             summary.innerHTML = '';
             result.description.forEach(content => {
@@ -807,7 +824,7 @@ function createMapClickEvent(hmiState){
             //Markup details specific session
             let dateFormat = new Date(values.animalRecordDate);
             document.getElementById("markup_img").src = values.animalIcon;
-            document.getElementById("markup_details").innerHTML = values.animalType + " | " + values.animalDiet + " | " + values.animalStatus;
+            document.getElementById("markup_details").innerHTML = values.animalType + " | " + values.animalDiet + " | " + statusPrintLookup[values.animalStatus];
             document.getElementById("markup_loc_lon").innerHTML = values.animalLon;
             document.getElementById("markup_loc_lat").innerHTML = values.animalLat;
             document.getElementById("markup_confidence").innerHTML = values.animalConfidence + "%";
