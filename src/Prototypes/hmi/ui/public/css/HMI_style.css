@@ -177,7 +177,7 @@ body{
 
 @media (min-width: 0px) {
   #menu {
-    max-width: 500px;
+    max-width: 520px;
   }
   #filter-menu{
     max-width: 500px;
@@ -195,6 +195,8 @@ body{
 
 .navbar {
   margin-top: 50px;
+  margin-left: 30px;
+  margin-right: 30px;
   height: 80px;
   display: flex;
   justify-content: left;
@@ -452,7 +454,7 @@ input[type="checkbox"]::after {
 
 #SIM-contents{
   padding-top: 20px;
-  margin-left: 30px;
+  margin-left: 10px;
   margin-right: 30px;
   height: 3000px;
   /*position: fixed;*/
@@ -481,7 +483,7 @@ input[type="checkbox"]::after {
 
 #filter-menu-contents{
   padding-top: 20px;
-  margin-left: 30px;
+  margin-left: 10px;
   margin-right: 30px;
   height: 3000px;
   /*position: fixed;*/
@@ -509,7 +511,7 @@ input[type="checkbox"]::after {
 
 #FAQ-contents{
   padding-top: 20px;
-  margin-left: 30px;
+  margin-left: 10px;
   margin-right: 30px;
   height: 3000px;
   /*position: fixed;*/
@@ -539,7 +541,7 @@ input[type="checkbox"]::after {
 
 #animal-popup #animal-popup-content{
   padding-top: 20px;
-  margin-left: 30px;
+  margin-left: 10px;
   margin-right: 30px;
   height: 3000px;
   /*position: fixed;*/
@@ -566,7 +568,7 @@ input[type="checkbox"]::after {
 
 #animal-default-content{
   padding-top: 20px;
-  margin-left: 30px;
+  margin-left: 10px;
   margin-right: 30px;
   height: 3000px;
   /*position: fixed;*/
@@ -907,11 +909,13 @@ i {
 
 .tabs-button:hover{
   cursor: pointer;
+  opacity: 0.6;
 }
 
 .tabs-button {
   background: none;
-  background-color: rgba(247, 186, 206, 0.4);
+  background-color: rgba(247, 186, 206);
+  opacity: 0.4;
   border: none;
   color: #cccccc;
   font-size: 30px;
@@ -924,6 +928,8 @@ i {
   text-align: center;
   transform: translateY(-10px);
   border-radius: 5px;
+  background-size: contain;
+  background-repeat: no-repeat;
 }
 
 .tabs-button.active {
@@ -931,8 +937,49 @@ i {
   height: 58px;
   width: 58px;
   transform: translateY(-13px);
-  transition: 0.5s ease-in-out;
+  transition: 0.2s ease-in-out;
+  opacity: 1;
 }
+
+#filter-menu-btn {
+  background-image: url("../images/tabIcons/filter.png");
+  background-size: cover;
+  background-size: 50%;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+#popup-menu-btn {
+  background-image: url("../images/tabIcons/detection.png");
+  background-size: cover;
+  background-size: 75%;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+#FAQ-menu-btn{
+  background-image: url("../images/tabIcons/info.png");
+  background-size: cover;
+  background-size: 25%;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+#SIM-menu-btn{
+  background-image: url("../images/tabIcons/simulator.png");
+  background-size: cover;
+  background-size: 70%;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+#filter-menu-btn::before {
+  opacity: 0.5;
+}
+#filter-menu-btn::after {
+  opacity: 1;
+}
+
 
 #app {
   display: none;
@@ -953,16 +1000,17 @@ i {
 }
 .wrapper{
   position: relative;
-  width: 500px; 
+  /*width: 500px;*/ 
   height: 100%; 
   padding: 0; 
   overflow-y: scroll; 
-  overflow-x: hidden; 
+  overflow-x: hidden;
+  margin-right: 20px; 
 }
 /* Width and height of the scrollbar */
 .wrapper::-webkit-scrollbar {
   display: block;
-  width: 7px !important;
+  width: 9px !important;
 }
 
 /* Background color of the scrollbar track */
@@ -974,18 +1022,17 @@ i {
 /* Color of the scrollbar thumb */
 .wrapper::-webkit-scrollbar-thumb {
   background: rgba(247, 186, 206, 0.6);
-  border-radius: 6px;
-  border-top: 90% solid transparent !important;
-  border-bottom: 90% solid transparent !important;
-  background-clip: padding-box !important;  
+  border: 3px solid transparent;
+  border-radius: 9px;
+  background-clip: content-box;
 }
 
 /* On hover, highlight the thumb */
 .wrapper::-webkit-scrollbar-thumb:hover {
   background: rgba(247, 186, 206, 0.8);
-  border-top: 90% solid transparent !important;
-  border-bottom: 90% solid transparent !important;
-  background-clip: padding-box !important;  
+  border: 3px solid transparent;
+  border-radius: 9px;
+  background-clip: content-box;
 }
 
 .wrapper::-webkit-scrollbar-track-piece:end {
