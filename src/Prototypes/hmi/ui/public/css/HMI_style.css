@@ -58,6 +58,18 @@ h2 {
   background-color: rgb(13, 12, 23, 0.8);
 }
 
+.image-container {
+  width: 70px;
+  height: 70px;
+  overflow: hidden;
+}
+
+.image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 #menu{
   height: 0%;
   width: 0%;
