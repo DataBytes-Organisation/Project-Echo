@@ -77,6 +77,15 @@ export function initialiseHMI(hmiState) {
   addTruthLayers(hmiState);
   addVocalisationLayers(hmiState);
   addVectorLayerTopDown(hmiState, "mic_layer");
+  addVectorLayerTopDown(hmiState, "mic_layer_1");
+  addVectorLayerTopDown(hmiState, "mic_layer_2");
+  addVectorLayerTopDown(hmiState, "mic_layer_3");
+  addVectorLayerTopDown(hmiState, "mic_layer_4");
+  addVectorLayerTopDown(hmiState, "mic_layer_5");
+  addVectorLayerTopDown(hmiState, "mic_layer_6");
+  addVectorLayerTopDown(hmiState, "mic_layer_7");
+  addVectorLayerTopDown(hmiState, "mic_layer_8");
+  addVectorLayerTopDown(hmiState, "mic_layer_9");
 
   addAllTruthFeatures(hmiState);
   addAllVocalizationFeatures(hmiState);
@@ -89,6 +98,7 @@ export function initialiseHMI(hmiState) {
   })
   
   queueSimUpdate(hmiState);
+  stepMicAnimation(hmiState);
   //simulateData(hmiState);
 }
 
@@ -653,7 +663,7 @@ function addNewVocalizationFeatures(hmiState, events) {
   }
 }
 
-function addmicrophones(hmiState) {
+function addMicrophonesByLayer(hmiState, layerName, iconPath){
   var mics = [];
 
   //console.log("locs", hmiState.microphoneLocations);
@@ -668,7 +678,7 @@ function addmicrophones(hmiState) {
     });
     var icon = new ol.style.Style({
       image: new ol.style.Icon({
-        src: "./../images/mic2.png",
+        src: iconPath,
         anchor: [0.5, 1],
         scale: 0.75,
       }),
@@ -678,11 +688,107 @@ function addmicrophones(hmiState) {
   });
 
   //console.log("mics: ", mics);
-  let layer = findMapLayerWithName(hmiState, "mic_layer");
+  let layer = findMapLayerWithName(hmiState, layerName);
   let layerSource = layer.getSource();
   layerSource.addFeatures(mics);
   layer.getSource().changed();
   layer.changed();
+}
+
+
+function addMicrophonesByHiddenLayer(hmiState, layerName, iconPath){
+  var mics = [];
+
+  //console.log("locs", hmiState.microphoneLocations);
+  hmiState.microphoneLocations.forEach((location) => {
+    //console.log(location);
+    // Add the marker into the array
+    var mic = new ol.Feature({
+      geometry: new ol.geom.Point(
+        ol.proj.fromLonLat([location.lon, location.lat])
+      ),
+      name: "mic",
+    });
+    var icon = new ol.style.Style({
+      image: new ol.style.Icon({
+        src: iconPath,
+        anchor: [0.5, 1],
+        scale: 1.0,
+      }),
+    });
+    mic.setStyle(icon);
+    mics.push(mic);
+  });
+
+  //console.log("mics: ", mics);
+  let layer = findMapLayerWithName(hmiState, layerName);
+  let layerSource = layer.getSource();
+  layerSource.addFeatures(mics);
+  layer.getSource().changed();
+  layer.changed();
+  layer.setVisible(false);
+}
+
+var micAnimFrameIndex = 1;
+var animTimeout = null;
+
+function addmicrophones(hmiState) {
+
+  addMicrophonesByLayer(hmiState, "mic_layer_9", "./../images/Microphone - 3-ai-9.png");
+  addMicrophonesByLayer(hmiState, "mic_layer_8", "./../images/Microphone - 3-ai-8.png");
+  addMicrophonesByLayer(hmiState, "mic_layer_7", "./../images/Microphone - 3-ai-7.png");
+  addMicrophonesByLayer(hmiState, "mic_layer_6", "./../images/Microphone - 3-ai-6.png");
+  addMicrophonesByLayer(hmiState, "mic_layer_5", "./../images/Microphone - 3-ai-5.png");
+  addMicrophonesByLayer(hmiState, "mic_layer_4", "./../images/Microphone - 3-ai-4.png");
+  addMicrophonesByLayer(hmiState, "mic_layer_3", "./../images/Microphone - 3-ai-3.png");
+  addMicrophonesByLayer(hmiState, "mic_layer_2", "./../images/Microphone - 3-ai-2.png");
+  addMicrophonesByLayer(hmiState, "mic_layer_1", "./../images/Microphone - 3-ai-1.png");
+
+  addMicrophonesByHiddenLayer(hmiState, "mic_layer", "./../images/mic2.png");
+}
+
+export function enableMicAnimation(hmiState){
+  var staticLayer = findMapLayerWithName(hmiState, "mic_layer");
+  staticLayer.setVisible(false);
+
+  for(var i = 1; i <= 9; i++){
+    var nextLayer = findMapLayerWithName(hmiState, "mic_layer_" + i);
+    nextLayer.setVisible(true);
+  }
+
+  stepMicAnimation(hmiState);
+}
+
+export function disableMicAnimation(hmiState){
+  if(animTimeout){
+    clearTimeout(animTimeout);
+  }
+
+  for(var i = 1; i <= 9; i++){
+    var nextLayer = findMapLayerWithName(hmiState, "mic_layer_" + i);
+    nextLayer.setVisible(false);
+  }
+}
+
+function stepMicAnimation(hmiState) {
+  var currentIndex = micAnimFrameIndex;
+  micAnimFrameIndex = (micAnimFrameIndex % 9) + 1;
+
+  var nextLayer = findMapLayerWithName(hmiState, "mic_layer_" + micAnimFrameIndex);
+  nextLayer.setVisible(true);
+
+  var currentLayer = findMapLayerWithName(hmiState, "mic_layer_" + currentIndex);
+  currentLayer.setVisible(false);
+
+  if(animTimeout){
+    clearTimeout(animTimeout);
+  }
+
+  animTimeout = setTimeout(
+    stepMicAnimation,
+    200,
+    hmiState
+  );
 }
 
 export function showMics(hmiState){

@@ -512,6 +512,10 @@
                       <input class="form-check-input" type="checkbox" value="" id="microphones" onchange="{microphoneDisplay()}" checked>
                       <label class="form-check-label" for="microphones">Microphones </label>
                     </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="microphoneAnimations" onchange="{updateMicrophoneAnimation()}" checked>
+                      <label class="form-check-label" for="microphones">Enable Animation </label>
+                    </div>
                    
                   </div>
                   </div>
@@ -782,9 +786,10 @@
 
 <script type="module">
   import { updateLayers, initialiseHMI, showMics, hideMics, updateAnimalMovementLayerFromPastData, updateVocalizationLayerFromPastData,
-  resetWildlifeLayers, MapOpenNav, MapCloseNav, getAnimalToggled } from "./js/HMI.js";
+  resetWildlifeLayers, MapOpenNav, MapCloseNav, getAnimalToggled, enableMicAnimation, disableMicAnimation } from "./js/HMI.js";
   import {retrieveTruthEventsInTimeRange, retrieveVocalizationEventsInTimeRange} from "./js/routes.js";
   window.updateMics = updateMics;
+  window.updateMicrophoneAnimation = updateMicrophoneAnimation;
   window.updateLayers = updateLayers;
   window.closeNav = MapCloseNav;
 
@@ -867,15 +872,36 @@
   //Microphone show/hide
   function updateMics(){
   //console.log("mic visibility toggled!")
-  let mic = document.getElementById("microphones");
-    if (mic.checked){
-      showMics(hmiState)
-    } 
+    let anim = document.getElementById("microphoneAnimations");
+    let mic = document.getElementById("microphones");
+    if(anim.checked && mic.checked){
+      enableMicAnimation(hmiState);
+    }
+    else if (mic.checked && !anim.checked){
+      showMics(hmiState);
+    }
+    else if (!mic.checked && anim.checked){
+      disableMicAnimation(hmiState);
+    }  
     else {
-      hideMics(hmiState)
+      hideMics(hmiState);
     }
   }
 
+  function updateMicrophoneAnimation(){
+    let anim = document.getElementById("microphoneAnimations");
+    let mic = document.getElementById("microphones");
+    if (anim.checked && mic.checked){
+      enableMicAnimation(hmiState);
+    } 
+    else {
+      disableMicAnimation(hmiState);
+
+      if(mic.checked){
+        showMics(hmiState);
+      }
+    }
+  }
   //Live mode and date range picker
 
   const toggleSwitch = document.querySelector('#liveModeToggle');
