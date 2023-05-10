@@ -786,7 +786,7 @@ function stepMicAnimation(hmiState) {
 
   animTimeout = setTimeout(
     stepMicAnimation,
-    200,
+    100,
     hmiState
   );
 }
