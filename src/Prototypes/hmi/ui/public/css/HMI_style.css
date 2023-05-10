@@ -177,25 +177,25 @@ body{
 
 @media (min-width: 0px) {
   #menu {
-    max-width: 520px;
+    max-width: 550px;
   }
   #filter-menu{
-    max-width: 500px;
+    max-width: 520px;
   }
   #animal-popup{
-    max-width: 500px;
+    max-width: 520px;
   }
   #FAQ{
-    max-width: 500px;
+    max-width: 520px;
   }
   #SIM{
-    max-width: 500px;
+    max-width: 520px;
   }
 }
 
 .navbar {
   margin-top: 50px;
-  margin-left: 30px;
+  margin-left: 40px;
   margin-right: 30px;
   height: 80px;
   display: flex;
@@ -348,45 +348,6 @@ input[type="checkbox"]{
   border-color: white;
   outline: none;
 }
-
-/* Hide the default checkbox tick icon 
-input[type="checkbox"] {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  outline: none;
-  cursor: pointer;
-  height: 20px;
-  width: 20px;
-  position: relative;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  background-color: black;
-  border-color: white;
-  outline: none;
-}
-
-input[type="checkbox"]::before,
-input[type="checkbox"]::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  margin: auto;
-  width: 50%;
-  height: 2px;
-  background-color: #555;
-}
-
-input[type="checkbox"]::before {
-  transform: rotate(45deg);
-}
-
-input[type="checkbox"]::after {
-  transform: rotate(-45deg);
-}*/
 
 .vulnerable {
   border-color :rgb(211, 100, 42) !important; 
@@ -643,7 +604,6 @@ input[type="checkbox"]::after {
 #animal-popup #animal-popup-content .desc {
   text-align: start;
   size: 16px;
-  margin-left: 8px;
   margin-bottom: 5px;
 }
 
@@ -1005,7 +965,7 @@ i {
   padding: 0; 
   overflow-y: scroll; 
   overflow-x: hidden;
-  margin-right: 20px; 
+  margin-right: 30px; 
 }
 /* Width and height of the scrollbar */
 .wrapper::-webkit-scrollbar {
