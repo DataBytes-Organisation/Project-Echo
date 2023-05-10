@@ -430,8 +430,18 @@ function addAllTruthFeatures(hmiState) {
   //console.log("addTruthLayers called.")
   //console.log("Truth locs", hmiState.movementEvents);
   for (const key in hmiState.movementEvents) {
-    let entry = hmiState.movementEvents[key];
     //console.log("True location found!:  ")
+
+    let entry = hmiState.movementEvents[key];
+
+    var iconPath = "";
+    if(entry.animalDiet === "herbavore" || entry.animalDiet === "frugivore"){
+      iconPath = './../images/sim/' + getIconName(entry.animalStatus, entry.animalType);
+    }
+    else{
+      iconPath ='./../images/Predator/sim/' + getIconName(entry.animalStatus, entry.animalType);
+    }
+    
     var trueLocation = new ol.Feature({
       geometry: new ol.geom.Point(
         ol.proj.fromLonLat([entry.locationLon,entry.locationLat])
@@ -445,19 +455,20 @@ function addAllTruthFeatures(hmiState) {
         animalDiet: entry.animalDiet,
         animalConfidence: entry.speciesIdentificationConfidence,
         animalLocConfidence: entry.locationConfidence,
-        animalIcon: './../images/sim/' + getIconName(entry.animalStatus, entry.animalType),
+        animalIcon: iconPath,
         animalRecordDate: entry.timestamp
     });
       //console.log(entry.locationLon, " ", entry.locationLat)
     
     var trueIcon = new ol.style.Style({
-        image: new ol.style.Icon({
-          src: './../images/sim/' + getIconName(entry.animalStatus, entry.animalType),
-          anchor: [0.5, 1],
-          scale: 0.75,
-          className: 'true-icon'
-        }),
+      image: new ol.style.Icon({
+        src: iconPath,
+        anchor: [0.5, 1],
+        scale: 0.75,
+        className: 'true-icon'
+      }),
     })
+  
     trueLocation.setStyle(trueIcon);
     trueLocation.setId(entry.animalId);
 
@@ -479,6 +490,14 @@ function addNewTruthFeatures(hmiState, events) {
   //console.log("Truth locs", hmiState.movementEvents);
   for (let entry of events) {
     //console.log("True location found!:  ")
+    var iconPath = "";
+    if(entry.animalDiet === "herbavore" || entry.animalDiet === "frugivore"){
+      iconPath = './../images/sim/' + getIconName(entry.animalStatus, entry.animalType);
+    }
+    else{
+      iconPath ='./../images/Predator/sim/' + getIconName(entry.animalStatus, entry.animalType);
+    }
+
     var trueLocation = new ol.Feature({
       geometry: new ol.geom.Point(
         ol.proj.fromLonLat([entry.locationLon, entry.locationLat])
@@ -492,19 +511,20 @@ function addNewTruthFeatures(hmiState, events) {
         animalDiet: entry.animalDiet,
         animalConfidence: entry.speciesIdentificationConfidence,
         animalLocConfidence: entry.locationConfidence,
-        animalIcon: './../images/sim/' + getIconName(entry.animalStatus, entry.animalType),
+        animalIcon: iconPath,
         animalRecordDate: entry.timestamp
     });
       //console.log(entry.locationLon, " ", entry.locationLat)
-    
+
     var trueIcon = new ol.style.Style({
-        image: new ol.style.Icon({
-          src: './../images/sim/' + getIconName(entry.animalStatus, entry.animalType),
-          anchor: [0.5, 1],
-          scale: 0.75,
-          className: 'true-icon'
-        }),
+      image: new ol.style.Icon({
+        src: iconPath,
+        anchor: [0.5, 1],
+        scale: 0.75,
+        className: 'true-icon'
+      }),
     })
+
     trueLocation.setStyle(trueIcon);
     trueLocation.setId(entry.animalId);
 
@@ -525,6 +545,14 @@ function addAllVocalizationFeatures(hmiState) {
   //console.log("Truth locs", hmiState.movementEvents);
   for (let entry of hmiState.vocalizationEvents) {
     //console.log("True location found!:  ")
+    var iconPath = "";
+    if(entry.animalDiet === "herbavore" || entry.animalDiet === "frugivore"){
+      iconPath = './../images/vocalization/' + getIconName(entry.animalStatus, entry.animalType);
+    }
+    else{
+      iconPath ='./../images/Predator/vocalization/' + getIconName(entry.animalStatus, entry.animalType);
+    }
+
     var evtLocation = new ol.Feature({
       geometry: new ol.geom.Point(
         ol.proj.fromLonLat([entry.locationLon,entry.locationLat])
@@ -538,19 +566,19 @@ function addAllVocalizationFeatures(hmiState) {
         animalConfidence: entry.speciesIdentificationConfidence,
         animalLocConfidence: entry.locationConfidence,
         animalDiet: entry.animalDiet,
-        animalIcon: './../images/vocalization/' + getIconName(entry.animalStatus, entry.animalType),
+        animalIcon: iconPath,
         animalRecordDate: entry.timestamp,
         eventId: entry.eventId
     });
       //console.log(entry.locationLon, " ", entry.locationLat)
     
     var icon = new ol.style.Style({
-        image: new ol.style.Icon({
-          src: './../images/vocalization/' + getIconName(entry.animalStatus, entry.animalType),
-          anchor: [0.5, 1],
-          scale: 0.75,
-          className: 'vocalization-icon'
-        }),
+      image: new ol.style.Icon({
+        src: iconPath,
+        anchor: [0.5, 1],
+        scale: 0.75,
+        className: 'vocalization-icon'
+      }),
     })
     evtLocation.setStyle(icon);
     evtLocation.setId(entry.animalId);
@@ -573,6 +601,14 @@ function addNewVocalizationFeatures(hmiState, events) {
   //console.log("Truth locs", hmiState.movementEvents);
   for (let entry of events) {
     //console.log("True location found!:  ")
+    var iconPath = "";
+    if(entry.animalDiet === "herbavore" || entry.animalDiet === "frugivore"){
+      iconPath = './../images/vocalization/' + getIconName(entry.animalStatus, entry.animalType);
+    }
+    else{
+      iconPath ='./../images/Predator/vocalization/' + getIconName(entry.animalStatus, entry.animalType);
+    }
+
     var evtLocation = new ol.Feature({
       geometry: new ol.geom.Point(
         ol.proj.fromLonLat([entry.locationLon,entry.locationLat])
@@ -586,20 +622,21 @@ function addNewVocalizationFeatures(hmiState, events) {
         animalConfidence: entry.speciesIdentificationConfidence,
         animalLocConfidence: entry.locationConfidence,
         animalDiet: entry.animalDiet,
-        animalIcon: './../images/vocalization/' + getIconName(entry.animalStatus, entry.animalType),
+        animalIcon: iconPath,
         animalRecordDate: entry.timestamp,
         eventId: entry.eventId 
     });
       //console.log(entry.locationLon, " ", entry.locationLat)
-    
+
     var icon = new ol.style.Style({
-        image: new ol.style.Icon({
-          src: './../images/vocalization/' + getIconName(entry.animalStatus, entry.animalType),
-          anchor: [0.5, 1],
-          scale: 0.75,
-          className: 'vocalization-icon'
-        }),
+      image: new ol.style.Icon({
+        src: iconPath,
+        anchor: [0.5, 1],
+        scale: 0.75,
+        className: 'vocalization-icon'
+      }),
     })
+    
     evtLocation.setStyle(icon);
     evtLocation.setId(entry.animalId);
 
@@ -817,6 +854,7 @@ function createMapClickEvent(hmiState){
               document.getElementById("desc_img").src = "../../images/bio/not_available_" + dice + ".png";
             }
             img.src = "../../images/bio/" + result.common + ".png";
+          
             //console.log("found")
             //Animal Bio specific session
             animal_data = result;
