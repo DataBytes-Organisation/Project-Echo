@@ -20,7 +20,7 @@ class PyObjectId(ObjectId):
 
 class EventSchema(BaseModel):
     timestamp: datetime
-    sensorId: int
+    sensorId: str
     species: str 
     microphoneLLA: List[float] 
     animalEstLLA: List[float]
@@ -37,7 +37,7 @@ class EventSchema(BaseModel):
         schema_extra = {
             "example": {                          
                 "timestamp": "2023-03-22T13:45:12.000Z",
-                "sensorId": 2,
+                "sensorId": "2",
                 "species": "Sus Scrofa",
                 "microphoneLLA":[-33.1101,150.0567, 23],
                 "animalEstLLA": [-33.1105,150.0569, 23],
@@ -64,5 +64,20 @@ class MovementSchema(BaseModel):
                 "species": "Sus Scrofa",
                 "animalId": 1,
                 "animalTrueLLA": [-33.1106,150.0570, 23]
+            }
+        }
+
+class MicrophoneSchema(BaseModel):
+    sensorId: str
+    microphoneLLA: List[float] 
+
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+        schema_extra = {
+            "example": {
+                    "sensorId": "2",
+                    "microphoneLLA": [-33.1106,150.0570, 23],           
             }
         }
