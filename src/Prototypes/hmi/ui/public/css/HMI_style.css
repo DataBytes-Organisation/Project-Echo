@@ -864,11 +864,13 @@ i {
 
 .tabs-button:hover{
   cursor: pointer;
+  opacity: 0.6;
 }
 
 .tabs-button {
   background: none;
-  background-color: rgba(247, 186, 206, 0.4);
+  background-color: rgba(247, 186, 206);
+  opacity: 0.4;
   border: none;
   color: #cccccc;
   font-size: 30px;
@@ -881,13 +883,56 @@ i {
   text-align: center;
   transform: translateY(-10px);
   border-radius: 10px;
+  background-size: contain;
+  background-repeat: no-repeat;
 }
 
 .tabs-button.active {
   background-color: rgba(247, 186, 206, 0.8);
   transform: translateY(-20px);
-  transition: 0.5s ease-in-out;
+  transition: 0.2s ease-in-out;
+  opacity: 1;
 }
+
+#filter-menu-btn {
+  background-image: url("../images/tabIcons/filter.png");
+  background-size: cover;
+  background-size: 50%;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+#popup-menu-btn {
+  background-image: url("../images/tabIcons/detection.png");
+  background-size: cover;
+  background-size: 75%;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+#FAQ-menu-btn{
+  background-image: url("../images/tabIcons/info.png");
+  background-size: cover;
+  background-size: 25%;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+#SIM-menu-btn{
+  background-image: url("../images/tabIcons/simulator.png");
+  background-size: cover;
+  background-size: 70%;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+#filter-menu-btn::before {
+  opacity: 0.5;
+}
+#filter-menu-btn::after {
+  opacity: 1;
+}
+
 
 #app {
   display: none;
