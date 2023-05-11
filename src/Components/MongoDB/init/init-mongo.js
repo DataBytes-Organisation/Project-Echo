@@ -15,5 +15,5 @@ db.createCollection("events");
 db.createCollection("species");
 db.createCollection("movements");
 
-const speciesData = JSON.parse(cat('./species.json'));
+const speciesData = JSON.parse(cat('/docker-entrypoint-initdb.d/species.json'));
 db.species.insertMany(speciesData);
