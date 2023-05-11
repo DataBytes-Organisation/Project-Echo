@@ -33,6 +33,11 @@ export function retrieveMicrophones() {
   return axios.get(`${MESSAGE_API_URL}/microphones`);
 }
 
+export function retrieveAudio(id){
+  console.log(`${MESSAGE_API_URL}/audio?id=${id}`);
+  return axios.get(`${MESSAGE_API_URL}/audio?id=${id}`);
+}
+
 /*
 export function retrieveAllMessages() {
   return axios.get(`${MESSAGE_API_URL}/messages`);
