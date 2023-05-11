@@ -15,9 +15,9 @@ MQTT_BROKER_PORT = 1883
 
 @router.get("/events_time", response_description="Get detection events within certain duration")
 def show_event_from_time(start: str, end: str):
-    datetime_start = datetime.datetime.fromtimestamp(int(start), datetime.timezone.utc)
-    datetime_end = datetime.datetime.fromtimestamp(int(end), datetime.timezone.utc)
-    print(datetime_start)
+    datetime_start = datetime.datetime.fromtimestamp(float(start), datetime.timezone.utc)
+    datetime_end = datetime.datetime.fromtimestamp(float(end), datetime.timezone.utc)
+    print(f'we think query date is {datetime_start}', flush=True)
     print(datetime_end)
     aggregate = [
         {
