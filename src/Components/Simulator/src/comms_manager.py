@@ -142,8 +142,15 @@ class CommsManager():
             "animalTrueLLA": list(animal.getLLA())    
         }
         
-        movements = self.echo_store["movements"]
-        movements.insert_one(movement_event)
+        #movements = self.echo_store["movements"]
+        #movements.insert_one(movement_event)
+        import requests
+
+        url = 'http://ts-api-cont:9000/sim/movement'
+
+        x = requests.post(url, json = movement_event)
+
+        print(x.text)
 
     # this method takes in binary audio data and encodes to string
     def audio_to_string(self, audio_binary) -> str:

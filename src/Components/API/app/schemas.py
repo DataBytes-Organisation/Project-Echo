@@ -51,7 +51,7 @@ class EventSchema(BaseModel):
 class MovementSchema(BaseModel):
     timestamp: datetime
     species: str
-    animalId: int
+    animalId: str
     animalTrueLLA: List[float]
 
     class Config:
@@ -62,7 +62,7 @@ class MovementSchema(BaseModel):
             "example": {                          
                 "timestamp": "2023-03-22T13:45:12.000Z",
                 "species": "Sus Scrofa",
-                "animalId": 1,
+                "animalId": "1",
                 "animalTrueLLA": [-33.1106,150.0570, 23]
             }
         }
