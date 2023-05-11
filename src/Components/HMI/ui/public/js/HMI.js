@@ -1,7 +1,7 @@
 "use strict";
 
 import { getAudioTestString } from "./HMI-utils.js";
-import { retrieveTruthEventsInTimeRange, retrieveVocalizationEventsInTimeRange, retrieveMicrophones } from "./routes.js";
+import { retrieveTruthEventsInTimeRange, retrieveVocalizationEventsInTimeRange, retrieveMicrophones, retrieveAudio } from "./routes.js";
 import data from "./sample_data.json" assert { type: 'json' };
 
 var markups = ["elephant.png", "monkey.png", "tiger.png"];
@@ -23,6 +23,14 @@ function matchStatus(status){
   }
 }
 
+var statusPrintLookup = {
+  "endangered" : "endangered",
+  "vulnerable": "vulnerable",
+  "near-threatened" : "near-threatened",
+  "normal" : "least concern",
+  "invasive" : "invasive"
+};
+
 var vocalizedLayers = []
 
 var animalTypes = ["mammal", "bird", "amphibian", "reptile", "insect"];
@@ -42,6 +50,8 @@ var animalTypeIconLookup = {
   "insect" : "insects",
   "reptile" : "reptiles"
 };
+
+var selectedVocalizationEventId = null;
 
 function getIconName(status, type){
   return animalTypeIconLookup[type] + statusIconLookup[status] + "-01.png";
@@ -67,6 +77,15 @@ export function initialiseHMI(hmiState) {
   addTruthLayers(hmiState);
   addVocalisationLayers(hmiState);
   addVectorLayerTopDown(hmiState, "mic_layer");
+  addVectorLayerTopDown(hmiState, "mic_layer_1");
+  addVectorLayerTopDown(hmiState, "mic_layer_2");
+  addVectorLayerTopDown(hmiState, "mic_layer_3");
+  addVectorLayerTopDown(hmiState, "mic_layer_4");
+  addVectorLayerTopDown(hmiState, "mic_layer_5");
+  addVectorLayerTopDown(hmiState, "mic_layer_6");
+  addVectorLayerTopDown(hmiState, "mic_layer_7");
+  addVectorLayerTopDown(hmiState, "mic_layer_8");
+  addVectorLayerTopDown(hmiState, "mic_layer_9");
 
   addAllTruthFeatures(hmiState);
   addAllVocalizationFeatures(hmiState);
@@ -79,6 +98,7 @@ export function initialiseHMI(hmiState) {
   })
   
   queueSimUpdate(hmiState);
+  stepMicAnimation(hmiState);
   //simulateData(hmiState);
 }
 
@@ -265,11 +285,13 @@ export function convertJSONtoAnimalMovementEvent(hmiState, data){
 export function convertJSONtoAnimalVocalizationEvent(hmiState, data){
   let vocalizationEvent = {};
 
-  console.log(data);
+  //console.log(data);
 
   vocalizationEvent.timestamp = hmiState.currentTime;
   vocalizationEvent.eventTimestamp = data.timestamp;
   vocalizationEvent.eventId = data._id;
+
+  console.log(vocalizationEvent.eventId);
   
   vocalizationEvent.speciesIdentificationConfidence = data.confidence;
   vocalizationEvent.speciesScientificName = data.species.toLowerCase();
@@ -306,7 +328,33 @@ export function convertJSONtoMicrophone(hmiState, data){
   }
 }
 
+export function muteAudioAnimation(){
+  const mute_audio = new CustomEvent('muteAnimation',{
+    detail: {
+      message: "mute animation"
+    }
+  })
 
+  document.dispatchEvent(mute_audio);
+}
+
+var activeAudioNode = null;
+var audioAnimTimeout = null;
+var playNextTrack = false;
+
+export function stopAudioPlayback(){
+  muteAudioAnimation();
+
+  if(audioAnimTimeout){
+    clearTimeout(audioAnimTimeout);
+  }
+  if(activeAudioNode != null){
+    console.log("calling stop");
+    activeAudioNode.stop();
+  }
+
+  activeAudioNode = null;
+}
 
 function playAudioString(audioDataString) {
   // Convert the binary audio data string into a typed array
@@ -318,11 +366,13 @@ function playAudioString(audioDataString) {
 
   // Create an audio context
   const audioContext = new AudioContext();
-
+  
+  const el = document.getElementById("player");
   // Create a new audio buffer
   const numChannels = 1;
   const sampleRate = 44100;
   const bufferLength = audioData.length / 2;
+
   const audioBuffer = audioContext.createBuffer(
     numChannels,
     bufferLength,
@@ -332,15 +382,26 @@ function playAudioString(audioDataString) {
   // Copy the binary audio data into the audio buffer
   audioBuffer.copyToChannel(new Float32Array(audioData.buffer), 0);
 
+  let duration = audioBuffer.duration;
+  console.log(duration);
+
   // Create a new audio buffer source node and set its buffer
-  const sourceNode = audioContext.createBufferSource();
-  sourceNode.buffer = audioBuffer;
+  activeAudioNode = audioContext.createBufferSource();
+  activeAudioNode.buffer = audioBuffer;
 
   // Connect the source node to the destination node of the audio context
-  sourceNode.connect(audioContext.destination);
+  activeAudioNode.connect(audioContext.destination);
 
-  // Start playing the audio
-  sourceNode.start();
+  if(playNextTrack){
+    // Start playing the audio
+    activeAudioNode.start();
+
+    audioAnimTimeout = setTimeout(
+      muteAudioAnimation,
+      duration*1000,
+      hmiState
+    );
+  }
 }
 
 export function updateLayers(filterState)  {
@@ -379,8 +440,18 @@ function addAllTruthFeatures(hmiState) {
   //console.log("addTruthLayers called.")
   //console.log("Truth locs", hmiState.movementEvents);
   for (const key in hmiState.movementEvents) {
-    let entry = hmiState.movementEvents[key];
     //console.log("True location found!:  ")
+
+    let entry = hmiState.movementEvents[key];
+
+    var iconPath = "";
+    if(entry.animalDiet === "herbavore" || entry.animalDiet === "frugivore"){
+      iconPath = './../images/sim/' + getIconName(entry.animalStatus, entry.animalType);
+    }
+    else{
+      iconPath ='./../images/Predator/sim/' + getIconName(entry.animalStatus, entry.animalType);
+    }
+    
     var trueLocation = new ol.Feature({
       geometry: new ol.geom.Point(
         ol.proj.fromLonLat([entry.locationLon,entry.locationLat])
@@ -388,18 +459,26 @@ function addAllTruthFeatures(hmiState) {
         name: 'trueLocation_' + entry.speciesScientificName,
         animalType: entry.animalType,
         animalStatus: entry.animalStatus,
-        animalSpecies: entry.speciesScientificName 
+        animalSpecies: entry.speciesScientificName,
+        animalLon: entry.locationLon,
+        animalLat: entry.locationLat,
+        animalDiet: entry.animalDiet,
+        animalConfidence: entry.speciesIdentificationConfidence,
+        animalLocConfidence: entry.locationConfidence,
+        animalIcon: iconPath,
+        animalRecordDate: entry.timestamp
     });
       //console.log(entry.locationLon, " ", entry.locationLat)
     
     var trueIcon = new ol.style.Style({
-        image: new ol.style.Icon({
-          src: './../images/sim/' + getIconName(entry.animalStatus, entry.animalType),
-          anchor: [0.5, 1],
-          scale: 0.75,
-          className: 'true-icon'
-        }),
+      image: new ol.style.Icon({
+        src: iconPath,
+        anchor: [0.5, 1],
+        scale: 0.75,
+        className: 'true-icon'
+      }),
     })
+  
     trueLocation.setStyle(trueIcon);
     trueLocation.setId(entry.animalId);
 
@@ -421,6 +500,14 @@ function addNewTruthFeatures(hmiState, events) {
   //console.log("Truth locs", hmiState.movementEvents);
   for (let entry of events) {
     //console.log("True location found!:  ")
+    var iconPath = "";
+    if(entry.animalDiet === "herbavore" || entry.animalDiet === "frugivore"){
+      iconPath = './../images/sim/' + getIconName(entry.animalStatus, entry.animalType);
+    }
+    else{
+      iconPath ='./../images/Predator/sim/' + getIconName(entry.animalStatus, entry.animalType);
+    }
+
     var trueLocation = new ol.Feature({
       geometry: new ol.geom.Point(
         ol.proj.fromLonLat([entry.locationLon, entry.locationLat])
@@ -428,18 +515,26 @@ function addNewTruthFeatures(hmiState, events) {
         name: 'trueLocation_' + entry.speciesScientificName,
         animalType: entry.animalType,
         animalStatus: entry.animalStatus,
-        animalSpecies: entry.speciesScientificName 
+        animalSpecies: entry.speciesScientificName,
+        animalLon: entry.locationLon,
+        animalLat: entry.locationLat,
+        animalDiet: entry.animalDiet,
+        animalConfidence: entry.speciesIdentificationConfidence,
+        animalLocConfidence: entry.locationConfidence,
+        animalIcon: iconPath,
+        animalRecordDate: entry.timestamp
     });
       //console.log(entry.locationLon, " ", entry.locationLat)
-    
+
     var trueIcon = new ol.style.Style({
-        image: new ol.style.Icon({
-          src: './../images/sim/' + getIconName(entry.animalStatus, entry.animalType),
-          anchor: [0.5, 1],
-          scale: 0.75,
-          className: 'true-icon'
-        }),
+      image: new ol.style.Icon({
+        src: iconPath,
+        anchor: [0.5, 1],
+        scale: 0.75,
+        className: 'true-icon'
+      }),
     })
+
     trueLocation.setStyle(trueIcon);
     trueLocation.setId(entry.animalId);
 
@@ -460,6 +555,14 @@ function addAllVocalizationFeatures(hmiState) {
   //console.log("Truth locs", hmiState.movementEvents);
   for (let entry of hmiState.vocalizationEvents) {
     //console.log("True location found!:  ")
+    var iconPath = "";
+    if(entry.animalDiet === "herbavore" || entry.animalDiet === "frugivore"){
+      iconPath = './../images/vocalization/' + getIconName(entry.animalStatus, entry.animalType);
+    }
+    else{
+      iconPath ='./../images/Predator/vocalization/' + getIconName(entry.animalStatus, entry.animalType);
+    }
+
     var evtLocation = new ol.Feature({
       geometry: new ol.geom.Point(
         ol.proj.fromLonLat([entry.locationLon,entry.locationLat])
@@ -467,17 +570,25 @@ function addAllVocalizationFeatures(hmiState) {
         name: 'vocalisation_' + entry.speciesScientificName,
         animalType: entry.animalType,
         animalStatus: entry.animalStatus,
-        animalSpecies: entry.speciesScientificName 
+        animalSpecies: entry.speciesScientificName,
+        animalLon: entry.locationLon,
+        animalLat: entry.locationLat,
+        animalConfidence: entry.speciesIdentificationConfidence,
+        animalLocConfidence: entry.locationConfidence,
+        animalDiet: entry.animalDiet,
+        animalIcon: iconPath,
+        animalRecordDate: entry.timestamp,
+        eventId: entry.eventId
     });
       //console.log(entry.locationLon, " ", entry.locationLat)
     
     var icon = new ol.style.Style({
-        image: new ol.style.Icon({
-          src: './../images/vocalization/' + getIconName(entry.animalStatus, entry.animalType),
-          anchor: [0.5, 1],
-          scale: 0.75,
-          className: 'vocalization-icon'
-        }),
+      image: new ol.style.Icon({
+        src: iconPath,
+        anchor: [0.5, 1],
+        scale: 0.75,
+        className: 'vocalization-icon'
+      }),
     })
     evtLocation.setStyle(icon);
     evtLocation.setId(entry.animalId);
@@ -500,6 +611,14 @@ function addNewVocalizationFeatures(hmiState, events) {
   //console.log("Truth locs", hmiState.movementEvents);
   for (let entry of events) {
     //console.log("True location found!:  ")
+    var iconPath = "";
+    if(entry.animalDiet === "herbavore" || entry.animalDiet === "frugivore"){
+      iconPath = './../images/vocalization/' + getIconName(entry.animalStatus, entry.animalType);
+    }
+    else{
+      iconPath ='./../images/Predator/vocalization/' + getIconName(entry.animalStatus, entry.animalType);
+    }
+
     var evtLocation = new ol.Feature({
       geometry: new ol.geom.Point(
         ol.proj.fromLonLat([entry.locationLon,entry.locationLat])
@@ -507,18 +626,27 @@ function addNewVocalizationFeatures(hmiState, events) {
         name: 'vocalisation_' + entry.speciesScientificName,
         animalType: entry.animalType,
         animalStatus: entry.animalStatus,
-        animalSpecies: entry.speciesScientificName 
+        animalSpecies: entry.speciesScientificName,
+        animalLon: entry.locationLon,
+        animalLat: entry.locationLat,
+        animalConfidence: entry.speciesIdentificationConfidence,
+        animalLocConfidence: entry.locationConfidence,
+        animalDiet: entry.animalDiet,
+        animalIcon: iconPath,
+        animalRecordDate: entry.timestamp,
+        eventId: entry.eventId 
     });
       //console.log(entry.locationLon, " ", entry.locationLat)
-    
+
     var icon = new ol.style.Style({
-        image: new ol.style.Icon({
-          src: './../images/vocalization/' + getIconName(entry.animalStatus, entry.animalType),
-          anchor: [0.5, 1],
-          scale: 0.75,
-          className: 'vocalization-icon'
-        }),
+      image: new ol.style.Icon({
+        src: iconPath,
+        anchor: [0.5, 1],
+        scale: 0.75,
+        className: 'vocalization-icon'
+      }),
     })
+    
     evtLocation.setStyle(icon);
     evtLocation.setId(entry.animalId);
 
@@ -535,7 +663,7 @@ function addNewVocalizationFeatures(hmiState, events) {
   }
 }
 
-function addmicrophones(hmiState) {
+function addMicrophonesByLayer(hmiState, layerName, iconPath){
   var mics = [];
 
   //console.log("locs", hmiState.microphoneLocations);
@@ -550,7 +678,7 @@ function addmicrophones(hmiState) {
     });
     var icon = new ol.style.Style({
       image: new ol.style.Icon({
-        src: "./../images/mic2.png",
+        src: iconPath,
         anchor: [0.5, 1],
         scale: 0.75,
       }),
@@ -560,11 +688,107 @@ function addmicrophones(hmiState) {
   });
 
   //console.log("mics: ", mics);
-  let layer = findMapLayerWithName(hmiState, "mic_layer");
+  let layer = findMapLayerWithName(hmiState, layerName);
   let layerSource = layer.getSource();
   layerSource.addFeatures(mics);
   layer.getSource().changed();
   layer.changed();
+}
+
+
+function addMicrophonesByHiddenLayer(hmiState, layerName, iconPath){
+  var mics = [];
+
+  //console.log("locs", hmiState.microphoneLocations);
+  hmiState.microphoneLocations.forEach((location) => {
+    //console.log(location);
+    // Add the marker into the array
+    var mic = new ol.Feature({
+      geometry: new ol.geom.Point(
+        ol.proj.fromLonLat([location.lon, location.lat])
+      ),
+      name: "mic",
+    });
+    var icon = new ol.style.Style({
+      image: new ol.style.Icon({
+        src: iconPath,
+        anchor: [0.5, 1],
+        scale: 1.0,
+      }),
+    });
+    mic.setStyle(icon);
+    mics.push(mic);
+  });
+
+  //console.log("mics: ", mics);
+  let layer = findMapLayerWithName(hmiState, layerName);
+  let layerSource = layer.getSource();
+  layerSource.addFeatures(mics);
+  layer.getSource().changed();
+  layer.changed();
+  layer.setVisible(false);
+}
+
+var micAnimFrameIndex = 1;
+var animTimeout = null;
+
+function addmicrophones(hmiState) {
+
+  addMicrophonesByLayer(hmiState, "mic_layer_9", "./../images/Microphone - 3-ai-9.png");
+  addMicrophonesByLayer(hmiState, "mic_layer_8", "./../images/Microphone - 3-ai-8.png");
+  addMicrophonesByLayer(hmiState, "mic_layer_7", "./../images/Microphone - 3-ai-7.png");
+  addMicrophonesByLayer(hmiState, "mic_layer_6", "./../images/Microphone - 3-ai-6.png");
+  addMicrophonesByLayer(hmiState, "mic_layer_5", "./../images/Microphone - 3-ai-5.png");
+  addMicrophonesByLayer(hmiState, "mic_layer_4", "./../images/Microphone - 3-ai-4.png");
+  addMicrophonesByLayer(hmiState, "mic_layer_3", "./../images/Microphone - 3-ai-3.png");
+  addMicrophonesByLayer(hmiState, "mic_layer_2", "./../images/Microphone - 3-ai-2.png");
+  addMicrophonesByLayer(hmiState, "mic_layer_1", "./../images/Microphone - 3-ai-1.png");
+
+  addMicrophonesByHiddenLayer(hmiState, "mic_layer", "./../images/mic2.png");
+}
+
+export function enableMicAnimation(hmiState){
+  var staticLayer = findMapLayerWithName(hmiState, "mic_layer");
+  staticLayer.setVisible(false);
+
+  for(var i = 1; i <= 9; i++){
+    var nextLayer = findMapLayerWithName(hmiState, "mic_layer_" + i);
+    nextLayer.setVisible(true);
+  }
+
+  stepMicAnimation(hmiState);
+}
+
+export function disableMicAnimation(hmiState){
+  if(animTimeout){
+    clearTimeout(animTimeout);
+  }
+
+  for(var i = 1; i <= 9; i++){
+    var nextLayer = findMapLayerWithName(hmiState, "mic_layer_" + i);
+    nextLayer.setVisible(false);
+  }
+}
+
+function stepMicAnimation(hmiState) {
+  var currentIndex = micAnimFrameIndex;
+  micAnimFrameIndex = (micAnimFrameIndex % 9) + 1;
+
+  var nextLayer = findMapLayerWithName(hmiState, "mic_layer_" + micAnimFrameIndex);
+  nextLayer.setVisible(true);
+
+  var currentLayer = findMapLayerWithName(hmiState, "mic_layer_" + currentIndex);
+  currentLayer.setVisible(false);
+
+  if(animTimeout){
+    clearTimeout(animTimeout);
+  }
+
+  animTimeout = setTimeout(
+    stepMicAnimation,
+    100,
+    hmiState
+  );
 }
 
 export function showMics(hmiState){
@@ -580,6 +804,20 @@ export function hideMics(hmiState){
 }
 
 function findMapLayerWithName(hmiState, name) {
+  if (!hmiState.basemap) {
+    console.log(`findMapLayerWithName: invalid basemap`);
+    return null;
+  } else {
+    if(hmiState.layers.hasOwnProperty(name)){
+      return hmiState.layers[name];
+    }
+  }
+
+  console.log(`findMapLayerWithName: layer not found: ` + name);
+  return null;
+}
+
+function findMapLayerWithName_Deprecated(hmiState, name) {
   if (!hmiState.basemap) {
     console.log(`findMapLayerWithName: invalid basemap`);
     return null;
@@ -619,6 +857,7 @@ function addVectorLayerToBasemap(hmiState, layerName, zIndex) {
     }
 
     hmiState.basemap.addLayer(layer);
+    hmiState.layers[layerName] = layer;
   }
 }
 
@@ -691,33 +930,79 @@ function createMapClickEvent(hmiState){
     const feature = hmiState.basemap.forEachFeatureAtPixel(evt.pixel, function (feature) {
       return feature;
     });
+
+    let active_content = $("#animal-popup-content");
+    let default_content = $("#animal-default-content");
     if (feature){
+      // console.log('feature: ', feature);
+      stopAudioPlayback();
+
+      active_content.show();
+      default_content.hide();
+
       let values = feature.getProperties();
+      if (values.eventId){
+        console.log("saving " + values.eventId);
+        selectedVocalizationEventId = values.eventId;
+      }
       if (values.animalSpecies){
-          var result = sample_data.find(({ common }) => common.toUpperCase() === values.animalSpecies.toUpperCase())
+          //console.log(values.animalSpecies)
+          var result = sample_data.find(({ species }) => species.toLowerCase() === values.animalSpecies.toLowerCase())
           if (result) {
+            const img = new Image();
+            img.onload = function() {
+              //console.log('Image exists!');
+              // Set the source of the img tag
+              document.getElementById("desc_img").src = "../../images/bio/" + result.common + ".png";
+            }
+            img.onerror = function() {
+              let dice = Math.floor(Math.random() * 6) + 1;
+              document.getElementById("desc_img").src = "../../images/bio/not_available_" + dice + ".png";
+            }
+            img.src = "../../images/bio/" + result.common + ".png";
+          
+            //console.log("found")
+            //Animal Bio specific session
             animal_data = result;
             document.getElementById("desc_name").innerText = result.common;
+            //document.getElementById("markup_img_2").src = values.animalIcon;
+            document.getElementById("desc_confidence").innerText = values.animalLocConfidence + "%";
             document.getElementById("desc_species").innerText = result.species;
             document.getElementById("desc_summary").innerText = result.summary;
-            document.getElementById("desc_img").src = "../../images/bio/" + result.common + ".png";
+
             let summary = document.getElementById("desc_details");
             summary.innerHTML = '';
             result.description.forEach(content => {
-              var p = document.createElement('p');
-              p.className = "desc_ul";
-              p.innerText = content;
-              summary.appendChild(p);
-            })
-            const toggleEvent = new CustomEvent('animalToggled', { 
-              detail: {
-                message: 'toggled'
+              if (content){
+                var p = document.createElement('p');
+                p.className = "desc_ul";
+                p.innerText = content;
+                summary.appendChild(p);
               }
-            });
-            document.dispatchEvent(toggleEvent);
+            })
+            //Markup details specific session
+            let dateFormat = new Date(values.animalRecordDate);
+            document.getElementById("markup_img").src = values.animalIcon;
+            document.getElementById("markup_details").innerHTML = values.animalType + " | " + values.animalDiet + " | " + statusPrintLookup[values.animalStatus];
+            document.getElementById("markup_loc_lon").innerHTML = values.animalLon;
+            document.getElementById("markup_loc_lat").innerHTML = values.animalLat;
+            document.getElementById("markup_confidence").innerHTML = values.animalConfidence + "%";
+            document.getElementById("markup_date").innerHTML = dateFormat.toUTCString()
+
+            animal_toggled = true;
+            const toggled_animal = new CustomEvent('animalToggled',{
+              detail: {
+                message: "Animal toggled: " + result.common,
+              }
+            })
+
+            document.dispatchEvent(toggled_animal);
           }
 
       }
+    } else {
+      active_content.hide();
+      default_content.show();
     }
   });
 }
@@ -733,6 +1018,7 @@ export function getAnimalToggled(){
 }
 
 export function MapCloseNav() {
+  document.getElementById("menuPanel").style.width = "0";
   animal_toggled = false;
 }
 
@@ -836,3 +1122,19 @@ function queueSimUpdate(hmiState) {
     hmiState
   );
 }
+
+document.addEventListener('playAudio', function(event){
+  console.log("play audio");
+  playNextTrack = true;
+  if(selectedVocalizationEventId != null){
+    retrieveAudio(selectedVocalizationEventId).then((res) => {
+      playAudioString(res.data.audioClip);
+    })
+  }
+})
+
+document.addEventListener('stopAudio', function(event){
+  console.log("stop audio");
+  playNextTrack = false;
+  stopAudioPlayback();
+})
