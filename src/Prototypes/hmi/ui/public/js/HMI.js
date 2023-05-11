@@ -95,10 +95,10 @@ export function initialiseHMI(hmiState) {
   retrieveMicrophones().then((res) => {
     
     updateMicrophoneLayer(hmiState, res.data);
+    stepMicAnimation(hmiState);
   })
   
   queueSimUpdate(hmiState);
-  stepMicAnimation(hmiState);
   //simulateData(hmiState);
 }
 
