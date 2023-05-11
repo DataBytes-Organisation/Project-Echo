@@ -23,37 +23,39 @@ To build the docker components and run on windows 11:
 
 3. Ensure that docker desktop is running
 
-4. Open your miniconda3 command line and move to the components directory
+4. Ensure that you have trained a model using the optimised_engine_pipeline.ipynb notebook.
+
+5. Open your miniconda3 command line and move to the components directory
 
 ```
 cd Project-Echo\src\Components
 ```
 
-5. Build and run all the components
+6. Build and run all the components
 
 ```
 docker-compose up --build
 ```
 
-6. All components should start are you should see something like the following running all the components (note this snapshot was taken before HMI was integrated so it is missing):
+7. All components should start are you should see something like the following running all the components (note this snapshot was taken before HMI was integrated so it is missing):
 
 ![Running Docker Containers](DockerContainers.png)
 
-7. The first time you run:  In order for the components to work correctly they will need to be authenticated to use GCP buckets so that they can download species data and audio samples.  To do this you need to login to once of the containers using docker attach and provide your key.  Open the logs from the engine and click the provided link, authenticate via the browser, then paste your key onto the container terminal.
+8. The first time you run:  In order for the components to work correctly they will need to be authenticated to use GCP buckets so that they can download species data and audio samples.  To do this you need to login to once of the containers using docker attach and provide your key.  Open the logs from the engine and click the provided link, authenticate via the browser, then paste your key onto the container terminal.
 
-8. Get the container id
+9. Get the container id
 
 ```
 docker ps
 ```
 
-9. Attach and paste key
+10. Attach and paste key
 
 ```
 docker attach <container_id_or_name>
 ```
 
-10. Paste key and ensure engine initialises correctly by checking the log output
+11. Paste key and ensure engine initialises correctly by checking the log output
 
-11. Restart all containers so they can access the new credentials - the simulator and engine share the credentials via a docker volume
+12. Restart all containers so they can access the new credentials - the simulator and engine share the credentials via a docker volume
 
