@@ -135,26 +135,12 @@ class CommsManager():
     ########################################################################################
     def echo_store_send_animal_movement(self, animal):
 
-        # s = datetime.datetime.strptime(self.clock.get_time(), "%Y-%m-%d %H:%M:%S")
-  
         movement_event = {
-            # "timestamp": self.clock.get_time(),
+            "timestamp": self.clock.get_time().timestamp(),
             "species": animal.getSpecies().getName(),
             "animalId": animal.getUUID(),
             "animalTrueLLA": list(animal.getLLA())    
         }
-        
-        movement_event["timestamp"] = self.clock.get_time()
-        
-#         data = {
-#     "_id": "645c9bc11124976c37d3c53b",  # assuming ObjectId is represented as a string
-#     "timestamp": {
-#         "$date": datetime.utcnow().isoformat() + 'Z'  # ISO 8601 datetime format with 'Z' for UTC timezone
-#     },
-#     "species": "Sus Scrofa",
-#     "animalId": 1,
-#     "animalTrueLLA": []  # assuming this is an empty array
-# }
         
         movements = self.echo_store["movements"]
         movements.insert_one(movement_event)

@@ -804,7 +804,7 @@
 
   //update config
   hmiState.liveMode = true;
-  hmiState.simUpdateDelay = 5000;
+  hmiState.simUpdateDelay = 10*60*60*1000 + 10000;
   hmiState.liveWindow = 60000;
 
   //NOTE: Use the replay date to replay past data as though it were live
