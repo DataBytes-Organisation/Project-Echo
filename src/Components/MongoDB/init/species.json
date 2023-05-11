@@ -1,106 +1,76 @@
-[{ 
-    "_id": "Sus Scrofa",
-    "commonName": "Wild Pig",
-    "type": "Mammal",
-    "status": "Invasive",
-    "diet": "Omnivore"
-},
-{
-    "_id": "Cervus Unicolour",
-    "commonName": "Sambar Deer",
-    "type": "Mammal",
-    "status": "Invasive",
-    "diet": "Herbavore"
-},
-{
-    "_id": "Aegotheles Cristatus",
-    "commonName": "Australian Owlet-nightjar",
-    "type": "Bird",
-    "status": "Least Concern",
-    "diet": "Carnivore"
-},
-{
-    "_id": "Alauda Arvensis",
-    "commonName": "European Skylark",
-    "type": "Bird",
-    "status": "Least Concern",
-    "diet": "Omnivore"
-},
-{
-    "_id": "Caligavis Chrysops",
-    "commonName": "Yellow-faced Honeyeater",
-    "type": "Bird",
-    "status": "Least Concern",
-    "diet": "Omnivore"
-},
-{
-    "_id": "Capra Hircus",
-    "commonName": "Feral Goat",
-    "type": "Mammal",
-    "status": "Invasive",
-    "diet": "Herbavore"
-},
-{
-    "_id": "Colluricincla Harmonica",
-    "commonName": "Grey Shrikethrush",
-    "type": "Bird",
-    "status": "Least Concern",
-    "diet": "Omnivore"
-},
-{
-    "_id": "Corvus Coronoides",
-    "commonName": "Australian Raven",
-    "type": "Bird",
-    "status": "Least Concern",
-    "diet": "Omnivore"
-},
-{
-    "_id": "Dama Dama",
-    "commonName": "Fallow Deer",
-    "type": "Mammal",
-    "status": "Invasive",
-    "diet": "Herbavore"
-},
-{
-    "_id": "Eopsaltria Australis",
-    "commonName": "Eastern Yellow Robin",
-    "type": "Bird",
-    "status": "Least Concern",
-    "diet": "Carnivore"
-},
-{
-    "_id": "Felis Catus",
-    "commonName": "Cat",
-    "type": "Mammal",
-    "status": "Invasive",
-    "diet": "Carnivore"
-},
-{
-    "_id": "Pachycephala Rufiventris",
-    "commonName": "Rufous Whistler",
-    "type": "Bird",
-    "status": "Least Concern",
-    "diet": "Omnivore"
-},
-{
-    "_id": "Ptilotula Penicillata",
-    "commonName": "White-plumed Honeyeater",
-    "type": "Bird",
-    "status": "Least Concern",
-    "diet": "Omnivore"
-},
-{
-    "_id": "Rattus Norvegicus",
-    "commonName": "Brown Rat",
-    "type": "Mammal",
-    "status": "Invasive",
-    "diet": "Omnivore"
-},
-{
-    "_id": "Strepera Graculina",
-    "commonName": "Pied Currawong",
-    "type": "Bird",
-    "status": "Least Concern",
-    "diet": "Omnivore"
-}
-]
+[{
+  "commonName": "Australian Owlet-nightjar",
+  "type": "Bird",
+  "status": "Least Concern",
+  "diet": "Carnivore"
+},{
+  "commonName": "Wild Pig",
+  "type": "Mammal",
+  "status": "Invasive",
+  "diet": "Omnivore"
+},{
+  "commonName": "European Skylark",
+  "type": "Bird",
+  "status": "Least Concern",
+  "diet": "Omnivore"
+},{
+  "commonName": "Australian Raven",
+  "type": "Bird",
+  "status": "Least Concern",
+  "diet": "Omnivore"
+},{
+  "commonName": "Eastern Yellow Robin",
+  "type": "Bird",
+  "status": "Least Concern",
+  "diet": "Carnivore"
+},{
+  "commonName": "Pied Currawong",
+  "type": "Bird",
+  "status": "Least Concern",
+  "diet": "Omnivore"
+},{
+  "commonName": "Feral Goat",
+  "type": "Mammal",
+  "status": "Invasive",
+  "diet": "Herbavore"
+},{
+  "commonName": "White-plumed Honeyeater",
+  "type": "Bird",
+  "status": "Least Concern",
+  "diet": "Omnivore"
+},{
+  "commonName": "Fallow Deer",
+  "type": "Mammal",
+  "status": "Invasive",
+  "diet": "Herbavore"
+},{
+  "commonName": "Yellow-faced Honeyeater",
+  "type": "Bird",
+  "status": "Least Concern",
+  "diet": "Omnivore"
+},{
+  "commonName": "Sambar Deer",
+  "type": "Mammal",
+  "status": "Invasive",
+  "diet": "Herbavore"
+},{
+  "commonName": "Brown Rat",
+  "type": "Mammal",
+  "status": "Invasive",
+  "diet": "Omnivore"
+},{
+  "commonName": "Cat",
+  "type": "Mammal",
+  "status": "Invasive",
+  "diet": "Carnivore"
+},{
+  "commonName": "Grey Shrikethrush",
+  "type": "Bird",
+  "status": "Least Concern",
+  "diet": "Omnivore"
+},{
+  "commonName": "Rufous Whistler",
+  "type": "Bird",
+  "status": "Least Concern",
+  "diet": "Omnivore"
+}]
