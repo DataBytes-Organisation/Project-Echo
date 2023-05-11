@@ -10,7 +10,7 @@ This is a variant of the generic engine pipeline that execute a parallel pipelin
 
 ## Docker
 
-***NOTE Before running this, please ensure you have trained a model and placed it in models/generic_engine_pipeline_model/1/***
+***NOTE Before running this, please ensure you have trained a model and placed it in models/echo_model/1/***
 
 Run these steps to execute the engine in docker
 
