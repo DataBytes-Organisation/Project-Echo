@@ -51,6 +51,7 @@ class SystemManager:
     async def run_loop(self):
         while True:
             command = await self.command_queue.get()
+            print(f"Simulator got command {command}", flush=True)
             if command == "Start":
                 if self.sim_running:
                     print("Simulator is already running", flush=True)

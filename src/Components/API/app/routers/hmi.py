@@ -9,7 +9,7 @@ import paho.mqtt.publish as publish
 
 router = APIRouter()
 
-MQTT_BROKER_URL = "broker.mqttdashboard.com"
+MQTT_BROKER_URL = "ts-mqtt-server-cont"
 MQTT_BROKER_PORT = 1883
 
 
