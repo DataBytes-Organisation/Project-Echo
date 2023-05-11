@@ -47,8 +47,8 @@ var animalTypeIconLookup = {
   "mammal" : "Mammals",
   "bird" : "Bird",
   "amphibian" : "Amphibians",
-  "insect" : "insects",
-  "reptile" : "reptiles"
+  "insect" : "Insects",
+  "reptile" : "Reptiles"
 };
 
 var selectedVocalizationEventId = null;
@@ -1089,12 +1089,21 @@ function simulateData(hmiState) {
   queueSimUpdate(hmiState);
 }
 
+export function getUTC(){
+  const now = new Date();
+  const utcTimestamp = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(),
+    now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds(), now.getUTCMilliseconds());
+  return utcTimestamp;
+}
+
 let simUpdateTimeout = null;
 
 function queueSimUpdate(hmiState) {
   if(hmiState.liveMode){
-    hmiState.currentTime = Math.floor((Date.now() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
-    hmiState.liveEventCutoff = Math.floor((Date.now() - hmiState.timeOffset - hmiState.simUpdateDelay - hmiState.liveWindow) / 1000);
+
+
+    hmiState.currentTime = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
+    hmiState.liveEventCutoff = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay - hmiState.liveWindow) / 1000);
     purgeTruthEvents(hmiState);
     purgeVocalizationEvents(hmiState);
     updateTruthEvents(hmiState);

@@ -789,8 +789,8 @@
 
 <script type="module">
   import { updateLayers, initialiseHMI, showMics, hideMics, updateAnimalMovementLayerFromPastData, updateVocalizationLayerFromPastData,
-  resetWildlifeLayers, MapOpenNav, MapCloseNav, getAnimalToggled, enableMicAnimation, disableMicAnimation } from "./js/HMI.js";
-  import {retrieveTruthEventsInTimeRange, retrieveVocalizationEventsInTimeRange} from "./js/routes.js";
+  resetWildlifeLayers, MapOpenNav, MapCloseNav, getAnimalToggled, enableMicAnimation, disableMicAnimation, getUTC } from "./js/HMI.js";
+  import {retrieveTruthEventsInTimeRange, retrieveVocalizationEventsInTimeRange, startSimulator, stopSimulator} from "./js/routes.js";
   window.updateMics = updateMics;
   window.updateMicrophoneAnimation = updateMicrophoneAnimation;
   window.updateLayers = updateLayers;
@@ -804,20 +804,20 @@
 
   //update config
   hmiState.liveMode = true;
-  hmiState.simUpdateDelay = 10*60*60*1000 + 10000;
+  hmiState.simUpdateDelay = 60*1000;
   hmiState.liveWindow = 60000;
 
   //NOTE: Use the replay date to replay past data as though it were live
     //const replayDate = new Date('March 23, 2023 20:35:00');
     //const replayTimestamp = replayDate.getTime();
-  
-  const replayTimestamp = Date.now();
 
+  const utcTime = getUTC();
+  const replayTimestamp = utcTime;
 
-  hmiState.timeOffset = Date.now() - replayTimestamp;
-  hmiState.currentTime = Math.floor((Date.now() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
-  hmiState.previousUpdateTime = Math.floor((Date.now() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
-  hmiState.liveEventCutoff = Math.floor((Date.now() - hmiState.timeOffset - hmiState.simUpdateDelay - hmiState.liveWindow) / 1000);
+  hmiState.timeOffset = utcTime - replayTimestamp;
+  hmiState.currentTime = Math.floor((utcTime - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
+  hmiState.previousUpdateTime = Math.floor((utcTime - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
+  hmiState.liveEventCutoff = Math.floor((utcTime - hmiState.timeOffset - hmiState.simUpdateDelay - hmiState.liveWindow) / 1000);
 
   //Basemap config
   //pls do not change origin lat long, these are set to target wild otways region
@@ -870,6 +870,8 @@
   window.onload = function() {
     console.log("Website loaded!");
     initialiseHMI(hmiState);
+    //sim is on by default
+    //startSimulator();
   };
 
   //Microphone show/hide
@@ -908,14 +910,17 @@
   //Live mode and date range picker
 
   const toggleSwitch = document.querySelector('#liveModeToggle');
+  const simulatorSwitch = document.querySelector('#simulatorToggle');
+  
   const pastDataContainer = document.querySelector('.past-data-container');
   //console.log("Live mode enabled");
 
   toggleSwitch.addEventListener('change', function() {
     if (this.checked) {
       resetWildlifeLayers(hmiState);
-      hmiState.currentTime = Math.floor((Date.now() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
-      hmiState.previousUpdate = Math.floor((Date.now() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
+      const currentUTC = getUTC();
+      hmiState.currentTime = Math.floor((currentUTC - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
+      hmiState.previousUpdate = Math.floor((currentUTC - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
       hmiState.liveMode = true;
       //console.log("Live mode enabled");
       pastDataContainer.style.maxHeight = '0';
@@ -924,6 +929,16 @@
       hmiState.liveMode = false;
       //console.log("Live mode disabled");
       pastDataContainer.style.maxHeight = pastDataContainer.scrollHeight + 'px';
+    }
+  });
+
+  simulatorSwitch.addEventListener('change', function() {
+    if (this.checked) {
+      console.log("starting");
+      startSimulator();
+    } else {
+      console.log("stopping");
+      stopSimulator();
     }
   });
 

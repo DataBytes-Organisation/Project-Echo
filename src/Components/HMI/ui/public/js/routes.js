@@ -38,11 +38,10 @@ export function retrieveAudio(id){
   return axios.get(`${MESSAGE_API_URL}/audio?id=${id}`);
 }
 
-/*
-export function retrieveAllMessages() {
-  return axios.get(`${MESSAGE_API_URL}/messages`);
+export function startSimulator(){
+  axios.post(`${MESSAGE_API_URL}/sim_control?control=Start`);
 }
 
-export function deleteMessage(id) {
-  return axios.delete(`${MESSAGE_API_URL}/messages/${id}`);
-}*/
+export function stopSimulator(){
+  axios.post(`${MESSAGE_API_URL}/sim_control?control=Stop`);
+}
