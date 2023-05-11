@@ -146,7 +146,7 @@ class CommsManager():
         #movements.insert_one(movement_event)
         import requests
 
-        url = 'ts-api-cont/sim/movement'
+        url = 'http://ts-api-cont:9000/sim/movement'
 
         x = requests.post(url, json = movement_event)
 
