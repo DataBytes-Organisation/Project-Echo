@@ -14,3 +14,6 @@ db.createUser({
 db.createCollection("events");
 db.createCollection("species");
 db.createCollection("movements");
+
+const speciesData = JSON.parse(cat('./species.json'));
+db.species.insertMany(speciesData);
