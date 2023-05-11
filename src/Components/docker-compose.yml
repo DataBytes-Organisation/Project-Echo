@@ -30,6 +30,21 @@ services:
     stdin_open: true
     tty: true
 
+  echo_hmi:
+    build:
+      context: HMI/
+      dockerfile: HMI.Dockerfile
+    image: ts-echo-hmi
+    container_name: ts-echo-hmi-cont
+    networks:
+      - echo-net
+    volumes:
+      - credentials_volume:/root/.config/gcloud/
+    stdin_open: true
+    tty: true
+    ports:
+      - "8080:8080" 
+
   echo_mqtt:
     build:
       context: MQTT-Server/
@@ -42,8 +57,8 @@ services:
     tty: true
     ports:
       - "1883:1883"
-      - "8000:8000"
-      - "8080:8080"
+      - "7000:7000"
+      - "7070:7070"
 
   echo_simulator:
     build:
