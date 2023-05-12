@@ -133,8 +133,8 @@ class Config:
 
     def create_animal_instances(self, animal_factory):
         instances = []
-        # TODO: we should use config for this
-        for a in range(1):
+
+        for a in range(int(os.environ['RANGE_ANIMALS_TO_CREATE'])):
             animal = animal_factory.create()
             lla = animal.randLatLong()
             animal.setLLA(lla)
