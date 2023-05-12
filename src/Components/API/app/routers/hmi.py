@@ -15,8 +15,8 @@ MQTT_BROKER_PORT = 1883
 
 @router.get("/events_time", response_description="Get detection events within certain duration")
 def show_event_from_time(start: str, end: str):
-    datetime_start = datetime.datetime.fromtimestamp(float(start), datetime.timezone.utc)
-    datetime_end = datetime.datetime.fromtimestamp(float(end), datetime.timezone.utc)
+    datetime_start = datetime.datetime.fromtimestamp(float(start))
+    datetime_end = datetime.datetime.fromtimestamp(float(end))
     # print(f'we think query date is {datetime_start}', flush=True)
     # print(datetime_end)
     aggregate = [
@@ -63,8 +63,8 @@ def show_audio(id: str):
 
 @router.get("/movement_time", response_description="Get true animal movement data within certain duration")
 def show_event_from_time(start: str, end: str):
-    datetime_start = datetime.datetime.fromtimestamp(float(start), datetime.timezone.utc)
-    datetime_end = datetime.datetime.fromtimestamp(float(end), datetime.timezone.utc)
+    datetime_start = datetime.datetime.fromtimestamp(float(start))
+    datetime_end = datetime.datetime.fromtimestamp(float(end))
     
     print(f'movement range: {datetime_start}  {datetime_end}')
     
@@ -100,6 +100,21 @@ def list_microphones():
     results = Microphones.find()
     microphones = serializers.microphoneListEntity(results)
     return microphones
+
+@router.get("/latest_movement", response_description="returns the latest simluated movement message")
+def latest_movememnt():
+
+    aggregate = [
+    { "$sort" : { "timestamp" : -1 } },
+    { "$limit": 1 },
+    { "$project": { "timestamp": 1 } }]
+
+    result = list(Movements.aggregate(aggregate))
+    timestamp = serializers.timestampListEntity(result)[0]
+
+    return timestamp
+
+
 
 @router.post("/sim_control", status_code=status.HTTP_201_CREATED)
 def post_control(control: str):

@@ -71,7 +71,11 @@ def microphoneEntity(microphone) -> dict:
         "_id": str(microphone["_id"]),
         "microphoneLLA": microphone["microphoneLLA"]
     }
-
+def timestampEntity(timestamp) -> dict:
+    return{
+        "timestamp": timestamp["timestamp"]
+    }
+    
 def eventListEntity(events) -> list:
     return [eventEntity(event) for event in events]
     
@@ -89,3 +93,6 @@ def movementSpeciesListEntity(events) -> list:
 
 def microphoneListEntity(microphones) -> list:
     return [microphoneEntity(microphone) for microphone in microphones]
+
+def timestampListEntity(timestamps) -> list:
+    return [timestampEntity(timestamp) for timestamp in timestamps]
