@@ -57,7 +57,7 @@ services:
     tty: true
     ports:
       - "1883:1883"
-      - "7000:7000"
+      - "7001:7001"
       - "7070:7070"
 
   echo_simulator:
