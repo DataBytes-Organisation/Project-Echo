@@ -477,7 +477,8 @@ function addAllTruthFeatures(hmiState) {
         animalConfidence: entry.speciesIdentificationConfidence,
         animalLocConfidence: entry.locationConfidence,
         animalIcon: iconPath,
-        animalRecordDate: entry.timestamp
+        animalRecordDate: entry.timestamp,
+        isAnimalMovement: 1,
     });
       //console.log(entry.locationLon, " ", entry.locationLat)
     
@@ -533,7 +534,8 @@ function addNewTruthFeatures(hmiState, events) {
         animalConfidence: entry.speciesIdentificationConfidence,
         animalLocConfidence: entry.locationConfidence,
         animalIcon: iconPath,
-        animalRecordDate: entry.timestamp
+        animalRecordDate: entry.timestamp,
+        isAnimalMovement: 1,
     });
       //console.log(entry.locationLon, " ", entry.locationLat)
 
@@ -589,7 +591,8 @@ function addAllVocalizationFeatures(hmiState) {
         animalDiet: entry.animalDiet,
         animalIcon: iconPath,
         animalRecordDate: entry.timestamp,
-        eventId: entry.eventId
+        eventId: entry.eventId,
+        isAnimalMovement: 0,
     });
       //console.log(entry.locationLon, " ", entry.locationLat)
     
@@ -645,7 +648,8 @@ function addNewVocalizationFeatures(hmiState, events) {
         animalDiet: entry.animalDiet,
         animalIcon: iconPath,
         animalRecordDate: entry.timestamp,
-        eventId: entry.eventId 
+        eventId: entry.eventId,
+        isAnimalMovement: 0,
     });
       //console.log(entry.locationLon, " ", entry.locationLat)
 
@@ -956,6 +960,12 @@ function createMapClickEvent(hmiState){
         //console.log("saving " + values.eventId);
         selectedVocalizationEventId = values.eventId;
       }
+      if(values.isAnimalMovement){
+        document.getElementById("audioControl").style.display = "none"
+      }
+      else{
+        document.getElementById("audioControl").style.display = "flex"
+      }
       if (values.animalSpecies){
           //console.log(values.animalSpecies)
           var result = sample_data.find(({ species }) => species.toLowerCase() === values.animalSpecies.toLowerCase())
@@ -1034,7 +1044,7 @@ export function MapCloseNav() {
 }
 
 function updateTruthEvents(hmiState){
-  retrieveTruthEventsInTimeRange(hmiState.currentTime-60, hmiState.currentTime).then((res) => {
+  retrieveTruthEventsInTimeRange(hmiState.currentTime-5, hmiState.currentTime).then((res) => {
     updateAnimalMovementLayerFromLiveData(hmiState, res.data);
     //TODO also update vocalisation layer here.
   })
@@ -1042,7 +1052,7 @@ function updateTruthEvents(hmiState){
 
 //TODO Implement this
 function updateVocalizationEvents(hmiState){
-  retrieveVocalizationEventsInTimeRange(hmiState.currentTime-60, hmiState.currentTime).then((res) => {
+  retrieveVocalizationEventsInTimeRange(hmiState.currentTime-5, hmiState.currentTime).then((res) => {
     updateVocalizationLayerFromLiveData(hmiState, res.data);
     //TODO also update vocalisation layer here.
   })
@@ -1131,6 +1141,7 @@ function queueSimUpdate(hmiState) {
     updateTimeOffset(hmiState);
     hmiState.currentTime = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
     hmiState.liveEventCutoff = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay - hmiState.liveWindow) / 1000);
+    console.log(hmiState.liveEventCutoff);                            
     //purgeTruthEvents(hmiState);
     //purgeVocalizationEvents(hmiState);
     updateTruthEvents(hmiState);
