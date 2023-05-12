@@ -1109,10 +1109,10 @@ export function updateTimeOffset(hmiState){
   retrieveSimTime().then((res) => {
     console.log(res.data);
     let unix = Date.parse(res.data.timestamp) / 1000;
-    const date = new Date(unix * 1000); // Multiply by 1000 to convert to milliseconds
-    const utcDate = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
+    hmiState.simTime = new Date(unix * 1000); // Multiply by 1000 to convert to milliseconds
+    /*const utcDate = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
       date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
-    hmiState.simTime = utcDate;
+    hmiState.simTime = utcDate;*/
     console.log(hmiState.simTime);
   });
   }catch(error){
