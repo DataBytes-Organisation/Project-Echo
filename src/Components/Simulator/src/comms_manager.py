@@ -17,6 +17,8 @@ import random
 from clock import Clock
 import logging
 import datetime
+import requests
+
 logger1 = logging.getLogger('_sys_logger')
         
 class CommsManager():
@@ -133,7 +135,7 @@ class CommsManager():
     ########################################################################################
     # this function populates the database with animal movement events
     ########################################################################################
-    def echo_store_send_animal_movement(self, animal):
+    def echo_api_send_animal_movement(self, animal):
 
         movement_event = {
             "timestamp": self.clock.get_time().timestamp(),
@@ -141,15 +143,36 @@ class CommsManager():
             "animalId": animal.getUUID(),
             "animalTrueLLA": list(animal.getLLA())    
         }
-        
-        #movements = self.echo_store["movements"]
-        #movements.insert_one(movement_event)
-        import requests
 
         url = 'http://ts-api-cont:9000/sim/movement'
 
         x = requests.post(url, json = movement_event)
 
+        print(x.text)
+        
+
+    ########################################################################################
+    # this function populates the database with all the microphones
+    ########################################################################################        
+    def echo_api_set_microphones(self, microphones):
+        
+        microphone_list = []
+        
+        for mic in microphones:
+            lla = mic.getLLA()
+            microphone = {
+                "sensorId": mic.getID(),
+                "microphoneLLA": [
+                    lla[0],
+                    lla[1],
+                    lla[2]
+                ]
+            }
+            print(f'Setting Mic {microphone}')
+            microphone_list.append(microphone)
+ 
+        url = 'http://ts-api-cont:9000/sim/microphones'
+        x = requests.post(url, json = microphone_list)
         print(x.text)
 
     # this method takes in binary audio data and encodes to string

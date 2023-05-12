@@ -283,6 +283,7 @@ class EchoEngine():
             # Catch the exception and print it to the console
             print(f"An error occurred: {e}", flush=True)
 
+
     ########################################################################################
     # this function populates the database with the prediction results
     ########################################################################################
@@ -299,14 +300,11 @@ class EchoEngine():
             "animalLLAUncertainty": audio_event["animalLLAUncertainty"],
             "audioClip": audio_event["audioClip"],        
         }
+        
         url = 'http://ts-api-cont:9000/engine/event'
-
         x = requests.post(url, json = detection_event)
-
         print(x.text)
-        #events = self.echo_store["events"]
-        #events.insert_one(detection_event)
-
+        
 
     ########################################################################################
     # Execute the main engine loop (which waits for messages to arrive from MQTT)

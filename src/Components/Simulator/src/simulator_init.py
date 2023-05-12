@@ -74,7 +74,7 @@ class Config:
         # Create Animal Instances
         animal_instances = self.create_animal_instances(animal_factory)
         
-        return animal_instances    
+        return animal_instances, sensor_instances    
     
     def validate_configuration(self, config):
         # TODO
