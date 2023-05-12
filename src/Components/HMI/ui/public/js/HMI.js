@@ -147,7 +147,7 @@ export function updateVocalizationLayerFromPastData(hmiState, results){
   clearAllVocalizationLayers();
 
   hmiState.vocalizationEvents = [];
-  console.log(results);
+  //console.log(results);
 
   for (let data of results) {
     let event = convertJSONtoAnimalVocalizationEvent(hmiState, data);
@@ -183,7 +183,7 @@ export function updateAnimalMovementLayerFromLiveData(hmiState, results){
   //ensure events are unique per id
   for (let data of results) {
     
-    console.log(data);
+    //console.log(data);
 
     if(latestSimAnimals.hasOwnProperty(data.animalId)){
       let entry = latestSimAnimals[data.animalId];
@@ -212,7 +212,10 @@ export function updateAnimalMovementLayerFromLiveData(hmiState, results){
     let layer = findMapLayerWithName(hmiState, layerName);
     const featureToPurge = layer.getSource().getFeatureById(evt.animalId);
     //console.log(featureToPurge);
-    layer.getSource().removeFeature(featureToPurge);
+    if(featureToPurge){
+      //console.log("purge lat: " + evt.locationLat + " lon: " + evt.locationLon);
+      layer.getSource().removeFeature(featureToPurge);
+    }
   }
 
   addNewTruthFeatures(hmiState, updatedMovementEvents);
@@ -274,7 +277,7 @@ export function convertJSONtoAnimalMovementEvent(hmiState, data){
 
   movementEvent.animalId = data.animalId;
   movementEvent.eventId = data._id;
-  movementEvent.timestamp = hmiState.currentTime;
+  movementEvent.timestamp = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
   movementEvent.eventTimestamp = data.timestamp;
   movementEvent.speciesScientificName = data.species.toLowerCase();
   movementEvent.speciesIdentificationConfidence = 100.0;
@@ -950,7 +953,7 @@ function createMapClickEvent(hmiState){
 
       let values = feature.getProperties();
       if (values.eventId){
-        console.log("saving " + values.eventId);
+        //console.log("saving " + values.eventId);
         selectedVocalizationEventId = values.eventId;
       }
       if (values.animalSpecies){
@@ -1031,7 +1034,7 @@ export function MapCloseNav() {
 }
 
 function updateTruthEvents(hmiState){
-  retrieveTruthEventsInTimeRange(hmiState.previousUpdateTime, hmiState.currentTime).then((res) => {
+  retrieveTruthEventsInTimeRange(hmiState.currentTime-60, hmiState.currentTime).then((res) => {
     updateAnimalMovementLayerFromLiveData(hmiState, res.data);
     //TODO also update vocalisation layer here.
   })
@@ -1039,7 +1042,7 @@ function updateTruthEvents(hmiState){
 
 //TODO Implement this
 function updateVocalizationEvents(hmiState){
-  retrieveVocalizationEventsInTimeRange(hmiState.previousUpdateTime, hmiState.currentTime).then((res) => {
+  retrieveVocalizationEventsInTimeRange(hmiState.currentTime-60, hmiState.currentTime).then((res) => {
     updateVocalizationLayerFromLiveData(hmiState, res.data);
     //TODO also update vocalisation layer here.
   })
@@ -1107,19 +1110,18 @@ export function getUTC(){
 export function updateTimeOffset(hmiState){
   try{
   retrieveSimTime().then((res) => {
-    console.log(res.data);
+    //console.log(res.data);
     let unix = Date.parse(res.data.timestamp) / 1000;
-    hmiState.simTime = new Date(unix * 1000); // Multiply by 1000 to convert to milliseconds
+    hmiState.simUpdateDelay = (getUTC() - new Date((unix + (10*60*60)) * 1000)) + 10000; // Multiply by 1000 to convert to milliseconds
     /*const utcDate = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
       date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
     hmiState.simTime = utcDate;*/
-    console.log(hmiState.simTime);
+    //console.log(hmiState.simUpdateDelay);
   });
   }catch(error){
     console.log(failed);
-    hmiState.simTime = getUTC();
+    hmiState.simUpdateDelay = getUTC();
   }
-  
 }
 
 let simUpdateTimeout = null;
@@ -1127,10 +1129,10 @@ let simUpdateTimeout = null;
 function queueSimUpdate(hmiState) {
   if(hmiState.liveMode){
     updateTimeOffset(hmiState);
-    hmiState.currentTime = Math.floor((hmiState.simTime - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
-    hmiState.liveEventCutoff = Math.floor((hmiState.simTime - hmiState.timeOffset - hmiState.simUpdateDelay - hmiState.liveWindow) / 1000);
-    purgeTruthEvents(hmiState);
-    purgeVocalizationEvents(hmiState);
+    hmiState.currentTime = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
+    hmiState.liveEventCutoff = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay - hmiState.liveWindow) / 1000);
+    //purgeTruthEvents(hmiState);
+    //purgeVocalizationEvents(hmiState);
     updateTruthEvents(hmiState);
     updateVocalizationEvents(hmiState);
     hmiState.previousUpdateTime = hmiState.currentTime;

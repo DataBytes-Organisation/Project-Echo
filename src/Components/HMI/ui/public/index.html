@@ -919,8 +919,8 @@
   toggleSwitch.addEventListener('change', function() {
     if (this.checked) {
       resetWildlifeLayers(hmiState);
-      hmiState.currentTime = Math.floor((hmiState.simTime - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
-      hmiState.previousUpdate = Math.floor((hmiState.simTime - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
+      hmiState.currentTime = Math.floor((getUTC()- hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
+      hmiState.previousUpdate = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
       hmiState.liveMode = true;
       //console.log("Live mode enabled");
       pastDataContainer.style.maxHeight = '0';
