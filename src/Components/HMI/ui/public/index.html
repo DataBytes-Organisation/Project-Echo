@@ -804,8 +804,8 @@
 
   //update config
   hmiState.liveMode = true;
-  hmiState.simUpdateDelay = 60*1000;
-  hmiState.liveWindow = 60000;
+  hmiState.simUpdateDelay = 10000;
+  hmiState.liveWindow = 300000;
 
   //NOTE: Use the replay date to replay past data as though it were live
     //const replayDate = new Date('March 23, 2023 20:35:00');
@@ -814,7 +814,8 @@
   const utcTime = getUTC();
   const replayTimestamp = utcTime;
 
-  hmiState.timeOffset = utcTime - replayTimestamp;
+  hmiState.timeOffset = 0;
+  hmiState.simTime = getUTC();
   hmiState.currentTime = Math.floor((utcTime - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
   hmiState.previousUpdateTime = Math.floor((utcTime - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
   hmiState.liveEventCutoff = Math.floor((utcTime - hmiState.timeOffset - hmiState.simUpdateDelay - hmiState.liveWindow) / 1000);
@@ -918,9 +919,8 @@
   toggleSwitch.addEventListener('change', function() {
     if (this.checked) {
       resetWildlifeLayers(hmiState);
-      const currentUTC = getUTC();
-      hmiState.currentTime = Math.floor((currentUTC - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
-      hmiState.previousUpdate = Math.floor((currentUTC - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
+      hmiState.currentTime = Math.floor((hmiState.simTime - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
+      hmiState.previousUpdate = Math.floor((hmiState.simTime - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
       hmiState.liveMode = true;
       //console.log("Live mode enabled");
       pastDataContainer.style.maxHeight = '0';

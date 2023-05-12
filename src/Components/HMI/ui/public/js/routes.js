@@ -45,3 +45,7 @@ export function startSimulator(){
 export function stopSimulator(){
   axios.post(`${MESSAGE_API_URL}/sim_control?control=Stop`);
 }
+
+export function retrieveSimTime(){
+  return axios.get(`${MESSAGE_API_URL}/latest_movement`);
+}

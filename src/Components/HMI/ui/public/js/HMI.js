@@ -1,7 +1,8 @@
 "use strict";
 
 import { getAudioTestString } from "./HMI-utils.js";
-import { retrieveTruthEventsInTimeRange, retrieveVocalizationEventsInTimeRange, retrieveMicrophones, retrieveAudio } from "./routes.js";
+import { retrieveTruthEventsInTimeRange, retrieveVocalizationEventsInTimeRange, 
+  retrieveMicrophones, retrieveAudio, retrieveSimTime } from "./routes.js";
 import data from "./sample_data.json" assert { type: 'json' };
 
 var markups = ["elephant.png", "monkey.png", "tiger.png"];
@@ -181,6 +182,9 @@ export function updateAnimalMovementLayerFromLiveData(hmiState, results){
 
   //ensure events are unique per id
   for (let data of results) {
+    
+    console.log(data);
+
     if(latestSimAnimals.hasOwnProperty(data.animalId)){
       let entry = latestSimAnimals[data.animalId];
       if(entry.timestamp < data.timestamp){
@@ -220,6 +224,9 @@ export function updateVocalizationLayerFromLiveData(hmiState, results){
   let newVocalizationEvents = [];
 
   for (let data of results) {
+
+    console.log(data);
+
     let event = convertJSONtoAnimalVocalizationEvent(hmiState, data);
     hmiState.vocalizationEvents.push(event);
     newVocalizationEvents.push(event);
@@ -274,6 +281,7 @@ export function convertJSONtoAnimalMovementEvent(hmiState, data){
   movementEvent.locationLat = data.animalTrueLLA[0];
   movementEvent.locationLon = data.animalTrueLLA[1];
   movementEvent.locationConfidence = 100.0;
+
   movementEvent.animalType = data.type.toLowerCase();
   movementEvent.animalStatus = matchStatus(data.status.toLowerCase());
   movementEvent.animalDiet = data.diet.toLowerCase();
@@ -1096,14 +1104,31 @@ export function getUTC(){
   return utcTimestamp;
 }
 
+export function updateTimeOffset(hmiState){
+  try{
+  retrieveSimTime().then((res) => {
+    console.log(res.data);
+    let unix = Date.parse(res.data.timestamp) / 1000;
+    const date = new Date(unix * 1000); // Multiply by 1000 to convert to milliseconds
+    const utcDate = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
+      date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
+    hmiState.simTime = utcDate;
+    console.log(hmiState.simTime);
+  });
+  }catch(error){
+    console.log(failed);
+    hmiState.simTime = getUTC();
+  }
+  
+}
+
 let simUpdateTimeout = null;
 
 function queueSimUpdate(hmiState) {
   if(hmiState.liveMode){
-
-
-    hmiState.currentTime = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
-    hmiState.liveEventCutoff = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay - hmiState.liveWindow) / 1000);
+    updateTimeOffset(hmiState);
+    hmiState.currentTime = Math.floor((hmiState.simTime - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
+    hmiState.liveEventCutoff = Math.floor((hmiState.simTime - hmiState.timeOffset - hmiState.simUpdateDelay - hmiState.liveWindow) / 1000);
     purgeTruthEvents(hmiState);
     purgeVocalizationEvents(hmiState);
     updateTruthEvents(hmiState);
