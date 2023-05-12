@@ -299,9 +299,13 @@ class EchoEngine():
             "animalLLAUncertainty": audio_event["animalLLAUncertainty"],
             "audioClip": audio_event["audioClip"],        
         }
-        
-        events = self.echo_store["events"]
-        events.insert_one(detection_event)
+        url = 'http://ts-api-cont:9000/engine/event'
+
+        x = requests.post(url, json = detection_event)
+
+        print(x.text)
+        #events = self.echo_store["events"]
+        #events.insert_one(detection_event)
 
 
     ########################################################################################

@@ -111,7 +111,7 @@ def latest_movememnt():
 
     result = list(Movements.aggregate(aggregate))
     timestamp = serializers.timestampListEntity(result)[0]
-
+    print(timestamp)
     return timestamp
 
 
