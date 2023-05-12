@@ -20,6 +20,8 @@ def create_movement(movement: schemas.MovementSchema):
 
 @router.post("/microphones", status_code=status.HTTP_201_CREATED)
 def create_microphones(microphones: list[schemas.MicrophoneSchema]):
+    
+    Microphones.drop()
     microphone_list = []
     for microphone in microphones:
         print(microphone)

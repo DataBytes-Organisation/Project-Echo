@@ -9,7 +9,7 @@ def eventEntity(event) -> dict:
         "animalTrueLLA": event["animalTrueLLA"],
         "animalLLAUncertainty": event["animalLLAUncertainty"],
         "confidence": event["confidence"],
-        "file_name": event["file_name"]
+        #"file_name": event["file_name"]
     }
 
 def eventSpeciesEntity(event) -> dict:
