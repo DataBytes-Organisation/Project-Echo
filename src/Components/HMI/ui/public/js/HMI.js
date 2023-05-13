@@ -228,7 +228,7 @@ export function updateVocalizationLayerFromLiveData(hmiState, results){
 
   for (let data of results) {
 
-    console.log(data);
+    //console.log(data);
 
     let event = convertJSONtoAnimalVocalizationEvent(hmiState, data);
     hmiState.vocalizationEvents.push(event);
@@ -302,7 +302,7 @@ export function convertJSONtoAnimalVocalizationEvent(hmiState, data){
   vocalizationEvent.eventTimestamp = data.timestamp;
   vocalizationEvent.eventId = data._id;
 
-  console.log(vocalizationEvent.eventId);
+  //console.log(vocalizationEvent.eventId);
   
   vocalizationEvent.speciesIdentificationConfidence = data.confidence;
   vocalizationEvent.speciesScientificName = data.species.toLowerCase();
@@ -961,9 +961,11 @@ function createMapClickEvent(hmiState){
         selectedVocalizationEventId = values.eventId;
       }
       if(values.isAnimalMovement){
+        document.getElementById("audioHeader").style.display = "none"
         document.getElementById("audioControl").style.display = "none"
       }
       else{
+        document.getElementById("audioHeader").style.display = "flex"
         document.getElementById("audioControl").style.display = "flex"
       }
       if (values.animalSpecies){
@@ -974,13 +976,13 @@ function createMapClickEvent(hmiState){
             img.onload = function() {
               //console.log('Image exists!');
               // Set the source of the img tag
-              document.getElementById("desc_img").src = "../../images/bio/" + result.common + ".png";
+              document.getElementById("desc_img").src = "../../images/bio/" + result.common.toLowerCase() + "-bio.png";
             }
             img.onerror = function() {
-              let dice = Math.floor(Math.random() * 6) + 1;
-              document.getElementById("desc_img").src = "../../images/bio/not_available_" + dice + ".png";
+              let dice = Math.floor(Math.random() * 5) + 1;
+              document.getElementById("desc_img").src = "../../images/bio/not_available_" + dice + "-bio.png";
             }
-            img.src = "../../images/bio/" + result.common + ".png";
+            img.src = "../../images/bio/" + result.common.toLowerCase() + "-bio.png";
           
             //console.log("found")
             //Animal Bio specific session
@@ -1141,9 +1143,9 @@ function queueSimUpdate(hmiState) {
     updateTimeOffset(hmiState);
     hmiState.currentTime = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
     hmiState.liveEventCutoff = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay - hmiState.liveWindow) / 1000);
-    console.log(hmiState.liveEventCutoff);                            
-    //purgeTruthEvents(hmiState);
-    //purgeVocalizationEvents(hmiState);
+    //console.log(hmiState.liveEventCutoff);                            
+    purgeTruthEvents(hmiState);
+    purgeVocalizationEvents(hmiState);
     updateTruthEvents(hmiState);
     updateVocalizationEvents(hmiState);
     hmiState.previousUpdateTime = hmiState.currentTime;
