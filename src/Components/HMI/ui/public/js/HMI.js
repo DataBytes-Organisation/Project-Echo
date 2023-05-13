@@ -402,7 +402,7 @@ function playAudioString(audioDataString) {
   audioBuffer.copyToChannel(new Float32Array(audioData.buffer), 0);
 
   let duration = audioBuffer.duration;
-  console.log(duration);
+  //console.log(duration);
 
   // Create a new audio buffer source node and set its buffer
   activeAudioNode = audioContext.createBufferSource();
@@ -1047,7 +1047,7 @@ function createMapClickEvent(hmiState){
         document.getElementById("audioControl").style.display = "flex"
       }
       if (values.animalSpecies){
-          console.log(values.animalSpecies)
+          //console.log(values.animalSpecies)
           var result = sample_data.find(({ species }) => species.toLowerCase() === values.animalSpecies.toLowerCase())
           if (result) {
             const img = new Image();
@@ -1277,7 +1277,7 @@ function queueSimUpdate(hmiState) {
 }
 
 document.addEventListener('playAudio', function(event){
-  console.log("play audio");
+  //console.log("play audio");
   playNextTrack = true;
   if(selectedVocalizationEventId != null){
     retrieveAudio(selectedVocalizationEventId).then((res) => {
@@ -1287,7 +1287,7 @@ document.addEventListener('playAudio', function(event){
 })
 
 document.addEventListener('stopAudio', function(event){
-  console.log("stop audio");
+  //console.log("stop audio");
   playNextTrack = false;
   stopAudioPlayback();
 })

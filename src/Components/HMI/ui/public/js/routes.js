@@ -34,7 +34,7 @@ export function retrieveMicrophones() {
 }
 
 export function retrieveAudio(id){
-  console.log(`${MESSAGE_API_URL}/audio?id=${id}`);
+  //console.log(`${MESSAGE_API_URL}/audio?id=${id}`);
   return axios.get(`${MESSAGE_API_URL}/audio?id=${id}`);
 }
 
