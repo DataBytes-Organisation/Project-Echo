@@ -1,1101 +1,1860 @@
 [{
   "timestamp": {
-    "$date": "2023-03-22T15:15:00.000Z"
+    "$date": "2023-05-13T01:30:48.895Z"
   },
-  "species": "Sus Scrofa",
-  "animalId": 1,
+  "species": "Colluricincla Harmonica",
+  "animalId": "EKKQSY1WSHGOPJ_9SMW4QA",
   "animalTrueLLA": [
-    -38.82035589571495,
-    143.55730780334838,
-    24
+    -38.78277437547685,
+    143.57232115266592,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T15:10:00.000Z"
+    "$date": "2023-05-13T01:30:48.895Z"
   },
-  "species": "Sus Scrofa",
-  "animalId": 1,
+  "species": "Felis Catus",
+  "animalId": "XWFX5JOKTEUBKYHBNUQZOA",
   "animalTrueLLA": [
-    -38.82042598244258,
-    143.55726110959208,
-    24
+    -38.79191902041485,
+    143.60495839660769,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T15:00:00.000Z"
+    "$date": "2023-05-13T01:30:48.895Z"
   },
-  "species": "Sus Scrofa",
-  "animalId": 1,
+  "species": "Caligavis Chrysops",
+  "animalId": "8F14G8JXS7YHMEMQLW1WZQ",
   "animalTrueLLA": [
-    -38.82044354878954,
-    143.55729263275768,
-    24
+    -38.77874291276044,
+    143.55601174784144,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T13:55:00.000Z"
+    "$date": "2023-05-13T01:30:48.895Z"
   },
-  "species": "Sus Scrofa",
-  "animalId": 1,
+  "species": "Dama Dama",
+  "animalId": "YXNKSPR3QU26BNSTRNRENG",
   "animalTrueLLA": [
-    -38.82128053380042,
-    143.55758049062868,
-    24
+    -38.77373432110877,
+    143.5650416594583,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T15:40:00.000Z"
+    "$date": "2023-05-13T01:30:48.895Z"
   },
-  "species": "Sus Scrofa",
-  "animalId": 1,
+  "species": "Corvus Coronoides",
+  "animalId": "GJ2H5IKERI2LWNS-M3OCCA",
   "animalTrueLLA": [
-    -38.82036924556811,
-    143.55755422745338,
-    24
+    -38.78832010264413,
+    143.59154928347888,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T14:30:00.000Z"
+    "$date": "2023-05-13T01:30:49.095Z"
   },
-  "species": "Sus Scrofa",
-  "animalId": 1,
+  "species": "Colluricincla Harmonica",
+  "animalId": "EKKQSY1WSHGOPJ_9SMW4QA",
   "animalTrueLLA": [
-    -38.820685300759386,
-    143.5576505966629,
-    24
+    -38.782104186834275,
+    143.57246379524284,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T16:05:00.000Z"
+    "$date": "2023-05-13T01:30:49.095Z"
   },
-  "species": "Sus Scrofa",
-  "animalId": 1,
+  "species": "Felis Catus",
+  "animalId": "XWFX5JOKTEUBKYHBNUQZOA",
   "animalTrueLLA": [
-    -38.82029210342592,
-    143.55754211182054,
-    24
+    -38.79175237827613,
+    143.60483449846805,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T17:40:00.000Z"
+    "$date": "2023-05-13T01:30:49.095Z"
   },
-  "species": "Sus Scrofa",
-  "animalId": 1,
+  "species": "Caligavis Chrysops",
+  "animalId": "8F14G8JXS7YHMEMQLW1WZQ",
   "animalTrueLLA": [
-    -38.820723000267904,
-    143.5572544726421,
-    24
+    -38.778716538768336,
+    143.5557139313578,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T14:45:00.000Z"
+    "$date": "2023-05-13T01:30:49.095Z"
   },
-  "species": "Alauda Arvensis",
-  "animalId": 2,
+  "species": "Dama Dama",
+  "animalId": "YXNKSPR3QU26BNSTRNRENG",
   "animalTrueLLA": [
-    -38.82025769985537,
-    143.55754687201588,
-    24
+    -38.7737010391841,
+    143.56573045049097,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T15:15:00.000Z"
+    "$date": "2023-05-13T01:30:49.095Z"
   },
-  "species": "Alauda Arvensis",
-  "animalId": 2,
+  "species": "Corvus Coronoides",
+  "animalId": "GJ2H5IKERI2LWNS-M3OCCA",
   "animalTrueLLA": [
-    -38.82033547998672,
-    143.55798974888637,
-    24
+    -38.78833745289801,
+    143.59170053556173,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T17:35:00.000Z"
+    "$date": "2023-05-13T01:30:49.295Z"
   },
-  "species": "Sus Scrofa",
-  "animalId": 1,
+  "species": "Colluricincla Harmonica",
+  "animalId": "EKKQSY1WSHGOPJ_9SMW4QA",
   "animalTrueLLA": [
-    -38.82064289265035,
-    143.55720934838368,
-    24
+    -38.78168084575142,
+    143.57208211061757,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T17:45:00.000Z"
+    "$date": "2023-05-13T01:30:49.295Z"
   },
-  "species": "Sus Scrofa",
-  "animalId": 1,
+  "species": "Felis Catus",
+  "animalId": "XWFX5JOKTEUBKYHBNUQZOA",
   "animalTrueLLA": [
-    -38.82055822087331,
-    143.55708251137082,
-    24
+    -38.79179985069249,
+    143.6050232361317,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T16:10:00.000Z"
+    "$date": "2023-05-13T01:30:49.295Z"
   },
-  "species": "Alauda Arvensis",
-  "animalId": 2,
+  "species": "Caligavis Chrysops",
+  "animalId": "8F14G8JXS7YHMEMQLW1WZQ",
   "animalTrueLLA": [
-    -38.82059423712145,
-    143.55813548753505,
-    24
+    -38.77842944503218,
+    143.55629086623154,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T16:35:00.000Z"
+    "$date": "2023-05-13T01:30:49.295Z"
   },
-  "species": "Alauda Arvensis",
-  "animalId": 2,
+  "species": "Dama Dama",
+  "animalId": "YXNKSPR3QU26BNSTRNRENG",
   "animalTrueLLA": [
-    -38.82074675003802,
-    143.55817292925144,
-    24
+    -38.773289398560195,
+    143.56676497291048,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T14:05:00.000Z"
+    "$date": "2023-05-13T01:30:49.295Z"
   },
-  "species": "Sus Scrofa",
-  "animalId": 1,
+  "species": "Corvus Coronoides",
+  "animalId": "GJ2H5IKERI2LWNS-M3OCCA",
   "animalTrueLLA": [
-    -38.82101974754943,
-    143.55769967009493,
-    24
+    -38.78823855936,
+    143.5919533782253,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T14:40:00.000Z"
+    "$date": "2023-05-13T01:30:49.495Z"
   },
-  "species": "Sus Scrofa",
-  "animalId": 1,
+  "species": "Colluricincla Harmonica",
+  "animalId": "EKKQSY1WSHGOPJ_9SMW4QA",
   "animalTrueLLA": [
-    -38.820798283090646,
-    143.5576931380204,
-    24
+    -38.78214740744742,
+    143.57197200671703,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T14:35:00.000Z"
+    "$date": "2023-05-13T01:30:49.495Z"
   },
-  "species": "Alauda Arvensis",
-  "animalId": 2,
+  "species": "Felis Catus",
+  "animalId": "XWFX5JOKTEUBKYHBNUQZOA",
   "animalTrueLLA": [
-    -38.820225961517764,
-    143.55732125691594,
-    24
+    -38.792487102367524,
+    143.60479346193665,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T14:40:00.000Z"
+    "$date": "2023-05-13T01:30:49.495Z"
   },
-  "species": "Alauda Arvensis",
-  "animalId": 2,
+  "species": "Caligavis Chrysops",
+  "animalId": "8F14G8JXS7YHMEMQLW1WZQ",
   "animalTrueLLA": [
-    -38.82039044033889,
-    143.557464975809,
-    24
+    -38.77898138566714,
+    143.5567110971284,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T15:05:00.000Z"
+    "$date": "2023-05-13T01:30:49.495Z"
   },
-  "species": "Alauda Arvensis",
-  "animalId": 2,
+  "species": "Dama Dama",
+  "animalId": "YXNKSPR3QU26BNSTRNRENG",
   "animalTrueLLA": [
-    -38.82002744658976,
-    143.55771412491265,
-    24
+    -38.77320627668524,
+    143.56639226208208,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T15:35:00.000Z"
+    "$date": "2023-05-13T01:30:49.495Z"
   },
-  "species": "Alauda Arvensis",
-  "animalId": 2,
+  "species": "Corvus Coronoides",
+  "animalId": "GJ2H5IKERI2LWNS-M3OCCA",
   "animalTrueLLA": [
-    -38.82025007738566,
-    143.55803561989723,
-    24
+    -38.78858870267782,
+    143.59121634817757,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T15:40:00.000Z"
+    "$date": "2023-05-13T01:30:49.695Z"
   },
-  "species": "Alauda Arvensis",
-  "animalId": 2,
+  "species": "Colluricincla Harmonica",
+  "animalId": "EKKQSY1WSHGOPJ_9SMW4QA",
   "animalTrueLLA": [
-    -38.82029548273614,
-    143.558202202249,
-    24
+    -38.78219451311559,
+    143.57248209649367,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T17:45:00.000Z"
+    "$date": "2023-05-13T01:30:49.695Z"
   },
-  "species": "Alauda Arvensis",
-  "animalId": 2,
+  "species": "Felis Catus",
+  "animalId": "XWFX5JOKTEUBKYHBNUQZOA",
   "animalTrueLLA": [
-    -38.8203446350477,
-    143.55801528432028,
-    24
+    -38.79246062300596,
+    143.60492351547117,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T13:45:00.000Z"
+    "$date": "2023-05-13T01:30:49.695Z"
   },
-  "species": "Sus Scrofa",
-  "animalId": 1,
+  "species": "Caligavis Chrysops",
+  "animalId": "8F14G8JXS7YHMEMQLW1WZQ",
   "animalTrueLLA": [
-    -38.8214807580445,
-    143.55769541441353,
-    24
+    -38.77878470061128,
+    143.55643887092745,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T15:25:00.000Z"
+    "$date": "2023-05-13T01:30:49.695Z"
   },
-  "species": "Sus Scrofa",
-  "animalId": 1,
+  "species": "Dama Dama",
+  "animalId": "YXNKSPR3QU26BNSTRNRENG",
   "animalTrueLLA": [
-    -38.82027792140283,
-    143.55741509137397,
-    24
+    -38.773331587881856,
+    143.56583111973853,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T14:50:00.000Z"
+    "$date": "2023-05-13T01:30:49.695Z"
   },
-  "species": "Sus Scrofa",
-  "animalId": 1,
+  "species": "Corvus Coronoides",
+  "animalId": "GJ2H5IKERI2LWNS-M3OCCA",
   "animalTrueLLA": [
-    -38.820649138589836,
-    143.5574495115151,
-    24
+    -38.788511445764456,
+    143.59112615907506,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T14:05:00.000Z"
+    "$date": "2023-05-13T01:30:49.895Z"
   },
-  "species": "Alauda Arvensis",
-  "animalId": 2,
+  "species": "Colluricincla Harmonica",
+  "animalId": "EKKQSY1WSHGOPJ_9SMW4QA",
   "animalTrueLLA": [
-    -38.82039433659942,
-    143.55749610258718,
-    24
+    -38.78189765324349,
+    143.57239214929612,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T15:45:00.000Z"
+    "$date": "2023-05-13T01:30:49.895Z"
   },
-  "species": "Alauda Arvensis",
-  "animalId": 2,
+  "species": "Felis Catus",
+  "animalId": "XWFX5JOKTEUBKYHBNUQZOA",
   "animalTrueLLA": [
-    -38.82036966139687,
-    143.55801655443184,
-    24
+    -38.793146203104655,
+    143.60486709234857,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T16:45:00.000Z"
+    "$date": "2023-05-13T01:30:49.895Z"
   },
-  "species": "Alauda Arvensis",
-  "animalId": 2,
+  "species": "Caligavis Chrysops",
+  "animalId": "8F14G8JXS7YHMEMQLW1WZQ",
   "animalTrueLLA": [
-    -38.820874510615944,
-    143.55804441926713,
-    24
+    -38.77900936761552,
+    143.5566732904941,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T15:05:00.000Z"
+    "$date": "2023-05-13T01:30:49.895Z"
   },
-  "species": "Sus Scrofa",
-  "animalId": 1,
+  "species": "Dama Dama",
+  "animalId": "YXNKSPR3QU26BNSTRNRENG",
   "animalTrueLLA": [
-    -38.82044849818421,
-    143.5572591670828,
-    24
+    -38.773428312331106,
+    143.56573131004055,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T16:15:00.000Z"
+    "$date": "2023-05-13T01:30:49.895Z"
   },
-  "species": "Sus Scrofa",
-  "animalId": 1,
+  "species": "Corvus Coronoides",
+  "animalId": "GJ2H5IKERI2LWNS-M3OCCA",
   "animalTrueLLA": [
-    -38.82020610251543,
-    143.5576423801367,
-    24
+    -38.788326380629,
+    143.59074988299636,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T17:30:00.000Z"
+    "$date": "2023-05-13T01:30:50.095Z"
   },
-  "species": "Sus Scrofa",
-  "animalId": 1,
+  "species": "Colluricincla Harmonica",
+  "animalId": "EKKQSY1WSHGOPJ_9SMW4QA",
   "animalTrueLLA": [
-    -38.820658517343574,
-    143.55717868871264,
-    24
+    -38.78222421301491,
+    143.5726820136208,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T16:00:00.000Z"
+    "$date": "2023-05-13T01:30:50.095Z"
   },
-  "species": "Alauda Arvensis",
-  "animalId": 2,
+  "species": "Felis Catus",
+  "animalId": "XWFX5JOKTEUBKYHBNUQZOA",
   "animalTrueLLA": [
-    -38.820420197648396,
-    143.5580499733643,
-    24
+    -38.793183906814036,
+    143.60435168938932,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T16:05:00.000Z"
+    "$date": "2023-05-13T01:30:50.095Z"
   },
-  "species": "Alauda Arvensis",
-  "animalId": 2,
+  "species": "Caligavis Chrysops",
+  "animalId": "8F14G8JXS7YHMEMQLW1WZQ",
   "animalTrueLLA": [
-    -38.82060839060079,
-    143.5580414619309,
-    24
+    -38.77887806925301,
+    143.55720518833198,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T16:15:00.000Z"
+    "$date": "2023-05-13T01:30:50.095Z"
   },
-  "species": "Alauda Arvensis",
-  "animalId": 2,
+  "species": "Dama Dama",
+  "animalId": "YXNKSPR3QU26BNSTRNRENG",
   "animalTrueLLA": [
-    -38.82070859610638,
-    143.55798223600013,
-    24
+    -38.773594451787794,
+    143.56584109853947,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T17:40:00.000Z"
+    "$date": "2023-05-13T01:30:50.095Z"
   },
-  "species": "Alauda Arvensis",
-  "animalId": 2,
+  "species": "Corvus Coronoides",
+  "animalId": "GJ2H5IKERI2LWNS-M3OCCA",
   "animalTrueLLA": [
-    -38.82048291892466,
-    143.55799935839403,
-    24
+    -38.788750716022754,
+    143.5903382290866,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T16:10:00.000Z"
+    "$date": "2023-05-13T01:30:50.295Z"
   },
-  "species": "Sus Scrofa",
-  "animalId": 1,
+  "species": "Colluricincla Harmonica",
+  "animalId": "EKKQSY1WSHGOPJ_9SMW4QA",
   "animalTrueLLA": [
-    -38.82020547033482,
-    143.55752470438227,
-    24
+    -38.78204050851246,
+    143.57303388969535,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T14:55:00.000Z"
+    "$date": "2023-05-13T01:30:50.295Z"
   },
-  "species": "Alauda Arvensis",
-  "animalId": 2,
+  "species": "Felis Catus",
+  "animalId": "XWFX5JOKTEUBKYHBNUQZOA",
   "animalTrueLLA": [
-    -38.82010862782687,
-    143.55768339303276,
-    24
+    -38.79289278962689,
+    143.6049093146548,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T16:25:00.000Z"
+    "$date": "2023-05-13T01:30:50.295Z"
   },
-  "species": "Alauda Arvensis",
-  "animalId": 2,
+  "species": "Caligavis Chrysops",
+  "animalId": "8F14G8JXS7YHMEMQLW1WZQ",
   "animalTrueLLA": [
-    -38.820705425406466,
-    143.55817307753304,
-    24
+    -38.77865095313571,
+    143.55687922391516,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T17:30:00.000Z"
+    "$date": "2023-05-13T01:30:50.295Z"
   },
-  "species": "Alauda Arvensis",
-  "animalId": 2,
+  "species": "Dama Dama",
+  "animalId": "YXNKSPR3QU26BNSTRNRENG",
   "animalTrueLLA": [
-    -38.820561296296646,
-    143.55793350677422,
-    24
+    -38.77337818410453,
+    143.56646829819542,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T17:35:00.000Z"
+    "$date": "2023-05-13T01:30:50.295Z"
   },
-  "species": "Alauda Arvensis",
-  "animalId": 2,
+  "species": "Corvus Coronoides",
+  "animalId": "GJ2H5IKERI2LWNS-M3OCCA",
   "animalTrueLLA": [
-    -38.82039057152215,
-    143.55794748034612,
-    24
+    -38.78932633353731,
+    143.59072699339052,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T16:45:00.000Z"
+    "$date": "2023-05-13T01:30:50.495Z"
   },
-  "species": "Sus Scrofa",
-  "animalId": 1,
+  "species": "Colluricincla Harmonica",
+  "animalId": "EKKQSY1WSHGOPJ_9SMW4QA",
   "animalTrueLLA": [
-    -38.81991531203644,
-    143.5572021141636,
-    24
+    -38.78182697868165,
+    143.57297975513333,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T14:55:00.000Z"
+    "$date": "2023-05-13T01:30:50.495Z"
   },
-  "species": "Sus Scrofa",
-  "animalId": 1,
+  "species": "Felis Catus",
+  "animalId": "XWFX5JOKTEUBKYHBNUQZOA",
   "animalTrueLLA": [
-    -38.82059598367876,
-    143.55732078844315,
-    24
+    -38.79350615422779,
+    143.60533117464908,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T16:20:00.000Z"
+    "$date": "2023-05-13T01:30:50.495Z"
   },
-  "species": "Sus Scrofa",
-  "animalId": 1,
+  "species": "Caligavis Chrysops",
+  "animalId": "8F14G8JXS7YHMEMQLW1WZQ",
   "animalTrueLLA": [
-    -38.820168300489904,
-    143.55766204526188,
-    24
+    -38.77845604704823,
+    143.55763340271903,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T13:55:00.000Z"
+    "$date": "2023-05-13T01:30:50.495Z"
   },
-  "species": "Alauda Arvensis",
-  "animalId": 2,
+  "species": "Dama Dama",
+  "animalId": "YXNKSPR3QU26BNSTRNRENG",
   "animalTrueLLA": [
-    -38.82022778432679,
-    143.55723654047043,
-    24
+    -38.77296482511746,
+    143.56659100483796,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T14:00:00.000Z"
+    "$date": "2023-05-13T01:30:50.495Z"
   },
-  "species": "Alauda Arvensis",
-  "animalId": 2,
+  "species": "Corvus Coronoides",
+  "animalId": "GJ2H5IKERI2LWNS-M3OCCA",
   "animalTrueLLA": [
-    -38.8203522888319,
-    143.55738761925963,
-    24
+    -38.78882861640574,
+    143.590930257931,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T15:10:00.000Z"
+    "$date": "2023-05-13T01:30:50.695Z"
   },
-  "species": "Alauda Arvensis",
-  "animalId": 2,
+  "species": "Colluricincla Harmonica",
+  "animalId": "EKKQSY1WSHGOPJ_9SMW4QA",
   "animalTrueLLA": [
-    -38.82014252886151,
-    143.55789648706022,
-    24
+    -38.78186780547312,
+    143.57307640427803,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T15:55:00.000Z"
+    "$date": "2023-05-13T01:30:50.695Z"
   },
-  "species": "Alauda Arvensis",
-  "animalId": 2,
+  "species": "Felis Catus",
+  "animalId": "XWFX5JOKTEUBKYHBNUQZOA",
   "animalTrueLLA": [
-    -38.820548608720976,
-    143.55797153645233,
-    24
+    -38.79341063679364,
+    143.60575060978974,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T16:40:00.000Z"
+    "$date": "2023-05-13T01:30:50.695Z"
   },
-  "species": "Alauda Arvensis",
-  "animalId": 2,
+  "species": "Caligavis Chrysops",
+  "animalId": "8F14G8JXS7YHMEMQLW1WZQ",
   "animalTrueLLA": [
-    -38.82089806169732,
-    143.55820515260652,
-    24
+    -38.77790089862826,
+    143.556735796763,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T16:55:00.000Z"
+    "$date": "2023-05-13T01:30:50.695Z"
   },
-  "species": "Alauda Arvensis",
-  "animalId": 2,
+  "species": "Dama Dama",
+  "animalId": "YXNKSPR3QU26BNSTRNRENG",
   "animalTrueLLA": [
-    -38.82093824898008,
-    143.5579850889189,
-    24
+    -38.77302005667768,
+    143.56709191109786,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T15:30:00.000Z"
+    "$date": "2023-05-13T01:30:50.695Z"
   },
-  "species": "Sus Scrofa",
-  "animalId": 1,
+  "species": "Corvus Coronoides",
+  "animalId": "GJ2H5IKERI2LWNS-M3OCCA",
   "animalTrueLLA": [
-    -38.820430498112664,
-    143.5575821678334,
-    24
+    -38.78782544150734,
+    143.59113121723246,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T16:25:00.000Z"
+    "$date": "2023-05-13T01:30:50.895Z"
   },
-  "species": "Sus Scrofa",
-  "animalId": 1,
+  "species": "Colluricincla Harmonica",
+  "animalId": "EKKQSY1WSHGOPJ_9SMW4QA",
   "animalTrueLLA": [
-    -38.8201438156613,
-    143.55765902906214,
-    24
+    -38.78186870233121,
+    143.57328584767413,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T16:30:00.000Z"
+    "$date": "2023-05-13T01:30:50.895Z"
   },
-  "species": "Sus Scrofa",
-  "animalId": 1,
+  "species": "Felis Catus",
+  "animalId": "XWFX5JOKTEUBKYHBNUQZOA",
   "animalTrueLLA": [
-    -38.82014795850599,
-    143.55750020633482,
-    24
+    -38.79406770956062,
+    143.60538065650604,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T14:50:00.000Z"
+    "$date": "2023-05-13T01:30:50.895Z"
   },
-  "species": "Alauda Arvensis",
-  "animalId": 2,
+  "species": "Caligavis Chrysops",
+  "animalId": "8F14G8JXS7YHMEMQLW1WZQ",
   "animalTrueLLA": [
-    -38.8202095076811,
-    143.5576436741683,
-    24
+    -38.77798985683474,
+    143.55675372845047,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T15:30:00.000Z"
+    "$date": "2023-05-13T01:30:50.895Z"
   },
-  "species": "Alauda Arvensis",
-  "animalId": 2,
+  "species": "Dama Dama",
+  "animalId": "YXNKSPR3QU26BNSTRNRENG",
   "animalTrueLLA": [
-    -38.82028563995326,
-    143.55810962969286,
-    24
+    -38.773088308005875,
+    143.56728986340207,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T17:25:00.000Z"
+    "$date": "2023-05-13T01:30:50.895Z"
   },
-  "species": "Alauda Arvensis",
-  "animalId": 2,
+  "species": "Corvus Coronoides",
+  "animalId": "GJ2H5IKERI2LWNS-M3OCCA",
   "animalTrueLLA": [
-    -38.8207466733638,
-    143.55776046472343,
-    24
+    -38.78860781890917,
+    143.59088941232443,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T14:00:00.000Z"
+    "$date": "2023-05-13T01:30:51.095Z"
   },
-  "species": "Sus Scrofa",
-  "animalId": 1,
+  "species": "Colluricincla Harmonica",
+  "animalId": "EKKQSY1WSHGOPJ_9SMW4QA",
   "animalTrueLLA": [
-    -38.82119158098055,
-    143.55759729513835,
-    24
+    -38.781824163568125,
+    143.57374544244462,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T14:15:00.000Z"
+    "$date": "2023-05-13T01:30:51.095Z"
   },
-  "species": "Sus Scrofa",
-  "animalId": 1,
+  "species": "Felis Catus",
+  "animalId": "XWFX5JOKTEUBKYHBNUQZOA",
   "animalTrueLLA": [
-    -38.82089754357015,
-    143.55759457101038,
-    24
+    -38.79360570818424,
+    143.60488135598405,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T14:45:00.000Z"
+    "$date": "2023-05-13T01:30:51.095Z"
   },
-  "species": "Sus Scrofa",
-  "animalId": 1,
+  "species": "Caligavis Chrysops",
+  "animalId": "8F14G8JXS7YHMEMQLW1WZQ",
   "animalTrueLLA": [
-    -38.8206752844276,
-    143.55751083673275,
-    24
+    -38.77727508133,
+    143.55686806412064,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T15:50:00.000Z"
+    "$date": "2023-05-13T01:30:51.095Z"
   },
-  "species": "Sus Scrofa",
-  "animalId": 1,
+  "species": "Dama Dama",
+  "animalId": "YXNKSPR3QU26BNSTRNRENG",
   "animalTrueLLA": [
-    -38.82040247329976,
-    143.55763607222298,
-    24
+    -38.773482393969516,
+    143.56746632578373,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T16:55:00.000Z"
+    "$date": "2023-05-13T01:30:51.095Z"
   },
-  "species": "Sus Scrofa",
-  "animalId": 1,
+  "species": "Corvus Coronoides",
+  "animalId": "GJ2H5IKERI2LWNS-M3OCCA",
   "animalTrueLLA": [
-    -38.8201901242586,
-    143.55748901746622,
-    24
+    -38.7882619223198,
+    143.5907266772183,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T17:05:00.000Z"
+    "$date": "2023-05-13T01:30:51.295Z"
   },
-  "species": "Sus Scrofa",
-  "animalId": 1,
+  "species": "Colluricincla Harmonica",
+  "animalId": "EKKQSY1WSHGOPJ_9SMW4QA",
   "animalTrueLLA": [
-    -38.820199541283166,
-    143.55750853538973,
-    24
+    -38.78185527620047,
+    143.57323422292714,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T15:20:00.000Z"
+    "$date": "2023-05-13T01:30:51.295Z"
   },
-  "species": "Alauda Arvensis",
-  "animalId": 2,
+  "species": "Felis Catus",
+  "animalId": "XWFX5JOKTEUBKYHBNUQZOA",
   "animalTrueLLA": [
-    -38.82035315267144,
-    143.55797747533592,
-    24
+    -38.79361670473395,
+    143.60520373199276,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T17:15:00.000Z"
+    "$date": "2023-05-13T01:30:51.295Z"
   },
-  "species": "Alauda Arvensis",
-  "animalId": 2,
+  "species": "Caligavis Chrysops",
+  "animalId": "8F14G8JXS7YHMEMQLW1WZQ",
   "animalTrueLLA": [
-    -38.82086429517052,
-    143.55786347861422,
-    24
+    -38.77804797259859,
+    143.55749258475308,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T17:20:00.000Z"
+    "$date": "2023-05-13T01:30:51.295Z"
   },
-  "species": "Alauda Arvensis",
-  "animalId": 2,
+  "species": "Dama Dama",
+  "animalId": "YXNKSPR3QU26BNSTRNRENG",
   "animalTrueLLA": [
-    -38.820919674819656,
-    143.5578961809382,
-    24
+    -38.77410273749424,
+    143.56654664856845,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T16:50:00.000Z"
+    "$date": "2023-05-13T01:30:51.295Z"
   },
-  "species": "Sus Scrofa",
-  "animalId": 1,
+  "species": "Corvus Coronoides",
+  "animalId": "GJ2H5IKERI2LWNS-M3OCCA",
   "animalTrueLLA": [
-    -38.820059741269866,
-    143.55738374988357,
-    24
+    -38.78876083414724,
+    143.59047479588983,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T17:00:00.000Z"
+    "$date": "2023-05-13T01:30:51.495Z"
   },
-  "species": "Sus Scrofa",
-  "animalId": 1,
+  "species": "Colluricincla Harmonica",
+  "animalId": "EKKQSY1WSHGOPJ_9SMW4QA",
   "animalTrueLLA": [
-    -38.820342543560585,
-    143.55750508372566,
-    24
+    -38.78204842387354,
+    143.57250728242587,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T17:10:00.000Z"
+    "$date": "2023-05-13T01:30:51.495Z"
   },
-  "species": "Sus Scrofa",
-  "animalId": 1,
+  "species": "Felis Catus",
+  "animalId": "XWFX5JOKTEUBKYHBNUQZOA",
   "animalTrueLLA": [
-    -38.820324984137,
-    143.55739853851003,
-    24
+    -38.79328663076958,
+    143.6057714706341,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T17:05:00.000Z"
+    "$date": "2023-05-13T01:30:51.495Z"
   },
-  "species": "Alauda Arvensis",
-  "animalId": 2,
+  "species": "Caligavis Chrysops",
+  "animalId": "8F14G8JXS7YHMEMQLW1WZQ",
   "animalTrueLLA": [
-    -38.821160700608154,
-    143.55770163013878,
-    24
+    -38.77804632239533,
+    143.5576472490234,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T14:20:00.000Z"
+    "$date": "2023-05-13T01:30:51.495Z"
   },
-  "species": "Sus Scrofa",
-  "animalId": 1,
+  "species": "Dama Dama",
+  "animalId": "YXNKSPR3QU26BNSTRNRENG",
   "animalTrueLLA": [
-    -38.82074925094961,
-    143.55773789152943,
-    24
+    -38.77411337775224,
+    143.5662252349046,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T17:15:00.000Z"
+    "$date": "2023-05-13T01:30:51.495Z"
   },
-  "species": "Sus Scrofa",
-  "animalId": 1,
+  "species": "Corvus Coronoides",
+  "animalId": "GJ2H5IKERI2LWNS-M3OCCA",
   "animalTrueLLA": [
-    -38.820497697382024,
-    143.5573735589613,
-    24
+    -38.7882275347485,
+    143.58969105438229,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T13:45:00.000Z"
+    "$date": "2023-05-13T01:30:51.695Z"
   },
-  "species": "Alauda Arvensis",
-  "animalId": 2,
+  "species": "Colluricincla Harmonica",
+  "animalId": "EKKQSY1WSHGOPJ_9SMW4QA",
   "animalTrueLLA": [
-    -38.82035557982231,
-    143.55718401038985,
-    24
+    -38.7826271920199,
+    143.5727116541894,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T13:50:00.000Z"
+    "$date": "2023-05-13T01:30:51.695Z"
   },
-  "species": "Alauda Arvensis",
-  "animalId": 2,
+  "species": "Felis Catus",
+  "animalId": "XWFX5JOKTEUBKYHBNUQZOA",
   "animalTrueLLA": [
-    -38.820236865685125,
-    143.55711355488458,
-    24
+    -38.79298763275606,
+    143.60547475257252,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T14:15:00.000Z"
+    "$date": "2023-05-13T01:30:51.695Z"
   },
-  "species": "Alauda Arvensis",
-  "animalId": 2,
+  "species": "Caligavis Chrysops",
+  "animalId": "8F14G8JXS7YHMEMQLW1WZQ",
   "animalTrueLLA": [
-    -38.82041024026933,
-    143.55737114014485,
-    24
+    -38.778445832484046,
+    143.55833365833465,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T17:10:00.000Z"
+    "$date": "2023-05-13T01:30:51.695Z"
   },
-  "species": "Alauda Arvensis",
-  "animalId": 2,
+  "species": "Dama Dama",
+  "animalId": "YXNKSPR3QU26BNSTRNRENG",
   "animalTrueLLA": [
-    -38.82104829188737,
-    143.5578565725571,
-    24
+    -38.77444540478211,
+    143.5672980663422,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T17:50:00.000Z"
+    "$date": "2023-05-13T01:30:51.695Z"
   },
-  "species": "Alauda Arvensis",
-  "animalId": 2,
+  "species": "Corvus Coronoides",
+  "animalId": "GJ2H5IKERI2LWNS-M3OCCA",
   "animalTrueLLA": [
-    -38.82041729818379,
-    143.55809817688856,
-    24
+    -38.78823255707049,
+    143.590676103261,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T15:45:00.000Z"
+    "$date": "2023-05-13T01:30:51.895Z"
   },
-  "species": "Sus Scrofa",
-  "animalId": 1,
+  "species": "Colluricincla Harmonica",
+  "animalId": "EKKQSY1WSHGOPJ_9SMW4QA",
   "animalTrueLLA": [
-    -38.82055505195631,
-    143.5574378188855,
-    24
+    -38.782567869305815,
+    143.5719782820905,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T17:50:00.000Z"
+    "$date": "2023-05-13T01:30:51.895Z"
   },
-  "species": "Sus Scrofa",
-  "animalId": 1,
+  "species": "Felis Catus",
+  "animalId": "XWFX5JOKTEUBKYHBNUQZOA",
   "animalTrueLLA": [
-    -38.82040751826376,
-    143.55725795200752,
-    24
+    -38.792996055956024,
+    143.60551950020127,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T16:30:00.000Z"
+    "$date": "2023-05-13T01:30:51.895Z"
   },
-  "species": "Alauda Arvensis",
-  "animalId": 2,
+  "species": "Caligavis Chrysops",
+  "animalId": "8F14G8JXS7YHMEMQLW1WZQ",
   "animalTrueLLA": [
-    -38.820703364877055,
-    143.55818515986087,
-    24
+    -38.77897599618801,
+    143.55795625561055,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T16:50:00.000Z"
+    "$date": "2023-05-13T01:30:51.895Z"
   },
-  "species": "Alauda Arvensis",
-  "animalId": 2,
+  "species": "Dama Dama",
+  "animalId": "YXNKSPR3QU26BNSTRNRENG",
   "animalTrueLLA": [
-    -38.82086329650652,
-    143.5581076063252,
-    24
+    -38.77373638269065,
+    143.5678028544468,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T13:50:00.000Z"
+    "$date": "2023-05-13T01:30:51.895Z"
   },
-  "species": "Sus Scrofa",
-  "animalId": 1,
+  "species": "Corvus Coronoides",
+  "animalId": "GJ2H5IKERI2LWNS-M3OCCA",
   "animalTrueLLA": [
-    -38.82134927608746,
-    143.557658300512,
-    24
+    -38.787468023680155,
+    143.59099015276803,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T14:35:00.000Z"
+    "$date": "2023-05-13T01:30:52.095Z"
   },
-  "species": "Sus Scrofa",
-  "animalId": 1,
+  "species": "Colluricincla Harmonica",
+  "animalId": "EKKQSY1WSHGOPJ_9SMW4QA",
   "animalTrueLLA": [
-    -38.82066570354894,
-    143.55772628076824,
-    24
+    -38.783149687962904,
+    143.57209937424403,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T15:35:00.000Z"
+    "$date": "2023-05-13T01:30:52.095Z"
   },
-  "species": "Sus Scrofa",
-  "animalId": 1,
+  "species": "Felis Catus",
+  "animalId": "XWFX5JOKTEUBKYHBNUQZOA",
   "animalTrueLLA": [
-    -38.82043596599108,
-    143.55745160651497,
-    24
+    -38.79231431837845,
+    143.605406284202,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T14:10:00.000Z"
+    "$date": "2023-05-13T01:30:52.095Z"
   },
-  "species": "Sus Scrofa",
-  "animalId": 1,
+  "species": "Caligavis Chrysops",
+  "animalId": "8F14G8JXS7YHMEMQLW1WZQ",
   "animalTrueLLA": [
-    -38.82084423495084,
-    143.5576789636477,
-    24
+    -38.77877757746688,
+    143.55845287410907,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T14:25:00.000Z"
+    "$date": "2023-05-13T01:30:52.095Z"
   },
-  "species": "Sus Scrofa",
-  "animalId": 1,
+  "species": "Dama Dama",
+  "animalId": "YXNKSPR3QU26BNSTRNRENG",
   "animalTrueLLA": [
-    -38.82062695237945,
-    143.55765451183376,
-    24
+    -38.77403603845575,
+    143.56685236046866,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T14:30:00.000Z"
+    "$date": "2023-05-13T01:30:52.095Z"
   },
-  "species": "Alauda Arvensis",
-  "animalId": 2,
+  "species": "Corvus Coronoides",
+  "animalId": "GJ2H5IKERI2LWNS-M3OCCA",
   "animalTrueLLA": [
-    -38.82035671608545,
-    143.55746824735192,
-    24
+    -38.787049884466704,
+    143.59092891788865,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T16:20:00.000Z"
+    "$date": "2023-05-13T01:30:52.295Z"
   },
-  "species": "Alauda Arvensis",
-  "animalId": 2,
+  "species": "Colluricincla Harmonica",
+  "animalId": "EKKQSY1WSHGOPJ_9SMW4QA",
   "animalTrueLLA": [
-    -38.820524386264104,
-    143.55809226065614,
-    24
+    -38.78330352835666,
+    143.57189795732063,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T16:35:00.000Z"
+    "$date": "2023-05-13T01:30:52.295Z"
   },
-  "species": "Sus Scrofa",
-  "animalId": 1,
+  "species": "Felis Catus",
+  "animalId": "XWFX5JOKTEUBKYHBNUQZOA",
   "animalTrueLLA": [
-    -38.82020402140596,
-    143.5573968960158,
-    24
+    -38.79201873267763,
+    143.60492857140298,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T16:40:00.000Z"
+    "$date": "2023-05-13T01:30:52.295Z"
   },
-  "species": "Sus Scrofa",
-  "animalId": 1,
+  "species": "Caligavis Chrysops",
+  "animalId": "8F14G8JXS7YHMEMQLW1WZQ",
   "animalTrueLLA": [
-    -38.8200835545978,
-    143.55726739550045,
-    24
+    -38.779041624973054,
+    143.558185514233,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T17:20:00.000Z"
+    "$date": "2023-05-13T01:30:52.295Z"
   },
-  "species": "Sus Scrofa",
-  "animalId": 1,
+  "species": "Dama Dama",
+  "animalId": "YXNKSPR3QU26BNSTRNRENG",
   "animalTrueLLA": [
-    -38.820559439764054,
-    143.5571922161455,
-    24
+    -38.77349029860222,
+    143.56713153882822,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T14:20:00.000Z"
+    "$date": "2023-05-13T01:30:52.295Z"
   },
-  "species": "Alauda Arvensis",
-  "animalId": 2,
+  "species": "Corvus Coronoides",
+  "animalId": "GJ2H5IKERI2LWNS-M3OCCA",
   "animalTrueLLA": [
-    -38.82036840008232,
-    143.55752789640255,
-    24
+    -38.786776238271244,
+    143.590615597231,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T15:25:00.000Z"
+    "$date": "2023-05-13T01:30:52.495Z"
   },
-  "species": "Alauda Arvensis",
-  "animalId": 2,
+  "species": "Colluricincla Harmonica",
+  "animalId": "EKKQSY1WSHGOPJ_9SMW4QA",
   "animalTrueLLA": [
-    -38.82042053074616,
-    143.55802492021007,
-    24
+    -38.782594452949176,
+    143.5718859004321,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T15:50:00.000Z"
+    "$date": "2023-05-13T01:30:52.495Z"
   },
-  "species": "Alauda Arvensis",
-  "animalId": 2,
+  "species": "Felis Catus",
+  "animalId": "XWFX5JOKTEUBKYHBNUQZOA",
   "animalTrueLLA": [
-    -38.82052110420438,
-    143.55803063878298,
-    24
+    -38.79129449544313,
+    143.60488912732183,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T15:55:00.000Z"
+    "$date": "2023-05-13T01:30:52.495Z"
   },
-  "species": "Sus Scrofa",
-  "animalId": 1,
+  "species": "Caligavis Chrysops",
+  "animalId": "8F14G8JXS7YHMEMQLW1WZQ",
   "animalTrueLLA": [
-    -38.820471066961886,
-    143.55764870840514,
-    24
+    -38.77975078705112,
+    143.55894248780578,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T16:00:00.000Z"
+    "$date": "2023-05-13T01:30:52.495Z"
   },
-  "species": "Sus Scrofa",
-  "animalId": 1,
+  "species": "Dama Dama",
+  "animalId": "YXNKSPR3QU26BNSTRNRENG",
   "animalTrueLLA": [
-    -38.82035339599573,
-    143.55762949745812,
-    24
+    -38.77325246154023,
+    143.56722619096354,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T17:25:00.000Z"
+    "$date": "2023-05-13T01:30:52.495Z"
   },
-  "species": "Sus Scrofa",
-  "animalId": 1,
+  "species": "Corvus Coronoides",
+  "animalId": "GJ2H5IKERI2LWNS-M3OCCA",
   "animalTrueLLA": [
-    -38.82048123907541,
-    143.55717996415353,
-    24
+    -38.78687844678607,
+    143.59134359059237,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T14:25:00.000Z"
+    "$date": "2023-05-13T01:30:52.695Z"
   },
-  "species": "Alauda Arvensis",
-  "animalId": 2,
+  "species": "Colluricincla Harmonica",
+  "animalId": "EKKQSY1WSHGOPJ_9SMW4QA",
   "animalTrueLLA": [
-    -38.820339812698045,
-    143.5573825244075,
-    24
+    -38.782992121897976,
+    143.57172979786012,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T15:00:00.000Z"
+    "$date": "2023-05-13T01:30:52.695Z"
   },
-  "species": "Alauda Arvensis",
-  "animalId": 2,
+  "species": "Felis Catus",
+  "animalId": "XWFX5JOKTEUBKYHBNUQZOA",
   "animalTrueLLA": [
-    -38.82005934786167,
-    143.5576217585393,
-    24
+    -38.79156637779138,
+    143.60531446271764,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T17:00:00.000Z"
+    "$date": "2023-05-13T01:30:52.695Z"
   },
-  "species": "Alauda Arvensis",
-  "animalId": 2,
+  "species": "Caligavis Chrysops",
+  "animalId": "8F14G8JXS7YHMEMQLW1WZQ",
   "animalTrueLLA": [
-    -38.8210990806569,
-    143.55786784422736,
-    24
+    -38.780459223578326,
+    143.55873622698118,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T15:20:00.000Z"
+    "$date": "2023-05-13T01:30:52.695Z"
   },
-  "species": "Sus Scrofa",
-  "animalId": 1,
+  "species": "Dama Dama",
+  "animalId": "YXNKSPR3QU26BNSTRNRENG",
   "animalTrueLLA": [
-    -38.8204462596961,
-    143.5572512883692,
-    24
+    -38.77374877552816,
+    143.56785942159843,
+    10
   ]
 },{
   "timestamp": {
-    "$date": "2023-03-22T14:10:00.000Z"
+    "$date": "2023-05-13T01:30:52.695Z"
   },
-  "species": "Alauda Arvensis",
-  "animalId": 2,
+  "species": "Corvus Coronoides",
+  "animalId": "GJ2H5IKERI2LWNS-M3OCCA",
   "animalTrueLLA": [
-    -38.8204358869565,
-    143.55736722466204,
-    24
+    -38.78607000413938,
+    143.59129209015404,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:52.895Z"
+  },
+  "species": "Colluricincla Harmonica",
+  "animalId": "EKKQSY1WSHGOPJ_9SMW4QA",
+  "animalTrueLLA": [
+    -38.78262536169689,
+    143.5715936319423,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:52.895Z"
+  },
+  "species": "Felis Catus",
+  "animalId": "XWFX5JOKTEUBKYHBNUQZOA",
+  "animalTrueLLA": [
+    -38.79113585160724,
+    143.6051549070879,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:52.895Z"
+  },
+  "species": "Caligavis Chrysops",
+  "animalId": "8F14G8JXS7YHMEMQLW1WZQ",
+  "animalTrueLLA": [
+    -38.78060584352983,
+    143.55909055613805,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:52.895Z"
+  },
+  "species": "Dama Dama",
+  "animalId": "YXNKSPR3QU26BNSTRNRENG",
+  "animalTrueLLA": [
+    -38.77381053896765,
+    143.56719789156435,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:52.895Z"
+  },
+  "species": "Corvus Coronoides",
+  "animalId": "GJ2H5IKERI2LWNS-M3OCCA",
+  "animalTrueLLA": [
+    -38.78597743604451,
+    143.59138632504875,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:53.095Z"
+  },
+  "species": "Colluricincla Harmonica",
+  "animalId": "EKKQSY1WSHGOPJ_9SMW4QA",
+  "animalTrueLLA": [
+    -38.78190417472781,
+    143.5715252022186,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:53.095Z"
+  },
+  "species": "Felis Catus",
+  "animalId": "XWFX5JOKTEUBKYHBNUQZOA",
+  "animalTrueLLA": [
+    -38.79136099297882,
+    143.60556317926296,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:53.095Z"
+  },
+  "species": "Caligavis Chrysops",
+  "animalId": "8F14G8JXS7YHMEMQLW1WZQ",
+  "animalTrueLLA": [
+    -38.780976471229565,
+    143.5590468104357,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:53.095Z"
+  },
+  "species": "Dama Dama",
+  "animalId": "YXNKSPR3QU26BNSTRNRENG",
+  "animalTrueLLA": [
+    -38.77387981985466,
+    143.56695348745967,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:53.095Z"
+  },
+  "species": "Corvus Coronoides",
+  "animalId": "GJ2H5IKERI2LWNS-M3OCCA",
+  "animalTrueLLA": [
+    -38.78569770314334,
+    143.59140314483193,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:53.295Z"
+  },
+  "species": "Colluricincla Harmonica",
+  "animalId": "EKKQSY1WSHGOPJ_9SMW4QA",
+  "animalTrueLLA": [
+    -38.78149603092402,
+    143.57180861716645,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:53.295Z"
+  },
+  "species": "Felis Catus",
+  "animalId": "XWFX5JOKTEUBKYHBNUQZOA",
+  "animalTrueLLA": [
+    -38.791857470942624,
+    143.60544206345375,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:53.295Z"
+  },
+  "species": "Caligavis Chrysops",
+  "animalId": "8F14G8JXS7YHMEMQLW1WZQ",
+  "animalTrueLLA": [
+    -38.780973369969885,
+    143.5593539375239,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:53.295Z"
+  },
+  "species": "Dama Dama",
+  "animalId": "YXNKSPR3QU26BNSTRNRENG",
+  "animalTrueLLA": [
+    -38.77414855545612,
+    143.56720161282453,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:53.295Z"
+  },
+  "species": "Corvus Coronoides",
+  "animalId": "GJ2H5IKERI2LWNS-M3OCCA",
+  "animalTrueLLA": [
+    -38.78540165988794,
+    143.59176675138346,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:53.495Z"
+  },
+  "species": "Colluricincla Harmonica",
+  "animalId": "EKKQSY1WSHGOPJ_9SMW4QA",
+  "animalTrueLLA": [
+    -38.781384216004135,
+    143.57226954097337,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:53.495Z"
+  },
+  "species": "Felis Catus",
+  "animalId": "XWFX5JOKTEUBKYHBNUQZOA",
+  "animalTrueLLA": [
+    -38.79199551948826,
+    143.60468371634394,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:53.495Z"
+  },
+  "species": "Caligavis Chrysops",
+  "animalId": "8F14G8JXS7YHMEMQLW1WZQ",
+  "animalTrueLLA": [
+    -38.780912302603824,
+    143.55967839690945,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:53.495Z"
+  },
+  "species": "Dama Dama",
+  "animalId": "YXNKSPR3QU26BNSTRNRENG",
+  "animalTrueLLA": [
+    -38.774009290251776,
+    143.56734293304646,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:53.495Z"
+  },
+  "species": "Corvus Coronoides",
+  "animalId": "GJ2H5IKERI2LWNS-M3OCCA",
+  "animalTrueLLA": [
+    -38.78544349790886,
+    143.5922133886371,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:53.695Z"
+  },
+  "species": "Colluricincla Harmonica",
+  "animalId": "EKKQSY1WSHGOPJ_9SMW4QA",
+  "animalTrueLLA": [
+    -38.78166458228642,
+    143.57284781389978,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:53.695Z"
+  },
+  "species": "Felis Catus",
+  "animalId": "XWFX5JOKTEUBKYHBNUQZOA",
+  "animalTrueLLA": [
+    -38.79225708094464,
+    143.60498242022226,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:53.695Z"
+  },
+  "species": "Caligavis Chrysops",
+  "animalId": "8F14G8JXS7YHMEMQLW1WZQ",
+  "animalTrueLLA": [
+    -38.780784700591454,
+    143.55904706367284,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:53.695Z"
+  },
+  "species": "Dama Dama",
+  "animalId": "YXNKSPR3QU26BNSTRNRENG",
+  "animalTrueLLA": [
+    -38.7740434949159,
+    143.56778518674474,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:53.695Z"
+  },
+  "species": "Corvus Coronoides",
+  "animalId": "GJ2H5IKERI2LWNS-M3OCCA",
+  "animalTrueLLA": [
+    -38.785706272503646,
+    143.59245126249417,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:53.895Z"
+  },
+  "species": "Colluricincla Harmonica",
+  "animalId": "EKKQSY1WSHGOPJ_9SMW4QA",
+  "animalTrueLLA": [
+    -38.78227071791906,
+    143.57262514538255,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:53.895Z"
+  },
+  "species": "Felis Catus",
+  "animalId": "XWFX5JOKTEUBKYHBNUQZOA",
+  "animalTrueLLA": [
+    -38.79197461497074,
+    143.6052086209635,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:53.895Z"
+  },
+  "species": "Caligavis Chrysops",
+  "animalId": "8F14G8JXS7YHMEMQLW1WZQ",
+  "animalTrueLLA": [
+    -38.78100784171968,
+    143.55873279118703,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:53.895Z"
+  },
+  "species": "Dama Dama",
+  "animalId": "YXNKSPR3QU26BNSTRNRENG",
+  "animalTrueLLA": [
+    -38.77409253019142,
+    143.56869097418655,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:53.895Z"
+  },
+  "species": "Corvus Coronoides",
+  "animalId": "GJ2H5IKERI2LWNS-M3OCCA",
+  "animalTrueLLA": [
+    -38.78521731949395,
+    143.59250837101135,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:54.095Z"
+  },
+  "species": "Colluricincla Harmonica",
+  "animalId": "EKKQSY1WSHGOPJ_9SMW4QA",
+  "animalTrueLLA": [
+    -38.782778039238835,
+    143.57332579628311,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:54.095Z"
+  },
+  "species": "Felis Catus",
+  "animalId": "XWFX5JOKTEUBKYHBNUQZOA",
+  "animalTrueLLA": [
+    -38.792137409789625,
+    143.60486528405266,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:54.095Z"
+  },
+  "species": "Caligavis Chrysops",
+  "animalId": "8F14G8JXS7YHMEMQLW1WZQ",
+  "animalTrueLLA": [
+    -38.78080278926622,
+    143.5584685358094,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:54.095Z"
+  },
+  "species": "Dama Dama",
+  "animalId": "YXNKSPR3QU26BNSTRNRENG",
+  "animalTrueLLA": [
+    -38.77357176044412,
+    143.5683160895076,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:54.095Z"
+  },
+  "species": "Corvus Coronoides",
+  "animalId": "GJ2H5IKERI2LWNS-M3OCCA",
+  "animalTrueLLA": [
+    -38.785513774158936,
+    143.59247960279845,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:54.295Z"
+  },
+  "species": "Colluricincla Harmonica",
+  "animalId": "EKKQSY1WSHGOPJ_9SMW4QA",
+  "animalTrueLLA": [
+    -38.782648469926976,
+    143.57359578264598,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:54.295Z"
+  },
+  "species": "Felis Catus",
+  "animalId": "XWFX5JOKTEUBKYHBNUQZOA",
+  "animalTrueLLA": [
+    -38.7931582532869,
+    143.60416395927592,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:54.295Z"
+  },
+  "species": "Caligavis Chrysops",
+  "animalId": "8F14G8JXS7YHMEMQLW1WZQ",
+  "animalTrueLLA": [
+    -38.780149525788275,
+    143.55849039458727,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:54.295Z"
+  },
+  "species": "Dama Dama",
+  "animalId": "YXNKSPR3QU26BNSTRNRENG",
+  "animalTrueLLA": [
+    -38.7740874474854,
+    143.56885973651683,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:54.295Z"
+  },
+  "species": "Corvus Coronoides",
+  "animalId": "GJ2H5IKERI2LWNS-M3OCCA",
+  "animalTrueLLA": [
+    -38.78471171844368,
+    143.59231280066746,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:54.495Z"
+  },
+  "species": "Colluricincla Harmonica",
+  "animalId": "EKKQSY1WSHGOPJ_9SMW4QA",
+  "animalTrueLLA": [
+    -38.7829397868641,
+    143.57377142746233,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:54.495Z"
+  },
+  "species": "Felis Catus",
+  "animalId": "XWFX5JOKTEUBKYHBNUQZOA",
+  "animalTrueLLA": [
+    -38.79309920874445,
+    143.6044252927323,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:54.495Z"
+  },
+  "species": "Caligavis Chrysops",
+  "animalId": "8F14G8JXS7YHMEMQLW1WZQ",
+  "animalTrueLLA": [
+    -38.78007642529935,
+    143.55808535932653,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:54.495Z"
+  },
+  "species": "Dama Dama",
+  "animalId": "YXNKSPR3QU26BNSTRNRENG",
+  "animalTrueLLA": [
+    -38.773788237960844,
+    143.56958749370904,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:54.495Z"
+  },
+  "species": "Corvus Coronoides",
+  "animalId": "GJ2H5IKERI2LWNS-M3OCCA",
+  "animalTrueLLA": [
+    -38.784768223639354,
+    143.59176200827298,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:54.695Z"
+  },
+  "species": "Colluricincla Harmonica",
+  "animalId": "EKKQSY1WSHGOPJ_9SMW4QA",
+  "animalTrueLLA": [
+    -38.7823528035231,
+    143.5738110563817,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:54.695Z"
+  },
+  "species": "Felis Catus",
+  "animalId": "XWFX5JOKTEUBKYHBNUQZOA",
+  "animalTrueLLA": [
+    -38.79282421172686,
+    143.60444394028008,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:54.695Z"
+  },
+  "species": "Caligavis Chrysops",
+  "animalId": "8F14G8JXS7YHMEMQLW1WZQ",
+  "animalTrueLLA": [
+    -38.77976380189484,
+    143.5575193493615,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:54.695Z"
+  },
+  "species": "Dama Dama",
+  "animalId": "YXNKSPR3QU26BNSTRNRENG",
+  "animalTrueLLA": [
+    -38.77372733922931,
+    143.569636246362,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:54.695Z"
+  },
+  "species": "Corvus Coronoides",
+  "animalId": "GJ2H5IKERI2LWNS-M3OCCA",
+  "animalTrueLLA": [
+    -38.78453627590761,
+    143.59086964291768,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:54.895Z"
+  },
+  "species": "Colluricincla Harmonica",
+  "animalId": "EKKQSY1WSHGOPJ_9SMW4QA",
+  "animalTrueLLA": [
+    -38.78228005497489,
+    143.57380723808532,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:54.895Z"
+  },
+  "species": "Felis Catus",
+  "animalId": "XWFX5JOKTEUBKYHBNUQZOA",
+  "animalTrueLLA": [
+    -38.793011428819966,
+    143.60437025869416,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:54.895Z"
+  },
+  "species": "Caligavis Chrysops",
+  "animalId": "8F14G8JXS7YHMEMQLW1WZQ",
+  "animalTrueLLA": [
+    -38.77990489979221,
+    143.5572859179821,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:54.895Z"
+  },
+  "species": "Dama Dama",
+  "animalId": "YXNKSPR3QU26BNSTRNRENG",
+  "animalTrueLLA": [
+    -38.773855517858486,
+    143.56933030853563,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:54.895Z"
+  },
+  "species": "Corvus Coronoides",
+  "animalId": "GJ2H5IKERI2LWNS-M3OCCA",
+  "animalTrueLLA": [
+    -38.78471836695314,
+    143.59099583510195,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:55.095Z"
+  },
+  "species": "Colluricincla Harmonica",
+  "animalId": "EKKQSY1WSHGOPJ_9SMW4QA",
+  "animalTrueLLA": [
+    -38.78243373213988,
+    143.57421855803656,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:55.095Z"
+  },
+  "species": "Felis Catus",
+  "animalId": "XWFX5JOKTEUBKYHBNUQZOA",
+  "animalTrueLLA": [
+    -38.79304941715615,
+    143.60363311250697,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:55.095Z"
+  },
+  "species": "Caligavis Chrysops",
+  "animalId": "8F14G8JXS7YHMEMQLW1WZQ",
+  "animalTrueLLA": [
+    -38.7799471041978,
+    143.5577118271581,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:55.095Z"
+  },
+  "species": "Dama Dama",
+  "animalId": "YXNKSPR3QU26BNSTRNRENG",
+  "animalTrueLLA": [
+    -38.773920793403796,
+    143.5697589671839,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:55.095Z"
+  },
+  "species": "Corvus Coronoides",
+  "animalId": "GJ2H5IKERI2LWNS-M3OCCA",
+  "animalTrueLLA": [
+    -38.783758050674045,
+    143.59093701316533,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:55.295Z"
+  },
+  "species": "Colluricincla Harmonica",
+  "animalId": "EKKQSY1WSHGOPJ_9SMW4QA",
+  "animalTrueLLA": [
+    -38.782824634890076,
+    143.5744334381429,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:55.295Z"
+  },
+  "species": "Felis Catus",
+  "animalId": "XWFX5JOKTEUBKYHBNUQZOA",
+  "animalTrueLLA": [
+    -38.79317225675577,
+    143.60308842978904,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:55.295Z"
+  },
+  "species": "Caligavis Chrysops",
+  "animalId": "8F14G8JXS7YHMEMQLW1WZQ",
+  "animalTrueLLA": [
+    -38.77997090555149,
+    143.55771516414774,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:55.295Z"
+  },
+  "species": "Dama Dama",
+  "animalId": "YXNKSPR3QU26BNSTRNRENG",
+  "animalTrueLLA": [
+    -38.7735959390738,
+    143.56964726797264,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:55.295Z"
+  },
+  "species": "Corvus Coronoides",
+  "animalId": "GJ2H5IKERI2LWNS-M3OCCA",
+  "animalTrueLLA": [
+    -38.784103410305775,
+    143.59056491727264,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:55.495Z"
+  },
+  "species": "Colluricincla Harmonica",
+  "animalId": "EKKQSY1WSHGOPJ_9SMW4QA",
+  "animalTrueLLA": [
+    -38.782722580884375,
+    143.57450963642827,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:55.495Z"
+  },
+  "species": "Felis Catus",
+  "animalId": "XWFX5JOKTEUBKYHBNUQZOA",
+  "animalTrueLLA": [
+    -38.79382866195037,
+    143.60273978650747,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:55.495Z"
+  },
+  "species": "Caligavis Chrysops",
+  "animalId": "8F14G8JXS7YHMEMQLW1WZQ",
+  "animalTrueLLA": [
+    -38.77944723121909,
+    143.5577201584636,
+    10
+  ]
+},{
+  "timestamp": {
+    "$date": "2023-05-13T01:30:55.495Z"
+  },
+  "species": "Dama Dama",
+  "animalId": "YXNKSPR3QU26BNSTRNRENG",
+  "animalTrueLLA": [
+    -38.77366927475468,
+    143.5690974619189,
+    10
   ]
 }]
