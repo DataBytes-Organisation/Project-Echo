@@ -9,7 +9,6 @@ def eventEntity(event) -> dict:
         "animalTrueLLA": event["animalTrueLLA"],
         "animalLLAUncertainty": event["animalLLAUncertainty"],
         "confidence": event["confidence"],
-        #"file_name": event["file_name"]
     }
 
 def eventSpeciesEntity(event) -> dict:
@@ -63,7 +62,8 @@ def speciesEntity(species) -> dict:
 def audioEntity(audio) -> dict:
     return {
         "_id": str(audio["_id"]),
-        "audioClip": audio["audioClip"]
+        "audioClip": audio["audioClip"],
+        "sampleRate": audio["sampleRate"]
     }
     
 def microphoneEntity(microphone) -> dict:

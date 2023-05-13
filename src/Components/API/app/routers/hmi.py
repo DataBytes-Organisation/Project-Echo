@@ -36,7 +36,7 @@ def show_event_from_time(start: str, end: str):
             "$replaceRoot": { "newRoot": { "$mergeObjects": [ { "$arrayElemAt": [ "$info", 0 ] }, "$$ROOT" ] } }
         },
         {
-            '$project': { "audioClip": 0, "sampleRate": 0, "fileFormat": 0}
+            '$project': { "audioClip": 0, "sampleRate": 0}
         },
         {
             "$addFields": {
@@ -54,7 +54,7 @@ def show_audio(id: str):
             '$match':{'_id': ObjectId(id)}
         },
         {
-            '$project': { "audioClip": 1}
+            '$project': { "audioClip": 1, "sampleRate": 1}
         }
     ]
     results = list(Events.aggregate(aggregate))

@@ -16,8 +16,8 @@ db.createCollection("microphones");
 db.createCollection("movements");
 db.createCollection("species");
 
-const eventsData = JSON.parse(cat('/docker-entrypoint-initdb.d/events.json'));
-db.events.insertMany(eventsData);
+//const eventsData = JSON.parse(cat('/docker-entrypoint-initdb.d/events.json'));
+//db.events.insertMany(eventsData);
 
 const microphonesData = JSON.parse(cat('/docker-entrypoint-initdb.d/microphones.json'));
 db.microphones.insertMany(microphonesData);

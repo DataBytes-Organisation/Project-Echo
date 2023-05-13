@@ -28,7 +28,7 @@ class EventSchema(BaseModel):
     animalLLAUncertainty: int 
     audioClip: str 
     confidence: float
-    #file_name: str
+    sampleRate: int
 
     class Config:
         allow_population_by_field_name = True
@@ -45,7 +45,7 @@ class EventSchema(BaseModel):
                 "animalLLAUncertainty": 10,
                 "audioClip": "some audio_base64 data",
                 "confidence": 99.4,
-                #"file_name": "0001.wav"
+                "sampleRate": 48000
             }
         }
 class MovementSchema(BaseModel):
