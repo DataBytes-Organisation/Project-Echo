@@ -16,8 +16,8 @@ class Animal(entities.entity.Entity):
     
     def __init__(self, species, 
                  lla=None, 
-                 vocal_interval_mean=0.1,
-                 vocal_interval_std=1.0) -> None:
+                 vocal_interval_mean=3.0,
+                 vocal_interval_std=0.5) -> None:
         
         # call parent constructor
         super(Animal, self).__init__(lla)
@@ -67,8 +67,8 @@ class Animal(entities.entity.Entity):
         lla = self.getLLA()
         
         # these parameters needs to be tuned
-        delta_lat = 0.00001
-        delta_lon = 0.00001
+        delta_lat = 0.001
+        delta_lon = 0.001
         
         # Generate random increments in x and y directions
         dx = delta_lat*np.sqrt(self.clock.step_interval) * np.random.randn(1)
