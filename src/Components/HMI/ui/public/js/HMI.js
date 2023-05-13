@@ -969,7 +969,7 @@ function createMapClickEvent(hmiState){
         document.getElementById("audioControl").style.display = "flex"
       }
       if (values.animalSpecies){
-          //console.log(values.animalSpecies)
+          console.log(values.animalSpecies)
           var result = sample_data.find(({ species }) => species.toLowerCase() === values.animalSpecies.toLowerCase())
           if (result) {
             const img = new Image();
@@ -1003,6 +1003,21 @@ function createMapClickEvent(hmiState){
                 summary.appendChild(p);
               }
             })
+          }
+          else{
+            let dice = Math.floor(Math.random() * 5) + 1;
+            document.getElementById("desc_img").src = "../../images/bio/not_available_" + dice + "-bio.png";
+
+            document.getElementById("desc_name").innerText = values.animalSpecies;
+            //document.getElementById("markup_img_2").src = values.animalIcon;
+            document.getElementById("desc_confidence").innerText = values.animalLocConfidence + "%";
+            document.getElementById("desc_species").innerText = values.animalSpecies;
+            document.getElementById("desc_summary").innerText = "Bio data coming soon.";
+            let summary = document.getElementById("desc_details");
+            summary.innerHTML = '';
+          }
+
+
             //Markup details specific session
             let dateFormat = new Date(values.animalRecordDate);
             document.getElementById("markup_img").src = values.animalIcon;
@@ -1015,13 +1030,16 @@ function createMapClickEvent(hmiState){
             animal_toggled = true;
             const toggled_animal = new CustomEvent('animalToggled',{
               detail: {
-                message: "Animal toggled: " + result.common,
+                message: "Animal toggled:",
               }
             })
 
             document.dispatchEvent(toggled_animal);
-          }
+          
 
+      }
+      else{
+        console.log(values);
       }
     } else {
       active_content.hide();
