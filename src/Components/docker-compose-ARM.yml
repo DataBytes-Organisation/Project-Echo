@@ -1,0 +1,116 @@
+version: "3.8"
+
+name: echo-net
+services:
+  model_server:
+    build:
+      context: Engine/
+      dockerfile: ModelARM.Dockerfile
+    image: ts-echo-model
+    container_name: ts-echo-model-cont
+    networks:
+      - echo-net
+    ports:
+      - "8501:8501"
+    volumes:
+      - credentials_volume:/root/.config/gcloud/
+    stdin_open: false
+    tty: true
+
+  echo_engine:
+    build:
+      context: Engine/
+      dockerfile: EngineARM.Dockerfile
+    image: ts-echo-engine
+    container_name: ts-echo-engine-cont
+    networks:
+      - echo-net
+    volumes:
+      - credentials_volume:/root/.config/gcloud/
+    stdin_open: true
+    tty: true
+
+  echo_hmi:
+    build:
+      context: HMI/
+      dockerfile: HMI.Dockerfile
+    image: ts-echo-hmi
+    container_name: ts-echo-hmi-cont
+    networks:
+      - echo-net
+    volumes:
+      - credentials_volume:/root/.config/gcloud/
+    stdin_open: true
+    tty: true
+    ports:
+      - "8080:8080" 
+
+  echo_mqtt:
+    build:
+      context: MQTT-Server/
+      dockerfile: MQTT.Dockerfile
+    image: ts-mqtt-server
+    container_name: ts-mqtt-server-cont
+    networks:
+      - echo-net
+    stdin_open: false
+    tty: true
+    ports:
+      - "1883:1883"
+      - "7001:7001"
+      - "7070:7070"
+
+  echo_simulator:
+    build:
+      context: Simulator/
+      dockerfile: Simulator.Dockerfile
+    image: ts-simulator
+    container_name: ts-simulator-cont
+    networks:
+      - echo-net
+    volumes:
+      - credentials_volume:/root/.config/gcloud/
+    stdin_open: false
+    tty: true
+
+  echo_api:
+    build:
+      context: API/
+      dockerfile: API.Dockerfile
+    image: ts-api
+    container_name: ts-api-cont
+    networks:
+      - echo-net
+    ports:
+      - "9000:9000"
+      - "9080:9080"      
+    volumes:
+      - credentials_volume:/root/.config/gcloud/
+    stdin_open: false
+    tty: true
+
+  echo_store:
+    build:
+      context: MongoDB/
+      dockerfile: MongoDB.Dockerfile
+    restart: always
+    image: ts-mongodb
+    container_name: ts-mongodb-cont
+    networks:
+      - echo-net
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root_password
+      MONGO_INITDB_DATABASE: EchoNet
+    ports:
+      - "27017:27017"
+    volumes:
+      - db-data:/data/db
+
+networks:
+  echo-net:
+    driver: bridge
+
+volumes:
+  credentials_volume:
+  db-data:
