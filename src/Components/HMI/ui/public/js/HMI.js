@@ -367,23 +367,14 @@ export function stopAudioPlayback(){
   activeAudioNode = null;
 }
 
-function playAudioString(audioDataString) {
+function playAudioString(audioDataString, sampleRate) {
   // Convert the binary audio data string into a typed array
   const audioData = new Uint8Array(
     atob(audioDataString)
       .split("")
       .map((char) => char.charCodeAt(0))
   );
-
-  // Derive the sample rate from the binary audio data
-  //const sampleRateOffset = 24;
-  /*const sampleRate = (audioData[sampleRateOffset + 3] << 24) |
-                     (audioData[sampleRateOffset + 2] << 16) |
-                     (audioData[sampleRateOffset + 1] << 8) |
-                     (audioData[sampleRateOffset]);*/
-  
-
-  const sampleRate = 48000;               
+         
   // Create an audio context
   const audioContext = new AudioContext();
   
@@ -422,76 +413,6 @@ function playAudioString(audioDataString) {
     );
   }
 }
-
-/*function playAudioString(audioDataString) {
-  // Convert the binary audio data string into a typed array
-  const audioData = new Uint8Array(
-    atob(audioDataString)
-      .split("")
-      .map((char) => char.charCodeAt(0))
-  );
-
-  // Derive the sample rate from the binary audio data
-  const audioContext = new AudioContext();
-
-  let sampleRate;
-  const buffer = new ArrayBuffer(44);
-  const view = new DataView(buffer);
-  view.setUint8(0, 'R'.charCodeAt(0));
-  view.setUint8(1, 'I'.charCodeAt(0));
-  view.setUint8(2, 'F'.charCodeAt(0));
-  view.setUint8(3, 'F'.charCodeAt(0));
-  view.setUint32(4, audioData.byteLength + 36, true);
-  view.setUint8(8, 'W'.charCodeAt(0));
-  view.setUint8(9, 'A'.charCodeAt(0));
-  view.setUint8(10, 'V'.charCodeAt(0));
-  view.setUint8(11, 'E'.charCodeAt(0));
-  view.setUint8(12, 'f'.charCodeAt(0));
-  view.setUint8(13, 'm'.charCodeAt(0));
-  view.setUint8(14, 't'.charCodeAt(0));
-  view.setUint8(15, ' '.charCodeAt(0));
-  view.setUint32(16, 16, true);
-  view.setUint16(20, 1, true);
-  view.setUint16(22, 1, true);
-  view.setUint32(24, sampleRate, true);
-  view.setUint32(28, sampleRate * 1 * 2);
-  view.setUint16(32, 1 * 2);
-  view.setUint16(34, 16, true);
-  view.setUint8(36, 'd'.charCodeAt(0));
-  view.setUint8(37, 'a'.charCodeAt(0));
-  view.setUint8(38, 't'.charCodeAt(0));
-  view.setUint8(39, 'a'.charCodeAt(0));
-  view.setUint32(40, audioData.byteLength, true);
-  const audioBuffer = audioContext.createBuffer(
-    1,
-    audioData.byteLength / 2,
-    sampleRate
-  );
-
-  // Use the Web Audio API to decode the audio data
-  audioContext.decodeAudioData(audioData.buffer, function(buffer) {
-    // Create a new audio buffer source node and set its buffer
-    activeAudioNode = audioContext.createBufferSource();
-    activeAudioNode.buffer = buffer;
-
-    // Connect the source node to the destination node of the audio context
-    activeAudioNode.connect(audioContext.destination);
-
-    if (playNextTrack) {
-      // Start playing the audio
-      activeAudioNode.start();
-
-      let duration = buffer.duration;
-      console.log(duration);
-
-      audioAnimTimeout = setTimeout(
-        muteAudioAnimation,
-        duration * 1000,
-        hmiState
-      );
-    }
-  });
-}*/
 
 export function updateLayers(filterState)  {
 
@@ -1281,7 +1202,7 @@ document.addEventListener('playAudio', function(event){
   playNextTrack = true;
   if(selectedVocalizationEventId != null){
     retrieveAudio(selectedVocalizationEventId).then((res) => {
-      playAudioString(res.data.audioClip);
+      playAudioString(res.data.audioClip, res.data.sampleRate);
     })
   }
 })
