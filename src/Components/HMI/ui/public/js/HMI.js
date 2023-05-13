@@ -1142,7 +1142,14 @@ export function updateTimeOffset(hmiState){
   retrieveSimTime().then((res) => {
     //console.log(res.data);
     let unix = Date.parse(res.data.timestamp) / 1000;
-    hmiState.simUpdateDelay = (getUTC() - new Date((unix + (10*60*60)) * 1000)) + 10000; // Multiply by 1000 to convert to milliseconds
+    let newDelay = (getUTC() - new Date((unix + (10*60*60)) * 1000)) + 10000;
+    if(isNaN(newDelay)){
+      hmiState.simUpdateDelay = 10000;
+    }
+    else{
+      hmiState.simUpdateDelay = newDelay;
+    }
+    // Multiply by 1000 to convert to milliseconds
     /*const utcDate = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
       date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
     hmiState.simTime = utcDate;*/
@@ -1150,7 +1157,7 @@ export function updateTimeOffset(hmiState){
   });
   }catch(error){
     console.log(failed);
-    hmiState.simUpdateDelay = getUTC();
+    hmiState.simUpdateDelay = 10000;
   }
 }
 
@@ -1159,9 +1166,10 @@ let simUpdateTimeout = null;
 function queueSimUpdate(hmiState) {
   if(hmiState.liveMode){
     updateTimeOffset(hmiState);
+
     hmiState.currentTime = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
     hmiState.liveEventCutoff = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay - hmiState.liveWindow) / 1000);
-    //console.log(hmiState.liveEventCutoff);                            
+                
     purgeTruthEvents(hmiState);
     purgeVocalizationEvents(hmiState);
     updateTruthEvents(hmiState);
