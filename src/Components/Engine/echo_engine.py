@@ -233,8 +233,15 @@ class EchoEngine():
         image = image - tf.reduce_min(image) 
         image = image / (tf.reduce_max(image)+0.0000001)
         
-        return image, sample_rate
-    
+        return image, audio_clip, sample_rate
+
+
+    # this method takes in binary audio data and encodes to string
+    def audio_to_string(self, audio_binary) -> str:
+        base64_encoded_data = base64.b64encode(audio_binary)
+        base64_message = base64_encoded_data.decode('utf-8')
+        return base64_message    
+
 
     ########################################################################################
     ########################################################################################
@@ -253,7 +260,10 @@ class EchoEngine():
             # convert to string representation of audio to binary for processing
             audio_clip = self.string_to_audio(audio_event['audioClip'])
             
-            image, sample_rate = self.combined_pipeline(audio_clip)
+            image, audio_clip, sample_rate = self.combined_pipeline(audio_clip)
+            
+            # update the audio event with the re-sampled audio
+            audio_event["audioClip"] = self.audio_to_string(audio_clip)
             
             image = tf.expand_dims(image, 0) 
             
