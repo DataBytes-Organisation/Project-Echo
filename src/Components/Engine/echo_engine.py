@@ -179,7 +179,7 @@ class EchoEngine():
         file = io.BytesIO(audio_clip)
 
         # Load the audio data with librosa
-        audio_clip, _ = librosa.load(file, sr=self.config['AUDIO_SAMPLE_RATE'])
+        audio_clip, sample_rate = librosa.load(file, sr=self.config['AUDIO_SAMPLE_RATE'])
         
         # keep right channel only
         if audio_clip.ndim == 2 and audio_clip.shape[0] == 2:
@@ -233,7 +233,7 @@ class EchoEngine():
         image = image - tf.reduce_min(image) 
         image = image / (tf.reduce_max(image)+0.0000001)
         
-        return image
+        return image, sample_rate
     
 
     ########################################################################################
@@ -253,7 +253,7 @@ class EchoEngine():
             # convert to string representation of audio to binary for processing
             audio_clip = self.string_to_audio(audio_event['audioClip'])
             
-            image = self.combined_pipeline(audio_clip)
+            image, sample_rate = self.combined_pipeline(audio_clip)
             
             image = tf.expand_dims(image, 0) 
             
@@ -274,8 +274,9 @@ class EchoEngine():
             print(f'Predicted probability : {predicted_probability}')
             
             # populate the database with the result
-            self.populate_echo_store_results(
+            self.echo_api_send_detection_event(
                 audio_event,
+                sample_rate,
                 predicted_class,
                 predicted_probability)
             
@@ -287,7 +288,7 @@ class EchoEngine():
     ########################################################################################
     # this function populates the database with the prediction results
     ########################################################################################
-    def populate_echo_store_results(self, audio_event, predicted_class, predicted_probability):
+    def echo_api_send_detection_event(self, audio_event, sample_rate, predicted_class, predicted_probability):
         
         detection_event = {
             "timestamp": audio_event["timestamp"],
@@ -298,7 +299,8 @@ class EchoEngine():
             "animalEstLLA": audio_event["animalEstLLA"], 
             "animalTrueLLA": audio_event["animalTrueLLA"], 
             "animalLLAUncertainty": audio_event["animalLLAUncertainty"],
-            "audioClip": audio_event["audioClip"],        
+            "audioClip": audio_event["audioClip"],
+            "sampleRate": sample_rate        
         }
         
         url = 'http://ts-api-cont:9000/engine/event'
