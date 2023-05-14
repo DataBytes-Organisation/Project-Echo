@@ -210,7 +210,7 @@
   }
   
   .screen > .screen-content > .screen-user > :is(.name, .subtitle) {
-    font-family: "Source Code Pro", monospace;
+    font-family: "EarthOrbiterCondensed Local";
     color: white; 
     text-align: center;
     text-transform: uppercase; 

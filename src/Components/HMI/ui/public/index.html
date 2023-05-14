@@ -60,7 +60,8 @@
 			<div class="screen-image"></div>  
 			<div class="screen-overlay"></div>  
 			<div class="screen-content">
-			  <i class="screen-icon fa-brands fa-codepen"></i>
+			  <!-- <i class="screen-icon fa-brands fa-codepen"></i> -->
+        <img src="./images/logo-splashscreen.png" style="width: 101px; height: 81px">
 			  <div class="screen-user">
 				<span class="name" id="name" data-value="PROJECT ECHO" onmouseenter="{textFlex()}">PROJECT ECHO</span>
 				<span class="subtitle" >Click to start</span>
@@ -197,7 +198,8 @@
                       <div class="form-group row">
                           <div>
                               <input type="text" class="form-control" id="email"
-                                  placeholder="Enter your email" name="email">
+                                  placeholder="Enter your email" name="email" oninput="emailValidate()">
+                              <span class="label" id="email_error_label">* Please enter the correct email address</span>
                           </div>
                       </div>
                       
@@ -205,13 +207,14 @@
                           <div>
                               <textarea rows="5" class="form-control" id="query"
                                   name="query"
-                                  placeholder="Please type your query here..."></textarea>
+                                  placeholder="Please type your query here..." onchange="queryValidate()"></textarea>
+                                  <span class="label" id="query_error_label">* Please enter a query</span>
                           </div>
                       </div>
                       
                       <div class="form-group row">
                           <div>
-                              <button type="submit" class="btn btn-primary">Submit</button>
+                              <button type="submit" class="btn btn-primary" id="query_submit_button">Submit</button>
                           </div>
                       </div>
                   </form>
@@ -532,6 +535,30 @@
     </div>
 
 <script>
+  let button = document.getElementById("query_submit_button");
+
+  emailValidate = function() {
+    let email_value = document.getElementById("email").value;
+    console.log('current email: ', email_value);
+    if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email_value)){
+      $("#email_error_label").hide();
+      button.disabled = false;
+    } else {
+      $("#email_error_label").show();
+      button.disabled = true;
+    }
+  } 
+
+  queryValidate = function(){
+    let query_value = document.getElementById("query").value;
+    if (query_value.replace(/\s/g, "") != ""){
+      $("#query_error_label").hide();
+      button.disabled = false;
+    } else {
+      $("#query_error_label").show();
+      button.disabled = true;
+    }
+  }
 
   var hamburgerStatus = false;
   var currentTab = document.getElementById('filter-menu'); 
