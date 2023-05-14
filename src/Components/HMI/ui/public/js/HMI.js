@@ -1141,7 +1141,7 @@ export function updateTimeOffset(hmiState){
   retrieveSimTime().then((res) => {
     //console.log(res.data);
     let unix = Date.parse(res.data.timestamp) / 1000;
-    let newDelay = (getUTC() - new Date((unix + (10*60*60)) * 1000)) + 10000;
+    let newDelay = (getUTC() - new Date((unix + (10*60*60)) * 1000)) + 1000;
     if(isNaN(newDelay)){
       hmiState.simUpdateDelay = 10000;
     }
