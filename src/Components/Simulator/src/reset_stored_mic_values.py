@@ -16,5 +16,5 @@ for mic in mics_info:
     mic['elevation'] = new_alt
 
 # Write the updated data back to the JSON file
-with open('mics_info.json', 'w') as f:
+with open(_path, 'w') as f:
     json.dump(mics_info, f, indent=4)

@@ -20,10 +20,10 @@ class Entity():
         
         # Initialise coordinates for otways
         self.centre_diamond = (-38.78628264411816, 143.55917569624032)
-        self.left_diamond = (-38.787378473780834, 143.51398413811944)
+        self.left_diamond = (-38.794128852897394, 143.50546901793675)
         self.top_diamond = (-38.76507546897413, 143.576881064484)
         self.bottom_diamond = (-38.808297607205255, 143.56535698715805)
-        self.right_diamond = (-38.7816258102422, 143.61529250820806)
+        self.right_diamond = (-38.792808699797234, 143.59295653156977)
         self.altitude = 10.0
 
     # get the earth-centered earth-fixed coordinates of this entity
