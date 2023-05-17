@@ -1,0 +1,1001 @@
+<html>
+  <head>
+    <!-- Imports -->
+    <meta charset="UTF-8" />
+    <!-- Open Layers -->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="./css/ol.css"
+    />
+
+    <script
+      type="text/javascript"
+      src="./js/ol.js"
+    ></script>
+
+    <!-- Bootstrap -->
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+		<script src="https://kit.fontawesome.com/8aa980d912.js" crossorigin="anonymous"></script>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD"
+      crossorigin="anonymous"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+    />
+
+    <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
+
+    <!-- SplashScreen Styling -->
+		<link rel="stylesheet" type="text/css" href="./css/splash_screen_style.css">
+
+    <!--jQuery-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script> 
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    
+    <!--Axios-->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+		<!-- HMI -->
+		<link rel="stylesheet" href="./css/HMI_style.css" type="text/css">
+		<script type="text/javascript" src="./js/audio.js"></script>
+		<script type="module" src='./js/HMI.js'></script>
+		<script type="text/javascript" src="./js/animation.js"></script>
+		<script type="module" src='./js/HMI-utils.js'></script>
+
+    <!-- End Imports -->
+    <title>Echo | Welcome</title>
+  </head>
+  <body>
+    
+    <div class="screen" id="screen" onclick="fadeAnim(); openSIMULATOR()">  
+			<div class="screen-image"></div>  
+			<div class="screen-overlay"></div>  
+			<div class="screen-content">
+			  <!-- <i class="screen-icon fa-brands fa-codepen"></i> -->
+        <img src="./images/logo-splashscreen.png" style="width: 101px; height: 81px">
+			  <div class="screen-user">
+				<span class="name" id="name" data-value="PROJECT ECHO" onmouseenter="{textFlex()}">PROJECT ECHO</span>
+				<span class="subtitle" >Click to start</span>
+			  </div>
+			</div>
+		</div>
+		
+		<div id="blur"></div>
+    <!--div id="content"></div-->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!--script>
+      document.getElementById('content').innerHTML =
+        marked.parse('# Marked in the browser\n\nRendered by **marked**.');
+    </script-->
+
+
+    <div class="container" style="width:100% !important; margin-left: 0px !important; padding: 12px !important;">
+      <!-- Row 1 with nav spanning the entire width and a fixed top-->
+      
+      <div class="hamburger-icon" onclick="toggleNav()">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+
+      <!-- Row 2 with main contents spanning the entire width-->
+      
+      <div class="row main bg-black" style="padding: 0px !important;">
+        <div class="col-md-12 col-main" style="padding: 0px !important;"> 
+          
+          <div id="basemap"></div>
+
+          <div id="menu" class="menu">
+            <div class="menu-header"><div class="image-container">
+              <img src="./images/tabIcons/logo.png" alt="project echo logo">
+            </div>
+          </div>
+            <div class="navbar">
+              <a id="filter-menu-btn" class="tabs-button active" onclick="openTab('filter-menu')"></a>
+              <a id="SIM-menu-btn" class="tabs-button" onclick="openTab('SIM')"></a>
+              <a id="popup-menu-btn" class="tabs-button" onclick="openTab('animal-popup')"></a>
+              <a id="FAQ-menu-btn" class="tabs-button" onclick="openTab('FAQ')"></a>
+              <span style="position: fixed; border-top: 6px solid rgba(247, 186, 206, 0.8); height: 2px; width: 440; margin-top: 36px;"></span>
+            </div>
+          <div id="FAQ">
+            <div class="wrapper">
+              <div id="FAQ-contents">
+              <h2>About Us</h2>
+              <div class="dropdown">
+                <button class="btn btn-secondary btn-no-background dropdown-toggle" id="about_us_toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                  Project Echo
+                </button>
+                <div class="dropdown-menu faq-content" id="about_us_content" aria-label="about_us_toggle">
+                  <h2>The Project</h2>
+                      <p>
+                        Project Echo, is a <strong>a bioacoustics classification tool</strong> that use AI/ML solution for understanding the density and classification of noise-producing animals in rainforests. 
+                        Echo’s vision is to help ecologists and environmentalists to survey the environment in a non-destructive and efficient way to track threatened animal species population numbers over time.
+                        This research input will provide conservationists the information they need to make informed conservation decisions to protect our precious native fauna. 
+                      </p>
+                      
+                      <h2>Who we are?</h2>
+                      <p>
+                        We are <strong>DataBytes</strong>, a cutting-edge, data-driven company that focuses on designing and implementing custom, cloud-based data collection and analytics platforms. 
+                        With a team of experienced data scientists and software engineers, we specialize in developing intelligent systems that optimize business processes and automate task management for increased efficiency across various industries. 
+                        From image recognition to language translation, our AI-driven technologies aim to transform the way businesses operate and enhance their capabilities for a brighter, more prosperous future. 
+                      </p>
+                      <p>
+                        Having worked with companies across the country in the retail vertical, financial services, healthcare, e-commerce, and even telecom, we’re well versed in a wide variety of data needs. 
+                        Our goal is to democratize AI and provide affordable, accessible solutions that enable our clients to accelerate their growth and improve their bottom line. 
+                        With a passion for innovation and a commitment to excellence, we are the go-to AI partner for businesses looking to unlock the full potential of their data. 
+                      </p>
+  
+                      <p>
+                        We believe that sound analysis can revolutionize the way we monitor animal populations, and we aim to make our solution widely available to conservationists and researchers. 
+                        Project Echo leverages machine learning to understand the density and classifications of animals in a survey area, using our curated sound datasets. 
+                        Our team is making solid and comprehensive progress in the analysis of labeled data and its predictive ability using Artificial Intelligence and Machine Learning.
+                      </p>
+                </div>
+              </div>
+              <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle btn-no-background" id="data_src_toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                  Data Sourcing and Pooling
+                </button>
+                <div class="dropdown-menu faq-content" id="data_src_content" aria-labelledby="data_src_toggle">
+                  <h2>Audio data</h2>
+                  <p>
+                    In the early process of the project, the audio data is collected and extracted through the existing online researches. The data source can be categorized under two areas:
+                  </p>
+  
+                  <h3>Research Paper sourced Data</h3>
+                  
+                  <p>
+                    Consistent with the systematic reviews of the literature, many papers are not following open science practices and are protecting their data. 
+                    However one promising public resource of animal audio data emerged from papers produced by Phillips and Towsey (2018) and Teixeira et al (2019); 
+                    Ecosounds (n.d.) is a repository of environmental audio recordings that provides publicly sourced annotations of animal sounds in Australia and other parts of the world. 
+                  </p>
+                  
+                  <h3>Internet Search</h3>
+  
+                  <p>
+  
+                    An internet search using the Google search engine using various combinations of terms such as ‘animal sound’ ‘database’ ‘repository’ ‘Australia’ ‘data set’ ‘dataset’, yielded useful results. 
+                    A non-exhaustive list of promising sources are provided in the appendix to this report.
+                    <br>
+                    The challenges for these sources is that data mining and scraping will be required to gain access to the audio files. This will be a required skill in Project Echo going forward. 
+  
+                  </p>
+  
+                  <h2>Image and biographical data</h2>
+                  <p>
+                    The names of the species respective to the available audio data are found in the <strong>Otways from the book: Grant Palmer. Wildlife of the Otways and Shipwreck Coast. Clayton, VIC: CSIRO PUBLISHING, 2019</strong>.
+                  </p>
+                  
+                  <p>
+                    Currently, the species biographical data is generated using Generative AI in order to avoid copyrights issue. The images are generated using Dall-E, and then compare to the real visualization of the real picture to select the most similar and realistic image.
+                    <br>
+                    The summary and description of each species is generated using ChatGPT, which provide a succinct and brief information about the animal and its habitat.
+                  </p>
+                  <p>
+                    As the project is still in development, the biological information of the species can be improved further.
+                  </p>
+                </div>
+              </div>
+              
+              <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle btn-no-background" id="contact_us_toggle">
+                  Contact Us
+                </button>
+                <div class="dropdown-menu faq-content" id="contact_us_content" aria-labelledby="contact_us_toggle">
+                  <h2>Send a Message to Project Echo</h2>
+                  <p>
+                    You can submit your query or feedback using the form below:
+                    <form method="post" action="/send_email" method="POST">
+                      <div class="form-group row">
+                          <div>
+                              <input type="text" class="form-control" id="email"
+                                  placeholder="Enter your email" name="email" oninput="emailValidate()">
+                              <span class="label" id="email_error_label">* Please enter the correct email address</span>
+                          </div>
+                      </div>
+                      
+                      <div class="form-group row">
+                          <div>
+                              <textarea rows="5" class="form-control" id="query"
+                                  name="query"
+                                  placeholder="Please type your query here..." onchange="queryValidate()"></textarea>
+                                  <span class="label" id="query_error_label">* Please enter a query</span>
+                          </div>
+                      </div>
+                      
+                      <div class="form-group row">
+                          <div>
+                              <button type="submit" class="btn btn-primary" id="query_submit_button">Submit</button>
+                          </div>
+                      </div>
+                  </form>
+                </div>
+              </div>
+              </div>
+            </div>
+            
+          </div>
+          <div id="SIM">
+            <div class="wrapper">
+            <div id="SIM-contents">
+              <h2>Simulator</h2>
+                  <p>
+                    <strong>The Echo Simulator</strong> - an innovative system - aims to replicate the Otway’s National Forest environment by creating virtual microphone sensors strategically placed and interconnected in a mesh-like network. This advanced system effectively monitors semi-random simulated animal production events, contributing to wildlife research and conservation efforts. Upon detecting a sound, the simulator shows how our end-to-end solution is able to leverage the trigger times from the nearest microphones, employing a brute-force optimisation technique to accurately triangulate the source location of the sound. With minimal error, the audio sample and associated microphone IDs are seamlessly integrated and communicated throughout Echo-Net, a comprehensive framework comprising a bioacoustics engine, store, processing server, communications servers, and APIs. This rich data is then visually represented on our (HMI), allowing researchers and wildlife enthusiasts to analyse and better understand the complex acoustic interactions within the simulated Otway’s National Forest ecosystem.
+                  </p>
+                  <div class="toggle-switch-container">
+                    <label for="toggle-switch" class="toggle-label">Simulator:</label>
+                    <label class="toggle-switch">
+                      <input id="simulatorToggle" type="checkbox" checked>
+                      <span class="slider round"></span>
+                    </label>
+                  </div>
+            </div>
+            </div>
+          </div> 
+          <div id="animal-popup">
+            <div class="wrapper">
+            <div id="animal-popup-content">
+              <div class="markup_form">
+                <!-- markup_icon -->
+                <div class="markup_column">
+                  <div class="markup_row_left markup_row_title" style="width: 420px !important; margin: 0px !important;">
+                    <h2 id="desc_name"></h2>
+                  </div>
+                  <div class="markup_row_right markup_row_title" style="width: 100px !important; margin: 0px !important; padding: 0px !important;">
+                    <h2 id="desc_confidence"></h2>
+                    <!--img id="markup_img_2" src=""></img-->
+                  </div>
+                </div>
+              </div>
+              
+              <img id= "desc_img" src=""></img>
+              <div id="desc_species" class="subtitle"></div>
+              <h2>Animal Summary</h2>
+              <div id="desc_summary" class="desc"></div>
+              <div id="desc_details" class="desc"></div>
+              
+              <h2 style="margin-top: 20px !important;">Event Details</h2>
+              <div class="markup_form">
+                <!-- markup_icon -->
+                <div class="markup_column">
+                  <div class="markup_row_left" style="width: 100px !important">
+                    <img id="markup_img" src=""></img>
+                  </div>
+                  <div class="markup_row_right" style="text-align: right !important; width: 400px !important">
+                    <div id="markup_details"></div>
+                  </div>
+                </div>
+                <!-- markup_location -->
+                <div class="markup_column">
+                  <div class="markup_row_left">
+                    <div>Longitude</div>
+                  </div>
+                  <div class="markup_row_right">
+                    <div id="markup_loc_lon"></div>
+                  </div>
+                </div>
+                <div class="markup_column">
+                  <div class="markup_row_left">
+                    <div>Latitude</div>
+                  </div>
+                  <div class="markup_row_right">
+                    <div id="markup_loc_lat"></div>
+                  </div>
+                </div>
+
+                <!-- markup_date -->
+                <div class="markup_column">
+                  <div class="markup_row_left" style="width: 100px !important">
+                    <div>Date</div>
+                  </div>
+                  <div class="markup_row_right" style="text-align: right !important; width: 400px !important">
+                    <div id="markup_date"></div>
+                  </div>
+                </div>
+
+                <!-- markup_confidence -->
+                <div class="markup_column">
+                  <div class="markup_row_left">
+                    <div>Location Confidence</div>
+                  </div>
+                  <div class="markup_row_right">
+                    <div id="markup_confidence"></div>
+                  </div>
+                </div>             
+              </div>
+                <h2 id="audioHeader"style="margin-top: 20px !important;">Audio</h2>
+
+                <div id="audioControl" class="audio_component">
+                  <span><i class="fa fa-volume-up fa-2x" style="color:rgba(247, 186, 206, 0.6);" onclick="{toggleAudio()}"></i></span>
+                  <div class="audioContainer">
+                    <div class="box box1"></div>
+                    <div class="box box2"></div>
+                    <div class="box box3"></div>
+                    <div class="box box4"></div>
+                    <div class="box box5"></div>
+                    <div class="box box6"></div>
+                    <div class="box box7"></div>
+                    <div class="box box8"></div>
+                    <div class="box box9"></div>
+                    <div class="box box10"></div>
+                    <div class="box box1"></div>
+                    <div class="box box2"></div>
+                    <div class="box box3"></div>
+                    <div class="box box4"></div>
+                    <div class="box box5"></div>
+                    <div class="box box6"></div>
+                    <div class="box box7"></div>
+                    <div class="box box8"></div>
+                    <div class="box box9"></div>
+                    <div class="box box10"></div>
+                  </div>
+                </div>
+              
+            </div>
+            <div id="animal-default-content">
+              <h2 style="text-align: left; color: rgba(247, 186, 206, 1) !important;">Animal Bio Data</h2>
+                <p>Please click on a map marker to view bio data.</p>
+            </div>
+            </div>
+          </div>
+          <div id="filter-menu">
+            <div class="wrapper">
+            <div id="filter-menu-contents">
+            <h2 style="text-align: left; color: rgba(247, 186, 206, 1) !important;">
+              Filter Menu
+            </h2>
+            <div class="toggle-switch-container">
+              <label for="toggle-switch" class="toggle-label">Live Mode:</label>
+              <label class="toggle-switch">
+                <input id="liveModeToggle" type="checkbox" checked>
+                <span class="slider round"></span>
+              </label>
+            </div>
+            
+            <div class="past-data-container">
+              <div class="past-data-header">View Past Data:</div>
+              <div class="time-range-picker">
+                <input type="text" id="datetime-range" name="datetime-range" style="width:100%" value="" />
+              </div>
+            </div>
+            <div class="dropdown">
+              <button class="btn btn-secondary dropdown-toggle btn-no-background" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                Animal Vocalizations
+              </button>
+              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <div class="row">
+                  <div class="col">
+                    
+                    <div class="form-check">
+                      <input class="form-check-input v"  type="checkbox" value="" id="_reptile" onchange="updateFilter('_reptile')" checked>
+                      <label class="form-check-label" for="_reptile">Reptile</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input v"  type="checkbox" value="" id="_bird" onchange="updateFilter('_bird')" checked>
+                      <label class="form-check-label" for="_bird">Bird</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input v"  type="checkbox" value="" id="_mammal" onchange="updateFilter('_mammal')" checked>
+                      <label class="form-check-label" for="_mammal">Mammal</label>
+                    </div>
+
+                    <div class="form-check">
+                      <input class="form-check-input v"  type="checkbox" value="" id="_insect" onchange="updateFilter('_insect')" checked>
+                      <label class="form-check-label" for="_insect">Insect</label>
+                    </div>
+
+                    <div class="form-check">
+                      <input class="form-check-input v"  type="checkbox" value="" id="_amphibian" onchange="updateFilter('_amphibian')" checked>
+                      <label class="form-check-label" for="_amphibian">Amphibian</label>
+                    </div>
+
+                    <div class="form-check">
+                      <button onclick="{selectAll('_all')}" class="toggle-button btn btn-secondary btn-no-background select-all-btn">Select All</button>
+                    </div>
+
+                  </div>
+                  <div class="col-6">
+                    
+                    <div class="form-check">
+                      <input class="form-check-input v endangered"  type="checkbox" value="" id="_endangered" onchange="updateFilter('_endangered')" checked>
+                      <label class="form-check-label" for="_endangered" onchange="">Endangered</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input v vulnerable"  type="checkbox" value="" id="_vulnerable" onchange="updateFilter('_vulnerable')" checked>
+                      <label class="form-check-label" for="_vulnerable">Vunerable</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input v nearthreatened"  type="checkbox" value="" id="_near-threatened" onchange="updateFilter('_near-threatened')" checked>
+                      <label class="form-check-label" for="_nearThreatened">Near Threatened</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input v normal"  type="checkbox" value="" id="_normal" onchange="updateFilter('_normal')" checked>
+                      <label class="form-check-label" for="_normal">Normal</label>
+                    </div>
+
+                    <div class="form-check">
+                      <input class="form-check-input v invasive"  type="checkbox" value="" id="_invasive" onchange="updateFilter('_invasive')" checked>
+                      <label class="form-check-label" for="_invasive">Invasive</label>
+                    </div>
+
+                    <div class="form-check">
+                      <button onclick="{selectAll('_clear')}" class="toggle-button btn btn-secondary btn-no-background select-all-btn">Clear All</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="dropdown">
+              <button class="btn btn-secondary dropdown-toggle btn-no-background" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                Animal Simulation
+              </button>
+              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <div class="row">
+                  <div class="col">
+                    
+                    <div class="form-check">
+                      <input class="form-check-input s"  type="checkbox" value="" id="reptile" onchange="{updateFilter('reptile')}" checked>
+                      <label class="form-check-label" for="reptile">Reptile</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input s"  type="checkbox" value="" id="bird" onchange="{updateFilter('bird')}" checked>
+                      <label class="form-check-label" for="bird">Bird</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input s"  type="checkbox" value="" id="mammal" onchange="{updateFilter('mammal')}" checked>
+                      <label class="form-check-label" for="mammal">Mammal</label>
+                    </div>
+
+                    <div class="form-check">
+                      <input class="form-check-input s"  type="checkbox" value="" id="insect" onchange="{updateFilter('insect')}" checked>
+                      <label class="form-check-label" for="insect">Insect</label>
+                    </div>
+
+                    <div class="form-check">
+                      <input class="form-check-input s"  type="checkbox" value="" id="amphibian" onchange="{updateFilter('amphibian')}" checked>
+                      <label class="form-check-label" for="amphibian">Amphibian</label>
+                    </div>
+
+                    <div class="form-check">
+                      <button onclick="{selectAll('all')}" class="toggle-button btn btn-secondary btn-no-background select-all-btn">Select All</button>
+                    </div>
+
+                  </div>
+                  <div class="col-6">
+                    
+                    <div class="form-check">
+                      <input class="form-check-input s endangered"  type="checkbox" value="" id="endangered" onchange="{updateFilter('endangered')}" checked>
+                      <label class="form-check-label" for="endangered">Endangered</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input s vulnerable" type="checkbox" value="" id="vulnerable" onchange="{updateFilter('vulnerable')}" checked>
+                      <label class="form-check-label" for="vulnerable">Vunerable</label>
+                    </div>
+
+                    <div class="form-check">
+                      <input class="form-check-input s nearthreatened"  type="checkbox" value="" id="near-threatened" onchange="{updateFilter('near-threatened')}" checked>
+                      <label class="form-check-label" for="nearthreatened">Near Threatened</label>
+                    </div>
+
+                    <div class="form-check">
+                      <input class="form-check-input s normal"  type="checkbox" value="" id="normal" onchange="{updateFilter('normal')}" checked>
+                      <label class="form-check-label" for="Normal" >Normal</label>
+                    </div>
+
+                    <div class="form-check">
+                      <input class="form-check-input s invasive" type="checkbox" value="" id="invasive" onchange="{updateFilter('invasive')}" checked>
+                      <label class="form-check-label" for="invasive">Invasive</label>
+                    </div>
+                    <div class="form-check">
+                      <button onclick="selectAll('clear')" class="toggle-button btn btn-secondary btn-no-background select-all-btn">Clear All</button>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="dropdown">
+              <button class="btn btn-secondary dropdown-toggle btn-no-background" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                Microphones
+              </button>
+              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <div class="row">
+                  <div class="col">
+                    
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="microphones" onchange="{microphoneDisplay()}" checked>
+                      <label class="form-check-label" for="microphones">Microphones </label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="microphoneAnimations" onchange="{updateMicrophoneAnimation()}" checked>
+                      <label class="form-check-label" for="microphones">Enable Animation </label>
+                    </div>
+                   
+                  </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            </div> 
+          </div>
+          </div>      
+        
+      </div>
+    </div>
+
+<script>
+  let button = document.getElementById("query_submit_button");
+
+  emailValidate = function() {
+    let email_value = document.getElementById("email").value;
+    console.log('current email: ', email_value);
+    if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email_value)){
+      $("#email_error_label").hide();
+      button.disabled = false;
+    } else {
+      $("#email_error_label").show();
+      button.disabled = true;
+    }
+  } 
+
+  queryValidate = function(){
+    let query_value = document.getElementById("query").value;
+    if (query_value.replace(/\s/g, "") != ""){
+      $("#query_error_label").hide();
+      button.disabled = false;
+    } else {
+      $("#query_error_label").show();
+      button.disabled = true;
+    }
+  }
+
+  var hamburgerStatus = false;
+  var currentTab = document.getElementById('filter-menu'); 
+
+  function toggleNav() {
+    var hamburger = document.querySelector('.hamburger-icon');
+    
+    hamburger.classList.toggle('active');
+
+    if(hamburgerStatus == false){
+      openMenu();
+    }
+    else {
+      closeMenu();
+    }
+  }
+  
+  function openMenu() {
+    document.getElementById("menu").style.width = "550px";
+    document.getElementById("menu").style.height = "100%";
+    hamburgerStatus = true;
+    openTab("filter-menu")
+  }
+
+  function closeMenu() {
+    document.getElementById("menu").style.width = "0%";
+    document.getElementById("menu").style.height = "0%";
+    hamburgerStatus = false;
+    closeTab()
+  }
+
+  function openTab(tab) {
+    $(".tabs-button").removeClass("active");
+    switch (tab){
+      case "filter-menu":
+        document.getElementById("filter-menu-btn").classList.add("active");
+        break;
+      case "animal-popup":
+        document.getElementById("popup-menu-btn").classList.add("active");
+        break;
+      case "FAQ":
+        document.getElementById("FAQ-menu-btn").classList.add("active");
+        break;
+      case "SIM":
+        document.getElementById("SIM-menu-btn").classList.add("active");
+        break;
+    }
+    if (tab != null){
+      if (currentTab != document.getElementById(tab)){
+        closeTab()
+      }
+      currentTab = document.getElementById(tab)
+    }
+    currentTab.style.width = "550px";
+    currentTab.style.height = "90%";
+  }
+
+  function closeTab() {
+    //console.log("Closing Current Tab")
+    currentTab.style.width = "0%"
+    currentTab.style.height = "0%"
+  }
+  var overlay = null;
+
+  function openSIMULATOR(){
+    if(overlay){
+      closeOverlay(overlay)
+    }
+    //console.log("Opening Simulator...")
+  }
+
+  function openNav(tab) {
+    var hamburger = document.querySelector('.hamburger-icon');
+    if(!hamburger.classList.contains('active')){
+      toggleNav();
+    }
+    if (tab){
+      openTab(tab)
+    } else {
+      openTab('filter-menu')
+    } 
+  }
+
+  document.addEventListener('animalToggled', function(event){
+    closeTab()
+    setTimeout(()=> {
+      currentTab = document.getElementById('animal-popup') 
+      openNav('animal-popup')
+    },10)
+  })
+
+  let aud = false;
+  function animateAudioPlay() {
+    $(".boxmuted").removeClass("boxmuted");
+      aud = true;
+      document.querySelector("i").style.opacity=".5";
+  }
+
+  function animateAudioMute(){
+    $(".box").addClass("boxmuted");
+      aud = false;
+      document.querySelector("i").style.opacity="1";
+  }
+
+  function toggleAudio() {
+    if(aud==false){
+      const play_audio = new CustomEvent('playAudio',{
+            detail: {
+              message: "play audio"
+            }
+          })
+
+      document.dispatchEvent(play_audio);
+
+      animateAudioPlay();
+    } 
+    else {
+      console.log()
+      const stop_audio = new CustomEvent('stopAudio',{
+            detail: {
+              message: "stop audio"
+            }
+          })
+
+      document.dispatchEvent(stop_audio);
+
+      animateAudioMute();
+    }			
+  }
+
+  toggleAudio();
+
+  document.addEventListener('muteAnimation', function(event){
+    animateAudioMute();
+  })
+  
+</script>
+
+<script>
+  
+  //import { updateLayers } from "./js/HMI.js";
+  //selecting the .form-check-input class (all the filter checkboxes fall under this class)                   
+  const myClass = document.querySelectorAll('.form-check-input')
+  const sim = document.querySelectorAll('.s')
+  const voc = document.querySelectorAll('.v')
+  //An array to store the ID for each checkbox 
+  const checkboxIDs = []
+  const simIds = []
+  
+  //Populating the checkbox
+  myClass.forEach(element => {
+    //console.log("doingsomething")
+    checkboxIDs.push(element.id);
+  });
+
+  sim.forEach(element => {
+    //console.log("doingsomething with it")
+    simIds.push(element.id);
+  });
+  //init variable is set to true before the user has selected any filter options
+  //before a user has checked any filter options, all layers will appear on screen
+  let filterState = [...checkboxIDs];
+  //console.log(filterState, "FilterState:  ")
+  //console.log(checkboxIDs)
+
+  function updateFilter(checkbox){ 
+
+    if (document.getElementById(checkbox).checked){
+      if(!filterState.includes(checkbox)){
+        filterState.push(checkbox)
+      }
+    }
+    else{
+      let index = filterState.indexOf(checkbox)
+        if (index > -1) {
+          filterState.splice(index, 1);
+        }
+    }
+    //console.log("Current filter state:  ", filterState);
+    updateLayers(filterState)
+  }
+
+  function microphoneDisplay(){
+      updateMics()
+  }
+
+  function selectAll(filter){
+  
+    if (filter == 'clear'){
+      sim.forEach(id => {
+        if(filterState.includes(id.id)){
+          filterState.splice(filterState.indexOf(id.id), 1)
+          id.checked = false;
+        }
+      })
+    }
+  
+    else if (filter == '_clear'){
+      voc.forEach(id => {
+        if(filterState.includes(id.id)){
+          filterState.splice(filterState.indexOf(id.id), 1)
+          id.checked = false;
+        }
+      })
+    }
+
+    else if (filter == 'all'){
+      sim.forEach(id => {
+        if (!filterState.includes(id.id)){
+          console.log("Filter state doesn't include: ",id.id)
+          filterState.push(id.id)
+        }
+        id.checked = true;
+      })
+      
+    
+    }
+    else if (filter == '_all'){
+      console.log(filter)
+      voc.forEach(id => {
+        if (!filterState.includes(id.id)){
+          console.log("Filter state doesn't include: ",id.id)
+          filterState.push(id.id)
+        }
+        id.checked = true;
+      })
+    }
+
+    updateLayers(filterState)
+  }
+
+  // Get all the dropdowns on the page
+  const dropdowns = document.querySelectorAll(".dropdown");
+  //console.log('dropdowns: ', dropdowns)
+  
+  // Add a click event listener to each dropdown
+  dropdowns.forEach((dropdown) => {
+    const button = dropdown.querySelector(".dropdown-toggle");
+    const menu = dropdown.querySelector(".dropdown-menu");
+    const inputs = dropdown.querySelectorAll(".form-check-input");
+
+    // Toggle the 'show' class on the menu and button when clicked
+    button.addEventListener("click", () => {
+      
+      menu.classList.toggle("show");
+      button.classList.toggle("show");
+      
+    });
+
+    
+  });
+
+</script>
+
+<script type="module">
+  import { updateLayers, initialiseHMI, showMics, hideMics, updateAnimalMovementLayerFromPastData, updateVocalizationLayerFromPastData,
+  resetWildlifeLayers, MapOpenNav, MapCloseNav, getAnimalToggled, enableMicAnimation, disableMicAnimation, getUTC } from "./js/HMI.js";
+  import {retrieveTruthEventsInTimeRange, retrieveVocalizationEventsInTimeRange, startSimulator, stopSimulator} from "./js/routes.js";
+  window.updateMics = updateMics;
+  window.updateMicrophoneAnimation = updateMicrophoneAnimation;
+  window.updateLayers = updateLayers;
+  window.closeNav = MapCloseNav;
+
+  //All global state based info is stored in the hmiState
+  let hmiState = {};
+  window.hmiState = hmiState; 
+  hmiState.truthEventId = 10;
+
+
+  //update config
+  hmiState.liveMode = true;
+  hmiState.simUpdateDelay = 10000;
+  hmiState.liveWindow = 300000;
+
+  //NOTE: Use the replay date to replay past data as though it were live
+    //const replayDate = new Date('March 23, 2023 20:35:00');
+    //const replayTimestamp = replayDate.getTime();
+
+  const utcTime = getUTC();
+  const replayTimestamp = utcTime;
+
+  hmiState.timeOffset = 0;
+  hmiState.simTime = getUTC();
+  hmiState.currentTime = Math.floor((utcTime - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
+  hmiState.previousUpdateTime = Math.floor((utcTime - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
+  hmiState.liveEventCutoff = Math.floor((utcTime - hmiState.timeOffset - hmiState.simUpdateDelay - hmiState.liveWindow) / 1000);
+
+  //Basemap config
+  //pls do not change origin lat long, these are set to target wild otways region
+  hmiState.originLat = -38.8078;
+  hmiState.originLon = 143.54741;
+  hmiState.defaultZoom = 10;
+  hmiState.requestInterval = 1000;
+  hmiState.layers = {};
+
+  const microphoneLocations = [
+    { lat: -38.808, lon: 143.554 },
+    { lat: -38.813, lon: 143.537 },
+    { lat: -38.794, lon: 143.52 },
+    { lat: -38.824, lon: 143.51 },
+    { lat: -38.812, lon: 143.573 },
+  ];
+  
+  const vocalizationEvents = [
+    {eventId: "6457a315e03129cb130fa270", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Tawny Frogmouth", speciesScientificName: "Podargus strigoides", speciesIdentificationConfidence: 90.98, locationLat:-38.80266562762370,locationLon:143.563 , locationConfidence:90.98 , animalType:"bird", animalStatus:"normal" ,animalDiet: "herbavore" },
+    {eventId: "6457a315e03129cb130fa271", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Cane toad", speciesScientificName: "Rhinella marina", speciesIdentificationConfidence: 90.98, locationLat:-38.81905478815443 ,locationLon:143.529, locationConfidence:90.98 , animalType:"amphibian", animalStatus:"invasive" ,animalDiet: "herbavore" },
+    {eventId: "6457a315e03129cb130fa272", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Wild Boar", speciesScientificName: "Sus scrofa", speciesIdentificationConfidence: 90.98, locationLat:-38.80166562762364 ,locationLon:143.545  , locationConfidence:90.98 , animalType:"mammal", animalStatus:"endangered" ,animalDiet: "omnivore" },
+    {eventId: "6457a315e03129cb130fa273", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Redeye", speciesScientificName: "Psaltoda moerens", speciesIdentificationConfidence: 90.98, locationLat:-38.82166562762360 ,locationLon:143.545 , locationConfidence:90.98 , animalType:"insect", animalStatus:"near-threatened" ,animalDiet: "carnivore" },
+    {eventId: "6457a315e03129cb130fa274", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Brown Rat", speciesScientificName: "Rattus norvegicus", speciesIdentificationConfidence: 90.98, locationLat:-38.80266562762380 ,locationLon:143.565 , locationConfidence:90.98 , animalType:"reptile", animalStatus:"vulnerable" ,animalDiet: "herbavore" },
+  ];
+  
+
+  const movementEvents = {
+    "M_1":{animalId: "M_1", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Brown Rat", speciesScientificName: "unknown", speciesIdentificationConfidence: 100, locationLat:-38.80266562762367 ,locationLon:143.560 , locationConfidence:100 , animalType:"reptile", animalStatus:"vulnerable" , animalDiet: "herbavore" },
+    "M_2":{animalId: "M_2", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Tawny Frogmouth", speciesScientificName: "Podargus strigoides", speciesIdentificationConfidence: 100, locationLat:-38.81905478815439 ,locationLon:143.524 , locationConfidence:100 , animalType:"bird", animalStatus:"normal" ,animalDiet: "herbavore" },
+    "M_3":{animalId: "M_3", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Cane toad", speciesScientificName: "Rhinella marina", speciesIdentificationConfidence: 100, locationLat:-38.80166562762367 ,locationLon:143.540 , locationConfidence:100 , animalType:"amphibian", animalStatus:"invasive" ,animalDiet: "omnivore" },
+    "M_4":{animalId: "M_4", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Red fox", speciesScientificName: "Vulpes vulpes", speciesIdentificationConfidence: 100, locationLat:-38.82166562762367 ,locationLon:143.550 , locationConfidence:100 , animalType:"mammal", animalStatus:"endangered" ,animalDiet: "carnivore" },
+    "M_5":{animalId: "M_5", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Brown Rat", speciesScientificName: "Rattus norvegicus", speciesIdentificationConfidence: 100, locationLat:-38.80266562762367 ,locationLon:143.570 , locationConfidence:100 , animalType:"reptile", animalStatus:"vulnerable" , animalDiet: "herbavore" },
+    "M_6":{animalId: "M_6", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Australian Fairy Martin", speciesScientificName: "Petrochelidon ariel", speciesIdentificationConfidence: 100, locationLat:-38.81905478815439 ,locationLon:143.580 , locationConfidence:100 , animalType:"bird", animalStatus:"normal" ,animalDiet: "herbavore" },
+    "M_7":{animalId: "M_7", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Cane toad", speciesScientificName: "Rhinella marina", speciesIdentificationConfidence: 100, locationLat:-38.80166562762367 ,locationLon:143.510 , locationConfidence:100 , animalType:"amphibian", animalStatus:"invasive" ,animalDiet: "omnivore" },
+    "M_8":{animalId: "M_8", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Red fox", speciesScientificName: "Vulpes vulpes", speciesIdentificationConfidence: 100, locationLat:-38.82166562762367 ,locationLon:143.520 , locationConfidence:100 , animalType:"mammal", animalStatus:"endangered" ,animalDiet: "carnivore" },
+    "M_9":{animalId: "M_9", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Redeye", speciesScientificName: "Psaltoda moerens", speciesIdentificationConfidence: 100, locationLat:-38.80066562762367 ,locationLon:143.555 , locationConfidence:100 , animalType:"insect", animalStatus:"near-threatened" ,animalDiet: "herbavore" },
+  };
+
+  hmiState.movementEvents = movementEvents;
+  hmiState.vocalizationEvents = vocalizationEvents;
+  hmiState.microphoneLocations = microphoneLocations;
+
+  const el = (sel) => {return document.getElementById(sel);}
+  const elArea  = el("basemap");
+
+  const simulatorOl = el("screen")
+
+  simulatorOl.addEventListener("click",openSIMULATOR)
+
+  window.onload = function() {
+    console.log("Website loaded!");
+    initialiseHMI(hmiState);
+    //sim is on by default
+    startSimulator();
+  };
+
+  //Microphone show/hide
+  function updateMics(){
+  //console.log("mic visibility toggled!")
+    let anim = document.getElementById("microphoneAnimations");
+    let mic = document.getElementById("microphones");
+    if(anim.checked && mic.checked){
+      enableMicAnimation(hmiState);
+    }
+    else if (mic.checked && !anim.checked){
+      showMics(hmiState);
+    }
+    else if (!mic.checked && anim.checked){
+      disableMicAnimation(hmiState);
+    }  
+    else {
+      hideMics(hmiState);
+    }
+  }
+
+  function updateMicrophoneAnimation(){
+    let anim = document.getElementById("microphoneAnimations");
+    let mic = document.getElementById("microphones");
+    if (anim.checked && mic.checked){
+      enableMicAnimation(hmiState);
+    } 
+    else {
+      disableMicAnimation(hmiState);
+
+      if(mic.checked){
+        showMics(hmiState);
+      }
+    }
+  }
+  //Live mode and date range picker
+
+  const toggleSwitch = document.querySelector('#liveModeToggle');
+  const simulatorSwitch = document.querySelector('#simulatorToggle');
+  
+  const pastDataContainer = document.querySelector('.past-data-container');
+  //console.log("Live mode enabled");
+
+  toggleSwitch.addEventListener('change', function() {
+    if (this.checked) {
+      resetWildlifeLayers(hmiState);
+      hmiState.currentTime = Math.floor((getUTC()- hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
+      hmiState.previousUpdate = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
+      hmiState.liveMode = true;
+      //console.log("Live mode enabled");
+      pastDataContainer.style.maxHeight = '0';
+    } else {
+      resetWildlifeLayers(hmiState);
+      hmiState.liveMode = false;
+      //console.log("Live mode disabled");
+      pastDataContainer.style.maxHeight = pastDataContainer.scrollHeight + 'px';
+    }
+  });
+
+  simulatorSwitch.addEventListener('change', function() {
+    if (this.checked) {
+      console.log("starting");
+      startSimulator();
+    } else {
+      console.log("stopping");
+      stopSimulator();
+    }
+  });
+
+  $(function() {
+    $('#datetime-range').daterangepicker({
+      timePicker: true,
+      timePicker24Hour: true,
+      timePickerIncrement: 1,
+      locale: {
+        format: 'YYYY-MM-DD HH:mm:ss'
+      }
+    }, function(start, end, label) {
+      // Callback function that executes when the date and time range is changed
+      hmiState.startTime = start.unix(); 
+      hmiState.endTime = end.unix();
+      console.log("date range updated: " + hmiState.startTime + " to " + hmiState.endTime); 
+      retrieveTruthEventsInTimeRange(hmiState.startTime, hmiState.endTime).then((res) => {
+        updateAnimalMovementLayerFromPastData(hmiState, res.data);
+      })
+
+      retrieveVocalizationEventsInTimeRange(hmiState.startTime, hmiState.endTime).then((res) => {
+        updateVocalizationLayerFromPastData(hmiState, res.data);
+      })
+    });
+  });
+
+  let active_content = $("#animal-popup-content");
+  let default_content = $("#animal-default-content");
+  active_content.hide();
+  default_content.show();
+
+</script>
+  </body>
+</html>

@@ -19,11 +19,11 @@ class Entity():
         self.from_ecef = Transformer.from_crs("EPSG:4978", "EPSG:4326", always_xy=True)
         
         # Initialise coordinates for otways
-        self.centre_diamond = (-38.78619972614279, 143.5743202660838)
-        self.left_diamond = (-38.78648354661556, 143.5445900890966)
-        self.top_diamond = (-38.77310461001655, 143.5769246453492)
-        self.bottom_diamond = (-38.80412439285561, 143.5796606462629)
-        self.right_diamond = (-38.78299363122898, 143.60726938275553)
+        self.centre_diamond = (-38.78628264411816, 143.55917569624032)
+        self.left_diamond = (-38.794128852897394, 143.50546901793675)
+        self.top_diamond = (-38.76507546897413, 143.576881064484)
+        self.bottom_diamond = (-38.808297607205255, 143.56535698715805)
+        self.right_diamond = (-38.792808699797234, 143.59295653156977)
         self.altitude = 10.0
 
     # get the earth-centered earth-fixed coordinates of this entity

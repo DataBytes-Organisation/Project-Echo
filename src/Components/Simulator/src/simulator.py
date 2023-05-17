@@ -24,7 +24,10 @@ class Simulator():
     # run the live simulators
     async def execute(self):
         # initialse the simulator configuration
-        animals = self.config.initialise()
+        animals, sensors = self.config.initialise()
+        
+        # send the list of microphones across to the database
+        self.config.comms_manager.echo_api_set_microphones(sensors)
 
         # render state
         if ast.literal_eval(os.environ['RENDER_STATES']):
@@ -51,7 +54,7 @@ class Simulator():
                     animal.update_lla()
                     
                     # send animal movement event for debugging
-                    self.config.comms_manager.echo_store_send_animal_movement(animal)
+                    self.config.comms_manager.echo_api_send_animal_movement(animal)
                     
                     # generate random animal vocalisation
                     if animal.random_vocalisation():

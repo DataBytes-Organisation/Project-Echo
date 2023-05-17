@@ -179,7 +179,7 @@ class EchoEngine():
         file = io.BytesIO(audio_clip)
 
         # Load the audio data with librosa
-        audio_clip, _ = librosa.load(file, sr=self.config['AUDIO_SAMPLE_RATE'])
+        audio_clip, sample_rate = librosa.load(file, sr=self.config['AUDIO_SAMPLE_RATE'])
         
         # keep right channel only
         if audio_clip.ndim == 2 and audio_clip.shape[0] == 2:
@@ -233,8 +233,15 @@ class EchoEngine():
         image = image - tf.reduce_min(image) 
         image = image / (tf.reduce_max(image)+0.0000001)
         
-        return image
-    
+        return image, audio_clip, sample_rate
+
+
+    # this method takes in binary audio data and encodes to string
+    def audio_to_string(self, audio_binary) -> str:
+        base64_encoded_data = base64.b64encode(audio_binary)
+        base64_message = base64_encoded_data.decode('utf-8')
+        return base64_message    
+
 
     ########################################################################################
     ########################################################################################
@@ -253,7 +260,10 @@ class EchoEngine():
             # convert to string representation of audio to binary for processing
             audio_clip = self.string_to_audio(audio_event['audioClip'])
             
-            image = self.combined_pipeline(audio_clip)
+            image, audio_clip, sample_rate = self.combined_pipeline(audio_clip)
+            
+            # update the audio event with the re-sampled audio
+            audio_event["audioClip"] = self.audio_to_string(audio_clip)
             
             image = tf.expand_dims(image, 0) 
             
@@ -274,8 +284,9 @@ class EchoEngine():
             print(f'Predicted probability : {predicted_probability}')
             
             # populate the database with the result
-            self.populate_echo_store_results(
+            self.echo_api_send_detection_event(
                 audio_event,
+                sample_rate,
                 predicted_class,
                 predicted_probability)
             
@@ -283,10 +294,11 @@ class EchoEngine():
             # Catch the exception and print it to the console
             print(f"An error occurred: {e}", flush=True)
 
+
     ########################################################################################
     # this function populates the database with the prediction results
     ########################################################################################
-    def populate_echo_store_results(self, audio_event, predicted_class, predicted_probability):
+    def echo_api_send_detection_event(self, audio_event, sample_rate, predicted_class, predicted_probability):
         
         detection_event = {
             "timestamp": audio_event["timestamp"],
@@ -297,12 +309,14 @@ class EchoEngine():
             "animalEstLLA": audio_event["animalEstLLA"], 
             "animalTrueLLA": audio_event["animalTrueLLA"], 
             "animalLLAUncertainty": audio_event["animalLLAUncertainty"],
-            "audioClip": audio_event["audioClip"],        
+            "audioClip": audio_event["audioClip"],
+            "sampleRate": sample_rate        
         }
         
-        events = self.echo_store["events"]
-        events.insert_one(detection_event)
-
+        url = 'http://ts-api-cont:9000/engine/event'
+        x = requests.post(url, json = detection_event)
+        print(x.text)
+        
 
     ########################################################################################
     # Execute the main engine loop (which waits for messages to arrive from MQTT)
