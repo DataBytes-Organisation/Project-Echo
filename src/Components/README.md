@@ -1,17 +1,18 @@
-
 ### Echo Components
 
-The echo Component directory contains all the core production components of the echo system.  These components can be instantiated locally on your developer machine using docker.  When the echo component are instantiated in this way, the project echo team call this the 'EchoNet' environment.  Within Docker, a private network is setup called EchoNet and all the component containers join this network.
+## Please note this is incomplete as of the code freeze. check the teams chanel for a more up to date version
 
-To define the EchoNet environment, each component has a Docker file which explains how the container is built.  Most containers will read in a requirements.txt file to setup the relevant python environment.  Since each container is isolated from every other container, each component is free to define its own dependecies (e.g. its own version of python).
+The echo Component directory contains all the core production components of the echo system. These components can be instantiated locally on your developer machine using docker. When the echo component are instantiated in this way, the project echo team call this the 'EchoNet' environment. Within Docker, a private network is setup called EchoNet and all the component containers join this network.
 
-There are a couple of containers which are defined by open source community which form part of EchoNet.  This includes the MongoDB component and the MQTT-Server component.  These provide database endpoints and message queue functionality to facilitate communication between components.
+To define the EchoNet environment, each component has a Docker file which explains how the container is built. Most containers will read in a requirements.txt file to setup the relevant python environment. Since each container is isolated from every other container, each component is free to define its own dependecies (e.g. its own version of python).
+
+There are a couple of containers which are defined by open source community which form part of EchoNet. This includes the MongoDB component and the MQTT-Server component. These provide database endpoints and message queue functionality to facilitate communication between components.
 
 The following diagram is taken from the Echo architecture document located here: https://deakin365.sharepoint.com/:p:/r/sites/DataBytes2/Shared%20Documents/Project%20Echo/Architecture/Project%20Echo%20Architecture.pptx?d=wd9aa543f681b45f19357c86377de93d5&csf=1&web=1&e=25pLgW
 
 ![Component Interactions](ComponentInteractions.png)
 
-The diagram describes the flow of information between components at a high level to provide an introduction to how these component interact.  For a detailed explaination of the contents of messages please read the associated documentation for each component.
+The diagram describes the flow of information between components at a high level to provide an introduction to how these component interact. For a detailed explaination of the contents of messages please read the associated documentation for each component.
 
 ### Running EchoNet
 
@@ -31,17 +32,33 @@ To build the docker components and run on windows 11:
 cd Project-Echo\src\Components
 ```
 
-6. Build and run all the components
+6. Build and run all the components. This can take up to 20 mins the first time it is run. Subsequent builds will run much quicker.
 
 ```
 docker-compose up --build
 ```
 
-7. All components should start are you should see something like the following running all the components (note this snapshot was taken before HMI was integrated so it is missing):
+7. All components should start are you should see something like the following running all the components **(note this snapshot was taken before HMI was integrated so it is missing)**:
 
 ![Running Docker Containers](DockerContainers.png)
 
-8. The first time you run:  In order for the components to work correctly they will need to be authenticated to use GCP buckets so that they can download species data and audio samples.  To do this you need to login to once of the containers using docker attach and provide your key.  Open the logs from the engine and click the provided link, authenticate via the browser, then paste your key onto the container terminal.
+8. The first time you run:  
+   In order for the components to work correctly they will need to be authenticated to use GCP buckets so that they can download species data and audio samples.  
+   To do this you need to:
+
+- In the containers tab: click the echo-engine-cont link to open this container.
+-
+
+- login to one of the containers using docker attach and provide your key.
+- Open the logs from the engine and click the provided link,
+- authenticate via the browser, then paste your key onto the container terminal.
+- open the terminal on the engine container
+- paste the command provided in the top portion of the authentication page into the terminal of the engine container
+- click the second link provided by the engine terminal
+- authenticate via the browser, again,
+- paste in the key provided in the lower portion of the authentication page, into the engine terminal
+
+_alternatively you can use steps 9 and 10, otherwise skip ahead to 12_
 
 9. Get the container id
 
@@ -59,3 +76,11 @@ docker attach <container_id_or_name>
 
 12. Restart all containers so they can access the new credentials - the simulator and engine share the credentials via a docker volume
 
+13. to delete, containers, images, volumnea. but dont delete credentials
+    kill with: `CMD + "."`
+
+Navigate to http://localhost:8080/ in **Chrome** to view the sim. Everytime it is refreshed a new sim request is sent. likewise with toggling the sim on and off.
+Simulator can timeout. If tf-simulator-cont container has exited, click to restart it.
+Refresh website
+
+sim will stop (exit) after about 10 mins. restart to turn on again.
