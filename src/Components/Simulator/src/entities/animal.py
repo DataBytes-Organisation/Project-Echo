@@ -62,23 +62,45 @@ class Animal(entities.entity.Entity):
         
     # motion is modelled as random brownian motion 
     def update_lla(self) -> None:
-        
         # get the current lla
         lla = self.getLLA()
         
         # these parameters needs to be tuned
         delta_lat = 0.001
         delta_lon = 0.001
-        
+
         # Generate random increments in x and y directions
         dx = delta_lat*np.sqrt(self.clock.step_interval) * np.random.randn(1)
         dy = delta_lon*np.sqrt(self.clock.step_interval) * np.random.randn(1)
 
-        # Compute the cumulative sum of the increments
-        lla = ((lla[0] + np.cumsum(dx))[0], (lla[1] + np.cumsum(dy))[0], lla[2])
- 
-        # update the LLA position
-        self.setLLA(lla)
+        new_lla = ((lla[0] + np.cumsum(dx))[0], (lla[1] + np.cumsum(dy))[0], lla[2])
+
+        if not self.is_within_boundaries(new_lla):
+            new_lla = self.adjust_to_boundaries(new_lla)
+
+        self.setLLA(new_lla)
+
+    def is_within_boundaries(self, lla):
+        lat, lon, _ = lla
+        if (lon >= self.left_diamond[1] and lon <= self.right_diamond[1] and 
+            lat >= self.bottom_diamond[0] and lat <= self.top_diamond[0]):
+            return True
+        return False
+
+    def adjust_to_boundaries(self, lla):
+        lat, lon, alt = lla
+        if lat > self.top_diamond[0]:
+            lat = self.top_diamond[0]
+        elif lat < self.bottom_diamond[0]:
+            lat = self.bottom_diamond[0]
+
+        if lon > self.right_diamond[1]:
+            lon = self.right_diamond[1]
+        elif lon < self.left_diamond[1]:
+            lon = self.left_diamond[1]
+
+        return (lat, lon, alt)
+
     
     def random_vocalisation(self) -> bool:
         logger1.info(f'Random sample for vocalisation')
