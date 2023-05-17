@@ -24,15 +24,12 @@ class SystemManager:
     async def initialise_communications(self):
         # sleep and wait for MQTT server to initialise
         print("Initialising communications with MQTT", flush=True)
-        connected = False
-        while not connected:
+        while True:
             try:
                 async with MqttClient(os.environ['MQTT_CLIENT_URL'], int(os.environ['MQTT_CLIENT_PORT']), clean_session=True) as mqtt_client:
                     print("Connected... waiting for start command", flush=True)
-                    connected = True
                     await mqtt_client.subscribe("Simulator_Controls")
-                    await asyncio.gather(self.handle_messages(mqtt_client), self.run_loop())
-                              
+                    await asyncio.gather(self.handle_messages(mqtt_client), self.run_loop())                   
             except Exception as e:
                 print(f"Exception {e} Retrying...", flush=True)
             await asyncio.sleep(1)    
@@ -78,4 +75,8 @@ async def main():
     await system_manager.initialise_communications()
 
 if __name__ == '__main__':
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+        print(f'Simulator Finished', flush=True)
+    except Exception as e:
+        print(f'Simulator Exception {e}', flush=True)
