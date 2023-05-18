@@ -662,7 +662,7 @@ function addNewVocalizationFeatures(hmiState, events) {
     })
     
     evtLocation.setStyle(icon);
-    evtLocation.setId(entry.animalId);
+    evtLocation.setId(entry.eventId);
 
     let layerName = deriveLayerName(entry.animalStatus,entry.animalType);
     let layer = findMapLayerWithName(hmiState, layerName);
@@ -1108,16 +1108,21 @@ function purgeVocalizationEvents(hmiState){
   //console.log(hmiState.liveEventCutoff);
   for(let event of hmiState.vocalizationEvents){
     //console.log(event);
+    //console.log(hmiState.liveEventCutoff);
+    //console.log(event.timestamp); 
 
     if(hmiState.liveEventCutoff > event.timestamp){
       let layerName = deriveLayerName(event.animalStatus, event.animalType);
       let layer = findMapLayerWithName(hmiState, layerName);
+      //console.log(event.eventId);
       const featureToPurge = layer.getSource().getFeatureById(event.eventId);
       //console.log(featureToPurge);
-      layer.getSource().removeFeature(featureToPurge);
+      if(featureToPurge !== null){
+        layer.getSource().removeFeature(featureToPurge);
+      }
     }
     else{
-      persistEvents[event.animalId] = event;
+      persistEvents.push(event);
     }
   }
 
