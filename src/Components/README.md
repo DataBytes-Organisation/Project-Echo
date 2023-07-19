@@ -41,7 +41,7 @@ docker-compose up --build
 
 7. All components should start and you should see something like the following running in the Docker Containers:
 
-<img src="Docker_Containers.png" width="450" height=auto>
+<img src="https://github.com/DataBytes-Organisation/Project-Echo/blob/main/src/Components/DockerContainers.png?raw=true" width="450" height=auto>
 <br/><br/>
 
 ### Authenticating with GCP buckets:
