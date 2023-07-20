@@ -1,4 +1,5 @@
 appdirs
+audio2numpy
 audiomentations
 audioread
 certifi
