@@ -8,7 +8,7 @@ The is an attempt to cover linux, mac and windows environments.
 
 ## Windows 11
 
-Likewise for Mac, isntalling and using Anaconda Navigator may be the better option. Follow the links below, or search to install Anaconda for Windows.
+Likewise for Mac, installing and using Anaconda Navigator may be the better option. Follow the links below, or search to install Anaconda for Windows.
 
 Use the Environment.bat file to build your conda environment - execute from within the directory.
 
@@ -17,6 +17,8 @@ Project-Echo\src\Environments> environment.bat
 ```
 
 ## Mac
+
+> _Instructions for Trimester 2 2023_
 
 _Once a virtual environment is set up, always launch Jupyter Notebook from this environment._
 
@@ -38,8 +40,8 @@ pip install -r env_dev_mac.txt
 
 #### Using command line:
 
-I have had errors with this, so if it doesnt work, try the above option. Use the env*dev_mac.yaml file to build your conda environment.  
-\_Note this file has not been updated, so may require additional libraries. Check out the text file to find any missing.*
+There are possible errors with this, so if it doesnt work, try the above option. Use the `env_dev_mac.yaml` file to build your conda environment.  
+\_Note this file has not been updated, so may require additional libraries. Check out the text file to find any missing.\*
 
 From within `~\Project-Echo\src\Environments` run:
 
@@ -72,7 +74,7 @@ sudo apt-get install -y libopenexr-dev
 sudo apt-get install -y python-is-python3
 ```
 
-install python dependencies:
+Install python dependencies:
 
 ```
 pip install -c constraints_wsl2.txt -r env_dev_wsl2.txt
