@@ -99,19 +99,33 @@ class CommsManager():
         # microphone LLA TODO
         microphone_lla  = closest_mic.getLLA()
         
-        # randomly sample from available audio blobs from this species
-        sample_blob = random.sample(self.audio_blobs[species_name], k=1)[0]
         
-        # Read the blob's content as a byte array
-        audio = sample_blob.download_as_bytes()
+        audio_str =""
+        audio_file = ""
+
+        try:
+            # randomly sample from available audio blobs from this species
+            print("Sampling blob", flush=True)
+            sample_blob = random.sample(self.audio_blobs[species_name], k=1)[0]
+            audio = sample_blob.download_as_bytes()
+            
+            # Read the blob's content as a byte array
+            print("Reading blob", flush=True)
+            audio = sample_blob.download_as_bytes()
+            
+            # Encode the audio data as a string
+            print("Encoding blob", flush=True)
+            audio_str = self.audio_to_string(audio)
+            
+            # For now, send filename across for format information
+            print("Grab blob filename", flush=True)
+            audio_file = sample_blob.name.split('/')[1]
  
-        # Encode the audio data as a string
-        audio_str = self.audio_to_string(audio)
-        
-        # For now, send filename across for format information
-        audio_file = sample_blob.name.split('/')[1]
+        except:
+            print("Failed to sample blob", flush=True)
          
         # Create the vocalisation event
+        print("Create vocalisation event", flush=True)
         vocalisation_event = {
             "timestamp": timestamp.isoformat(),
             "sensorId": closest_mic.getID(),
@@ -126,6 +140,7 @@ class CommsManager():
         MQTT_MSG = json.dumps(vocalisation_event)
      
         # publish the audio message on the queue
+        print("Publishing message on queue", flush=True)
         (rc, mid) = self.mqtt_client.publish(os.environ['MQTT_PUBLISH_URL'], MQTT_MSG)
         
         logger1.info(f'Vocal message sent {animal.getUUID()} time: {timestamp} species: {species_name}')
