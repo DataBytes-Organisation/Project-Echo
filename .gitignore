@@ -8,3 +8,5 @@ tensorboard_logs/
 logs/
 models/
 src\Prototypes\api\__pycache__
+
+src/Prototypes/hmi/ui/node_modules/*
