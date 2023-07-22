@@ -4626,12 +4626,12 @@
         },
         {
             "species": "Ephippitytha trigintiduoguttata",
-            "common": "Spotted Katydid",
+            "common": "'32-Spotted Katydid','Mottled Katydid', 'Speckled grasshopper' ",
             "summary": "The Spotted Katydid is a type of bush cricket found in eastern Australia.",
             "description": [
                 "They are named for the distinctive spots on their body, which can vary in color from green to brown.",
                 "These insects are known for their loud and persistent chirping, which is produced by rubbing their wings together.",
-                "The Spotted Katydid feeds on a variety of plant matter, including leaves, flowers, and fruits.",
+                "The Spotted Katydid feeds on a variety of plant matter, favouring Ecualyptus leaves",
                 "Females lay their eggs in the soil or on plant stems, and the young nymphs undergo several molts before reaching adulthood.",
                 "Spotted Katydids are preyed upon by a variety of predators, including birds, reptiles, and mammals."
             ],
@@ -4679,10 +4679,10 @@
         {
             "species": "Eurystomus orientalis",
             "common": "Dollarbird",
-            "summary": "The Eurystomus orientalis, commonly known as the Dollarbird, is a medium-sized bird in the roller family that is found throughout Australia, Indonesia, and Papua New Guinea.",
+            "summary": "The Eurystomus orientalis, commonly known as the Dollarbird, is a medium-sized bird in the roller family that is found throughout eastern Asia. They can be found as far north as Korea, and as far south as Victoria, Australia.",
             "description": [
-                "They get their name from the distinctive circular patches of bright blue feathers on their throat, which resemble silver dollar coins.",
-                "The Dollarbird is a migratory species, with populations moving south during the winter months and returning north in the summer to breed.",
+                "They get their name from the distinctive circular patches of bright blue feathers on their wings, which resemble silver dollar coins.",
+                "The Dollarbird is a migratory species, with populations moving towards the equator during the winter months.",
                 "They are known for their acrobatic flight displays, which involve swooping, gliding and soaring through the air.",
                 "These birds are primarily insectivorous, feeding on a variety of insects including beetles, crickets, and cicadas.",
                 "The Dollarbird is also known for its unique breeding habits, with pairs working together to excavate a nest hole in a tree, usually high up in a eucalyptus or acacia tree."
@@ -4704,7 +4704,7 @@
         },
         {
             "species": "Falco cenchroides",
-            "common": "Nankeen kestrel",
+            "common": "'Nankeen kestrel','Australian kestral'",
             "summary": "The Nankeen kestrel is one of the most common and widespread raptors in Australia, and can be found in a variety of habitats including forests, grasslands, and urban areas.",
             "description": [
                 "This species is named after its distinctive coloration, which resembles the yellowish-brown color of Nankeen cloth, a type of cotton fabric that was once common in Australia.",
@@ -4783,7 +4783,7 @@
         {
             "species": "Galanga labeculata",
             "common": "Double-Spotted Cicada",
-            "summary": "Galanga labeculata, commonly known as the Double-Spotted Cicada, is a species of cicada found in parts of Australia, including New South Wales and Queensland.",
+            "summary": "Galanga labeculata, commonly known as the Double-Spotted Cicada, is a species of cicada found in parts of Australia, including New South Wales, Victoria and Queensland.",
             "description": [
                 "The Double-Spotted Cicada gets its name from the two distinct spots on the base of its wings.",
                 "Adult Double-Spotted Cicadas are usually around 30 mm long and have a wingspan of about 55 mm.",
@@ -4815,7 +4815,7 @@
                 "These birds feed mainly on nectar, insects, and fruit. They have a specialized brush-tipped tongue that allows them to extract nectar from flowers with ease.",
                 "Singing Honeyeaters are known for their unique breeding habits. They form breeding pairs during the breeding season, and the female lays two to three eggs in a small cup-shaped nest made of twigs and bark.",
                 "Unlike other honeyeater species, Singing Honeyeaters are not territorial and will often feed in flocks. They have also been known to form mixed-species flocks with other bird species.",
-                "The Singing Honeyeater is an important cultural symbol for many Indigenous Australians, who often use their feathers in ceremonial dress and art."
+                
             ],
             "img": ""
         },
@@ -4891,7 +4891,7 @@
             "description": [
                 "The Brown Gerygone is a small bird, measuring only about 11 cm in length and weighing around 6-8 grams. They have a brownish-grey upper body with a lighter underbelly and a distinctive white eye ring.",
                 "These birds are insectivores, feeding on a variety of small insects and spiders. They can be found foraging for food in the understory of forests and woodlands.",
-                "The Brown Gerygone is known for its beautiful and complex song, which is a series of high- pitched and melodious notes. They are often heard singing during the breeding season, which occurs between August and January.",
+                "The Brown Gerygone is known to make short repetitive calls that sound like “which-is-it-is-it",
                 "This species is known to be monogamous, with pairs forming long-lasting bonds. They build small, cup-shaped nests made of grasses, bark, and spider webs, which are typically hidden in the foliage of trees or shrubs.",
                 "The Brown Gerygone is generally found in coastal and subcoastal areas of eastern and southeastern Australia, but can also be found in Tasmania and nearby islands. They are considered to be a species of least concern by the IUCN, with a stable population and a wide distribution range."
             ],
