@@ -35,11 +35,7 @@ keras-toolbox
 keras-unet
 keras-util
 kiwisolver
-<<<<<<< Updated upstream
-librosa==0.10.0.post2
-=======
 librosa
->>>>>>> Stashed changes
 lightgbm
 llvmlite
 matplotlib
