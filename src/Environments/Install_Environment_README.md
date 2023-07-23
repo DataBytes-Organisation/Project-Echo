@@ -26,7 +26,7 @@ _Once a virtual environment is set up, always launch Jupyter Notebook from this 
 
 You can use Anaconda Navigator to create a new environment. This is a much easier to switch environments, access the environment's terminal and launch Jupyter Notebook. Name it _ProjectEcho_. In this case, ignore the below code and create the environment directly from _Anaconda Navigator_. For help check out:  
 [Installing Anaconda](https://docs.anaconda.com/free/navigator/install/)  
-[Creating Environments in Anaconda](https://docs.anaconda.com/free/navigator/tutorials/manage-environments/)
+[Creating Environments in Anaconda](https://docs.anaconda.com/free/navigator/tutorials/manage-environments/) (create new env with python 3.8)
 
 Once the environment is created, launch terminal from this environment. The list of libraries to install are included in the text file below and currently include all libraries that have been used up until now for developing and testing. Some of them may no longer be required.
 
