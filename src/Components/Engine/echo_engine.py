@@ -39,7 +39,6 @@ import tensorflow_addons as tfa
 import tensorflow_hub as hub
 import tensorflow_io as tfio
 from google.cloud import storage
-from keras.utils import dataset_utils
 
 # database libraries
 import pymongo
