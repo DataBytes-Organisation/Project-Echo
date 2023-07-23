@@ -1,13 +1,7 @@
 appdirs
-<<<<<<< Updated upstream
-audio2numpy
-audiomentations
-audioread
-=======
 audiomentations
 audioread
 catboost
->>>>>>> Stashed changes
 certifi
 cffi
 chardet
@@ -50,10 +44,7 @@ lightgbm
 llvmlite
 matplotlib
 museval
-<<<<<<< Updated upstream
-=======
 mutagen
->>>>>>> Stashed changes
 notebook
 numba
 numpy
