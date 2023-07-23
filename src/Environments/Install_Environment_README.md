@@ -35,6 +35,13 @@ From `~\Project-Echo\src\Environments` run the following command to install the 
 ```
 pip install -r env_dev_mac.txt
 ```
+after this, install tensorflow : 
+Run the following command:
+
+`conda install -y -c apple tensorflow-deps`
+`python -m pip install tensorflow-macos tensorflow-metal`
+
+
 
 <br/>
 
