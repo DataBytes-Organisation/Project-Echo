@@ -691,7 +691,8 @@ function addMicrophonesByLayer(hmiState, layerName, iconPath){
       name: "mic",
       micLat: location.lat,
       micLon: location.lon,
-      micId: location.id,
+      micIcon: iconPath,
+      id: location.id,
       isMic: 1,
     });
     var icon = new ol.style.Style({
@@ -956,22 +957,40 @@ function createMapClickEvent(hmiState){
     if (feature){
 
       let values = feature.getProperties();
-      if (values.micId){
+      if (values.isMic){
         active_mic_content.show();
         default_mic_content.hide();
 
         const img = new Image();
+        let dice = Math.floor(Math.random() * 4) + 1;
         img.onload = function() {
           //console.log('Image exists!');
-          let dice = Math.floor(Math.random() * 5) + 1;
-          document.getElementById("desc_img").src = "../../images/bio/not_available_" + dice + "-bio.png";
+          document.getElementById("mic_desc_img").src = "../../images/bio/mic_bio_" + dice + ".png";
         }
         img.onerror = function() {
-          //console.log('Image exists!');
-          let dice = Math.floor(Math.random() * 5) + 1;
-          document.getElementById("desc_img").src = "../../images/bio/not_available_" + dice + "-bio.png";
+          console.log('Mic image does not exist!');
         }
-        img.src = "../../images/bio/" + result.common.toLowerCase() + "-bio.png";
+        img.src = "../../images/bio/mic_bio_" + dice + ".png";
+        //document.getElementById("mic_desc_name").innerText = result.common;
+        document.getElementById("mic_desc_id").innerText = values.id;
+        //document.getElementById("desc_summary").innerText = result.summary;
+
+        //Markup details specific session
+        let dateFormat = new Date();
+        document.getElementById("mic_markup_img").src = values.micIcon;
+        document.getElementById("mic_markup_details").innerHTML = "Microphone";
+        document.getElementById("mic_markup_loc_lon").innerHTML = values.micLon;
+        document.getElementById("mic_markup_loc_lat").innerHTML = values.micLat;
+        document.getElementById("mic_markup_date").innerHTML = dateFormat.toUTCString()
+        
+        animal_toggled = true;
+        const toggled_mic = new CustomEvent('micToggled',{
+        detail: {
+          message: "Mic toggled:",
+          }
+        })
+        
+        document.dispatchEvent(toggled_mic);
       }
       else{
         // console.log('feature: ', feature);

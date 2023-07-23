@@ -355,7 +355,7 @@
                 <!-- markup_icon -->
                 <div class="markup_column">
                   <div class="markup_row_left markup_row_title" style="width: 420px !important; margin: 0px !important;">
-                    <h2 id="mic_name"></h2>
+                    <h2 id="mic_desc_name">Microphone</h2>
                   </div>
                 </div>
               </div>
@@ -381,7 +381,7 @@
                     <div>Longitude</div>
                   </div>
                   <div class="markup_row_right">
-                    <div id="markup_loc_lon"></div>
+                    <div id="mic_markup_loc_lon"></div>
                   </div>
                 </div>
                 <div class="markup_column">
@@ -389,7 +389,7 @@
                     <div>Latitude</div>
                   </div>
                   <div class="markup_row_right">
-                    <div id="markup_loc_lat"></div>
+                    <div id="mic_markup_loc_lat"></div>
                   </div>
                 </div>
 
@@ -399,7 +399,7 @@
                     <div>Date</div>
                   </div>
                   <div class="markup_row_right" style="text-align: right !important; width: 400px !important">
-                    <div id="markup_date"></div>
+                    <div id="mic_markup_date"></div>
                   </div>
                 </div>
 
@@ -714,6 +714,14 @@
     setTimeout(()=> {
       currentTab = document.getElementById('animal-popup') 
       openNav('animal-popup')
+    },10)
+  })
+
+  document.addEventListener('micToggled', function(event){
+    closeTab()
+    setTimeout(()=> {
+      currentTab = document.getElementById('mic-popup') 
+      openNav('mic-popup')
     },10)
   })
 
