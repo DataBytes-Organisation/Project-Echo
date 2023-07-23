@@ -4626,7 +4626,7 @@
         },
         {
             "species": "Ephippitytha trigintiduoguttata",
-            "common": "'32-Spotted Katydid','Mottled Katydid', 'Speckled grasshopper' ",
+            "common": "32-Spotted Katydid",
             "summary": "The Spotted Katydid is a type of bush cricket found in eastern Australia.",
             "description": [
                 "They are named for the distinctive spots on their body, which can vary in color from green to brown.",
@@ -4704,7 +4704,7 @@
         },
         {
             "species": "Falco cenchroides",
-            "common": "'Nankeen kestrel','Australian kestral'",
+            "common": "Australian kestral",
             "summary": "The Nankeen kestrel is one of the most common and widespread raptors in Australia, and can be found in a variety of habitats including forests, grasslands, and urban areas.",
             "description": [
                 "This species is named after its distinctive coloration, which resembles the yellowish-brown color of Nankeen cloth, a type of cotton fabric that was once common in Australia.",
@@ -4815,7 +4815,7 @@
                 "These birds feed mainly on nectar, insects, and fruit. They have a specialized brush-tipped tongue that allows them to extract nectar from flowers with ease.",
                 "Singing Honeyeaters are known for their unique breeding habits. They form breeding pairs during the breeding season, and the female lays two to three eggs in a small cup-shaped nest made of twigs and bark.",
                 "Unlike other honeyeater species, Singing Honeyeaters are not territorial and will often feed in flocks. They have also been known to form mixed-species flocks with other bird species.",
-                
+                ""
             ],
             "img": ""
         },
