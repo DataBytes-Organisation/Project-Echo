@@ -103,6 +103,7 @@
               <a id="filter-menu-btn" class="tabs-button active" onclick="openTab('filter-menu')"></a>
               <a id="SIM-menu-btn" class="tabs-button" onclick="openTab('SIM')"></a>
               <a id="popup-menu-btn" class="tabs-button" onclick="openTab('animal-popup')"></a>
+              <a id="mic-popup-menu-btn" class="tabs-button" onclick="openTab('mic-popup')"></a>
               <a id="FAQ-menu-btn" class="tabs-button" onclick="openTab('FAQ')"></a>
               <span style="position: fixed; border-top: 6px solid rgba(247, 186, 206, 0.8); height: 2px; width: 440; margin-top: 36px;"></span>
             </div>
@@ -344,6 +345,69 @@
             <div id="animal-default-content">
               <h2 style="text-align: left; color: rgba(247, 186, 206, 1) !important;">Animal Bio Data</h2>
                 <p>Please click on a map marker to view bio data.</p>
+            </div>
+            </div>
+          </div>
+          <div id="mic-popup">
+            <div class="wrapper">
+            <div id="mic-popup-content">
+              <div class="markup_form">
+                <!-- markup_icon -->
+                <div class="markup_column">
+                  <div class="markup_row_left markup_row_title" style="width: 420px !important; margin: 0px !important;">
+                    <h2 id="mic_name"></h2>
+                  </div>
+                </div>
+              </div>
+              
+              <img id="mic_desc_img" src=""></img>
+              <div id="mic_desc_id" class="subtitle"></div>
+              <div id="mic_desc_details" class="desc"></div>
+              
+              <h2 style="margin-top: 20px !important;">Microhpone Details</h2>
+              <div class="markup_form">
+                <!-- markup_icon -->
+                <div class="markup_column">
+                  <div class="markup_row_left" style="width: 100px !important">
+                    <img id="mic_markup_img" src=""></img>
+                  </div>
+                  <div class="markup_row_right" style="text-align: right !important; width: 400px !important">
+                    <div id="mic_markup_details"></div>
+                  </div>
+                </div>
+                <!-- markup_location -->
+                <div class="markup_column">
+                  <div class="markup_row_left">
+                    <div>Longitude</div>
+                  </div>
+                  <div class="markup_row_right">
+                    <div id="markup_loc_lon"></div>
+                  </div>
+                </div>
+                <div class="markup_column">
+                  <div class="markup_row_left">
+                    <div>Latitude</div>
+                  </div>
+                  <div class="markup_row_right">
+                    <div id="markup_loc_lat"></div>
+                  </div>
+                </div>
+
+                <!-- markup_date -->
+                <div class="markup_column">
+                  <div class="markup_row_left" style="width: 100px !important">
+                    <div>Date</div>
+                  </div>
+                  <div class="markup_row_right" style="text-align: right !important; width: 400px !important">
+                    <div id="markup_date"></div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+            <div id="mic-default-content">
+              <h2 style="text-align: left; color: rgba(247, 186, 206, 1) !important;">Animal Bio Data</h2>
+                <p>Please click on a map marker to view microphone data.</p>
             </div>
             </div>
           </div>
@@ -598,6 +662,9 @@
         break;
       case "animal-popup":
         document.getElementById("popup-menu-btn").classList.add("active");
+        break;
+      case "mic-popup":
+        document.getElementById("mic-popup-menu-btn").classList.add("active");
         break;
       case "FAQ":
         document.getElementById("FAQ-menu-btn").classList.add("active");

@@ -689,6 +689,10 @@ function addMicrophonesByLayer(hmiState, layerName, iconPath){
         ol.proj.fromLonLat([location.lon, location.lat])
       ),
       name: "mic",
+      micLat: location.lat,
+      micLon: location.lon,
+      micId: location.id,
+      isMic: 1,
     });
     var icon = new ol.style.Style({
       image: new ol.style.Icon({
@@ -947,27 +951,47 @@ function createMapClickEvent(hmiState){
 
     let active_content = $("#animal-popup-content");
     let default_content = $("#animal-default-content");
+    let active_mic_content = $("#mic-popup-content");
+    let default_mic_content = $("mic-default-content");
     if (feature){
-      // console.log('feature: ', feature);
-      stopAudioPlayback();
-
-      active_content.show();
-      default_content.hide();
 
       let values = feature.getProperties();
-      if (values.eventId){
-        //console.log("saving " + values.eventId);
-        selectedVocalizationEventId = values.eventId;
-      }
-      if(values.isAnimalMovement){
-        document.getElementById("audioHeader").style.display = "none"
-        document.getElementById("audioControl").style.display = "none"
+      if (values.micId){
+        active_mic_content.show();
+        default_mic_content.hide();
+
+        const img = new Image();
+        img.onload = function() {
+          //console.log('Image exists!');
+          let dice = Math.floor(Math.random() * 5) + 1;
+          document.getElementById("desc_img").src = "../../images/bio/not_available_" + dice + "-bio.png";
+        }
+        img.onerror = function() {
+          //console.log('Image exists!');
+          let dice = Math.floor(Math.random() * 5) + 1;
+          document.getElementById("desc_img").src = "../../images/bio/not_available_" + dice + "-bio.png";
+        }
+        img.src = "../../images/bio/" + result.common.toLowerCase() + "-bio.png";
       }
       else{
-        document.getElementById("audioHeader").style.display = "flex"
-        document.getElementById("audioControl").style.display = "flex"
-      }
-      if (values.animalSpecies){
+        // console.log('feature: ', feature);
+        stopAudioPlayback();
+
+        active_content.show();
+        default_content.hide();
+        if (values.eventId){
+          //console.log("saving " + values.eventId);
+          selectedVocalizationEventId = values.eventId;
+        }
+        if(values.isAnimalMovement){
+          document.getElementById("audioHeader").style.display = "none"
+          document.getElementById("audioControl").style.display = "none"
+        }
+        else{
+          document.getElementById("audioHeader").style.display = "flex"
+          document.getElementById("audioControl").style.display = "flex"
+        }
+        if (values.animalSpecies){
           //console.log(values.animalSpecies)
           var result = sample_data.find(({ species }) => species.toLowerCase() === values.animalSpecies.toLowerCase())
           if (result) {
@@ -1036,13 +1060,16 @@ function createMapClickEvent(hmiState){
             document.dispatchEvent(toggled_animal);
           
 
-      }
-      else{
-        console.log(values);
+        }
+        else{
+          console.log(values);
+        }
       }
     } else {
       active_content.hide();
+      active_mic_content.hide();
       default_content.show();
+      default_mic_content.show();
     }
   });
 }
