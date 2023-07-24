@@ -3,13 +3,17 @@ const app = express();
 const path = require('path');
 const fs = require('fs');
 const cookieSession = require("cookie-session");
+const dbConfig = require("./config/db.config");
+
+
 
 //Add mongoDB module inside config folder
-const db = require("./public/config");
+const db = require("./model");
 const Role = db.role;
 
+//Establish Mongo Client connection to mongoDB
 db.mongoose
-  .connect(`mongodb://${dbConfig.HOST}:${dbConfig.PORT}/${dbConfig.DB}`, {
+  .connect(`mongodb://${dbConfig.USERNAME}:${dbConfig.PASSWORD}@${dbConfig.HOST}:${dbConfig.PORT}/${dbConfig.DB}`, {
     useNewUrlParser: true,
     useUnifiedTopology: true
   })
@@ -23,7 +27,33 @@ db.mongoose
   });
 
 
-const port = 8080;
+//Initalize the data if no user role existed
+function initial() {
+  Role.estimatedDocumentCount((err, count) => {
+    if (!err && count === 0) {
+      new Role({
+        name: "user"
+      }).save(err => {
+        if (err) {
+          console.log("error", err);
+        }
+
+        console.log("added 'user' to roles collection");
+      });
+      new Role({
+        name: "admin"
+      }).save(err => {
+        if (err) {
+          console.log("error", err);
+        }
+
+        console.log("added 'admin' to roles collection");
+      });
+    }
+  });
+}
+
+const port = 8081;
 
 // serve static files from the public directory
 app.use(express.static(path.join(__dirname, 'public')));
@@ -32,7 +62,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 const cors = require("cors");
 
 var corsOptions = {
-  origin: "http://localhost:8080"
+  origin: "http://localhost:8081"
 };
 
 app.use(cors(corsOptions))
@@ -47,7 +77,7 @@ app.use(bodyParser.urlencoded({ extended: true }))
 
 app.use(
   cookieSession({
-    name: "bezkoder-session",
+    name: "echo-session",
     keys: ["COOKIE_SECRET"], // should use as secret environment variable
     httpOnly: true
   })
@@ -99,6 +129,10 @@ app.post("/send_email", (req,res) => {
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, 'public/index.html'))
 })
+
+// routes
+require('./routes/auth.routes')(app);
+require('./routes/user.routes')(app);
 
 // start the server
 app.listen(port, () => {
