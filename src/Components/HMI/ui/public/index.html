@@ -235,7 +235,7 @@
                   <div class="toggle-switch-container">
                     <label for="toggle-switch" class="toggle-label">Simulator:</label>
                     <label class="toggle-switch">
-                      <input id="simulatorToggle" type="checkbox" checked>
+                      <input id="simulatorToggle" type="checkbox">
                       <span class="slider round"></span>
                     </label>
                   </div>
@@ -972,8 +972,8 @@
   window.onload = function() {
     console.log("Website loaded!");
     initialiseHMI(hmiState);
-    //sim is on by default
-    startSimulator();
+    //sim is usually on by default, but this functionality is disabled during development
+    //startSimulator();
   };
 
   //Microphone show/hide
