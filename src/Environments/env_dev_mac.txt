@@ -1,13 +1,7 @@
 appdirs
-<<<<<<< Updated upstream
 audio2numpy
 audiomentations
 audioread
-=======
-audiomentations
-audioread
-catboost
->>>>>>> Stashed changes
 certifi
 cffi
 chardet
@@ -41,19 +35,12 @@ keras-toolbox
 keras-unet
 keras-util
 kiwisolver
-<<<<<<< Updated upstream
-librosa==0.10.0.post2
-=======
 librosa
->>>>>>> Stashed changes
 lightgbm
 llvmlite
 matplotlib
 museval
-<<<<<<< Updated upstream
-=======
 mutagen
->>>>>>> Stashed changes
 notebook
 numba
 numpy
