@@ -13,7 +13,7 @@ const Role = db.role;
 
 //Establish Mongo Client connection to mongoDB
 db.mongoose
-  .connect(`mongodb://${dbConfig.USERNAME}:${dbConfig.PASSWORD}@${dbConfig.HOST}`, {
+  .connect(`mongodb://${dbConfig.USERNAME}:${dbConfig.PASSWORD}@${dbConfig.HOST}/${dbConfig.DB}?authSource=admin`, {
     useNewUrlParser: true,
     useUnifiedTopology: true
   })
@@ -22,7 +22,7 @@ db.mongoose
     initial();
   })
   .catch(err => {
-    console.log("ConnString: ", `mongodb://${dbConfig.USERNAME}:${dbConfig.PASSWORD}@${dbConfig.HOST}/${dbConfig.DB}`)
+    console.log("ConnString: ", `mongodb://${dbConfig.USERNAME}:${dbConfig.PASSWORD}@${dbConfig.HOST}/${dbConfig.DB}?authSource=admin`)
     console.error("Connection error", err);
     process.exit();
   });
