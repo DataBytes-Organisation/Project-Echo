@@ -4,6 +4,8 @@ const path = require('path');
 const fs = require('fs');
 const cookieSession = require("cookie-session");
 const dbConfig = require("./config/db.config");
+const jwt = require("jsonwebtoken");
+const { authJwt } = require("./middleware");
 
 
 
@@ -127,13 +129,41 @@ app.post("/send_email", (req,res) => {
 
 })
 
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, 'public/index.html'))
-})
-
 // routes
 require('./routes/auth.routes')(app);
 require('./routes/user.routes')(app);
+
+app.get("/", (req, res) => {
+  if (authJwt.verifyToken && authJwt.isUser) {
+    console.log("This is user session!")
+    res.sendFile(path.join(__dirname, 'public/index.html'))
+  }
+  else {
+    console.log("This is not user sessions!")
+    res.json("No available session, you have not logged in yet")
+  }
+  
+})
+
+
+
+app.get("/login", (req,res) => {
+  res.sendFile(path.join(__dirname, 'public/login.html'));
+})
+
+
+app.get("*", (req,res) => {
+  let token = req.session.token;
+  console.log("Current token: ", token)
+  if (!token) {
+    console.log("Current user session unavailable")
+    res.sendFile(path.join(__dirname, 'public/login.html'));
+  } else {
+    console.log("redirect to homepage")
+    return res.sendFile(path.join(__dirname, 'public/index.html'))
+  }
+
+})
 
 // start the server
 app.listen(port, () => {

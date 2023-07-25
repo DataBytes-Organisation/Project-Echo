@@ -25,4 +25,9 @@ module.exports = function(app) {
     [authJwt.verifyToken, authJwt.isAdmin],
     controller.adminBoard
   );
+  app.get(
+    "/test",
+    [authJwt.verifyToken, authJwt.isUser],
+    controller.publicHMI
+  )
 };

@@ -13,3 +13,8 @@ exports.allAccess = (req, res) => {
   exports.moderatorBoard = (req, res) => {
     res.status(200).send("Moderator Content.");
   };
+
+  exports.publicHMI = (req, res) => {
+    console.log("Sending index.html from router")
+    res.status(200).sendFile(path.join(__dirname, 'public/index.html'))
+  };

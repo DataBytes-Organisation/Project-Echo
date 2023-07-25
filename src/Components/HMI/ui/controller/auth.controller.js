@@ -102,12 +102,20 @@ exports.signin = (req, res) => {
 
       req.session.token = token;
 
-      res.status(200).send({
+      // res.status(200).send({
+      //   id: user._id,
+      //   username: user.username,
+      //   email: user.email,
+      //   roles: authorities,
+      // });
+      let result = {
         id: user._id,
         username: user.username,
         email: user.email,
         roles: authorities,
-      });
+      }
+      console.log("user login successfully: ", result);
+      res.status(200).redirect("/")
     });
 };
 
