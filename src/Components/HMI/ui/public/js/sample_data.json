@@ -1557,11 +1557,11 @@
       "common": "Grey-crowned Babbler",
       "summary": "Pomatostomus temporalis, commonly known as the Grey-crowned Babbler, is a small bird species found in eastern Australia. This bird species is known for its social behavior and unique vocalizations.",
       "description": [
-        "The Grey-crowned Babbler feeds mainly on insects, seeds, and fruits.",
-        "This species is highly social and often seen in family groups of up to 10 birds.",
-        "Grey-crowned Babblers have a unique vocalization system that includes a range of calls and songs that are used for communication and group cohesion.",
-        "Grey-crowned Babblers build communal nests made of sticks, grass, and other materials.",
-        "The Grey-crowned Babbler is listed as a vulnerable species due to habitat loss and fragmentation."
+        "The Grey-crowned Babbler is a distinctive bird, 23-29 cm long, with a curved bill, pale-grey crown, dark face mask, orange-tipped wings, and white-tipped tail.",
+        "It lives in groups of 2-12 birds, all of which participate in nesting activities and territorial defence.",
+        "Grey-crowned Babblers are insectivores that forage partly on the ground and partly on the trunks and branches of trees and shrubs.",
+        "Family groups build a number of large, domed stick nests in saplings, shrubs or trees, usually some 1-6 m above the ground. These nests are used as dormitories for communal roosting at night. An extra nest is built for breeding.",
+        "Adult birds have an average life expectancy of approximately four years. Young birds stay with the family group for at least one year after fledging and may remain for two or more years. "
       ],
       "img": ""
     },
@@ -1570,11 +1570,11 @@
       "common": "White-browed Babbler",
       "summary": "Pomatostomus superciliosus, commonly known as the White-browed Babbler, is a small bird species found in Australia. This bird species is known for its social behavior and unique vocalizations.",
       "description": [
-        "The White-browed Babbler feeds mainly on insects, seeds, and fruits.",
-        "This species is highly social and often seen in family groups of up to 10 birds.",
-        "White-browed Babblers have a unique vocalization system that includes a range of calls and songs that are used for communication and group cohesion.",
-        "White-browed Babblers build communal nests made of sticks, grass, and other materials.",
-        "The White-browed Babbler is listed as a vulnerable species due to habitat loss and fragmentation."
+        "The white-browed babbler id a medium-sized terrestrial bird with a long and decurved bill, and short and rounded wings.",
+        "Full body is similar, but slightly smaller than the chestnut-crowned or Hall's babbler.",
+        "The tail is long and graduated ending with a rounded tip. The gregarious nature of this species means that the tail is often fanned or raised or any mix of the two.",
+        "There are many variations to colour; however, the adult babbler generally varies from a dark grey-brown to solid dark brown with distinguished white supercilium and dark brown eye stripe.",
+        "Juveniles often have more pronounced dark plumage with a chestnut or cinnamon motif, especially on the underside. Breeding adult males may sometimes have a more pronounced brown 'cap' compared to females or juveniles."
       ],
       "img": ""
     },
@@ -1713,11 +1713,11 @@
       "common": "Little Red Flying-fox",
       "summary": "Pteropus scapulatus, commonly known as the Little Red Flying-fox, is a species of megabat native to Australia. They are known for their ability to fly long distances and their important role in pollination and seed dispersal.",
       "description": [
-        "Little Red Flying-foxes are social animals and often roost in large groups of thousands of individuals.",
-        "They are herbivores and feed mainly on nectar, pollen, and fruit.",
-        "Little Red Flying-foxes are important pollinators and seed dispersers, helping to maintain the health of many ecosystems.",
-        "They are known for their ability to fly long distances, with some individuals traveling up to 1,000 km in search of food and water.",
-        "The Little Red Flying-fox is a threatened species, with its population declining due to habitat destruction and fragmentation, as well as hunting and persecution by humans."
+        "P. scapulatus occurs at the coast and further inland, camping and flying to the tropical to temperate regions that provide them with an annual source of nectar. They exhibit an unusual method of obtaining drinking water during dry periods, skimming a stream's surface to gather it onto their fur while they are in flight.",
+        "A flying mammal of the pteropodid family, frugivorous bats with simple dog-like heads, often found roosting closely together in large numbers. The characteristic absence of a tail distinguishes these 'flying-foxes' from other bats in Australia.",
+        "The colour of the pelage is reddish brown, the short fur appearing over most of the body and more sparsely at the lower part of the leg.",
+        "The primary source of food for this species is obtained from Eucalyptus and Corymbia blossoms. Their diet consists of nectar and pollen of these eucalypts and is responsible for the much of their pollination, the irregular flowering periods induce the camps to forage in new areas.",
+        "The animals are nomadic and difficult to track, as they tend not to live in urban areas. No accurate method in use currently can estimate the population to determine if it is stable or in decline. The species is very likely to be affected by the same factors that have seen the grey-headed flying fox and spectacled flying fox listed as threatened, that is, the destruction of foraging areas and roosting habitat."
       ],
       "img": ""
     },
@@ -1726,11 +1726,9 @@
       "common": "Flying Foxes",
       "summary": "The Pteropus genus is a group of megabats, commonly known as flying foxes, that are found throughout Asia, Australia, and the Pacific. They are known for their large size and their important role in pollination and seed dispersal.",
       "description": [
-        "The Pteropus genus includes over 60 species of flying foxes, ranging in size from the small Little Red Flying-fox to the large Black Flying-fox, which can have a wingspan of up to 1.5 meters.",
-        "Flying foxes are herbivores and feed mainly on nectar, pollen, and fruit.",
-        "They are important pollinators and seed dispersers, helping to maintain the health of many ecosystems.",
-        "Some species of flying foxes are considered to be pests, as they can cause damage to crops and orchards.",
-        "Many species of flying foxes are threatened by habitat destruction and fragmentation, hunting, and persecution by humans."
+        "TThe Torresian Flying-fox is claimed to be the smallest flying-fox known to occur in Australia. Its scientific description was first published in 2002, however there is still ongoing debate among experts over the recognition of this taxon. It is blackish with relatively long ears and a long thumb. The fur on the belly is often tipped grey. Little is known of its ecology, but its teeth suggest that it is a fruit-eating species.",
+        "Torresian Flying-foxes roost in rainforest trees.",
+        "They are thought to eat rainforest fruits and are likely to be important dispersers of seeds on Moa, the only rainforested island in the Torres Strait."
       ],
       "img": ""
     },
@@ -1804,11 +1802,10 @@
       "common": "Little Grassbird",
       "summary": "The Poodytes gramineus, also known as the Little Grassbird, is a small passerine bird that is native to Australia. These birds have an olive-brown plumage and a distinct white eyebrow, and they are known for their loud and melodious song that is often heard in grassy areas.",
       "description": [
-        "The Little Grassbird is known for its distinctive call that sounds like a rattling trill. This sound is created by vibrating its throat while singing.",
-        "These birds are found in a variety of habitats, including wetlands, grasslands, and shrublands, and they are often seen skulking in the tall grasses and reeds.",
-        "Little Grassbirds are known to build elaborate nests in the reeds and grasses. They often use spiderwebs to hold the nest together, which helps to make it more durable and stable.",
-        "The Little Grassbird is an omnivore that feeds on insects, spiders, seeds, and small vertebrates. They are known to forage on the ground and in the vegetation for their food.",
-        ""
+        "These sexually monomorphic birds are found in reed beds, rushes, lignum swamps and salt marshes of Southeastern Australia.",
+        "The little grassbird is an inconspicuous and dull-coloured bird that is heard more regularly than it is seen, known for readily engaging in conversation with people.",
+        "They feed on insects and small arthropods, usually remaining in densely covered areas of vegetation and living nomadically with no regular migration patterns.",
+        "The species has been assessed as Least Concern by the IUCN. The population trend appears to be increasing; therefore the species does not reach the thresholds for a vulnerable listing. Birtdlife Australia lists it as secure in all states."
       ],
       "img": ""
     },
@@ -1817,11 +1814,10 @@
       "common": "Purple Swamphen",
       "summary": "The Porphyrio porphyrio, also known as the Purple Swamphen, is a large and colorful bird that is native to the wetlands of Africa, southern Europe, and Asia. These birds are known for their distinctive plumage and loud calls, and they are often seen wading through the shallow waters of their habitats.",
       "description": [
-        "The Purple Swamphen is a large bird that can grow up to 50 centimeters in length and weigh up to 1 kilogram. They have a distinctive blue-purple plumage, red bill, and a red and yellow shield on their forehead.",
-        "These birds are known for their loud and distinctive calls, which they use to communicate with each other and defend their territory. Their calls are often heard at dawn and dusk.",
-        "The Purple Swamphen is an omnivore that feeds on a variety of foods, including plants, insects, fish, and small vertebrates. They are often seen wading in the shallow waters of their habitat, using their long toes to grasp and catch their prey.",
-        "These birds are known to be strong and agile fliers, and they are able to fly short distances to escape predators or reach new habitats.",
-        ""
+        "The western swamphen is primarily found in wetlands in Spain (where the largest population lives), Portugal, southeastern France, Italy (Sardinia and Sicily) and northwestern Africa (Morocco, Algeria and Tunisia).",
+        "The species makes loud, quick, bleating and hooting calls which are hardly bird-like in tone. It is particularly noisy during the breeding season.",
+        "Despite being clumsy in flight, it can fly long distances and is a good swimmer, especially for a bird without webbed feet.",
+        "Today the western swamphen is locally common, with the largest population in Spain. It was formerly listed as 'Rare' by the European Union, but has been delisted to 'Localised'."
       ],
       "img": ""
     },
@@ -1830,11 +1826,10 @@
       "common": "Redeye Cicada",
       "summary": "The Psaltoda moerens, also known as the Redeye cicada, is a large and colorful cicada that is native to eastern Australia. These cicadas are known for their distinctive calls, which are often heard during the summer months.",
       "description": [
-        "The Redeye cicada is a large and colorful insect that can grow up to 4.5 centimeters in length. They have a black body with bright red eyes and wings that are mottled with brown and black.",
-        "These cicadas are known for their loud and distinctive calls, which are created by vibrating their tymbals, a specialized structure in their abdomen. The calls are used to attract mates and defend their territory.",
-        "Redeye cicadas are found in a variety of habitats, including forests, woodlands, and urban areas. They are often seen clinging to the bark of trees or plants, and they are known to shed their exoskeletons on tree trunks.",
-        "These cicadas have a unique life cycle that involves spending most of their lives underground as nymphs. They emerge from the ground as adults, mate and lay eggs, and then die within a few weeks.",
-        ""
+        "Populations can vary greatly between years; one year they may be present in large numbers and the next they may be entirely absent.",
+        "They feed primarily on eucalyptus but also on Angophora trees. As they feed on tree sap they expel small droplets of clear waste fluid. When numbers are high, this can form a constant stream.",
+        "Redeyes are also attracted to light. The female lays eggs in dead or dying plant tissue only.",
+        "The redeye is preyed upon by the cicada killer wasp (Exeirus lateritius), which stings and paralyses the cicada before storing it in its burrow with the wasp egg. When the larva hatches it consumes the hapless insect."
       ],
       "img": ""
     },
@@ -1843,11 +1838,10 @@
       "common": "Varied Lorikeet",
       "summary": "The Varied Lorikeet (Psephotellus varius) is a colorful species of parrot native to the eastern and southeastern parts of Australia. These parrots are known for their striking plumage, which is predominantly green with blue and yellow markings on the wings and tail.",
       "description": [
-        "Varied Lorikeets can grow up to 28cm in length and weigh between 70 and 90g.",
-        "These parrots are highly social and usually travel in flocks of up to 20 individuals.",
-        "They feed primarily on nectar and pollen, but will also eat insects, fruit, and seeds.",
-        "The breeding season for Varied Lorikeets is typically between August and December.  Females lay between 2-4 eggs per clutch, which are incubated by both parents for around 25 days.",
-        "Young Varied Lorikeets fledge after approximately 6 weeks and become fully independent after 2-3 months."
+        "The varied lorikeet is mainly green with short yellow longitudinal streaks. The fine yellow streaking and broad orbital patch are distinctive.",
+        "In the female the red on the head is less extensive, and the breast has duller colours. Juveniles are much duller and are mainly green with an orange forehead, pale-brown irises, and a brown beak that is orange at the base.",
+        "ts flight is swift and direct and contact call is a distinct shrill screech. The call is given constantly in flight and flocks are often heard before they are seen. This is a blossom nomad.",
+        "IUCN status: Least Concern"
       ],
       "img": ""
     },
@@ -1856,11 +1850,10 @@
       "common": "Red-rumped Parrot",
       "summary": "The Red-rumped Parrot (Psephotus haematonotus) is a small and brightly-colored species of parrot native to southeastern Australia. As their name suggests, these parrots are primarily green with a bright red rump and lower back.",
       "description": [
-        "Red-rumped Parrots can grow up to 29cm in length and weigh between 50-80g.",
-        "They are known for their high-pitched and chirpy calls, which are usually heard during flight or when perched.",
-        "These parrots are commonly found in open woodlands, grasslands, and farmlands.",
-        "Red-rumped Parrots feed mainly on seeds, but will also eat fruit and insects.",
-        "The breeding season for Red-rumped Parrots is typically between August and December.  Females lay between 3-6 eggs per clutch, which are incubated by both parents for around 20-22 days."
+        "Red-rumped parrots are slim, moderate-sized parrots. The male's plumage is a bright emerald-green with yellow underparts, a brick-red rump and blue highlights on the wings and upper back. The female's plumage is less vibrant, with pale olive underparts, dull green wings and back and blue-black wingtips.",
+        "They can be found in pairs or flocks in open country with access to water. They avoid the coast and the wetter, more heavily wooded areas. Clearing of large tracts of forest and the provision of water for stock has probably extended their range.",
+        "Red-rumped parrots do well in aviaries and cages. They do not like crowded spaces and will sometimes be aggressive towards other birds if they do not have enough space. Red-rumped parrots can also be hand-reared, provided that they have a large cage and are taken out of their cage on a daily basis to prevent boredom, as it may result in the parrot pulling out its feathers to occupy itself.",
+        "In captivity, if properly cared for, these birds will live from 15 to 32 years."
       ],
       "img": ""
     },
@@ -1869,11 +1862,10 @@
       "common": "Common Ringtail Possum",
       "summary": "The Common Ringtail Possum (Pseudocheirus peregrinus) is a small and nocturnal marsupial native to Australia. These possums are named after their distinctive prehensile tails, which are used for grasping and balancing while climbing.",
       "description": [
-        "Common Ringtail Possums can grow up to 35cm in length (including their tail) and weigh between 350-550g.",
-        "They are primarily arboreal and are commonly found in eucalyptus forests and woodlands.",
-        "Common Ringtail Possums are herbivorous and feed mainly on leaves, flowers, and fruits.",
-        "These possums are highly social and usually live in family groups consisting of one adult male, one or more adult females, and their offspring.",
-        "The breeding season for Common Ringtail Possums is typically between May and September.  Females give birth to a single young, which remains in the mother's pouch for around 4 months."
+        "It lives in a variety of habitats and eats a variety of leaves of both native and introduced plants, as well as flowers, fruits and sap. This possum also consumes a special type of faeces that is produced during the daytime when it is resting in a nest. This behaviour is called caecotrophy and is similar to that seen in rabbits.",
+        "The common ringtail possum is nocturnal and well adapted to arboreal life. It relies on its prehensile tail and sometimes will descend to the ground. They communicate with soft, high-pitched, and twittering calls.",
+        "The common ringtail possum feeds on a wide variety of plants in the family Myrtaceae including the foliage, flowers and fruits from shrubs and lower canopy.",
+        "Common ringtail possum populations severely declined during the 1950s. However, populations seem to have recovered in recent times. Because they are largely arboreal, common ringtail possums are particularly affected by deforestation in Australia. They are also heavily predated upon by the introduced red fox. They are also hit by cars, or killed by snakes, cats and dogs in suburban areas."
       ],
       "img": ""
     },
@@ -1882,11 +1874,10 @@
       "common": "Silver Knight",
       "summary": "Psaltoda plaga, commonly known as the silver knight, is a species of cicada found in eastern Australia. These large and noisy insects are known for their distinctive calls, which can reach up to 110 decibels and are often heard during the summer months.",
       "description": [
-        "The silver knight cicada is named for its metallic silver appearance, which gives it a knight-like appearance.",
-        "Male silver knights produce their loud calls by vibrating their tymbals, which are specialized structures on their abdomens. The sound is amplified by their mostly hollow abdomens.",
-        "The calls of male silver knights are distinct from other cicada species, with a series of rapid and high-pitched notes followed by a longer, lower-pitched note. This pattern can vary between populations and is believed to be a way for males to attract mates and establish territories.",
-        "Female silver knights are larger than males and have a distinctive green coloration.",
-        "Silver knights spend most of their lives underground as nymphs, feeding on sap from the roots of trees. They emerge from the soil as adults after several years, usually during the warmer months."
+        "This species can be recognised by its forewing having a zigzag infuscation (dark marking) near the apex, while the hindwing lacks an infuscation around the border",
+        "The colour of adult male black prince varies with age and locality. ",
+        "There are two components of the call; a rhythmic revving, which is more prevalent when the weather is cooler, and a continuous call, more common in hot weather.",
+        "Live cicadas are often collected by climbing trees, a common cause of summertime broken arms. The cicadas can be kept temporarily as pets in shoeboxes, but not easily for longer than a day or two, given that they need flowing sap for food."
       ],
       "img": ""
     },
@@ -1895,11 +1886,11 @@
       "common": "Mulga Parrot",
       "summary": "Psephotellus varius, also known as the Mulga Parrot, is a small species of parrot that is found throughout much of inland Australia. These birds are commonly found in arid and semi-arid regions, particularly in mulga woodlands and shrublands.",
       "description": [
-        "Mulga Parrots are sexually dimorphic, meaning males and females have different coloration. Males have a bright green head and neck, a yellow chest and belly, and a red patch on the nape of the neck. Females have a more subdued green plumage with a grayish-brown head and neck.",
-        "These birds are known for their acrobatic flight displays during courtship, which involve quick, darting movements and sharp turns.",
-        "Mulga Parrots are mainly seed-eaters, feeding on a variety of grasses and seeds of acacia and eucalyptus trees. They may also eat insects and other small invertebrates.",
-        "During breeding season, these parrots form monogamous pairs and construct a nest in a tree hollow or crevice. The female lays 4-6 eggs, which are incubated for around 20 days.",
-        "Mulga Parrots are not considered to be globally threatened, although they may be vulnerable to habitat loss and degradation in some parts of their range. They are popular birds among aviculturists and have been successfully bred in captivity."
+        "The mulga parrot is a medium-sized parrot of slim build and long tail. The species is sexually dimorphic, the sexes differing markedly in plumage.",
+        "The male mulga parrot is multicolored, from which the alternate common name many-coloured parrot is derived. It is a bright green overall, with a bluish tinge on the neck and above the eye, and paler on the breast. The rump is light green. ",
+        "The female is duller overall, with an olive-brown head and chest, duller yellow forehead and red patch on the back of the head, and pale green belly, and more brown-grey bill. It sometimes also has a red shoulder.",
+        "Breeding season is anywhere from July to December or after rainfall, with one or occasionally two broods raised depending on rainfall. A hollow in a tree is utilised for nesting.",
+        "It has a endangered status of 'Least Concer'"
       ],
       "img": ""
     },
@@ -1908,11 +1899,10 @@
       "common": "Chirruping Wedgebill",
       "summary": "Psophodes cristatus, commonly known as the chirruping wedgebill, is a bird species found in the arid and semi-arid regions of Australia. These small and active birds are known for their distinctive appearance, vocalizations, and unique feeding behavior.",
       "description": [
-        "Chirruping wedgebills have a distinctive appearance, with a large head, short neck, and a distinctive black and white striped pattern on their back and wings.",
-        "These birds are highly vocal and have a distinctive, repetitive chirping call that gives them their name.",
-        "Chirruping wedgebills are omnivorous, feeding on a variety of insects, seeds, and plant matter. They are known for their unique feeding behavior, in which they use their strong beaks to break open tough seed pods and extract the seeds inside.",
-        "The species is highly adapted to life in arid and semi-arid environments and is able to survive without access to free water by obtaining moisture from their food.",
-        "Chirruping wedgebills are often seen in pairs or small family groups and are known for their cooperative breeding behavior."
+        "Commonly found in low shrublands in south-eastern inland Australia, the species is distinguished by its distinctive, chirruping call. The chirruping wedgebill and chiming wedgebill (Psophodes occidentalis) were considered to be a single species until as late as 1973, when they were separated due to marked differences in their calls.",
+        "Its bill is dark and wedge-shaped when mature, and horn-coloured when immature. It possesses a slim upright crest, and long rounded tail. Adult plumage consists of pale brown upperparts, with white/pale grey underparts. Flight feathers are edged with white, and the tail is coloured dark black-brown with a white tip. Immature individuals possess similar plumage, the only key differences being buff-tipped flight feathers, unlike the white tips of the mature individual.",
+        "This bird is often misidentified as the chiming wedgebill (Psophodes occidentalis). Key identifying features include the faint breast streaking, slightly longer tail, and repetitive chirruping call",
+        "IUCN status: Least Concern"
       ],
       "img": ""
     },
@@ -1921,11 +1911,10 @@
       "common": "Black-throated whipbird",
       "summary": "Psophodes nigrogularis, commonly known as the black-throated whipbird, is a bird species found in the forests and woodlands of eastern Australia. These elusive and cryptic birds are known for their distinctive calls and striking appearance.",
       "description": [
-        "Black-throated whipbirds are named for their whip-like calls, which are often heard in pairs or family groups. The male makes the initial 'whip' sound, followed by the female's 'crack' response.",
-        "These birds have a striking appearance, with black and white stripes on their heads and distinctive black throat feathers.",
-        "Black-throated whipbirds are territorial and have been known to defend their territories against other birds and even humans.",
-        "The species is known for its unusual breeding behavior, with females laying eggs in the nests of other birds, often the superb fairywren or the grey shrike-thrush. The foster parents then raise the chick as their own.",
-        "Black-throated whipbirds are notoriously difficult to spot, often remaining hidden in the undergrowth. Birdwatchers and naturalists may need to rely on their calls to detect their presence."
+        "It is predominantly olive green with a black throat and a narrow white cheek-patch edged with black on its face.",
+        "It has a small crest and a long dark olive-green tail tipped with white, its underparts are a paler olive colour. The bill is black with blackish feet. Juveniles are a duller olive-brown in colour and lack the white cheek stripes and dark throat.",
+        "The white-bellied whipbird (Psophodes leucogaster) was formerly treated as conspecific with the black-throated whipbird. It was promoted to species status based on an analysis of mitochondrial DNA sequences published in 2017.",
+        "IUCN Status: Least Concern"
       ],
       "img": ""
     },
@@ -1934,11 +1923,9 @@
       "common": "Chiming Wedgebill",
       "summary": "Psophodes occidentalis, also known as the Chiming Wedgebill, is a species of bird found in the arid regions of central and western Australia. They are known for their distinctive chiming call, which sounds like a series of metallic notes.",
       "description": [
-        "Chiming Wedgebills are ground-dwelling birds and are rarely seen in flight.",
-        "They are highly territorial and will defend their territory aggressively against other birds.",
-        "Chiming Wedgebills are omnivorous and will eat a wide variety of insects, as well as seeds and fruit.",
-        "They are known to drink from dew drops and shallow pools of water in arid areas where water is scarce.",
-        ""
+        "The chiming wedgebill and chirruping wedgebill (Psophodes occidentalis) were considered a single species until as late as 1973, when they were separated due to marked differences in their calls.",
+        "The chiming wedgebill makes a cooing sound during mating.",
+        "This species has an extremely large range, and hence does not approach the thresholds for Vulnerable under the range size criterion in IUCN Red List."
       ],
       "img": ""
     },
@@ -1947,11 +1934,9 @@
       "common": "Eastern Whipbird",
       "summary": "Psophodes olivaceus, commonly known as the Eastern Whipbird, is a species of passerine bird that is found in eastern Australia. These birds are known for their distinctive call, which sounds like the crack of a whip followed by a trill.",
       "description": [
-        "Eastern Whipbirds are relatively large birds, growing up to 30 cm in length.",
-        "They are sexually dimorphic, with males having a white cheek patch and females having a brown cheek patch.",
-        "Eastern Whipbirds are usually found in pairs or small family groups, and are often heard but not seen due to their shy nature and preference for dense vegetation.",
-        "They primarily feed on insects and other small invertebrates, which they find by foraging on the ground or in low vegetation.",
-        "Eastern Whipbirds are monogamous and build nests in low shrubs or saplings using twigs and other plant material.  Females typically lay two eggs, which both parents incubate and care for."
+        "The eastern whipbird is generally shy, and is heard much more often than seen. Its long drawn out call - a long note, followed by a 'whip crack' (which is the source of the common name) and some follow-on notes - is one of the most distinctive sounds of the eastern Australian bush.",
+        "The call is usually a duet between the male and female, the male producing the long note and whip crack and female the following notes. Calls are most frequent in the early morning, though do occur through the day with small peaks at noon and sunset. Though male calls are consistent across the species range, a high degree of variation in female calls has been reported.",
+        "Whipbirds are monogamous. Breeding occurs from late winter through spring; a loosely built bowl of twigs and sticks lined with softer material such as grasses, located in short shrubs or trees."
       ],
       "img": ""
     },
@@ -1960,11 +1945,10 @@
       "common": "Rose-crowned Fruit Dove",
       "summary": "Ptilinopus regina, also known as the Rose-crowned Fruit Dove, is a species of bird in the family Columbidae, native to New Guinea and nearby islands. The species is characterized by its distinctive pink head and green body.",
       "description": [
-        "The Rose-crowned Fruit Dove feeds on a variety of fruits, including figs, guavas, and papayas.",
-        "Males of the species perform courtship displays where they bow their heads and fan their tails to attract a mate.",
-        "Ptilinopus regina is considered to be a species of least concern by the IUCN, due to its large range and stable population.",
-        "",
-        ""
+        "The Rose-crowned Fruit-Dove is a small, compact dove, with a short tail and rounded wings. Its name comes from the deep pink cap or forehead, which is bordered behind by a narrow yellow stripe. The upper body is bright green and the under-body orange and yellow with a rose-coloured patch. The throat and upper breast is rough grey. In flight, dark underwings contrast with the yellow body and band on the end of the tail. The female is similar, but lighter.",
+        "Rose-crowned Fruit-Doves are found in coastal tall tropical and sub-tropical forests, particularly with dense vine growth, in monsoon rainforest and tall woodlands near rainforest with many fruiting trees. They are sometimes found in mangroves.",
+        "Rose-crowned Fruit-Doves feed in the canopy of rainforest, mainly in the morning or late afternoon. They swallow fruit whole and particularly like figs and the fruit of other species of rainforest trees, palms and vines. They also use Camphor Laurel as a food source. They feed singly or in pairs or small parties and take water from leaves or from dew, not from the ground.",
+        "The Rose-crowned Fruit Dove is listed as vulnerable in New South Wales, with threats including: rainforest clearing and fragmentation, logging, weeds and increased fire regimes altering habitat, and the removal of Camphor Laurel, an introduced tree that has become an important food source, without appropriate alternatives."
       ],
       "img": ""
     },
@@ -1973,11 +1957,10 @@
       "common": "Satin Bowerbird",
       "summary": "Ptilonorhynchus violaceus, commonly known as the Satin Bowerbird, is a species of bowerbird found in eastern Australia. They are known for their elaborate mating displays and intricate bowers, which they construct from twigs and decorate with colorful objects.",
       "description": [
-        "Male Satin Bowerbirds use a combination of vocalizations and dance-like movements to attract females.",
-        "The species is known to collect and decorate their bowers with blue objects, such as feathers and bottle caps.",
-        "Ptilonorhynchus violaceus is listed as a species of least concern by the IUCN, due to its large range and stable population.",
-        "",
-        ""
+        "Mature males have violet-blue eyes and are uniformly coloured black, however, light diffraction by the surface texture of the feathers results in an almost metallic sheen giving a deep shiny blue appearance.[2][3] Immature males are coloured and marked the same as females and are often mistaken for them.",
+        "Females might be mistaken for the green catbird or spotted catbird with distinctively green/brown or otherwise entirely brown upper body and lighter under body with a distinct reticulated or scalloped pattern, but with very striking blue eyes.",
+        "Like all Ptilonorhynchidae, satin bowerbirds are predominantly frugivorous as adults, though they also eat leaves and a small amount of seeds and insects. As nestlings, however, they are largely fed on beetles, grasshoppers and cicadas until they can fly.",
+        "Satin bowerbirds nest between October and February. Typically two eggs but occasionally one or three are laid in a shallow nest of twigs on top of which are placed leaves of Eucalyptus or Acacia. These leaves turn brown as the eggs are laid, and may serve as camouflage."
       ],
       "img": ""
     },
@@ -1986,11 +1969,9 @@
       "common": "Yellow-tinted Honeyeater",
       "summary": "Ptilotula flavescens, commonly known as the yellow-tinted honeyeater, is a small bird species belonging to the honeyeater family. It is native to Australia and can be found in various habitats such as woodlands, savannas, and forests.",
       "description": [
-        "The yellow honeyeater has a bright yellow plumage with a black mask around its eyes.",
-        "These birds feed on nectar and insects, and can often be seen hovering in front of flowers to feed.",
-        "The female builds the nest using grass, bark, and spiderwebs, and the male helps to defend the territory.",
-        "",
-        ""
+        "Its natural habitats are subtropical or tropical moist lowland forests and subtropical or tropical mangrove forests.",
+        "The yellow-tinted honeyeater was previously included in the genus Lichenostomus, but was moved to Ptilotula after a molecular phylogenetic analysis, published in 2011, showed that the original genus was polyphyletic.",
+        "Small honeyeater with pale yellow throat and face, as well as a distinct black neck patch. Plumage is mostly olive-gray with yellow coloration in the wing and tail. Adult has an entirely black bill, whereas juvenile's bill is mostly yellow. Feeds on nectar and insects. Tends to be aggressive towards other species."
       ],
       "img": ""
     },
@@ -1999,11 +1980,9 @@
       "common": "Fuscous Honeyeater",
       "summary": "Ptilotula fusca, also known as the fuscous honeyeater, is a small bird species belonging to the honeyeater family. It is native to Australia and can be found in various habitats such as woodlands, forests, and scrublands.",
       "description": [
-        "The fuscous honeyeater has a brownish-grey plumage with a dark eye stripe and a pale throat.",
-        "These birds feed on nectar and insects, and are known to feed on the sugary excretions of certain insects.",
-        "The female builds the nest using twigs and grass, and the male helps to defend the territory.",
-        "",
-        ""
+        "The fuscous honeyeater is dull grey-brown to olive-brown above with buffy-grey underparts. The bill is black and the eye-ring dark. It has a small black and yellow plume formed by the rear edge of the ear coverts.",
+        "Its natural habitat is subtropical or tropical dry forests.",
+        "The fuscous honeyeater was previously placed in the genus Lichenostomus, but was moved to Ptilotula after a molecular phylogenetic analysis, published in 2011, showed that the original genus was polyphyletic."
       ],
       "img": ""
     },
@@ -2012,11 +1991,11 @@
       "common": "Grey-headed Honeyeater",
       "summary": "Ptilotula keartlandi, commonly known as the grey-headed honeyeater, is a bird species found in the woodlands and forests of eastern Australia. These small and active birds are known for their distinctive calls and their important role in pollinating plants.",
       "description": [
-        "Grey-headed honeyeaters have a distinctive appearance, with grey feathers on their head and upper body and a yellow belly.",
-        "These birds are highly vocal and are known for their complex songs and calls, which can vary between individuals and populations.",
-        "Grey-headed honeyeaters primarily feed on nectar from flowering plants and are important pollinators for many plant species in their native habitats.",
-        "The species has a unique foraging behavior, often hovering in front of flowers to feed on nectar or using their sharp beaks to pry open the bases of flowers to access the nectar inside.",
-        "Grey-headed honeyeaters are monogamous and form strong pair bonds that can last for several years."
+        "Grey-headed honeyeaters are relatively small for honeyeaters. Adults have a distinctive grey crown above a black facial mask with the nape and remaining upper body parts coloured dark fawn-grey.",
+        "There is no plumage difference between the sexes; however, there is some sexual dimorphism, as males are slightly heavier and larger than females.[11] There is no geographical variation in plumage across the species range.",
+        "Juveniles have similar plumage to adults, but are generally paler with a lighter grey-brown face mask. Juveniles also have grey-black bills with an orange-brown base, yellow gapes, and a lighter grey crown.",
+        "The grey-headed honeyeater mostly frequents Eucalyptus scrub and woodlands in stony hill country and timbered gullies within ranges; however, it can be observed on sand-plains, when vegetation is flowering.",
+        "The grey-headed honeyeater gleans and probes for invertebrates on the foliage and branches of vegetation, but will also take insects on the wing."
       ],
       "img": ""
     },
@@ -2025,11 +2004,10 @@
       "common": "White-plumed Honeyeater",
       "summary": "Ptilotula penicillata, commonly known as the white-plumed honeyeater, is a bird species found in the woodlands and forests of Australia. These small and active birds are known for their distinctive appearance, vocalizations, and important role in pollinating plants.",
       "description": [
-        "White-plumed honeyeaters have a distinctive appearance, with a white plume on their head and a black mask around their eyes.",
-        "These birds are highly vocal and have a range of calls and songs that are used to communicate with each other and establish territories.",
-        "White-plumed honeyeaters are primarily nectarivorous, feeding on the nectar of flowering plants. They are important pollinators for many plant species in their native habitats.",
-        "The species is highly adaptable and can thrive in a range of habitats, from arid and semi-arid regions to wet and temperate forests.",
-        "White-plumed honeyeaters are often seen in pairs or family groups and are known for their social behavior."
+        "White-plumed honeyeaters are common around water and are often seen in backyards and suburbs with vegetation cover.",
+        "The plumage does not differ between the sexes. The distinguishing characteristic is a conspicuous white plume across the neck from the throat to the edge of the nape. The top of head and neck are olive, with a yellow eye-ring surrounding a black-brown to olive-brown eye.",
+        "The white-plumed honeyeater's diet consists mainly of nectar, insects and their products (e.g., honeydew and lerp), manna, fruit, and very occasionally seeds.",
+        "This is a gregarious species, often found in groups of 12 or more individuals during the nonbreeding season. These larger groups then dissipate during breeding."
       ],
       "img": ""
     },
@@ -2038,11 +2016,10 @@
       "common": "White-fronted Honeyeater",
       "summary": "Purnella albifrons, commonly known as the White-fronted Honeyeater, is a small bird species found in eastern Australia.",
       "description": [
-        "They have distinctive white feathers on their forehead and throat that contrast with their grey-brown body plumage.",
-        "White-fronted Honeyeaters are social birds that often gather in large flocks to feed and roost together.",
-        "Their diet consists mainly of nectar, insects, and spiders, which they forage for in trees and shrubs.",
-        "These birds have a wide range and are found in a variety of habitats, including eucalyptus forests, woodlands, and heathlands.",
-        ""
+        "The white-fronted honeyeater has distinct colourings with a white face, black or brown upper chest with white speckles and yellow panels on their brown wings.",
+        "White-fronted honeyeaters (as the name suggests) primarily consume nectar from flowers. Studies have been undertaken to expand this field of knowledge and it has been identified that when nectar is not available or in minimal supply, white-fronted honeyeaters may consume a range of other materials such as seeds, plant matter and insects.",
+        "The white-fronted honeyeater moves quickly throughout landscapes; foraging for food and avoiding predators. The species regularly frequents tall shrub species, such as Eremophilia shrubs and flowering mallee plants.",
+        "White-fronted honeyeaters are currently classified as 'least concern' under the IUCN red list."
       ],
       "img": ""
     },
@@ -2051,11 +2028,9 @@
       "common": "Red-capped Parrot",
       "summary": "Purpureicephalus spurius, commonly known as the Red-capped Parrot, is a small parrot species found in Australia.",
       "description": [
-        "They have a distinctive red cap on their head, which contrasts with their green body plumage.",
-        "Red-capped Parrots are social birds that often gather in flocks to feed and roost together.",
-        "They have a varied diet that includes seeds, fruit, flowers, and insects.",
-        "These parrots are found in a variety of habitats, including woodlands, forests, and grasslands, and are widely distributed throughout most of Australia.",
-        ""
+        "It has long been classified in its own genus owing to its distinctive elongated beak, though genetic analysis shows that it lies within the lineage of the Psephotellus parrots and that its closest relative is the mulga parrot (Psephotellus varius). Not easily confused with other parrot species, it has a bright crimson crown, green-yellow cheeks, and a distinctive long bill.",
+        "Found in woodland and open savanna country, the red-capped parrot is predominantly herbivorous, consuming seeds, particularly of eucalypts, as well as flowers and berries, but insects are occasionally eaten. ",
+        "Nesting takes place in tree hollows, generally of older large trees. Although the red-capped parrot has been shot as a pest and has been affected by land clearing, the population is growing and the species is considered of least-concern by the International Union for Conservation of Nature (IUCN)."
       ],
       "img": ""
     },
@@ -5509,3 +5484,4 @@
             }
     ]
 }
+
