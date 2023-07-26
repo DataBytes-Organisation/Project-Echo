@@ -33,6 +33,7 @@ button=driver.find_element(By.XPATH,'//*[@id="content_full"]/form/input[2]').cli
 #Please change to type of audio required
 SearchFor = input('Please enter the type of audio you would like to scrape: ')
 
+#Seach for chosen subject
 audioSearch=driver.find_element(By.XPATH,'//*[@id="search"]/form/fieldset/input[1]')
 audioSearch.send_keys(SearchFor)
 button=driver.find_element(By.XPATH,'//*[@id="search_submit"]').click()
@@ -41,10 +42,10 @@ button=driver.find_element(By.XPATH,'//*[@id="search_submit"]').click()
 ##SCRAPING THE RESULTS##
 anoutherPage=True
 lastPage=False
+#Continue scraping until the last page is reached
 while anoutherPage==True:
     soup=BeautifulSoup(driver.page_source, 'lxml')
     results = soup.find_all('div',class_="sample_player_small")
-    print(len(results))
     try:
         next_page = soup.find('a', {'title':'Next Page'}).get('href')
         baseURL='https://freesound.org'
@@ -101,5 +102,6 @@ while anoutherPage==True:
             anoutherPage=False
         else:
             driver.get(next_page)
-        
+
+#Export data to CSV program        
 df.to_csv('weather.csv')
