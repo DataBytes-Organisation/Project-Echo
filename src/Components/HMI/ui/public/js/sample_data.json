@@ -4317,8 +4317,8 @@
             "common": "Little Crow",
             "summary": "Corvus bennetti, commonly known as the Little Crow, is a species of bird belonging to the Corvidae family. It is a small-sized crow found in various regions of Australia, including the southern coastal regions of Western Australia, South Australia, Victoria, New South Wales, and Queensland.",
             "description": [
-                "The Little Crow measures approximately 36-43 cm in length and has a wingspan of 75-85 cm. They have a glossy black plumage with a slender bill, and their eyes are brown. The males are usually slightly larger than the females.",
-                "The Little Crow is known for its distinctive and melodious calls, which are complex and varied. They are highly social birds that often gather in large flocks, and they are opportunistic feeders, feeding on insects, fruits, seeds, small animals, and carrion.",
+                "The Little Crow measures approximately 36-43 cm in length and has a wingspan of 75-85 cm. They have a glossy black plumage with a slender bill, and their eyes are light blue. The males are usually slightly larger than the females.",
+                "The Little Crow is known for its distinctive and melodious calls, which are complex and varied. They are highly social birds that often gather in large flocks, and they are opportunistic feeders, feeding on insects, seeds, cereals, it is less of a scavenger than the Torresian Crow.",
                 "Interestingly, the Little Crow has been observed exhibiting tool use behavior, where it uses sticks to pry insects out of bark or crevices. This behavior is relatively rare among birds and is considered a sign of high intelligence.",
                 "The Little Crow is not considered to be a threatened species, although its population may be declining in some regions due to habitat loss and fragmentation.",
                 ""
@@ -4332,7 +4332,7 @@
             "description": [
                 "They have a distinctive deep, resonant call that can be described as a ‘cronk’ or ‘korrk’ sound.",
                 "Their diet consists of a wide variety of food, including insects, small mammals, reptiles, fruits, and carrion.",
-                "They are known to form lifelong pair bonds and mate for life, and can live up to 30 years in the wild.",
+                "They are known to form lifelong pair bonds and mate for life, and can live for around 20 years in the wild.",
                 "Australian Ravens are intelligent birds and have been observed using tools, playing games, and even engaging in deception. They have also been known to mimic other bird species and human speech.",
                 "These birds are an important part of Indigenous Australian culture and are featured in many Dreamtime stories and Aboriginal artwork."
             ],
@@ -4340,12 +4340,12 @@
         },
         {
             "species": "Corvus mellori",
-            "common": "",
+            "common": "The little Raven",
             "summary": "The Little Raven (Corvus mellori) is a passerine bird native to southeastern Australia, particularly the coastal and sub-coastal areas of Victoria, New South Wales, and South Australia.",
             "description": [
                 "It is smaller than the Australian Raven, measuring about 42-46 cm in length and weighing around 350-500 g.",
                 "They are social birds and are often seen in groups or pairs, particularly during the breeding season. They are also known for their acrobatic flight and playful behavior.",
-                "Little Ravens are omnivorous and feed on a wide variety of foods, including insects, small mammals, birds, eggs, carrion, and fruit.",
+                "Little Ravens are ground feeders, with their diet mainly consisting of small insects, though they are likely omniverous.",
                 "They build their nests in trees, typically using sticks and other plant material, and lining the interior with softer materials like fur or feathers.",
                 "Little Ravens have been known to exhibit some interesting behaviors, including using tools to access food sources, like using sticks to extract insects from tree bark."
             ],
@@ -4358,7 +4358,7 @@
             "description": [
                 "They have a distinctive loud and raucous call that is often heard in the early morning and late afternoon, as well as a variety of other vocalizations.",
                 "Torresian Crows are known for their intelligence and problem-solving abilities, with some individuals observed using tools to obtain food.",
-                "They are opportunistic feeders, eating a wide range of food including insects, small mammals, reptiles, and fruit.",
+                "They are opportunistic feeders, eating a wide range of food including insects, small mammals, reptiles, and fruit. They have been known to work in teams to steal food from larger birds",
                 "Torresian Crows are social birds, often seen in groups or pairs, and have been known to form lifelong partnerships with their mates.",
                 "In some Aboriginal cultures, the Torresian Crow is considered a sacred bird, associated with creation and the afterlife."
             ],
@@ -4372,7 +4372,6 @@
                 "Stubble quails are often found in grasslands, farmlands, and other open habitats across their range.",
                 "They are sexually dimorphic, with males having a chestnut-brown breast and a bluish-grey head, while females have a brownish breast and a brown head.",
                 "Stubble quails are omnivorous, feeding on a variety of seeds, insects, and small invertebrates.",
-                "These birds are known for their distinctive ‘chuck-chuck’ calls, which can be heard throughout their range.",
                 "Stubble quails are highly migratory, and populations in the southern parts of their range will move north during winter in search of more favourable conditions."
             ],
             "img": ""
@@ -4382,10 +4381,10 @@
             "common": "Pied Butcherbird",
             "summary": "The Pied Butcherbird (Cracticus nigrogularis) is a medium-sized songbird found in Australia.",
             "description": [
-                "Pied Butcherbirds are known for their beautiful and complex songs, which consist of a series of melodious notes that can last for several minutes.",
+                "Pied Butcherbirds are known for their beautiful and complex songs, which consist of a series of melodious notes that have been described as a 'magical flute' .",
                 "They are also skilled predators, feeding on a variety of insects, small reptiles, and mammals, which they catch by swooping down from perches in trees and bushes.",
                 "Pied Butcherbirds are highly territorial and will defend their territory vigorously against other birds and animals.",
-                "They are monogamous and form long-term pair bonds, with both parents participating in the care of their young.",
+                "They are thought to be monogamous and form long-term pair bonds, though not enough study has been completed to confirm this.",
                 "In some Aboriginal cultures, the Pied Butcherbird is considered a spiritual animal and is associated with creation stories and the cycle of life."
             ],
             "img": ""
