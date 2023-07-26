@@ -12,7 +12,7 @@ const { authJwt } = require("./middleware");
 //Add mongoDB module inside config folder
 const db = require("./model");
 const Role = db.role;
-
+const User = db.user;
 //Establish Mongo Client connection to mongoDB
 db.mongoose
   .connect(`mongodb://${dbConfig.USERNAME}:${dbConfig.PASSWORD}@${dbConfig.HOST}/${dbConfig.DB}?authSource=admin`, {
@@ -22,6 +22,7 @@ db.mongoose
   .then(() => {
     console.log("Successfully connect to MongoDB.");
     initial();
+    initUsers();
   })
   .catch(err => {
     console.log("ConnString: ", `mongodb://${dbConfig.USERNAME}:${dbConfig.PASSWORD}@${dbConfig.HOST}/${dbConfig.DB}?authSource=admin`)
@@ -34,24 +35,38 @@ db.mongoose
 function initial() {
   Role.estimatedDocumentCount((err, count) => {
     if (!err && count === 0) {
-      new Role({
-        name: "user"
-      }).save(err => {
-        if (err) {
-          console.log("error", err);
-        }
+      // new Role({
+      //   name: "user"
+      // }).save(err => {
+      //   if (err) {
+      //     console.log("error", err);
+      //   }
 
-        console.log("added 'user' to roles collection");
-      });
-      new Role({
-        name: "admin"
-      }).save(err => {
-        if (err) {
-          console.log("error", err);
-        }
+      //   console.log("added 'user' to roles collection");
+      // });
+      // new Role({
+      //   name: "admin"
+      // }).save(err => {
+      //   if (err) {
+      //     console.log("error", err);
+      //   }
 
-        console.log("added 'admin' to roles collection");
-      });
+      //   console.log("added 'admin' to roles collection");
+      // });
+      const roleData = require(path.join(__dirname, "user-sample/role-seed.json"));
+
+      Role.insertMany(roleData);
+    }
+  });
+}
+
+//Add sample Users if none exists
+function initUsers(){
+  User.estimatedDocumentCount((err, count) => {
+    if (!err && count === 0) {
+      const userData = require(path.join(__dirname, "user-sample/user-seed.json"));
+      User.insertMany(userData);
+      
     }
   });
 }
