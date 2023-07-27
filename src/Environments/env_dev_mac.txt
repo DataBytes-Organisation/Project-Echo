@@ -2,9 +2,6 @@ appdirs
 audio2numpy
 audiomentations
 audioread
-audiomentations
-audioread
-catboost
 certifi
 cffi
 chardet
@@ -38,7 +35,6 @@ keras-toolbox
 keras-unet
 keras-util
 kiwisolver
-librosa==0.10.0.post2
 librosa
 lightgbm
 llvmlite
@@ -88,14 +84,7 @@ tensorflow_datasets
 tensorflow_gnn
 tensorflow_graphics
 tensorflow_hub
-tensorflow_io==0.27.0
-tensorflow-estimator
-tensorflow-graphics
-tensorflow-metadata
-tensorflow==2.10.1
-tf-explain
-tfimm
-tflite-support
+
 threadpoolctl
 timm
 torch 
