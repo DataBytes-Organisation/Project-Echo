@@ -6,9 +6,7 @@ ipykernel
 librosa
 matplotlib
 paho-mqtt
-tensorflow-addons
-tensorflow_hub
-tensorflow_io
+
 xgboost
 numpy
 pandas
