@@ -63,8 +63,12 @@
             <!-- <i class="screen-icon fa-brands fa-codepen"></i> -->
             <img src="./images/logo-splashscreen.png" style="width: 101px; height: 81px">
             <div class="screen-user">
-                <button onclick="{openForm('login-form')}" class= "auth-form-button" style="width:auto;">Login</button>
-                <span class="name animate" id="project-title" data-value="PROJECT ECHO" onmouseenter="{textFlex()}">PROJECT ECHO</span>
+                <ul>
+                    <li><span onclick="{openForm('login-form')}">Login</span></li>
+                    <li><span onclick="{openForm('signup-form')}">Register</span></li>
+                </ul>
+                
+                <span class="name animate" id="name" data-value="PROJECT ECHO" onmouseenter="{textFlex()}">PROJECT ECHO</span>
             </div>
         </div>
         
@@ -84,7 +88,7 @@
                     <label for="password"><b>Password</b></label>
                     <input type="password" placeholder="Enter Password" name="password" required>
                     
-                    <button type="submit">Login</button>
+                    <button type="submit" class="btn10"><span>Login</span></button>
                     <label>
                         <input type="checkbox" checked="checked" name="remember"> Remember me
                     </label>
