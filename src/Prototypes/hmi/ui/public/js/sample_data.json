@@ -3280,9 +3280,9 @@
       "summary": "Cacomantis variolosus or Brush cuckoo is a small and secretive bird species found in Australia and parts of Southeast Asia.",
       "description": [
         "They are named for their brown and streaked plumage, which allows them to blend into forest understory habitats.",
-        "Like other cuckoo species, Brush cuckoos lay their eggs in the nests of other bird species.",
+        "Despite being a cuckoo species, Brush cuckoos do not lay their eggs in the nests of other bird species.",
         "Instead, they build their own nests in shrubs and brush piles, and lay their eggs there.",
-        "Brush cuckoos feed primarily on insects, and are known for their distinctive call."
+        "Brush cuckoos feed primarily on insects, and are known for their quick and agile flight patterns."
       ],
       "img": ""
     },
@@ -3292,10 +3292,10 @@
       "common": "Yellow-faced honeyeater",
       "summary": "Caligavis chrysops or Yellow-faced honeyeater is a small bird native to eastern and southeastern Australia.",
       "description": [
-        "They are known for the bright yellow stripe on their face.",
-        "These birds feed on nectar, insects, seeds, and fruit.",
-        "They are often found in open eucalyptus forests and woodlands, but can appear is a variety of other habitats.",
-        "Yellow-faced honeyeaters play a role in pollination and seed dispersal due to their diet and migration habits."
+        "They are known for their bright yellow face and distinctive black and white bands on their wings.",
+        "These birds feed on nectar, insects, and fruit.",
+        "They are often found in eucalyptus forests and woodlands.",
+        "Yellow-faced honeyeaters play an important role in pollination and seed dispersal."
       ],
       "img": ""
     },
@@ -3307,8 +3307,8 @@
       "description": [
         "They are easily recognized by the male's distinctive red head and crest.",
         "These birds feed on seeds, fruits, and insects.",
-        "Gang-gang cockatoos are known for their social nature and distinctive call.",
-        "Due to habitat loss and poaching, the Gang-gang cockatoo is set to be listed as an endangered species."
+        "Gang-gang cockatoos are known for their quiet calls and social nature.",
+        "Due to habitat loss and poaching, the Gang-gang cockatoo is listed as a vulnerable species."
       ],
       "img": ""
     },
@@ -3319,7 +3319,7 @@
       "summary": "Calyptorhynchus banksii or Red-tailed black cockatoo is a large, black parrot native to Australia.",
       "description": [
         "They are named for their red tail feathers, which can be seen when they fly.",
-        "These birds feed on the seeds of eucalyptus trees and other grains.",
+        "These birds feed on the seeds of eucalyptus trees and other plants.",
         "Red-tailed black cockatoos are known for their loud calls and distinctive crest.",
         "Due to habitat loss and hunting, the Red-tailed black cockatoo is listed as a vulnerable species."
       ],
@@ -3334,7 +3334,7 @@
         "They are named for their glossy, black feathers and red tail band.",
         "These birds feed on the seeds of casuarina trees.",
         "Glossy black cockatoos are known for their distinctive calls and nesting habits.",
-        "Due to massive habitat loss, the Glossy black cockatoo is listed as a vulnerable species."
+        "Due to habitat loss and disease, the Glossy black cockatoo is listed as a vulnerable species."
       ],
       "img": ""
     },
@@ -3369,9 +3369,9 @@
       "summary": "Carterornis leucotis or White-eared monarch is a small, insect-eating bird species that are found in the tropical rainforests of Asia and Australia.",
       "description": [
         "They have a distinctive white ear patch, which gives them their common name.",
-        "These birds are territorial due to their elusive nature and will defend their nesting sites.",
-        "White-eared monarchs have a unique courtship display, due to their varying song notes.",
-        "The female monarchs build a cup-shaped nest high up in trees out of a range of materials, and lay 2-3 eggs per clutch."
+        "These birds are highly territorial and will aggressively defend their nesting sites.",
+        "White-eared monarchs have a unique courtship display, where males perform acrobatic flights and sing complex songs to woo females.",
+        "The female monarchs build a cup-shaped nest out of sticks, moss, spiderwebs, and other materials, and lay 2-3 eggs per clutch."
       ],
       "img": ""
     },
@@ -3384,7 +3384,7 @@
         "These birds have a distinctive black head, red eyes, and a long, curved bill.",
         "Pheasant coucals primarily feed on insects, small mammals, reptiles, and birds, and may occasionally eat fruits and seeds.",
         "They are highly territorial birds that will defend their territory from other coucals and predators.",
-        "Pheasant coucals are unusual among other cuckoos in that it incubates and raises its own young instead of laying eggs in the nest of another species."
+        "Pheasant coucals have a unique nesting behavior, where the female lays her eggs in the nests of other birds and lets them raise her chicks."
       ],
       "img": ""
     },
@@ -3397,7 +3397,7 @@
         "These deer have a dark brown coat, large antlers, and a distinctive white rump patch.",
         "Sambar deer primarily feed on grasses, leaves, fruits, and bark, and may occasionally eat insects, birds, and small mammals.",
         "They are highly adaptable animals that can survive in a variety of habitats, from tropical rainforests to dry savannas.",
-        "Sambar deer have a unique mating behavior, where males can emit loud bellowing calls to attract females in conjunction with usual behaviours."
+        "Sambar deer have a unique mating behavior, where males emit loud bellowing calls to attract females during the breeding season."
       ],
       "img": ""
     },
@@ -3410,7 +3410,7 @@
         "They have a distinctive azure-blue plumage, with a white belly and a black bill.",
         "Azure kingfishers are expert fish hunters, diving into the water to catch small fish and crustaceans.",
         "They are highly territorial birds that will defend their nesting sites from other kingfishers and predators.",
-        "Azure kingfishers have a unique mating behavior, where the male and female work together to incubate the eggs."
+        "Azure kingfishers have a unique mating behavior, where the male and female work together to excavate a nest in a riverbank."
       ],
       "img": ""
     },
@@ -3420,10 +3420,10 @@
       "common": "Rufous-Banded Honeyeater",
       "summary": "The Rufous-banded Honeyeater is a small bird species that is found in the northern parts of Australia, specifically in the Kimberley region of Western Australia and the Top End of the Northern Territory.",
       "description": [
-        "They are about 14 to 16 cm in length and have a distinctive rufous-colored band across their throat and upper breast, with a greyish-brown head and upperparts, and paler underparts.",
+        "They are about 12 to 14 cm in length and have a distinctive rufous-colored band across their throat and upper breast, with a greyish-brown head and upperparts, and paler underparts.",
         "Rufous-banded Honeyeaters are primarily insectivorous, feeding on small insects and spiders, but will also occasionally feed on nectar from flowering plants",
         "They are known for their acrobatic flying abilities, darting and hovering among foliage and flowers to catch their prey.",
-        "These honeyeaters are territorial during breeding season, and will defend their nests aggressively against intruders.",
+        "These honeyeaters are highly territorial during breeding season, and will defend their nests aggressively against intruders.",
         "Despite their territorial nature, they may also join mixed-species flocks with other honeyeaters and small birds outside of breeding season."
       ],
       "img": ""
@@ -3443,8 +3443,8 @@
     },
     {
       "species": "Cophixalus exiguus",
-      "common": "Dainty Nursery Frog",
-      "summary": "Cophixalus exiguus, also known as the Dainty Nursery Frog, is a small frog species that is endemic to the wet tropical regions of Queensland.",
+      "common": "Dainty Nurseryfrog",
+      "summary": "Cophixalus exiguus, also known as the Dainty Nurseryfrog, is a small frog species that is endemic to the coastal regions of eastern Australia, specifically the areas of Queensland and New South Wales.",
       "description": [
         "Adult Dainty Nurseryfrogs typically measure around 1.5 cm in length, making them one of the smallest frog species in Australia.",
         "This species is known for its distinctive high-pitched squeaking call, which is used primarily during the breeding season to attract mates.",
@@ -3457,7 +3457,7 @@
     {
       "species": "Cophixalus infacetus",
       "common": "Dull Frog",
-      "summary": "Cophixalus infacetus, also known as the Dull Frog, is a small species of frog endemic to the wet tropical regions of Queensland.",
+      "summary": "Cophixalus infacetus, also known as the Dull Frog, is a small species of frog found in eastern Australia, specifically in the regions of Queensland and possibly the northeastern corner of New South Wales.",
       "description": [
         "Despite their name, Dull Frogs have a distinctive appearance. They are usually brown or grey with a white or cream underbelly and have small, granular skin.",
         "Dull Frogs are a type of ground-dwelling frog and are usually found in moist, shaded habitats such as rainforests and wet sclerophyll forests.",
@@ -3470,10 +3470,10 @@
     {
       "species": "Cophixalus ornatus",
       "common": "Ornate Frog",
-      "summary": "Cophixalus ornatus, commonly known as the Ornate Frog, is a small, arboreal frog species endemic to the wet tropical regions of North Queensland.",
+      "summary": "Cophixalus ornatus, commonly known as the Ornate Frog, is a small, arboreal frog species belonging to the family Microhylidae. They are endemic to Papua New Guinea and can be found in both lowland and mountain forests.",
       "description": [
-        "This species remain small and can reach a maximum size of 3cm.",
-        "They have a brown or greyish-brown base color, with intricate black markings and spots covering their bodies, and have distinctively gold irises.",
+        "The males of this species can reach a maximum size of 25mm, while females can grow up to 28mm in length.",
+        "They have a brown or greyish-brown base color, with intricate black markings and spots covering their bodies, and have distinctively bright red irises.",
         "These frogs are known for their unique calling behavior, where they produce a series of high- pitched, bird-like chirping sounds.",
         "Ornate Frogs are primarily arboreal and are found living in the forest canopy, where they lay their eggs in tree holes or in moist crevices of bark.",
         "This species is not currently considered threatened, but due to their small size and cryptic coloration, they can be difficult to spot in the wild."
@@ -3481,13 +3481,13 @@
       "img": ""
     },
     {
-      "species": "Coracina novaehollandiae",
+      "species": "Coracina novaehollandiae ",
       "common": "Black-Faced Cuckoo-Shrike",
       "summary": "The Black-Faced Cuckoo-Shrike (Coracina novaehollandiae) is a medium-sized bird found throughout Australia and parts of Southeast Asia. They are easily identifiable by their striking black and white plumage, with a distinctive black mask across their face.",
       "description": [
-        "Black-Faced Cuckoo-Shrikes are known for their unique vocalizations, which include a range of whistles, warbles, and trills. They are particularly well-known for their shrill, screaming call, sounding like 'creearck'",
+        "Black-Faced Cuckoo-Shrikes are known for their unique vocalizations, which include a range of whistles, warbles, and trills. They are particularly well-known for their ‘kow-kow’ call,which sounds similar to a squeaky toy.",
         "These birds are typically found in forested areas, but are also known to frequent parks and gardens in urban areas. They feed on insects and other small invertebrates, which they catch by swooping down from trees and bushes.",
-        "During breeding season, Black-Faced Cuckoo-Shrikes build shallow cup-shaped nests made of twigs, grass, and bark. They lay 2-4 eggs per clutch, which are incubated for around two weeks before hatching. Both male and female birds take turns incubating the eggs and feeding the chicks.",
+        "During breeding season, Black-Faced Cuckoo-Shrikes build cup-shaped nests made of twigs, grass, and bark. They lay 2-4 eggs per clutch, which are incubated for around two weeks before hatching. Both male and female birds take turns incubating the eggs and feeding the chicks.",
         "",
         ""
       ],
@@ -3499,20 +3499,20 @@
       "summary": "The White-Bellied Cuckoo-Shrike is a medium-sized bird species found in Australia, Indonesia, and Papua New Guinea. They have a distinct appearance with a white belly, black head and wings, and greyish-blue back and tail.",
       "description": [
         "They are known for their loud, melodic songs that are often sung in pairs or groups.",
-        "These birds have a unique breeding strategy where both build the nest and incubate the eggs while the females defend the territory.",
+        "These birds have a unique breeding strategy where the males build the nest and incubate the eggs while the females defend the territory.",
         "White-Bellied Cuckoo-Shrikes are omnivorous and feed on a variety of insects, fruit, and nectar.",
         "They are considered a common bird species in their range and are not currently listed as threatened.",
-        ""
+        "In some areas, the White-Bellied Cuckoo-Shrike is believed to have cultural significance and is featured in the mythology of some Indigenous Australian communities."
       ],
       "img": ""
     },
     {
-      "species": "Corcorax melanorhamphos",
+      "species": "Corcorax melanorhamphos ",
       "common": "White-Winged Chough",
       "summary": "Corcorax melanorhamphos, commonly known as the White-Winged Chough, is a species of bird native to southeastern Australia. They have a distinctive appearance, with glossy black feathers, a curved black bill, and white wing patches that are visible in flight.",
       "description": [
         "White-Winged Choughs are known for their complex social behavior, living in large family groups of up to 20 individuals that work together to forage for food and build complex stick nests. They communicate with a range of vocalizations, including melodious songs and harsh calls.",
-        "Interestingly, the White-Winged Chough has convergently evolved similar physical traits with the unrelated New World Choughs of the genus Pyrrhocorax, such as their curved bill and glossy black feathers.",
+        "Interestingly, the White-Winged Chough has convergently evolved similar physical traits with the unrelated New World Choughs of the genus Pyrrhocorax, such as their curved bill andglossy black feathers. They also have a unique foraging behavior known as ‘foot-tapping’, where they use their feet to disturb leaf litter and uncover insects.",
         "White-Winged Choughs are considered to be a species of least concern, although their populations are declining due to habitat loss and fragmentation. Conservation efforts are underway to protect their remaining habitat and promote their recovery.",
         "",
         ""
@@ -3520,14 +3520,14 @@
       "img": ""
     },
     {
-      "species": "Cormobates leucophaea",
+      "species": "Cormobates leucophaea ",
       "common": "White-Throated Treecreeper",
-      "summary": "Cormobates leucophaea is a small passerine bird about 17cm, native to eastern Australia. It is part of the treecreeper family and is known for its distinctive white throat and black and white barred wings. The upperparts of the bird are brown with a streaked appearance, while the underparts are white.",
+      "summary": "Cormobates leucophaea is a small passerine bird about 15cm, native to eastern Australia, including Tasmania. It is part of the treecreeper family and is known for its distinctive white throat and black and white barred wings. The upperparts of the bird are brown with a streaked appearance, while the underparts are white.",
       "description": [
         "White-Throated Treecreepers are found in eucalyptus forests and woodlands, where they use their strong, curved bills to search for insects and spiders in the crevices of bark. They also have a unique habit of spiraling up tree trunks as they forage, using their stiffened tail feathers and long toes to prop themselves up.",
-        "During the breeding season, there is no cooperative breeding, and they construct a nest made of bark and grass, which is usually placed behind a flap of loose bark.",
-        "One interesting fact about the White-Throated Treecreeper is that it has a unique adaptation for perching on vertical surfaces - the stiffened tail feathers and long toes that allow it to prop itself up while foraging also help it cling to tree trunks and branches.",
-        "The White-Throated Treecreeper has a similar appearance and behavior to the Brown Creeper found in North America, showing an example of convergent evolution in these distantly related species.",
+        "During the breeding season, the male and female work together to construct a nest made of bark and grass, which is usually placed behind a flap of loose bark. The female lays 2-3 eggs, which are incubated by both parents.",
+        "One interesting fact about the White-Throated Treecreeper is that it has a unique adaptation for perching on vertical surfaces - the stiffened tail feathers and long toes that allow it to prop itself up while foraging also help it cling to tree trunks and branches. Another interesting fact is that the White-Throated Treecreeper has a similar appearance and behavior to the Brown Creeper found in North America, showing an example of convergent evolution in these distantly related species.",
+        "",
         ""
       ],
       "img": ""
