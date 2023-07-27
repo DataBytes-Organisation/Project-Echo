@@ -2558,9 +2558,8 @@
       "common": "Stonemason Toadlet",
       "summary": "Uperoleia lithomoda, commonly known as the stonemason toadlet, is a small species of frog that belongs to the family of frogs known as Myobatrachidae. The species is endemic to Australia, and is found in the rainforests and wet sclerophyll forests of the Wet Tropics region of northeastern Queensland.",
       "description": [
-        "The stonemason toadlet is named after its unique breeding behaviour, in which the male constructs a small 'nest' made of pebbles and gravel to attract females. The male will call from inside the nest, and if a female is interested, she will enter the nest and lay her eggs there.",
         "The species is small, with males typically reaching a maximum length of around 2.5 centimetres. The species is brown or grey in colour, with dark brown or black spots on its back and legs.",
-        "The stonemason toadlet is primarily active during the wet season, when it emerges from its burrow to mate and feed. The species is insectivorous, and feeds on a variety of small invertebrates.",
+        "The stonemason toadlet is primarily active during the wet season, when it emerges from its burrow to mate and feed, though the breeding biology is little known. The species is insectivorous, and feeds on a variety of small invertebrates.",
         "The stonemason toadlet is an important indicator species for the health of the Wet Tropics region, as it is sensitive to changes in its environment. The species' presence in an area is a sign of a healthy and intact ecosystem.",
         "The species is not considered to be threatened, and is classified as of 'Least Concern' by the International Union for Conservation of Nature (IUCN). However, like many other amphibian species around the world, it is vulnerable to habitat loss and degradation caused by human activities such as land clearing and climate change."
       ],
@@ -2581,14 +2580,13 @@
     },
     {
       "species": "Uperoleia mimula",
-      "common": "Tawny Toadlet",
-      "summary": "Uperoleia mimula, commonly known as the Tawny Toadlet, is a species of frog found in eastern Australia. These small toadlets grow to a length of about 2.5 cm and are typically found in wet forests, woodlands, and heathlands.",
+      "common": "Mimicking gungan",
+      "summary": "Uperoleia mimula, commonly known as the Mimicking gungan, is a species of frog found in eastern Australia. These small toadlets grow to a length of about 2.5 cm and are typically found in subtropical or tropical swamps, dry savanna, moist savanna, subtropical or tropical seasonally wet lands",
       "description": [
         "They are mostly active during the day and are known for their distinctive call, which sounds like a short trill.",
-        "Tawny Toadlets feed on a variety of small invertebrates, such as ants and spiders, and are preyed upon by a range of animals, including birds, snakes, and larger frogs.",
-        "They have a unique adaptation where their skin is able to secrete a mild toxin to deter predators.",
-        "Tawny Toadlets are considered to be of least concern in terms of conservation status, although their populations may be impacted by habitat loss and degradation due to human activities such as urbanization and agriculture.",
-        ""
+        "Mimicking gungan feed on a variety of small invertebrates, such as ants and spiders, and are preyed upon by a range of animals, including birds, snakes, and larger frogs.",
+        "Mimicking gungan are considered to be of least concern in terms of conservation status, although their populations may be impacted by habitat loss and degradation due to human activities such as urbanization and agriculture.",
+        "For breeding behavior, the eggs are laid singly and attached to vegetation under the surface of the water in ponds, swamps, and flooded grassland"
       ],
       "img": ""
     },
@@ -2598,7 +2596,7 @@
       "summary": "Vanellus spinosus, commonly known as the spur-winged lapwing, is a species of bird that belongs to the family of plovers known as Charadriidae. The species is found in a wide range of habitats, including wetlands, grasslands, and agricultural fields, in parts of Africa, the Middle East, and southwestern Asia.",
       "description": [
         "The species is named after the spurs that are located on its wings. These spurs are used for defense against predators and rival lapwings during territorial disputes. The spur-winged lapwing is known for being highly territorial, and will aggressively defend its territory against other lapwings and even much larger birds.",
-        "The species is distinctive in appearance, with a black and white plumage, a large yellow facial patch, and a long yellow bill. The species is also notable for its loud and distinctive call, which is a sharp, ringing ‘peewit’ or ‘pee-wit’ sound.",
+        "The species is distinctive in appearance, with a black and white plumage, a brown facial patch, and a long brown bill. The species is also notable for its loud and distinctive call, which is a sharp, ringing ‘peewit’ or ‘pee-wit’ sound.",
         "The spur-winged lapwing is an omnivorous species, and feeds on a variety of insects, small invertebrates, and plant material. The species is known for its opportunistic feeding habits, and will scavenge for food in addition to hunting and foraging.",
         "The spur-winged lapwing has cultural significance in some parts of its range, and is featured in traditional stories and folklore. In some African cultures, the species is considered to be a symbol of good luck and protection.",
         "The species is not considered to be threatened, and is classified as of ‘Least Concern’ by the International Union for Conservation of Nature (IUCN). However, like many other bird species around the world, it is vulnerable to habitat loss and degradation caused by human activities such as land development and agricultural practices."
@@ -2631,6 +2629,21 @@
       ],
       "img": ""
     },
+
+    {
+      "species": "Yoyetta tristrigata",
+      "common": "Tropical ambertail",
+      "summary": "Yoyetta tristrigata, commonly known as the Tropical ambertail, is a native species to tropical regions, specifically found in the rainforests and lush habitats of Queensland, Australia.",
+      "description": [
+        "The name was given to this dragonfly species as referring to its distinctive amber-colored tail.",
+        "The Tropical ambertail belongs to the family of dragonflies known as Libellulidae, which are characterized by their strong and agile flight patterns.",
+        "This dragonfly species showcases sexual dimorphism, with the males displaying dark-brown markings and the females exhibiting a lighter brown or yellow-brown coloration.",
+        "The Tropical ambertail is known for its strong territorial behavior and agility during flight, often defending its preferred habitats and food sources such as small insects and other invertebrates."  
+      
+      ],
+      "img": ""
+    },
+
     {
       "species": "Zanda funereal",
       "common": "Yellow-tailed Black Cockatoo",
@@ -5014,7 +5027,7 @@
             ],
             "img": ""
           },
-          {
+        {
             "species": "Chenonetta jubata",
             "common": "Australian wood duck",
             "summary": "The Australian wood duck, also known as maned duck, is a medium-sized dabbling duck found throughout much of Australia. They are usually found in pairs or small flocks near water, and have distinctive chestnut and black plumage with a white speckled neck and head.",
@@ -5026,6 +5039,18 @@
                 "The Australian wood duck is a common species and is not considered to be threatened. They are often hunted for sport and are also bred in captivity for meat and eggs."
             ],
             "img": ""
+        },
+        {
+          "species": "Cassinia Cicada",
+          "common": "Chelapsalta puer",
+          "summary": "Chelapsalta puer, also known as Cassinia Cicada, is a species of cicada found in the forests of Australia.",
+          "description": [
+              "These cicadas are commonly associated with the Cassinia plant genus, which they predominantly feed upon during their nymph stage.",
+              "The species gets its common name from its strong affinity for the Cassinia plants, where they lay their eggs and feed on the leaves.",
+              "The Cassinia Cicada has a distinct and loud mating call, which is generated by males vibrating specialized organs called tymbals to attract females.",
+              "The life cycle of these cicadas is typically around four years, with the nymphs spending most of their life underground before emerging as adults, making them a prime example of periodical cicadas."
+          ],
+          "img": ""
         },
         {
             "species": "Cherax destructor",
