@@ -5,13 +5,6 @@ import { retrieveTruthEventsInTimeRange, retrieveVocalizationEventsInTimeRange,
   retrieveMicrophones, retrieveAudio, retrieveSimTime } from "./routes.js";
 import data from "./sample_data.json" assert { type: 'json' };
 
-let json2csv;
-if (typeof window === 'undefined') {
-  json2csv = require("json2csv");
-} else {
-  json2csv = window.json2csv;
-}
-
 
 // import { parse } from 'json2csv';
 
@@ -36,9 +29,7 @@ function matchStatus(status){
 }
 
 export function convertCSV(json) {
-  console.log("about to convert: ", json)
   if (json === [] | json === null | typeof json === undefined | json.length === 0){
-    console.log("wrong data type or null data");
     return null
   }
   let data = json;

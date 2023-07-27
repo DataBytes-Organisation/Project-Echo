@@ -1106,9 +1106,8 @@
     let filename= "exportedCSV"
     let csv = null;
     let request_error = false;
-    console.log("Start downloading!")
     if (toggleSwitch.checked) {
-      console.log("Current Live mode ON! Download all")
+      console.log("Current Live mode ON!")
       datepickerStart = hmiState.currentTime;
       datepickerEnd = hmiState.previousUpdateTime;
       retrieveTruthEventsInTimeRange(datepickerStart, datepickerEnd).then((res) => {
