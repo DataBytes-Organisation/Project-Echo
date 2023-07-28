@@ -1,13 +1,7 @@
 appdirs
-<<<<<<< Updated upstream
 audio2numpy
 audiomentations
 audioread
-=======
-audiomentations
-audioread
-catboost
->>>>>>> Stashed changes
 certifi
 cffi
 chardet
@@ -41,19 +35,12 @@ keras-toolbox
 keras-unet
 keras-util
 kiwisolver
-<<<<<<< Updated upstream
-librosa==0.10.0.post2
-=======
 librosa
->>>>>>> Stashed changes
 lightgbm
 llvmlite
 matplotlib
 museval
-<<<<<<< Updated upstream
-=======
 mutagen
->>>>>>> Stashed changes
 notebook
 numba
 numpy
@@ -97,14 +84,7 @@ tensorflow_datasets
 tensorflow_gnn
 tensorflow_graphics
 tensorflow_hub
-tensorflow_io==0.27.0
-tensorflow-estimator
-tensorflow-graphics
-tensorflow-metadata
-tensorflow==2.10.1
-tf-explain
-tfimm
-tflite-support
+
 threadpoolctl
 timm
 torch 
