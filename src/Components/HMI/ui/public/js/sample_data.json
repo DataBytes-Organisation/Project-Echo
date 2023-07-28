@@ -1037,7 +1037,7 @@
       "species": "Manorina flavigula",
       "common": "Yellow-throated Miner",
 
-      "summary": "Manorina flavigula, commonly known as Yellow-throated Miner, is a bird species found in Australia.",
+      "summary": "Manorina flavigula, commonly known as Yellow-throated Miner, is a bird species that can be located in woodlands and dry forests.",
       "description": [
         "Yellow-throated Miners have yellow feathers on their throats and a dark grayish-brown back.",
         "They are known for their aggressive behavior and will often chase away other bird species from their territory.",
@@ -1051,7 +1051,7 @@
       "species": "Manorina melanocephala",
       "common": "Noisy Miner",
 
-      "summary": "Manorina melanocephala, commonly known as Noisy Miner, is a bird species found in Australia.",
+      "summary": "Manorina melanocephala, commonly known as Noisy Miner, is a bird species found throughout eastern and southeastern Australia, including Tasmania.",
       "description": [
         "Noisy Miners have a gray head, yellow eyes, and a yellow beak.",
         "They are known for their loud, constant vocalizations, which have given them their name.",
@@ -1066,7 +1066,7 @@
       "species": "Malurus leucopterus",
       "common": "White-winged Fairywren",
 
-      "summary": "Malurus cyaneus, commonly known as Superb Fairywren, is a small bird species found in Australia. It is common and familiar across south-eastern Australia.",
+      "summary": "Malurus leucopterus, commonly known as White-winged Fairywren, is a small bird species primarily inhabiting the drier regions of Central Australia. Its range spans from central Queensland and South Australia across to Western Australia.",
       "description": [
         "Male White-winged Fairywrens have bright blue and black plumage during the breeding season, while females are brown and white.",
         "These birds are known for their complex social behaviors, including cooperative breeding and territorial displays.",
@@ -1080,7 +1080,7 @@
       "species": "Malurus splendens",
       "common": "Splendid Fairywren",
 
-      "summary": "Malurus splendens, commonly known as Splendid Fairywren, is a small bird species found in Australia.",
+      "summary": "Malurus splendens, commonly known as Splendid Fairywren, is a small bird species found in central-western New South Wales and southwestern Queensland over to coastal Western Australia.",
       "description": [
         "Male Splendid Fairywrens have bright blue and black plumage during the breeding season, while females are brown and white.",
         "These birds are known for their complex social behaviors, including cooperative breeding and territorial displays.",
@@ -1261,9 +1261,9 @@
       "summary": "The Litoria latopalmata, commonly known as the Broad-palmed Frog, is a ground-dwelling tree frog native to large portion of eastern Australia. Its natural habitat ranges from mid-Queensland to the areas south of Sydney.",
       "description": [
         "The Broad-palmed Frog is a species of ground-dwelling tree frog native to much of eastern Australia. It is characterised by a pointed snout, broad head stripes, long legs and a first finger that is usually longer than the second.",
-        "They can be found from mid-Queensland to south of Sydney and are associated with the coast and inland.",
-        "The frog is pale to dark brown on its dorsal surface and can have darker blotches or variegations. Its skin is smooth, with the occasional wart on its back.",
-        "A white line breaks the black band in front of the eye, and runs under the eye. The thighs are marbled yellow and black and the armpit is yellow. The lower lip is normally marbled black and white. The belly is white."  
+        "The frog exhibits a dorsal surface ranging from pale to dark brown with potential darker blotches or variegations. Its skin is generally smooth, occasionally featuring warts on its back.",
+        "The frog is distributed along the eastern coast of Australia, ranging from mid-Queensland to the southern regions near Sydney. This species is found in both coastal and inland areas.",
+        "It possesses distinct features, including a white line that interrupts the black band in front of the eye and extends beneath the eye. Its thighs showcase a marbled pattern of yellow and black, while the armpit area is yellow. The lower lip typically exhibits a marbled pattern of black and white. Additionally, the frog's belly is predominantly white in color."  
       ],
       "img": ""
     },
@@ -4147,7 +4147,7 @@
     {
       "species": "Glossopsitta concinna",
       "common": "Musk Lorikeet",
-      "summary": "The Glossopsitta concinna, also known as the Musk Lorikeet, is a species of parrot native to Australia. These small, brightly colored birds are typically found in eucalyptus forests, woodlands, and urban areas along the eastern coast of Australia.",
+      "summary": "The Glossopsitta concinna, also known as the Musk Lorikeet, is a species of parrot native to Australia. These small, brightly colored birds are located at eucalyptus forests, woodlands, and the span through urban areas along the eastern coast of Australia.",
       "description": [
         "The Musk Lorikeet is named for the musky odor it emits, which is thought to help protect it from predators by masking its scent.",
         "These birds are known for their acrobatic flight patterns, which involve fast and erratic movements as they dart through the trees in search of food.",
@@ -4173,7 +4173,7 @@
     {
       "species": "Grantiella picta",
       "common": "Painted Honeyeater",
-      "summary": "The Painted Honeyeater (Grantiella picta) is a small bird found in various parts of Australia, including woodlands, forests and shrublands. It is native to mainland Australia and is found across eastern and northern parts of the country.",
+      "summary": "The Painted Honeyeater (Grantiella picta) is a small bird found in various parts of Australia, including woodlands, forests and shrublands. It is native to Australian mainland and is found across eastern and northern parts of the country.",
       "description": [
         "It has a striking black and white plumage with yellow wing patches. Males and females have similar markings, but males have a slightly longer bill.",
         "Painted Honeyeaters are known for their sweet and melodious calls, often performed by males during courtship displays.",
