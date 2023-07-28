@@ -1066,7 +1066,7 @@
       "species": "Malurus leucopterus",
       "common": "White-winged Fairywren",
 
-      "summary": "Malurus leucopterus, commonly known as White-winged Fairywren, is a small bird species found in the drier parts of Central Australia; from central Queensland and South Australia across to Western Australia1.",
+      "summary": "Malurus leucopterus, commonly known as White-winged Fairywren, is a small bird species found in Australia.",
       "description": [
         "Male White-winged Fairywrens have bright blue and black plumage during the breeding season, while females are brown and white.",
         "These birds are known for their complex social behaviors, including cooperative breeding and territorial displays.",
@@ -1095,7 +1095,7 @@
       "species": "Malurus cyaneus",
       "common": "Superb Fairywren",
 
-      "summary": "Malurus cyaneus, commonly known as Superb Fairywren, is a small bird species found in Australia. It is common and familiar across south-eastern Australia.",
+      "summary": "Malurus cyaneus, commonly known as Superb Fairywren, is a small bird species found in Australia.",
       "description": [
         "Male Superb Fairywrens have bright blue and black plumage during the breeding season, while females are brown and white.",
         "These birds are known for their complex social behaviors, including cooperative breeding and territorial displays.",
@@ -1109,7 +1109,7 @@
       "species": "Malurus lamberti",
       "common": "Variegated Fairywren",
 
-      "summary": "Malurus lamberti, commonly known as Variegated Fairywren, is a small bird species found in eastern Australia.",
+      "summary": "Malurus lamberti, commonly known as Variegated Fairywren, is a small bird species found in Australia.",
       "description": [
         "Male Variegated Fairywrens have bright blue and black plumage during the breeding season, while females are brown and white.",
         "These birds are known for their complex social behaviors, including cooperative breeding and territorial displays.",
@@ -1124,7 +1124,7 @@
       "species": "Malacostraca sp.",
       "common": "Malacostraca",
 
-      "summary": "Malacostraca is a diverse group of crustaceans that includes shrimp, lobsters, crabs, and more. They are found in all permanent waters of the world: in the seas from the tropics to the poles and from the tidal zone to the abyss; in surface and subterranean fresh waters of all continents except Antarctica",
+      "summary": "Malacostraca is a diverse group of crustaceans that includes shrimp, lobsters, crabs, and more.",
       "description": [
         "Malacostraca have a hard exoskeleton that provides protection and support for their bodies.",
         "Many species in this group have specialized appendages that are modified for feeding or locomotion.",
@@ -1136,13 +1136,13 @@
     },
     {
       "species": "Malurus coronatus",
-      "common": "Purple-crowned Fairywren",
+      "common": "Crowned Fairywren",
 
-      "summary": "Malurus coronatus, commonly known as Purple-crowned Fairywren, is a small bird species found in Australia. It is the largest of the eleven species in the genus Malurus and is endemic to northern Australia.",
+      "summary": "Malurus coronatus, commonly known as Crowned Fairywren, is a small bird species found in Australia.",
       "description": [
-        "Male Purple-crowned Fairywren have bright blue and black plumage during the breeding season, while females are brown and white.",
+        "Male Crowned Fairywrens have bright blue and black plumage during the breeding season, while females are brown and white.",
         "These birds are known for their acrobatic displays, including flitting their tails and performing aerial displays.",
-        "Purple-crowned Fairywren are insectivores and forage for food in the underbrush.",
+        "Crowned Fairywrens are insectivores and forage for food in the underbrush.",
         "During the breeding season, males will build multiple nests to attract females and may mate with multiple females.",
         "This species is relatively common and is not considered to be threatened."
       ],
@@ -1181,15 +1181,15 @@
 
     {
       "species": "Litoria xanthomera",
-      "common": "Orange-thighed Tree Frog",
+      "common": "Yellow-thighed Tree Frog",
 
-      "summary": "Orange-thighed Tree Frog is a tree frog species found in the rainforests of Papua New Guinea.",
+      "summary": "Yellow-thighed Tree Frog is a tree frog species found in the rainforests of Papua New Guinea.",
       "description": [
-        "The Orange-thighed Tree Frog gets its name from its bright Orange thighs, contrasting with its green or brown body coloration. It has a distinctive pattern of black spots on its back and legs.",
+        "The Yellow-thighed Tree Frog gets its name from its bright yellow thighs, contrasting with its green or brown body coloration. It has a distinctive pattern of black spots on its back and legs.",
         "This arboreal species spends most of its time in trees, feeding on insects and other small invertebrates.",
-        "Orange-thighed Tree Frogs are egg-laying species, with females depositing their eggs on leaves overhanging water bodies. The tadpoles develop in the water and undergo metamorphosis into juvenile frogs after several weeks.",
+        "Yellow-thighed Tree Frogs are egg-laying species, with females depositing their eggs on leaves overhanging water bodies. The tadpoles develop in the water and undergo metamorphosis into juvenile frogs after several weeks.",
         "They are relatively small, with adults measuring around 2-3 cm in length. They have large eyes with horizontal pupils, providing excellent vision in low-light conditions.",
-        "Habitat loss, degradation, and the pet trade pose threats to the Orange-thighed Tree Frog. Conservation efforts aim to protect their remaining habitat and regulate the trade of wild-caught specimens."
+        "Habitat loss, degradation, and the pet trade pose threats to the Yellow-thighed Tree Frog. Conservation efforts aim to protect their remaining habitat and regulate the trade of wild-caught specimens."
       ],
       "img": ""
     },
@@ -1213,7 +1213,7 @@
       "species": "Litoria peronii",
       "common": "Emerald-spotted Treefrog",
 
-      "summary": "Emerald-spotted Treefrog is a tree frog species found in Australia including suburban Sydney, using ponds as their breeding-water source. ",
+      "summary": "Emerald-spotted Treefrog is a tree frog species found in Australia and Papua New Guinea.",
       "description": [
         "The Emerald-spotted Treefrog is named for the bright green spots on its back and legs, contrasting with its dark brown or black body coloration.",
         "It is a relatively large species, with adults measuring around 6-7 cm in length and possessing a slender, streamlined body shape for tree movement.",
@@ -1241,9 +1241,9 @@
 
     {
       "species": "Litoria myola",
-      "common": "Kuranda Tree Frog/Myola Treefrog",
+      "common": "Myola Treefrog",
 
-      "summary": "Myola Treefrog is a tree frog species found in the small areas in the wet tropics of far north Queensland, Australia, specifically around the town of Kuranda.",
+      "summary": "Myola Treefrog is a tree frog species found in the wet sclerophyll forests of New South Wales, Australia.",
       "description": [
         "The Myola Treefrog has a distinctive olive green or brown coloration with a white belly and a bright yellow stripe running from the corner of its mouth to its shoulder.",
         "It is a relatively small species, with adults measuring around 3 cm in length and possessing a broad and flattened body shape for camouflage among leaf litter.",
@@ -1253,22 +1253,6 @@
       ],
       "img": ""
     },
-
-    {
-      "species": "Litoria Latopalmata",
-      "common": "Broad Palmed Frog",
-
-      "summary": "The Litoria latopalmata, commonly known as the Broad-palmed Frog, is a species of ground-dwelling tree frog native to much of eastern Australia. They can be found from mid-Queensland to south of Sydney.",
-      "description": [
-        "The Broad-palmed Frog is a species of ground-dwelling tree frog native to much of eastern Australia. It is characterised by a pointed snout, broad head stripes, long legs and a first finger that is usually longer than the second.",
-        "They can be found from mid-Queensland to south of Sydney and are associated with the coast and inland.",
-        "The frog is pale to dark brown on its dorsal surface and can have darker blotches or variegations. Its skin is smooth, with the occasional wart on its back.",
-        "A white line breaks the black band in front of the eye, and runs under the eye. The thighs are marbled yellow and black and the armpit is yellow. The lower lip is normally marbled black and white. The belly is white."  
-      ],
-      "img": ""
-    },
-
-
 
     {
       "species": "Litoria Myola",
@@ -1285,7 +1269,7 @@
     },
     {
       "species": "Litoria peronii",
-      "common": "Peron's treefrog/Emerald-spotted treefrog",
+      "common": "Emerald-spotted treefrog",
       "summary": "Litoria peronii, or the Emerald-spotted treefrog, is a species of tree frog found in the eastern and northern parts of Australia, as well as in Papua New Guinea and some nearby islands.",
       "description": [
         "The Emerald-spotted treefrog gets its name from the bright green spots on its back and legs, which stand out against its dark brown or black body coloration.",
@@ -4175,7 +4159,7 @@
     {
       "species": "Grantiella picta ",
       "common": "Painted Honeyeater",
-      "summary": "The Painted Honeyeater (Grantiella picta) is a small bird found in various parts of Australia, including woodlands, forests and shrublands. It is native to mainland Australia and is found across eastern and northern parts of the country.",
+      "summary": "The Painted Honeyeater (Grantiella picta) is a small bird found in various parts of Australia, including woodlands, forests and shrublands. ",
       "description": [
         "It has a striking black and white plumage with yellow wing patches. Males and females have similar markings, but males have a slightly longer bill.",
         "Painted Honeyeaters are known for their sweet and melodious calls, often performed by males during courtship displays. ",
@@ -4955,7 +4939,7 @@
         {
             "species": "Grantiella picta ",
             "common": "Painted Honeyeater",
-            "summary": "The Painted Honeyeater (Grantiella picta) is a small bird found in various parts of Australia, including woodlands, forests and shrublands. It is native to mainland Australia and is found across eastern and northern parts of the country. ",
+            "summary": "The Painted Honeyeater (Grantiella picta) is a small bird found in various parts of Australia, including woodlands, forests and shrublands. ",
             "description": [
                 "It has a striking black and white plumage with yellow wing patches. Males and females have similar markings, but males have a slightly longer bill.",
                 "Painted Honeyeaters are known for their sweet and melodious calls, often performed by males during courtship displays. ",
@@ -5522,6 +5506,6 @@
             "This species is considered abundant and endemic to Australia, but habitat loss and degradation are potential threats to their population."
             ],
             "img": ""
-            }
+        }       
     ]
 }

@@ -1066,7 +1066,7 @@
       "species": "Malurus leucopterus",
       "common": "White-winged Fairywren",
 
-      "summary": "Malurus leucopterus, commonly known as White-winged Fairywren, is a small bird species found in Australia.",
+      "summary": "Malurus cyaneus, commonly known as Superb Fairywren, is a small bird species found in Australia. It is common and familiar across south-eastern Australia.",
       "description": [
         "Male White-winged Fairywrens have bright blue and black plumage during the breeding season, while females are brown and white.",
         "These birds are known for their complex social behaviors, including cooperative breeding and territorial displays.",
@@ -1095,7 +1095,7 @@
       "species": "Malurus cyaneus",
       "common": "Superb Fairywren",
 
-      "summary": "Malurus cyaneus, commonly known as Superb Fairywren, is a small bird species found in Australia.",
+      "summary": "Malurus cyaneus, commonly known as Superb Fairywren, is a small bird species found in Australia. It is common and familiar across south-eastern Australia.",
       "description": [
         "Male Superb Fairywrens have bright blue and black plumage during the breeding season, while females are brown and white.",
         "These birds are known for their complex social behaviors, including cooperative breeding and territorial displays.",
@@ -1109,7 +1109,7 @@
       "species": "Malurus lamberti",
       "common": "Variegated Fairywren",
 
-      "summary": "Malurus lamberti, commonly known as Variegated Fairywren, is a small bird species found in Australia.",
+      "summary": "Malurus lamberti, commonly known as Variegated Fairywren, is a small bird species found in eastern Australia.",
       "description": [
         "Male Variegated Fairywrens have bright blue and black plumage during the breeding season, while females are brown and white.",
         "These birds are known for their complex social behaviors, including cooperative breeding and territorial displays.",
@@ -1124,7 +1124,7 @@
       "species": "Malacostraca sp.",
       "common": "Malacostraca",
 
-      "summary": "Malacostraca is a diverse group of crustaceans that includes shrimp, lobsters, crabs, and more.",
+      "summary": "Malacostraca is a diverse group of crustaceans that includes shrimp, lobsters, crabs, and more. They are found in all permanent waters of the world: in the seas from the tropics to the poles and from the tidal zone to the abyss; in surface and subterranean fresh waters of all continents except Antarctica",
       "description": [
         "Malacostraca have a hard exoskeleton that provides protection and support for their bodies.",
         "Many species in this group have specialized appendages that are modified for feeding or locomotion.",
@@ -1136,9 +1136,9 @@
     },
     {
       "species": "Malurus coronatus",
-      "common": "Crowned Fairywren",
+      "common": "Purple-crowned Fairywren",
 
-      "summary": "Malurus coronatus, commonly known as Crowned Fairywren, is a small bird species found in Australia.",
+      "summary": "Malurus coronatus, commonly known as Purple-crowned Fairywren, is a small bird species found in Australia. It is the largest of the eleven species in the genus Malurus and is endemic to northern Australia.",
       "description": [
         "Male Crowned Fairywrens have bright blue and black plumage during the breeding season, while females are brown and white.",
         "These birds are known for their acrobatic displays, including flitting their tails and performing aerial displays.",
@@ -1213,7 +1213,7 @@
       "species": "Litoria peronii",
       "common": "Emerald-spotted Treefrog",
 
-      "summary": "Emerald-spotted Treefrog is a tree frog species found in Australia including suburban Sydney, using ponds as their breeding-water source. ",
+      "summary": "Emerald-spotted Treefrog is a tree frog species found in Australia including suburban Sydney, where they use ponds as their breeding-water source.",
       "description": [
         "The Emerald-spotted Treefrog is named for the bright green spots on its back and legs, contrasting with its dark brown or black body coloration.",
         "It is a relatively large species, with adults measuring around 6-7 cm in length and possessing a slender, streamlined body shape for tree movement.",
@@ -1258,7 +1258,7 @@
       "species": "Litoria Latopalmata",
       "common": "Broad Palmed Frog",
 
-      "summary": "The Litoria latopalmata, commonly known as the Broad-palmed Frog, is a species of ground-dwelling tree frog native to much of eastern Australia. They can be found from mid-Queensland to south of Sydney.",
+      "summary": "The Litoria latopalmata, commonly known as the Broad-palmed Frog, is a ground-dwelling tree frog native to large portion of eastern Australia. Its natural habitat ranges from mid-Queensland to the areas south of Sydney.",
       "description": [
         "The Broad-palmed Frog is a species of ground-dwelling tree frog native to much of eastern Australia. It is characterised by a pointed snout, broad head stripes, long legs and a first finger that is usually longer than the second.",
         "They can be found from mid-Queensland to south of Sydney and are associated with the coast and inland.",
