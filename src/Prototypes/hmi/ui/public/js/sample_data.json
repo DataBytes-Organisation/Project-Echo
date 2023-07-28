@@ -1181,15 +1181,15 @@
 
     {
       "species": "Litoria xanthomera",
-      "common": "Yellow-thighed Tree Frog",
+      "common": "Orange-thighed Tree Frog",
 
-      "summary": "Yellow-thighed Tree Frog is a tree frog species found in the rainforests of Papua New Guinea.",
+      "summary": "Orange-thighed Tree Frog is a tree frog species found in the rainforests of Papua New Guinea.",
       "description": [
-        "The Yellow-thighed Tree Frog gets its name from its bright yellow thighs, contrasting with its green or brown body coloration. It has a distinctive pattern of black spots on its back and legs.",
+        "The Orange-thighed Tree Frog gets its name from its bright Orange thighs, contrasting with its green or brown body coloration. It has a distinctive pattern of black spots on its back and legs.",
         "This arboreal species spends most of its time in trees, feeding on insects and other small invertebrates.",
-        "Yellow-thighed Tree Frogs are egg-laying species, with females depositing their eggs on leaves overhanging water bodies. The tadpoles develop in the water and undergo metamorphosis into juvenile frogs after several weeks.",
+        "Orange-thighed Tree Frogs are egg-laying species, with females depositing their eggs on leaves overhanging water bodies. The tadpoles develop in the water and undergo metamorphosis into juvenile frogs after several weeks.",
         "They are relatively small, with adults measuring around 2-3 cm in length. They have large eyes with horizontal pupils, providing excellent vision in low-light conditions.",
-        "Habitat loss, degradation, and the pet trade pose threats to the Yellow-thighed Tree Frog. Conservation efforts aim to protect their remaining habitat and regulate the trade of wild-caught specimens."
+        "Habitat loss, degradation, and the pet trade pose threats to the Orange-thighed Tree Frog. Conservation efforts aim to protect their remaining habitat and regulate the trade of wild-caught specimens."
       ],
       "img": ""
     },
@@ -1213,7 +1213,7 @@
       "species": "Litoria peronii",
       "common": "Emerald-spotted Treefrog",
 
-      "summary": "Emerald-spotted Treefrog is a tree frog species found in Australia and Papua New Guinea.",
+      "summary": "Emerald-spotted Treefrog is a tree frog species found in Australia including suburban Sydney, using ponds as their breeding-water source. ",
       "description": [
         "The Emerald-spotted Treefrog is named for the bright green spots on its back and legs, contrasting with its dark brown or black body coloration.",
         "It is a relatively large species, with adults measuring around 6-7 cm in length and possessing a slender, streamlined body shape for tree movement.",
@@ -1241,9 +1241,9 @@
 
     {
       "species": "Litoria myola",
-      "common": "Myola Treefrog",
+      "common": "Kuranda Tree Frog/Myola Treefrog",
 
-      "summary": "Myola Treefrog is a tree frog species found in the wet sclerophyll forests of New South Wales, Australia.",
+      "summary": "Myola Treefrog is a tree frog species found in the small areas in the wet tropics of far north Queensland, Australia, specifically around the town of Kuranda.",
       "description": [
         "The Myola Treefrog has a distinctive olive green or brown coloration with a white belly and a bright yellow stripe running from the corner of its mouth to its shoulder.",
         "It is a relatively small species, with adults measuring around 3 cm in length and possessing a broad and flattened body shape for camouflage among leaf litter.",
@@ -1253,6 +1253,22 @@
       ],
       "img": ""
     },
+
+    {
+      "species": "Litoria Latopalmata",
+      "common": "Broad Palmed Frog",
+
+      "summary": "The Litoria latopalmata, commonly known as the Broad-palmed Frog, is a species of ground-dwelling tree frog native to much of eastern Australia. They can be found from mid-Queensland to south of Sydney.",
+      "description": [
+        "The Broad-palmed Frog is a species of ground-dwelling tree frog native to much of eastern Australia. It is characterised by a pointed snout, broad head stripes, long legs and a first finger that is usually longer than the second.",
+        "They can be found from mid-Queensland to south of Sydney and are associated with the coast and inland.",
+        "The frog is pale to dark brown on its dorsal surface and can have darker blotches or variegations. Its skin is smooth, with the occasional wart on its back.",
+        "A white line breaks the black band in front of the eye, and runs under the eye. The thighs are marbled yellow and black and the armpit is yellow. The lower lip is normally marbled black and white. The belly is white."  
+      ],
+      "img": ""
+    },
+
+
 
     {
       "species": "Litoria Myola",
@@ -1269,7 +1285,7 @@
     },
     {
       "species": "Litoria peronii",
-      "common": "Emerald-spotted treefrog",
+      "common": "Peron's treefrog/Emerald-spotted treefrog",
       "summary": "Litoria peronii, or the Emerald-spotted treefrog, is a species of tree frog found in the eastern and northern parts of Australia, as well as in Papua New Guinea and some nearby islands.",
       "description": [
         "The Emerald-spotted treefrog gets its name from the bright green spots on its back and legs, which stand out against its dark brown or black body coloration.",
@@ -4939,7 +4955,7 @@
         {
             "species": "Grantiella picta ",
             "common": "Painted Honeyeater",
-            "summary": "The Painted Honeyeater (Grantiella picta) is a small bird found in various parts of Australia, including woodlands, forests and shrublands. ",
+            "summary": "The Painted Honeyeater (Grantiella picta) is a small bird found in various parts of Australia, including woodlands, forests and shrublands. It is native to mainland Australia and is found across eastern and northern parts of the country. ",
             "description": [
                 "It has a striking black and white plumage with yellow wing patches. Males and females have similar markings, but males have a slightly longer bill.",
                 "Painted Honeyeaters are known for their sweet and melodious calls, often performed by males during courtship displays. ",
