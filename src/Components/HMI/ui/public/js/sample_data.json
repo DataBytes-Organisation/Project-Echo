@@ -3524,7 +3524,7 @@
       "common": "White-Throated Treecreeper",
       "summary": "Cormobates leucophaea is a small passerine bird about 15cm, native to eastern Australia, including Tasmania. It is part of the treecreeper family and is known for its distinctive white throat and black and white barred wings. The upperparts of the bird are brown with a streaked appearance, while the underparts are white.",
       "description": [
-        "White-Throated Treecreepers are found in eucalyptus forests and woodlands, where they use their strong, curved bills to search for insects and spiders in the crevices of bark. They also have a unique habit of spiraling up tree trunks as they forage, using their stiffened tail feathers and long toes to prop themselves up.",
+        "White-Throated are found in eucalyptus forests and woodlands, where they use their strong, curved bills to search for insects and spiders in the crevices of bark. They also have a unique habit of spiraling up tree trunks as they forage, using their stiffened tail feathers and long toes to prop themselves up.",
         "During the breeding season, the male and female work together to construct a nest made of bark and grass, which is usually placed behind a flap of loose bark. The female lays 2-3 eggs, which are incubated by both parents.",
         "One interesting fact about the White-Throated Treecreeper is that it has a unique adaptation for perching on vertical surfaces - the stiffened tail feathers and long toes that allow it to prop itself up while foraging also help it cling to tree trunks and branches. Another interesting fact is that the White-Throated Treecreeper has a similar appearance and behavior to the Brown Creeper found in North America, showing an example of convergent evolution in these distantly related species.",
         "",
@@ -3615,11 +3615,10 @@
       "common": "Grey Butcherbird",
       "summary": "Cracticus torquatus, commonly known as the Grey Butcherbird, is a species of bird native to Australia.",
       "description": [
-        "They are medium-sized birds, with males typically measuring 28–32 cm (11–13 in) in length and females measuring 25–28 cm (10–11 in) in length.",
-        "They are known for their beautiful and melodic calls, which are often heard in the early morning and late afternoon.",
+        "They are small birds, with males typically measuring 27–30 cm (11–13 in) in length and females measuring 25–28 cm (10–11 in) in length.",
+        "They are known for their raucous song that harmoniously blends musical and rough elements.",
         "Grey Butcherbirds are carnivorous and feed on insects, small mammals, reptiles, and other birds.",
-        "They are skilled hunters and are known to impale their prey on thorns or sharp branches to make it easier to consume.",
-        "Grey Butcherbirds are also known to be highly intelligent birds. They have been observed using tools, such as twigs and sticks, to extract insects from tree bark."
+        "They are skilled hunters and are known to impale their prey on thorns or sharp branches to make it easier to consume."
       ],
       "img": ""
     },
@@ -3628,10 +3627,9 @@
       "common": "Common Froglet",
       "summary": "Crinia signifera, commonly known as the Common Froglet, is a small species of ground- dwelling frog found throughout southern and eastern Australia.",
       "description": [
-        "The Common Froglet is one of the smallest frog species in Australia, measuring only 1-2.5 cm in length.",
-        "Despite its small size, the Common Froglet has a loud and distinctive call that can be heard during the breeding season. The call is described as a 'clicking' or 'ticking' sound.",
+        "The Common Froglet is one of the smallest frog species in Australia, measuring only up to 3cm in length.",
+        "Despite its small size, the Common Froglet has a loud and distinctive call, males can usually be heard accompanied by a choir of other males. The call is described as a 'crick-crick-crick' sound",
         "These frogs are highly adaptable and can be found in a variety of habitats, including wetlands, grasslands, and forests.",
-        "During the breeding season, males will establish small territories and call to attract females. Once the female has laid her eggs, the male will guard them until they hatch.",
         "The Common Froglet is an important indicator species for wetland health, as it is highly sensitive to changes in water quality and habitat degradation."
       ],
       "img": ""
@@ -3641,24 +3639,23 @@
       "common": "Black Swan",
       "summary": "The Black Swan is a large waterbird native to Australia.",
       "description": [
-        "They are the only swan species that is entirely black, with the exception of a small patch of white feathers on their wingtips.",
+        "They are the only swan species that is entirely black, with the exception of a small patch of white feathers on their wingtips (flight feathers).",
         "Black Swans are monogamous and mate for life, often staying together even outside of breeding season.",
         "They are herbivorous and feed on a variety of aquatic plants, including algae and submerged vegetation.",
-        "Black Swans are highly territorial during the breeding season and will aggressively defend their nests and young from predators.",
-        "In Indigenous Australian culture, the Black Swan is seen as a symbol of beauty, grace, and loyalty."
+        "Black Swans are highly territorial during the breeding season and will aggressively defend their nests and young from predators."
       ],
       "img": ""
     },
     {
       "species": "Dacelo leachii",
       "common": "Blue-Winged Kookaburra",
-      "summary": "The Blue-Winged Kookaburra (Dacelo leachii) is a large bird native to northern and eastern Australia and southern New Guinea.",
+      "summary": "The Blue-Winged Kookaburra (Dacelo leachii) is a large kind of kingfisher native to northern, western, and eastern Australia, as well as southern New Guinea.",
       "description": [
-        "They are about 40-45 cm (16-18 in) in length and have a wingspan of around 60-65 cm (24- 26 in).",
+        "Adults are about 38-42 cm  in length and weigh roughly 260 to 330 grams.",
         "Like other members of the kingfisher family, Blue-Winged Kookaburras are carnivorous and primarily feed on insects, small mammals, lizards, and snakes.",
-        "They are also known for their loud, raucous laughter-like call, which is often used as a territorial display.",
+        "They are also known for their loud, raucous laughter-like call and are often confused with the laughing kookaburra.",
         "Blue-Winged Kookaburras are cooperative breeders, with family groups consisting of a breeding pair and several of their offspring from previous years assisting with nesting and caring for young.",
-        "They are found in a variety of habitats, including open woodland, savannah, and urban areas, and are generally not considered threatened."
+        "They are found in a variety of habitats, including open woodland, savannah, and rural farm areas near sugarcane fields."
       ],
       "img": ""
     },
@@ -3680,7 +3677,7 @@
       "common": "Fallow Deer",
       "summary": "Dama Dama is a medium-sized deer species native to Western Eurasia but has been introduced to other parts of the world, including Australia and North America.",
       "description": [
-        "Fallow Deer are known for their distinctive palmate antlers, which are flattened and shaped like a hand with fingers. These antlers are shed and regrown each year.",
+        "Fallow Deer are known for their distinctive palmate antlers, which are flattened and shaped like a hand with fingers. These antlers are shed around October every year and regrown each year by February.",
         "Fallow Deer are primarily grazers, feeding on a variety of vegetation, including grasses, leaves, and shoots.",
         "During the breeding season, males engage in a behavior known as ‘rutting,’ where they compete with each other for access to females. This behavior includes vocalizations, posturing, and antler-wrestling.",
         "Fallow Deer have been hunted for their meat and antlers for centuries, and are also commonly kept in parks and game reserves for their aesthetic appeal.",
@@ -3694,10 +3691,9 @@
       "summary": "Daphoenositta chrysoptera, commonly known as the Varied Sittella, is a small passerine bird native to Australia.",
       "description": [
         "The Varied Sittella is known for its unique feeding behavior. It moves along the branches of trees, often hanging upside down like a chickadee, to feed on insects and spiders.",
-        "The species has a distinctive black, white, and chestnut plumage. The male and female have a similar appearance, but the female has a slightly smaller bill.",
+        "This bird displays a variable crown and head coloration, ranging from white, grey, to black, while its body is predominantly whitish or grey with occasional black and grey streaks. Its wings are entirely black, distinguished by a prominent bar in either white or cinnamon.",
         "The Varied Sittella is a cooperative breeder, with a breeding pair assisted by several helper birds that are typically their offspring from previous seasons. These helpers aid in feeding and caring for the young.",
-        "This species is found in a range of habitats, from woodlands and forests to arid scrublands, across much of Australia except for the far north and southwest of the country.",
-        "The Varied Sittella has a unique call that sounds like a high-pitched, rapid trill. It is often heard in small flocks as they move through the treetops."
+        "This species is found predominantly in woodlands and eucalypt forests."
       ],
       "img": ""
     },
@@ -3706,11 +3702,11 @@
       "common": "Wandering Whistling-Duck",
       "summary": "Dendrocygna arcuata, commonly known as the Wandering Whistling-Duck, is a species of whistling duck found in parts of Australia, Indonesia, Papua New Guinea, and the Solomon Islands. They inhabit freshwater wetlands, swamps, and rice fields, and are known for their distinctive whistling calls, which can be heard during flight.",
       "description": [
-        "The Wandering Whistling-Duck is a medium-sized duck, measuring around 50-60 cm in length and weighing up to 1 kg.",
+        "The Wandering Whistling-Duck is a medium-sized duck, measuring around 54-60 cm in length and weighing up to 750g.",
         "They have a striking appearance, with a chestnut-brown head and neck, a white eye-ring, and a buff-colored body with black spots.",
         "These ducks are mostly herbivorous, feeding on aquatic plants, seeds, and grasses.",
-        "They are known for their unique breeding habits, as they form large communal nests made from reeds and grasses in areas of flooded wetlands. These nests can house up to 50 eggs and are tended by both males and females.",
-        "The Wandering Whistling-Duck is considered a game bird in Australia and is sometimes hunted for sport or food, but their populations are generally stable and not considered threatened."
+        "During the tropical wet season, which usually falls between December and May, the bird lays six to fifteen eggs in a nest situated not far from water. The nest is typically found in high grass or a sheltered area.",
+        "The Wandering Whistling-Duck is considered a game bird in the Northern Territory and is sometimes hunted for sport or food, but their populations are generally stable and not considered threatened."
       ],
       "img": ""
     },
@@ -3719,7 +3715,7 @@
       "common": "Mistletoebird",
       "summary": "The Mistletoebird is a small, plump, and active bird found across much of Australia and parts of Southeast Asia.",
       "description": [
-        "They are about 8-10 cm in length and weigh around 6-9 grams.",
+        "They are about 9-10 cm in length and weigh around 7.5-11 grams.",
         "Mistletoebirds are named after their unique feeding habit of eating the sticky white berries of mistletoe plants. They are the only bird species in the world that is completely dependent on mistletoe for their survival.",
         "Mistletoebirds are able to digest mistletoe berries very quickly, sometimes even while still in flight, which allows them to consume large quantities of the fruit in a short amount of time.",
         "They build their small, cup-shaped nests using fine twigs and grasses, often weaving them into the dense foliage of mistletoe plants.",
@@ -3732,24 +3728,23 @@
       "common": "Spangled Drongo",
       "summary": "The Spangled Drongo is a medium-sized bird found in the forests and woodlands of Australia and Southeast Asia.",
       "description": [
-        "They are known for their glossy black plumage and striking, iridescent blue-green spangles on their tail.",
-        "Spangled Drongos are highly vocal and have a wide repertoire of calls, including mimicry of other bird species and even mechanical sounds like car alarms.",
+        "They are known for their glossy black plumage and striking, iridescent blue-green spangles on their pronged tail.",
+        "Spangled Drongos are highly vocal and have a wide repertoire of calls, including mimicry of other bird species, and entertaining calls that are described to sound like a 'sneeze'.",
         "They are insectivorous and often hunt insects in flight, using their acrobatic flying abilities to catch their prey.",
-        "During the breeding season, Spangled Drongos are known to form cooperative breeding groups where non-breeding birds help raise the offspring of breeding pairs.",
-        "In some Indigenous Australian cultures, the Spangled Drongo is considered a trickster figure, often depicted in stories as using its intelligence and cunning to outsmart other animals."
+        "During the breeding season, Spangled Drongos are known to form cooperative breeding groups where non-breeding birds help raise the offspring of breeding pairs."
       ],
       "img": ""
     },
     {
       "species": "Ducula spilorrhoa",
       "common": "Torresian imperial pigeon",
-      "summary": "The Torresian imperial pigeon is a large, plump pigeon found throughout northern and eastern Australia and in parts of New Guinea.",
+      "summary": "The Torresian imperial pigeon is a relatively large, plump pigeon found throughout northern and eastern Australia and in parts of New Guinea.",
       "description": [
         "They are known for their loud and distinctive calls, which can be heard echoing through the forests where they live.",
         "Torresian imperial pigeons are frugivores, feeding primarily on the fruits of rainforest trees.",
         "They are considered an important seed disperser for many of these trees, as they can swallow fruits whole and pass the seeds intact through their digestive system, allowing them to be spread over large distances.",
         "During breeding season, males perform elaborate courtship displays, puffing out their chest feathers and cooing to attract a mate.",
-        "Females typically lay a single egg, which both parents take turns incubating for around 24 days."
+        "Females typically lay a single egg, which both parents take turns incubating for around 27 days."
       ],
       "img": ""
     },
@@ -3771,9 +3766,9 @@
       "common": "White-Faced Heron",
       "summary": "The White-Faced Heron is a medium-sized heron found throughout most of Australia and parts of New Zealand and New Caledonia.",
       "description": [
-        "They are typically found in wetlands, swamps, estuaries, and other waterways, where they feed on a variety of small aquatic animals, such as fish, frogs, and crustaceans.",
-        "White-Faced Herons are very adaptable and can also be found in urban areas, such as parks and gardens, where they may feed on insects and small vertebrates.",
-        "During breeding season, they develop long, wispy plumes on their back and neck, which they use in courtship displays.",
+        "They are typically found in wetlands, swamps, estuaries, and other waterways, where they feed on a variety of small aquatic animals, such as fish, reptiles, and insects.",
+        "White-Faced Herons are very adaptable and can also be found in urban areas, such as parks and golf courses, where they may feed on insects and small vertebrates.",
+        "In the breeding season, blue-grey plumes appear on the back, while pinkish-brown or bronze nuptial plumes emerge on the foreneck and breast.",
         "White-Faced Herons are generally solitary birds, although they may form small flocks during the non-breeding season.",
         "They are known for their slow, graceful flight, and may soar high in the sky on thermal currents."
       ],
@@ -3784,7 +3779,7 @@
       "common": "Black-Shouldered Kite",
       "summary": "Elanus axillaris, commonly known as the Black-Shouldered Kite, is a small and graceful raptor found in parts of Australia, New Guinea, and Indonesia.",
       "description": [
-        "They are small, measuring about 30-35 cm in length with a wingspan of 80-100 cm, and weighing only around 200-300 grams.",
+        "They are small, measuring about 30-35 cm in length with a wingspan of 80-100 cm, and weighing on average 300 grams.",
         "These birds are highly skilled hunters, preying mainly on small rodents such as mice and voles, as well as insects and small birds.",
         "Unlike most other birds of prey, the Black-Shouldered Kite is known to hover in one spot in the air for extended periods of time, scanning the ground below for prey before swooping down to catch it.",
         "These kites are also known for their vocalizations, which include high-pitched whistles and screeches.",
@@ -3797,8 +3792,8 @@
       "common": "Black-Fronted Dotterel",
       "summary": "Elseyornis melanops, commonly known as the Black-Fronted Dotterel, is a small bird species native to Australia, New Zealand, and New Guinea. They are typically found near bodies of water such as rivers, lakes, and wetlands.",
       "description": [
-        "They are small birds, measuring only about 15-18 cm in length and weighing around 25-45 grams.",
-        "The males and females have similar plumage, with a distinctive black ‘V’ shape on their breast and a white belly.",
+        "They are small birds, measuring only a wingspan of 105-119 mm in and weighing around 26-39 grams.",
+        "The males and females have similar plumage, with a distinctive black ‘V’ shape on their breast and a white belly. The black band around the eyes and breast area is absent in juveniles.",
         "They are known for their distinctive call, which is described as a high-pitched ‘weet-weet- weet’ sound.",
         "Elseyornis melanops are ground-nesting birds, laying their eggs in shallow scrapes on sandy or muddy areas near the water's edge.",
         "They feed on small invertebrates such as insects, crustaceans, and mollusks, which they find by probing their bills into the mud or sand."
@@ -3810,8 +3805,8 @@
       "common": "Blue-Faced Honeyeater",
       "summary": "The Blue-Faced Honeyeater is a species of honeyeater found in Australia, particularly in the northern and eastern parts of the country. It is characterized by its distinctive blue skin around the eyes and beak, which gives it its name. The Blue-Faced Honeyeater has a wide range of habitats, from rainforests to woodlands, and feeds on nectar, insects, and fruit.",
       "description": [
-        "The Blue-Faced Honeyeater is known for its impressive ability to mimic the calls of other birds and even other animals, including dogs and cats.",
         "This bird is often seen in groups, sometimes consisting of up to 20 individuals, and they are known for their vocal communication with each other.",
+        "At the break of dawn, the bird's calls become noisy and varied, featuring a repeated and penetrating 'woik' sound. Additionally, during flight, it emits squeaks, while producing softer 'hwit hwit' calls.",
         "The Blue-Faced Honeyeater is an important pollinator of flowers, particularly those with tubular shapes that other birds may have difficulty accessing.",
         "During the breeding season, males will display their blue facial skin more prominently in order to attract mates.",
         "The Blue-Faced Honeyeater has been known to visit gardens and even homes in search of food, particularly sugary treats like jam and honey."
@@ -3824,10 +3819,9 @@
       "summary": "The Galah is a common and widespread bird, found in open country throughout most of Australia.",
       "description": [
         "Galahs are highly social birds and often form large flocks of up to several hundred individuals, which can be quite noisy.",
-        "Galahs are capable of mimicking human speech and can also learn to imitate other sounds, such as car alarms and telephone ringtones.",
+        "Galahs are capable of learning human speech and can also learn to imitate other sounds, such as car alarms and telephone ringtones.",
         "In the wild, Galahs feed on a variety of seeds, fruits, and insects, and are particularly fond of eating the seeds of the eucalyptus tree.",
-        "Galahs are a popular pet bird and are often kept in captivity due to their playful and affectionate personalities.",
-        "In some Indigenous Australian cultures, the Galah has mythological significance and is associated with storytelling and traditional medicine."
+        "Galahs are a popular pet bird and are often kept in captivity due to their playful and affectionate personalities."
       ],
       "img": ""
     },
