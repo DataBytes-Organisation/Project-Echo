@@ -674,11 +674,11 @@
       "species": "Neophema pulchella",
       "common": "Turquoise Parrot",
 
-      "summary": "Neophema pulchella, commonly known as Turquoise Parrot, is a small parrot found in southeastern Australia.",
+      "summary": "Neophema pulchella, commonly known as Turquoise Parrot, is a small parrot found in eastern and southeastern Australia.",
       "description": [
         "Males have bright turquoise feathers on their wings and back while females have green feathers.",
         "They inhabit open woodlands and grasslands.",
-        "Their diet primarily consists of seeds and fruits.",
+        "Their diet primarily consists of seeds and fruits, however they will occasionally consume insects and leaves.",
         "The Turquoise Parrot is a popular bird among aviculture enthusiasts."
       ],
       "img": ""
@@ -686,26 +686,26 @@
 
     {
       "species": "Myzomela sanguinolenta",
-      "common": "Crimson-hooded Myzomela",
+      "common": "Scarlet Myzomela",
 
-      "summary": "Myzomela sanguinolenta, commonly known as Crimson-hooded Myzomela, is a small bird found in Indonesia, Papua New Guinea, and the Solomon Islands.",
+      "summary": "Myzomela sanguinolenta, commonly known as Scarlet Myzomela, is a small bird found in eastern Australia.",
       "description": [
-        "These birds have a distinctive crimson-colored hood, with a black body and wings.",
-        "Crimson-hooded Myzomelas feed on nectar, insects, and spiders, and are important pollinators of native plant species in their range.",
-        "They are also known to engage in 'hawkmoth hovering,' where they hover in front of flowers while feeding on nectar, similar to a hummingbird.",
+        "Male Scarlet Myzomelas showcase a striking crimson hood, which contrasts with their black body and wings, while the females exhibit an entirely brown plumage.",
+        "Scarlet Myzomelas feed on nectar and insects.",
+        "They are also known to engage in 'hawkmoth hovering,' where they hover in front of flowers while sipping nectar, resembling the feeding habits of hummingbirds.",
         "The species is classified as Least Concern on the IUCN Red List, with a stable population trend."
       ],
       "img": ""
     },
     {
       "species": "Neochmia phaeton",
-      "common": "Common Crimson Finch",
+      "common": "Crimson Finch",
 
-      "summary": "Neochmia phaeton, commonly known as Common Crimson Finch, is a small bird found in northern and eastern Australia.",
+      "summary": "Neochmia phaeton, commonly known as Crimson Finch, is a small bird found in northern Australia and southern New Guinea.",
       "description": [
         "These birds have a distinctive crimson-colored head and breast, with a brownish back and wings.",
-        "They are known to form large flocks outside of the breeding season, sometimes numbering in the hundreds or even thousands of individuals.",
-        "Common Crimson Finches primarily feed on grass seeds, and are important seed dispersers in their range.",
+        "They build nests in shrubs and dry brush near the base of Pandanus trees.",
+        "Crimson Finches have a tendancy for aggression towards other birds.",
         "The species is classified as Least Concern on the IUCN Red List, with a stable population trend."
       ],
       "img": ""
@@ -716,9 +716,9 @@
 
       "summary": "Neochmia temporalis, commonly known as Red-browed Finch, is a small bird found in eastern and southeastern Australia.",
       "description": [
-        "These birds have a distinctive red stripe above their eye, with a brownish back and wings and a white belly.",
-        "Red-browed Finches feed on grass seeds and insects, and are often seen foraging on the ground in small groups.",
-        "The species is known for its elaborate courtship displays, which involve the male fluffing up its feathers and performing a 'dancing' display to attract a mate.",
+        "These birds have a distinctive red stripe above their eye, with a brownish back, olive wings and a white belly.",
+        "Red-browed Finches feed on grass seeds, but will also consume other non-native seed types.",
+        "The species is sociable and can often be seen in flocks of 10 to 20 birds.",
         "The Red-browed Finch is classified as Least Concern on the IUCN Red List, with a stable population trend."
       ],
       "img": ""
@@ -726,13 +726,13 @@
 
     {
       "species": "Myiagra rubecula",
-      "common": "Pacific Flycatcher",
+      "common": "Leaden Flycatcher",
 
-      "summary": "Myiagra rubecula, commonly known as Pacific Flycatcher, is a small passerine bird found in various Pacific Islands, including Samoa, Fiji, and Tonga.",
+      "summary": "Myiagra rubecula, commonly known as Leaden Flycatcher, is a small passerine bird found in veastern and northern Australia, Indonesia, and Papua New Guinea.",
       "description": [
-        "These birds have a distinctive reddish-brown coloration on their head and upperparts, with a yellow throat and belly.",
-        "Pacific Flycatchers are known for their aerial acrobatics, which they use to catch insects on the wing.",
-        "They are also known to build their nests in tree cavities or man-made structures such as birdhouses.",
+        "These birds exhibit shiny grey heads and upperparts, while the females boast distinctive orange throats.",
+        "The Leaden Flycatchers are celebrated for their impressive aerial acrobatics, skillfully maneuvering through the air to capture insects on the wing as a part of their feeding strategy.",
+        "They craft their nests using a combination of bark, dry grass, and skillfully woven spider webs.",
         "The species is currently classified as Least Concern on the IUCN Red List, with a stable population trend."
       ],
       "img": ""
@@ -743,10 +743,10 @@
 
       "summary": "Myzomela erythrocephala, commonly known as Red-headed Myzomela, is a small bird found in Australia, Indonesia, and Papua New Guinea.",
       "description": [
-        "As the name suggests, the species has a bright red head, with a black body and wings.",
-        "These birds feed on nectar, insects, and spiders, and are important pollinators of native plant species in their range.",
-        "Red-headed Myzomelas are also known for their unique vocalizations, which include a variety of whistles, trills, and clicks.",
-        "The species is classified as Least Concern on the IUCN Red List, with a stable population trend."
+        "The Red-headed Myzomelas, as the name suggests, possess a strikingly bright red head, contrasting with their black body and wings.",
+        "Their diet is diverse, consisting of nectar, insects, and spiders, and they play a vital role as pollinators for native plant species in their habitat, contributing to the ecological balance.",
+        "These birds are known for their distinct and captivating vocalizations, incorporating a variety of whistles, trills, and clicks.",
+        "The Red-headed Myzomelas are classified as Least Concern on the IUCN Red List, indicating a stable population trend, and providing some reassurance about their current conservation status."
       ],
       "img": ""
     },
@@ -757,10 +757,10 @@
 
       "summary": "Myiagra cyanoleuca, commonly known as Satin Flycatcher, is a small bird found in parts of Australia and Papua New Guinea.",
       "description": [
-        "Males have a black head and upperparts with a bright blue breast while females have a brownish-gray breast.",
-        "They are typically found in forests and woodlands and are often seen perching on low branches.",
+        "Males are a shiny dark blue colour, with a white belly and small crest on their head, while females are brown with an orange chest and throat.",
+        "During the summer, these birds undertake migration to southeast Australia for breeding purposes.",
         "Their diet primarily consists of insects and other small invertebrates.",
-        "The Satin Flycatcher is known for its distinctive high-pitched whistle call."
+        "This bird species garners recognition for its distinct and melodious high-pitched whistle call."
       ],
       "img": ""
     },
@@ -768,26 +768,26 @@
       "species": "Myiagra inquieta",
       "common": "Restless Flycatcher",
 
-      "summary": "Myiagra inquieta, commonly known as Restless Flycatcher, is a medium-sized bird found in parts of Australia and Papua New Guinea.",
+      "summary": "Myiagra inquieta, commonly known as Restless Flycatcher, is a medium-sized bird found in parts of Australia.",
       "description": [
-        "They have brownish-gray plumage with streaks of white on their breast and belly.",
-        "They are typically found in forests and woodlands and are often seen perching on low branches.",
-        "Their diet primarily consists of insects and other small invertebrates.",
-        "The Restless Flycatcher is known for its distinctive loud, harsh screech call."
+        "They have a shiny dark blue crest, a blue-grey back and white underparts.",
+        "Frequently encountered in forests and woodlands, they are commonly seen perching on branches, making them easy to spot.",
+        "Their diet mainly comprises insects and other small invertebrates.",
+        "The Restless Flycatcher is known for its unique loud, harsh screech call."
       ],
       "img": ""
     },
 
     {
       "species": "Mirafra javanica",
-      "common": "Javan Bushlark",
+      "common": "Singing Bushlark",
 
-      "summary": "Mirafra javanica, commonly known as Javan Bushlark, is a small bird found in Indonesia and Malaysia.",
+      "summary": "Mirafra javanica, commonly known as Singing Bushlark, is a small bird found in Australia, Indonesia and Malaysia.",
       "description": [
         "They have brownish plumage with streaks of black and white on their breast and belly.",
         "They are typically found in grasslands and open savannas.",
-        "Their diet primarily consists of insects and other small invertebrates.",
-        "The Javan Bushlark is known for its distinctive series of high-pitched whistle song."
+        "Their diet primarily consists of insects, grass seeds and other small invertebrates.",
+        "The Singing Bushlark is known for its distinctive series of high-pitched whistle song."
       ],
       "img": ""
     },
@@ -797,24 +797,24 @@
 
       "summary": "Myiagra alecto, commonly known as Shining Flycatcher, is a small bird found in parts of Asia and Oceania.",
       "description": [
-        "Males have a bright blue crown and upperparts while females have a grayish-blue crown and upperparts.",
-        "They are typically found in forests and woodlands and are often seen perching on low branches.",
-        "Their diet primarily consists of insects and other small invertebrates.",
-        "The Shining Flycatcher is known for its distinctive high-pitched whistle call."
+        "Distinguished by its appearance, the males exhibit glossy blue-black plumage, while the females boast a rich chestnut hue, coupled with white underparts, a black crown, and face.",
+        "Frequently found in forests and woodlands, these birds often perch on low branches, offering easy sightings.",
+        "Their diet primarily consists of insects and other small invertebrates, sustaining their energetic lifestyle.",
+        "The Shining Flycatcher is further recognized for its unique and melodic high-pitched whistle call."
       ],
       "img": ""
     },
 
     {
       "species": "Microeca flavigaster",
-      "common": "Yellow-bellied Flyrobin",
+      "common": "Lemon-bellied Flyrobin",
 
-      "summary": "Microeca flavigaster, commonly known as Yellow-bellied Flyrobin, is a small bird found in Australia and Papua New Guinea.",
+      "summary": "Microeca flavigaster, commonly known as Lemon-bellied Flyrobin, is a small bird found in Australia, Indonesia and Papua New Guinea.",
       "description": [
-        "Males have a black head, wings, and tail with a bright yellow belly while females have a brownish-gray belly.",
-        "They are typically found in forests and woodlands and are often seen perching on low branches.",
-        "Their diet primarily consists of insects and other small invertebrates.",
-        "The Yellow-bellied Flyrobin is known for its distinctive high-pitched whistle call."
+        "Both male and female Lemon-bellied Flyrobins display lemon yellow underparts, complemented by a white throat, a grey face featuring a distinctive white eyebrow stripe, and olive-brown upperparts.",
+        "These birds predominantly inhabit mangroves, paperbark swamp forests, and woodlands.",
+        "Feeding mainly on insects and other small invertebrates, they sustain their diet from the resources found in their natural habitats.",
+        "Lemon-bellied Flyrobins lay pale blue eggs adorned with brown markings."
       ],
       "img": ""
     },
@@ -822,12 +822,12 @@
       "species": "Milvus migrans",
       "common": "Black Kite",
 
-      "summary": "Milvus migrans, commonly known as Black Kite, is a medium-sized bird of prey found in parts of Europe, Asia, and Africa.",
+      "summary": "Milvus migrans, commonly known as Black Kite, is a medium-sized bird of prey found in parts of Europe, Asia, and Australasia.",
       "description": [
-        "They have dark brown plumage and a distinctive forked tail.",
-        "They are often seen soaring high in the sky and are known for their impressive aerial acrobatics.",
-        "Their diet consists of a variety of prey, including small mammals, birds, and insects.",
-        "The Black Kite is a common sight in many urban areas and is sometimes seen scavenging for food in garbage dumps."
+        "This species boasts dark brown plumage and stands out with its forked tail.",
+        "Frequently observed soaring at great heights, the Black Kite is renowned for its remarkable aerial maneuvers and acrobatics.",
+        "Their diet is diverse, encompassing a variety of prey, such as small mammals, birds, and insects.",
+        "A familiar presence in numerous urban locations, the Black Kite is occasionally spotted scavenging for food in garbage dumps."
       ],
       "img": ""
     },
@@ -838,10 +838,10 @@
 
       "summary": "Microchiroptera sp., commonly known as Microbat, is a group of small bats found around the world, known for their echolocation abilities and insectivorous diets.",
       "description": [
-        "These bats use high-pitched calls to locate prey, and can eat up to half their body weight in insects each night.",
-        "Microbats have unique adaptations, such as elongated fingers and specialized ear structures, that allow them to navigate and hunt in complete darkness.",
+        "These bats emit high-frequency calls to pinpoint and capture their prey, devouring up to half of their body weight in insects during each night.",
+        "Equipped with adaptations such as elongated fingers and specialized ear structures, microbats possess the ability to navigate and hunt effortlessly in total darkness.",
         "Many species of microbat are threatened by habitat loss and fragmentation, as well as disease and predation by introduced species like cats and rats.",
-        "Despite their small size, microbats play an important role in many ecosystems as both predators and prey."
+        "espite their small size, microbats fulfill crucial roles within various ecosystems, serving both as predators and prey, highlighting their significance in maintaining ecological balance."
       ],
       "img": ""
     },
@@ -851,10 +851,10 @@
 
       "summary": "Microeca fascinans, commonly known as Jacky Winter, is a small, insectivorous bird found in Australia.",
       "description": [
-        "These birds are known for their distinctive tail-wagging behavior, which they use to attract insects and other small prey.",
-        "Jacky Winter males and females have similar plumage, with a dull brown back and wings and a white belly.",
-        "These birds build small, cup-shaped nests out of twigs and grass, typically in a fork of a tree branch or among dense vegetation.",
-        "Jacky Winter populations have declined in some areas due to habitat loss and fragmentation, as well as predation by introduced species."
+        "Renowned for its distinctive swooping behavior, Jacky Winter exhibits remarkable aerial acrobatics to capture prey while in flight.",
+        "Both male and female Jacky Winter birds sport a similar plumage, characterized by a dull brown back and wings, complemented by a white belly.",
+        "To create their nests, these birds construct small cup-shaped structures using twigs and grass, often nestled within the forks of tree branches or amidst dense vegetation.",
+        "Jacky Winter populations have experienced decline in certain regions due to the detrimental impacts of habitat loss and fragmentation, along with predation by introduced species."
       ],
       "img": ""
     },
@@ -866,9 +866,9 @@
       "summary": "Menura novaehollandiae, commonly known as Superb Lyrebird, is found in southeastern Australia and is known for its elaborate courtship displays and mimicry abilities.",
       "description": [
         "These birds have a complex vocal repertoire, and males can imitate over 20 other bird species, as well as sounds like camera shutters and car alarms.",
-        "Superb Lyrebirds are ground-dwelling birds and feed on a variety of insects, as well as seeds and fruit.",
+        "Superb Lyrebirds are ground-dwelling birds and feed on a variety of insects and earthworms.",
         "Females build their nests on the ground, typically in dense vegetation, and raise their chicks alone.",
-        "These birds are considered a keystone species in their ecosystem, as they help to disperse seeds and maintain forest health."
+        "These birds prefer to inhabit rainforests, where there is a moist open ground layer shaded by vegetation."
       ],
       "img": ""
     },
@@ -881,7 +881,7 @@
         "These birds are named for their diet of bees, wasps, and other flying insects, which they catch in mid-air using their sharp beaks.",
         "Rainbow Bee-eaters are migratory birds, spending the breeding season in Australia and then moving to Indonesia and Papua New Guinea for the non-breeding season.",
         "Males and females have similar plumage, with bright green and blue feathers on their backs and wings, and a bright yellow throat and belly.",
-        "Rainbow Bee-eaters are important pollinators, as they consume large numbers of bees and wasps that might otherwise damage crops or flowers."
+        "Rainbow Bee-eaters inhabit woodlands, beaches, dunes, cliffs, mangroves, and farmlands, and they also visit parks and private gardens."
       ],
       "img": ""
     },
@@ -907,9 +907,9 @@
       "description": [
         "The male Albert's Lyrebird is known for its beautiful tail, featuring two large, lyre-shaped feathers.",
         "They are found only in a small area of southeastern Queensland and are considered a threatened species.",
-        "Albert's Lyrebirds are excellent mimics and can imitate a wide variety of sounds, including other bird songs, chainsaws, and car alarms.",
+        "Albert's Lyrebirds are excellent mimics and can imitate other bird songs with a wide range of pitch and tone.",
         "Females build their nests on the ground and raise their chicks alone, without any assistance from the male.",
-        "These birds are important seed dispersers, as they eat fruit and spread the seeds through their droppings."
+        "These birds feed mainly on insects, and find most of their food while foraging on the ground."
       ],
       "img": ""
     },
@@ -918,13 +918,13 @@
       "species": "Melithreptus gularis",
       "common": "Black-chinned Honeyeater",
 
-      "summary": "Melithreptus gularis, commonly known as Black-chinned Honeyeater, is a small bird species found in southeastern Australia.",
+      "summary": "Melithreptus gularis, commonly known as Black-chinned Honeyeater, is a small bird species found in northern and southeastern Australia.",
       "description": [
         "Black-chinned Honeyeaters are named for the black stripe that runs across their throat and chin.",
         "They are often found in eucalyptus forests and woodlands, foraging for insects and spiders.",
         "These birds build small, cup-shaped nests out of twigs, grass, and other materials, often hidden in foliage.",
         "Black-chinned Honeyeaters have a distinctive and loud call, described as sounding like 'cheep-cheep-cheep.'",
-        "They are known for their territorial behavior and will defend their feeding and nesting sites against other birds."
+        "They lay shiny, pink eggs with sparse red-brown spots."
       ],
       "img": ""
     },
@@ -932,13 +932,13 @@
       "species": "Melithreptus lunatus",
       "common": "White-naped Honeyeater",
 
-      "summary": "Melithreptus lunatus, commonly known as White-naped Honeyeater, is a small bird species found in southeastern Australia.",
+      "summary": "Melithreptus lunatus, commonly known as White-naped Honeyeater, is a small bird species found in eastern Australia.",
       "description": [
         "White-naped Honeyeaters are named for the white patch on the back of their neck.",
         "They are often found in eucalyptus forests and woodlands, feeding on nectar, insects, and other small invertebrates.",
         "These birds build small, cup-shaped nests out of twigs, grass, and other materials, often hidden in foliage.",
-        "White-naped Honeyeaters have a distinctive and melodic song, described as sounding like 'twee-twee-twee.'",
-        "They are known for their acrobatic foraging behavior, often hanging upside down from branches or leaves to reach insects and prey."
+        "White-naped Honeyeaters have a distinctive and melodic song, described as sounding like 'mjerp-mjerp-mjerp.'",
+        "They usually forage in tall trees, and are rarely seen on the ground."
       ],
       "img": ""
     },
@@ -947,13 +947,13 @@
       "species": "Melithreptus albogularis",
       "common": "White-throated Honeyeater",
 
-      "summary": "Melithreptus albogularis, commonly known as White-throated Honeyeater, is a small bird species found in southeastern Australia.",
+      "summary": "Melithreptus albogularis, commonly known as White-throated Honeyeater, is a small bird species found in eastern and northern Australia.",
       "description": [
         "White-throated Honeyeaters are named for the white patch on their throat and upper breast.",
-        "They are often found in eucalyptus forests and woodlands, foraging for insects and spiders.",
+        "They are often found in eucalyptus forests and woodlands, foraging for insects, spiders and nectar.",
         "These birds build small, cup-shaped nests out of twigs, grass, and other materials, often hidden in foliage.",
         "White-throated Honeyeaters have a distinctive and high-pitched 'tsip' call, often repeated several times in a row.",
-        "They are known for their acrobatic foraging behavior, often hanging upside down from branches or leaves to reach insects and prey."
+        "They are known for foraging at all levels to reach their food."
       ],
       "img": ""
     },
@@ -966,8 +966,8 @@
         "Brown-headed Honeyeaters are named for the brown cap and nape on their head.",
         "They are often found in eucalyptus forests and woodlands, feeding on nectar, insects, and other small invertebrates.",
         "These birds build small, cup-shaped nests out of twigs, grass, and other materials, often hidden in foliage.",
-        "Brown-headed Honeyeaters have a distinctive and melodious song, described as sounding like 'peety-peety-peety.'",
-        "They are known for their acrobatic foraging behavior, often hanging upside down from branches or leaves to reach insects and prey."
+        "Brown-headed Honeyeaters have a distinctive and scratchy call, described as sounding like 'chwik-chwik-chwik.'",
+        "They forage by picking at the bark of trees."
       ],
       "img": ""
     },
@@ -993,10 +993,10 @@
       "summary": "Meliphaga lewinii, commonly known as Lewin's Honeyeater, is a medium-sized bird species found in eastern and northern Australia.",
       "description": [
         "Lewin's Honeyeaters are named for John Lewin, an early Australian naturalist and artist.",
-        "They have a distinctive and melodious song, described as sounding like 'pretty-pretty-pretty.'",
-        "These birds are primarily nectar feeders but will also eat insects and other small invertebrates.",
-        "Lewin's Honeyeaters are often found in coastal forests and woodlands but can also be found in urban and suburban areas.",
-        "They are known for their territorial behavior and will defend their feeding and nesting sites against other birds."
+        "They possess a distinctive and rapid 'machine-gun-like' call, audible across considerable distances.",
+        "Their diet primarily consists of fruit, although they also consume nectar and insects.",
+        "Typically inhabiting coastal forests and woodlands, these birds can also be spotted in urban and suburban environments.",
+        "While they are frequently observed alone, they occasionally gather in small groups of up to 10 individuals"
       ],
       "img": ""
     },
