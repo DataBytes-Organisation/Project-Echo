@@ -193,7 +193,6 @@
     {
       "species": "Petrochelidon ariel",
       "common": "Australian Fairy Martin",
-
       "summary": "Petrochelidon ariel, commonly known as the Australian Fairy Martin, is a small passerine bird found in Australia and New Guinea.",
       "description": [
         "The Australian Fairy Martin has a distinctive white rump and a dark brown body.",
@@ -206,7 +205,6 @@
     {
       "species": "Pelecanus conspicillatus",
       "common": "Australian Pelican",
-
       "summary": "Pelecanus conspicillatus, commonly known as the Australian Pelican, is a large bird found throughout Australia.",
       "description": [
         "Australian Pelicans have a white body with black wings and a distinctive pink, fleshy patch on their bill.",
@@ -219,7 +217,6 @@
     {
       "species": "Parvipsitta pusilla",
       "common": "Little Parrot",
-
       "summary": "Parvipsitta pusilla, commonly known as the Little Parrot, is a small, colorful parrot found in northern Australia and southern New Guinea.",
       "description": [
         "Little Parrots are often seen in pairs or small flocks, and are known for their high-pitched, chattering calls.",
@@ -1673,11 +1670,7 @@
     {
       "species": "Turnix varius ",
       "common": "Painted Buttonquail",
-<<<<<<< HEAD
       "summary": "The Turnix varius, also known as the painted buttonquail, the family of Turnicidae, is a small ground-dwelling bird found in Australia and New Guinea.",
-=======
-      "summary": "The Turnix varius, also known as the painted buttonquail, is a small ground-dwelling bird found in Australia and New Guinea. ",
->>>>>>> origin/rm/onboardingTask
       "description": [
         "The painted buttonquail has a distinctive plumage, with intricate patterns of black, brown, and white on its feathers.",
         "These birds are primarily ground-dwelling and prefer to run rather than fly, but can take short flights when necessary.",
@@ -2602,16 +2595,8 @@
       "summary": "Uperoleia mimula, commonly known as the Mimicking gungan, is a species of frog found in eastern Australia. These small toadlets grow to a length of about 2.5 cm and are typically found in subtropical or tropical swamps, dry savanna, moist savanna, subtropical or tropical seasonally wet lands",
       "description": [
         "They are mostly active during the day and are known for their distinctive call, which sounds like a short trill.",
-<<<<<<< HEAD
-        "Mimicking gungan feed on a variety of small invertebrates, such as ants and spiders, and are preyed upon by a range of animals, including birds, snakes, and larger frogs.",
-        "Mimicking gungan are considered to be of least concern in terms of conservation status, although their populations may be impacted by habitat loss and degradation due to human activities such as urbanization and agriculture.",
-        "For breeding behavior, the eggs are laid singly and attached to vegetation under the surface of the water in ponds, swamps, and flooded grassland"
-=======
         "Tawny Toadlets feed on a variety of small invertebrates, such as ants and spiders, and are preyed upon by a range of animals, including birds, snakes, and larger frogs. ",
-        "They have a unique adaptation where their skin is able to secrete a mild toxin to deter predators.",
-        "Tawny Toadlets are considered to be of least concern in terms of conservation status, although their populations may be impacted by habitat loss and degradation due to human activities such as urbanization and agriculture.",
-        ""
->>>>>>> origin/rm/onboardingTask
+        "They have a unique adaptation where their skin is able to secrete a mild toxin to deter predators."
       ],
       "img": ""
     },
@@ -2664,7 +2649,7 @@
         "The Tropical ambertail belongs to the family of dragonflies known as Libellulidae, which are characterized by their strong and agile flight patterns.",
         "This dragonfly species showcases sexual dimorphism, with the males displaying dark-brown markings and the females exhibiting a lighter brown or yellow-brown coloration.",
         "The Tropical ambertail is known for its strong territorial behavior and agility during flight, often defending its preferred habitats and food sources such as small insects and other invertebrates."  
-      
+    
       ],
       "img": ""
     },
@@ -4191,12 +4176,8 @@
     {
       "species": "Grantiella picta ",
       "common": "Painted Honeyeater",
-<<<<<<< HEAD
       "summary": "The Painted Honeyeater (Grantiella picta) is a small bird found in various parts of Australia, including woodlands, forests and shrublands. It is native to Australian mainland and is found across eastern and northern parts of the country.",
-=======
-      "summary": "The Painted Honeyeater (Grantiella picta) is a small bird found in various parts of Australia, including woodlands, forests and shrublands. ",
->>>>>>> origin/rm/onboardingTask
-      "description": [
+      "descri      ption": [
         "It has a striking black and white plumage with yellow wing patches. Males and females have similar markings, but males have a slightly longer bill.",
         "Painted Honeyeaters are known for their sweet and melodious calls, often performed by males during courtship displays. ",
         "They feed mainly on nectar and insects, using their brush- tipped tongues to extract nectar from flowers. They also catch insects by hawking them in the air or gleaning them from vegetation.",
@@ -4660,13 +4641,8 @@
             "img": ""
         },
         {
-<<<<<<< HEAD
             "species": "Ephippitytha trigintiduoguttata",
             "common": "32-Spotted Katydid",
-=======
-            "species": "Ephippitytha trigintiduoguttata ",
-            "common": "Spotted Katydid",
->>>>>>> origin/rm/onboardingTask
             "summary": "The Spotted Katydid is a type of bush cricket found in eastern Australia.",
             "description": [
                 "They are named for the distinctive spots on their body, which can vary in color from green to brown.",
@@ -4743,13 +4719,8 @@
             "img": ""
         },
         {
-<<<<<<< HEAD
-            "species": "Falco cenchroides",
-            "common": "Australian kestral",
-=======
             "species": "Falco cenchroides ",
             "common": "Nankeen kestrel",
->>>>>>> origin/rm/onboardingTask
             "summary": "The Nankeen kestrel is one of the most common and widespread raptors in Australia, and can be found in a variety of habitats including forests, grasslands, and urban areas.",
             "description": [
                 "This species is named after its distinctive coloration, which resembles the yellowish-brown color of Nankeen cloth, a type of cotton fabric that was once common in Australia.",
