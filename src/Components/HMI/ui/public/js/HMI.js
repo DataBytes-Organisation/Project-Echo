@@ -1,6 +1,7 @@
 "use strict";
 
 import { getAudioTestString } from "./HMI-utils.js";
+//import { audioRecorder } from "./audio_recorder.js";
 import { retrieveTruthEventsInTimeRange, retrieveVocalizationEventsInTimeRange, 
   retrieveMicrophones, retrieveAudio, retrieveSimTime } from "./routes.js";
 import data from "./sample_data.json" assert { type: 'json' };
@@ -1263,3 +1264,219 @@ document.addEventListener('stopAudio', function(event){
   playNextTrack = false;
   stopAudioPlayback();
 })
+
+var durationTag = document.getElementById("recording_duration");
+
+var overlay = document.getElementsByClassName("overlay")[0];
+var audioElement = document.getElementsByClassName("audio-element")[0];
+var audioElementSource = document.getElementsByClassName("audio-element")[0]
+    .getElementsByTagName("source")[0];
+var textIndicatorOfAudiPlaying = document.getElementsByClassName("audio_playback_indicator")[0];
+
+
+var recordButton = document.getElementById("record_audio_button");
+recordButton.onclick = startAudioRecording;
+
+var stopRecordingButton = document.getElementById("stop_recording_button");
+stopRecordingButton.onclick = stopAudioRecording;
+
+var cancelRecordingButton = document.getElementById("cancel_recording_button");
+cancelRecordingButton.onclick = cancelAudioRecording;
+
+var acknowledgeButton = document.getElementById("acknowledge_button");
+acknowledgeButton.onclick = hideRecordingNotSupportedOverlay;
+
+
+//Listen to when the audio being played ends
+audioElement.onended = hidePlaybackIndicator;
+var recordingControls = document.getElementsByClassName("recording_contorls_container");
+
+function showRecordingControls() {
+    recordButton.style.display = "none";
+    recordingControls.classList.remove("hide");
+    initializeRecordingDuration();
+}
+
+function hideRecordingControls() {
+    recordButton.style.display = "block";
+    recordingControls.classList.add("hide");
+    clearInterval(durationTimer);
+}
+
+function showRecordingNotSupportedOverlay() {
+    overlay.classList.remove("hide");
+}
+
+function hideRecordingNotSupportedOverlay() {
+    overlay.classList.add("hide");
+}
+
+function createSourceForAudioElement() {
+    let sourceElement = document.createElement("source");
+    audioElement.appendChild(sourceElement);
+
+    audioElementSource = sourceElement;
+}
+
+function showPlaybackIndicator() {
+    textIndicatorOfAudiPlaying.classList.remove("hide");
+}
+
+function hidePlaybackIndicator() {
+    textIndicatorOfAudiPlaying.classList.add("hide");
+}
+
+var audioRecordStartTime;
+const MAX_RECORDING_TIME_S = "10";
+var durationTimer;
+
+function startAudioRecording() {
+
+    console.log("Recording started");
+
+    if (!audioElement.paused) {
+        console.log("Paused playback");
+        audioElement.pause();
+        hidePlaybackIndicator();
+    }
+
+    audioRecorder.start()
+        .then(() => {
+            audioRecordStartTime = new Date();
+            showRecordingControls();
+        })
+        .catch(error => {
+            if (error.message.includes("mediaDevices API or getUserMedia method is not supported in this browser.")) {
+                console.log("To record audio, use browsers like Chrome and Firefox.");
+                showRecordingNotSupportedOverlay();
+            }
+
+            switch (error.name) {
+                case 'AbortError': 
+                    console.log("An AbortError has occured.");
+                    break;
+                case 'NotAllowedError': 
+                    console.log("A NotAllowedError has occured. User might have denied permission.");
+                    break;
+                case 'NotFoundError': 
+                    console.log("A NotFoundError has occured.");
+                    break;
+                case 'NotReadableError': 
+                    console.log("A NotReadableError has occured.");
+                    break;
+                case 'SecurityError': 
+                    console.log("A SecurityError has occured.");
+                    break;
+                case 'TypeError': 
+                    console.log("A TypeError has occured.");
+                    break;
+                case 'InvalidStateError': 
+                    console.log("An InvalidStateError has occured.");
+                    break;
+                case 'UnknownError': 
+                    console.log("An UnknownError has occured.");
+                    break;
+                default:
+                    console.log("An error occured with the error name " + error.name);
+            };
+        });
+}
+
+
+function stopAudioRecording() {
+    console.log("Stopped recording...");
+
+    audioRecorder.stop()
+        .then(audioAsblob => {
+            playAudio(audioAsblob);
+            hideRecordingControls();
+        })
+        .catch(error => {
+            switch (error.name) {
+                case 'InvalidStateError':
+                    console.log("An InvalidStateError has occured.");
+                    break;
+                default:
+                    console.log("ERROR: " + error.name);
+            };
+        });
+}
+
+function cancelAudioRecording() {
+    console.log("Cancelled recording");
+
+    audioRecorder.cancel();
+    hideRecordingControls();
+}
+
+function playAudio(recorderAudioAsBlob) {
+
+    let reader = new FileReader();
+
+    reader.onload = (e) => {
+        let base64URL = e.target.result;
+
+        if (!audioElementSource)
+            createSourceForAudioElement();
+
+        audioElementSource.src = base64URL;
+
+        let BlobType = recorderAudioAsBlob.type.includes(";") ?
+            recorderAudioAsBlob.type.substr(0, recorderAudioAsBlob.type.indexOf(';')) : recorderAudioAsBlob.type;
+        audioElementSource.type = BlobType
+
+        audioElement.load();
+
+        console.log("Playing audio");
+        audioElement.play();
+
+        showPlaybackIndicator();
+    };
+
+    reader.readAsDataURL(recorderAudioAsBlob);
+}
+
+function initializeRecordingDuration() {
+    showRecordingDuration("00:00:00");
+
+    durationTimer = setInterval(() => {
+        let duration = computeRecordingDuration(audioRecordStartTime);
+        showRecordingDuration(duration);
+    }, 1000); 
+}
+
+function showRecordingDuration(duration) {
+    durationTag.innerHTML = duration;
+
+    if (checkAudioDurationThreshold(duration)) {
+        stopAudioRecording();
+    }
+}
+
+function checkAudioDurationThreshold(duration) {
+    let timers = duration.split(":");
+
+    if (timers[2] === MAX_RECORDING_TIME_S)
+        return true;
+    else 
+        return false;
+}
+
+function computeRecordingDuration(startTime) {
+    let currentTime = new Date();
+
+    let timeDelta = currentTime - startTime;
+
+    timeDeltaS = timeDelta / 1000;
+
+    let seconds = Math.floor(timeDeltaS % 60);
+
+    seconds = seconds < 10 ? "0" + seconds : seconds;
+
+    timeDeltaM = Math.floor(timeDeltaS / 60);
+
+    let minutes = timeDeltaM % 60; 
+    minutes = minutes < 10 ? "0" + minutes : minutes;
+
+    return  "00:" + minutes + ":" + seconds;
+}

@@ -46,10 +46,10 @@
 
 		<!-- HMI -->
 		<link rel="stylesheet" href="./css/HMI_style.css" type="text/css">
-		<script type="text/javascript" src="./js/audio.js"></script>
 		<script type="module" src='./js/HMI.js'></script>
 		<script type="text/javascript" src="./js/animation.js"></script>
 		<script type="module" src='./js/HMI-utils.js'></script>
+    <script src="js/audio_recorder.js"></script>
 
     <!-- End Imports -->
     <title>Echo | Welcome</title>
@@ -404,6 +404,32 @@
                 </div>
 
               </div>
+
+              <div id="audio_recording_container">
+                <h1 class="title">Record Live Audio</h1>
+                <i id="record_audio_button" class="fa fa-microphone" aria-hidden="true"></i>
+                <div id="recording_contorls_container" class="hide">
+                    <i id="cancel_recording_button" class="fa fa-times-circle-o" aria-hidden="true"></i>
+                    <div id="recording_info">
+                        <i id="recording_indicator" class="fa fa-circle" aria-hidden="true"></i>
+                        <p id="recording_duration"></p>
+                    </div>
+                    <i id="stop_recording_button" class="fa fa-stop-circle-o" aria-hidden="true"></i>
+                </div>
+                <div id="audio_playback_container">
+                    <p id="audio_playback_indicator" class="hide">Audio is playing<span>.</span><span>.</span><span>.</span></p>
+                </div>
+              </div>
+              <div class="overlay hide">
+                <div id="audio_recording_not_supported">
+                    <p>To record audio, use browsers like Chrome and Firefox that support audio recording.</p>
+                    <button type="button" id="acknowledge_button">Ok.</button>
+                </div>
+              </div>
+        
+              <audio controls class="audio-element hide">
+              </audio>
+
             </div>
             <div id="mic-default-content">
               <h2 style="text-align: left; color: rgba(247, 186, 206, 1) !important;">Animal Bio Data</h2>
