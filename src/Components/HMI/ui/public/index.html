@@ -593,7 +593,8 @@
               </div>
 
             <div class="export-tab">
-              <button id="export-csv" onclick="{downloadXLSX()}"> Export to XLSX </button>
+              <button id="export-csv" onclick="{downloadCSV()}"> Export to CSV </button>
+              <button id="export-xlsx" onclick="{downloadXLSX()}"> Export to XLSX </button>
               
             </div>
             <div class="error-box" id="error-msg"></div>
@@ -1102,106 +1103,132 @@
   active_content.hide();
   default_content.show();
 
+  // Function to rename the keys in an object
+  function renameKeys(obj) {
+    const keyMappings = {
+      date: "Date",
+      timestamp: "Time Stamp",
+      animalId: "Animal ID",
+      detectingmicID: "Detecting Mic ID",
+      detectingMicLat: "Detecting Mic Lat",
+      detectingMicLon: "Detecting Mic Lon",
+      commonName: "Common Name",
+      speciesScientificName: "Species Scientific Name",
+      speciesIdentificationConfidence: "Species Identification Confidence",
+      locationLat: "Location Lat",
+      locationLon: "Location Lon",
+      locationConfidence: "Location Confidence",
+      animalType: "Animal Type",
+      animalStatus: "Animal Status",
+      animalDiet: "Animal Diet",
+    };
+
+    const renamedObj = {};
+    for (const [oldKey, newKey] of Object.entries(keyMappings)) {
+      if (obj.hasOwnProperty(oldKey)) {
+        renamedObj[newKey] = obj[oldKey];
+      }
+    }
+    return renamedObj;
+  }
+
+  function dataCleansing(json_data) {
+    //Escape if there is no data
+    if (json_data === [] | json_data === null | typeof json_data === undefined | json_data.length === 0){
+      return null
+    }
+    //Add date column with converted timestamp value
+    for (let i = 0; i < json_data.length; i++){
+          json_data[i].date = new Date(json_data[i].timestamp*1000).toLocaleString();
+    }
+    
+    //Re-index the columns: move date to first column
+    //The headers are in accordance to the data schema and desired export column order
+    const headers = [
+      "date", "timestamp", "animalId", , "detectingmicID", "detectingMicLat",
+      "detectingMicLon", "commonName", "speciesScientificName", "speciesIdentificationConfidence",
+      "locationLat", "locationLon", "locationConfidence", "animalType", "animalStatus",
+      "animalDiet"
+    ]
+    
+    // Parse JSON to have date as first column:
+    let data = JSON.parse(JSON.stringify( json_data, headers, 4))
+    // Rename Keys in data
+
+    data = data.map(renameKeys);
+    return data;
+  }
   
   function downloadCSV() {
     let filename= "exportedCSV.csv"
     let csv = null;
+    let data = null;
+    datepickerStart = hmiState.currentTime;
+    datepickerEnd = hmiState.previousUpdateTime;
     if (toggleSwitch.checked) {
+      //Reset datePicker range in case toggle mode Off -> On
       console.log("Current Live mode ON!")
       datepickerStart = hmiState.currentTime;
       datepickerEnd = hmiState.previousUpdateTime;
-      retrieveTruthEventsInTimeRange(datepickerStart, datepickerEnd).then((res) => {
-        console.log("GET JSON FROM TIME RANGE: ", res.data)
-        csv = convertCSV(res.data);
-        if (csv === null) {
-          ErrDisplay("There is no result");
-          csv=convertCSV(sampleJSONmovementEvents)
-          
-        }
-        exportCSV(filename, csv);
-        console.log("CSV RESULT: ", csv);
-      })
     } else {
-      console.log(`Current Live mode OFF! Download selected time range ${datepickerStart} - ${datepickerEnd}`)
-      retrieveTruthEventsInTimeRange(datepickerStart, datepickerEnd).then((res) => {
-        console.log("GET JSON FROM TIME RANGE: ", res.data)
-        csv = convertCSV(res.data);
-        if (csv === null) {
-          ErrDisplay("There is no result");
-          csv=convertCSV(sampleJSONmovementEvents)
-          
-        }
-        exportCSV(filename, csv);
-        console.log("CSV RESULT: ", csv);
-      })
+      console.log("Current Live mode OFF!")
     }
+    
+    console.log(`Download selected time range ${datepickerStart} - ${datepickerEnd}`)
+    retrieveTruthEventsInTimeRange(datepickerStart, datepickerEnd).then((res) => {
+      console.log("GET JSON FROM TIME RANGE: ", res.data)
+      data = dataCleansing(res.data)
+      csv = convertCSV(data);
+      if (csv === null) {
+        ErrDisplay("There is no result");
+        data = dataCleansing(sampleJSONmovementEvents)
+        csv=convertCSV(data)
+        
+      }
+      exportCSV(filename, csv);
+      console.log("CSV RESULT: ", csv);
+    })
   }
-  const TIMESTAMP_NAME_CONST = ['timestamp', 'time', 'date']
+
   function downloadXLSX() {
     let filename = "exportedExcel.xlsx"
     let xlsx = null
     let data = null
+    datepickerStart = hmiState.currentTime;
+    datepickerEnd = hmiState.previousUpdateTime;
     if (toggleSwitch.checked) {
+      //Reset datePicker range in case toggle mode Off -> On
       console.log("Current Live mode ON!")
       datepickerStart = hmiState.currentTime;
       datepickerEnd = hmiState.previousUpdateTime;
-      retrieveTruthEventsInTimeRange(datepickerStart, datepickerEnd).then((res) => {
-        if (res.data === [] | res.data === null | typeof res.data === undefined | res.data.length === 0){
-          data = sampleJSONmovementEvents
-        } else {
-          data = res.data
-        }
-        for (let i = 0; i < data.length; i++){
-          data[i].date = new Date(data[i].timestamp*1000).toLocaleString();
-        }
-        
-        //Re-index the columns: move date to first column
-        let headers = Object.keys(data[0])
-        const shiftColumn = headers.pop()
-        headers.unshift(shiftColumn);
-        // Parse JSON to have date as first column:
-        data = JSON.parse(JSON.stringify( data, headers, 4))
-        var ws = XLSX.utils.json_to_sheet(data);
-        var wb = XLSX.utils.book_new();
-        //Enable filter
-        ws["!autofilter"] = { ref: XLSX.utils.encode_range(XLSX.utils.decode_range(ws['!ref'])) };
-        
-        XLSX.utils.book_append_sheet(wb, ws, "Records");
-        XLSX.writeFile(wb,filename,{ bookType: "xlsx", header: Object.keys(data[0]) });
-        // exportXLSX(filename, ws);
-        console.log("EXCEL RESULT: ", ws);
-      })
     } else {
-      console.log(`Current Live mode OFF! Download selected time range ${datepickerStart} - ${datepickerEnd}`)
-      retrieveTruthEventsInTimeRange(datepickerStart, datepickerEnd).then((res) => {
-        if (res.data === [] | res.data === null | typeof res.data === undefined | res.data.length === 0){
-          data = sampleJSONmovementEvents
-        } else {
-          data = res.data
-        }
-        
-        for (let i = 0; i < data.length; i++){
-          data[i].date = new Date(data[i].timestamp*1000).toLocaleString();
-        }
-
-        //Re-index the columns: move date to first column
-        let headers = Object.keys(data[0])
-        const shiftColumn = headers.pop()
-        headers.unshift(shiftColumn);
-        // Parse JSON to have date as first column:
-        data = JSON.parse(JSON.stringify( data, headers, 4))
-        var ws = XLSX.utils.json_to_sheet(data);
-        var wb = XLSX.utils.book_new();
-        //Enable filter
-        ws["!autofilter"] = { ref: XLSX.utils.encode_range(XLSX.utils.decode_range(ws['!ref'])) };
-
-        XLSX.utils.book_append_sheet(wb, ws, "Records");
-
-        XLSX.writeFile(wb,filename, { bookType: "xlsx", header: Object.keys(data[0]) });
-        // exportXLSX(filename, ws);
-        console.log("EXCEL RESULT: ", ws);
-      })
+      console.log("Current Live mode OFF!")
     }
+    
+    console.log(`Download selected time range ${datepickerStart} - ${datepickerEnd}`)
+    retrieveTruthEventsInTimeRange(datepickerStart, datepickerEnd).then((res) => {
+      if (res.data === [] | res.data === null | typeof res.data === undefined | res.data.length === 0){
+        ErrDisplay("There is no result");
+        data = sampleJSONmovementEvents
+      } else {
+        data = res.data
+      }
+
+      //Data preprocessing
+      data = dataCleansing(data)
+      
+      //Initiate worksheet and workbook instance
+      var ws = XLSX.utils.json_to_sheet(data);
+      var wb = XLSX.utils.book_new();
+      //Enable filter
+      ws["!autofilter"] = { ref: XLSX.utils.encode_range(XLSX.utils.decode_range(ws['!ref'])) };
+
+      //Save data as datasheet and export
+      XLSX.utils.book_append_sheet(wb, ws, "Records");
+      XLSX.writeFile(wb,filename, { bookType: "xlsx", header: Object.keys(data[0]) });
+      console.log("EXCEL RESULT: ", ws);
+    })
+    
   }
 
   function exportCSV(filename, csvData) {
@@ -1215,18 +1242,6 @@
 			element.click();
 			document.body.removeChild(element);
 		}
-
-  // function exportXLSX(filename, xlsxData) {
-	// 		const element = document.createElement("a");
-
-	// 		element.setAttribute("href", `data:text/xlsx;charset=utf-8,${xlsxData}`);
-	// 		element.setAttribute("download", filename);
-	// 		element.style.display = "none";
-
-	// 		document.body.appendChild(element);
-	// 		element.click();
-	// 		document.body.removeChild(element);
-	// 	}
 
   function ErrDisplay(text){
     let errorbox = document.getElementById("error-msg");
