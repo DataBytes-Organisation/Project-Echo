@@ -355,21 +355,34 @@ body{
 .export-tab {
   position: sticky;
   bottom: 10px;
-  width: 100%;
   height: 20vh;
   min-height: 30px;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  flex-direction: column;
+  justify-content: center;
+  flex-direction: row;
   margin-top: 50px;
 }
 
 .export-tab button {
-  width: 80%;
-  height: 80%;
+  width: 40%;
+  height: 30%;
+  min-width: 50px;
   max-height: 40px;
   background-color: rgba(247, 186, 206, 1) !important;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+  font-size: 16px;
+  font-family: 'Roboto', sans-serif;
+}
+
+.export-tab button i {
+  color:white;
+  font-size: 20px;
+  border-left: 1px solid black;
+  padding-left: 8px;
 }
 
 .error-box {
