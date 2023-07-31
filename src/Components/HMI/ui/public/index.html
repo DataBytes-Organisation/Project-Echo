@@ -50,6 +50,7 @@
 		<script type="module" src='./js/HMI.js'></script>
 		<script type="text/javascript" src="./js/animation.js"></script>
 		<script type="module" src='./js/HMI-utils.js'></script>
+    <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
 
     <!-- End Imports -->
     <title>Echo | Welcome</title>
@@ -590,6 +591,13 @@
                   </div>
                 </div>
               </div>
+
+            <div class="export-tab">
+              <button id="export-csv" onclick="{downloadCSV()}">EXPORT AS CSV <i class="fa-solid fa-cloud-arrow-down"></i></button>
+              <button id="export-xlsx" onclick="{downloadXLSX()}">EXPORT AS XLSX <i class="fa-solid fa-cloud-arrow-down"></i></button>
+              
+            </div>
+            <div class="error-box" id="error-msg"></div>
             </div>
             </div> 
           </div>
@@ -886,13 +894,18 @@
     
   });
 
+
+
 </script>
+
 
 <script type="module">
   import { updateLayers, initialiseHMI, showMics, hideMics, updateAnimalMovementLayerFromPastData, updateVocalizationLayerFromPastData,
-  resetWildlifeLayers, MapOpenNav, MapCloseNav, getAnimalToggled, enableMicAnimation, disableMicAnimation, getUTC } from "./js/HMI.js";
+  resetWildlifeLayers, MapOpenNav, MapCloseNav, getAnimalToggled, enableMicAnimation, disableMicAnimation, getUTC, convertCSV } from "./js/HMI.js";
   import {retrieveTruthEventsInTimeRange, retrieveVocalizationEventsInTimeRange, startSimulator, stopSimulator} from "./js/routes.js";
   window.updateMics = updateMics;
+  window.downloadCSV = downloadCSV;
+  window.downloadXLSX = downloadXLSX;
   window.updateMicrophoneAnimation = updateMicrophoneAnimation;
   window.updateLayers = updateLayers;
   window.closeNav = MapCloseNav;
@@ -902,6 +915,8 @@
   window.hmiState = hmiState; 
   hmiState.truthEventId = 10;
 
+  let datepickerStart = hmiState.currentTime;
+  let datepickerEnd = hmiState.previousUpdateTime;
 
   //update config
   hmiState.liveMode = true;
@@ -957,6 +972,18 @@
     "M_8":{animalId: "M_8", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Red fox", speciesScientificName: "Vulpes vulpes", speciesIdentificationConfidence: 100, locationLat:-38.82166562762367 ,locationLon:143.520 , locationConfidence:100 , animalType:"mammal", animalStatus:"endangered" ,animalDiet: "carnivore" },
     "M_9":{animalId: "M_9", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Redeye", speciesScientificName: "Psaltoda moerens", speciesIdentificationConfidence: 100, locationLat:-38.80066562762367 ,locationLon:143.555 , locationConfidence:100 , animalType:"insect", animalStatus:"near-threatened" ,animalDiet: "herbavore" },
   };
+
+  const sampleJSONmovementEvents = [
+    {animalId: "M_1", timestamp: 1690765721, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Brown Rat", speciesScientificName: "Rattus norvegicus", speciesIdentificationConfidence: 100, locationLat:-38.80266562762367 ,locationLon:143.560 , locationConfidence:100 , animalType:"reptile", animalStatus:"vulnerable" , animalDiet: "herbavore" },
+    {animalId: "M_2", timestamp: 1672448921, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Tawny Frogmouth", speciesScientificName: "Podargus strigoides", speciesIdentificationConfidence: 100, locationLat:-38.81905478815439 ,locationLon:143.524 , locationConfidence:100 , animalType:"bird", animalStatus:"normal" ,animalDiet: "herbavore" },
+    {animalId: "M_3", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Cane toad", speciesScientificName: "Rhinella marina", speciesIdentificationConfidence: 100, locationLat:-38.80166562762367 ,locationLon:143.540 , locationConfidence:100 , animalType:"amphibian", animalStatus:"invasive" ,animalDiet: "omnivore" },
+    {animalId: "M_4", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Red fox", speciesScientificName: "Vulpes vulpes", speciesIdentificationConfidence: 100, locationLat:-38.82166562762367 ,locationLon:143.550 , locationConfidence:100 , animalType:"mammal", animalStatus:"endangered" ,animalDiet: "carnivore" },
+    {animalId: "M_5", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Brown Rat", speciesScientificName: "Rattus norvegicus", speciesIdentificationConfidence: 100, locationLat:-38.80266562762367 ,locationLon:143.570 , locationConfidence:100 , animalType:"reptile", animalStatus:"vulnerable" , animalDiet: "herbavore" },
+    {animalId: "M_6", timestamp: 1672448921, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Australian Fairy Martin", speciesScientificName: "Petrochelidon ariel", speciesIdentificationConfidence: 100, locationLat:-38.81905478815439 ,locationLon:143.580 , locationConfidence:100 , animalType:"bird", animalStatus:"normal" ,animalDiet: "herbavore" },
+    {animalId: "M_7", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Cane toad", speciesScientificName: "Rhinella marina", speciesIdentificationConfidence: 100, locationLat:-38.80166562762367 ,locationLon:143.510 , locationConfidence:100 , animalType:"amphibian", animalStatus:"invasive" ,animalDiet: "omnivore" },
+    {animalId: "M_8", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Red fox", speciesScientificName: "Vulpes vulpes", speciesIdentificationConfidence: 100, locationLat:-38.82166562762367 ,locationLon:143.520 , locationConfidence:100 , animalType:"mammal", animalStatus:"endangered" ,animalDiet: "carnivore" },
+    {animalId: "M_9", timestamp: 1690765721, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Redeye", speciesScientificName: "Psaltoda moerens", speciesIdentificationConfidence: 100, locationLat:-38.80066562762367 ,locationLon:143.555 , locationConfidence:100 , animalType:"insect", animalStatus:"near-threatened" ,animalDiet: "herbavore" },
+];
 
   hmiState.movementEvents = movementEvents;
   hmiState.vocalizationEvents = vocalizationEvents;
@@ -1022,6 +1049,8 @@
       resetWildlifeLayers(hmiState);
       hmiState.currentTime = Math.floor((getUTC()- hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
       hmiState.previousUpdate = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
+      datepickerStart = Math.floor((getUTC()- hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
+      datepickerEnd = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
       hmiState.liveMode = true;
       //console.log("Live mode enabled");
       pastDataContainer.style.maxHeight = '0';
@@ -1043,6 +1072,7 @@
     }
   });
 
+
   $(function() {
     $('#datetime-range').daterangepicker({
       timePicker: true,
@@ -1055,6 +1085,8 @@
       // Callback function that executes when the date and time range is changed
       hmiState.startTime = start.unix(); 
       hmiState.endTime = end.unix();
+      datepickerStart = start.unix();
+      datepickerEnd = end.unix();
       console.log("date range updated: " + hmiState.startTime + " to " + hmiState.endTime); 
       retrieveTruthEventsInTimeRange(hmiState.startTime, hmiState.endTime).then((res) => {
         updateAnimalMovementLayerFromPastData(hmiState, res.data);
@@ -1071,6 +1103,156 @@
   active_content.hide();
   default_content.show();
 
+  // Function to rename the keys in an object
+  function renameKeys(obj) {
+    const keyMappings = {
+      date: "Date",
+      timestamp: "Time Stamp",
+      animalId: "Animal ID",
+      detectingmicID: "Detecting Mic ID",
+      detectingMicLat: "Detecting Mic Lat",
+      detectingMicLon: "Detecting Mic Lon",
+      commonName: "Common Name",
+      speciesScientificName: "Species Scientific Name",
+      speciesIdentificationConfidence: "Species Identification Confidence",
+      locationLat: "Location Lat",
+      locationLon: "Location Lon",
+      locationConfidence: "Location Confidence",
+      animalType: "Animal Type",
+      animalStatus: "Animal Status",
+      animalDiet: "Animal Diet",
+    };
+
+    const renamedObj = {};
+    for (const [oldKey, newKey] of Object.entries(keyMappings)) {
+      if (obj.hasOwnProperty(oldKey)) {
+        renamedObj[newKey] = obj[oldKey];
+      }
+    }
+    return renamedObj;
+  }
+
+  function dataCleansing(json_data) {
+    //Escape if there is no data
+    if (json_data === [] | json_data === null | typeof json_data === undefined | json_data.length === 0){
+      return null
+    }
+    //Add date column with converted timestamp value
+    for (let i = 0; i < json_data.length; i++){
+          json_data[i].date = new Date(json_data[i].timestamp*1000).toLocaleString();
+    }
+    
+    //Re-index the columns: move date to first column
+    //The headers are in accordance to the data schema and desired export column order
+    const headers = [
+      "date", "timestamp", "animalId", , "detectingmicID", "detectingMicLat",
+      "detectingMicLon", "commonName", "speciesScientificName", "speciesIdentificationConfidence",
+      "locationLat", "locationLon", "locationConfidence", "animalType", "animalStatus",
+      "animalDiet"
+    ]
+    
+    // Parse JSON to have date as first column:
+    let data = JSON.parse(JSON.stringify( json_data, headers, 4))
+    // Rename Keys in data
+
+    data = data.map(renameKeys);
+    return data;
+  }
+  
+  function downloadCSV() {
+    let filename= "exportedCSV.csv"
+    let csv = null;
+    let data = null;
+    datepickerStart = hmiState.currentTime;
+    datepickerEnd = hmiState.previousUpdateTime;
+    if (toggleSwitch.checked) {
+      //Reset datePicker range in case toggle mode Off -> On
+      console.log("Current Live mode ON!")
+      datepickerStart = hmiState.currentTime;
+      datepickerEnd = hmiState.previousUpdateTime;
+    } else {
+      console.log("Current Live mode OFF!")
+    }
+    
+    console.log(`Download selected time range ${datepickerStart} - ${datepickerEnd}`)
+    retrieveTruthEventsInTimeRange(datepickerStart, datepickerEnd).then((res) => {
+      console.log("GET JSON FROM TIME RANGE: ", res.data)
+      data = dataCleansing(res.data)
+      csv = convertCSV(data);
+      if (csv === null) {
+        ErrDisplay("There is no result");
+        data = dataCleansing(sampleJSONmovementEvents)
+        csv=convertCSV(data)
+        
+      }
+      exportCSV(filename, csv);
+      console.log("CSV RESULT: ", csv);
+    })
+  }
+
+  function downloadXLSX() {
+    let filename = "exportedExcel.xlsx"
+    let xlsx = null
+    let data = null
+    datepickerStart = hmiState.currentTime;
+    datepickerEnd = hmiState.previousUpdateTime;
+    if (toggleSwitch.checked) {
+      //Reset datePicker range in case toggle mode Off -> On
+      console.log("Current Live mode ON!")
+      datepickerStart = hmiState.currentTime;
+      datepickerEnd = hmiState.previousUpdateTime;
+    } else {
+      console.log("Current Live mode OFF!")
+    }
+    
+    console.log(`Download selected time range ${datepickerStart} - ${datepickerEnd}`)
+    retrieveTruthEventsInTimeRange(datepickerStart, datepickerEnd).then((res) => {
+      if (res.data === [] | res.data === null | typeof res.data === undefined | res.data.length === 0){
+        ErrDisplay("There is no result");
+        data = sampleJSONmovementEvents
+      } else {
+        data = res.data
+      }
+
+      //Data preprocessing
+      data = dataCleansing(data)
+      
+      //Initiate worksheet and workbook instance
+      var ws = XLSX.utils.json_to_sheet(data);
+      var wb = XLSX.utils.book_new();
+      //Enable filter
+      ws["!autofilter"] = { ref: XLSX.utils.encode_range(XLSX.utils.decode_range(ws['!ref'])) };
+
+      //Save data as datasheet and export
+      XLSX.utils.book_append_sheet(wb, ws, "Records");
+      XLSX.writeFile(wb,filename, { bookType: "xlsx", header: Object.keys(data[0]) });
+      console.log("EXCEL RESULT: ", ws);
+    })
+    
+  }
+
+  function exportCSV(filename, csvData) {
+			const element = document.createElement("a");
+
+			element.setAttribute("href", `data:text/csv;charset=utf-8,${csvData}`);
+			element.setAttribute("download", filename);
+			element.style.display = "none";
+
+			document.body.appendChild(element);
+			element.click();
+			document.body.removeChild(element);
+		}
+
+  function ErrDisplay(text){
+    let errorbox = document.getElementById("error-msg");
+    console.log("Error box ele: ", errorbox);
+    errorbox.innerHTML = `Exception error occured: ${text}`;
+    errorbox.style.display = "block"
+    setTimeout(()=> {
+      errorbox.innerHTML = '';
+      errorbox.style.display = "none";
+    },2000)
+  }
 </script>
   </body>
 </html>

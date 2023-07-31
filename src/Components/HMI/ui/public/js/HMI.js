@@ -5,6 +5,10 @@ import { retrieveTruthEventsInTimeRange, retrieveVocalizationEventsInTimeRange,
   retrieveMicrophones, retrieveAudio, retrieveSimTime } from "./routes.js";
 import data from "./sample_data.json" assert { type: 'json' };
 
+
+// import { parse } from 'json2csv';
+
+
 var markups = ["elephant.png", "monkey.png", "tiger.png"];
 
 var statuses = [
@@ -22,6 +26,26 @@ function matchStatus(status){
   else{
     return status;
   }
+}
+
+export function convertCSV(json) {
+  if (json == null) return null
+  if (json === [] | typeof json === undefined | json.length === 0){
+    return null
+  }
+  let data = json;
+  let fields = Object.keys(data[0]);
+  let replacer = function(key, value) { return value === null ? 'N/A' : value } ;
+
+  let csv = null;
+  csv = data.map(function(row){
+    return fields.map(function(fieldName){
+      return JSON.stringify(row[fieldName], replacer)
+    }).join(',')
+  })
+  csv.unshift(fields.join(',')) // add header column
+  csv = csv.join('\r\n');
+  return csv
 }
 
 var statusPrintLookup = {

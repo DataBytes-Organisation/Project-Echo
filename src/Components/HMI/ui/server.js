@@ -27,7 +27,7 @@ db.mongoose
   .catch(err => {
     console.log("ConnString: ", `mongodb://${dbConfig.USERNAME}:${dbConfig.PASSWORD}@${dbConfig.HOST}/${dbConfig.DB}?authSource=admin`)
     console.error("Connection error", err);
-    process.exit();
+    // process.exit();
   });
 
 
