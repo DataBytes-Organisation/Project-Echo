@@ -28,6 +28,9 @@ function matchStatus(status){
   }
 }
 
+//Timestamp column indicators
+const TIMESTAMP_NAME_CONST = ['timestamp', 'time', 'date']
+
 export function convertCSV(json) {
   if (json === [] | json === null | typeof json === undefined | json.length === 0){
     return null
@@ -39,6 +42,14 @@ export function convertCSV(json) {
   let csv = null;
   csv = data.map(function(row){
     return fields.map(function(fieldName){
+      //Check row data that has timestamp
+      for (const i of TIMESTAMP_NAME_CONST) {
+        if (fieldName.toString().toLowerCase().includes(i)){
+          let date = new Date(row[fieldName])
+          return JSON.stringify(date, replacer)
+        }
+      }
+      //Return other data if not timestamp
       return JSON.stringify(row[fieldName], replacer)
     }).join(',')
   })
