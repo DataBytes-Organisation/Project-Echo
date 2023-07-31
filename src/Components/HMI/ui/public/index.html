@@ -1154,6 +1154,13 @@
         for (let i = 0; i < data.length; i++){
           data[i].date = new Date(data[i].timestamp*1000).toLocaleString();
         }
+        
+        //Re-index the columns: move date to first column
+        let headers = Object.keys(data[0])
+        const shiftColumn = headers.pop()
+        headers.unshift(shiftColumn);
+        // Parse JSON to have date as first column:
+        data = JSON.parse(JSON.stringify( data, headers, 4))
         var ws = XLSX.utils.json_to_sheet(data);
         var wb = XLSX.utils.book_new();
         //Enable filter
@@ -1176,6 +1183,13 @@
         for (let i = 0; i < data.length; i++){
           data[i].date = new Date(data[i].timestamp*1000).toLocaleString();
         }
+
+        //Re-index the columns: move date to first column
+        let headers = Object.keys(data[0])
+        const shiftColumn = headers.pop()
+        headers.unshift(shiftColumn);
+        // Parse JSON to have date as first column:
+        data = JSON.parse(JSON.stringify( data, headers, 4))
         var ws = XLSX.utils.json_to_sheet(data);
         var wb = XLSX.utils.book_new();
         //Enable filter
