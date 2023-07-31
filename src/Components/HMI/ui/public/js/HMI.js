@@ -45,8 +45,8 @@ export function convertCSV(json) {
       //Check row data that has timestamp
       for (const i of TIMESTAMP_NAME_CONST) {
         if (fieldName.toString().toLowerCase().includes(i)){
-          let date = new Date(row[fieldName])
-          return JSON.stringify(date, replacer)
+          let date = new Date(row[fieldName]*1000)
+          return JSON.stringify(date.toLocaleString() , replacer)
         }
       }
       //Return other data if not timestamp

@@ -50,6 +50,7 @@
 		<script type="module" src='./js/HMI.js'></script>
 		<script type="text/javascript" src="./js/animation.js"></script>
 		<script type="module" src='./js/HMI-utils.js'></script>
+    <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
 
     <!-- End Imports -->
     <title>Echo | Welcome</title>
@@ -592,7 +593,7 @@
               </div>
 
             <div class="export-tab">
-              <button id="export-csv" onclick="{downloadCSV()}"> Export to CSV </button>
+              <button id="export-csv" onclick="{downloadXLSX()}"> Export to XLSX </button>
               
             </div>
             <div class="error-box" id="error-msg"></div>
@@ -901,9 +902,9 @@
   import { updateLayers, initialiseHMI, showMics, hideMics, updateAnimalMovementLayerFromPastData, updateVocalizationLayerFromPastData,
   resetWildlifeLayers, MapOpenNav, MapCloseNav, getAnimalToggled, enableMicAnimation, disableMicAnimation, getUTC, convertCSV } from "./js/HMI.js";
   import {retrieveTruthEventsInTimeRange, retrieveVocalizationEventsInTimeRange, startSimulator, stopSimulator} from "./js/routes.js";
-
   window.updateMics = updateMics;
   window.downloadCSV = downloadCSV;
+  window.downloadXLSX = downloadXLSX;
   window.updateMicrophoneAnimation = updateMicrophoneAnimation;
   window.updateLayers = updateLayers;
   window.closeNav = MapCloseNav;
@@ -972,15 +973,15 @@
   };
 
   const sampleJSONmovementEvents = [
-    {animalId: "M_1", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Brown Rat", speciesScientificName: "unknown", speciesIdentificationConfidence: 100, locationLat:-38.80266562762367 ,locationLon:143.560 , locationConfidence:100 , animalType:"reptile", animalStatus:"vulnerable" , animalDiet: "herbavore" },
-    {animalId: "M_2", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Tawny Frogmouth", speciesScientificName: "Podargus strigoides", speciesIdentificationConfidence: 100, locationLat:-38.81905478815439 ,locationLon:143.524 , locationConfidence:100 , animalType:"bird", animalStatus:"normal" ,animalDiet: "herbavore" },
+    {animalId: "M_1", timestamp: 1690765721, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Brown Rat", speciesScientificName: "Rattus norvegicus", speciesIdentificationConfidence: 100, locationLat:-38.80266562762367 ,locationLon:143.560 , locationConfidence:100 , animalType:"reptile", animalStatus:"vulnerable" , animalDiet: "herbavore" },
+    {animalId: "M_2", timestamp: 1672448921, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Tawny Frogmouth", speciesScientificName: "Podargus strigoides", speciesIdentificationConfidence: 100, locationLat:-38.81905478815439 ,locationLon:143.524 , locationConfidence:100 , animalType:"bird", animalStatus:"normal" ,animalDiet: "herbavore" },
     {animalId: "M_3", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Cane toad", speciesScientificName: "Rhinella marina", speciesIdentificationConfidence: 100, locationLat:-38.80166562762367 ,locationLon:143.540 , locationConfidence:100 , animalType:"amphibian", animalStatus:"invasive" ,animalDiet: "omnivore" },
     {animalId: "M_4", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Red fox", speciesScientificName: "Vulpes vulpes", speciesIdentificationConfidence: 100, locationLat:-38.82166562762367 ,locationLon:143.550 , locationConfidence:100 , animalType:"mammal", animalStatus:"endangered" ,animalDiet: "carnivore" },
     {animalId: "M_5", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Brown Rat", speciesScientificName: "Rattus norvegicus", speciesIdentificationConfidence: 100, locationLat:-38.80266562762367 ,locationLon:143.570 , locationConfidence:100 , animalType:"reptile", animalStatus:"vulnerable" , animalDiet: "herbavore" },
-    {animalId: "M_6", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Australian Fairy Martin", speciesScientificName: "Petrochelidon ariel", speciesIdentificationConfidence: 100, locationLat:-38.81905478815439 ,locationLon:143.580 , locationConfidence:100 , animalType:"bird", animalStatus:"normal" ,animalDiet: "herbavore" },
+    {animalId: "M_6", timestamp: 1672448921, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Australian Fairy Martin", speciesScientificName: "Petrochelidon ariel", speciesIdentificationConfidence: 100, locationLat:-38.81905478815439 ,locationLon:143.580 , locationConfidence:100 , animalType:"bird", animalStatus:"normal" ,animalDiet: "herbavore" },
     {animalId: "M_7", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Cane toad", speciesScientificName: "Rhinella marina", speciesIdentificationConfidence: 100, locationLat:-38.80166562762367 ,locationLon:143.510 , locationConfidence:100 , animalType:"amphibian", animalStatus:"invasive" ,animalDiet: "omnivore" },
     {animalId: "M_8", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Red fox", speciesScientificName: "Vulpes vulpes", speciesIdentificationConfidence: 100, locationLat:-38.82166562762367 ,locationLon:143.520 , locationConfidence:100 , animalType:"mammal", animalStatus:"endangered" ,animalDiet: "carnivore" },
-    {animalId: "M_9", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Redeye", speciesScientificName: "Psaltoda moerens", speciesIdentificationConfidence: 100, locationLat:-38.80066562762367 ,locationLon:143.555 , locationConfidence:100 , animalType:"insect", animalStatus:"near-threatened" ,animalDiet: "herbavore" },
+    {animalId: "M_9", timestamp: 1690765721, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Redeye", speciesScientificName: "Psaltoda moerens", speciesIdentificationConfidence: 100, locationLat:-38.80066562762367 ,locationLon:143.555 , locationConfidence:100 , animalType:"insect", animalStatus:"near-threatened" ,animalDiet: "herbavore" },
 ];
 
   hmiState.movementEvents = movementEvents;
@@ -1103,9 +1104,8 @@
 
   
   function downloadCSV() {
-    let filename= "exportedCSV"
+    let filename= "exportedCSV.csv"
     let csv = null;
-    let request_error = false;
     if (toggleSwitch.checked) {
       console.log("Current Live mode ON!")
       datepickerStart = hmiState.currentTime;
@@ -1135,8 +1135,59 @@
         console.log("CSV RESULT: ", csv);
       })
     }
+  }
+  const TIMESTAMP_NAME_CONST = ['timestamp', 'time', 'date']
+  function downloadXLSX() {
+    let filename = "exportedExcel.xlsx"
+    let xlsx = null
+    let data = null
+    if (toggleSwitch.checked) {
+      console.log("Current Live mode ON!")
+      datepickerStart = hmiState.currentTime;
+      datepickerEnd = hmiState.previousUpdateTime;
+      retrieveTruthEventsInTimeRange(datepickerStart, datepickerEnd).then((res) => {
+        if (res.data === [] | res.data === null | typeof res.data === undefined | res.data.length === 0){
+          data = sampleJSONmovementEvents
+        } else {
+          data = res.data
+        }
+        for (let i = 0; i < data.length; i++){
+          data[i].date = new Date(data[i].timestamp*1000).toLocaleString();
+        }
+        var ws = XLSX.utils.json_to_sheet(data);
+        var wb = XLSX.utils.book_new();
+        //Enable filter
+        ws["!autofilter"] = { ref: XLSX.utils.encode_range(XLSX.utils.decode_range(ws['!ref'])) };
+        
+        XLSX.utils.book_append_sheet(wb, ws, "Records");
+        XLSX.writeFile(wb,filename,{ bookType: "xlsx", header: Object.keys(data[0]) });
+        // exportXLSX(filename, ws);
+        console.log("EXCEL RESULT: ", ws);
+      })
+    } else {
+      console.log(`Current Live mode OFF! Download selected time range ${datepickerStart} - ${datepickerEnd}`)
+      retrieveTruthEventsInTimeRange(datepickerStart, datepickerEnd).then((res) => {
+        if (res.data === [] | res.data === null | typeof res.data === undefined | res.data.length === 0){
+          data = sampleJSONmovementEvents
+        } else {
+          data = res.data
+        }
+        
+        for (let i = 0; i < data.length; i++){
+          data[i].date = new Date(data[i].timestamp*1000).toLocaleString();
+        }
+        var ws = XLSX.utils.json_to_sheet(data);
+        var wb = XLSX.utils.book_new();
+        //Enable filter
+        ws["!autofilter"] = { ref: XLSX.utils.encode_range(XLSX.utils.decode_range(ws['!ref'])) };
 
-    
+        XLSX.utils.book_append_sheet(wb, ws, "Records");
+
+        XLSX.writeFile(wb,filename, { bookType: "xlsx", header: Object.keys(data[0]) });
+        // exportXLSX(filename, ws);
+        console.log("EXCEL RESULT: ", ws);
+      })
+    }
   }
 
   function exportCSV(filename, csvData) {
@@ -1150,6 +1201,18 @@
 			element.click();
 			document.body.removeChild(element);
 		}
+
+  // function exportXLSX(filename, xlsxData) {
+	// 		const element = document.createElement("a");
+
+	// 		element.setAttribute("href", `data:text/xlsx;charset=utf-8,${xlsxData}`);
+	// 		element.setAttribute("download", filename);
+	// 		element.style.display = "none";
+
+	// 		document.body.appendChild(element);
+	// 		element.click();
+	// 		document.body.removeChild(element);
+	// 	}
 
   function ErrDisplay(text){
     let errorbox = document.getElementById("error-msg");
