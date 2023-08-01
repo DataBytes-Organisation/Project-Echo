@@ -99,7 +99,8 @@ export function initialiseHMI(hmiState) {
     updateMicrophoneLayer(hmiState, res.data);
     stepMicAnimation(hmiState);
   })
-  
+  addmicrophones(hmiState);
+  stepMicAnimation(hmiState);
   queueSimUpdate(hmiState);
   //simulateData(hmiState);
 }
@@ -1267,7 +1268,7 @@ document.addEventListener('stopAudio', function(event){
 
 var durationTag = document.getElementById("recording_duration");
 
-var overlay = document.getElementsByClassName("overlay")[0];
+
 var audioElement = document.getElementsByClassName("audio-element")[0];
 var audioElementSource = document.getElementsByClassName("audio-element")[0]
     .getElementsByTagName("source")[0];
@@ -1283,8 +1284,7 @@ stopRecordingButton.onclick = stopAudioRecording;
 var cancelRecordingButton = document.getElementById("cancel_recording_button");
 cancelRecordingButton.onclick = cancelAudioRecording;
 
-var acknowledgeButton = document.getElementById("acknowledge_button");
-acknowledgeButton.onclick = hideRecordingNotSupportedOverlay;
+
 
 
 //Listen to when the audio being played ends
@@ -1303,12 +1303,16 @@ function hideRecordingControls() {
     clearInterval(durationTimer);
 }
 
+//var overlay = document.getElementsByClassName("overlay")[0];
+//var acknowledgeButton = document.getElementById("acknowledge_button");
+//acknowledgeButton.onclick = hideRecordingNotSupportedOverlay;
+
 function showRecordingNotSupportedOverlay() {
-    overlay.classList.remove("hide");
+    //overlay.classList.remove("hide");
 }
 
 function hideRecordingNotSupportedOverlay() {
-    overlay.classList.add("hide");
+    //overlay.classList.add("hide");
 }
 
 function createSourceForAudioElement() {

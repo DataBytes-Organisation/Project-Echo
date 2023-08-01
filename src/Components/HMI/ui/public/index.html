@@ -408,24 +408,24 @@
               <div id="audio_recording_container">
                 <h1 class="title">Record Live Audio</h1>
                 <i id="record_audio_button" class="fa fa-microphone" aria-hidden="true"></i>
-                <div id="recording_contorls_container" class="hide">
+                <div id="recording_contorls_container" class="recording_controls hide">
                     <i id="cancel_recording_button" class="fa fa-times-circle-o" aria-hidden="true"></i>
                     <div id="recording_info">
                         <i id="recording_indicator" class="fa fa-circle" aria-hidden="true"></i>
-                        <p id="recording_duration"></p>
+                        <p id="recording_duration">"00:00:00"</p>
                     </div>
                     <i id="stop_recording_button" class="fa fa-stop-circle-o" aria-hidden="true"></i>
                 </div>
                 <div id="audio_playback_container">
-                    <p id="audio_playback_indicator" class="hide">Audio is playing<span>.</span><span>.</span><span>.</span></p>
+                    <p id="audio_playback_indicator" class="playback_indicator hide">Audio is playing<span>.</span><span>.</span><span>.</span></p>
                 </div>
               </div>
-              <div class="overlay hide">
+              <!--div class="overlay hide">
                 <div id="audio_recording_not_supported">
                     <p>To record audio, use browsers like Chrome and Firefox that support audio recording.</p>
                     <button type="button" id="acknowledge_button">Ok.</button>
                 </div>
-              </div>
+              </div-->
         
               <audio controls class="audio-element hide">
               </audio>
@@ -956,11 +956,11 @@
   hmiState.layers = {};
 
   const microphoneLocations = [
-    { lat: -38.808, lon: 143.554 },
-    { lat: -38.813, lon: 143.537 },
-    { lat: -38.794, lon: 143.52 },
-    { lat: -38.824, lon: 143.51 },
-    { lat: -38.812, lon: 143.573 },
+    { lat: -38.808, lon: 143.554, id:1 },
+    { lat: -38.813, lon: 143.537, id:2 },
+    { lat: -38.794, lon: 143.52, id:3 },
+    { lat: -38.824, lon: 143.51, id:4 },
+    { lat: -38.812, lon: 143.573, id:5 },
   ];
   
   const vocalizationEvents = [
