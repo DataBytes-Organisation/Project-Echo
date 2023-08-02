@@ -229,7 +229,7 @@ app.post("/request_access", async (req,res) => {
   console.log("email: ", req.body.email);
   const {email} = req.body;
   //Generate Guest credentials + timestamp
-  let username = email.split('@')[0] + "_" + crypto.getRandomValues(new Uint32Array(1));
+  let username = 'guest_' + email.split('@')[0] + "_" + crypto.getRandomValues(new Uint32Array(1));
   console.log("username: ", username)
   let password =  genPass(12);
   let timestamp = new Date(Date.now() + 1800000) //Set time to live of 1800000 ms = 1800 s = 30 mins
@@ -273,7 +273,7 @@ app.post("/request_access", async (req,res) => {
             console.log(error);
           } else {
             console.log('Email sent: ' + info.response);
-            return res.redirect("/")
+            return res.redirect("/login")
           }
         });
       } else {
