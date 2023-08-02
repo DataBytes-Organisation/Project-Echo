@@ -6,8 +6,9 @@ const cookieSession = require("cookie-session");
 const dbConfig = require("./config/db.config");
 const jwt = require("jsonwebtoken");
 const { authJwt } = require("./middleware");
-
-
+const controller = require("./controller/auth.controller");
+const crypto = require("crypto")
+var bcrypt = require("bcryptjs");
 
 //Add mongoDB module inside config folder
 const db = require("./model");
@@ -82,9 +83,14 @@ function initGuests(){
       // Only feasible if there are only 1-2 sample documents
       const newGuest1 = new Guest({
         userId: "HMITest1",
-        username: "guest_tester_1",
+        username: "guest_tester1_0987654321",
         email: "guest@echo.com",
-        password: "guest_password",
+        password: bcrypt.hashSync("guest_password", 8),
+        roles: [
+          {
+            "_id":"64be1d0f05225843178d91d7"
+          }
+        ],
         expiresAt: new Date(Date.now() + 1800000) // Set the expiration duration for 30 mins = 1800 s = 1800000 ms from now
       });
       
@@ -99,9 +105,14 @@ function initGuests(){
 
       const newGuest2 = new Guest({
         userId: "HMITest2",
-        username: "guest_tester_2",
+        username: "guest_tester2_1234567890",
         email: "guest@hmi.com",
-        password: "guest_password",
+        password: bcrypt.hashSync("guest_password", 8),
+        roles: [
+          {
+            "_id":"64be1d0f05225843178d91d7"
+          }
+        ],
         expiresAt: new Date(Date.now() + 300000) // Set the expiration duration for 5 mins = 300 s = 300000 ms from now
       });
       
@@ -200,6 +211,85 @@ app.post("/send_email", (req,res) => {
       return res.redirect("/")
     }
   });
+
+})
+
+var chars = "0123456789abcdefghijklmnopqrstuvwxyz!@#$%^&*()ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+function genPass(length){
+  let password = "";
+  for (var i = 0; i <= parseInt(length); i++) {
+    var randomNumber = Math.floor(Math.random() * chars.length);
+    password += chars.substring(randomNumber, randomNumber +1);
+   }
+  return password;
+}
+
+app.post("/request_access", async (req,res) => {
+  console.log("email: ", req.body.email);
+  const {email} = req.body;
+  //Generate Guest credentials + timestamp
+  let username = email.split('@')[0] + "_" + crypto.getRandomValues(new Uint32Array(1));
+  console.log("username: ", username)
+  let password =  genPass(12);
+  let timestamp = new Date(Date.now() + 1800000) //Set time to live of 1800000 ms = 1800 s = 30 mins
+  let request = {
+    "username": username,
+    "email": req.body.email,
+    "password": password,
+    "timestamp": timestamp
+  }
+  try {
+    //Sending that to Guest signup
+    const response = await controller.guestsignup(request);
+    
+    setTimeout(()=>{
+      console.log("response is back! ", response);
+      //Send email to user when success
+      if (response && response.status === 'success') {
+        let html_text = '<div>';
+        html_text += '<h2>Echo HMI Temporary Access Requested!</h2>'
+        html_text += '<img src="cid:logo@echo.hmi" style="height: 150px; width: 150px; display: flex; margin: auto;"/>'
+        html_text += '<p>Dear \t <strong>' + req.body.email + '</strong></p>';
+        html_text += '<hr>';
+        html_text += '<p>Thank you for your patience, here is your login credential </p>'
+        html_text += '<p><strong>Username:</strong> \t ' + username + '</p>'
+        html_text += '<p><strong>Password:</strong> \t ' + password + '</p>'
+        html_text += '<br><p>Please take in mind that this account will only be valid until '+ timestamp.toString() + ' (Subject to change based on development)</p>'
+        html_text += '</div>';
+        let mailOptions = {
+          from: email,
+          to: `echodatabytes@gmail.com, ${email}`,
+          subject: 'Guest User Access Granted!',
+          html: html_text,
+          attachments: [{   // stream as an attachment
+            filename: 'image.png',
+            content: fs.createReadStream(path.join(__dirname, 'public/images/tabIcons/logo.png')),
+            cid: 'logo@echo.hmi' //same cid value as in the html
+        }]
+        }
+        transporter.sendMail(mailOptions, function(error, info){
+          if (error) {
+            console.log(error);
+          } else {
+            console.log('Email sent: ' + info.response);
+            return res.redirect("/")
+          }
+        });
+      } else {
+        console.log("Status wrong? ", response)
+      }
+
+    },200)
+    
+  } catch (error) {
+    res.status(500).send({ message: 'An error occurred while sending the request access: ' + error });
+  }
+  
+ 
+
+
+  
 
 })
 
