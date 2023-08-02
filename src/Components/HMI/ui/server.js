@@ -13,6 +13,7 @@ const { authJwt } = require("./middleware");
 const db = require("./model");
 const Role = db.role;
 const User = db.user;
+const Guest = db.guest;
 //Establish Mongo Client connection to mongoDB
 db.mongoose
   .connect(`mongodb://${dbConfig.USERNAME}:${dbConfig.PASSWORD}@${dbConfig.HOST}/${dbConfig.DB}?authSource=admin`, {
@@ -23,6 +24,7 @@ db.mongoose
     console.log("Successfully connect to MongoDB.");
     initial();
     initUsers();
+    initGuests();
   })
   .catch(err => {
     console.log("ConnString: ", `mongodb://${dbConfig.USERNAME}:${dbConfig.PASSWORD}@${dbConfig.HOST}/${dbConfig.DB}?authSource=admin`)
@@ -70,6 +72,63 @@ function initUsers(){
     }
   });
 }
+
+//Add sample Guest users if none exists
+function initGuests(){
+  Guest.estimatedDocumentCount((err, count) => {
+    if (!err && count === 0) {
+      //Different from Roles and Users, 
+      // another approach is to manually seed mongoDB document
+      // Only feasible if there are only 1-2 sample documents
+      const newGuest1 = new Guest({
+        userId: "HMITest1",
+        username: "guest_tester_1",
+        email: "guest@echo.com",
+        password: "guest_password",
+        expiresAt: new Date(Date.now() + 1800000) // Set the expiration duration for 30 mins = 1800 s = 1800000 ms from now
+      });
+      
+      // Save the new guest document to the collection
+      newGuest1.save((err, doc) => {
+        if (err) {
+          console.error(err);
+        } else {
+          console.log('Guest document inserted successfully:', doc);
+        }
+      });
+
+      const newGuest2 = new Guest({
+        userId: "HMITest2",
+        username: "guest_tester_2",
+        email: "guest@hmi.com",
+        password: "guest_password",
+        expiresAt: new Date(Date.now() + 300000) // Set the expiration duration for 5 mins = 300 s = 300000 ms from now
+      });
+      
+      // Save the new guest document to the collection
+      newGuest2.save((err, doc) => {
+        if (err) {
+          console.error(err);
+        } else {
+          console.log('Guest document inserted successfully:', doc);
+        }
+      });
+    }
+  });
+}
+
+//Background Process to automatically delete Guest role after exceeding expiration
+setInterval(() => {
+  const now = new Date();
+  console.log("Background monitor at ", now.toString())
+  Guest.deleteMany({ expiresAt: { $lte: now } }, (err) => {
+    if (err) {
+      console.error('Error deleting expired documents:', err);
+    } else {
+      console.log('Expired documents deleted successfully.');
+    }
+  });
+}, 360000); // Run every 6 mins = 360 s = 360000 ms (adjust as needed)
 
 const port = 8080;
 
