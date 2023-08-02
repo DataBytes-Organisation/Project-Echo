@@ -130,8 +130,7 @@
         "The Rose Robin is sexually dimorphic, with the male having a pink breast and throat and the female having a grey-brown breast and throat.",
         "These birds are typically found in moist, dense forests but can also be found in more open woodland and shrubland habitats.",
         "The Rose Robin feeds on insects, spiders, and other small invertebrates that it finds by hopping along the ground or perching on low branches.",
-        "These birds are migratory, with some populations moving to higher elevations during the winter months.",
-        "The Rose Robin has a sweet, melodic song that can be heard throughout the breeding season."
+        "These birds are migratory, with some populations moving to higher elevations during the winter months."
       ],
       "img": ""
     },
@@ -179,14 +178,14 @@
     },
     {
       "species": "Petrochelidon nigricans",
-      "common": "Tree Swallow",
+      "common": "Tree Martin",
 
       "summary": "Petrochelidon nigricans, commonly known as the Tree Swallow, is a small passerine bird found in North and Central America.",
       "description": [
-        "The Tree Swallow has a metallic blue-green upper body and a white underbody.",
+        "The Tree martins has a metallic blue-green upper body and a white underbody.",
         "They are known for their ability to catch insects in mid-air while flying at high speeds.",
-        "Tree Swallows are cavity nesters and use natural or artificial cavities to build their nests.",
-        "During migration, Tree Swallows form large flocks and roost together in large numbers."
+        "Tree martins are cavity nesters and use natural or artificial cavities to build their nests.",
+        "During migration, Tree martins form large flocks and roost together in large numbers."
       ],
       "img": ""
     },
@@ -1386,7 +1385,7 @@
       "common": "Scarlet Robin",
       "summary": "Petroica boodang, commonly known as the Scarlet Robin, is a small passerine bird that is native to southeastern Australia.",
       "description": [
-        "The Scarlet Robin is sexually dimorphic, with the male having a bright red cap and breast and the female having a grey-brown cap and breast.",
+        "Male brds have a bright red cap and breast and the female having a grey-brown cap and breast.",
         "These birds are found in a variety of habitats, including open forests, woodlands, and shrublands.",
         "The Scarlet Robin feeds mainly on insects and other small invertebrates that it finds by hopping along the ground or perching on low branches.",
         "These birds are territorial and will defend their nesting area aggressively against intruders.",
@@ -1399,12 +1398,11 @@
       "common": "Red-capped Robin",
       "summary": "Petroica goodenovii, commonly known as the Red-capped Robin, is a small passerine bird that is native to Australia.",
       "description": [
-        "The Red-capped Robin is sexually dimorphic, with the male having a bright red cap and breast and the female having a grey-brown cap and breast.",
-        "These birds are found in a variety of habitats, including open forests, woodlands, and shrublands.",
+        "The male Red-capped Robin is a small bird with a black back and white belly.",
+        "You can find the Red-capped Robin in different parts of Australia, from Queensland to Victoria and South Australia.",  
         "The Red-capped Robin feeds mainly on insects and other small invertebrates that it finds by hopping along the ground or perching on low branches.",
         "These birds are territorial and will defend their nesting area aggressively against intruders.",
-        "The Red-capped Robin has a sweet, melodic song that can be heard throughout the breeding season."
-      ],
+        "This bird looks for food by scratching the ground with its feet and sometimes tilts its head to one side to see better."      ],
       "img": ""
     },
     {
@@ -1415,8 +1413,7 @@
         "The Flame Robin is sexually dimorphic, with the male having a bright red cap and breast and the female having a grey-brown cap and breast.",
         "These birds are found in a variety of habitats, including open forests, woodlands, and shrublands.",
         "The Flame Robin feeds mainly on insects and other small invertebrates that it finds by hopping along the ground or perching on low branches.",
-        "These birds are territorial and will defend their nesting area aggressively against intruders.",
-        "The Flame Robin has a sweet, melodic song that can be heard throughout the breeding season."
+        "These birds are territorial and will defend their nesting area aggressively against intruders."
       ],
       "img": ""
     },
