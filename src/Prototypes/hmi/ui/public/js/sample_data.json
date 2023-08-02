@@ -2686,11 +2686,11 @@
     {
       "species": "Acanthagenys rufogularis",
       "common": "Spiny-cheeked Honeyeater",
-      "summary": "Acanthagenys rufogularis is a small bird species, commonly known as Spiny-cheeked Honeyeater.",
+      "summary": "Acanthagenys rufogularis is a medium bird species, commonly known as Spiny-cheeked Honeyeater.",
       "description": [
-        "Spiny-cheeked Honeyeater is known for its distinctive spiny cheek feathers and rusty-red throat patch.",
-        "Acanthagenys rufogularis inhabits the dry montane forests, scrublands, and even agricultural areas, where it feeds on nectar, insects, and small fruits.",
-        "The males display unique plumage with black and white stripes on the head, a bluish gray back, and a rufous throat and underparts, while the females have a more uniform grayish-brown coloration.",
+        "Juvenille Spiny-cheeked Honeyeaters are known for their distinctive yellow cheek sash which becomes less pronounced towards adulthood.",
+        "Acanthagenys rufogularis inhabit most locations throughout Australia which include, the dry montane forests, scrublands, and even agricultural areas, where it feeds on nectar, insects, and small fruits.",
+        "Within this species, there is a large amounnt of variability in their appearance.",
         "Acanthagenys rufogularis is not considered endangered, although its population is threatened by deforestation, habitat fragmentation, and pesticide use in agricultural areas."
       ],
       "img": ""
@@ -2704,7 +2704,7 @@
         "They have a distinctive high-pitched call that can be heard from a long distance.",
         "These small birds are skilled at hopping along branches and twigs in search of food.",
         "The Inland thornbill is threatened by habitat loss due to land clearing for agriculture.",
-        "They are monogamous and form lasting pairs, with both partners involved in nest building and caring for young."
+        "The Inland Thornbills are believed to breed in pairs but other species of Acanthiza have exhibited cooperative breeding."
       ],
       "img": ""
     },
@@ -2718,7 +2718,7 @@
         "They can survive in a range of habitats, from forests to semi-arid scrublands.",
         "Yellow-rumped thornbills are known for their energetic, acrobatic movements as they forage for insects.",
         "They have been observed making use of tools, such as using sticks to pry open bark to expose insects.",
-        "This thornbill has a clutch size of only 2 eggs, and they often lay multiple clutches per year."
+        "This thornbill has a clutch size that could range from three to four eggs, and they often lay multiple clutches per year."
       ],
       "img": ""
     },
@@ -2730,7 +2730,7 @@
       "description": [
         "The Striated thornbill is named for the distinctive markings on its wings and back.",
         "They are found throughout most of southern Australia, from rainforests to arid scrublands.",
-        "These birds are highly territorial and aggressive towards other bird species.",
+        "They often occur among other mixed species of feeding flocks such as other species of thornbills, robins and warblers.",
         "Young Striated thornbills remain in the nest for up to 3 weeks after hatching, and are fed by both parents.",
         "They have a varied diet that includes insects, nectar, and fruit."
       ],
@@ -2759,8 +2759,8 @@
         "This thornbill is named for its bright yellow plumage on the head and underparts.",
         "They are the smallest thornbill species, weighing only around 6 grams.",
         "Yellow thornbills are socially monogamous, but males may mate with multiple females.",
-        "These birds are able to survive in a range of habitats, including eucalypt forests and mangroves.",
-        "They have been observed using feathers to line their nests, which are constructed in tree forks or other hidden locations."
+        "These birds are able to survive in a range of habitats, including eucalypt forests and areas particularly with a drier climate.",
+        "Nests are usually built with fiber from bark and grasses that have been matted together by spider webs."
       ],
       "img": ""
     },
@@ -2771,8 +2771,8 @@
       "summary": "Acanthiza reguloides is a small bird species, commonly known as Buff-rumped thornbill",
       "description": [
         "The buff-rumped thornbill is a small bird native to Australia.",
-        "They are found in woodland habitats across most of eastern Australia.",
-        "These birds are known for their distinctive black and white streaked head and back, and buff-colored rump.",
+        "They are found in open forest habitats across most of eastern Australia.",
+        "These birds are known for their buff coloured rump and belly.",
         "Buff-rumped thornbills feed primarily on insects and spiders, which they glean from tree bark and foliage.",
         "They are known to build intricate dome-shaped nests made of grass, bark, and spider webs."
       ],
@@ -2785,10 +2785,10 @@
       "summary": "Acanthiza uropygialis is a small bird species, commonly known as Chestnut-rumped thornbill",
       "description": [
         "The chestnut-rumped thornbill is a small bird found in southeastern Australia.",
-        "They inhabit a variety of forested habitats including eucalyptus forests and woodlands.",
+        "They inhabit a variety of forested habitats including eucalyptus forests, shrublands and woodlands.",
         "These birds are named for their chestnut-colored rump, and are olive-green and grey in color overall.",
         "Chestnut-rumped thornbills feed on insects and spiders, which they obtain by gleaning from tree bark and foliage.",
-        "They are known to breed opportunistically, with some pairs producing up to three broods per year."
+        "They are known to breed opportunistically, with some pairs producing up to three broods per season."
       ],
       "img": ""
     },
@@ -2800,7 +2800,7 @@
         "The eastern spinebill is a small bird found in southeastern Australia, primarily in woodland habitats.",
         "They are known for their distinctive long, slender beaks, which are adapted for feeding on nectar from flowers.",
         "Eastern spinebills are also known to eat insects and spiders.",
-        "They are named for the prominent spine-like feathers on their throat, which are used in territorial displays.",
+        "They havea very clear and high pitched staccato call that they sometimes repeat for lengthy periods.",
         "These birds are known to breed in late winter and early spring, when they construct small cup-shaped nests made of grass and other materials."
       ],
       "img": ""
@@ -2814,7 +2814,7 @@
         "They inhabit a variety of forested habitats, and are known for their adaptability to human-modified landscapes.",
         "Collared sparrowhawks mainly feed on small birds and mammals, which they capture by surprise attack.",
         "They are named for the distinctive collar of feathers on their neck.",
-        "These hawks are known to breed in the spring and summer, with females laying up to four eggs per clutch."
+        "Laysing season is from July to December, with females laying up to four eggs per clutch."
       ],
       "img": ""
     },
@@ -2825,7 +2825,7 @@
       "summary": "Accipiter fasciatus, or brown goshawk is a medium-sized bird of prey found in Australia, New Guinea, and nearby islands.",
       "description": [
         "They inhabit a variety of forested habitats, including eucalyptus forests, and are known for their agile flight and swift attacks on prey.",
-        "Brown goshawks feed mainly on birds, but they will also eat mammals and reptiles.",
+        "Brown goshawks feed mainly on birds, but they will also eat small mammals and reptiles.",
         "They are named for their brown feathers, and for the distinctive white and black bands on their tail feathers.",
         "These birds are known to breed in the spring and summer, and females lay up to four eggs per clutch."
       ],
@@ -2861,12 +2861,12 @@
     {
       "species": "Aegotheles cristatus",
       "common": "Australian owlet-nightjar",
-      "summary": "Aegotheles cristatus or Australian owlet-nightjar is a nocturnal bird, endemic to Australia",
+      "summary": "Aegotheles cristatus or Australian owlet-nightjar is the smallest nocturnal bird, endemic to Australia",
       "description": [
-        "They are known for their wide mouths and large eyes.",
+        "They are known for their large eyes and whiskers on their face.",
         "Australian owlet-nightjars feed on insects and spiders.",
         "They are able to camouflage themselves on trees during the day.",
-        "Males have a distinct courtship display where they puff up their throat and make a booming call."
+        "They live in a variety of habitats and their plumage is overall paler in desert populations."
       ],
       "img": ""
     },
@@ -2879,7 +2879,7 @@
         "They are named after the male's distinctive plum-colored head.",
         "Plum-headed finches feed on seeds and insects.",
         "They are often kept as pets due to their colorful appearance.",
-        "They have a short lifespan of only 4-5 years in the wild."
+        "They have a lifespan of about 6-8 years."
       ],
       "img": ""
     },
@@ -2892,7 +2892,7 @@
         "The male has a bright red head and body while the female is mostly green.",
         "Australian king parrots feed on seeds, fruit, and insects.",
         "They are known for their loud, screeching call.",
-        "They form long-term pair bonds and mate for life."
+        "They form long-term pair bonds and mate for life, although sometimes they will swap partners."
       ],
       "img": ""
     },
@@ -2915,10 +2915,10 @@
       "common": "Dusky grasswren",
       "summary": "Amytornis purnelli or Dusky grasswren  is a small bird found in the arid regions of Australia.",
       "description": [
-        "This bird has a dark brown plumage and a distinctive white eyebrow.",
-        "Dusky Grasswrens are non-migratory and are adapted to living in harsh desert environments.",
+        "This bird has a dark brown plumage and a distinctive white streaking over the mantle and head breast.",
+        "Dusky Grasswrens are non-migratory and are adapted to living in rocky ranges across Central Australia.",
         "They typically nest in low bushes and feed on insects and seeds.",
-        "Due to habitat loss and degradation, the Dusky Grasswren is listed as Vulnerable on the IUCN Red List."
+        "The Dusky Grasswren is assumed to have a stable population despite detailed distribution and population data that are lacking."
       ],
       "img": ""
     },
@@ -2930,8 +2930,8 @@
       "description": [
         "They have a glossy black head, brown body, and a striking blue speculum on their wings.",
         "Pacific Black Ducks are adaptable and can be found in a wide range of freshwater habitats.",
-        "They are omnivorous and feed on a variety of plant and animal matter.",
-        "Pacific Black Ducks are important game birds and are also hunted for their meat and feathers."
+        "They are omnivorous and feed on a variety of plant and animal matter but are mainly vegetarian.",
+        "Due to competition and hybridisation from the introduced mallard, Pacific Black Duck numbers have sharply declined."
       ],
       "img": ""
     },
@@ -2967,7 +2967,7 @@
       "common": "Red wattlebird",
       "summary": "Anthochaera carunculata or Red wattlebird a large honeyeater native to southeastern Australia.",
       "description": [
-        "They are known for their prominent red caruncle (a fleshy ornament) on their throat.",
+        "They are known for their prominent red caruncle (a fleshy ornament) on the side of their neck.",
         "Red wattlebirds use their long bills to extract nectar and insects from flowers.",
         "They are noisy and territorial birds, defending their favorite feeding spots from others.",
         "Their population has declined due to loss of habitat and competition with introduced bird species."
