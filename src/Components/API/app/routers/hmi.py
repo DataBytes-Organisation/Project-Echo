@@ -5,7 +5,7 @@ from app import serializers
 from app import schemas
 from app.database import Events, Movements, Microphones, Species
 import paho.mqtt.publish as publish
-
+import json
 
 
 router = APIRouter()
@@ -49,16 +49,28 @@ def show_event_from_time(start: str, end: str):
     return events
 
 # Return all species data
- 
+
+
 @router.get("/record_animals", response_description="Get all record of animals")
 def list_species_data():
-    data = Species.find()
-    species_data =[]
-    for i in data: 
-        species_data.append(i)
-    return species_data
+    Species_data = Species.find()
+    animals_record = []
 
+    for each_species in Species_data:
+        each_species['species'] = each_species.pop('_id')
+        each_species['movements'] = []
 
+        Movements_data = Movements.find()
+        for moves in Movements_data:
+            if moves['species'] == each_species['species']:
+                each_species['animalId'] = moves['animalId']
+                del moves['species']
+                del moves['animalId']
+                moves['id'] = str(moves['_id']).replace('ObjectId', "")
+                del moves['_id']
+                each_species['movements'].append(moves)
+        animals_record.append(each_species)
+    return animals_record
 
  
 
