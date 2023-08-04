@@ -112,9 +112,9 @@
                 
                 <div class="container">
                     <label for="email"><b>Email</b></label>
-                    <input type="text" placeholder="Enter Email" name="email" required>
-                    
-                    <button type="submit" class="btn10"><span>Send Request</span></button>
+                    <input id="request-access-email-inp" type="text" placeholder="Enter Email" name="email" oninput="{emailFormValidation('request-access')}" required>
+                    <span id="request-access-email-error" class="error-text"></span>
+                    <button type="submit" class="btn10" id="request-access-button"><span>Send Request</span></button>
                 </div>
                 
                 <div class="container" style="background-color:#f1f1f1">
@@ -122,6 +122,8 @@
                 </div>
             </form>
         </div>
+
+        <div id="error-box" class="error_box"></div>
 
     </div>		
 
@@ -146,12 +148,32 @@
     function openForm(id) {
         let ele = id;
         document.getElementById(ele).style.display='block';
-        document.getElementById(project-title).style.display='none';
+        // document.getElementById(project-title).style.display='none';
     }
 
     function closeForm(id) {
         let ele = id;
         document.getElementById(ele).style.display='none';
     }
+    const validEmailRegex = /^[\w\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+    function emailFormValidation(inp){
+    let email_id = inp + "-email-inp";
+    let error_id = inp + "-email-error";
+    let btn_id = inp + "-button"
+    let input_ele = document.getElementById(email_id);
+    let error_ele = document.getElementById(error_id);
+    let btn_ele = document.getElementById(btn_id);
+    if (input_ele.value.match(validEmailRegex)){
+        error_ele.style.display = 'none';
+        error_ele.innerHTML = '';
+        btn_ele.disabled = false;
+    } else {
+        error_ele.style.display = 'block';
+        error_ele.innerHTML = 'Please insert a valid email address';
+        btn_ele.disabled = true;
+    }
+    }
+  
 </script>
+
 </html>

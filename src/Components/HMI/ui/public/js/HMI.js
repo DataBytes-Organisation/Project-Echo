@@ -131,6 +131,27 @@ function updateFilters(){
   
 }
 
+const validEmailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+export function emailValidation(inp){
+  let email_id = inp + "-email-inp";
+  let error_id = inp + "-email-error";
+  let btn_id = inp + "-button"
+  let input_ele = document.getElementById(email_id);
+  let error_ele = document.getElementById(error_id);
+  let btn_ele = document.getElementById(btn_id);
+  console.log("Toggle email: ", input_ele.value)
+  if (input_ele.value.match(validEmailRegex)){
+    error_ele.style.display = 'none';
+    error_ele.innerHTML = '';
+    btn_ele.disabled = false;
+  } else {
+    error_ele.style.display = 'block';
+    error_ele.innerHTML = 'Please insert a valid email address';
+    btn_ele.disabled = true;
+  }
+  
+}
+
 let latestSimAnimals = {};
 
 export function updateAnimalMovementLayerFromPastData(hmiState, results){

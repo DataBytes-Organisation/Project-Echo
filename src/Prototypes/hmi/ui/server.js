@@ -53,7 +53,7 @@ function initial() {
   });
 }
 
-const port = 8081;
+const port = 8080;
 
 // serve static files from the public directory
 app.use(express.static(path.join(__dirname, 'public')));
@@ -62,7 +62,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 const cors = require("cors");
 
 var corsOptions = {
-  origin: "http://localhost:8081"
+  origin: "http://localhost:8080"
 };
 
 app.use(cors(corsOptions))

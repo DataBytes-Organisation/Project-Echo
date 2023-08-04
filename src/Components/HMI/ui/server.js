@@ -150,7 +150,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 const cors = require("cors");
 
 var corsOptions = {
-  origin: "http://localhost:8080"
+  origin: "http://localhost:8081"
 };
 
 app.use(cors(corsOptions))
@@ -277,7 +277,14 @@ app.post("/request_access", async (req,res) => {
           }
         });
       } else {
-        console.log("Status wrong? ", response)
+        console.log("Something happened for Guest Access Granting: ", response);
+        let error_box = document.getElementById("request-access-email-error");
+        error_box.innerHTML = `Exception error occured: ${response.message}`;
+        error_box.style.display = "block"
+        setTimeout(()=> {
+          error_box.innerHTML = '';
+          error_box.style.display = "none";
+        },3000)
       }
 
     },200)

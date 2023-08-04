@@ -125,8 +125,6 @@ exports.signin = (req, res) => {
 
 //Guest signup, with random UserId and Password
 exports.guestsignup = async (req) => {
-  console.log("Start signing up new guest: ", req)
-  console.log("Username??? ", req.username)
   const guest = new Guest({
     userId: "guest_" + crypto.randomUUID().toString(),
     username: req.username,
@@ -138,20 +136,21 @@ exports.guestsignup = async (req) => {
   guest.save((err, guest) => {
     if (err) {
       // res.status(500).send({ message: err });
-      return {status: "failed"};
+      console.log("Cannot created new Guest account: " + err)
+      return {status: "failed", message: "Create Guest Error! Please check the console log"};
     }
     Role.findOne({ name: "guest" }, (err, role) => {
       if (err) {
-        console.log("Cannot find the role document of guest")
+        console.log("Cannot find the role document of guest: " + err)
         // res.status(500).send({ message: err });
-        return {status: "failed"};
+        return {status: "failed", message: "Find Role Error! Check the console log"};
       }
       guest.roles = [role._id];
       guest.save((err) => {
         if (err) {
-          console.log("Cannot save? ", err)
+          console.log("Cannot save Guest: ", err)
           // res.status(500).send({ message: err });
-          return {status: "failed"};
+          return {status: "failed", message: "Save Guest Error! Please check the console log"};
         }
         return { status: 'success' };
       });
