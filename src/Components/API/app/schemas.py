@@ -81,3 +81,12 @@ class MicrophoneSchema(BaseModel):
                     "microphoneLLA": [-33.1106,150.0570, 23],           
             }
         }
+
+class UserSchema():
+    username: str
+    password: str
+    email: str
+    role = {ObjectId: str}
+    
+
+    
