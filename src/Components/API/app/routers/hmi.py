@@ -12,6 +12,13 @@ router = APIRouter()
 MQTT_BROKER_URL = "ts-mqtt-server-cont"
 MQTT_BROKER_PORT = 1883
 
+#i have created a new end point  called used_algorithms
+used_algorithms = ["Algorithm 1", "Algorithm 2", "Algorithm 3"]
+
+@router.get("/used_algorithms", response_description="Get information about the algorithms being used")
+def get_used_algorithms():
+    return {"algorithms": used_algorithms}
+
 
 @router.get("/events_time", response_description="Get detection events within certain duration")
 def show_event_from_time(start: str, end: str):
