@@ -1464,37 +1464,6 @@ export function playAudio() {
   console.log("play");
 
   playRecording(audioRecorder.audioBlobs);
-
-  /*
-  let reader = new FileReader();
-
-  reader.onload = (e) => {
-    console.log("loaded reader");
-    let base64URL = e.target.result;
-
-    if (!audioElementSource)
-      console.log("creating source");
-      createSourceForAudioElement();
-
-    audioElementSource.src = base64URL;
-    console.log(base64URL);
-
-    let BlobType = recorderAudioAsBlob.type.includes(";") ?
-    recorderAudioAsBlob.type.substr(0, recorderAudioAsBlob.type.indexOf(';')) : recorderAudioAsBlob.type;
-    
-    audioElementSource.type = BlobType;
-    console.log(BlobType);
-
-    audioElement.load();
-    console.log("loaded element");
-
-    audioElement.play();
-    console.log("Playing audio");
-
-    showPlaybackIndicator();
-  };
-
-  reader.readAsDataURL(recorderAudioAsBlob);*/
 }
 
 export function initializeRecordingDuration() {

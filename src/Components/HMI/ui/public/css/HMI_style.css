@@ -1206,13 +1206,6 @@ i {
   align-items: center;
   text-align: center;
 }
-/*#record_audio_button {
-  font-size: 70px;
-  color: #435f7a;
-  cursor: pointer;
-  opacity: .5;
-  margin-bottom: 30px;
-}*/
 #record_audio_button:hover {
   opacity: 1;
 }
@@ -1235,21 +1228,6 @@ i {
   margin-left: auto !important;
   margin-right: auto !important;
 }
-/*
-#cancel_recording_button {
-  color: red;
-  opacity: 0.7;
-}
-#cancel_recording_button:hover {
-  color: rgb(206, 4, 4);
-}
-#stop_recording_button {
-  color: #33cc33;
-  opacity: 0.7;
-}
-#stop_recording_button:hover {
-  color: #27a527;
-}*/
 #recording_info {
   display: -webkit-flex;
   display: -ms-flex;
