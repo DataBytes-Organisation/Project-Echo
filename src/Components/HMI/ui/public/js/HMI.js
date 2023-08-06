@@ -3,7 +3,11 @@
 import { getAudioTestString } from "./HMI-utils.js";
 import { retrieveTruthEventsInTimeRange, retrieveVocalizationEventsInTimeRange, 
   retrieveMicrophones, retrieveAudio, retrieveSimTime } from "./routes.js";
-//import data from "./sample_data.json" assert { type: 'json' }; Not supported on all browsers due to assertions still being proposed.
+//import data from "./sample_data.json" assert { type: 'json' }; Browser assertions not yet supported in all browsers, alternative method used instead.
+
+
+// import { parse } from 'json2csv';
+
 
 var markups = ["elephant.png", "monkey.png", "tiger.png"];
 
@@ -22,6 +26,26 @@ function matchStatus(status){
   else{
     return status;
   }
+}
+
+export function convertCSV(json) {
+  if (json == null) return null
+  if (json === [] | typeof json === undefined | json.length === 0){
+    return null
+  }
+  let data = json;
+  let fields = Object.keys(data[0]);
+  let replacer = function(key, value) { return value === null ? 'N/A' : value } ;
+
+  let csv = null;
+  csv = data.map(function(row){
+    return fields.map(function(fieldName){
+      return JSON.stringify(row[fieldName], replacer)
+    }).join(',')
+  })
+  csv.unshift(fields.join(',')) // add header column
+  csv = csv.join('\r\n');
+  return csv
 }
 
 var statusPrintLookup = {
@@ -58,11 +82,11 @@ function getIconName(status, type){
   return animalTypeIconLookup[type] + statusIconLookup[status] + "-01.png";
 }
 
-var sample_data = [];
+//var sample_data = data.data; For assertion method
+var sample_data = []; // For the universal method
 fetch("./js/sample_data.json").then(res => res.json()).then(data => sample_data = data.data);
-// Went from 4 lines to 1. I hate everything. This method works on all browsers according to previous tests.
+// Went from 4 lines to 1. This method works on all browsers according to previous tests.
 var animal_data = [];
-//fetch("./js/animal_data.json").then(res => res.json()).then(data => animal_data = data.data);
 
 export var animal_toggled = false;
 
@@ -691,6 +715,11 @@ function addMicrophonesByLayer(hmiState, layerName, iconPath){
         ol.proj.fromLonLat([location.lon, location.lat])
       ),
       name: "mic",
+      micLat: location.lat,
+      micLon: location.lon,
+      micIcon: iconPath,
+      id: location.id,
+      isMic: 1,
     });
     var icon = new ol.style.Style({
       image: new ol.style.Icon({
@@ -949,27 +978,65 @@ function createMapClickEvent(hmiState){
 
     let active_content = $("#animal-popup-content");
     let default_content = $("#animal-default-content");
+    let active_mic_content = $("#mic-popup-content");
+    let default_mic_content = $("mic-default-content");
     if (feature){
-      // console.log('feature: ', feature);
-      stopAudioPlayback();
-
-      active_content.show();
-      default_content.hide();
 
       let values = feature.getProperties();
-      if (values.eventId){
-        //console.log("saving " + values.eventId);
-        selectedVocalizationEventId = values.eventId;
-      }
-      if(values.isAnimalMovement){
-        document.getElementById("audioHeader").style.display = "none"
-        document.getElementById("audioControl").style.display = "none"
+      if (values.isMic){
+        active_mic_content.show();
+        default_mic_content.hide();
+
+        const img = new Image();
+        let dice = Math.floor(Math.random() * 4) + 1;
+        img.onload = function() {
+          //console.log('Image exists!');
+          document.getElementById("mic_desc_img").src = "../../images/bio/mic_bio_" + dice + ".png";
+        }
+        img.onerror = function() {
+          console.log('Mic image does not exist!');
+        }
+        img.src = "../../images/bio/mic_bio_" + dice + ".png";
+        //document.getElementById("mic_desc_name").innerText = result.common;
+        document.getElementById("mic_desc_id").innerText = values.id;
+        //document.getElementById("desc_summary").innerText = result.summary;
+
+        //Markup details specific session
+        let dateFormat = new Date();
+        document.getElementById("mic_markup_img").src = values.micIcon;
+        document.getElementById("mic_markup_details").innerHTML = "Microphone";
+        document.getElementById("mic_markup_loc_lon").innerHTML = values.micLon;
+        document.getElementById("mic_markup_loc_lat").innerHTML = values.micLat;
+        document.getElementById("mic_markup_date").innerHTML = dateFormat.toUTCString()
+        
+        animal_toggled = true;
+        const toggled_mic = new CustomEvent('micToggled',{
+        detail: {
+          message: "Mic toggled:",
+          }
+        })
+        
+        document.dispatchEvent(toggled_mic);
       }
       else{
-        document.getElementById("audioHeader").style.display = "flex"
-        document.getElementById("audioControl").style.display = "flex"
-      }
-      if (values.animalSpecies){
+        // console.log('feature: ', feature);
+        stopAudioPlayback();
+
+        active_content.show();
+        default_content.hide();
+        if (values.eventId){
+          //console.log("saving " + values.eventId);
+          selectedVocalizationEventId = values.eventId;
+        }
+        if(values.isAnimalMovement){
+          document.getElementById("audioHeader").style.display = "none"
+          document.getElementById("audioControl").style.display = "none"
+        }
+        else{
+          document.getElementById("audioHeader").style.display = "flex"
+          document.getElementById("audioControl").style.display = "flex"
+        }
+        if (values.animalSpecies){
           //console.log(values.animalSpecies)
           var result = sample_data.find(({ species }) => species.toLowerCase() === values.animalSpecies.toLowerCase())
           if (result) {
@@ -1038,13 +1105,16 @@ function createMapClickEvent(hmiState){
             document.dispatchEvent(toggled_animal);
           
 
-      }
-      else{
-        console.log(values);
+        }
+        else{
+          console.log(values);
+        }
       }
     } else {
       active_content.hide();
+      active_mic_content.hide();
       default_content.show();
+      default_mic_content.show();
     }
   });
 }
