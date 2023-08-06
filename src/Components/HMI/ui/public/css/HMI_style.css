@@ -1194,7 +1194,8 @@ i {
   margin-top: 100px;
 }
 
-#audio-recording-container {
+#audio_recording_container {
+  margin-top: 20px;
   width: 100%;
   height: 100vh;
   display: -webkit-flex;
@@ -1203,14 +1204,15 @@ i {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  text-align: center;
 }
-#record_audio_button {
+/*#record_audio_button {
   font-size: 70px;
   color: #435f7a;
   cursor: pointer;
   opacity: .5;
   margin-bottom: 30px;
-}
+}*/
 #record_audio_button:hover {
   opacity: 1;
 }
@@ -1220,14 +1222,20 @@ i {
   display: inline-block;
   justify-content: space-evenly;
   align-items: center;
-  width: 334px;
+  width: 400px;
   margin-bottom: 30px;
 }
 #cancel_recording_button,
-#stop_recording_button {
-  font-size: 70px;
-  cursor: pointer;
+#stop_recording_button,
+#record_audio_button {
+  margin-top: -10px !important;
+  width: 100px;
 }
+#record_audio_button{
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+/*
 #cancel_recording_button {
   color: red;
   opacity: 0.7;
@@ -1241,7 +1249,7 @@ i {
 }
 #stop_recording_button:hover {
   color: #27a527;
-}
+}*/
 #recording_info {
   display: -webkit-flex;
   display: -ms-flex;
@@ -1250,6 +1258,7 @@ i {
   align-items: center;
 }
 #recording_indicator {
+  display: inline-block;
   font-size: 25px;
   color: red;
   margin-right: 12px;
@@ -1312,6 +1321,7 @@ i {
   }
 }
 #recording_duration {
+  display: inline-block;
   font-size: 32px;
 }
 #recording_contorls_container.hide {
@@ -1447,4 +1457,13 @@ i {
   100% {
       opacity: 0;
   }
+}
+
+.controls_item_row {
+  display: flex;
+  flex-direction: row;
+}
+
+#audio_recording_container{
+  width:440px;
 }

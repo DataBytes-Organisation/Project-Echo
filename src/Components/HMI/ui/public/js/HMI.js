@@ -1445,13 +1445,18 @@ function playRecording(recordedChunks) {
         return;
     }else{
       const blob = new Blob(recordedChunks, { type: 'audio/webm' });
-      const url = URL.createObjectURL(blob);
-      const audioElement = document.getElementById("audioElem");
+      if(blob.size > 0){
+        const url = URL.createObjectURL(blob);
+        const audioElement = document.getElementById("audioElem");
   
-      audioElement.src = url;
-      audioElement.load();
-      audioElement.play();
-      showPlaybackIndicator();
+        audioElement.src = url;
+        audioElement.load();
+        audioElement.play();
+        showPlaybackIndicator();
+      }
+      else{
+        console.log("Recording failed check microphone configuration settings.");
+      }
     }
 }
 

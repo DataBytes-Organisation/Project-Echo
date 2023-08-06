@@ -404,17 +404,16 @@
                 </div>
 
               </div>
-
+              <h2 style="margin-top: 20px !important;">Record Live Audio</h2>
               <div id="audio_recording_container">
-                <h1 class="title">Record Live Audio</h1>
-                <i id="record_audio_button" class="fa fa-microphone" onclick="{record()}" aria-hidden="true"></i>
-                <div id="recording_contorls_container" class="recording_controls hide">
-                    <i id="cancel_recording_button" class="fa fa-times-circle-o" onclick="{cancelRecording()}" aria-hidden="true"></i>
-                    <div id="recording_info">
+                <i id="record_audio_button" class="toggle-button btn btn-secondary btn-no-background select-all-btn" onclick="{record()}" aria-hidden="true">Record</i>
+                <div id="recording_contorls_container" class="recording_controls controls_item_row hide">
+                    <i id="cancel_recording_button" class="toggle-button btn btn-secondary btn-no-background select-all-btn" onclick="{cancelRecording()}" aria-hidden="true">Cancel</i>
+                    <div id="recording_info" class="controls_item_row">
                         <i id="recording_indicator" class="fa fa-circle" aria-hidden="true"></i>
                         <p id="recording_duration">"00:00:00"</p>
                     </div>
-                    <i id="stop_recording_button" class="fa fa-stop-circle-o" onclick="{stopRecording()}" aria-hidden="true"></i>
+                    <i id="stop_recording_button" class="toggle-button btn btn-secondary btn-no-background select-all-btn" onclick="{stopRecording()}" aria-hidden="true">Stop</i>
                 </div>
                 <div id="audio_playback_container">
                     <p id="audio_playback_indicator" class="playback_indicator hide">Audio is playing<span>.</span><span>.</span><span>.</span></p>
