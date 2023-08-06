@@ -49,7 +49,7 @@
 		<script type="module" src='./js/HMI.js'></script>
 		<script type="text/javascript" src="./js/animation.js"></script>
 		<script type="module" src='./js/HMI-utils.js'></script>
-    <script src="js/audio_recorder.js"></script>
+    <script type="module" src="./js/audio_recorder.js"></script>
 
     <!-- End Imports -->
     <title>Echo | Welcome</title>
@@ -407,14 +407,14 @@
 
               <div id="audio_recording_container">
                 <h1 class="title">Record Live Audio</h1>
-                <i id="record_audio_button" class="fa fa-microphone" aria-hidden="true"></i>
+                <i id="record_audio_button" class="fa fa-microphone" onclick="{record()}" aria-hidden="true"></i>
                 <div id="recording_contorls_container" class="recording_controls hide">
-                    <i id="cancel_recording_button" class="fa fa-times-circle-o" aria-hidden="true"></i>
+                    <i id="cancel_recording_button" class="fa fa-times-circle-o" onclick="{cancelRecording()}" aria-hidden="true"></i>
                     <div id="recording_info">
                         <i id="recording_indicator" class="fa fa-circle" aria-hidden="true"></i>
                         <p id="recording_duration">"00:00:00"</p>
                     </div>
-                    <i id="stop_recording_button" class="fa fa-stop-circle-o" aria-hidden="true"></i>
+                    <i id="stop_recording_button" class="fa fa-stop-circle-o" onclick="{stopRecording()}" aria-hidden="true"></i>
                 </div>
                 <div id="audio_playback_container">
                     <p id="audio_playback_indicator" class="playback_indicator hide">Audio is playing<span>.</span><span>.</span><span>.</span></p>
@@ -427,7 +427,7 @@
                 </div>
               </div-->
         
-              <audio controls class="audio-element hide">
+              <audio controls id="audioElem" class="audio-element hide">
               </audio>
 
             </div>
@@ -916,12 +916,23 @@
 
 <script type="module">
   import { updateLayers, initialiseHMI, showMics, hideMics, updateAnimalMovementLayerFromPastData, updateVocalizationLayerFromPastData,
-  resetWildlifeLayers, MapOpenNav, MapCloseNav, getAnimalToggled, enableMicAnimation, disableMicAnimation, getUTC } from "./js/HMI.js";
+  resetWildlifeLayers, MapOpenNav, MapCloseNav, getAnimalToggled, enableMicAnimation, disableMicAnimation, getUTC, startAudioRecording,
+  stopAudioRecording, cancelAudioRecording, testFunct} from "./js/HMI.js";
   import {retrieveTruthEventsInTimeRange, retrieveVocalizationEventsInTimeRange, startSimulator, stopSimulator} from "./js/routes.js";
   window.updateMics = updateMics;
   window.updateMicrophoneAnimation = updateMicrophoneAnimation;
   window.updateLayers = updateLayers;
   window.closeNav = MapCloseNav;
+
+
+  /*var recordButton = document.getElementById("record_audio_button");
+  recordButton.onclick = record;
+
+  var stopRecordingButton = document.getElementById("stop_recording_button");
+  stopRecordingButton.onclick = stopRecording;
+
+  var cancelRecordingButton = document.getElementById("cancel_recording_button");
+  cancelRecordingButton.onclick = cancelRecording;*/
 
   //All global state based info is stored in the hmiState
   let hmiState = {};
@@ -1096,6 +1107,26 @@
   let default_content = $("#animal-default-content");
   active_content.hide();
   default_content.show();
+
+  function record(){
+    console.log("calling startAudioRecording...");
+    testFunct();
+    startAudioRecording();
+  }
+
+  function stopRecording(){
+    console.log("calling stopAudioRecording...");
+    stopAudioRecording();
+  }
+
+  function cancelRecording(){
+    console.log("calling cancelAudioRecording...");
+    cancelAudioRecording();
+  }
+
+  window.record = record;
+  window.cancelRecording = cancelRecording;
+  window.stopRecording = stopRecording;
 
 </script>
   </body>
