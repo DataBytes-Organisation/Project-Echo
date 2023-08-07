@@ -133,6 +133,7 @@ exports.guestsignup = async (req) => {
     expiresAt: req.timestamp
   });
   console.log("Guest is looking: ", guest);
+  console.log("unecrypted password: ", req.password)
   guest.save((err, guest) => {
     if (err) {
       // res.status(500).send({ message: err });
