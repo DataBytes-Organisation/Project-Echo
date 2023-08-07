@@ -35,22 +35,24 @@
     <!-- SplashScreen Styling -->
 		<link rel="stylesheet" type="text/css" href="./css/splash_screen_style.css">
 
-    <!--jQuery-->
+    <!-- xlsx -->
+    <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+
+    <!-- jQuery -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script> 
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
     
-    <!--Axios-->
+    <!-- Axios -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
 		<!-- HMI -->
 		<link rel="stylesheet" href="./css/HMI_style.css" type="text/css">
-		<script type="text/javascript" src="./js/audio.js"></script>
 		<script type="module" src='./js/HMI.js'></script>
 		<script type="text/javascript" src="./js/animation.js"></script>
 		<script type="module" src='./js/HMI-utils.js'></script>
-    <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+    <script type="module" src="./js/audio_recorder.js"></script>
 
     <!-- End Imports -->
     <title>Echo | Welcome</title>
@@ -405,6 +407,31 @@
                 </div>
 
               </div>
+              <h2 style="margin-top: 20px !important;">Record Live Audio</h2>
+              <div id="audio_recording_container">
+                <i id="record_audio_button" class="toggle-button btn btn-secondary btn-no-background select-all-btn" onclick="{record()}" aria-hidden="true">Record</i>
+                <div id="recording_contorls_container" class="recording_controls controls_item_row hide">
+                    <i id="cancel_recording_button" class="toggle-button btn btn-secondary btn-no-background select-all-btn" onclick="{cancelRecording()}" aria-hidden="true">Cancel</i>
+                    <div id="recording_info" class="controls_item_row">
+                        <i id="recording_indicator" class="fa fa-circle" aria-hidden="true"></i>
+                        <p id="recording_duration">"00:00:00"</p>
+                    </div>
+                    <i id="stop_recording_button" class="toggle-button btn btn-secondary btn-no-background select-all-btn" onclick="{stopRecording()}" aria-hidden="true">Stop</i>
+                </div>
+                <div id="audio_playback_container">
+                    <p id="audio_playback_indicator" class="playback_indicator hide">Audio is playing<span>.</span><span>.</span><span>.</span></p>
+                </div>
+              </div>
+              <!--div class="overlay hide">
+                <div id="audio_recording_not_supported">
+                    <p>To record audio, use browsers like Chrome and Firefox that support audio recording.</p>
+                    <button type="button" id="acknowledge_button">Ok.</button>
+                </div>
+              </div-->
+        
+              <audio controls id="audioElem" class="audio-element hide">
+              </audio>
+
             </div>
             <div id="mic-default-content">
               <h2 style="text-align: left; color: rgba(247, 186, 206, 1) !important;">Animal Bio Data</h2>
@@ -901,7 +928,8 @@
 
 <script type="module">
   import { updateLayers, initialiseHMI, showMics, hideMics, updateAnimalMovementLayerFromPastData, updateVocalizationLayerFromPastData,
-  resetWildlifeLayers, MapOpenNav, MapCloseNav, getAnimalToggled, enableMicAnimation, disableMicAnimation, getUTC, convertCSV } from "./js/HMI.js";
+  resetWildlifeLayers, MapOpenNav, MapCloseNav, getAnimalToggled, enableMicAnimation, disableMicAnimation, getUTC, startAudioRecording,
+  stopAudioRecording, cancelAudioRecording, testFunct, convertCSV} from "./js/HMI.js";
   import {retrieveTruthEventsInTimeRange, retrieveVocalizationEventsInTimeRange, startSimulator, stopSimulator} from "./js/routes.js";
   window.updateMics = updateMics;
   window.downloadCSV = downloadCSV;
@@ -945,11 +973,11 @@
   hmiState.layers = {};
 
   const microphoneLocations = [
-    { lat: -38.808, lon: 143.554 },
-    { lat: -38.813, lon: 143.537 },
-    { lat: -38.794, lon: 143.52 },
-    { lat: -38.824, lon: 143.51 },
-    { lat: -38.812, lon: 143.573 },
+    { lat: -38.808, lon: 143.554, id:1 },
+    { lat: -38.813, lon: 143.537, id:2 },
+    { lat: -38.794, lon: 143.52, id:3 },
+    { lat: -38.824, lon: 143.51, id:4 },
+    { lat: -38.812, lon: 143.573, id:5 },
   ];
   
   const vocalizationEvents = [
@@ -1253,6 +1281,27 @@
       errorbox.style.display = "none";
     },2000)
   }
+
+  function record(){
+    console.log("calling startAudioRecording...");
+    //testFunct();
+    startAudioRecording();
+  }
+
+  function stopRecording(){
+    console.log("calling stopAudioRecording...");
+    stopAudioRecording();
+  }
+
+  function cancelRecording(){
+    console.log("calling cancelAudioRecording...");
+    cancelAudioRecording();
+  }
+
+  window.record = record;
+  window.cancelRecording = cancelRecording;
+  window.stopRecording = stopRecording;
+
 </script>
   </body>
 </html>

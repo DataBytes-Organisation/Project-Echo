@@ -1,6 +1,7 @@
 "use strict";
 
 import { getAudioTestString } from "./HMI-utils.js";
+import { getAudioRecorder } from "./audio_recorder.js";
 import { retrieveTruthEventsInTimeRange, retrieveVocalizationEventsInTimeRange, 
   retrieveMicrophones, retrieveAudio, retrieveSimTime } from "./routes.js";
 import data from "./sample_data.json" assert { type: 'json' };
@@ -10,6 +11,8 @@ import data from "./sample_data.json" assert { type: 'json' };
 
 
 var markups = ["elephant.png", "monkey.png", "tiger.png"];
+
+var audioRecorder = getAudioRecorder();
 
 var statuses = [
   "endangered",
@@ -122,7 +125,8 @@ export function initialiseHMI(hmiState) {
     updateMicrophoneLayer(hmiState, res.data);
     stepMicAnimation(hmiState);
   })
-  
+  addmicrophones(hmiState);
+  stepMicAnimation(hmiState);
   queueSimUpdate(hmiState);
   //simulateData(hmiState);
 }
@@ -1272,6 +1276,8 @@ function queueSimUpdate(hmiState) {
   );
 }
 
+
+
 document.addEventListener('playAudio', function(event){
   //console.log("play audio");
   playNextTrack = true;
@@ -1287,3 +1293,246 @@ document.addEventListener('stopAudio', function(event){
   playNextTrack = false;
   stopAudioPlayback();
 })
+
+var durationTag = document.getElementById("recording_duration");
+
+
+var audioElement = document.getElementsByClassName("audio-element")[0];
+var audioElementSource = document.getElementsByClassName("audio-element")[0]
+    .getElementsByTagName("source")[0];
+audioElement.onended = hidePlaybackIndicator;
+var textIndicatorOfAudiPlaying = document.getElementsByClassName("playback_indicator")[0];
+
+var recordButton = document.getElementById("record_audio_button");
+//recordButton.onclick = startAudioRecording;
+
+var recordingControls = document.getElementsByClassName("recording_controls")[0];
+
+export function showRecordingControls() {
+  console.log("showing controls")
+  recordButton.style.display = "none";
+  recordingControls.classList.remove("hide");
+  initializeRecordingDuration();
+}
+
+export function hideRecordingControls() {
+  console.log("hiding controls")
+  recordButton.style.display = "block";
+  recordingControls.classList.add("hide");
+  clearInterval(durationTimer);
+}
+
+//var overlay = document.getElementsByClassName("overlay")[0];
+//var acknowledgeButton = document.getElementById("acknowledge_button");
+//acknowledgeButton.onclick = hideRecordingNotSupportedOverlay;
+
+export function showRecordingNotSupportedOverlay() {
+    //overlay.classList.remove("hide");
+}
+
+function hideRecordingNotSupportedOverlay() {
+    //overlay.classList.add("hide");
+}
+
+export function createSourceForAudioElement() {
+    let sourceElement = document.createElement("source");
+    audioElement.appendChild(sourceElement);
+
+    audioElementSource = sourceElement;
+}
+
+export function showPlaybackIndicator() {
+    textIndicatorOfAudiPlaying.classList.remove("hide");
+}
+
+export function hidePlaybackIndicator() {
+    textIndicatorOfAudiPlaying.classList.add("hide");
+}
+
+var audioRecordStartTime = null;
+const MAX_RECORDING_TIME_S = "10";
+var durationTimer = null;
+
+export function testFunct(){
+  console.log("Recording started 1");
+}
+
+export function startAudioRecording() {
+  console.log("Recording started 2");
+
+  if (!audioElementSource){}
+  else if (!audioElement.paused) {
+    console.log("Paused playback");
+    audioElement.pause();
+    hidePlaybackIndicator();
+  }
+
+  audioRecorder.start()
+    .then(() => {
+      audioRecordStartTime = new Date();
+        showRecordingControls();
+      })
+    .catch(error => {
+      console.log(error.message);
+
+      if (error.message.includes("mediaDevices API or getUserMedia method is not supported in this browser.")) {
+        console.log("To record audio, use browsers like Chrome and Firefox.");
+        showRecordingNotSupportedOverlay();
+      }
+
+      switch (error.name) {
+        case 'AbortError': 
+          console.log("An AbortError has occured.");
+          break;
+        case 'NotAllowedError': 
+          console.log("A NotAllowedError has occured. User might have denied permission.");
+          break;
+        case 'NotFoundError': 
+          console.log("A NotFoundError has occured.");
+          break;
+        case 'NotReadableError': 
+          console.log("A NotReadableError has occured.");
+          break;
+        case 'SecurityError': 
+          console.log("A SecurityError has occured.");
+          break;
+        case 'TypeError': 
+          console.log("A TypeError has occured.");
+          break;
+        case 'InvalidStateError': 
+          console.log("An InvalidStateError has occured.");
+          break;
+        case 'UnknownError': 
+          console.log("An UnknownError has occured.");
+          break;
+        default:
+          console.log("An error occured with the error name " + error.name);
+        };
+      });
+}
+
+
+export function stopAudioRecording() {
+  console.log("Stopped recording...");
+
+  audioRecorder.stop()
+    .then(audioAsblob => {
+      playAudio();
+      hideRecordingControls();
+    })
+    .catch(error => {
+      switch (error.name) {
+        case 'InvalidStateError':
+          console.log("An InvalidStateError has occured.");
+          break;
+        default:
+          console.log("ERROR: " + error.name);
+      };
+    });
+}
+
+export function cancelAudioRecording() {
+  console.log("Cancelled recording");
+
+  audioRecorder.cancel();
+  hideRecordingControls();
+}
+
+/*
+let mediaRecorder;
+
+function startRecording() {
+    navigator.mediaDevices.getUserMedia({ audio: true })
+        .then(stream => {
+            mediaRecorder = new MediaRecorder(stream);
+            mediaRecorder.ondataavailable = handleDataAvailable;
+            mediaRecorder.start();
+        })
+        .catch(err => console.error("Error accessing microphone: ", err));
+}
+
+function stopRecording() {
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+    }
+}
+
+function handleDataAvailable(event) {
+    if (event.data.size > 0) {
+        recordedChunks.push(event.data);
+    }
+}*/
+
+function playRecording(recordedChunks) {
+    if (recordedChunks.length === 0) {
+        console.log("No recording available.");
+        return;
+    }else{
+      const blob = new Blob(recordedChunks, { type: 'audio/webm' });
+      if(blob.size > 0){
+        const url = URL.createObjectURL(blob);
+        const audioElement = document.getElementById("audioElem");
+  
+        audioElement.src = url;
+        audioElement.load();
+        audioElement.play();
+        showPlaybackIndicator();
+      }
+      else{
+        console.log("Recording failed check microphone configuration settings.");
+      }
+    }
+}
+
+export function playAudio() {
+  console.log("play");
+
+  playRecording(audioRecorder.audioBlobs);
+}
+
+export function initializeRecordingDuration() {
+    showRecordingDuration("00:00:00");
+
+    durationTimer = setInterval(() => {
+        let duration = computeRecordingDuration(audioRecordStartTime);
+        console.log("Start time" + audioRecordStartTime);
+        console.log("Recording " + duration);
+        showRecordingDuration(duration);
+    }, 1000); 
+}
+
+export function showRecordingDuration(duration) {
+    durationTag.innerHTML = duration;
+
+    if (checkAudioDurationThreshold(duration)) {
+        stopAudioRecording();
+    }
+}
+
+export function checkAudioDurationThreshold(duration) {
+    let timers = duration.split(":");
+
+    if (timers[2] === MAX_RECORDING_TIME_S)
+        return true;
+    else 
+        return false;
+}
+
+export function computeRecordingDuration(startTime) {
+    let currentTime = new Date();
+
+    let timeDelta = currentTime - startTime;
+
+    let timeDeltaS = timeDelta / 1000;
+
+    let seconds = Math.floor(timeDeltaS % 60);
+
+    seconds = seconds < 10 ? "0" + seconds : seconds;
+
+    let timeDeltaM = Math.floor(timeDeltaS / 60);
+
+    let minutes = timeDeltaM % 60; 
+    minutes = minutes < 10 ? "0" + minutes : minutes;
+
+    return  "00:" + minutes + ":" + seconds;
+}

@@ -694,7 +694,7 @@ input[type="checkbox"]{
     text-decoration: none;
     /*font-size: 14px;*/
     color:  rgb(141, 141, 141, 1.0);
-    display: block;
+    display: inline-block;
     transition: 0.3s;
     /*font-family: 'Roboto', sans-serif;*/
 }
@@ -857,7 +857,7 @@ input[type="checkbox"]{
     text-decoration: none;
     /*font-size: 14px;*/
     color:  rgb(141, 141, 141, 1.0);
-    display: block;
+    display: inline-block;
     transition: 0.3s;
     /*font-family: 'Roboto', sans-serif;*/
 }
@@ -1237,4 +1237,256 @@ i {
 .wrapper::-webkit-scrollbar-track-piece:start {
   background: transparent;
   margin-top: 100px;
+}
+
+#audio_recording_container {
+  margin-top: 20px;
+  width: 100%;
+  height: 100vh;
+  display: -webkit-flex;
+  display: -ms-flex;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+#record_audio_button:hover {
+  opacity: 1;
+}
+#recording_contorls_container {
+  display: -webkit-flex;
+  display: -ms-flex;
+  display: inline-block;
+  justify-content: space-evenly;
+  align-items: center;
+  width: 400px;
+  margin-bottom: 30px;
+}
+#cancel_recording_button,
+#stop_recording_button,
+#record_audio_button {
+  margin-top: -10px !important;
+  width: 100px;
+}
+#record_audio_button{
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+#recording_info {
+  display: -webkit-flex;
+  display: -ms-flex;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#recording_indicator {
+  display: inline-block;
+  font-size: 25px;
+  color: red;
+  margin-right: 12px;
+  animation-name: flashing-recording-dot;
+  -webkit-animation-name: flashing-recording-dot;
+  -moz-animation-name: flashing-recording-dot;
+  -o-animation-name: flashing-recording-dot;
+  animation-duration: 2s;
+  -webkit-animation-duration: 2s;
+  -moz-animation-duration: 2s;
+  -o-animation-duration: 2s;
+  animation-iteration-count: infinite;
+  -webkit-animation-iteration-count: infinite;
+  -moz-animation-iteration-count: infinite;
+  -o-animation-iteration-count: infinite;
+}
+/* The animation code */
+@keyframes flashing-recording-dot {
+  0% {
+      opacity: 1;
+  }
+  50% {
+      opacity: 0;
+  }
+  100% {
+      opacity: 1;
+  }
+}
+@-webkit-keyframes flashing-recording-dot {
+  0% {
+      opacity: 1;
+  }
+  50% {
+      opacity: 0;
+  }
+  100% {
+      opacity: 1;
+  }
+}
+@-moz-keyframes flashing-recording-dot {
+  0% {
+      opacity: 1;
+  }
+  50% {
+      opacity: 0;
+  }
+  100% {
+      opacity: 1;
+  }
+}
+@-o-keyframes flashing-recording-dot {
+  0% {
+      opacity: 1;
+  }
+  50% {
+      opacity: 0;
+  }
+  100% {
+      opacity: 1;
+  }
+}
+#recording_duration {
+  display: inline-block;
+  font-size: 32px;
+}
+#recording_contorls_container.hide {
+  display: none;
+}
+.overlay {
+  position: absolute;
+  top: 0;
+  height: 100vh;
+  width: 100%;
+  background-color: rgba(82, 76, 76, 0.35);
+  display: -webkit-flex;
+  display: -ms-flex;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.overlay.hide {
+  display: none;
+}
+#audio_recording_not_supported {
+  display: -webkit-flex;
+  display: -ms-flex;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  width: 317px;
+  height: 119px;
+  background-color: white;
+  border-radius: 10px;
+  padding: 15px;
+  font-size: 16px;
+}
+#acknowledge_button {
+  cursor: pointer;
+  background-color: #abc1c05c;
+  border-radius: 10px;
+  font-size: 16px;
+  border: none;
+}
+#acknowledge_button:hover {
+  background-color: #92a5a45c;
+}
+#acknowledge_button:focus {
+  outline: none;
+  border: none;
+}
+.audio-element.hide {
+  display: none;
+}
+#audio_playback_container {
+  height: 20px;
+}
+#audio_playback_indicator {
+  font-size: 20px;
+}
+#audio_playback_indicator.hide {
+  display: none;
+}
+/* 3 Dots animation*/
+#audio_playback_indicator span {
+  /*transitions with Firefox, IE and Opera Support browser support*/
+  animation-name: blinking-dot;
+  -webkit-animation-name: blinking-dot;
+  -moz-animation-name: blinking-dot;
+  -o-animation-name: blinking-dot;
+  animation-duration: 2s;
+  -webkit-animation-duration: 2s;
+  -moz-animation-duration: 2s;
+  -o-animation-duration: 2s;
+  animation-iteration-count: infinite;
+  -webkit-animation-iteration-count: infinite;
+  -moz-animation-iteration-count: infinite;
+  -o-animation-iteration-count: infinite;
+}
+#audio_playback_indicator span:nth-child(2) {
+  animation-delay: .4s;
+  -webkit-animation-delay: .4s;
+  -moz-animation-delay: .4s;
+  -o-animation-delay: .4s;
+}
+#audio_playback_indicator span:nth-child(3) {
+  animation-delay: .8s;
+  -webkit-animation-delay: .8s;
+  -moz-animation-delay: .8s;
+  -o-animation-delay: .8s;
+}
+/* The animation code */
+@keyframes blinking-dot {
+  0% {
+      opacity: 0;
+  }
+  50% {
+      opacity: 1;
+  }
+  100% {
+      opacity: 0;
+  }
+}
+/* The animation code */
+@-webkit-keyframes blinking-dot {
+  0% {
+      opacity: 0;
+  }
+  50% {
+      opacity: 1;
+  }
+  100% {
+      opacity: 0;
+  }
+}
+/* The animation code */
+@-moz-keyframes blinking-dot {
+  0% {
+      opacity: 0;
+  }
+  50% {
+      opacity: 1;
+  }
+  100% {
+      opacity: 0;
+  }
+}
+/* The animation code */
+@-o-keyframes blinking-dot {
+  0% {
+      opacity: 0;
+  }
+  50% {
+      opacity: 1;
+  }
+  100% {
+      opacity: 0;
+  }
+}
+
+.controls_item_row {
+  display: flex;
+  flex-direction: row;
+}
+
+#audio_recording_container{
+  width:440px;
 }
