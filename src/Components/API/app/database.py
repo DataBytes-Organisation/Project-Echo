@@ -1,5 +1,5 @@
 import pymongo
-import mongoose
+# import mongoose
 
 # please use echonet credentials here, this connection string is just a placeholder
 connection_string="mongodb://modelUser:EchoNetAccess2023@ts-mongodb-cont:27017/EchoNet"
@@ -13,8 +13,7 @@ Species = db.species
 Microphones = db.microphones
 
 User_connection_string = "mongodb://root:root_password@ts-mongodb-cont/UserSample?authSource=admin"
-UserClient = pymongo.MongoClient(User_connection_string)
-Userdb = UserClient["User"]
-Users = Userdb.user
-Userdb.role = ["user", "admin"]
-Roles = Userdb.role
+Userdb = pymongo.MongoClient(User_connection_string)
+Users = Userdb.users
+Userdb.roles = ["user", "admin"]
+Roles = Userdb.roles

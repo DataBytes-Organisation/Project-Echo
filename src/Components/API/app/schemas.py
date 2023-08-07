@@ -82,11 +82,30 @@ class MicrophoneSchema(BaseModel):
             }
         }
 
-class UserSchema():
+class UserSignupSchema(BaseModel):
     username: str
     password: str
     email: str
-    role = {ObjectId: str}
-    
+    roles: List[str]
 
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+        schema_extra = {
+           
+        } 
+
+   
+class UserLoginSchema(BaseModel):
+    username: str
+    password: str
+
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+        schema_extra = {
+           
+        } 
     

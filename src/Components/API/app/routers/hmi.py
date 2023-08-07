@@ -1,4 +1,9 @@
 from fastapi import status, APIRouter
+from fastapi import FastAPI, Body, HTTPException, status, APIRouter
+from fastapi.encoders import jsonable_encoder
+from fastapi.responses import JSONResponse
+from typing import Optional, List
+
 from bson import ObjectId
 import datetime
 from app import serializers
@@ -128,31 +133,27 @@ def post_control(control: str):
     return control
 
 @router.post("/signup", status_code=status.HTTP_201_CREATED)
-def signup(user: schemas.UserSchema):  
-    if(user.username in Users.username):
-        response = {"message": "Failed! Username is already in use!"}
-        return jsonify(response), 500
-    elif(user.email in Users.email):
-        response = {"message": "Failed! Email is already in use!"}
-        return jsonify(response), 500
-    elif(user.role not in Roles):
-        response = {"message": "Failed! Role does not exist!"}
-        return jsonify(response), 500
-
-    user.password = bcrypt.hashpw(user.password.encode('utf-8'), bcrypt.gensalt(8))
-    user.role = list(map((lambda role: Roles.id, Roles)))
-
-    Users.insert_one(user.dict())
+def signup(user: schemas.UserSignupSchema):  
+    # if(user.username in Users.username):
+    #     response = {"message": "Failed! Username is already in use!"}
+    #     return JSONResponse(content=response)
+    # elif(user.email in Users.email):
+    #     response = {"message": "Failed! Email is already in use!"}
+    #     return JSONResponse(content=response)
+    # elif(user.role not in Roles):
+    #     response = {"message": "Failed! Role does not exist!"}
+    #     return JSONResponse(content=response)
+    
     response = {"message": "User was registered successfully!"}
-    return jsonify(response), 201
+    return JSONResponse(content=response)
 
 
-@router.post("/signin", status_code=status.HTTP_200_CREATED)
-def signin(user: schemas.UserSchema):
+@router.post("/signin", status_code=status.HTTP_200_OK)
+def signin(user: schemas.UserLoginSchema):
     
     if(user.username not in Users.username):
         response = {"message": "User Not Found."}
-        return jsonify(response), 404
+        return JSONResponse(content=response)
     else:
         account = next((account for account in Users if account.username == user.username), None)
     
@@ -160,7 +161,7 @@ def signin(user: schemas.UserSchema):
     passwordIsValid = bcrypt.checkpw(user.password, account.password)
     if (passwordIsValid == False):
         response = {"message": "Invalid Password!"}
-        return jsonify(response), 401
+        return JSONResponse(content=response)
     
     token = jwt.encode({"id": account[id]}, "echo-auth-secret-key", algorithm = "HS256", lifetime = 86400)
     authorities = "ROLE_" + account.role._name_.toUpperCase()
@@ -173,22 +174,22 @@ def signin(user: schemas.UserSchema):
         "roles" : authorities,
     }
     
-    # publish.single("User_Login_Controls", result, hostname=MQTT_BROKER_URL, port=MQTT_BROKER_PORT)
+#     # publish.single("User_Login_Controls", result, hostname=MQTT_BROKER_URL, port=MQTT_BROKER_PORT)
 
     response = {"message": "User Login Successfully!"}
     print(result)
-    return jsonify(response), 200
-    # publish.single("User_Login_Controls", user, hostname=MQTT_BROKER_URL, port=MQTT_BROKER_PORT)
+    return JSONResponse(content=response)
+#     # publish.single("User_Login_Controls", user, hostname=MQTT_BROKER_URL, port=MQTT_BROKER_PORT)
 
-    # return user.userId
+#     # return user.userId
 
-@router.post("/signout", status_code=status.HTTP_200_CREATED)
+@router.post("/signout", status_code=status.HTTP_200_OK)
 def signout():
     try:
         requests.session.clear()
         response = {"message": "You've been signed out!"}
-        return jsonify(response), 200
+        return JSONResponse(content=response)
     
     except Exception as err:
-        return jsonify({"Error": str(err)}), 500
+        return JSONResponse({"Error": str(err)})
     
