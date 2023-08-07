@@ -184,7 +184,7 @@ exports.guestsignin = (req, res) => {
         return res.status(401).send({ message: "Invalid Password!" });
       }
 
-      const token = jwt.sign({ id: user.id },
+      const token = jwt.sign({ id: user.userId },
                               config.secret,
                               {
                                 algorithm: 'HS256',
@@ -216,7 +216,7 @@ exports.guestsignin = (req, res) => {
 exports.signout = async (req, res) => {
   try {
     req.session = null;
-    return res.status(200).send({ message: "You've been signed out!" });
+    return res.status(200).send({ message: "You've been signed out!" , session: req.session});
   } catch (err) {
     this.next(err);
   }

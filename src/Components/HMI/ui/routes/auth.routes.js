@@ -21,7 +21,7 @@ module.exports = function(app) {
 
   app.post("/api/auth/signin", (req, res) => {
     let uname = req.body.username;
-    let re = new RegExp("^guest\_.*\_[0-9]{10}$");
+    let re = new RegExp("^guest\_.*\_[0-9]{8,10}$");
     
     //Check user login based on Regex Pattern:
     if (uname.match(re) === null){

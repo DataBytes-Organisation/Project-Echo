@@ -172,6 +172,7 @@ app.use(
 );
 
 const nodemailer = require('nodemailer');
+const { verifyToken } = require('./middleware/authJwt');
 var transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -229,7 +230,11 @@ app.post("/request_access", async (req,res) => {
   console.log("email: ", req.body.email);
   const {email} = req.body;
   //Generate Guest credentials + timestamp
-  let username = 'guest_' + email.split('@')[0] + "_" + crypto.getRandomValues(new Uint32Array(1));
+  let salt = '';
+  while (salt.length < 8){
+    salt = crypto.getRandomValues(new Uint32Array(1)).toString();
+  }
+  let username = 'guest_' + email.split('@')[0] + "_" + salt;
   console.log("username: ", username)
   let password =  genPass(12);
   let timestamp = new Date(Date.now() + 1800000) //Set time to live of 1800000 ms = 1800 s = 30 mins
@@ -319,19 +324,26 @@ app.get("/", (req, res) => {
 
 
 app.get("/login", (req,res) => {
+  [verifyToken]
   res.sendFile(path.join(__dirname, 'public/login.html'));
 })
 
 
 app.get("*", (req,res) => {
-  let token = req.session.token;
-  console.log("Current token: ", token)
-  if (!token) {
-    console.log("Current user session unavailable")
+  if (authJwt.verifyToken){
+    let token = req.session.token;
+    console.log("Current token: ", req.session.token)
+    if (!token) {
+      console.log("Current user session unavailable")
+      res.sendFile(path.join(__dirname, 'public/login.html'));
+    } else {
+      console.log("redirect to homepage")
+      return res.sendFile(path.join(__dirname, 'public/index.html'))
+    }
+  }
+  else {
+    console.log("User token not assigned!");
     res.sendFile(path.join(__dirname, 'public/login.html'));
-  } else {
-    console.log("redirect to homepage")
-    return res.sendFile(path.join(__dirname, 'public/index.html'))
   }
 
 })
