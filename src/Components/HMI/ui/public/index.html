@@ -1273,7 +1273,6 @@
 
   function ErrDisplay(text){
     let errorbox = document.getElementById("error-msg");
-    console.log("Error box ele: ", errorbox);
     errorbox.innerHTML = `Exception error occured: ${text}`;
     errorbox.style.display = "block"
     setTimeout(()=> {

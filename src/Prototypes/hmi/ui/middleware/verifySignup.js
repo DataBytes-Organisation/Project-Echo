@@ -9,12 +9,12 @@ checkDuplicateUsernameOrEmail = (req, res, next) => {
   }).exec((err, user) => {
     if (err) {
       res.status(500).send({ message: err });
-      return;
+      return {status: "failed", message: "Find Username Error: " + err};
     }
 
     if (user) {
       res.status(400).send({ message: "Failed! Username is already in use!" });
-      return;
+      return {status: "failed", message: "Find Username Error: Username already in use"};
     }
 
     // Email
@@ -23,12 +23,12 @@ checkDuplicateUsernameOrEmail = (req, res, next) => {
     }).exec((err, user) => {
       if (err) {
         res.status(500).send({ message: err });
-        return;
+        return {status: "failed", message: "Find Email Error: " + err};
       }
 
       if (user) {
         res.status(400).send({ message: "Failed! Email is already in use!" });
-        return;
+        return {status: "failed", message: "Find Email Error: Email already in use"};
       }
 
       next();
@@ -43,7 +43,7 @@ checkRolesExisted = (req, res, next) => {
         res.status(400).send({
           message: `Failed! Role ${req.body.roles[i]} does not exist!`
         });
-        return;
+        return {status: "failed", message: "Find Role Error: Role does not exist"};
       }
     }
   }
