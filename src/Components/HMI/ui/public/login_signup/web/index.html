@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login Form</title>
+  <link href="main.css" rel="stylesheet">
+</head>
+<body>
+  <div class="login-container">
+    <form id="login-form">
+      <div id="emailInput">
+        <input type="text" id="email" placeholder="Email ID">
+      </div>
+      <div id="usernameInput" style="display:none;">
+        <input type="text" id="username" placeholder="Username">
+      </div>
+      <input type="password" id="password" placeholder="Password" required>
+      <button type="submit" id="loginBtn">Login</button>
+      <hr>
+      <button type="button" id="SignUp" onclick="window.location.href='/signup';"">Don't have an account? Sign Up</button>
+    </form>
+    <div class="login-switch">
+      <input type="checkbox" id="switchInput" onchange="toggleLoginType()">
+      <label for="switchInput">Use Username instead</label>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
