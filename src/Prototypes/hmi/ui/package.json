@@ -16,7 +16,7 @@
     "jquery": "^3.6.4",
     "nodemailer": "^6.9.1",
     "nodemon": "^2.0.22",
-    "ol": "^7.3.0",
+    "ol": "^7.4.0",
     "path": "^0.12.7",
     "requirejs": "^2.3.6",
     "serve-index": "^1.9.1"
