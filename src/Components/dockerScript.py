@@ -1,4 +1,6 @@
 import docker
+import subprocess
+
 # List of container names to delete
 containers_to_delete = ["ts-echo-model-cont","ts-echo-hmi-cont","ts-api-cont", "ts-simulator-cont", "ts-echo-engine-cont", "ts-mongodb-cont", "mongo-express", "ts-mqtt-server-cont"]
 images = ["ts-simulator","ts-api","ts-mongodb","ts-echo-hmi","ts-echo-engine","ts-mqtt-server","ts-echo-model","mongo-express"]
@@ -43,8 +45,14 @@ def delete_images(image_names_or_ids):
         except docker.errors.ImageNotFound:
             print(f"Image {name_or_id} not found.")
 
+def run_docker_compose_up():
+    try:
+        subprocess.run(["docker-compose", "up", "--build"], check=True)
+    except subprocess.CalledProcessError as e:
+        print(f"Error running 'docker-compose up --build': {e}")
+
 if __name__ == "__main__":
     delete_containers(containers_to_delete)
     delete_images(images)
     delete_unused_volumes(preserved_volumes)
-
+    run_docker_compose_up()

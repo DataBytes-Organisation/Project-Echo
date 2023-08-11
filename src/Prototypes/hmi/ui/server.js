@@ -61,6 +61,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 //cors access to enable sending emails from different hosts
 const cors = require("cors");
 
+
 var corsOptions = {
   origin: "http://localhost:8080"
 };
@@ -124,6 +125,11 @@ app.post("/send_email", (req,res) => {
     }
   });
 
+})
+
+
+app.get("/requests", (req,res) => {
+  res.sendFile(path.join(__dirname, 'public/requests.html'))
 })
 
 app.get("/", (req, res) => {

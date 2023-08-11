@@ -15,6 +15,7 @@ const db = require("./model");
 const Role = db.role;
 const User = db.user;
 const Guest = db.guest;
+const Request = db.request;
 //Establish Mongo Client connection to mongoDB
 db.mongoose
   .connect(`mongodb://${dbConfig.USERNAME}:${dbConfig.PASSWORD}@${dbConfig.HOST}/${dbConfig.DB}?authSource=admin`, {
@@ -26,6 +27,7 @@ db.mongoose
     initial();
     initUsers();
     initGuests();
+    initRequests();
   })
   .catch(err => {
     console.log("ConnString: ", `mongodb://${dbConfig.USERNAME}:${dbConfig.PASSWORD}@${dbConfig.HOST}/${dbConfig.DB}?authSource=admin`)
@@ -63,6 +65,14 @@ function initial() {
   });
 }
 
+function initRequests(){
+  Request.estimatedDocumentCount((err, count) => {
+    if (!err && count === 0) {
+      const requestData = require(path.join(__dirname, "user-sample/request-seed.json"));
+      Request.insertMany(requestData);
+    }
+  });
+}
 //Add sample Users if none exists
 function initUsers(){
   User.estimatedDocumentCount((err, count) => {
@@ -328,6 +338,18 @@ app.get("/login", (req,res) => {
   res.sendFile(path.join(__dirname, 'public/login.html'));
 })
 
+app.get("/requests", (req,res) => {
+  res.sendFile(path.join(__dirname, 'public/requests.html'))
+})
+
+app.get('/api/requests', async (req, res) => {
+  try {
+    const requests = await Request.find();
+    res.json(requests);
+  } catch (error) {
+    res.status(500).json({ error: 'Error fetching data' });
+  }
+});
 
 app.get("*", (req,res) => {
   if (authJwt.verifyToken){
