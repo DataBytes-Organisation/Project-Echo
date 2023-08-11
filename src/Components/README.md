@@ -107,6 +107,8 @@ If this occurs, and _tf-simulator-cont_ container has exited, click to restart i
 
 ## `Failed to solve credentials:`
 
+The config file needs to be changed. This can be a recurring issue.
+
 The below error can occur if the docker config file has changed:
 
 ```
@@ -114,6 +116,12 @@ failed to solve: error getting credentials - err: docker-credential-desktop reso
 ```
 
 ### **Fix:**
+
+Run the following terminal command to open the config file:
+
+```
+open  ~/.docker/config.json
+```
 
 Check that config file looks something like below.
 

@@ -44,6 +44,7 @@ services:
     tty: true
     ports:
       - "8080:8080" 
+    restart: on-failure
 
   echo_mqtt:
     build:
@@ -88,7 +89,7 @@ services:
       - credentials_volume:/root/.config/gcloud/
     stdin_open: false
     tty: true
-    
+
   mongo-express:
     image: mongo-express
     container_name: mongo-express
