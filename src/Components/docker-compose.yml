@@ -88,6 +88,22 @@ services:
       - credentials_volume:/root/.config/gcloud/
     stdin_open: false
     tty: true
+    
+  mongo-express:
+    image: mongo-express
+    container_name: mongo-express
+    restart: always
+    ports:
+      - 8888:8081
+    environment:
+      ME_CONFIG_MONGODB_SERVER: ts-mongodb-cont
+      ME_CONFIG_MONGODB_ENABLE_ADMIN: true
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: root_password
+    depends_on:
+      - echo_store
+    networks:
+      - echo-net
 
   echo_store:
     build:

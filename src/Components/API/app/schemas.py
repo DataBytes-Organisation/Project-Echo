@@ -86,7 +86,7 @@ class UserSignupSchema(BaseModel):
     username: str
     password: str
     email: str
-    roles: List[str]
+    role: List[str]
 
     class Config:
         allow_population_by_field_name = True

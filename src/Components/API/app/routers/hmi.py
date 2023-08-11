@@ -8,7 +8,7 @@ from bson import ObjectId
 import datetime
 from app import serializers
 from app import schemas
-from app.database import Events, Movements, Microphones, Users, Roles
+from app.database import Events, Movements, Microphones, User, Role
 import paho.mqtt.publish as publish
 import bcrypt
 from flask import jsonify
@@ -134,28 +134,30 @@ def post_control(control: str):
 
 @router.post("/signup", status_code=status.HTTP_201_CREATED)
 def signup(user: schemas.UserSignupSchema):  
-    # if(user.username in Users.username):
-    #     response = {"message": "Failed! Username is already in use!"}
-    #     return JSONResponse(content=response)
-    # elif(user.email in Users.email):
-    #     response = {"message": "Failed! Email is already in use!"}
-    #     return JSONResponse(content=response)
-    # elif(user.role not in Roles):
-    #     response = {"message": "Failed! Role does not exist!"}
-    #     return JSONResponse(content=response)
-    
+    if(user.username in User.username):
+        response = {"message": "Failed! Username is already in use!"}
+        return JSONResponse(content=response)
+    elif(user.email in User.email):
+        response = {"message": "Failed! Email is already in use!"}
+        return JSONResponse(content=response)
+    elif(user.role not in Role):
+        response = {"message": "Failed! Role does not exist!"}
+        return JSONResponse(content=response)
+
+
     response = {"message": "User was registered successfully!"}
+    User.save(response, user)
     return JSONResponse(content=response)
 
 
 @router.post("/signin", status_code=status.HTTP_200_OK)
 def signin(user: schemas.UserLoginSchema):
     
-    if(user.username not in Users.username):
+    if(user.username not in User.username):
         response = {"message": "User Not Found."}
         return JSONResponse(content=response)
     else:
-        account = next((account for account in Users if account.username == user.username), None)
+        account = next((account for account in User if account.username == user.username), None)
     
     
     passwordIsValid = bcrypt.checkpw(user.password, account.password)
@@ -171,7 +173,7 @@ def signin(user: schemas.UserLoginSchema):
         "id": account["_id"],
         "username": account.username,
         "email": account.email,
-        "roles" : authorities,
+        "role" : authorities,
     }
     
 #     # publish.single("User_Login_Controls", result, hostname=MQTT_BROKER_URL, port=MQTT_BROKER_PORT)

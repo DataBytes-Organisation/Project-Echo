@@ -14,6 +14,6 @@ Microphones = db.microphones
 
 User_connection_string = "mongodb://root:root_password@ts-mongodb-cont/UserSample?authSource=admin"
 Userdb = pymongo.MongoClient(User_connection_string)
-Users = Userdb.users
-Userdb.roles = ["user", "admin"]
-Roles = Userdb.roles
+User = Userdb.user
+Userdb.role = ["user", "admin"]
+Role = Userdb.role
