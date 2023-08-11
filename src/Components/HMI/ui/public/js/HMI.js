@@ -4,7 +4,7 @@ import { getAudioTestString } from "./HMI-utils.js";
 import { getAudioRecorder } from "./audio_recorder.js";
 import { retrieveTruthEventsInTimeRange, retrieveVocalizationEventsInTimeRange, 
   retrieveMicrophones, retrieveAudio, retrieveSimTime } from "./routes.js";
-import data from "./sample_data.json" assert { type: 'json' };
+//import data from "./sample_data.json" assert { type: 'json' }; Browser assertions not yet supported in all browsers, alternative method used instead.
 
 
 // import { parse } from 'json2csv';
@@ -85,8 +85,10 @@ function getIconName(status, type){
   return animalTypeIconLookup[type] + statusIconLookup[status] + "-01.png";
 }
 
-var sample_data = data.data;
-
+//var sample_data = data.data; For assertion method
+var sample_data = []; // For the universal method
+fetch("./js/sample_data.json").then(res => res.json()).then(data => sample_data = data.data);
+// Went from 4 lines to 1. This method works on all browsers according to previous tests.
 var animal_data = [];
 
 export var animal_toggled = false;
