@@ -145,14 +145,14 @@ def signup(user: schemas.UserSignupSchema):
             response = {"message": "Failed! Email is already in use!"}
         elif(user.roles not in ROLES):
             response = {"message": "Failed! Role does not exist!"}
-            return JSONResponse(content=response)
+            return JSONResponse(content=response, status_code=404)
         else:
             response = {"message": "Failed! Conflict occurred."}
         return JSONResponse(content=response, status_code=409)
 
     #Hash password using bcrypt
-    user.password = bcrypt.hashpw(user.password.encode('utf-8'), bcrypt.gensalt(rounds=8))
-    user.password = user.password.decode('utf-8')
+    password_hashed = bcrypt.hashpw(user.password.encode('utf-8'), bcrypt.gensalt(rounds=8))
+    user.password = password_hashed.decode('utf-8')
 
     #Store user role as an id 
     user_role_id = []
@@ -175,13 +175,13 @@ def signin(user: schemas.UserLoginSchema):
     account = User.find_one({"username": user.username})
     if(account is None):
         response = {"message": "User Not Found."}
-        return JSONResponse(content=response)
+        return JSONResponse(content=response, status_code=404)
    
     #Find if the password matches
     passwordIsValid = bcrypt.checkpw(user.password.encode('utf-8'), account['password'].encode('utf-8'))
     if (passwordIsValid == False):
         response = {"message": "Invalid Password!"}
-        return JSONResponse(content=response)
+        return JSONResponse(content=response, status_code=401)
 
     #Create payload for our token
     payload = {
@@ -219,3 +219,30 @@ def signout():
     except Exception as err:
         return JSONResponse({"Error": str(err)})
     
+@router.post("/ChangePassword", status_code=status.HTTP_200_OK)
+def passwordchange(user: schemas.UserLoginSchema, newpw: str, cfm_newpw: str):
+    #Find if the username exist in our database
+    account = User.find_one({"username": user.username})
+    if(account is None):
+        response = {"message": "User Not Found."}
+        return JSONResponse(content=response, status_code=401)
+   
+    #Find if the password matches
+    passwordIsValid = bcrypt.checkpw(user.password.encode('utf-8'), account['password'].encode('utf-8'))
+    if (passwordIsValid == False):
+        response = {"message": "Invalid Password!"}
+        return JSONResponse(content=response, status_code=404)
+
+    if (newpw != cfm_newpw):
+        response = {"message": "New Password Must Match Each Other"}
+        return JSONResponse(content=response, status_code=401)
+    
+    newpw_hashed = bcrypt.hashpw(newpw.encode('utf-8'), bcrypt.gensalt(rounds=8))
+
+    User.update_one(
+        {"username": account['username']},
+        {"$set": {"password": newpw_hashed.decode('utf-8')}}
+    )
+
+    response = {"message": "User Password Changed Sucessfully!"}
+    return JSONResponse(content=response)
