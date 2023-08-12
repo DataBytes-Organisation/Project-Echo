@@ -8,12 +8,14 @@ from bson import ObjectId
 import datetime
 from app import serializers
 from app import schemas
-from app.database import Events, Movements, Microphones, User, Role
+from app.database import Events, Movements, Microphones, User, Role, ROLES
 import paho.mqtt.publish as publish
 import bcrypt
 from flask import jsonify
 import jwt
 import requests
+import datetime
+
 
 
 router = APIRouter()
@@ -131,59 +133,81 @@ def post_control(control: str):
     publish.single("Simulator_Controls", control, hostname=MQTT_BROKER_URL, port=MQTT_BROKER_PORT)
 
     return control
-
+    
 @router.post("/signup", status_code=status.HTTP_201_CREATED)
 def signup(user: schemas.UserSignupSchema):  
-    if(user.username in User.username):
-        response = {"message": "Failed! Username is already in use!"}
-        return JSONResponse(content=response)
-    elif(user.email in User.email):
-        response = {"message": "Failed! Email is already in use!"}
-        return JSONResponse(content=response)
-    elif(user.role not in Role):
-        response = {"message": "Failed! Role does not exist!"}
-        return JSONResponse(content=response)
+    # Check to see if the request body has conflict with the database
+    existing_user = User.find_one({"$or": [{"username": user.username}, {"email": user.email}]})
+    if existing_user:
+        if existing_user['username'] == user.username:
+            response = {"message": "Failed! Username is already in use!"}
+        elif existing_user['email'] == user.email:
+            response = {"message": "Failed! Email is already in use!"}
+        elif(user.roles not in ROLES):
+            response = {"message": "Failed! Role does not exist!"}
+            return JSONResponse(content=response)
+        else:
+            response = {"message": "Failed! Conflict occurred."}
+        return JSONResponse(content=response, status_code=409)
 
+    #Hash password using bcrypt
+    user.password = bcrypt.hashpw(user.password.encode('utf-8'), bcrypt.gensalt(rounds=8))
+    user.password = user.password.decode('utf-8')
 
+    #Store user role as an id 
+    user_role_id = []
+    for role_name in user.roles:
+        role = Role.find_one({"name": role_name})
+        user_role_id.append(role["_id"])
+    user.roles = user_role_id
+
+    #Convert into dictionary and insert into the database
+    user_dict = user.dict()
+    user_dict["userId"] = user.username
+    User.insert_one(user_dict)
     response = {"message": "User was registered successfully!"}
-    User.save(response, user)
     return JSONResponse(content=response)
 
 
 @router.post("/signin", status_code=status.HTTP_200_OK)
 def signin(user: schemas.UserLoginSchema):
-    
-    if(user.username not in User.username):
+    #Find if the username exist in our database
+    account = User.find_one({"username": user.username})
+    if(account is None):
         response = {"message": "User Not Found."}
         return JSONResponse(content=response)
-    else:
-        account = next((account for account in User if account.username == user.username), None)
-    
-    
-    passwordIsValid = bcrypt.checkpw(user.password, account.password)
+   
+    #Find if the password matches
+    passwordIsValid = bcrypt.checkpw(user.password.encode('utf-8'), account['password'].encode('utf-8'))
     if (passwordIsValid == False):
         response = {"message": "Invalid Password!"}
         return JSONResponse(content=response)
+
+    #Create payload for our token
+    payload = {
+        "id": account["userId"],
+        "exp": datetime.datetime.utcnow() + datetime.timedelta(seconds=86400)
+    }
     
-    token = jwt.encode({"id": account[id]}, "echo-auth-secret-key", algorithm = "HS256", lifetime = 86400)
-    authorities = "ROLE_" + account.role._name_.toUpperCase()
+    token = jwt.encode(payload, "echo-auth-secret-key", algorithm = "HS256")
+
+    authorities = []
+    for role_id in account['roles']:
+        role = Role.find_one({"_id": ObjectId(role_id)})
+        if role:
+            authorities.append("ROLE_" + role['name'].upper())
 
     requests.session.token = token
     result = {
         "id": account["_id"],
-        "username": account.username,
-        "email": account.email,
+        "username": account["username"],
+        "email": account["email"],
         "role" : authorities,
     }
-    
-#     # publish.single("User_Login_Controls", result, hostname=MQTT_BROKER_URL, port=MQTT_BROKER_PORT)
 
     response = {"message": "User Login Successfully!"}
     print(result)
     return JSONResponse(content=response)
-#     # publish.single("User_Login_Controls", user, hostname=MQTT_BROKER_URL, port=MQTT_BROKER_PORT)
-
-#     # return user.userId
 
 @router.post("/signout", status_code=status.HTTP_200_OK)
 def signout():

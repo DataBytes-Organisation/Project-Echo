@@ -86,7 +86,7 @@ class UserSignupSchema(BaseModel):
     username: str
     password: str
     email: str
-    role: List[str]
+    roles: List[str]
 
     class Config:
         allow_population_by_field_name = True
@@ -108,4 +108,7 @@ class UserLoginSchema(BaseModel):
         schema_extra = {
            
         } 
+
+class RoleSchema(BaseModel):
+    name: str
     

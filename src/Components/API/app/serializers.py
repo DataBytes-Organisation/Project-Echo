@@ -76,9 +76,14 @@ def timestampEntity(timestamp) -> dict:
         "timestamp": timestamp["timestamp"]
     }
 
+# def userEntity(user) -> dict:
+#     return{
+#         "userId": user["userId"]
+#     }
+
 def userEntity(user) -> dict:
     return{
-        "userId": user["userId"]
+        "username": user["username"]
     }
     
 def eventListEntity(events) -> list:
@@ -102,5 +107,8 @@ def microphoneListEntity(microphones) -> list:
 def timestampListEntity(timestamps) -> list:
     return [timestampEntity(timestamp) for timestamp in timestamps]
 
-def userListEntity(userIds) -> list:
-    return [userEntity(userId) for userId in userIds]
+# def userListEntity(userIds) -> list:
+#     return [userEntity(userId) for userId in userIds]
+
+def userListEntity(username) -> list:
+    return [userEntity(userName) for userName in username]
