@@ -1,8 +1,8 @@
 import pymongo
 
 # please use echonet credentials here, this connection string is just a placeholder
-connection_string="mongodb://modelUser:EchoNetAccess2023@ts-mongodb-cont:27017/EchoNet"
-# connection_string = "mongodb://root:root_password@localhost:27017/?authMechanism=DEFAULT"
+# connection_string="mongodb://modelUser:EchoNetAccess2023@ts-mongodb-cont:27017/EchoNet"
+connection_string = "mongodb://root:root_password@localhost:27017/?authMechanism=DEFAULT"
 client = pymongo.MongoClient(connection_string)
 db = client['EchoNet']
 Events = db.events

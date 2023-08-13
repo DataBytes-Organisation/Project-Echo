@@ -52,36 +52,63 @@ def show_event_from_time(start: str, end: str):
 
 
 @router.get("/record_animals", response_description="Get all record of animals")
-def list_species_data():
+def list_species_data(events_time: str  = None, species: str = None, location_sensorId: str = None):
     Species_data = Species.find()
     animals_record = []
+    filter_record = []
+    events_time = events_time[1:]
+    events_time = events_time[:-1]
+    species = species[1:]
+    species = species[:-1]
+    location_sensorId = location_sensorId[1:]
+    location_sensorId = location_sensorId[:-1]
+    
 
     for each_species in Species_data:
         each_species['species'] = each_species.pop('_id')
-        each_species['movements'] = []
+        each_species['animalId'] = ''
         each_species['events'] = []
 
         Movements_data = Movements.find()
         for moves in Movements_data:
             if moves['species'] == each_species['species']:
                 each_species['animalId'] = moves['animalId']
-                moves.pop('species')
-                moves.pop('animalId')
-                moves['id'] = str(moves['_id']).replace('ObjectId', "")
-                del moves['_id']
-                each_species['movements'].append(moves)
 
         events_data = Events.find()
-        for events in events_data:
-            if events['species'] == each_species['species']:
-        #         each_species['animalId'] = events['animalId']
-        #         events.pop('species')
-        #         events.pop('animalId')
-        #         events['id'] = str(events['_id']).replace('ObjectId', "")
-        #         del events['_id']
-                each_species['events'].append(events)
+        for event in events_data:
+            if event['species'] == each_species['species']:
+                event['events_timestamp'] = event.pop('timestamp')
+                event.pop('species')
+                # event['id'] = str(event['_id']).replace('ObjectId', "")
+                del event['_id']
+                each_species['events'].append(event)
+
         animals_record.append(each_species)
-    return animals_record
+
+    if len(events_time)>0:
+        for animal in animals_record:
+            temp = animal['events']
+            for each_event in temp:
+                if each_event['events_timestamp'] == events_time:
+                    filter_record.append(animal)
+
+    if len(species)>0:
+        for animal in animals_record:
+            if animal['species'] == species:
+                filter_record.append(animal)
+
+    if len(location_sensorId)>0:
+        for animal in animals_record:
+            temp = animal['events']
+            for each_event in temp:
+                if each_event['sensorId'] == location_sensorId:
+                    filter_record.append(animal)
+
+    if len(filter_record)>0:
+
+        return filter_record
+    else:
+        return animals_record
 
  
 
