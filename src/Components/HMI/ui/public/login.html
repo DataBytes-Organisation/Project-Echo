@@ -66,6 +66,7 @@
                 <ul>
                     <li><span onclick="{openForm('login-form')}">Login</span></li>
                     <li><span onclick="{openForm('signup-form')}">Register</span></li>
+                    <li><span onclick="{openForm('request-access-form')}">Guest Request</span></li>
                 </ul>
                 
                 <span class="name animate" id="name" data-value="PROJECT ECHO" onmouseenter="{textFlex()}">PROJECT ECHO</span>
@@ -95,14 +96,39 @@
                 </div>
                 
                 <div class="container" style="background-color:#f1f1f1">
-                    <button type="button" onclick="document.getElementById('id01').style.display='none'" class="cancelbtn">Cancel</button>
-                    <span class="psw">Forgot <a href="#">password?</a></span>
+                    <button type="button" onclick="{closeForm('login-form')}" class="cancelbtn">Cancel</button>
+                    <span class="psw"><a href="#">Forgot password?</a></span>
                 </div>
             </form>
         </div>
-        
-        
+
+
+        <div id="request-access-form" class="user-auth-form modal">
+            
+            <form class="modal-content animate" action="/request_access" method="POST">
+                <div class="imgcontainer">
+                    <span onclick="{closeForm('request-access-form')}" class="close" title="Close Modal">&times;</span>
+                </div>
+                
+                <div class="container">
+                    <label for="email"><b>Email</b></label>
+                    <input id="request-access-email-inp" type="text" placeholder="Enter Email" name="email" oninput="{emailFormValidation('request-access')}" required>
+                    <span id="request-access-email-error" class="error-text"></span>
+                    <button type="submit" class="btn10" id="request-access-button"><span>Send Request</span></button>
+                </div>
+                
+                <div class="container" style="background-color:#f1f1f1">
+                    <button type="button" onclick="{closeForm('request-access-form')}" class="cancelbtn">Cancel</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="error-box" class="error_box"></div>
+
     </div>		
+
+
+
     <div id="blur"></div>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     
@@ -122,12 +148,32 @@
     function openForm(id) {
         let ele = id;
         document.getElementById(ele).style.display='block';
-        document.getElementById(project-title).style.display='none';
+        // document.getElementById(project-title).style.display='none';
     }
 
     function closeForm(id) {
         let ele = id;
         document.getElementById(ele).style.display='none';
     }
+    const validEmailRegex = /^[\w\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+    function emailFormValidation(inp){
+    let email_id = inp + "-email-inp";
+    let error_id = inp + "-email-error";
+    let btn_id = inp + "-button"
+    let input_ele = document.getElementById(email_id);
+    let error_ele = document.getElementById(error_id);
+    let btn_ele = document.getElementById(btn_id);
+    if (input_ele.value.match(validEmailRegex)){
+        error_ele.style.display = 'none';
+        error_ele.innerHTML = '';
+        btn_ele.disabled = false;
+    } else {
+        error_ele.style.display = 'block';
+        error_ele.innerHTML = 'Please insert a valid email address';
+        btn_ele.disabled = true;
+    }
+    }
+  
 </script>
+
 </html>

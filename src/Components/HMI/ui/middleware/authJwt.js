@@ -7,10 +7,12 @@ const path = require('path');
 
 exports.verifyToken = (req, res, next) => {
   let token = req.session.token;
-  console.log("Current token in console.log: ", token)
+  console.log("Current token in console.log: ", req.session)
   if (!token) {
     // return res.status(403).send({ message: "No token provided!" });
-    return res.sendFile(path.join(__dirname, '../public/login.html'));
+    console.log("Can't assign token!")
+    res.sendFile(path.join(__dirname, '../public/login.html'));
+    return false;
   }
 
   jwt.verify(token,
@@ -23,14 +25,15 @@ exports.verifyToken = (req, res, next) => {
               }
               req.userId = decoded.id;
               next();
+              return true;
             });
 };
 
 exports.isAdmin = (req, res, next) => {
   User.findById(req.userId).exec((err, user) => {
     if (err) {
-      res.status(500).send({ message: err });
-      return false;
+      return res.status(500).send({ message: err });
+
     }
 
     Role.find(
@@ -39,7 +42,7 @@ exports.isAdmin = (req, res, next) => {
       },
       (err, roles) => {
         if (err) {
-          res.status(500).send({ message: err });
+          return res.status(500).send({ message: err });
           return false;
         }
 
@@ -50,8 +53,7 @@ exports.isAdmin = (req, res, next) => {
           }
         }
 
-        res.status(403).send({ message: "Require Admin Role!" });
-        return false;
+        return res.status(403).send({ message: "Require Admin Role!" });
       }
     );
   });
@@ -60,8 +62,8 @@ exports.isAdmin = (req, res, next) => {
 exports.isModerator = (req, res, next) => {
   User.findById(req.userId).exec((err, user) => {
     if (err) {
-      res.status(500).send({ message: err });
-      return false;
+      return res.status(500).send({ message: err });
+      
     }
 
     Role.find(
@@ -70,8 +72,8 @@ exports.isModerator = (req, res, next) => {
       },
       (err, roles) => {
         if (err) {
-          res.status(500).send({ message: err });
-          return false;
+          return res.status(500).send({ message: err });
+          
         }
 
         for (let i = 0; i < roles.length; i++) {
@@ -81,8 +83,8 @@ exports.isModerator = (req, res, next) => {
           }
         }
 
-        res.status(403).send({ message: "Require Moderator Role!" });
-        return false;
+        return res.status(403).send({ message: "Require Moderator Role!" });
+        
       }
     );
   });
@@ -91,8 +93,8 @@ exports.isModerator = (req, res, next) => {
 exports.isUser = (req, res, next) => {
   User.findById(req.userId).exec((err, user) => {
     if (err) {
-      res.status(500).send({ message: err });
-      return false;
+      return res.status(500).send({ message: err });
+      
     }
 
     Role.find(
@@ -101,8 +103,8 @@ exports.isUser = (req, res, next) => {
       },
       (err, roles) => {
         if (err) {
-          res.status(500).send({ message: err });
-          return false;
+          return res.status(500).send({ message: err });
+          
         }
 
         for (let i = 0; i < roles.length; i++) {
@@ -112,8 +114,8 @@ exports.isUser = (req, res, next) => {
           }
         }
 
-        res.status(403).send({ message: "Require User Role!" });
-        return false;
+        return res.status(403).send({ message: "Require User Role!" });
+        
       }
     );
   });
