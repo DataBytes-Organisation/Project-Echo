@@ -112,35 +112,372 @@
             <a id="services-menu-btn" class="tabs-button" onclick="openTab('services')"></a> <!-- New tab -->
             <span style="position: fixed; border-top: 6px solid rgba(247, 186, 206, 0.8); height: 2px; width: 440; margin-top: 36px;"></span>
           </div>
-          <div id="services">
-            <div class="wrapper">
-              <div id="services-contents">
-                <h2>Our Services</h2>
-                <ul class="service-list">
-                  <li onclick="showServiceDescription('consulting')">Animal Consulting</li>
-                  <li onclick="showServiceDescription('analysis')">Animal Analysis</li>
-                  <li onclick="showServiceDescription('development')">Animal Software Development</li>
-                  <li onclick="showServiceDescription('solutions')">Animal Solutions</li>
-                </ul>
-                <div class="service-description" id="consulting-description">
-                  <h3>Animal Consulting</h3>
-                  <p>Animal Consulting provides expert advice and guidance for understanding animal behavior and ecosystems. Our team of experts...</p>
-                </div>
-                <div class="service-description" id="analysis-description">
-                  <h3>Animal Analysis</h3>
-                  <p>Animal Analysis involves using advanced data analytics to gain insights into animal populations and habitats. We use...</p>
-                </div>
-                <div class="service-description" id="development-description">
-                  <h3>Animal Software Development</h3>
-                  <p>Animal Software Development focuses on creating innovative software solutions tailored to the needs of researchers...</p>
-                </div>
-                <div class="service-description" id="solutions-description">
-                  <h3>Animal Solutions</h3>
-                  <p>Animal Solutions aims to provide comprehensive solutions for conservationists and researchers. Our integrated approach...</p>
+            <div id="services">
+              <div class="wrapper">
+                <div id="services-contents">
+                  <h2>Our Services and Get Involved</h2>
+                  <ul class="service-list">
+                    <li onclick="showServiceDescription('consulting')">Animal Consulting</li>
+                    <li onclick="showServiceDescription('analysis')">Animal Analysis</li>
+                    <li onclick="showServiceDescription('development')">Animal Software Development</li>
+                    <li onclick="showServiceDescription('solutions')">Animal Solutions</li>
+                  </ul>
+                  <div class="service-description" id="consulting-description">
+                    <h3>Animal Consulting</h3>
+                    <p>Volunteer for upcoming events and initiatives.</p>
+                  </div>
+                  <div class="service-description" id="analysis-description">
+                    <h3>Animal Analysis</h3>
+                    <p>Support our cause through donations.</p>
+                  </div>
+                  <div class="service-description" id="development-description">
+                    <h3>Animal Software Development</h3>
+                    <p>Join our community and spread awareness.</p>
+                  </div>
+                  <div class="service-description" id="solutions-description">
+                    <h3>Animal Solutions</h3>
+                    <p>Explore various ways to make a difference and contribute to our mission.</p>
+                    <form>
+                      <div class="form-group">
+                          <label class="font-weight-bold row-margin-10">Name:</label>
+                          <div class="form-group">
+                              <div class="form-row row row-margin-10">
+                                  <div class="col-md-3">
+                                      <label for="title">Title</label>
+                                      <input type="text" class="form-control" name="title" id="title" placeholder="Title"
+                                          required>
+                                  </div>
+                                  <div class="col-md-3">
+                                      <label for="title">First Name</label>
+                                      <input type="text" class="form-control" name="firstName" id="firstName"
+                                          placeholder="FirstName" required>
+                                  </div>
+                                  <div class="col-md-3">
+                                      <label for="title">Surname</label>
+                                      <input type="text" class="form-control" name="Surname" id="Surname" placeholder="Surname"
+                                          required>
+                                  </div>
+                                  <div class="col-md-3">
+                                      <label for="title">Preferred Name</label>
+                                      <input type="text" class="form-control" name="preferredName" id="preferredName"
+                                          placeholder="Preferred Name If Any">
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+          
+                      <div class="form-group">
+                          <label class="font-weight-bold row-margin-10" for="date"> Date of Birth:</label>
+                          <input type="date" class="form-control" name="date" id="date" placeholder="dd/mm/yyyy" required>
+                      </div>
+          
+                      <div class="form-group">
+                          <label class="font-weight-bold row-margin-10" for="gender">Gender</label>
+                          <select name="gender" id="gender" class="form-control" required>
+                              <option>Select one...</option>
+                              <option value="male">Male</option>
+                              <option value="female">Female</option>
+                              <option value="trans">Transgender</option>
+                              <option value="other">Other</option>
+                              <option value="notToSay">Prefer not to say</option>
+                          </select>
+                      </div>
+          
+                      <div class="form-group">
+                          <label class="font-weight-bold row-margin-10" for="email"> Your mail:</label>
+                          <input type="email" class="form-control" name="email" id="email" value="username@echo.com.au"
+                              required>
+                      </div>
+          
+                      <div class="form-group">
+                          <label class="font-weight-bold row-margin-10" for="mobile"> Contact Number:</label>
+                          <input type="tel" class="form-control" name="mobile" id="mobile" placeholder="Moble Number" required>
+                      </div>
+          
+                      <div class="form-group">
+                          <label class="font-weight-bold row-margin-10">Address:</label>
+                          <div class="form-group row-margin-10">
+                              <label for="street">Street Name and Number</label>
+                              <input type="text" class="form-control" name="street" id="street"
+                                  placeholder="Street Name and Number" required>
+                              <div class="form-row row row-margin-10">
+                                  <div class="col-md-3 col-3">
+                                      <label for="city">City</label>
+                                      <input type="text" class="form-control" name="city" id="city" placeholder="City" required>
+                                  </div>
+                                  <div class="col-md-3 col-3">
+                                      <label for="state">State</label>
+                                      <input type="text" class="form-control" name="state" id="state" placeholder="State"
+                                          required>
+                                  </div>
+                                  <div class="col-md-3 col-3">
+                                      <label for="postcode">Postcode</label>
+                                      <input type="number" class="form-control" name="postcode" id="postcode"
+                                          placeholder="postcode" required>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                      <br>
+                      <h3>Your donated bird</h3>
+                      <div class="form-group">
+                          <label class="font-weight-bold row-margin-10" for="bird">Name of Bird</label>
+                          <select name="course" id="course" class="form-control" required>
+                              <option>Select one...</option>
+                              <option value="1">1 &nbsp;Cinclosoma cinnamomeum</option>
+                              <option value="2">2 &nbsp;Cinclosoma punctatum</option>
+                              <option value="3">3 &nbsp;Cisticola exilis</option>
+                              <option value="4">4 &nbsp;Climacteris erythrops</option>
+                              <option value="5">5 &nbsp;Climacteris picumnus</option>
+                              <option value="6">6 &nbsp;Colluricincla harmonica</option>
+                              <option value="7">7 &nbsp;Colluricincla megarhyncha</option>
+                              <option value="8">8 &nbsp;Colluricincla woodwardi</option>
+                              <option value="9">9 &nbsp;Conocephalus albescens</option>
+                              <option value="10">10 &nbsp;Conocephalus semivittatus</option>
+                              <option value="11">11 &nbsp;Conocephalus upoluensis</option>
+                              <option value="12">12 &nbsp;Gymnorhina tibicen</option>
+                              <option value="13">13 &nbsp;Heteroscenes pallidus</option>
+                              <option value="14">14 &nbsp;Hieraaetus morphnoides</option>
+                              <option value="15">15 &nbsp;Himantopus himantopus</option>
+                          </select>
+                      </div>
+                      <br>
+                      <h3>Birds that you are interested in finding another way to donation</h3>
+                      <div class="form-group">
+                          <label class="font-weight-bold row-margin-10">Bird(s)</label>
+                          <div class="row col-11 offset-1">
+                              <div class="form-group form-check form-check-inline col-md-4 col-12">
+                                  <input class="form-check-input" type="checkbox" name="number1" id="number1" value="number1">
+                                  <label class="col-form-label form-check-label"
+                                      for="number1"><b>Number1</b>&nbsp;&nbsp;One-time Monetary Donations</label>
+                              </div>
+                              <div class="form-group form-check form-check-inline col-md-4 col-12">
+                                  <input class="form-check-input" type="checkbox" name="number2" id="number2" value="number2">
+                                  <label class="col-form-label form-check-label" for="number2"><b>Number2</b>&nbsp;&nbsp;DRecurring Donations</label>
+                              </div>
+                              <div class="form-group form-check form-check-inline col-md-4 col-12">
+                                  <input class="form-check-input" type="checkbox" name="number3" id="number3" value="number3">
+                                  <label class="col-form-label form-check-label" for="number3"><b>Number3</b>&nbsp;&nbsp;Online Platforms:</label>
+                              </div>
+                              <div class="form-group form-check form-check-inline col-md-4 col-12">
+                                  <input class="form-check-input" type="checkbox" name="number4" id="number4" value="number4">
+                                  <label class="col-form-label form-check-label" for="number4"><b>Number4</b>&nbsp;&nbsp;Membership Donations</label>
+                              </div>
+                              <div class="form-group form-check form-check-inline col-md-4 col-12">
+                                  <input class="form-check-input" type="checkbox" name="number5" id="number5" value="number5">
+                                  <label class="col-form-label form-check-label" for="number5"><b>Number5</b>&nbsp;&nbsp;Adoption Programs</label>
+                              </div>
+                              <div class="form-group form-check form-check-inline col-md-4 col-12">
+                                  <input class="form-check-input" type="checkbox" name="number6" id="number6" value="number6">
+                                  <label class="col-form-label form-check-label" for="number6"><b>Number6</b>&nbsp;&nbsp;Sponsorship</label>
+                              </div>
+      
+                              <div class="form-group form-check form-check-inline col-md-4 col-12">
+                                  <input class="form-check-input" type="checkbox" name="number7" id="number7" value="number7">
+                                  <label class="col-form-label form-check-label" for="number7"><b>Number7</b>&nbsp;&nbsp;Corporate Donations</label>
+                              </div>
+          
+          
+                              <div class="form-group form-check form-check-inline col-md-4 col-12">
+                                  <input class="form-check-input" type="checkbox" name="number8" id="number8" value="number8">
+                                  <label class="col-form-label form-check-label" for="number8"><b>Number8</b>&nbsp;&nbsp;Legacy Giving/Bequests</label>
+                              </div>
+                              <div class="form-group form-check form-check-inline col-md-4 col-12">
+                                  <input class="form-check-input" type="checkbox" name="number9" id="number9" value="number9">
+                                  <label class="col-form-label form-check-label" for="number9"><b>Number9</b>&nbsp;&nbsp;Fundraising Events</label>
+                              </div>
+                              <div class="form-group form-check form-check-inline col-md-4 col-12">
+                                  <input class="form-check-input" type="checkbox" name="number10" id="number10" value="number10">
+                                  <label class="col-form-label form-check-label" for="number10"><b>Number10</b>&nbsp;&nbsp;In-kind Donations</label>
+                              </div>
+                              <div class="form-group form-check form-check-inline col-md-4 col-12">
+                                  <input class="form-check-input" type="checkbox" name="number11" id="number11" value="number11">
+                                  <label class="col-form-label form-check-label" for="number11"><b>Number11</b>&nbsp;&nbsp;Volunteer-Based Contributions</label>
+                              </div>
+                              <div class="form-group form-check form-check-inline col-md-4 col-12">
+                                  <input class="form-check-input" type="checkbox" name="number12" id="number12" value="number12">
+                                  <label class="col-form-label form-check-label" for="number12"><b>Number12</b>&nbsp;&nbsp;Matching Gifts</label>
+                              </div>
+                          </div>
+                      </div>
+          
+          
+                      <label class="font-weight-bold row-margin-10">Mode of Donations</label>
+                      <div class="form-group">
+                          <div class="form-group form-check form-check-inline">
+                              <input type="radio" data-bs-toggle="collapse" data-bs-target="#inPersonOpts" aria-expanded="false"
+                                  aria-controls="inPersonOpts" name="collab" id="inPerson" required>
+                              <label class="col-form-label form-check-label" for="inpPerson">&nbsp;In Person</label>
+                          </div>
+                          <div class="form-group form-check form-check-inline">
+                              <input type="radio" data-bs-toggle="collapse" data-bs-target="#onlineOpts" aria-expanded="false"
+                                  aria-controls="onlineOpts" name="collab" id="online">
+                              <label class="col-form-label form-check-label" for="online">&nbsp;Online</label>
+                          </div>
+                      </div>
+                      <div class="collapse row-margin-10" id="inPersonOpts">
+                          <div class="form-group form-check form-check-inline">
+                              <input class="form-check-input" type="radio" name="waurnPonds" id="waurnPonds" value="waurnPonds"
+                                  required>
+                              <label class="col-form-label form-check-label" for="waurnPonds">Geelong - Waurn Ponds</label>
+                          </div><br>
+                          <div class="form-group form-check form-check-inline">
+                              <input class="form-check-input" type="radio" name="waterfronts" id="waterfronts"
+                                  value="waterfronts">
+                              <label class="col-form-label form-check-label" for="waterfronts">Geelong - Waterfronts</label>
+                          </div><br>
+                          <div class="form-group form-check form-check-inline">
+                              <input class="form-check-input" type="radio" name="burwood" id="burwood" value="burwood">
+                              <label class="col-form-label form-check-label" for="burwood">Melbourne - Burwood</label>
+                          </div>
+                      </div>
+                      <div class="collapse" id="onlineOpts">
+                          <div class="form-group form-check form-check-inline">
+                              <input class="form-check-input" type="radio" name="zoom" id="zoom" value="zoom" required>
+                              <label class="col-form-label form-check-label" for="zoom">Zoom Meeting</label>
+                          </div><br>
+                          <div class="form-group form-check form-check-inline">
+                              <input class="form-check-input" type="radio" name="teams" id="teams" value="teams">
+                              <label class="col-form-label form-check-label" for="teams">MS Teams</label>
+                          </div><br>
+                          <div class="form-group form-check form-check-inline">
+                              <input class="form-check-input" type="radio" name="phone" id="phone" value="phone">
+                              <label class="col-form-label form-check-label" for="phone">Phone Call</label>
+                          </div>
+                      </div>
+                      <br>
+                      <h3>Your preferred daytime</h3>
+                      <div class="form-group">
+                          <label class="font-weight-bold row-margin-10">Days that you are available</label><br>
+                          <div class="form-group form-check form-check-inline">
+                              <input class="form-check-input" type="checkbox" name="mon" id="mon" value="mon">
+                              <label class="col-form-label form-check-label" for="mon">Monday</label>
+                          </div>
+                          <div class="form-group form-check form-check-inline">
+                              <input class="form-check-input" type="checkbox" name="tue" id="tue" value="tue">
+                              <label class="col-form-label form-check-label" for="tue">Tuesday</label>
+                          </div>
+                          <div class="form-group form-check form-check-inline">
+                              <input class="form-check-input" type="checkbox" name="wed" id="wed" value="wed">
+                              <label class="col-form-label form-check-label" for="wed">Wednsday</label>
+                          </div>
+                          <div class="form-group form-check form-check-inline">
+                              <input class="form-check-input" type="checkbox" name="thu" id="thu" value="thu">
+                              <label class="col-form-label form-check-label" for="thu">Thursday</label>
+                          </div>
+                          <div class="form-group form-check form-check-inline">
+                              <input class="form-check-input" type="checkbox" name="fri" id="fri" value="fri">
+                              <label class="col-form-label form-check-label" for="fri">Friday</label>
+                          </div>
+                          <div class="form-group form-check form-check-inline">
+                              <input class="form-check-input" type="checkbox" name="sat" id="sat" value="sat">
+                              <label class="col-form-label form-check-label" for="sat">Saturday</label>
+                          </div>
+                          <div class="form-group form-check form-check-inline">
+                              <input class="form-check-input" type="checkbox" name="sun" id="sun" value="sun">
+                              <label class="col-form-label form-check-label" for="sun">Sunday</label>
+                          </div>
+                      </div>
+                      <div class="form-group">
+                          <label class="font-weight-bold row-margin-10">Days that you are not available</label><br>
+                          <div class="form-group form-check form-check-inline">
+                              <input class="form-check-input" type="checkbox" name="monNot" id="monNot" value="monNot">
+                              <label class="col-form-label form-check-label" for="monNot">Monday</label>
+                          </div>
+                          <div class="form-group form-check form-check-inline">
+                              <input class="form-check-input" type="checkbox" name="tueNot" id="tueNot" value="tueNot">
+                              <label class="col-form-label form-check-label" for="tueNot">Tuesday</label>
+                          </div>
+                          <div class="form-group form-check form-check-inline">
+                              <input class="form-check-input" type="checkbox" name="wedNot" id="wedNot" value="wedNot">
+                              <label class="col-form-label form-check-label" for="wedNot">Wednsday</label>
+                          </div>
+                          <div class="form-group form-check form-check-inline">
+                              <input class="form-check-input" type="checkbox" name="thuNot" id="thuNot" value="thuNot">
+                              <label class="col-form-label form-check-label" for="thuNot">Thursday</label>
+                          </div>
+                          <div class="form-group form-check form-check-inline">
+                              <input class="form-check-input" type="checkbox" name="friNot" id="friNot" value="friNot">
+                              <label class="col-form-label form-check-label" for="friNot">Friday</label>
+                          </div>
+                          <div class="form-group form-check form-check-inline">
+                              <input class="form-check-input" type="checkbox" name="satNot" id="satNot" value="satNot">
+                              <label class="col-form-label form-check-label" for="satNot">Saturday</label>
+                          </div>
+                          <div class="form-group form-check form-check-inline">
+                              <input class="form-check-input" type="checkbox" name="sunNot" id="sunNot" value="sunNot">
+                              <label class="col-form-label form-check-label" for="sunNot">Sunday</label>
+                          </div>
+                      </div>
+                      <label class="font-weight-bold row-margin-10">Preferred Times</label>
+                      <div class="form-group">
+                          <div class="form-group form-check form-check-inline">
+                              <input type="radio" data-bs-toggle="collapse" data-bs-target="#broad" aria-expanded="false"
+                                  aria-controls="broad" name="collab" id="broad" required>
+                              <label class="col-form-label form-check-label" for="broad">&nbsp;Board</label>
+                          </div>
+                          <div class="form-group form-check form-check-inline">
+                              <input type="radio" data-bs-toggle="collapse" data-bs-target="#specific" aria-expanded="false"
+                                  aria-controls="specific" name="collab" id="specific">
+                              <label class="col-form-label form-check-label" for="specific">&nbsp;Specific</label>
+                          </div>
+                      </div>
+                      <div class="collapse row-margin-10" id="broad">
+                          <div class="form-group form-check form-check-inline">
+                              <input type="radio" data-bs-toggle="collapse" data-bs-target="#time" aria-expanded="false"
+                                  aria-controls="time" name="preferredTime" id="preferredTimeMorn" required>
+                              <label class="col-form-label form-check-label" for="preferredTimeMorn">&nbsp;Mornings</label>
+                          </div>
+                          <div class="form-group form-check form-check-inline">
+                              <input type="radio" data-bs-toggle="collapse" data-bs-target="#time" aria-expanded="false"
+                                  aria-controls="time" name="preferredTime" id="preferredTimeDay">
+                              <label class="col-form-label form-check-label" for="preferredTimeDay">&nbsp;During the
+                                  day</label>
+                          </div>
+                          <div class="form-group form-check form-check-inline">
+                              <input type="radio" data-bs-toggle="collapse" data-bs-target="#time" aria-expanded="false"
+                                  aria-controls="time" name="preferredTime" id="preferredTimeEven">
+                              <label class="col-form-label form-check-label" for="preferredTimeEven">&nbsp;Evenings</label>
+                          </div>
+                      </div>
+          
+                      <div class="collapse" id="specific">
+                          <div class="form-group">
+                              <label for="startTime">Specific start time</label>
+                              <input type="time" class="form-control" name="startTime" id="startTime" required>
+                          </div>
+                          <div class="form-group">
+                              <label for="finishTime">Specific finish time</label>
+                              <input type="time" class="form-control" name="finishTime" id="finishTime" required>
+                          </div>
+                      </div>
+                      <div class="form-group row-margin-10">
+                          <label class="font-weight-bold" for="startDate">Start Date</label><br>
+                          <input type="date" class="fomr-control" name="startDate" id="startDate" required>
+                      </div>
+                      <div class="form-group row-margin-10">
+                          <label class="font-weight-bold" for="comment">Note</label><br>
+                          <label for="comment">Always choose the method that best suits your capacity and intention 
+                            to support these magnificent creatures.</label>
+                          <textarea class="form-control" name="comment" id="comment" rows="5">
+                          </textarea>
+                      </div>
+                      <div class="form-group row row-margin-10">
+                          <div class="col">
+                      
+                              <input type="reset" value="Reset">
+                      
+                              &nbsp;
+                      
+                              <input type="submit" value="Submit">
+                      
+                          </div>
+                      </div>
+                  </form>      
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
           <div id="FAQ">
             <div class="wrapper">
               <div id="FAQ-contents">
@@ -740,9 +1077,6 @@
       case "animal-popup":
         document.getElementById("popup-menu-btn").classList.add("active");
         break;
-      case "mic-popup":
-        document.getElementById("mic-popup-menu-btn").classList.add("active");
-        break;
       case "FAQ":
         document.getElementById("FAQ-menu-btn").classList.add("active");
         break;
@@ -751,6 +1085,9 @@
         break;
       case "donate":
         document.getElementById("donate-menu-btn").classList.add("active");
+        break;
+      case "mic-popup":
+        document.getElementById("mic-popup-menu-btn").classList.add("active");
         break;
       case "services":
         document.getElementById("services-menu-btn").classList.add("active");

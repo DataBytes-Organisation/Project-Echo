@@ -217,6 +217,9 @@ body{
   #services{
     max-width: 520px;
   }
+  #mic-popup{
+    max-width: 520px;
+  }
 }
 
 .navbar {
@@ -528,7 +531,8 @@ input[type="checkbox"]{
 }
 
 #services-contents ul {
-  color: white; /* Light green color */
+  color: rgb(101, 188, 71); /* Light green color */
+  /*color: white; */
   list-style-type: disc; /* Use disc bullet points */
   margin-left: 20px; /* Add some left margin for bullet points */
   padding-left: 20px; /* Add left padding for the list items */
