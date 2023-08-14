@@ -1137,6 +1137,14 @@
     },10)
   })
 
+  document.addEventListener('micToggled', function(event){
+    closeTab()
+    setTimeout(()=> {
+      currentTab = document.getElementById('mic-popup') 
+      openNav('mic-popup')
+    },10)
+  })
+
   let aud = false;
   function animateAudioPlay() {
     $(".boxmuted").removeClass("boxmuted");
