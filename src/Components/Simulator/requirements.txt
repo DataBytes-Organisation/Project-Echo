@@ -6,7 +6,6 @@ ipykernel
 librosa
 matplotlib
 paho-mqtt
-
 xgboost
 numpy
 pandas

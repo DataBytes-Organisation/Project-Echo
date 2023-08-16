@@ -1558,9 +1558,9 @@
       "summary": "Pomatostomus temporalis, commonly known as the Grey-crowned Babbler, is a small bird species found in eastern Australia. This bird species is known for its social behavior and unique vocalizations.",
       "description": [
         "The Grey-crowned Babbler feeds mainly on insects, seeds, and fruits.",
-        "This species is highly social and often seen in family groups of up to 10 birds.",
+        "This species is highly social and often seen in family groups of 2-12 birds.",
         "Grey-crowned Babblers have a unique vocalization system that includes a range of calls and songs that are used for communication and group cohesion.",
-        "Grey-crowned Babblers build communal nests made of sticks, grass, and other materials.",
+        "Grey-crowned Babblers build large, domed communal nests made of sticks, grass, and other materials in saplings, shrubs or trees.",
         "The Grey-crowned Babbler is listed as a vulnerable species due to habitat loss and fragmentation."
       ],
       "img": ""
@@ -1570,11 +1570,11 @@
       "common": "White-browed Babbler",
       "summary": "Pomatostomus superciliosus, commonly known as the White-browed Babbler, is a small bird species found in Australia. This bird species is known for its social behavior and unique vocalizations.",
       "description": [
-        "The White-browed Babbler feeds mainly on insects, seeds, and fruits.",
+        "The White-browed Babbler feeds mainly on insects, seeds, spiders, amphibians, crustaceans, reptiles and fruits.",
         "This species is highly social and often seen in family groups of up to 10 birds.",
         "White-browed Babblers have a unique vocalization system that includes a range of calls and songs that are used for communication and group cohesion.",
         "White-browed Babblers build communal nests made of sticks, grass, and other materials.",
-        "The White-browed Babbler is listed as a vulnerable species due to habitat loss and fragmentation."
+        "The White-browed Babbler is listed as a Least Concern species by IUCN."
       ],
       "img": ""
     },
@@ -1717,7 +1717,7 @@
         "They are herbivores and feed mainly on nectar, pollen, and fruit.",
         "Little Red Flying-foxes are important pollinators and seed dispersers, helping to maintain the health of many ecosystems.",
         "They are known for their ability to fly long distances, with some individuals traveling up to 1,000 km in search of food and water.",
-        "The Little Red Flying-fox is a threatened species, with its population declining due to habitat destruction and fragmentation, as well as hunting and persecution by humans."
+        "The Little Red Flying-fox is a Least Concern species in the IUCN red list."
       ],
       "img": ""
     },
@@ -1807,7 +1807,7 @@
         "The Little Grassbird is known for its distinctive call that sounds like a rattling trill. This sound is created by vibrating its throat while singing.",
         "These birds are found in a variety of habitats, including wetlands, grasslands, and shrublands, and they are often seen skulking in the tall grasses and reeds.",
         "Little Grassbirds are known to build elaborate nests in the reeds and grasses. They often use spiderwebs to hold the nest together, which helps to make it more durable and stable.",
-        "The Little Grassbird is an omnivore that feeds on insects, spiders, seeds, and small vertebrates. They are known to forage on the ground and in the vegetation for their food.",
+        "The Little Grassbird is an omnivore that feeds on insects, spiders, seeds, other small arthropods and small vertebrates. They are known to forage on the ground and in the vegetation for their food.",
         ""
       ],
       "img": ""
@@ -1873,7 +1873,7 @@
         "They are primarily arboreal and are commonly found in eucalyptus forests and woodlands.",
         "Common Ringtail Possums are herbivorous and feed mainly on leaves, flowers, and fruits.",
         "These possums are highly social and usually live in family groups consisting of one adult male, one or more adult females, and their offspring.",
-        "The breeding season for Common Ringtail Possums is typically between May and September.  Females give birth to a single young, which remains in the mother's pouch for around 4 months."
+        "The breeding season for Common Ringtail Possums is typically between April and December.  Females give birth to a single young, which remains in the mother's pouch for around 4 months."
       ],
       "img": ""
     },
@@ -1899,7 +1899,7 @@
         "These birds are known for their acrobatic flight displays during courtship, which involve quick, darting movements and sharp turns.",
         "Mulga Parrots are mainly seed-eaters, feeding on a variety of grasses and seeds of acacia and eucalyptus trees. They may also eat insects and other small invertebrates.",
         "During breeding season, these parrots form monogamous pairs and construct a nest in a tree hollow or crevice. The female lays 4-6 eggs, which are incubated for around 20 days.",
-        "Mulga Parrots are not considered to be globally threatened, although they may be vulnerable to habitat loss and degradation in some parts of their range. They are popular birds among aviculturists and have been successfully bred in captivity."
+        "Mulga Parrots are not considered to be globally threatened, although they may be vulnerable to habitat loss and degradation in some parts of their range. They are listed as species of Least Concern in the IUCN Red list. They are popular birds among aviculturists and have been successfully bred in captivity."
       ],
       "img": ""
     },
@@ -1950,7 +1950,7 @@
         "Eastern Whipbirds are relatively large birds, growing up to 30 cm in length.",
         "They are sexually dimorphic, with males having a white cheek patch and females having a brown cheek patch.",
         "Eastern Whipbirds are usually found in pairs or small family groups, and are often heard but not seen due to their shy nature and preference for dense vegetation.",
-        "They primarily feed on insects and other small invertebrates, which they find by foraging on the ground or in low vegetation.",
+        "They primarily feed on insects and other small invertebrates, which they find by foraging on the ground or in low vegetation. They either do this alone, in pairs or in small family groups.",
         "Eastern Whipbirds are monogamous and build nests in low shrubs or saplings using twigs and other plant material.  Females typically lay two eggs, which both parents incubate and care for."
       ],
       "img": ""
@@ -1989,7 +1989,7 @@
         "The yellow honeyeater has a bright yellow plumage with a black mask around its eyes.",
         "These birds feed on nectar and insects, and can often be seen hovering in front of flowers to feed.",
         "The female builds the nest using grass, bark, and spiderwebs, and the male helps to defend the territory.",
-        "",
+        "It has been listed as a species of Least Concern in the IUCN Red List.",
         ""
       ],
       "img": ""
@@ -2002,7 +2002,7 @@
         "The fuscous honeyeater has a brownish-grey plumage with a dark eye stripe and a pale throat.",
         "These birds feed on nectar and insects, and are known to feed on the sugary excretions of certain insects.",
         "The female builds the nest using twigs and grass, and the male helps to defend the territory.",
-        "",
+        "The Fuscous Honeyeater has been listed as a species of Least Concern in the IUCN Red List.",
         ""
       ],
       "img": ""
@@ -2027,7 +2027,7 @@
       "description": [
         "White-plumed honeyeaters have a distinctive appearance, with a white plume on their head and a black mask around their eyes.",
         "These birds are highly vocal and have a range of calls and songs that are used to communicate with each other and establish territories.",
-        "White-plumed honeyeaters are primarily nectarivorous, feeding on the nectar of flowering plants. They are important pollinators for many plant species in their native habitats.",
+        "White-plumed honeyeaters are primarily nectarivorous, feeding on the nectar of flowering plants and gleaning leaf surfaces. They also feed on berries for their juice and are important pollinators for many plant species in their native habitats.",
         "The species is highly adaptable and can thrive in a range of habitats, from arid and semi-arid regions to wet and temperate forests.",
         "White-plumed honeyeaters are often seen in pairs or family groups and are known for their social behavior."
       ],
@@ -2042,7 +2042,7 @@
         "White-fronted Honeyeaters are social birds that often gather in large flocks to feed and roost together.",
         "Their diet consists mainly of nectar, insects, and spiders, which they forage for in trees and shrubs.",
         "These birds have a wide range and are found in a variety of habitats, including eucalyptus forests, woodlands, and heathlands.",
-        ""
+        "They have been listed as a species of Least Concern in the IUCN Red List."
       ],
       "img": ""
     },
@@ -4626,12 +4626,12 @@
         },
         {
             "species": "Ephippitytha trigintiduoguttata",
-            "common": "Spotted Katydid",
+            "common": "32-Spotted Katydid",
             "summary": "The Spotted Katydid is a type of bush cricket found in eastern Australia.",
             "description": [
                 "They are named for the distinctive spots on their body, which can vary in color from green to brown.",
                 "These insects are known for their loud and persistent chirping, which is produced by rubbing their wings together.",
-                "The Spotted Katydid feeds on a variety of plant matter, including leaves, flowers, and fruits.",
+                "The Spotted Katydid feeds on a variety of plant matter, favouring Ecualyptus leaves",
                 "Females lay their eggs in the soil or on plant stems, and the young nymphs undergo several molts before reaching adulthood.",
                 "Spotted Katydids are preyed upon by a variety of predators, including birds, reptiles, and mammals."
             ],
@@ -4679,10 +4679,10 @@
         {
             "species": "Eurystomus orientalis",
             "common": "Dollarbird",
-            "summary": "The Eurystomus orientalis, commonly known as the Dollarbird, is a medium-sized bird in the roller family that is found throughout Australia, Indonesia, and Papua New Guinea.",
+            "summary": "The Eurystomus orientalis, commonly known as the Dollarbird, is a medium-sized bird in the roller family that is found throughout eastern Asia. They can be found as far north as Korea, and as far south as Victoria, Australia.",
             "description": [
-                "They get their name from the distinctive circular patches of bright blue feathers on their throat, which resemble silver dollar coins.",
-                "The Dollarbird is a migratory species, with populations moving south during the winter months and returning north in the summer to breed.",
+                "They get their name from the distinctive circular patches of bright blue feathers on their wings, which resemble silver dollar coins.",
+                "The Dollarbird is a migratory species, with populations moving towards the equator during the winter months.",
                 "They are known for their acrobatic flight displays, which involve swooping, gliding and soaring through the air.",
                 "These birds are primarily insectivorous, feeding on a variety of insects including beetles, crickets, and cicadas.",
                 "The Dollarbird is also known for its unique breeding habits, with pairs working together to excavate a nest hole in a tree, usually high up in a eucalyptus or acacia tree."
@@ -4704,7 +4704,7 @@
         },
         {
             "species": "Falco cenchroides",
-            "common": "Nankeen kestrel",
+            "common": "Australian kestral",
             "summary": "The Nankeen kestrel is one of the most common and widespread raptors in Australia, and can be found in a variety of habitats including forests, grasslands, and urban areas.",
             "description": [
                 "This species is named after its distinctive coloration, which resembles the yellowish-brown color of Nankeen cloth, a type of cotton fabric that was once common in Australia.",
@@ -4783,7 +4783,7 @@
         {
             "species": "Galanga labeculata",
             "common": "Double-Spotted Cicada",
-            "summary": "Galanga labeculata, commonly known as the Double-Spotted Cicada, is a species of cicada found in parts of Australia, including New South Wales and Queensland.",
+            "summary": "Galanga labeculata, commonly known as the Double-Spotted Cicada, is a species of cicada found in parts of Australia, including New South Wales, Victoria and Queensland.",
             "description": [
                 "The Double-Spotted Cicada gets its name from the two distinct spots on the base of its wings.",
                 "Adult Double-Spotted Cicadas are usually around 30 mm long and have a wingspan of about 55 mm.",
@@ -4815,7 +4815,7 @@
                 "These birds feed mainly on nectar, insects, and fruit. They have a specialized brush-tipped tongue that allows them to extract nectar from flowers with ease.",
                 "Singing Honeyeaters are known for their unique breeding habits. They form breeding pairs during the breeding season, and the female lays two to three eggs in a small cup-shaped nest made of twigs and bark.",
                 "Unlike other honeyeater species, Singing Honeyeaters are not territorial and will often feed in flocks. They have also been known to form mixed-species flocks with other bird species.",
-                "The Singing Honeyeater is an important cultural symbol for many Indigenous Australians, who often use their feathers in ceremonial dress and art."
+                ""
             ],
             "img": ""
         },
@@ -4891,7 +4891,7 @@
             "description": [
                 "The Brown Gerygone is a small bird, measuring only about 11 cm in length and weighing around 6-8 grams. They have a brownish-grey upper body with a lighter underbelly and a distinctive white eye ring.",
                 "These birds are insectivores, feeding on a variety of small insects and spiders. They can be found foraging for food in the understory of forests and woodlands.",
-                "The Brown Gerygone is known for its beautiful and complex song, which is a series of high- pitched and melodious notes. They are often heard singing during the breeding season, which occurs between August and January.",
+                "The Brown Gerygone is known to make short repetitive calls that sound like “which-is-it-is-it",
                 "This species is known to be monogamous, with pairs forming long-lasting bonds. They build small, cup-shaped nests made of grasses, bark, and spider webs, which are typically hidden in the foliage of trees or shrubs.",
                 "The Brown Gerygone is generally found in coastal and subcoastal areas of eastern and southeastern Australia, but can also be found in Tasmania and nearby islands. They are considered to be a species of least concern by the IUCN, with a stable population and a wide distribution range."
             ],
@@ -5509,3 +5509,4 @@
             }
     ]
 }
+
