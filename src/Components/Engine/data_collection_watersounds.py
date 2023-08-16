@@ -8,7 +8,7 @@ from lxml import etree
 
 
 driver = webdriver.Chrome()
-with open(f'C:/users/prajwal/water_sounds/water_sounds.csv', 'w', newline='\n') as file:
+with open('G:/water_sounds/water_sounds.csv', 'w', newline='\n') as file:
         writer = csv.writer(file)
         writer.writerow(['name', 'uploaded_by', 'length', 'file_size', 'sample_rate', 'bit_depth', 'description', 'link'])
 
@@ -16,14 +16,14 @@ url = 'https://freesound.org/search/?q=forest+water'
 i = 0
 
 # Increase the range value to get more audio files loaded into specified directory
-for x in range(300):
+for x in range(1000):
         try:
                 i += 1
                 if i == 15:
                         i = 0
                         url = driver.find_element(By.XPATH, '/html/body/div[2]/div/div/div[30]/ul/li[2]/a').get_attribute('href')
                 driver.get(url)
-                driver.implicitly_wait(5)
+                driver.implicitly_wait(3)
                 titles = driver.find_elements(By.CLASS_NAME, 'sound_filename')
                 titles[i].click()
                 soup = BeautifulSoup(driver.page_source, 'html.parser')
@@ -39,14 +39,17 @@ for x in range(300):
                 file_size = dom.xpath('/html/body/div[2]/div/div/div[4]/dl/dd[3]')[0].text
                 sample_rate = dom.xpath('/html/body/div[2]/div/div/div[4]/dl/dd[4]')[0].text
                 bit_depth = dom.xpath('/html/body/div[2]/div/div/div[4]/dl/dd[5]')[0].text
-                with open('C:/users/prajwal/water_sounds/water_sounds.csv', 'a', newline='\n') as file:
-                        writer = csv.writer(file)
-                        writer.writerow([file_name, sound_author, sound_information_length, file_size, sample_rate, bit_depth, sound_description, video_url])
-                with open(f'C:/users/prajwal/water_sounds/{file_name}.mp3', 'wb') as file:
+                driver.implicitly_wait(3)
+                with open(f'G:/water_sounds/{file_name}.mp3', 'wb') as file:
                     file.write(doc.content)
+                    driver.implicitly_wait(5)
+                    with open('G:/water_sounds/water_sounds.csv', 'a', newline='\n') as file:
+                            writer = csv.writer(file)
+                            writer.writerow([file_name, sound_author, sound_information_length, file_size, sample_rate,
+                                             bit_depth, sound_description, video_url])
                 driver.back()
                 driver.find_element(By.XPATH, '//*[@id="cookie-accept"]').click()
-                driver.implicitly_wait(5)
+                driver.implicitly_wait(2)
 
         except:
                 print("Exception")
