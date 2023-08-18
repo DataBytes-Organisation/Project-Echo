@@ -4,14 +4,16 @@ const path = require('path');
 const fs = require('fs');
 const cookieSession = require("cookie-session");
 const dbConfig = require("./config/db.config");
-
-
+const mongoose = require("mongoose");
 
 //Add mongoDB module inside config folder
 const db = require("./model");
+
 const Role = db.role;
 
-//Establish Mongo Client connection to mongoDB
+//added in
+const Request = require("./public/js/sampleRequests")
+
 db.mongoose
   .connect(`mongodb://${dbConfig.USERNAME}:${dbConfig.PASSWORD}@${dbConfig.HOST}:${dbConfig.PORT}/${dbConfig.DB}`, {
     useNewUrlParser: true,
@@ -25,7 +27,6 @@ db.mongoose
     console.error("Connection error", err);
     process.exit();
   });
-
 
 //Initalize the data if no user role existed
 function initial() {
@@ -52,8 +53,7 @@ function initial() {
     }
   });
 }
-
-const port = 8080;
+const port = 7080;
 
 // serve static files from the public directory
 app.use(express.static(path.join(__dirname, 'public')));
@@ -63,7 +63,7 @@ const cors = require("cors");
 
 
 var corsOptions = {
-  origin: "http://localhost:8080"
+  origin: "http://localhost:7080"
 };
 
 app.use(cors(corsOptions))
@@ -127,6 +127,15 @@ app.post("/send_email", (req,res) => {
 
 })
 
+app.get('/api/requests', async (req, res) => {
+  try {
+    const requests = await Request.find();
+    console.log(requests);
+    res.json(requests);
+  } catch (error) {
+    res.status(500).json({ error: 'Error fetching data' });
+  }
+});
 
 app.get("/requests", (req,res) => {
   res.sendFile(path.join(__dirname, 'public/requests.html'))

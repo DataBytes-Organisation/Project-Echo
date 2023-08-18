@@ -22,7 +22,7 @@
     <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
     
     <!-- SplashScreen Styling -->
-    <link rel="stylesheet" type="text/css" href="./css/splash_screen_style.css">
+    <link rel="stylesheet" type="text/css" href="./css/splash_screen_style_requests.css">
 
     <!--- Requests Page Styling -->
     <link rel="stylesheet" href="./css/requests.css" type="text/css">
@@ -80,26 +80,102 @@
 
         
 <script>
-    const dataBody = document.getElementById('data-body');
 
-    fetch('/api/requests') // Replace with the correct endpoint from your server
-        .then(response => response.json())
-        .then(data => {
-        data.forEach(item => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-            <td>${item.requestId}</td>
-            <td>${item.username}</td>
-            <td>${item.animal}</td>
-            <td>${item.date}</td>
-            <td>${item.status}</td>
-            `;
-            dataBody.appendChild(row);
-        });
-        })
-        .catch(error => {
-        console.error('Error fetching data:', error);
-        });
+
+//
+
+const dataBody = document.getElementById('data-body');
+
+  // Sample data from the array you provided
+  const requests = [
+  {
+    "idRequest": "1",
+    "username": "TN-HMI",
+    "animal": "animal",
+    "date": "2023-08-10T10:30:00Z",
+    "status": "pending"
+  },
+  {
+    "idRequest": "2",
+    "username": "QC-HMI",
+    "animal": "animal 2",
+    "date": "2023-08-10T12:30:00Z",
+    "status": "approved"
+  }
+];
+
+  // Create a dropdown element with options
+  function createDropdown(requestId) {
+    const dropdown = document.createElement('div');
+    dropdown.classList.add('dropdown');
+
+    const button = document.createElement('button');
+    button.textContent = 'Pending';
+    dropdown.appendChild(button);
+
+    const options = document.createElement('div');
+    options.classList.add('dropdown-options');
+    options.innerHTML = `
+      <button class="approve-btn" data-request-id="${requestId}">Approve</button>
+      <button class="deny-btn" data-request-id="${requestId}">Deny</button>
+    `;
+    dropdown.appendChild(options);
+
+    return dropdown;
+  }
+
+  
+  function updateTable(){
+    requests.forEach(item => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${item.idRequest}</td>
+      <td>${item.username}</td>
+      <td>${item.animal}</td>
+      <td>${item.date}</td>
+      <td></td>
+    `;
+
+    const statusCell = row.querySelector('td:last-child');
+
+    if (item.status === 'pending') {
+      const dropdown = createDropdown(item.idRequest);
+      statusCell.appendChild(dropdown);
+    } else {
+      statusCell.textContent = item.status;
+    }
+
+    dataBody.appendChild(row);
+  });
+  }
+  // Loop through the sample data array and populate the table
+  
+  function clearTable() {
+  const dataBody = document.getElementById('data-body');
+  dataBody.innerHTML = ''; // Remove all rows
+}
+  updateTable();
+
+  // Add event listener to the dropdown options
+  dataBody.addEventListener('click', event => {
+    const target = event.target;
+    if (target.classList.contains('approve-btn')) {
+      const requestId = target.getAttribute('data-request-id');
+      console.log(`Approving request ${requestId}`);
+      requests[requestId-1].status = "Approved"
+      clearTable()
+      updateTable()
+    } else if (target.classList.contains('deny-btn')) {
+      const requestId = target.getAttribute('data-request-id');
+      console.log(`Denying request ${requestId}`);
+      console.log(requests[requestId-1].status);
+      requests[requestId-1].status = "Denied"
+      clearTable()
+      updateTable()
+    }
+    
+
+  });
 </script> 
 
 </html>
