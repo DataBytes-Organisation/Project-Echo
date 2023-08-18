@@ -214,7 +214,7 @@ body{
   #donate{
     max-width: 520px;
   }
-  #services{
+  #statistics{
     max-width: 520px;
   }
   #mic-popup{
@@ -499,7 +499,7 @@ input[type="checkbox"]{
   margin-top: 30px;
 }
 
-#services{
+#stats{
   padding: 0px 0px 0px 0px;
   height: 100%;
   width: 0%;
@@ -515,7 +515,7 @@ input[type="checkbox"]{
   margin-top: 30px;
 }
 
-#services-contents{
+#stats-contents{
   color: rgb(106, 246, 239);
   padding-top: 20px;
   margin-left: 10px;
@@ -528,14 +528,6 @@ input[type="checkbox"]{
   font-family: 'Roboto', sans-serif;
   /*overflow-y: scroll;
   overflow-x: hidden;*/
-}
-
-#services-contents ul {
-  color: rgb(101, 188, 71); /* Light green color */
-  /*color: white; */
-  list-style-type: disc; /* Use disc bullet points */
-  margin-left: 20px; /* Add some left margin for bullet points */
-  padding-left: 20px; /* Add left padding for the list items */
 }
 
 #SIM {  
