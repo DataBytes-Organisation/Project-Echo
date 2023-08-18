@@ -9,13 +9,15 @@ const { authJwt } = require("./middleware");
 const controller = require("./controller/auth.controller");
 const crypto = require("crypto")
 var bcrypt = require("bcryptjs");
+const mongoose = require('mongoose');
 
 //Add mongoDB module inside config folder
 const db = require("./model");
 const Role = db.role;
 const User = db.user;
 const Guest = db.guest;
-//Establish Mongo Client connection to mongoDB
+const Request = db.request;
+
 db.mongoose
   .connect(`mongodb://${dbConfig.USERNAME}:${dbConfig.PASSWORD}@${dbConfig.HOST}/${dbConfig.DB}?authSource=admin`, {
     useNewUrlParser: true,
@@ -26,6 +28,7 @@ db.mongoose
     initial();
     initUsers();
     initGuests();
+    initRequests();
   })
   .catch(err => {
     console.log("ConnString: ", `mongodb://${dbConfig.USERNAME}:${dbConfig.PASSWORD}@${dbConfig.HOST}/${dbConfig.DB}?authSource=admin`)
@@ -33,7 +36,7 @@ db.mongoose
     // process.exit();
   });
 
-
+//mongoose.connect("mongodb://modelUser:EchoNetAccess2023@localhost:27017/EchoNet")
 //Initalize the data if no user role existed
 function initial() {
   Role.estimatedDocumentCount((err, count) => {
@@ -63,6 +66,14 @@ function initial() {
   });
 }
 
+function initRequests(){
+  Request.estimatedDocumentCount((err, count) => {
+    if (!err && count === 0) {
+      const requestData = require(path.join(__dirname, "user-sample/request-seed.json"));
+      Request.insertMany(requestData);
+    }
+  });
+}
 //Add sample Users if none exists
 function initUsers(){
   User.estimatedDocumentCount((err, count) => {
@@ -328,6 +339,54 @@ app.get("/login", (req,res) => {
   res.sendFile(path.join(__dirname, 'public/login.html'));
 })
 
+app.post("/api/submit", async (req, res) => {
+  try {
+    const newRequest = new Request(req.body);
+    newRequest.date = new Date();
+    newRequest.status = "pending";
+    await newRequest.save();
+    res.status(200).send("Request submitted successfully");
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("An error occurred");
+  }
+});
+
+app.get("/requests", (req,res) => {
+  res.sendFile(path.join(__dirname, 'public/requests.html'))
+})
+
+app.patch('/api/requests/:id', async (req, res) => {
+  const requestId = req.params.id; // Get the request ID from the URL parameter
+  const newStatus = req.body.status; // Get the new status from the request body
+
+  try {
+    // Find the request by ID and update the status
+    const updatedRequest = await Request.findByIdAndUpdate(
+      requestId,
+      { $set: { status: newStatus } },
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedRequest) {
+      return res.status(404).json({ error: 'Request not found' });
+    }
+
+    res.json({ message: 'Request status updated successfully', updatedRequest });
+  } catch (error) {
+    console.error('Error updating request status:', error);
+    res.status(500).json({ error: 'Error updating request status' });
+  }
+});
+
+app.get('/api/requests', async (req, res) => {
+  try {
+    const requests = await Request.find();
+    res.json(requests);
+  } catch (error) {
+    res.status(500).json({ error: 'Error fetching data' });
+  }
+});
 
 app.get("*", (req,res) => {
   if (authJwt.verifyToken){
