@@ -4,7 +4,7 @@ import subprocess
 # List of container names to delete
 containers_to_delete = ["ts-echo-model-cont","ts-echo-hmi-cont","ts-api-cont", "ts-simulator-cont", "ts-echo-engine-cont", "ts-mongodb-cont", "mongo-express", "ts-mqtt-server-cont"]
 images = ["ts-simulator","ts-api","ts-mongodb","ts-echo-hmi","ts-echo-engine","ts-mqtt-server","ts-echo-model","mongo-express"]
-preserved_volumes = ["echo-net_credentials_volume", "echo-net_db-data"]
+preserved_volumes = ["echo-net_credentials_volume"]
 
 def delete_containers(container_names):
     client = docker.from_env()
@@ -17,7 +17,6 @@ def delete_containers(container_names):
             print(f"Container {container_name} stopped and deleted.")
         except docker.errors.NotFound:
             print(f"Container {container_name} not found.")
-
 
 
 def delete_unused_volumes(preserved_volume_names):

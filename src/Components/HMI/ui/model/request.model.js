@@ -7,6 +7,10 @@ const Request = mongoose.model(
     requestId: String,
     username: String,
     animal: String,
+    requestingToChange: String,
+    from: String,
+    to: String,
+    source: String,
     date: Date,
     status: String,
    
