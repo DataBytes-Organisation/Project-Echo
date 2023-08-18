@@ -13,17 +13,10 @@ const mongoose = require('mongoose');
 
 //Add mongoDB module inside config folder
 const db = require("./model");
-
 const Role = db.role;
 const User = db.user;
 const Guest = db.guest;
 const Request = db.request;
-const Species = db.species;
-
-
-//db2 
-
-//Establish Mongo Client connection to mongoDB
 
 db.mongoose
   .connect(`mongodb://${dbConfig.USERNAME}:${dbConfig.PASSWORD}@${dbConfig.HOST}/${dbConfig.DB}?authSource=admin`, {
