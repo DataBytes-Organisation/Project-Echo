@@ -13,7 +13,19 @@
 				"_id": "64be1d0f05225843178d91d6"
 			}	
 		],
-		"__v": 1
+		"__v": 1,
+		"gender": "MALE",
+		"DoB": "01-01-2000",
+		"address":[
+			{
+				"country": "australia",
+				"state": "vic",
+				"homeaddress": ""
+			}
+			
+		],
+		"organization": "Deakin",
+		"phonenumber": "0499999999"
 	},
 	{
 		"_id": "64bf206f7e048a9822077b7a",
@@ -29,7 +41,19 @@
 				"_id": "64be1d0f05225843178d91d6"
 			}	
 		],
-		"__v": 1
+		"__v": 1,
+		"gender": "MALE",
+		"DoB": "01-01-2000",
+		"address":[
+			{
+				"country": "australia",
+				"state": "vic",
+				"homeaddress": ""
+			}
+			
+		],
+		"organization": "Deakin",
+		"phonenumber": "0499999999"
 	},
 	{
 		"_id": "64bf209e7e048a9822077b80",
@@ -45,7 +69,19 @@
 				"_id": "64be1d0f05225843178d91d6"
 			}	
 		],
-		"__v": 1
+		"__v": 1,
+		"gender": "MALE",
+		"DoB": "01-01-2000",
+		"address":[
+			{
+				"country": "australia",
+				"state": "vic",
+				"homeaddress": ""
+			}
+			
+		],
+		"organization": "Deakin",
+		"phonenumber": "0499999999"
 	},
 	{
 		"_id": "64bf20e37e048a9822077b86",
@@ -61,6 +97,18 @@
 				"_id": "64be1d0f05225843178d91d6"
 			}	
 		],
-		"__v": 1
+		"__v": 1,
+		"gender": "MALE",
+		"DoB": "01-01-2000",
+		"address":[
+			{
+				"country": "australia",
+				"state": "vic",
+				"homeaddress": ""
+			}
+			
+		],
+		"organization": "Deakin",
+		"phonenumber": "0499999999"
 	}
 ]
