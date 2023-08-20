@@ -1471,6 +1471,52 @@ export function cancelAudioRecording() {
   hideRecordingControls();
 }
 
+function save() {
+  let exportData = {};
+  exportData.audioBlobs = audioRecorder.audioBlobs;
+
+  const jsonDataString = JSON.stringify(exportData, null, 2);
+
+  const filename = prompt("Enter a filename for the JSON file:", "data.json");
+
+  if (filename) {
+    // Create a Blob object with the JSON data
+    const blob = new Blob([jsonDataString], { type: 'application/json' });
+
+    // Create a URL for the Blob object
+    const blobURL = URL.createObjectURL(blob);
+
+    // Create a link for downloading the JSON file
+    const downloadLink = document.createElement('a');
+    downloadLink.href = blobURL;
+    downloadLink.download = filename;
+    downloadLink.textContent = 'Download JSON';
+
+    // Append the link to the DOM
+    document.getElementById("downloadLink").innerHTML = "";
+    document.getElementById("downloadLink").appendChild(downloadLink);
+    downloadLink.click();
+  }
+}
+
+var fileInput = document.getElementById("fileInput");
+
+fileInput.addEventListener("change", function(event) {
+  const selectedFile = event.target.files[0];
+
+  if (selectedFile) {
+    const reader = new FileReader();
+
+    reader.onload = function(event) {
+      const fileContent = event.target.result;
+      const jsonData = JSON.parse(fileContent);
+      audioRecorder.audioBlobs = jsonData.audioBlobs;
+      //output.textContent = JSON.stringify(jsonData, null, 2);
+    };
+
+    reader.readAsText(selectedFile);
+  }
+});
 /*
 let mediaRecorder;
 

@@ -891,6 +891,27 @@
       animateAudioMute();
     }			
   }
+  
+  function saveRecordingEvent(){
+    const save_recording = new CustomEvent('saveRecording',{
+            detail: {
+              message: "save"
+            }
+          })
+
+    document.dispatchEvent(save_recording);
+  }
+
+  function loadRecordingEvent(){
+    const load_recording = new CustomEvent('loadRecording',{
+            detail: {
+              message: "load"
+            }
+          })
+
+    document.dispatchEvent(load_recording);
+  }
+
   function animateRecordedAudioPlay() {
     $(".boxmutedR").removeClass("boxmutedR");
       recordingAud = true;

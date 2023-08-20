@@ -1371,6 +1371,17 @@ i {
   width: 400px;
   margin-bottom: 30px;
 }
+#recording_export_container {
+  display: -webkit-flex;
+  display: -ms-flex;
+  display: inline-block;
+  justify-content: space-evenly;
+  align-items: center;
+  width: 400px;
+  margin-bottom: 30px;
+}
+#save_recording_button,
+#load_recording_button,
 #cancel_recording_button,
 #stop_recording_button,
 #record_audio_button {
