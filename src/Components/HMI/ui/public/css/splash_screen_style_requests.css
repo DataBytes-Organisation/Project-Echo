@@ -74,6 +74,7 @@
   }
   
   .screen-overlay {    
+	-webkit-transform: translate3d(0, 0, 0);
     background: linear-gradient(
       rgb(var(--primary-rgb) / 0.15),
       rgb(var(--primary-rgb) / 0.15) 3px,
@@ -143,6 +144,7 @@
   }
   /* IMAGE: https://wallpaperaccess.com/magical-forest */
   .screen > .screen-image {
+	-webkit-transform: translate3d(0, 0, 0);
     background-image: url("./forest_1.jpg") ;
     height: 100%;
     width: 100%;
