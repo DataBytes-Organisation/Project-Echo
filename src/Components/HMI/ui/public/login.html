@@ -65,23 +65,34 @@
 
         <div id="login-form" class="user-auth-form modal">
 
-            <form class="modal-content animate" action="/api/auth/signin" method="POST">
+            <form class="modal-content animate" id="login-form-form" action="/api/auth/signin" method="POST">
                 <div class="imgcontainer">
                     <span onclick="{closeForm('login-form')}" class="close" title="Close Modal">&times;</span>
                     <!-- <img src="img_avatar2.png" alt="Avatar" class="avatar"> -->
                 </div>
 
                 <div class="container">
-                    <label for="username"><b>Username</b></label>
-                    <input type="text" placeholder="Enter Username" name="username" required>
+                    <!-- <label for="username"><b>Username</b></label>
+                    <input type="text" placeholder="Enter Username" name="username" required> -->
+                    <div id="emailInput">
+                        <label for="email"><b>Email ID</b></label>
+                        <input type="text" id="email" placeholder="Email ID">
+                    </div>
+                    <div id="usernameInput" style="display:none;">
+                        <label for="username"><b>Username</b></label>
+                        <input type="text" id="username" placeholder="Username">
+                    </div>
 
                     <label for="password"><b>Password</b></label>
                     <input type="password" placeholder="Enter Password" name="password" required>
+                    <div class="login-switch">
+                        <input type="checkbox" id="switchInput" onchange="toggleLoginType()">
+                        <label for="switchInput">Use Username instead</label>
+                    </div>
+                   
+                </button>
 
                     <button type="submit" class="btn10"><span>Login</span></button>
-                    <label>
-                        <input type="checkbox" checked="checked" name="remember"> Remember me
-                    </label>
                 </div>
 
                 <div class="container" style="background-color:#f1f1f1">
@@ -116,9 +127,7 @@
                     <input type="password" placeholder="Enter Password" name="password" required>
 
                     <button type="submit" class="btn10"><span>Login</span></button>
-                    <label>
-                        <input type="checkbox" checked="checked" name="remember"> Remember me
-                    </label>
+                   
                 </div>
 
                 <div class="container" style="background-color:#f1f1f1">
@@ -161,6 +170,26 @@
 </body>
 
 <script>
+    //Switching between username and email
+    function toggleLoginType() {
+    const emailInput = document.getElementById('emailInput');
+    const usernameInput = document.getElementById('usernameInput');
+    const switchInput = document.getElementById('switchInput');
+
+    if (switchInput.checked) {
+        emailInput.style.display = 'none';
+        usernameInput.style.display = 'block';
+
+        document.getElementById('username').setAttribute('required', 'required');
+        document.getElementById('email').removeAttribute('required');
+    } else {
+        emailInput.style.display = 'block';
+        usernameInput.style.display = 'none';
+
+        document.getElementById('username').setAttribute('required', 'required');
+        document.getElementById('email').removeAttribute('required');
+        }
+    }
     // Get the modal
     var modal = document.getElementById('id01');
 
@@ -199,6 +228,47 @@
             btn_ele.disabled = true;
         }
     }
+
+
+//For Authentication, matching credentials from client side with those of database
+
+document.getElementById('login-form-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  let identifier;
+  if (document.getElementById('switchInput').checked) {
+    identifier = document.getElementById('username').value;
+  } else {
+    identifier = document.getElementById('email').value;
+  }
+  const password = document.getElementById('password').value;
+  const response = await fetch('/login', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ identifier, password })
+  });
+
+  //For redirecting user to welcome page, if the credentials are correct and a response.ok is received
+
+  try {
+    const data = await response.json();
+    if (response.ok) {
+      if (data.redirectTo) {
+        window.open(data.redirectTo, "_blank");
+      } else {
+        alert(data.message);
+      }
+    } else {
+      alert(data.error);
+    }
+  } catch (error) {
+    console.error(error);
+    alert('An error occurred.');
+  }
+});
+
 
 </script>
 
