@@ -367,7 +367,7 @@
                 <h2 id="audioHeader"style="margin-top: 20px !important;">Audio</h2>
 
                 <div id="audioControl" class="audio_component">
-                  <span><i class="fa fa-volume-up fa-2x" style="color:rgba(247, 186, 206, 0.6);" onclick="{toggleAudio()}"></i></span>
+                  <span><i id="animalAudioI" class="fa fa-volume-up fa-2x" style="color:rgba(247, 186, 206, 0.6);" onclick="{toggleAudio()}"></i></span>
                   <div class="audioContainer">
                     <div class="box box1"></div>
                     <div class="box box2"></div>
@@ -852,16 +852,19 @@
   })
 
   let aud = false;
+  let recordingAud = false;
+
   function animateAudioPlay() {
     $(".boxmuted").removeClass("boxmuted");
       aud = true;
-      document.querySelector("i").style.opacity=".5";
+      document.getElementById("animalAudioI").style.opacity=".5";
+      
   }
 
   function animateAudioMute(){
     $(".box").addClass("boxmuted");
       aud = false;
-      document.querySelector("i").style.opacity="1";
+      document.getElementById("animalAudioI").style.opacity="1";
   }
 
   function toggleAudio() {
@@ -877,7 +880,6 @@
       animateAudioPlay();
     } 
     else {
-      console.log()
       const stop_audio = new CustomEvent('stopAudio',{
             detail: {
               message: "stop audio"
@@ -1550,18 +1552,18 @@ closeFormButton.addEventListener('click', (event) => {
   }
 
   function record(){
-    console.log("calling startAudioRecording...");
+    //console.log("calling startAudioRecording...");
     //testFunct();
     startAudioRecording();
   }
 
   function stopRecording(){
-    console.log("calling stopAudioRecording...");
+    //console.log("calling stopAudioRecording...");
     stopAudioRecording();
   }
 
   function cancelRecording(){
-    console.log("calling cancelAudioRecording...");
+    //console.log("calling cancelAudioRecording...");
     cancelAudioRecording();
   }
 
