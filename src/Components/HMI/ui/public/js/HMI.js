@@ -1496,6 +1496,24 @@ function handleDataAvailable(event) {
     }
 }*/
 
+var playNextRecordedTrack = false;
+var audioAnimTimeout = null;
+
+document.addEventListener('playRecordedAudio', function(event){
+  //console.log("play audio");
+  playNextRecordedTrack = true;
+  playAudio()
+})
+
+document.addEventListener('stopRecordedAudio', function(event){
+  //console.log("stop audio");
+  playNextRecordedTrack = false;
+  stopRecordingPlayback();
+})
+
+var audioRecordingElement = null;
+var recordingPlaybackAnimTimeout = null;
+
 function playRecording(recordedChunks) {
     if (recordedChunks.length === 0) {
         console.log("No recording available.");
@@ -1504,17 +1522,36 @@ function playRecording(recordedChunks) {
       const blob = new Blob(recordedChunks, { type: 'audio/webm' });
       if(blob.size > 0){
         const url = URL.createObjectURL(blob);
-        const audioElement = document.getElementById("audioElem");
+        audioRecordingElement = document.getElementById("audioElem");
   
-        audioElement.src = url;
-        audioElement.load();
-        audioElement.play();
-        showPlaybackIndicator();
+        audioRecordingElement.src = url;
+        audioRecordingElement.load();
+        if(playNextRecordedTrack){
+          recordingPlaybackAnimTimeout = setTimeout(
+            muteRecordingPlaybackAnimation,
+            audioRecordingElement.duration*1000,
+            hmiState
+          );
+          audioRecordingElement.play();
+          showPlaybackIndicator();
+        }
       }
       else{
         console.log("Recording failed check microphone configuration settings.");
       }
     }
+}
+
+function stopRecordingPlayback(){
+  muteRecordingPlaybackAnimation();
+
+  if(recordingPlaybackAnimTimeout){
+    clearTimeout(recordingPlaybackAnimTimeout);
+  }
+
+  if(audioRecordingElement != null){
+    audioRecordingElement.stop();
+  }
 }
 
 export function playAudio() {
