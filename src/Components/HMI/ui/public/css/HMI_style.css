@@ -195,6 +195,10 @@ body{
   animation-name: silence;
 }
 
+.boxmutedR {
+  animation-name: silence;
+}
+
 @media (min-width: 0px) {
   #menu {
     max-width: 550px;

@@ -400,6 +400,16 @@ export function muteAudioAnimation(){
   document.dispatchEvent(mute_audio);
 }
 
+export function muteRecordingPlaybackAnimation(){
+  const mute_audio = new CustomEvent('muteRecordingAnimation',{
+    detail: {
+      message: "mute animation"
+    }
+  })
+
+  document.dispatchEvent(mute_audio);
+}
+
 var activeAudioNode = null;
 var audioAnimTimeout = null;
 var playNextTrack = false;
