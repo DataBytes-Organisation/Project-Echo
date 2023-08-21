@@ -470,9 +470,43 @@
                     </div>
                     <i id="stop_recording_button" class="toggle-button btn btn-secondary btn-no-background select-all-btn" onclick="{stopRecording()}" aria-hidden="true">Stop</i>
                 </div>
-                <div id="audio_playback_container">
+                <div id="audio_playback_div">
                     <p id="audio_playback_indicator" class="playback_indicator hide">Audio is playing<span>.</span><span>.</span><span>.</span></p>
                 </div>
+              </div>
+              <h2 id="audioHeader"style="margin-top: 20px !important;">Recording Playback</h2>
+              <div id="audio_playback_container">
+                <div id="audioControl" class="audio_component">
+                  <span><i id="recordingI" class="fa fa-volume-up fa-2x" style="color:rgba(247, 186, 206, 0.6);" onclick="{toggleRecordingAudio()}"></i></span>
+                  <div class="audioContainer">
+                    <div class="boxR box1"></div>
+                    <div class="boxR box2"></div>
+                    <div class="boxR box3"></div>
+                    <div class="boxR box4"></div>
+                    <div class="boxR box5"></div>
+                    <div class="boxR box6"></div>
+                    <div class="boxR box7"></div>
+                    <div class="boxR box8"></div>
+                    <div class="boxR box9"></div>
+                    <div class="boxR box10"></div>
+                    <div class="boxR box1"></div>
+                    <div class="boxR box2"></div>
+                    <div class="boxR box3"></div>
+                    <div class="boxR box4"></div>
+                    <div class="boxR box5"></div>
+                    <div class="boxR box6"></div>
+                    <div class="boxR box7"></div>
+                    <div class="boxR box8"></div>
+                    <div class="boxR box9"></div>
+                    <div class="boxR box10"></div>
+                  </div>
+                </div>
+                <div id="recording_export_container" class="recording_controls controls_item_row">
+                  <i id="save_recording_button" class="toggle-button btn btn-secondary btn-no-background select-all-btn" onclick="{saveRecordingEvent()}" aria-hidden="true">Save</i>
+                  <i id="load_recording_button" class="toggle-button btn btn-secondary btn-no-background select-all-btn" onclick="{loadRecordingEvent()}" aria-hidden="true">Load</i>
+                  <input type="file" id="fileInput">
+                </div>
+                <div id="downloadLink"></div>
               </div>
               <!--div class="overlay hide">
                 <div id="audio_recording_not_supported">
@@ -483,39 +517,7 @@
         
               <audio controls id="audioElem" class="audio-element hide">
               </audio>
-              <h2 id="audioHeader"style="margin-top: 20px !important;">Recording Playback</h2>
 
-              <div id="audioControl" class="audio_component">
-                <span><i id="recordingI" class="fa fa-volume-up fa-2x" style="color:rgba(247, 186, 206, 0.6);" onclick="{toggleRecordingAudio()}"></i></span>
-                <div class="audioContainer">
-                  <div class="boxR box1"></div>
-                  <div class="boxR box2"></div>
-                  <div class="boxR box3"></div>
-                  <div class="boxR box4"></div>
-                  <div class="boxR box5"></div>
-                  <div class="boxR box6"></div>
-                  <div class="boxR box7"></div>
-                  <div class="boxR box8"></div>
-                  <div class="boxR box9"></div>
-                  <div class="boxR box10"></div>
-                  <div class="boxR box1"></div>
-                  <div class="boxR box2"></div>
-                  <div class="boxR box3"></div>
-                  <div class="boxR box4"></div>
-                  <div class="boxR box5"></div>
-                  <div class="boxR box6"></div>
-                  <div class="boxR box7"></div>
-                  <div class="boxR box8"></div>
-                  <div class="boxR box9"></div>
-                  <div class="boxR box10"></div>
-                </div>
-              </div>
-              <div id="recording_export_container" class="recording_controls controls_item_row">
-                <i id="save_recording_button" class="toggle-button btn btn-secondary btn-no-background select-all-btn" onclick="{saveRecordingEvent()}" aria-hidden="true">Save</i>
-                <i id="load_recording_button" class="toggle-button btn btn-secondary btn-no-background select-all-btn" onclick="{loadRecordingEvent()}" aria-hidden="true">Load</i>
-                <input type="file" id="fileInput">
-              </div>
-              <div id="downloadLink"></div>
 
             </div>
             <div id="mic-default-content">
@@ -858,7 +860,6 @@
     $(".boxmuted").removeClass("boxmuted");
       aud = true;
       document.getElementById("animalAudioI").style.opacity=".5";
-      
   }
 
   function animateAudioMute(){
@@ -926,7 +927,7 @@
 
   function toggleRecordingAudio() {
     if(recordingAud==false){
-      const play_recorded_audio = new CustomEvent('startRecordingPlayback',{
+      const play_recorded_audio = new CustomEvent('playRecordedAudio',{
             detail: {
               message: "play audio"
             }
@@ -934,10 +935,10 @@
 
       document.dispatchEvent(play_recorded_audio);
 
-      animateAudioPlay();
+      animateRecordedAudioPlay();
     } 
     else {
-      const stop_recorded_audio = new CustomEvent('stopRecordingPlayback',{
+      const stop_recorded_audio = new CustomEvent('stopRecordedAudio',{
             detail: {
               message: "stop audio"
             }
@@ -945,11 +946,12 @@
 
       document.dispatchEvent(stop_recorded_audio);
 
-      animateAudioMute();
+      animateRecordedAudioMute();
     }			
   }
 
   toggleAudio();
+  toggleRecordingAudio();
 
   document.addEventListener('muteAnimation', function(event){
     animateAudioMute();

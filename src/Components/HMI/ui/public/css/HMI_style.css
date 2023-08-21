@@ -962,6 +962,34 @@ input[type="checkbox"]{
     /*font-family: 'Roboto', sans-serif;*/
 }
 
+#mic-popup .audio_component {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+}
+
+#mic-popup .audio_component .audioContainer{
+  display: flex;
+  justify-content: space-between;
+  height: 64px;
+  --boxSize: 8px;
+  --gutter: 8px;
+  width: calc((var(--boxSize) + var(--gutter)) * 20);
+}
+
+#mic-popup .audioContainer .boxR{
+  transform: scaleY(.01);
+  height: 100%;
+  width: var(--boxSize);
+  background: rgba(247, 186, 206, 0.6) !important;
+  animation-duration: 1.5s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  border-radius: 8px;
+}
+
 #mic-popup img{
     /* padding: 8px 8px 8px 32px; */
     display: block;
@@ -1350,6 +1378,17 @@ i {
 #audio_recording_container {
   margin-top: 20px;
   width: 100%;
+  display: -webkit-flex;
+  display: -ms-flex;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+#audio_playback_container {
+  margin-top: 20px;
+  width: 100%;
   height: 100vh;
   display: -webkit-flex;
   display: -ms-flex;
@@ -1515,7 +1554,7 @@ i {
 .audio-element.hide {
   display: none;
 }
-#audio_playback_container {
+#audio_playback_div {
   height: 20px;
 }
 #audio_playback_indicator {
@@ -1609,6 +1648,11 @@ i {
 #audio_recording_container{
   width:440px;
 }
+
+#audio_playback_container{
+  width:440px;
+}
+
 
 #request-edit-button {
   color: white;
