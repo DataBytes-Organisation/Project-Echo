@@ -13,7 +13,18 @@ const User = mongoose.model(
         type: mongoose.Schema.Types.ObjectId,
         ref: "Role"
       }
-    ]
+    ],
+    gender: String,
+    DoB: Date,
+    address: [
+      {
+        country: String,
+        state: String,
+        homeaddress: String
+      }
+    ],
+    organization: String,
+    phonenumber: String,
   })
 );
 

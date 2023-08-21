@@ -8,7 +8,7 @@ from bson import ObjectId
 import datetime
 from app import serializers
 from app import schemas
-from app.database import Events, Movements, Microphones, User, Role, ROLES
+from app.database import Events, Movements, Microphones, User, Role, ROLES, GENDER, STATES_CODE, AUS_STATES
 import paho.mqtt.publish as publish
 import bcrypt
 from flask import jsonify
@@ -164,6 +164,7 @@ def signup(user: schemas.UserSignupSchema):
     #Convert into dictionary and insert into the database
     user_dict = user.dict()
     user_dict["userId"] = user.username
+    user_dict["__v"] = 0
     User.insert_one(user_dict)
     response = {"message": "User was registered successfully!"}
     return JSONResponse(content=response)
