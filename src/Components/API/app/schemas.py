@@ -87,7 +87,6 @@ class MicrophoneSchema(BaseModel):
 class AddressSchema(BaseModel):
     country: str
     state: Optional[str]
-    homeaddress: Optional[str]
 
     class Config:
         allow_population_by_field_name = True
@@ -106,7 +105,7 @@ class UserSignupSchema(BaseModel):
     DoB: datetime
     address: AddressSchema
     organization: str
-    phonenumber: str
+    phonenumber: Optional[str]
 
 
     @validator('DoB', pre=True)
