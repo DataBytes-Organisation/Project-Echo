@@ -1471,31 +1471,72 @@ export function cancelAudioRecording() {
   hideRecordingControls();
 }
 
+document.addEventListener('saveRecording', function(event){
+  save();
+})
+
+document.addEventListener('loadRecording', function(event){
+  //console.log("stop audio");
+  //playNextTrack = false;
+  //stopAudioPlayback();
+})
+
 function save() {
-  let exportData = {};
-  exportData.audioBlobs = audioRecorder.audioBlobs;
+  if(audioRecorder.audioBlobs.length != 0){
+    let exportData = {};
+    exportData.audioBlobs = [];
 
-  const jsonDataString = JSON.stringify(exportData, null, 2);
+    audioRecorder.audioBlobs.forEach(item => {
+      exportData.audioBlobs.push(btoa(item));
+    });
 
-  const filename = prompt("Enter a filename for the JSON file:", "data.json");
+    const base64AudioDataArray = audioRecorder.audioBlobs.map(blob => {
+      const reader = new FileReader();
+      return new Promise((resolve, reject) => {
+          reader.onloadend = () => {
+              resolve(reader.result.split(',')[1]); // Extract Base64 data
+          };
+          reader.readAsDataURL(blob);
+      });
+    });
 
-  if (filename) {
-    // Create a Blob object with the JSON data
-    const blob = new Blob([jsonDataString], { type: 'application/json' });
+    var jsonDataStr = "";
 
-    // Create a URL for the Blob object
-    const blobURL = URL.createObjectURL(blob);
+    Promise.all(base64AudioDataArray)
+      .then(audioDataArray => {
+          const jsonData = {
+              audioBlobs: audioDataArray,
+              // Include other metadata here if needed
+          };
 
-    // Create a link for downloading the JSON file
-    const downloadLink = document.createElement('a');
-    downloadLink.href = blobURL;
-    downloadLink.download = filename;
-    downloadLink.textContent = 'Download JSON';
+          jsonDataStr = JSON.stringify(jsonData);
+          
 
-    // Append the link to the DOM
-    document.getElementById("downloadLink").innerHTML = "";
-    document.getElementById("downloadLink").appendChild(downloadLink);
-    downloadLink.click();
+          const filename = prompt("Enter a filename for the JSON file:", "data.json");
+
+          if (filename) {
+      
+            const jsonDataString = jsonDataStr;
+            // Create a Blob object with the JSON data
+            const blob = new Blob([jsonDataString], { type: 'application/json' });
+      
+            // Create a URL for the Blob object
+            const blobURL = URL.createObjectURL(blob);
+      
+            // Create a link for downloading the JSON file
+            const downloadLink = document.createElement('a');
+            downloadLink.href = blobURL;
+            downloadLink.download = filename;
+            downloadLink.textContent = 'Download JSON';
+      
+             // Append the link to the DOM
+            document.getElementById("downloadLink").innerHTML = "";
+            document.getElementById("downloadLink").appendChild(downloadLink);
+            console.log(jsonDataString);
+            downloadLink.click();
+          }
+      })
+      .catch(err => console.error("Error processing audio blobs: ", err));
   }
 }
 
@@ -1510,7 +1551,24 @@ fileInput.addEventListener("change", function(event) {
     reader.onload = function(event) {
       const fileContent = event.target.result;
       const jsonData = JSON.parse(fileContent);
-      audioRecorder.audioBlobs = jsonData.audioBlobs;
+      audioRecorder.audioBlobs = [];
+
+      // Step 2: Convert Base64 audio data to binary data
+      const binaryAudioDataArray = jsonData.audioBlobs.map(base64Data => {
+        return atob(base64Data);
+      })
+
+      // Step 3: Create audio blobs from binary data chunks
+      const audioBlobs = binaryAudioDataArray.map(binaryData => {
+        const byteArray = new Uint8Array(binaryData.length);
+        for (let i = 0; i < binaryData.length; i++) {
+          byteArray[i] = binaryData.charCodeAt(i);
+        }
+        return byteArray;
+      });
+
+      audioRecorder.audioBlobs = audioBlobs; 
+      //audioRecorder.audioBlobs = atob(jsonData.audioBlobs);
       //output.textContent = JSON.stringify(jsonData, null, 2);
     };
 
@@ -1579,7 +1637,7 @@ function playRecording(recordedChunks) {
             hmiState
           );
           audioRecordingElement.play();
-          showPlaybackIndicator();
+          //showPlaybackIndicator();
         }
       }
       else{
@@ -1596,7 +1654,8 @@ function stopRecordingPlayback(){
   }
 
   if(audioRecordingElement != null){
-    audioRecordingElement.stop();
+    audioRecordingElement.pause();     // Pause the playback
+    audioRecordingElement.currentTime = 0; 
   }
 }
 
