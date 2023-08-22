@@ -49,8 +49,6 @@ for x in range(1000):
                                              bit_depth, sound_description, video_url])
                 driver.back()
                 driver.find_element(By.XPATH, '//*[@id="cookie-accept"]').click()
-                driver.implicitly_wait(2)
-
         except:
                 print("Exception")
 
