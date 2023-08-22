@@ -1274,6 +1274,14 @@ i {
   background-position: center;
 }
 
+#mic-popup-menu-btn{
+  background-image: url("../images/tabIcons/mic_icon.png");
+  background-size: cover;
+  background-size: 50%;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
 #filter-menu-btn::before {
   opacity: 0.5;
 }
