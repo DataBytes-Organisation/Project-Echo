@@ -73,7 +73,8 @@
     }
   }
   
-  .screen-overlay {    
+  .screen-overlay {    /* The below line enables hardware rendering, meaning that instead of the SW renderer being used to perform the abundance of paint commands, the HW renderer will be used instead, offering a massive speed increase */
+	-webkit-transform: translate3d(0, 0, 0); /* Since HW rendering should be used only for proper 3D elements, appending the -webkit- prefix enables it only for WebKit devices, since the other browsers work just fine without it. */
     background: linear-gradient(
       rgb(var(--primary-rgb) / 0.15),
       rgb(var(--primary-rgb) / 0.15) 3px,
@@ -143,6 +144,7 @@
   }
   /* IMAGE: https://wallpaperaccess.com/magical-forest */
   .screen > .screen-image {
+	-webkit-transform: translate3d(0, 0, 0); /* Using this translate command not only will enable the HW renderer, but it should also assist with the prevention of screen cutoff due to it rendering differently to the map section, fixing the other issue */
     background-image: url("./forest_1.jpg") ;
     height: 100%;
     width: 100%;
@@ -209,7 +211,7 @@
     translate: 26px calc(-1rem - 0.5px);
   }
   
-  .screen > .screen-content > .screen-user > :is(.name, .subtitle) {
+  .screen > .screen-content > .screen-user > :is(.name, .subtitle) { /* While the text animation did also use the SW renderer and cause some CPU usage, it shouldn't need the HW renderer for now... */
     font-family: "EarthOrbiterCondensed Local";
     color: white; 
     text-align: center;

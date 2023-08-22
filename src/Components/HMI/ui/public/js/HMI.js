@@ -1,11 +1,18 @@
 "use strict";
 
 import { getAudioTestString } from "./HMI-utils.js";
+import { getAudioRecorder } from "./audio_recorder.js";
 import { retrieveTruthEventsInTimeRange, retrieveVocalizationEventsInTimeRange, 
   retrieveMicrophones, retrieveAudio, retrieveSimTime } from "./routes.js";
-import data from "./sample_data.json" assert { type: 'json' };
+//import data from "./sample_data.json" assert { type: 'json' }; Browser assertions not yet supported in all browsers, alternative method used instead.
+
+
+// import { parse } from 'json2csv';
+
 
 var markups = ["elephant.png", "monkey.png", "tiger.png"];
+
+var audioRecorder = getAudioRecorder();
 
 var statuses = [
   "endangered",
@@ -22,6 +29,26 @@ function matchStatus(status){
   else{
     return status;
   }
+}
+
+export function convertCSV(json) {
+  if (json == null) return null
+  if (json === [] | typeof json === undefined | json.length === 0){
+    return null
+  }
+  let data = json;
+  let fields = Object.keys(data[0]);
+  let replacer = function(key, value) { return value === null ? 'N/A' : value } ;
+
+  let csv = null;
+  csv = data.map(function(row){
+    return fields.map(function(fieldName){
+      return JSON.stringify(row[fieldName], replacer)
+    }).join(',')
+  })
+  csv.unshift(fields.join(',')) // add header column
+  csv = csv.join('\r\n');
+  return csv
 }
 
 var statusPrintLookup = {
@@ -58,8 +85,10 @@ function getIconName(status, type){
   return animalTypeIconLookup[type] + statusIconLookup[status] + "-01.png";
 }
 
-var sample_data = data.data;
-
+//var sample_data = data.data; For assertion method
+var sample_data = []; // For the universal method
+fetch("./js/sample_data.json").then(res => res.json()).then(data => sample_data = data.data);
+// Went from 4 lines to 1. This method works on all browsers according to previous tests.
 var animal_data = [];
 
 export var animal_toggled = false;
@@ -98,12 +127,34 @@ export function initialiseHMI(hmiState) {
     updateMicrophoneLayer(hmiState, res.data);
     stepMicAnimation(hmiState);
   })
-  
+  addmicrophones(hmiState);
+  stepMicAnimation(hmiState);
   queueSimUpdate(hmiState);
   //simulateData(hmiState);
 }
 
 function updateFilters(){
+  
+}
+
+const validEmailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+export function emailValidation(inp){
+  let email_id = inp + "-email-inp";
+  let error_id = inp + "-email-error";
+  let btn_id = inp + "-button"
+  let input_ele = document.getElementById(email_id);
+  let error_ele = document.getElementById(error_id);
+  let btn_ele = document.getElementById(btn_id);
+  console.log("Toggle email: ", input_ele.value)
+  if (input_ele.value.match(validEmailRegex)){
+    error_ele.style.display = 'none';
+    error_ele.innerHTML = '';
+    btn_ele.disabled = false;
+  } else {
+    error_ele.style.display = 'block';
+    error_ele.innerHTML = 'Please insert a valid email address';
+    btn_ele.disabled = true;
+  }
   
 }
 
@@ -341,6 +392,16 @@ export function convertJSONtoMicrophone(hmiState, data){
 
 export function muteAudioAnimation(){
   const mute_audio = new CustomEvent('muteAnimation',{
+    detail: {
+      message: "mute animation"
+    }
+  })
+
+  document.dispatchEvent(mute_audio);
+}
+
+export function muteRecordingPlaybackAnimation(){
+  const mute_audio = new CustomEvent('muteRecordingAnimation',{
     detail: {
       message: "mute animation"
     }
@@ -689,6 +750,11 @@ function addMicrophonesByLayer(hmiState, layerName, iconPath){
         ol.proj.fromLonLat([location.lon, location.lat])
       ),
       name: "mic",
+      micLat: location.lat,
+      micLon: location.lon,
+      micIcon: iconPath,
+      id: location.id,
+      isMic: 1,
     });
     var icon = new ol.style.Style({
       image: new ol.style.Icon({
@@ -947,27 +1013,65 @@ function createMapClickEvent(hmiState){
 
     let active_content = $("#animal-popup-content");
     let default_content = $("#animal-default-content");
+    let active_mic_content = $("#mic-popup-content");
+    let default_mic_content = $("mic-default-content");
     if (feature){
-      // console.log('feature: ', feature);
-      stopAudioPlayback();
-
-      active_content.show();
-      default_content.hide();
 
       let values = feature.getProperties();
-      if (values.eventId){
-        //console.log("saving " + values.eventId);
-        selectedVocalizationEventId = values.eventId;
-      }
-      if(values.isAnimalMovement){
-        document.getElementById("audioHeader").style.display = "none"
-        document.getElementById("audioControl").style.display = "none"
+      if (values.isMic){
+        active_mic_content.show();
+        default_mic_content.hide();
+
+        const img = new Image();
+        let dice = Math.floor(Math.random() * 4) + 1;
+        img.onload = function() {
+          //console.log('Image exists!');
+          document.getElementById("mic_desc_img").src = "../../images/bio/mic_bio_" + dice + ".png";
+        }
+        img.onerror = function() {
+          console.log('Mic image does not exist!');
+        }
+        img.src = "../../images/bio/mic_bio_" + dice + ".png";
+        //document.getElementById("mic_desc_name").innerText = result.common;
+        document.getElementById("mic_desc_id").innerText = values.id;
+        //document.getElementById("desc_summary").innerText = result.summary;
+
+        //Markup details specific session
+        let dateFormat = new Date();
+        document.getElementById("mic_markup_img").src = values.micIcon;
+        document.getElementById("mic_markup_details").innerHTML = "Microphone";
+        document.getElementById("mic_markup_loc_lon").innerHTML = values.micLon;
+        document.getElementById("mic_markup_loc_lat").innerHTML = values.micLat;
+        document.getElementById("mic_markup_date").innerHTML = dateFormat.toUTCString()
+        
+        animal_toggled = true;
+        const toggled_mic = new CustomEvent('micToggled',{
+        detail: {
+          message: "Mic toggled:",
+          }
+        })
+        
+        document.dispatchEvent(toggled_mic);
       }
       else{
-        document.getElementById("audioHeader").style.display = "flex"
-        document.getElementById("audioControl").style.display = "flex"
-      }
-      if (values.animalSpecies){
+        // console.log('feature: ', feature);
+        stopAudioPlayback();
+
+        active_content.show();
+        default_content.hide();
+        if (values.eventId){
+          //console.log("saving " + values.eventId);
+          selectedVocalizationEventId = values.eventId;
+        }
+        if(values.isAnimalMovement){
+          document.getElementById("audioHeader").style.display = "none"
+          document.getElementById("audioControl").style.display = "none"
+        }
+        else{
+          document.getElementById("audioHeader").style.display = "flex"
+          document.getElementById("audioControl").style.display = "flex"
+        }
+        if (values.animalSpecies){
           //console.log(values.animalSpecies)
           var result = sample_data.find(({ species }) => species.toLowerCase() === values.animalSpecies.toLowerCase())
           if (result) {
@@ -1036,13 +1140,16 @@ function createMapClickEvent(hmiState){
             document.dispatchEvent(toggled_animal);
           
 
-      }
-      else{
-        console.log(values);
+        }
+        else{
+          console.log(values);
+        }
       }
     } else {
       active_content.hide();
+      active_mic_content.hide();
       default_content.show();
+      default_mic_content.show();
     }
   });
 }
@@ -1202,6 +1309,8 @@ function queueSimUpdate(hmiState) {
   );
 }
 
+
+
 document.addEventListener('playAudio', function(event){
   //console.log("play audio");
   playNextTrack = true;
@@ -1217,3 +1326,388 @@ document.addEventListener('stopAudio', function(event){
   playNextTrack = false;
   stopAudioPlayback();
 })
+
+var durationTag = document.getElementById("recording_duration");
+
+
+var audioElement = document.getElementsByClassName("audio-element")[0];
+var audioElementSource = document.getElementsByClassName("audio-element")[0]
+    .getElementsByTagName("source")[0];
+audioElement.onended = hidePlaybackIndicator;
+var textIndicatorOfAudiPlaying = document.getElementsByClassName("playback_indicator")[0];
+
+var recordButton = document.getElementById("record_audio_button");
+//recordButton.onclick = startAudioRecording;
+
+var recordingControls = document.getElementsByClassName("recording_controls")[0];
+
+export function showRecordingControls() {
+  console.log("showing controls")
+  recordButton.style.display = "none";
+  recordingControls.classList.remove("hide");
+  initializeRecordingDuration();
+}
+
+export function hideRecordingControls() {
+  console.log("hiding controls")
+  recordButton.style.display = "block";
+  recordingControls.classList.add("hide");
+  clearInterval(durationTimer);
+}
+
+//var overlay = document.getElementsByClassName("overlay")[0];
+//var acknowledgeButton = document.getElementById("acknowledge_button");
+//acknowledgeButton.onclick = hideRecordingNotSupportedOverlay;
+
+export function showRecordingNotSupportedOverlay() {
+    //overlay.classList.remove("hide");
+}
+
+function hideRecordingNotSupportedOverlay() {
+    //overlay.classList.add("hide");
+}
+
+export function createSourceForAudioElement() {
+    let sourceElement = document.createElement("source");
+    audioElement.appendChild(sourceElement);
+
+    audioElementSource = sourceElement;
+}
+
+export function showPlaybackIndicator() {
+    textIndicatorOfAudiPlaying.classList.remove("hide");
+}
+
+export function hidePlaybackIndicator() {
+    textIndicatorOfAudiPlaying.classList.add("hide");
+}
+
+var audioRecordStartTime = null;
+const MAX_RECORDING_TIME_S = "10";
+var durationTimer = null;
+
+export function testFunct(){
+  console.log("Recording started 1");
+}
+
+export function startAudioRecording() {
+  console.log("Recording started 2");
+
+  if (!audioElementSource){}
+  else if (!audioElement.paused) {
+    console.log("Paused playback");
+    audioElement.pause();
+    hidePlaybackIndicator();
+  }
+
+  audioRecorder.start()
+    .then(() => {
+      audioRecordStartTime = new Date();
+        showRecordingControls();
+      })
+    .catch(error => {
+      console.log(error.message);
+
+      if (error.message.includes("mediaDevices API or getUserMedia method is not supported in this browser.")) {
+        console.log("To record audio, use browsers like Chrome and Firefox.");
+        showRecordingNotSupportedOverlay();
+      }
+
+      switch (error.name) {
+        case 'AbortError': 
+          console.log("An AbortError has occured.");
+          break;
+        case 'NotAllowedError': 
+          console.log("A NotAllowedError has occured. User might have denied permission.");
+          break;
+        case 'NotFoundError': 
+          console.log("A NotFoundError has occured.");
+          break;
+        case 'NotReadableError': 
+          console.log("A NotReadableError has occured.");
+          break;
+        case 'SecurityError': 
+          console.log("A SecurityError has occured.");
+          break;
+        case 'TypeError': 
+          console.log("A TypeError has occured.");
+          break;
+        case 'InvalidStateError': 
+          console.log("An InvalidStateError has occured.");
+          break;
+        case 'UnknownError': 
+          console.log("An UnknownError has occured.");
+          break;
+        default:
+          console.log("An error occured with the error name " + error.name);
+        };
+      });
+}
+
+
+export function stopAudioRecording() {
+  console.log("Stopped recording...");
+
+  audioRecorder.stop()
+    .then(audioAsblob => {
+      playAudio();
+      hideRecordingControls();
+    })
+    .catch(error => {
+      switch (error.name) {
+        case 'InvalidStateError':
+          console.log("An InvalidStateError has occured.");
+          break;
+        default:
+          console.log("ERROR: " + error.name);
+      };
+    });
+}
+
+export function cancelAudioRecording() {
+  console.log("Cancelled recording");
+
+  audioRecorder.cancel();
+  hideRecordingControls();
+}
+
+document.addEventListener('saveRecording', function(event){
+  save();
+})
+
+document.addEventListener('loadRecording', function(event){
+  //console.log("stop audio");
+  //playNextTrack = false;
+  //stopAudioPlayback();
+})
+
+function save() {
+  if(audioRecorder.audioBlobs.length != 0){
+    let exportData = {};
+    exportData.audioBlobs = [];
+
+    audioRecorder.audioBlobs.forEach(item => {
+      exportData.audioBlobs.push(btoa(item));
+    });
+
+    const base64AudioDataArray = audioRecorder.audioBlobs.map(blob => {
+      const reader = new FileReader();
+      return new Promise((resolve, reject) => {
+          reader.onloadend = () => {
+              resolve(reader.result.split(',')[1]); // Extract Base64 data
+          };
+          reader.readAsDataURL(blob);
+      });
+    });
+
+    var jsonDataStr = "";
+
+    Promise.all(base64AudioDataArray)
+      .then(audioDataArray => {
+          const jsonData = {
+              audioBlobs: audioDataArray,
+              // Include other metadata here if needed
+          };
+
+          jsonDataStr = JSON.stringify(jsonData);
+          
+
+          const filename = prompt("Enter a filename for the JSON file:", "data.json");
+
+          if (filename) {
+      
+            const jsonDataString = jsonDataStr;
+            // Create a Blob object with the JSON data
+            const blob = new Blob([jsonDataString], { type: 'application/json' });
+      
+            // Create a URL for the Blob object
+            const blobURL = URL.createObjectURL(blob);
+      
+            // Create a link for downloading the JSON file
+            const downloadLink = document.createElement('a');
+            downloadLink.href = blobURL;
+            downloadLink.download = filename;
+            downloadLink.textContent = 'Download JSON';
+      
+             // Append the link to the DOM
+            document.getElementById("downloadLink").innerHTML = "";
+            document.getElementById("downloadLink").appendChild(downloadLink);
+            console.log(jsonDataString);
+            downloadLink.click();
+          }
+      })
+      .catch(err => console.error("Error processing audio blobs: ", err));
+  }
+}
+
+var fileInput = document.getElementById("fileInput");
+
+fileInput.addEventListener("change", function(event) {
+  const selectedFile = event.target.files[0];
+
+  if (selectedFile) {
+    const reader = new FileReader();
+
+    reader.onload = function(event) {
+      const fileContent = event.target.result;
+      const jsonData = JSON.parse(fileContent);
+      audioRecorder.audioBlobs = [];
+
+      // Step 2: Convert Base64 audio data to binary data
+      const binaryAudioDataArray = jsonData.audioBlobs.map(base64Data => {
+        return atob(base64Data);
+      })
+
+      // Step 3: Create audio blobs from binary data chunks
+      const audioBlobs = binaryAudioDataArray.map(binaryData => {
+        const byteArray = new Uint8Array(binaryData.length);
+        for (let i = 0; i < binaryData.length; i++) {
+          byteArray[i] = binaryData.charCodeAt(i);
+        }
+        return byteArray;
+      });
+
+      audioRecorder.audioBlobs = audioBlobs; 
+      //audioRecorder.audioBlobs = atob(jsonData.audioBlobs);
+      //output.textContent = JSON.stringify(jsonData, null, 2);
+    };
+
+    reader.readAsText(selectedFile);
+  }
+});
+/*
+let mediaRecorder;
+
+function startRecording() {
+    navigator.mediaDevices.getUserMedia({ audio: true })
+        .then(stream => {
+            mediaRecorder = new MediaRecorder(stream);
+            mediaRecorder.ondataavailable = handleDataAvailable;
+            mediaRecorder.start();
+        })
+        .catch(err => console.error("Error accessing microphone: ", err));
+}
+
+function stopRecording() {
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+    }
+}
+
+function handleDataAvailable(event) {
+    if (event.data.size > 0) {
+        recordedChunks.push(event.data);
+    }
+}*/
+
+var playNextRecordedTrack = false;
+var audioAnimTimeout = null;
+
+document.addEventListener('playRecordedAudio', function(event){
+  //console.log("play audio");
+  playNextRecordedTrack = true;
+  playAudio()
+})
+
+document.addEventListener('stopRecordedAudio', function(event){
+  //console.log("stop audio");
+  playNextRecordedTrack = false;
+  stopRecordingPlayback();
+})
+
+var audioRecordingElement = null;
+var recordingPlaybackAnimTimeout = null;
+
+function playRecording(recordedChunks) {
+    if (recordedChunks.length === 0) {
+        console.log("No recording available.");
+        return;
+    }else{
+      const blob = new Blob(recordedChunks, { type: 'audio/webm' });
+      if(blob.size > 0){
+        const url = URL.createObjectURL(blob);
+        audioRecordingElement = document.getElementById("audioElem");
+  
+        audioRecordingElement.src = url;
+        audioRecordingElement.load();
+        if(playNextRecordedTrack){
+          recordingPlaybackAnimTimeout = setTimeout(
+            muteRecordingPlaybackAnimation,
+            10000,
+            hmiState
+          );
+          audioRecordingElement.play();
+          //showPlaybackIndicator();
+        }
+      }
+      else{
+        console.log("Recording failed check microphone configuration settings.");
+      }
+    }
+}
+
+function stopRecordingPlayback(){
+  muteRecordingPlaybackAnimation();
+
+  if(recordingPlaybackAnimTimeout){
+    clearTimeout(recordingPlaybackAnimTimeout);
+  }
+
+  if(audioRecordingElement != null){
+    audioRecordingElement.pause();     // Pause the playback
+    audioRecordingElement.currentTime = 0; 
+  }
+}
+
+export function playAudio() {
+  console.log("play");
+
+  playRecording(audioRecorder.audioBlobs);
+}
+
+export function initializeRecordingDuration() {
+    showRecordingDuration("00:00:00");
+
+    durationTimer = setInterval(() => {
+        let duration = computeRecordingDuration(audioRecordStartTime);
+        console.log("Start time" + audioRecordStartTime);
+        console.log("Recording " + duration);
+        showRecordingDuration(duration);
+    }, 1000); 
+}
+
+export function showRecordingDuration(duration) {
+    durationTag.innerHTML = duration;
+
+    if (checkAudioDurationThreshold(duration)) {
+        stopAudioRecording();
+    }
+}
+
+export function checkAudioDurationThreshold(duration) {
+    let timers = duration.split(":");
+
+    if (timers[2] === MAX_RECORDING_TIME_S)
+        return true;
+    else 
+        return false;
+}
+
+export function computeRecordingDuration(startTime) {
+    let currentTime = new Date();
+
+    let timeDelta = currentTime - startTime;
+
+    let timeDeltaS = timeDelta / 1000;
+
+    let seconds = Math.floor(timeDeltaS % 60);
+
+    seconds = seconds < 10 ? "0" + seconds : seconds;
+
+    let timeDeltaM = Math.floor(timeDeltaS / 60);
+
+    let minutes = timeDeltaM % 60; 
+    minutes = minutes < 10 ? "0" + minutes : minutes;
+
+    return  "00:" + minutes + ":" + seconds;
+}

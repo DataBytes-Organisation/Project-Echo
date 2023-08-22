@@ -49,3 +49,11 @@ export function stopSimulator(){
 export function retrieveSimTime(){
   return axios.get(`${MESSAGE_API_URL}/latest_movement`);
 }
+
+export function signup(){
+  return axios.post(`${MESSAGE_API_URL}/signup`)
+}
+
+export function signin(){
+  return axios.post(`${MESSAGE_API_URL}/signin`)
+}

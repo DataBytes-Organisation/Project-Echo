@@ -93,6 +93,36 @@
           
           <div id="basemap"></div>
 
+          <div id="editFormWrapper">
+            <form id="editForm">
+              <!-- Add your form fields here -->
+              <h2 id="formSpeciesName"></h2>
+              <div id="ccs">
+                <label for="ccs">Current Conservation Status:&nbsp;&nbsp;&nbsp;</label> <p id="currentConservationStatus" name="ccs"></p> <br>
+              </div>
+              <div id="ncs">
+                <label for="ncs">New Conservation Status:&nbsp;&nbsp;&nbsp; </label>
+                <div id="dropdownNCS">
+                  <button id="selectNCS" name="ncs">Select New</button>
+                  <div id="dropdownContentNCS">
+                    <button>endangered</button>
+                    <button>vulnerable</button>
+                    <button>near-threatened</button>
+                    <button>least concern</button>
+                    <button>invasive</button>
+                  </div>
+                </div> 
+                 <br><br>
+              </div>
+              <label for="citationSneeded">Source:&nbsp;&nbsp;&nbsp; </label> <input type="text" id="citationSneeded" name="citationSneeded"> <br>
+              <p>Please enter a link to a reliable source that backs up your claim to make this edit.</p>
+
+              <label for="important" id="important">Important:&nbsp;&nbsp;&nbsp; </label> <p id="currentConservationStatus" name="important">Spamming or intentionally abusing this functionality will not be tolerated and will result in your account being either suspended or banned.</p>
+              <button id="submitEditButton">Submit</button>
+              <button id="closeFormButton">Close</button>
+            </form>
+          </div>
+          
           <div id="menu" class="menu">
             <div class="menu-header"><div class="image-container">
               <img src="./images/tabIcons/logo.png" alt="project echo logo">
@@ -338,6 +368,14 @@
                 </div>
               </div>
               
+              <p style="margin-top: 40px !important;">
+                 Is the information above inaccurate? <br>
+                 Request to make an edit.
+              </p>
+              <button id="request-edit-button">Request Edit</button>
+
+              
+
             </div>
             <div id="animal-default-content">
               <h2 style="text-align: left; color: rgba(247, 186, 206, 1) !important;">Animal Bio Data</h2>
@@ -345,6 +383,7 @@
             </div>
             </div>
           </div>
+          
           <div id="filter-menu">
             <div class="wrapper">
             <div id="filter-menu-contents">
@@ -528,9 +567,12 @@
             </div> 
           </div>
           </div>      
-        
+          
       </div>
+      
     </div>
+
+    
 
 <script>
 
@@ -783,6 +825,115 @@
     });
 
     
+  });
+
+  const requestButton = document.getElementById("request-edit-button")
+  const editForm = document.getElementById("editForm");
+  const editFormWrapper = document.getElementById("editFormWrapper");
+  const closeFormButton = document.getElementById("closeFormButton");
+  const submit = document.getElementById("submitEditButton");
+  var thirdItem;
+  var newStatus;
+
+  requestButton.addEventListener('click', () => {
+
+    editFormWrapper.style.display = "";
+    console.log("Request edit button clicked.");
+    divElement = document.getElementById("desc_species");
+    var divContent = divElement.innerHTML;
+    const markupDetails = document.getElementById("markup_details");
+    const content = markupDetails.innerHTML;
+    newStatus = document.getElementById("selectNCS");
+    const conservationButtons = document.getElementById("dropdownContentNCS"); 
+    const dropdownOptions = document.getElementById("dropdownContentNCS");
+    conservationButtons.addEventListener("click", (event) => {
+      if (event.target.tagName === 'BUTTON') {
+        event.preventDefault();
+        const buttonText = event.target.innerHTML;
+        console.log("Clicked on:", buttonText);
+        newStatus.innerHTML = buttonText;
+        dropdownOptions.style.display = "none";
+      }
+    
+    })
+    //New Status Button Clicked, display the options
+    newStatus.addEventListener('click', (event) => {
+
+      event.preventDefault();
+      console.log("New Status clicked! ")
+     
+      if (dropdownOptions.style.display === "none" || dropdownOptions.style.display === "") {
+    //     console.log("Adding new conservation status ")
+           dropdownOptions.style.display = "block";
+       } else {
+           dropdownOptions.style.display = "none";
+       }
+    })
+
+
+
+
+
+   // Split the content using the '|' delimiter
+    const items = content.split('|');
+
+   // Trim whitespace from each item
+    const trimmedItems = items.map(item => item.trim());
+
+  // Access the third item (index 2) after trimming
+    thirdItem = trimmedItems[2];
+      
+
+    console.log("Third item:", thirdItem);
+    //Populate form with the species name
+    document.getElementById("formSpeciesName").innerHTML = divContent;
+    document.getElementById("currentConservationStatus").innerHTML = thirdItem;
+    console.log("Species: ", divContent);
+    editFormWrapper.style.zIndex = "1000";
+    editForm.style.display = "block";
+    
+
+  } )
+
+  var user = 'TN-HMI';
+  var animal;
+  var requestingToChange;
+  var from;
+  var to;
+  var source;
+
+
+  function checkFields(){
+    if (to === undefined || source === undefined){
+      console.log("Fields not properly filled out!", to, source);
+      return false
+    }
+    return true
+  }
+
+  submit.addEventListener('click', (event) => {
+    event.preventDefault();
+    animal = divElement.innerHTML;
+    requestingToChange = "Conservation Status"
+    from = thirdItem;
+    to = newStatus.innerHTML
+    source = document.getElementById("citationSneeded");
+    console.log(source.value);
+    console.log("Checking Fields")
+    if(checkFields() == false){
+      return;
+    }
+    console.log("Submitting the following: ", user, animal, requestingToChange, from, to, source.value);
+    console.log("Submitting the following:  ")
+    event.preventDefault();
+    editFormWrapper.style.display = "none";
+    editForm.style.display = "none"; // Hide the form
+  });
+
+  closeFormButton.addEventListener('click', (event) => {
+    event.preventDefault();
+    editFormWrapper.style.display = "none";
+    editForm.style.display = "none"; // Hide the form
   });
 
 </script>

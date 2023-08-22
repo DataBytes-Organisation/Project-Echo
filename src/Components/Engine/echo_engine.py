@@ -40,7 +40,6 @@ import tensorflow_hub as hub
 import tensorflow_io as tfio
 from google.cloud import storage
 
-
 # database libraries
 import pymongo
 

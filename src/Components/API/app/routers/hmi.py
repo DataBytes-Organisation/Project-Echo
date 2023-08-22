@@ -1,10 +1,21 @@
 from fastapi import status, APIRouter
+from fastapi import FastAPI, Body, HTTPException, status, APIRouter
+from fastapi.encoders import jsonable_encoder
+from fastapi.responses import JSONResponse
+from typing import Optional, List
+
 from bson import ObjectId
 import datetime
 from app import serializers
 from app import schemas
-from app.database import Events, Movements, Microphones
+from app.database import Events, Movements, Microphones, User, Role, ROLES, GENDER, STATES_CODE, AUS_STATES
 import paho.mqtt.publish as publish
+import bcrypt
+from flask import jsonify
+import jwt
+import requests
+import datetime
+
 
 
 router = APIRouter()
@@ -122,4 +133,117 @@ def post_control(control: str):
     publish.single("Simulator_Controls", control, hostname=MQTT_BROKER_URL, port=MQTT_BROKER_PORT)
 
     return control
+    
+@router.post("/signup", status_code=status.HTTP_201_CREATED)
+def signup(user: schemas.UserSignupSchema):  
+    # Check to see if the request body has conflict with the database
+    existing_user = User.find_one({"$or": [{"username": user.username}, {"email": user.email}]})
+    if existing_user:
+        if existing_user['username'] == user.username:
+            response = {"message": "Failed! Username is already in use!"}
+        elif existing_user['email'] == user.email:
+            response = {"message": "Failed! Email is already in use!"}
+        elif(user.roles not in ROLES):
+            response = {"message": "Failed! Role does not exist!"}
+            return JSONResponse(content=response, status_code=404)
+        else:
+            response = {"message": "Failed! Conflict occurred."}
+        return JSONResponse(content=response, status_code=409)
 
+    #Hash password using bcrypt
+    password_hashed = bcrypt.hashpw(user.password.encode('utf-8'), bcrypt.gensalt(rounds=8))
+    user.password = password_hashed.decode('utf-8')
+
+    #Store user role as an id 
+    user_role_id = []
+    for role_name in user.roles:
+        role = Role.find_one({"name": role_name})
+        user_role_id.append(role["_id"])
+    user.roles = user_role_id
+
+    #Convert into dictionary and insert into the database
+    user_dict = user.dict()
+    user_dict["userId"] = user.username
+    user_dict["__v"] = 0
+    User.insert_one(user_dict)
+    response = {"message": "User was registered successfully!"}
+    return JSONResponse(content=response)
+
+
+@router.post("/signin", status_code=status.HTTP_200_OK)
+def signin(user: schemas.UserLoginSchema):
+    #Find if the username exist in our database
+    account = User.find_one({"username": user.username})
+    if(account is None):
+        response = {"message": "User Not Found."}
+        return JSONResponse(content=response, status_code=404)
+   
+    #Find if the password matches
+    passwordIsValid = bcrypt.checkpw(user.password.encode('utf-8'), account['password'].encode('utf-8'))
+    if (passwordIsValid == False):
+        response = {"message": "Invalid Password!"}
+        return JSONResponse(content=response, status_code=401)
+
+    #Create payload for our token
+    payload = {
+        "id": account["userId"],
+        "exp": datetime.datetime.utcnow() + datetime.timedelta(seconds=86400)
+    }
+    
+    token = jwt.encode(payload, "echo-auth-secret-key", algorithm = "HS256")
+
+    authorities = []
+    for role_id in account['roles']:
+        role = Role.find_one({"_id": ObjectId(role_id)})
+        if role:
+            authorities.append("ROLE_" + role['name'].upper())
+
+    requests.session.token = token
+    result = {
+        "id": account["_id"],
+        "username": account["username"],
+        "email": account["email"],
+        "role" : authorities,
+    }
+
+    response = {"message": "User Login Successfully!"}
+    print(result)
+    return JSONResponse(content=response)
+
+@router.post("/signout", status_code=status.HTTP_200_OK)
+def signout():
+    try:
+        requests.session.clear()
+        response = {"message": "You've been signed out!"}
+        return JSONResponse(content=response)
+    
+    except Exception as err:
+        return JSONResponse({"Error": str(err)})
+    
+@router.post("/ChangePassword", status_code=status.HTTP_200_OK)
+def passwordchange(user: schemas.UserLoginSchema, newpw: str, cfm_newpw: str):
+    #Find if the username exist in our database
+    account = User.find_one({"username": user.username})
+    if(account is None):
+        response = {"message": "User Not Found."}
+        return JSONResponse(content=response, status_code=401)
+   
+    #Find if the password matches
+    passwordIsValid = bcrypt.checkpw(user.password.encode('utf-8'), account['password'].encode('utf-8'))
+    if (passwordIsValid == False):
+        response = {"message": "Invalid Password!"}
+        return JSONResponse(content=response, status_code=404)
+
+    if (newpw != cfm_newpw):
+        response = {"message": "New Password Must Match Each Other"}
+        return JSONResponse(content=response, status_code=401)
+    
+    newpw_hashed = bcrypt.hashpw(newpw.encode('utf-8'), bcrypt.gensalt(rounds=8))
+
+    User.update_one(
+        {"username": account['username']},
+        {"$set": {"password": newpw_hashed.decode('utf-8')}}
+    )
+
+    response = {"message": "User Password Changed Sucessfully!"}
+    return JSONResponse(content=response)
