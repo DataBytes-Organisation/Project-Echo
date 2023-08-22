@@ -26,7 +26,7 @@ Here are some sample details from the audio dataset:
 | Cicada3 | azdipu | 1min 4s |
 | cricket | soundscalpel.co | 1min 17s |
 | cricket2 | acclivity | 21s |
-
+| grasshopper2 | bruno.auzet | 3min 21s  |
 ... (and more)
 
 ## Data Cleaning and Preprocessing
