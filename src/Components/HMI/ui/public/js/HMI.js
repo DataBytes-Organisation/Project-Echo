@@ -1633,7 +1633,7 @@ function playRecording(recordedChunks) {
         if(playNextRecordedTrack){
           recordingPlaybackAnimTimeout = setTimeout(
             muteRecordingPlaybackAnimation,
-            audioRecordingElement.duration*1000,
+            10000,
             hmiState
           );
           audioRecordingElement.play();
