@@ -367,7 +367,7 @@
                 <h2 id="audioHeader"style="margin-top: 20px !important;">Audio</h2>
 
                 <div id="audioControl" class="audio_component">
-                  <span><i class="fa fa-volume-up fa-2x" style="color:rgba(247, 186, 206, 0.6);" onclick="{toggleAudio()}"></i></span>
+                  <span><i id="animalAudioI" class="fa fa-volume-up fa-2x" style="color:rgba(247, 186, 206, 0.6);" onclick="{toggleAudio()}"></i></span>
                   <div class="audioContainer">
                     <div class="box box1"></div>
                     <div class="box box2"></div>
@@ -470,9 +470,43 @@
                     </div>
                     <i id="stop_recording_button" class="toggle-button btn btn-secondary btn-no-background select-all-btn" onclick="{stopRecording()}" aria-hidden="true">Stop</i>
                 </div>
-                <div id="audio_playback_container">
+                <div id="audio_playback_div">
                     <p id="audio_playback_indicator" class="playback_indicator hide">Audio is playing<span>.</span><span>.</span><span>.</span></p>
                 </div>
+              </div>
+              <h2 id="audioHeader"style="margin-top: 20px !important;">Recording Playback</h2>
+              <div id="audio_playback_container">
+                <div id="audioControl" class="audio_component">
+                  <span><i id="recordingI" class="fa fa-volume-up fa-2x" style="color:rgba(247, 186, 206, 0.6);" onclick="{toggleRecordingAudio()}"></i></span>
+                  <div class="audioContainer">
+                    <div class="boxR box1"></div>
+                    <div class="boxR box2"></div>
+                    <div class="boxR box3"></div>
+                    <div class="boxR box4"></div>
+                    <div class="boxR box5"></div>
+                    <div class="boxR box6"></div>
+                    <div class="boxR box7"></div>
+                    <div class="boxR box8"></div>
+                    <div class="boxR box9"></div>
+                    <div class="boxR box10"></div>
+                    <div class="boxR box1"></div>
+                    <div class="boxR box2"></div>
+                    <div class="boxR box3"></div>
+                    <div class="boxR box4"></div>
+                    <div class="boxR box5"></div>
+                    <div class="boxR box6"></div>
+                    <div class="boxR box7"></div>
+                    <div class="boxR box8"></div>
+                    <div class="boxR box9"></div>
+                    <div class="boxR box10"></div>
+                  </div>
+                </div>
+                <div id="recording_export_container" style="margin-top: 10px !important;" class="recording_controls controls_item_row">
+                  <i id="save_recording_button" style="width:100px !important" class="toggle-button btn btn-secondary btn-no-background select-all-btn" onclick="{saveRecordingEvent()}" aria-hidden="true">Save</i>
+                  <!--i id="load_recording_button" class="toggle-button btn btn-secondary btn-no-background select-all-btn" onclick="{loadRecordingEvent()}" aria-hidden="true">Load</i-->
+                  <input type="file" style="display: inline-block !important; width: 250px !important" id="fileInput">
+                </div>
+                <div id="downloadLink"></div>
               </div>
               <!--div class="overlay hide">
                 <div id="audio_recording_not_supported">
@@ -483,6 +517,7 @@
         
               <audio controls id="audioElem" class="audio-element hide">
               </audio>
+
 
             </div>
             <div id="mic-default-content">
@@ -819,16 +854,18 @@
   })
 
   let aud = false;
+  let recordingAud = false;
+
   function animateAudioPlay() {
     $(".boxmuted").removeClass("boxmuted");
       aud = true;
-      document.querySelector("i").style.opacity=".5";
+      document.getElementById("animalAudioI").style.opacity=".5";
   }
 
   function animateAudioMute(){
     $(".box").addClass("boxmuted");
       aud = false;
-      document.querySelector("i").style.opacity="1";
+      document.getElementById("animalAudioI").style.opacity="1";
   }
 
   function toggleAudio() {
@@ -844,7 +881,6 @@
       animateAudioPlay();
     } 
     else {
-      console.log()
       const stop_audio = new CustomEvent('stopAudio',{
             detail: {
               message: "stop audio"
@@ -856,11 +892,73 @@
       animateAudioMute();
     }			
   }
+  
+  function saveRecordingEvent(){
+    const save_recording = new CustomEvent('saveRecording',{
+            detail: {
+              message: "save"
+            }
+          })
+
+    document.dispatchEvent(save_recording);
+  }
+
+  function loadRecordingEvent(){
+    const load_recording = new CustomEvent('loadRecording',{
+            detail: {
+              message: "load"
+            }
+          })
+
+    document.dispatchEvent(load_recording);
+  }
+
+  function animateRecordedAudioPlay() {
+    $(".boxmutedR").removeClass("boxmutedR");
+      recordingAud = true;
+      document.getElementById("recordingI").style.opacity=".5";
+  }
+
+  function animateRecordedAudioMute(){
+    $(".boxR").addClass("boxmutedR");
+      recordingAud = false;
+      document.getElementById("recordingI").style.opacity="1";
+  }
+
+  function toggleRecordingAudio() {
+    if(recordingAud==false){
+      animateRecordedAudioPlay();
+
+      const play_recorded_audio = new CustomEvent('playRecordedAudio',{
+            detail: {
+              message: "play audio"
+            }
+          })
+
+      document.dispatchEvent(play_recorded_audio);
+    } 
+    else {
+      animateRecordedAudioMute();
+
+      const stop_recorded_audio = new CustomEvent('stopRecordedAudio',{
+            detail: {
+              message: "stop audio"
+            }
+          })
+
+      document.dispatchEvent(stop_recorded_audio);
+    }			
+  }
 
   toggleAudio();
+  animateRecordedAudioMute();
 
   document.addEventListener('muteAnimation', function(event){
     animateAudioMute();
+  })
+
+  document.addEventListener('muteRecordingAnimation', function(event){
+    animateRecordedAudioMute();
   })
   
 </script>
@@ -1477,18 +1575,18 @@ closeFormButton.addEventListener('click', (event) => {
   }
 
   function record(){
-    console.log("calling startAudioRecording...");
+    //console.log("calling startAudioRecording...");
     //testFunct();
     startAudioRecording();
   }
 
   function stopRecording(){
-    console.log("calling stopAudioRecording...");
+    //console.log("calling stopAudioRecording...");
     stopAudioRecording();
   }
 
   function cancelRecording(){
-    console.log("calling cancelAudioRecording...");
+    //console.log("calling cancelAudioRecording...");
     cancelAudioRecording();
   }
 
