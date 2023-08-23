@@ -74,20 +74,20 @@
                 <div class="container">
                     <!-- <label for="username"><b>Username</b></label>
                     <input type="text" placeholder="Enter Username" name="username" required> -->
-                    <div id="emailInput">
+                    <div id="emailInput" style="display:none;">
                         <label for="email"><b>Email ID</b></label>
                         <input type="text" id="emailLogin" placeholder="Email ID" name="email">
                     </div>
-                    <div id="usernameInput" style="display:none;">
+                    <div id="usernameInput" >
                         <label for="username"><b>Username</b></label>
-                        <input type="text" id="usernameLogin." placeholder="Username" name="username">
+                        <input type="text" id="usernameLogin" placeholder="Username" name="username">
                     </div>
 
                     <label for="password"><b>Password</b></label>
                     <input type="password" id="passwordLogin" placeholder="Enter Password" name="password" required>
                     <div class="login-switch">
                         <input type="checkbox" id="switchInput" onchange="toggleLoginType()">
-                        <label for="switchInput">Use Username instead</label>
+                        <label for="switchInput">Use Email instead</label>
                     </div>
                    
                 </button>
@@ -175,14 +175,16 @@
     const switchInput = document.getElementById('switchInput');
 
     if (switchInput.checked) {
-        emailInput.style.display = 'none';
-        usernameInput.style.display = 'block';
+        emailInput.style.display = 'block';
+        usernameInput.style.display = 'none';
 
         document.getElementById('usernameLogin').setAttribute('required', 'required');
         document.getElementById('emailLogin').removeAttribute('required');
+
     } else {
-        emailInput.style.display = 'block';
-        usernameInput.style.display = 'none';
+        
+        emailInput.style.display = 'none';
+        usernameInput.style.display = 'block';
 
         document.getElementById('usernameLogin').setAttribute('required', 'required');
         document.getElementById('emailLogin').removeAttribute('required');
@@ -246,9 +248,9 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
 
   let identifier;
   if (document.getElementById('switchInput').checked) {
-    identifier = document.getElementById('usernameLogin').value;
-  } else {
     identifier = document.getElementById('emailLogin').value;
+  } else {
+    identifier = document.getElementById('usernameLogin').value;
   }
   const password = document.getElementById('passwordLogin').value;
   const response = await fetch('/login', {
