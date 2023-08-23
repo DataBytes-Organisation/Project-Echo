@@ -148,8 +148,6 @@ const port = 8080;
 // serve static files from the public directory
 app.use(express.static(path.join(__dirname, 'public')));
 
-//cors access to enable sending emails from different hosts
-const cors = require("cors");
 
 var corsOptions = {
   origin: "http://localhost:8081"
@@ -306,6 +304,29 @@ app.post("/request_access", async (req, res) => {
 
 
 })
+
+app.post("/login", async (req, res) => {
+  const { identifier, password } = req.body;
+
+  try {
+    const user = await User.findOne({
+      $or: [{ email: identifier }, { username: identifier }],
+      password: password
+    });
+
+    if (user) {
+      res.json({
+        message: "Login successful",
+        redirectTo: "/welcome" // Redirect to welcome.html on success
+      });
+      console.log("Successful login")
+    } else {
+      res.status(401).json({ error: "Invalid credentials" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 
 // routes
 require('./routes/auth.routes')(app);

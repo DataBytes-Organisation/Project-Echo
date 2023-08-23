@@ -65,7 +65,7 @@
 
         <div id="login-form" class="user-auth-form modal">
 
-            <form class="modal-content animate" id="login-form-form" action="/api/auth/signin" method="POST">
+            <form class="modal-content animate" id="login-form" action="/api/auth/signin" method="POST">
                 <div class="imgcontainer">
                     <span onclick="{closeForm('login-form')}" class="close" title="Close Modal">&times;</span>
                     <!-- <img src="img_avatar2.png" alt="Avatar" class="avatar"> -->
@@ -76,15 +76,15 @@
                     <input type="text" placeholder="Enter Username" name="username" required> -->
                     <div id="emailInput">
                         <label for="email"><b>Email ID</b></label>
-                        <input type="text" id="email" placeholder="Email ID">
+                        <input type="text" id="emailLogin" placeholder="Email ID" name="email">
                     </div>
                     <div id="usernameInput" style="display:none;">
                         <label for="username"><b>Username</b></label>
-                        <input type="text" id="username" placeholder="Username">
+                        <input type="text" id="usernameLogin." placeholder="Username" name="username">
                     </div>
 
                     <label for="password"><b>Password</b></label>
-                    <input type="password" placeholder="Enter Password" name="password" required>
+                    <input type="password" id="passwordLogin" placeholder="Enter Password" name="password" required>
                     <div class="login-switch">
                         <input type="checkbox" id="switchInput" onchange="toggleLoginType()">
                         <label for="switchInput">Use Username instead</label>
@@ -92,7 +92,7 @@
                    
                 </button>
 
-                    <button type="submit" class="btn10"><span>Login</span></button>
+                    <button type="submit" class="btn10" id="buttonLogin"><span>Login</span></button>
                 </div>
 
                 <div class="container" style="background-color:#f1f1f1">
@@ -112,26 +112,29 @@
 
                 <div class="container">
                     <label for="firstname"><b>First Name</b></label>
-                    <input type="text" placeholder="First Name" name="firstname" required>
+                    <input type="text" id="firstnameSignUp" placeholder="First Name" name="firstname" required>
 
                     <label for="lastname"><b>Last Name</b></label>
-                    <input type="text" placeholder="Last Name" name="lastname" required>
+                    <input type="text" id="lastnameSignUp" placeholder="Last Name" name="lastname" required>
 
                     <label for="username"><b>Username</b></label>
-                    <input type="text" placeholder="Enter Username" name="username" required>
+                    <input type="text" id="usernameSignUp" placeholder="Enter Username" name="username" required>
 
                     <label for="email"><b>Email</b></label>
-                    <input type="email" placeholder="Enter Email" name="email" required>
+                    <input type="email" id="emailSignUp" placeholder="Enter Email" name="email" required>
 
                     <label for="password"><b>Password</b></label>
-                    <input type="password" placeholder="Enter Password" name="password" required>
+                    <input type="password" id="passwordSignUp" placeholder="Enter Password" name="password" required>
 
-                    <button type="submit" class="btn10"><span>Login</span></button>
+                    <label for="confirmpassword"><b>Confirm Password</b></label>
+                    <input type="password" id="confirmSignp" placeholder="Enter Password Again" name="confirmpassword" required>
+
+                    <button type="submit" class="btn10" id="buttonSignUp"><span>Sign Up</span></button>
                    
                 </div>
 
                 <div class="container" style="background-color:#f1f1f1">
-                    <button type="button" onclick="{closeForm('login-form')}" class="cancelbtn">Cancel</button>
+                    <button type="button" onclick="{closeForm('signup-form')}" class="cancelbtn">Cancel</button>
                 </div>
             </form>
         </div>
@@ -180,14 +183,14 @@
         emailInput.style.display = 'none';
         usernameInput.style.display = 'block';
 
-        document.getElementById('username').setAttribute('required', 'required');
-        document.getElementById('email').removeAttribute('required');
+        document.getElementById('usernameLogin').setAttribute('required', 'required');
+        document.getElementById('emailLogin').removeAttribute('required');
     } else {
         emailInput.style.display = 'block';
         usernameInput.style.display = 'none';
 
-        document.getElementById('username').setAttribute('required', 'required');
-        document.getElementById('email').removeAttribute('required');
+        document.getElementById('usernameLogin').setAttribute('required', 'required');
+        document.getElementById('emailLogin').removeAttribute('required');
         }
     }
     // Get the modal
@@ -232,16 +235,16 @@
 
 //For Authentication, matching credentials from client side with those of database
 
-document.getElementById('login-form-form').addEventListener('submit', async (e) => {
+document.getElementById('login-form').addEventListener('submit', async (e) => {
   e.preventDefault();
 
   let identifier;
   if (document.getElementById('switchInput').checked) {
-    identifier = document.getElementById('username').value;
+    identifier = document.getElementById('usernameLogin').value;
   } else {
-    identifier = document.getElementById('email').value;
+    identifier = document.getElementById('emailLogin').value;
   }
-  const password = document.getElementById('password').value;
+  const password = document.getElementById('passwordLogin').value;
   const response = await fetch('/login', {
     method: 'POST',
     headers: {
