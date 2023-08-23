@@ -322,13 +322,34 @@ app.get("/", (req, res) => {
 
 })
 
+//For the working of the login page
+app.post("/login", async (req, res) => {
+  const { identifier, password } = req.body;
 
+  try {
+    const user = await User.findOne({
+      $or: [{ email: identifier }, { username: identifier }],
+      password: password
+    });
+
+    if (user) {
+      res.json({
+        message: "Login successful",
+        redirectTo: "/welcome" // Redirect to welcome.html on success
+      });
+      console.log("Successful login")
+    } else {
+      res.status(401).json({ error: "Invalid credentials" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 
 app.get("/login", (req, res) => {
   [verifyToken]
   res.sendFile(path.join(__dirname, 'public/login.html'));
 })
-
 
 app.get("*", (req, res) => {
   if (authJwt.verifyToken) {
