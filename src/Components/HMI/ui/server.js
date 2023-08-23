@@ -10,6 +10,7 @@ const controller = require('./controller/auth.controller');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
+const cors = require('cors');
 
 //Add mongoDB module inside config folder
 const db = require("./model");
