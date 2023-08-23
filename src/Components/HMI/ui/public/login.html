@@ -104,18 +104,13 @@
 
         <div id="signup-form" class="user-auth-form modal">
 
-            <form class="modal-content animate" action="/api/auth/signup" method="POST">
+            <form class="modal-content animate" action="/api/auth/signup" method="POST" id="form-sign-up">
                 <div class="imgcontainer">
                     <span onclick="{closeForm('signup-form')}" class="close" title="Close Modal">&times;</span>
                     <!-- <img src="img_avatar2.png" alt="Avatar" class="avatar"> -->
                 </div>
 
                 <div class="container">
-                    <label for="firstname"><b>First Name</b></label>
-                    <input type="text" id="firstnameSignUp" placeholder="First Name" name="firstname" required>
-
-                    <label for="lastname"><b>Last Name</b></label>
-                    <input type="text" id="lastnameSignUp" placeholder="Last Name" name="lastname" required>
 
                     <label for="username"><b>Username</b></label>
                     <input type="text" id="usernameSignUp" placeholder="Enter Username" name="username" required>
@@ -231,6 +226,17 @@
             btn_ele.disabled = true;
         }
     }
+
+        // const form = document.getElementById('form-sign-up');
+        // const password = document.getElementById('passwordSignUp');
+        // const confirmSignup = document.getElementById('confirmSignup');
+
+        // form.addEventListener('buttonSignUp', function (event) {
+        //     if (password.value !== confirmSignup.value) {
+        //         event.preventDefault();
+        //         alert('Passwords do not match');
+        //     }
+        // });
 
 
 //For Authentication, matching credentials from client side with those of database

@@ -51,9 +51,20 @@ checkRolesExisted = (req, res, next) => {
   next();
 };
 
+confirmPassword = (req, res, next) => {
+  if (req.body.confirmpassword != req.body.password) {
+    res.status(400).send({
+      message: `Failed! Password does not match its confirmation!`
+    });
+    return;
+  }
+  next();
+}
+
 const verifySignUp = {
   checkDuplicateUsernameOrEmail,
-  checkRolesExisted
+  checkRolesExisted,
+  confirmPassword
 };
 
 module.exports = verifySignUp;

@@ -297,12 +297,6 @@ app.post("/request_access", async (req, res) => {
   } catch (error) {
     res.status(500).send({ message: 'An error occurred while sending the request access: ' + error });
   }
-
-
-
-
-
-
 })
 
 app.post("/login", async (req, res) => {
@@ -317,7 +311,7 @@ app.post("/login", async (req, res) => {
     if (user) {
       res.json({
         message: "Login successful",
-        redirectTo: "/welcome" // Redirect to welcome.html on success
+        redirectTo: "/" // Redirect to welcome.html on success
       });
       console.log("Successful login")
     } else {
