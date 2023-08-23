@@ -9,7 +9,6 @@ const { authJwt } = require('./middleware');
 const controller = require('./controller/auth.controller');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
-const cors = require('cors');
 const mongoose = require('mongoose');
 
 //Add mongoDB module inside config folder
