@@ -1,0 +1,15 @@
+Google Cloud Project budget-: 
+Task-: Research on GCP budget and set a budget of 20% for rest of T2 2023.
+Some reasons why you should allocate a budget and add threshold alerts:
+	•	To track your spending. A budget helps you track your actual spending against your planned spending. This can help you identify areas where you can cut costs or find ways to get more value for your money.
+	•	To stay on top of your costs. Threshold alerts can notify you when your spending reaches or exceeds a certain amount. This helps you stay on top of your costs and take corrective action if necessary.
+	•	To avoid overspending. A budget can help you avoid overspending by giving you a clear limit on how much money you can spend.
+	•	To make informed decisions. A budget can help you make informed decisions about your cloud spending. For example, you can use your budget to compare different pricing plans or to decide whether to move to a different cloud provider.
+	•	To meet compliance requirements. Some organisations are required to have a budget in place in order to meet compliance requirements.
+Here are some additional things to keep in mind about budgets and threshold alerts:
+	•	The amount of money you allocate to your budget will depend on your specific needs and circumstances.
+	•	You can set different alert thresholds for different budgets. For example, you might have a lower threshold for your monthly budget than for your quarterly budget.
+	•	You can choose to receive notifications via email, text message, or other methods.
+	•	You can also use threshold alerts to automate cost control responses. For example, you could have an alert trigger an action that stops new resources from being created when your spending reaches a certain level.
+
+NOTE-: Task completed by adding a threshold of 36% and 38% to the budget usage so that we can get notified if there is sudden spike in the usage.
