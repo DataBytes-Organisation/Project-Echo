@@ -321,21 +321,21 @@ app.post("/request_access", async (req, res) => {
 //   }
 // });
 
-// // routes
-// require('./routes/auth.routes')(app);
-// require('./routes/user.routes')(app);
+// routes
+require('./routes/auth.routes')(app);
+require('./routes/user.routes')(app);
 
-// app.get("/", (req, res) => {
-//   if (authJwt.verifyToken && authJwt.isUser) {
-//     console.log("This is user session!")
-//     res.sendFile(path.join(__dirname, 'public/index.html'))
-//   }
-//   else {
-//     console.log("This is not user sessions!")
-//     res.json("No available session, you have not logged in yet")
-//   }
+app.get("/", (req, res) => {
+  if (authJwt.verifyToken && authJwt.isUser) {
+    console.log("This is user session!")
+    res.sendFile(path.join(__dirname, 'public/index.html'))
+  }
+  else {
+    console.log("This is not user sessions!")
+    res.json("No available session, you have not logged in yet")
+  }
 
-// })
+})
 
 
 
