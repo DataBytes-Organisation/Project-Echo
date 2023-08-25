@@ -127,3 +127,32 @@ exports.signout = async (req, res) => {
     this.next(err);
   }
 };
+
+exports.loadForget = (req,res) => {
+  try {
+    console.log("Sending forgetPass.html from router");
+    res.status(200).sendFile(path.join(__dirname, 'public/forgetPass.html'));
+  } catch (error) {
+    console.log(error.message);
+  }
+}
+
+exports.verifyForget = (req,res)=>{
+  try {
+    
+    const emailToCheck = req.body.email;
+    const userData = User.findOne({email:emailToCheck});
+    if (userData) {
+      res.send("Success");
+      // res.getElementById("demo").innerHTML = "Success";
+    }
+    else{
+      const errorMessage = "User not found.";
+      res.send(errorMessage);
+      //res.getElementById("demo").innerHTML = "Failed";
+    }
+
+  } catch (error) {
+    console.log(error.message);
+  }
+}
