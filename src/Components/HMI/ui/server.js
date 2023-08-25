@@ -299,43 +299,44 @@ app.post("/request_access", async (req, res) => {
   }
 })
 
-// app.post("/login", async (req, res) => {
-//   const {username, password} = req.body;
+app.post("/login", async (req, res) => {
+  const { identifier, password } = req.body;
 
-//   try {
-//     const user = await User.findOne({
-//       username: username
-//     });
+  try {
+    const user = await User.findOne({
+      $or: [{ email: identifier }, { username: identifier }],
+      password: password
+    });
 
-//     if (user && bcrypt.compareSync(password, user.password)) {
-//       res.json({
-//         message: "Login successful",
-//         redirectTo: "/" // Redirect to welcome.html on success
-//       });
-//       console.log("Successful login")
-//     } else {
-//       res.status(401).json({ error: "Invalid credentials" });
-//     }
-//   } catch (error) {
-//     res.status(500).json({ error: "Internal server error" });
-//   }
-// });
+    if (user) {
+      res.json({
+        message: "Login successful",
+        redirectTo: "/" // Redirect to welcome.html on success
+      });
+      console.log("Successful login")
+    } else {
+      res.status(401).json({ error: "Invalid credentials" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 
-// // routes
-// require('./routes/auth.routes')(app);
-// require('./routes/user.routes')(app);
+// routes
+require('./routes/auth.routes')(app);
+require('./routes/user.routes')(app);
 
-// app.get("/", (req, res) => {
-//   if (authJwt.verifyToken && authJwt.isUser) {
-//     console.log("This is user session!")
-//     res.sendFile(path.join(__dirname, 'public/index.html'))
-//   }
-//   else {
-//     console.log("This is not user sessions!")
-//     res.json("No available session, you have not logged in yet")
-//   }
+app.get("/", (req, res) => {
+  if (authJwt.verifyToken && authJwt.isUser) {
+    console.log("This is user session!")
+    res.sendFile(path.join(__dirname, 'public/index.html'))
+  }
+  else {
+    console.log("This is not user sessions!")
+    res.json("No available session, you have not logged in yet")
+  }
 
-// })
+})
 
 
 

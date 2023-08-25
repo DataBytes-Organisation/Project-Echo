@@ -74,15 +74,25 @@
                 <div class="container">
                     <!-- <label for="username"><b>Username</b></label>
                     <input type="text" placeholder="Enter Username" name="username" required> -->
+                    <div id="emailInput" style="display:none;">
+                        <label for="email"><b>Email ID</b></label>
+                        <input type="text" id="emailLogin" placeholder="Email ID" name="email">
+                    </div>
+                    <div id="usernameInput" >
                         <label for="username"><b>Username</b></label>
-                        <input type="text" placeholder="Username" name="username">
+                        <input type="text" id="usernameLogin" placeholder="Username" name="username">
+                    </div>
 
                     <label for="password"><b>Password</b></label>
-                    <input type="password" placeholder="Enter Password" name="password" required>
+                    <input type="password" id="passwordLogin" placeholder="Enter Password" name="password" required>
+                    <div class="login-switch">
+                        <input type="checkbox" id="switchInput" onchange="toggleLoginType()">
+                        <label for="switchInput">Use Email instead</label>
+                    </div>
                    
                 </button>
 
-                    <button type="submit" class="btn10"><span>Login</span></button>
+                    <button type="submit" class="btn10" id="buttonLogin"><span>Login</span></button>
                 </div>
 
                 <div class="container" style="background-color:#f1f1f1">
@@ -103,18 +113,18 @@
                 <div class="container">
 
                     <label for="username"><b>Username</b></label>
-                    <input type="text" placeholder="Enter Username" name="username" required>
+                    <input type="text" id="usernameSignUp" placeholder="Enter Username" name="username" required>
 
                     <label for="email"><b>Email</b></label>
-                    <input type="email" placeholder="Enter Email" name="email" required>
+                    <input type="email" id="emailSignUp" placeholder="Enter Email" name="email" required>
 
                     <label for="password"><b>Password</b></label>
-                    <input type="password" placeholder="Enter Password" name="password" required>
+                    <input type="password" id="passwordSignUp" placeholder="Enter Password" name="password" required>
 
                     <label for="confirmpassword"><b>Confirm Password</b></label>
-                    <input type="password" placeholder="Enter Password Again" name="confirmpassword" required>
+                    <input type="password" id="confirmSignp" placeholder="Enter Password Again" name="confirmpassword" required>
 
-                    <button type="submit" class="btn10"><span>Sign Up</span></button>
+                    <button type="submit" class="btn10" id="buttonSignUp"><span>Sign Up</span></button>
                    
                 </div>
 
@@ -158,6 +168,28 @@
 </body>
 
 <script>
+    //Switching between username and email
+    function toggleLoginType() {
+    const emailInput = document.getElementById('emailInput');
+    const usernameInput = document.getElementById('usernameInput');
+    const switchInput = document.getElementById('switchInput');
+
+    if (switchInput.checked) {
+        emailInput.style.display = 'block';
+        usernameInput.style.display = 'none';
+
+        document.getElementById('usernameLogin').setAttribute('required', 'required');
+        document.getElementById('emailLogin').removeAttribute('required');
+
+    } else {
+        
+        emailInput.style.display = 'none';
+        usernameInput.style.display = 'block';
+
+        document.getElementById('usernameLogin').setAttribute('required', 'required');
+        document.getElementById('emailLogin').removeAttribute('required');
+        }
+    }
     // Get the modal
     var modal = document.getElementById('id01');
 
@@ -211,37 +243,42 @@
 
 //For Authentication, matching credentials from client side with those of database
 
-// document.getElementById('login-form').addEventListener('submit', async (e) => {
-//   e.preventDefault();
+document.getElementById('login-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
 
-//   const username = document.getElementById('usernameLogin').value;
-//   const password = document.getElementById('passwordLogin').value;
-//   const response = await fetch('/login', {
-//     method: 'POST',
-//     headers: {
-//       'Content-Type': 'application/json'
-//     },
-//     body: JSON.stringify({ username, password })
-//   });
+  let identifier;
+  if (document.getElementById('switchInput').checked) {
+    identifier = document.getElementById('emailLogin').value;
+  } else {
+    identifier = document.getElementById('usernameLogin').value;
+  }
+  const password = document.getElementById('passwordLogin').value;
+  const response = await fetch('/login', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ identifier, password })
+  });
 
-//   //For redirecting user to welcome page, if the credentials are correct and a response.ok is received
+  //For redirecting user to welcome page, if the credentials are correct and a response.ok is received
 
-//   try {
-//     const data = await response.json();
-//     if (response.ok) {
-//       if (data.redirectTo) {
-//         window.open(data.redirectTo, "_blank");
-//       } else {
-//         alert(data.message);
-//       }
-//     } else {
-//       alert(data.error);
-//     }
-//   } catch (error) {
-//     console.error(error);
-//     alert('An error occurred.');
-//   }
-// });
+  try {
+    const data = await response.json();
+    if (response.ok) {
+      if (data.redirectTo) {
+        window.open(data.redirectTo, "_blank");
+      } else {
+        alert(data.message);
+      }
+    } else {
+      alert(data.error);
+    }
+  } catch (error) {
+    console.error(error);
+    alert('An error occurred.');
+  }
+});
 
 
 </script>
