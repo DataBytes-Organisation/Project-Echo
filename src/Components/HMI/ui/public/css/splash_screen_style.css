@@ -90,58 +90,116 @@
     left: 0px;
     top: 0px;
   }
-  
-  @keyframes pan-image {  
-    0% {
-      background-position: 36% 42%;
-      background-size: 200%;
-    }
-    
-    20% {
-      background-position: 30% 35%;
-      background-size: 200%;
-    }
-    
-    20.0001% { /* -- View 2 -- */
-      background-position: 60% 85%;
-      background-size: 500%;
-    }
-    
-    40% {
-      background-position: 49% 81%;
-      background-size: 500%;
-    }
-    
-    40.0001% { /* -- View 3 -- */
-      background-position: 80% 42%;
-      background-size: 300%;
-    }
-    
-    60% {
-      background-position: 84% 33%;
-      background-size: 300%;
-    }
-    
-    60.0001% { /* -- View 4 -- */
-      background-position: 0% 0%;
-      background-size: 300%;
-    }
-    
-    80% {
-      background-position: 15% 4%;
-      background-size: 300%;
-    }
-    
-    80.0001% { /* -- View 5 -- */
-      background-position: 80% 10%;
-      background-size: 300%;
-    }
-    
-    100% {
-      background-position: 72% 14%;
-      background-size: 300%;
+
+  @media only screen and (min-width: 981px) { /* desktop : controls the images in bg */
+    @keyframes pan-image {  
+      0% {
+        background-position: 36% 42%;
+        background-size: 200%;
+      }
+
+      20% {
+        background-position: 30% 35%;
+        background-size: 200%;
+      }
+
+      20.0001% { /* -- View 2 -- */
+        background-position: 60% 85%;
+        background-size: 500%;
+      }
+
+      40% {
+        background-position: 49% 81%;
+        background-size: 500%;
+      }
+
+      40.0001% { /* -- View 3 -- */
+        background-position: 80% 42%;
+        background-size: 300%;
+      }
+
+      60% {
+        background-position: 84% 33%;
+        background-size: 300%;
+      }
+
+      60.0001% { /* -- View 4 -- */
+        background-position: 0% 0%;
+        background-size: 300%;
+      }
+
+      80% {
+        background-position: 15% 4%;
+        background-size: 300%;
+      }
+
+      80.0001% { /* -- View 5 -- */
+        background-position: 80% 10%;
+        background-size: 300%;
+      }
+
+      100% {
+        background-position: 72% 14%;
+        background-size: 300%;
+      }
     }
   }
+
+  @media only screen and (max-width: 980px) { /* mobile */
+    @keyframes pan-image {  
+      0% {
+        background-position: 36% 42%;
+        background-size: 500%;
+      }
+
+      20% {
+        background-position: 30% 35%;
+        background-size: 500%;
+      }
+
+      20.0001% { /* -- View 2 -- */
+        background-position: 60% 85%;
+        background-size: 500%;
+      }
+
+      40% {
+        background-position: 49% 81%;
+        background-size: 500%;
+      }
+
+      40.0001% { /* -- View 3 -- */
+        background-position: 80% 42%;
+        background-size: 400%;
+      }
+
+      60% {
+        background-position: 84% 33%;
+        background-size: 400%;
+      }
+
+      60.0001% { /* -- View 4 -- */
+        background-position: 0% 0%;
+        background-size: 400%;
+      }
+
+      80% {
+        background-position: 15% 4%;
+        background-size: 400%;
+      }
+
+      80.0001% { /* -- View 5 -- */
+        background-position: 80% 10%;
+        background-size: 500%;
+      }
+
+      100% {
+        background-position: 72% 14%;
+        background-size: 500%;
+      }
+    }
+  }
+
+
   /* IMAGE: https://wallpaperaccess.com/magical-forest */
   .screen > .screen-image {
 	-webkit-transform: translate3d(0, 0, 0); /* Using this translate command not only will enable the HW renderer, but it should also assist with the prevention of screen cutoff due to it rendering differently to the map section, fixing the other issue */
@@ -159,19 +217,45 @@
     animation: pan-image 15s linear infinite;
   }
   
-  .screen > .screen-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-end;
-    flex-grow: 1;
-    gap: 4rem;
-    position: relative;
-    z-index: 3;
-    margin: 1rem;
-    padding-bottom: 6rem;
-    border: 1px solid rgb(var(--primary-rgb) / 50%);
-    border-radius: 0.6rem;
+  @media only screen and (min-width: 981px) { /* desktop : controls the something under logo*/
+    .screen > .screen-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      flex-grow: 1;
+      gap: 4rem;
+      position: relative;
+      z-index: 3;
+      margin: 1rem;
+      padding-bottom: 6rem;
+      border: 1px solid rgb(var(--primary-rgb) / 50%);
+      border-radius: 0.6rem;
+    }
+  }
+
+  @media only screen and (max-width: 980px) { /* mobile */
+    .screen > .screen-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex-grow: 1;
+      gap: 4rem;
+      position: relative;
+      z-index: 3;
+      margin: 1rem;
+      padding-bottom: 8rem;
+      border: 1px solid rgb(var(--primary-rgb) / 50%);
+      border-radius: 0.6rem;
+    }
+  }
+
+  @media only screen and (max-width: 980px) { /* mobile exclusive image adjustments*/
+    .screen > .screen-content > img {
+      min-height: 200px;
+      min-width: 250px;
+    }
   }
   
   .screen > .screen-content > .screen-icon {
@@ -189,28 +273,51 @@
   }
   
   .screen > .screen-content > .screen-user:before,
-  .screen > .screen-content > .screen-user:after {
+  .screen > .screen-content > .screen-user:after { /* desktop : controls the green lines under logo*/
     content: "";
     position: absolute;
     top: 0px;
     background-color: rgb(var(--primary-rgb));
     border-radius: 1rem;
-    box-shadow: 0px 0px 8px 3px rgb(var(--primary-rgb) / 60%);
+    box-shadow: 0px 0px 8px 4px rgb(var(--primary-rgb) / 60%);
   }
   
-  .screen > .screen-content > .screen-user:before {
-    height: 2px;
-    width: 50px;
-    translate: -20px -1rem;
-    opacity: 0.75;
+
+
+  @media only screen and (min-width: 981px) { /* desktop : controls the dark green line under logo*/
+    .screen > .screen-content > .screen-user:before {
+      height: 2px;
+      width: 50px;
+      translate: -20px -1rem;
+      opacity: 0.75;
+    }
   }
   
-  .screen > .screen-content > .screen-user:after {
-    height: 3px;
-    width: 30px;
-    translate: 26px calc(-1rem - 0.5px);
+  @media only screen and (max-width: 980px) { /* mobile */
+    .screen > .screen-content > .screen-user:before {
+      height: 5px;
+      width: 140px;
+      translate: -45px -1rem;
+      opacity: 0.75;
+    }
   }
   
+  @media only screen and (min-width: 981px) { /* desktop : controls the bright green line under logo*/
+    .screen > .screen-content > .screen-user:after {
+      height: 3px;
+      width: 30px;
+      translate: 26px calc(-1rem - 0.5px);
+    }
+  }
+  
+  @media only screen and (max-width: 980px) { /* mobile */
+    .screen > .screen-content > .screen-user:after {
+      height: 7px;
+      width: 80px;
+      translate: 76px calc(-1rem - 0.5px);
+    }
+  }
+  /* comment */
   .screen > .screen-content > .screen-user > :is(.name, .subtitle) { /* While the text animation did also use the SW renderer and cause some CPU usage, it shouldn't need the HW renderer for now... */
     font-family: "EarthOrbiterCondensed Local";
     color: white; 
@@ -224,15 +331,62 @@
     font-size: 4.25rem;
     font-weight: 400;
   }
-  
-  .screen > .screen-content > .screen-user > .name:before,
-  .screen > .screen-content > .screen-user > .name:after {
-    content: "";
-    height: 4px;
-    width: 4px;
-    position: absolute;
-    border: 2px solid white;
-    border-radius: 2px;
+
+  @media only screen and (min-width: 981px) { /* desktop : controls the project echo text */
+    .screen > .screen-content > .screen-user > .name {
+      position: relative;
+      font-size: 4.25rem;
+      font-weight: 400;
+    }
+  }
+
+  @media only screen and (max-width: 980px) { /* mobile*/
+    .screen > .screen-content > .screen-user > .name {
+      position: relative;
+      font-size: 6.5rem;
+      font-weight: 400;
+    }
+  }
+
+  @media only screen and (max-width: 980px) { /* mobile exclusive click text*/
+    .screen > .screen-content > .screen-user > .subtitle{
+      visibility: hidden;
+    }
+  }
+
+  @media only screen and (max-width: 980px) { /* mobile exclusive click text*/
+    .screen > .screen-content > .screen-user > .subtitle:after{
+      position: relative;
+      font-size: 4rem;
+      font-weight: 750;
+      content: "Touch to start";
+      display: block;
+      visibility: visible;
+    }
+  }
+
+  @media only screen and (min-width: 981px) { /* desktop : controls the 2 dots */
+    .screen > .screen-content > .screen-user > .name:before,
+    .screen > .screen-content > .screen-user > .name:after {
+      content: "";
+      height: 4px;
+      width: 4px;
+      position: absolute;
+      border: 2px solid white;
+      border-radius: 2px;
+    }
+  }
+
+  @media only screen and (max-width: 980px) { /* mobile*/
+    .screen > .screen-content > .screen-user > .name:before,
+    .screen > .screen-content > .screen-user > .name:after {
+      content: "";
+      height: 4px;
+      width: 4px;
+      position: absolute;
+      border: 4px solid white;
+      border-radius: 4px;
+    }
   }
   
   .screen > .screen-content > .screen-user > .name:before {
