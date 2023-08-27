@@ -133,6 +133,13 @@ def post_control(control: str):
     publish.single("Simulator_Controls", control, hostname=MQTT_BROKER_URL, port=MQTT_BROKER_PORT)
 
     return control
+
+@router.post("/post_recording", status_code=status.HTTP_201_CREATED)
+def post_recording(recording: schemas.RecordingData):
+
+    publish.single("Simulate_Recording", recording, hostname=MQTT_BROKER_URL, port=MQTT_BROKER_PORT)
+
+    return recording
     
 @router.post("/signup", status_code=status.HTTP_201_CREATED)
 def signup(user: schemas.UserSignupSchema):  
