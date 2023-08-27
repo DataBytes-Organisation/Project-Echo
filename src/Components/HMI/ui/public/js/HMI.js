@@ -1506,7 +1506,6 @@ function save() {
       .then(audioDataArray => {
           const jsonData = {
               audioBlobs: audioDataArray,
-              // Include other metadata here if needed
           };
 
           jsonDataStr = JSON.stringify(jsonData);
@@ -1517,19 +1516,15 @@ function save() {
           if (filename) {
       
             const jsonDataString = jsonDataStr;
-            // Create a Blob object with the JSON data
             const blob = new Blob([jsonDataString], { type: 'application/json' });
       
-            // Create a URL for the Blob object
             const blobURL = URL.createObjectURL(blob);
       
-            // Create a link for downloading the JSON file
             const downloadLink = document.createElement('a');
             downloadLink.href = blobURL;
             downloadLink.download = filename;
             downloadLink.textContent = 'Download JSON';
       
-             // Append the link to the DOM
             document.getElementById("downloadLink").innerHTML = "";
             document.getElementById("downloadLink").appendChild(downloadLink);
             console.log(jsonDataString);
@@ -1553,12 +1548,10 @@ fileInput.addEventListener("change", function(event) {
       const jsonData = JSON.parse(fileContent);
       audioRecorder.audioBlobs = [];
 
-      // Step 2: Convert Base64 audio data to binary data
       const binaryAudioDataArray = jsonData.audioBlobs.map(base64Data => {
         return atob(base64Data);
       })
 
-      // Step 3: Create audio blobs from binary data chunks
       const audioBlobs = binaryAudioDataArray.map(binaryData => {
         const byteArray = new Uint8Array(binaryData.length);
         for (let i = 0; i < binaryData.length; i++) {
@@ -1568,37 +1561,11 @@ fileInput.addEventListener("change", function(event) {
       });
 
       audioRecorder.audioBlobs = audioBlobs; 
-      //audioRecorder.audioBlobs = atob(jsonData.audioBlobs);
-      //output.textContent = JSON.stringify(jsonData, null, 2);
     };
 
     reader.readAsText(selectedFile);
   }
 });
-/*
-let mediaRecorder;
-
-function startRecording() {
-    navigator.mediaDevices.getUserMedia({ audio: true })
-        .then(stream => {
-            mediaRecorder = new MediaRecorder(stream);
-            mediaRecorder.ondataavailable = handleDataAvailable;
-            mediaRecorder.start();
-        })
-        .catch(err => console.error("Error accessing microphone: ", err));
-}
-
-function stopRecording() {
-    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-        mediaRecorder.stop();
-    }
-}
-
-function handleDataAvailable(event) {
-    if (event.data.size > 0) {
-        recordedChunks.push(event.data);
-    }
-}*/
 
 var playNextRecordedTrack = false;
 var audioAnimTimeout = null;
