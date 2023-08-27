@@ -8,7 +8,7 @@ const Guest = db.guest;
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
 
-
+const nodemailer = require("nodemailer");
 
 exports.signup = (req, res) => {
   const user = new User({
@@ -22,6 +22,31 @@ exports.signup = (req, res) => {
       res.status(500).send({ message: err });
       return;
     }
+
+    // Set up Nodemailer transporter
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: "echodatabytes@gmail.com",
+        pass: "ltzoycrrkpeipngi",
+      },
+    });
+
+    // Send registration confirmation email
+    const mailOptions = {
+      from: "echodatabytes@gmail.com",
+      to: user.email,
+      subject: "Registration Successful",
+      html: `Congratulations! You have successfully registered.<hr> Dear ${user.username},<br> You've successfully been registered for the project echo. <br> You can now enter your credentials and sign in your personal account <hr>.`,
+    };
+
+    transporter.sendMail(mailOptions, (err, info) => {
+      if (err) {
+        console.error("Error sending email:", err);
+      } else {
+        console.log("Email sent:", info.response);
+      }
+    });
 
     if (req.body.roles) {
       Role.find(

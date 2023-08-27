@@ -14,7 +14,7 @@ checkDuplicateUsernameOrEmail = (req, res, next) => {
 
     if (user) {
       // res.status(400).send({ message: "Failed! Username is already in use!" });
-      res.status(400).send('<script>alert("Failed! Username is already in use!")</script>');
+      res.status(400).send('<script> window.location.href = "/login"; alert("Failed! Username is already in use!");</script>');
       return;
     }
 
@@ -29,7 +29,7 @@ checkDuplicateUsernameOrEmail = (req, res, next) => {
 
       if (user) {
         // res.status(400).send({ message: "Failed! Email is already in use!" });
-        res.status(400).send('<script>alert("Failed! Email is already in use!")</script>');
+        res.status(400).send('<script> window.location.href = "/login"; alert("Failed! Email is already in use!");</script>');
         return;
       }
 
@@ -45,7 +45,7 @@ checkRolesExisted = (req, res, next) => {
         // res.status(400).send({
         //   message: `Failed! Role ${req.body.roles[i]} does not exist!`
         // });
-        res.status(400).send('<script>alert(`Failed! Role ${req.body.roles[i]} does not exist!`)</script>');
+        res.status(400).send('<script> window.location.href = "/login"; alert("Failed! Role ${req.body.roles[i]} does not exist!");</script>');
         return;
       }
     }
@@ -59,7 +59,7 @@ confirmPassword = (req, res, next) => {
     // res.status(400).send({
     //   message: `Failed! Password does not match its confirmation!`
     // });
-    res.status(400).send('<script>alert("Failed! Password does not match its confirmation!")</script>');
+    res.status(400).send('<script> window.location.href = "/login"; alert("Failed! Password does not match its confirmation!");</script>');
     return;
   }
   next();
