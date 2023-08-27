@@ -41,7 +41,10 @@ exports.signup = (req, res) => {
               return;
             }
 
-            res.send({ message: "User was registered successfully!" });
+            console.log("User was registered successfully!");
+            res.status(200).send('<script> window.location.href = "/login"; alert("User was registered successfully!");</script>');
+
+
           });
         }
       );
@@ -59,7 +62,9 @@ exports.signup = (req, res) => {
             return;
           }
 
-          res.send({ message: "User was registered successfully!" });
+          console.log("User was registered successfully!");
+          res.status(200).send('<script>window.location.href = "/login"; alert("User was registered successfully!"); </script>');
+
         });
       });
     }
@@ -70,7 +75,7 @@ exports.signin = (req, res) => {
   User.findOne({
     $or: [
       { username: req.body.username },
-      { email: req.body.email}
+      { email: req.body.email }
     ]
   })
     .populate("roles", "-__v")
@@ -81,7 +86,7 @@ exports.signin = (req, res) => {
       }
 
       if (!user) {
-        return res.status(404).send({ message: "User Not found." });
+        return res.status(404).send('<script> alert("User does not exist"); window.location.href = "/login";  </script>');
       }
 
       var passwordIsValid = bcrypt.compareSync(
@@ -90,7 +95,8 @@ exports.signin = (req, res) => {
       );
 
       if (!passwordIsValid) {
-        return res.status(401).send({ message: "Invalid Password!" });
+        return res.status(401).send('<script> alert("Incorrect Password!"); window.location.href = "/login";  </script>');
+
       }
 
       const token = jwt.sign({ id: user.id },
@@ -141,7 +147,7 @@ exports.guestsignup = async (req) => {
     if (err) {
       // res.status(500).send({ message: err });
       console.log("Cannot created new Guest account: " + err)
-      return {status: "failed", message: "Create Guest Error! Please check the console log"};
+      return { status: "failed", message: "Create Guest Error! Please check the console log" };
     }
     Role.findOne({ name: "guest" }, (err, role) => {
       if (err) {
@@ -159,7 +165,7 @@ exports.guestsignup = async (req) => {
         return { status: 'success' };
       });
     });
-    }
+  }
   );
   return { status: 'success' };
 };
