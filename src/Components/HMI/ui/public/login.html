@@ -170,19 +170,17 @@
         const switchInput = document.getElementById('switchInput');
 
         if (switchInput.checked) {
-            emailInput.style.display = 'none';
-            usernameInput.style.display = 'block';
-
-            document.getElementById('username').setAttribute('required', 'required');
-            document.getElementById('email').removeAttribute('required');
-            console.log(`getElementById('switchText').innerHTML = "Use Email Instead"`);
-        } else {
             emailInput.style.display = 'block';
             usernameInput.style.display = 'none';
             
             document.getElementById('email').setAttribute('required', 'required');
             document.getElementById('username').removeAttribute('required');
-            document.getElementById('switchText').innerHTML = "Use Username Instead";
+        } else {
+            emailInput.style.display = 'none';
+            usernameInput.style.display = 'block';
+    
+            document.getElementById('username').setAttribute('required', 'required');
+            document.getElementById('email').removeAttribute('required');
         }
     }
 
