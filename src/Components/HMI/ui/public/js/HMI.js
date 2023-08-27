@@ -3,7 +3,7 @@
 import { getAudioTestString } from "./HMI-utils.js";
 import { getAudioRecorder } from "./audio_recorder.js";
 import { retrieveTruthEventsInTimeRange, retrieveVocalizationEventsInTimeRange, 
-  retrieveMicrophones, retrieveAudio, retrieveSimTime } from "./routes.js";
+  retrieveMicrophones, retrieveAudio, retrieveSimTime, postRecording } from "./routes.js";
 //import data from "./sample_data.json" assert { type: 'json' }; Browser assertions not yet supported in all browsers, alternative method used instead.
 
 
@@ -11,6 +11,11 @@ import { retrieveTruthEventsInTimeRange, retrieveVocalizationEventsInTimeRange,
 
 
 var markups = ["elephant.png", "monkey.png", "tiger.png"];
+
+const EARTH_RADIUS = 6371000;
+const MIC_DETECTION_RANGE = 750;
+const DEG_TO_RAD = (Math.PI / 180);
+const RAD_TO_DEG = (180 / Math.PI);
 
 var audioRecorder = getAudioRecorder();
 
@@ -1005,6 +1010,11 @@ function createBasemap(hmiState) {
   return basemap;
 }
 
+var current_mic_lat = 0.0;
+var current_mic_lon = 0.0;
+var current_mic_id = "";
+
+
 function createMapClickEvent(hmiState){
   hmiState.basemap.on("click", function (evt) {
     const feature = hmiState.basemap.forEachFeatureAtPixel(evt.pixel, function (feature) {
@@ -1040,10 +1050,15 @@ function createMapClickEvent(hmiState){
         let dateFormat = new Date();
         document.getElementById("mic_markup_img").src = values.micIcon;
         document.getElementById("mic_markup_details").innerHTML = "Microphone";
-        document.getElementById("mic_markup_loc_lon").innerHTML = values.micLon;
         document.getElementById("mic_markup_loc_lat").innerHTML = values.micLat;
+        document.getElementById("mic_markup_loc_lon").innerHTML = values.micLon;
         document.getElementById("mic_markup_date").innerHTML = dateFormat.toUTCString()
-        
+
+        current_mic_lat = values.micLat;
+        current_mic_lon = values.micLon;
+        current_mic_id = values.id;
+
+
         animal_toggled = true;
         const toggled_mic = new CustomEvent('micToggled',{
         detail: {
@@ -1481,6 +1496,62 @@ document.addEventListener('loadRecording', function(event){
   //stopAudioPlayback();
 })
 
+document.addEventListener('simulateRecording', function(event){
+  simulateRecording(audioRecorder.audioBlobs, window.hmiState);
+})
+
+function generateRandomCoordinate(latitude, longitude) {
+  const latRad = latitude * DEG_TO_RAD;
+  const lonRad = longitude * DEG_TO_RAD;
+
+  const dist = (Math.random() * MIC_DETECTION_RANGE) + 50;
+
+  const theta = Math.random() * 2 * Math.PI;
+
+  const newLatRad = latRad + (dist / EARTH_RADIUS) * Math.cos(theta);
+  const newLonRad = lonRad + (dist / EARTH_RADIUS) * Math.sin(theta);
+
+  const newLat = newLatRad * RAD_TO_DEG;
+  const newLon = newLonRad * RAD_TO_DEG;
+
+  return { lat: newLat, lon: newLon };
+}
+
+function simulateRecording(recordedChunks, hmiState){
+  if (recordedChunks.length === 0) {
+    console.log("No recording available.");
+    return;
+  }else{
+    const blob = new Blob(recordedChunks, { type: 'audio/webm' });
+    if(blob.size > 0){
+
+      let coords = generateRandomCoordinate(current_mic_lat, current_mic_lon);
+
+      //timestamp
+      //sensorId
+      //microphone LLA  
+      //animal est LLA
+      //animal true LLA
+      //animal LLA uncertainty
+      //audio clip
+      //audio file
+
+      const recordingData = {
+        timestamp: Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000),
+        sensorId: current_mic_id,
+        microphoneLLA: [current_mic_lat, current_mic_lon, 0.0],
+        animalEstLLA: [coords.lat, coords.lon, 0.0],
+        animalTrueLLA: [coords.lat, coords.lon, 0.0],
+        animalLLAUncertainty: 50.0,
+        audioClip: btoa(blob),
+        audioFile: "live_recording"
+      }
+
+      postRecording(recordingData);
+    }
+  }
+}
+
 function save() {
   if(audioRecorder.audioBlobs.length != 0){
     let exportData = {};
@@ -1604,7 +1675,6 @@ function playRecording(recordedChunks) {
             hmiState
           );
           audioRecordingElement.play();
-          //showPlaybackIndicator();
         }
       }
       else{
@@ -1621,7 +1691,7 @@ function stopRecordingPlayback(){
   }
 
   if(audioRecordingElement != null){
-    audioRecordingElement.pause();     // Pause the playback
+    audioRecordingElement.pause();
     audioRecordingElement.currentTime = 0; 
   }
 }

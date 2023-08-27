@@ -38,6 +38,10 @@ export function retrieveAudio(id){
   return axios.get(`${MESSAGE_API_URL}/audio?id=${id}`);
 }
 
+export function postRecording(recordingData){
+  axios.post(`${MESSAGE_API_URL}/post_recording?data=${recordingData}`);
+}
+
 export function startSimulator(){
   axios.post(`${MESSAGE_API_URL}/sim_control?control=Start`);
 }
