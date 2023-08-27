@@ -16,17 +16,17 @@ exports.verifyToken = (req, res, next) => {
   }
 
   jwt.verify(token,
-            config.secret,
-            (err, decoded) => {
-              if (err) {
-                return res.status(401).send({
-                  message: "Unauthorized!",
-                });
-              }
-              req.userId = decoded.id;
-              next();
-              return true;
-            });
+    config.secret,
+    (err, decoded) => {
+      if (err) {
+        return res.status(401).send({
+          message: "Unauthorized!",
+        });
+      }
+      req.userId = decoded.id;
+      next();
+      return true;
+    });
 };
 
 exports.isAdmin = (req, res, next) => {
@@ -63,7 +63,7 @@ exports.isModerator = (req, res, next) => {
   User.findById(req.userId).exec((err, user) => {
     if (err) {
       return res.status(500).send({ message: err });
-      
+
     }
 
     Role.find(
@@ -73,7 +73,7 @@ exports.isModerator = (req, res, next) => {
       (err, roles) => {
         if (err) {
           return res.status(500).send({ message: err });
-          
+
         }
 
         for (let i = 0; i < roles.length; i++) {
@@ -84,7 +84,7 @@ exports.isModerator = (req, res, next) => {
         }
 
         return res.status(403).send({ message: "Require Moderator Role!" });
-        
+
       }
     );
   });
@@ -94,7 +94,7 @@ exports.isUser = (req, res, next) => {
   User.findById(req.userId).exec((err, user) => {
     if (err) {
       return res.status(500).send({ message: err });
-      
+
     }
 
     Role.find(
@@ -104,7 +104,7 @@ exports.isUser = (req, res, next) => {
       (err, roles) => {
         if (err) {
           return res.status(500).send({ message: err });
-          
+
         }
 
         for (let i = 0; i < roles.length; i++) {
@@ -115,7 +115,7 @@ exports.isUser = (req, res, next) => {
         }
 
         return res.status(403).send({ message: "Require User Role!" });
-        
+
       }
     );
   });

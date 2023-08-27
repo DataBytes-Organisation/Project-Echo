@@ -68,7 +68,10 @@ exports.signup = (req, res) => {
 
 exports.signin = (req, res) => {
   User.findOne({
-    username: req.body.username,
+    $or: [
+      { username: req.body.username },
+      { email: req.body.email}
+    ]
   })
     .populate("roles", "-__v")
     .exec((err, user) => {
@@ -91,12 +94,12 @@ exports.signin = (req, res) => {
       }
 
       const token = jwt.sign({ id: user.id },
-                              config.secret,
-                              {
-                                algorithm: 'HS256',
-                                allowInsecureKeySizes: true,
-                                expiresIn: 86400, // 24 hours
-                              });
+        config.secret,
+        {
+          algorithm: 'HS256',
+          allowInsecureKeySizes: true,
+          expiresIn: 86400, // 24 hours
+        });
 
       var authorities = [];
 
@@ -119,7 +122,7 @@ exports.signin = (req, res) => {
         roles: authorities,
       }
       console.log("user login successfully: ", result);
-      res.status(200).redirect("/")
+      res.status(200).redirect("/welcome")
     });
 };
 
@@ -144,14 +147,14 @@ exports.guestsignup = async (req) => {
       if (err) {
         console.log("Cannot find the role document of guest: " + err)
         // res.status(500).send({ message: err });
-        return {status: "failed", message: "Find Role Error! Check the console log"};
+        return { status: "failed", message: "Find Role Error! Check the console log" };
       }
       guest.roles = [role._id];
       guest.save((err) => {
         if (err) {
           console.log("Cannot save Guest: ", err)
           // res.status(500).send({ message: err });
-          return {status: "failed", message: "Save Guest Error! Please check the console log"};
+          return { status: "failed", message: "Save Guest Error! Please check the console log" };
         }
         return { status: 'success' };
       });
@@ -186,12 +189,12 @@ exports.guestsignin = (req, res) => {
       }
 
       const token = jwt.sign({ id: user.userId },
-                              config.secret,
-                              {
-                                algorithm: 'HS256',
-                                allowInsecureKeySizes: true,
-                                expiresIn: 86400, // 24 hours
-                              });
+        config.secret,
+        {
+          algorithm: 'HS256',
+          allowInsecureKeySizes: true,
+          expiresIn: 86400, // 24 hours
+        });
 
       var authorities = [];
 
@@ -209,7 +212,7 @@ exports.guestsignin = (req, res) => {
         roles: authorities,
       }
       console.log("Guest login successfully: ", result);
-      res.status(200).redirect("/")
+      res.status(200).redirect("/welcome")
     });
 };
 
@@ -217,7 +220,7 @@ exports.guestsignin = (req, res) => {
 exports.signout = async (req, res) => {
   try {
     req.session = null;
-    return res.status(200).send({ message: "You've been signed out!" , session: req.session});
+    return res.status(200).send({ message: "You've been signed out!", session: req.session });
   } catch (err) {
     this.next(err);
   }

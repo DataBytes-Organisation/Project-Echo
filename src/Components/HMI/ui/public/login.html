@@ -72,15 +72,22 @@
                 </div>
 
                 <div class="container">
-                    <!-- <label for="username"><b>Username</b></label>
-                    <input type="text" placeholder="Enter Username" name="username" required> -->
+                    
+                    <div id="usernameInput">
                         <label for="username"><b>Username</b></label>
                         <input type="text" placeholder="Username" name="username">
+                    </div>
+
+                    <div id="emailInput" style="display:none;">
+                        <label for="email"><b>Email</b></label>
+                        <input type="Email" placeholder="Enter Email" name="email">
+                    </div>
 
                     <label for="password"><b>Password</b></label>
                     <input type="password" placeholder="Enter Password" name="password" required>
-                   
-                </button>
+
+                    <input type="checkbox" id="switchInput" onclick="toggleLoginType()" name="switchInput">
+                    <label for="switchInput" id="switchText">Use Email instead</label>
 
                     <button type="submit" class="btn10"><span>Login</span></button>
                 </div>
@@ -115,7 +122,6 @@
                     <input type="password" placeholder="Enter Password Again" name="confirmpassword" required>
 
                     <button type="submit" class="btn10"><span>Sign Up</span></button>
-                   
                 </div>
 
                 <div class="container" style="background-color:#f1f1f1">
@@ -158,6 +164,28 @@
 </body>
 
 <script>
+    function toggleLoginType() {
+        const emailInput = document.getElementById('emailInput');
+        const usernameInput = document.getElementById('usernameInput');
+        const switchInput = document.getElementById('switchInput');
+
+        if (switchInput.checked) {
+            emailInput.style.display = 'none';
+            usernameInput.style.display = 'block';
+
+            document.getElementById('username').setAttribute('required', 'required');
+            document.getElementById('email').removeAttribute('required');
+            console.log(`getElementById('switchText').innerHTML = "Use Email Instead"`);
+        } else {
+            emailInput.style.display = 'block';
+            usernameInput.style.display = 'none';
+            
+            document.getElementById('email').setAttribute('required', 'required');
+            document.getElementById('username').removeAttribute('required');
+            document.getElementById('switchText').innerHTML = "Use Username Instead";
+        }
+    }
+
     // Get the modal
     var modal = document.getElementById('id01');
 

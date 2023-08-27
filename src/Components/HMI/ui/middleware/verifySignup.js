@@ -13,7 +13,8 @@ checkDuplicateUsernameOrEmail = (req, res, next) => {
     }
 
     if (user) {
-      res.status(400).send({ message: "Failed! Username is already in use!" });
+      // res.status(400).send({ message: "Failed! Username is already in use!" });
+      res.status(400).send('<script>alert("Failed! Username is already in use!")</script>');
       return;
     }
 
@@ -27,7 +28,8 @@ checkDuplicateUsernameOrEmail = (req, res, next) => {
       }
 
       if (user) {
-        res.status(400).send({ message: "Failed! Email is already in use!" });
+        // res.status(400).send({ message: "Failed! Email is already in use!" });
+        res.status(400).send('<script>alert("Failed! Email is already in use!")</script>');
         return;
       }
 
@@ -40,9 +42,10 @@ checkRolesExisted = (req, res, next) => {
   if (req.body.roles) {
     for (let i = 0; i < req.body.roles.length; i++) {
       if (!ROLES.includes(req.body.roles[i])) {
-        res.status(400).send({
-          message: `Failed! Role ${req.body.roles[i]} does not exist!`
-        });
+        // res.status(400).send({
+        //   message: `Failed! Role ${req.body.roles[i]} does not exist!`
+        // });
+        res.status(400).send('<script>alert(`Failed! Role ${req.body.roles[i]} does not exist!`)</script>');
         return;
       }
     }
@@ -53,9 +56,10 @@ checkRolesExisted = (req, res, next) => {
 
 confirmPassword = (req, res, next) => {
   if (req.body.confirmpassword != req.body.password) {
-    res.status(400).send({
-      message: `Failed! Password does not match its confirmation!`
-    });
+    // res.status(400).send({
+    //   message: `Failed! Password does not match its confirmation!`
+    // });
+    res.status(400).send('<script>alert("Failed! Password does not match its confirmation!")</script>');
     return;
   }
   next();
