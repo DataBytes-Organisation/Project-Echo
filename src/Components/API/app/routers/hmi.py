@@ -208,7 +208,7 @@ def signin(user: schemas.UserLoginSchema):
 
     response = {"message": "User Login Successfully!"}
     print(result)
-    return JSONResponse(content=response)
+    return JSONResponse(content=response, status_code=200)
 
 @router.post("/signout", status_code=status.HTTP_200_OK)
 def signout():

@@ -50,10 +50,14 @@ export function retrieveSimTime(){
   return axios.get(`${MESSAGE_API_URL}/latest_movement`);
 }
 
-export function signup(){
-  return axios.post(`${MESSAGE_API_URL}/signup`)
-}
+// export function signup(){
+//   return axios.post(`${MESSAGE_API_URL}/signup`)
+// }
 
-export function signin(){
-  return axios.post(`${MESSAGE_API_URL}/signin`)
-}
+// export function signin(username, password){
+//   return axios.post(`${MESSAGE_API_URL}/signin`, {
+//     username,
+//     password
+//   }).then(res => console.log(res))
+//   .catch(err => console.log(err))
+// }
