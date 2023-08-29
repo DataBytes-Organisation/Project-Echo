@@ -30,7 +30,7 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "EE/SW/Transfer-learning-with-GoogleNet",
+    "git-widget-placeholder": "EE/SW/Model__Integration",
     "last_opened_file_path": "C:/Users/22396/PycharmProjects/temporaryEcho/yamnet/IntegrationModel.py",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -50,6 +50,7 @@
       <updated>1693050150087</updated>
       <workItem from="1693050156042" duration="71000" />
       <workItem from="1693128279787" duration="543000" />
+      <workItem from="1693276337817" duration="595000" />
     </task>
     <servers />
   </component>
