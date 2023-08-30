@@ -12,6 +12,11 @@ from app import schemas
 import pymongo
 import json
 from app.routers import hmi, engine, sim
+import app.database as db
+
+
+
+
 app = FastAPI()
 
 # Add the CORS middleware

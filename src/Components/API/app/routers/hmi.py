@@ -8,13 +8,14 @@ from bson import ObjectId
 import datetime
 from app import serializers
 from app import schemas
-from app.database import Events, Movements, Microphones, User, Role, ROLES, GENDER, STATES_CODE, AUS_STATES
+from app.database import Events, Movements, Microphones, Species, User, Role, ROLES, GENDER, STATES_CODE, AUS_STATES
 import paho.mqtt.publish as publish
 import bcrypt
 from flask import jsonify
 import jwt
 import requests
 import datetime
+
 
 
 
@@ -58,12 +59,26 @@ def show_event_from_time(start: str, end: str):
     events = serializers.eventSpeciesListEntity(Events.aggregate(aggregate))
     return events
 
+# Return all species data
+ 
+@router.get("/record_animals", response_description="Get all record of animals")
+def list_species_data():
+    data = Species.find()
+    species_data =[]
+    for i in data: 
+        species_data.append(i)
+    return species_data
+
+
+
+ 
+
 @router.get("/audio", response_description="returns audio given ID")
 def show_audio(id: str):
     aggregate = [
         {
             '$match':{'_id': ObjectId(id)}
-        },
+        }, 
         {
             '$project': { "audioClip": 1, "sampleRate": 1}
         }
