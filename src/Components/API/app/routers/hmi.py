@@ -74,11 +74,21 @@ def list_species_data():
         for moves in Movements_data:
             if moves['species'] == each_species['species']:
                 each_species['animalId'] = moves['animalId']
-                del moves['species']
-                del moves['animalId']
+                moves.pop('species')
+                moves.pop('animalId')
                 moves['id'] = str(moves['_id']).replace('ObjectId', "")
                 del moves['_id']
                 each_species['movements'].append(moves)
+
+        # events_data = Events.find()
+        # for events in events_data:
+        #     if events['species'] == each_species['species']:
+        #         each_species['animalId'] = events['animalId']
+        #         events.pop('species')
+        #         events.pop('animalId')
+        #         events['id'] = str(events['_id']).replace('ObjectId', "")
+        #         del events['_id']
+        #         each_species['movements'].append(events)
         animals_record.append(each_species)
     return animals_record
 
