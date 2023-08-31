@@ -1,5 +1,6 @@
 const config = require("../config/auth.config");
 const db = require("../model");
+const path = require('path');
 const User = db.user;
 const Role = db.role;
 
@@ -131,7 +132,8 @@ exports.signout = async (req, res) => {
 exports.loadForget = (req,res) => {
   try {
     console.log("Sending forgetPass.html from router");
-    res.status(200).sendFile(path.join(__dirname, 'public/forgetPass.html'));
+    console.log("Current dirPath: ", __dirname);
+    res.status(200).sendFile(path.join(__dirname, '../public/forgetPass.html'));
   } catch (error) {
     console.log(error.message);
   }

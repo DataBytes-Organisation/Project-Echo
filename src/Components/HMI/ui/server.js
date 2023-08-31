@@ -177,7 +177,7 @@ app.get("*", (req,res) => {
   if (!token) {
     console.log("Current user session unavailable")
     res.sendFile(path.join(__dirname, 'public/login.html'));
-    res.sendFile(path.join(__dirname, 'public/forgetPass.html'));
+    // res.sendFile(path.join(__dirname, 'public/forgetPass.html'));
   } else {
     console.log("redirect to homepage")
     return res.sendFile(path.join(__dirname, 'public/index.html'))
