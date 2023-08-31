@@ -167,7 +167,7 @@ def signup(user: schemas.UserSignupSchema):
     user_dict["__v"] = 0
     User.insert_one(user_dict)
     response = {"message": "User was registered successfully!"}
-    return JSONResponse(content=response)
+    return JSONResponse(content=response, status_code=201)
 
 
 @router.post("/signin", status_code=status.HTTP_200_OK)
@@ -244,6 +244,13 @@ def passwordchange(user: schemas.UserLoginSchema, newpw: str, cfm_newpw: str):
         {"username": account['username']},
         {"$set": {"password": newpw_hashed.decode('utf-8')}}
     )
+
+    response = {"message": "User Password Changed Sucessfully!"}
+    return JSONResponse(content=response)
+
+
+@router.get("/abc", status_code=status.HTTP_200_OK)
+def abc():
 
     response = {"message": "User Password Changed Sucessfully!"}
     return JSONResponse(content=response)
