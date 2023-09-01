@@ -62,16 +62,19 @@ def show_event_from_time(start: str, end: str):
 
 
 @router.get("/record_animals", response_description="Get all record of animals")
-def list_species_data(events_time: str  = None, species: str = None, location_sensorId: str = None):
+def list_species_data(events_time: str  = "", species: str = "", location_sensorId: str = ""):
     Species_data = Species.find()
     animals_record = []
     filter_record = []
-    events_time = events_time[1:]
-    events_time = events_time[:-1]
-    species = species[1:]
-    species = species[:-1]
-    location_sensorId = location_sensorId[1:]
-    location_sensorId = location_sensorId[:-1]
+    if events_time:
+        # events_time = events_time[1:]
+        events_time = events_time[:-1]
+    if species:
+        species = species[1:]
+        species = species[:-1]
+    if location_sensorId:
+        location_sensorId = location_sensorId[1:]
+        location_sensorId = location_sensorId[:-1]
     
 
     for each_species in Species_data:
@@ -115,7 +118,7 @@ def list_species_data(events_time: str  = None, species: str = None, location_se
                     filter_record.append(animal)
 
     if len(filter_record)>0:
-
+        print(filter_record)
         return filter_record
     else:
         return animals_record
