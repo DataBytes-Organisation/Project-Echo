@@ -353,7 +353,7 @@ app.post("/api/submit", async (req, res) => {
 });
 
 app.get("/requests", (req,res) => {
-  res.sendFile(path.join(__dirname, 'public/requests.html'))
+  res.sendFile(path.join(__dirname, 'public/admin/admin-request.html'))
 })
 
 app.patch('/api/requests/:id', async (req, res) => {
