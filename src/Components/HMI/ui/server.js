@@ -161,7 +161,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 const cors = require("cors");
 
 var corsOptions = {
-  origin: "http://localhost:8081"
+  origin: ["http://localhost:8081", "*"]
 };
 
 app.use(cors(corsOptions))
@@ -332,7 +332,9 @@ app.get("/", (req, res) => {
   
 })
 
-
+app.get("/admin-dashboard", (req,res)=> {
+  return res.sendFile(path.join(__dirname, 'public/admin/dashboard.html'));
+})
 
 app.get("/login", (req,res) => {
   [verifyToken]
@@ -388,24 +390,21 @@ app.get('/api/requests', async (req, res) => {
   }
 });
 
-app.get("*", (req,res) => {
-  if (authJwt.verifyToken){
-    let token = req.session.token;
-    console.log("Current token: ", req.session.token)
-    if (!token) {
-      console.log("Current user session unavailable")
-      res.sendFile(path.join(__dirname, 'public/login.html'));
-    } else {
-      console.log("redirect to homepage")
-      return res.sendFile(path.join(__dirname, 'public/index.html'))
-    }
-  }
-  else {
-    console.log("User token not assigned!");
-    res.sendFile(path.join(__dirname, 'public/login.html'));
-  }
+// app.get("*", (req,res) => {
+//   if (authJwt.verifyToken){
+//     let token = req.session.token;
+//     console.log("Current token: ", req.session.token)
+//     if (!token) {
+//       console.log("Current user session unavailable")
+//       res.sendFile(path.join(__dirname, 'public/login.html'));
+//     } 
+//   }
+//   else {
+//     console.log("User token not assigned!");
+//     res.sendFile(path.join(__dirname, 'public/login.html'));
+//   }
 
-})
+// })
 
 // start the server
 app.listen(port, () => {
