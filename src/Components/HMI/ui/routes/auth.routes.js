@@ -24,10 +24,11 @@ module.exports = function (app) {
         
   
   //   );
-  app.post("/api/auth/signup", async (req, res) => {
+  app.post("/api/auth/signup", verifySignUp.confirmPassword, async (req, res) => {
     
-    verifySignUp.confirmPassword
-    // // After signup page are completed
+    
+    // // After signup page are completed and merged
+    // // Use this schema instead of the bottom one 
     // let schema = {
     //   uname : req.body.username,
     //   pw : req.body.password,
@@ -54,23 +55,26 @@ module.exports = function (app) {
       
       address : {"country": 'Australia', "state": 'VIC'}   
     }
-
-      const axiosResponse = await axios.post('http://ts-api-cont:9000/hmi/signup',schema);
-      if (axiosResponse.status === 201) {
+      try {
+        const axiosResponse = await axios.post('http://ts-api-cont:9000/hmi/signup',schema)
+      
+        if (axiosResponse.status === 201) {
+          console.log('Status Code: ' + axiosResponse.status + ' ' + axiosResponse.statusText)
           res.status(201).redirect('/welcome')
-      } else {
-          // msg = {
-          //   status: axiosResponse.status,
-          //   message: axiosResponse.message,
-          // }
-          //console.log(msg)
-          res.status(axiosResponse.status).redirect('/login')
+        } 
+      } catch (err) {
+        console.log('Status Code: ' + err.response.status + ' ' + err.response.statusText)
+        console.log(err.response.data)
+        res.status(err.response.status).redirect('/login')
       }
 });
     
   app.post("/api/auth/signin", async (req, res) => {
       let uname = req.body.username;
       let pw = req.body.password;
+
+      let email = req.body.email;
+      
       let re = new RegExp("^guest\_.*\_[0-9]{8,10}$");
       
       //Check user login based on Regex Pattern:
@@ -78,24 +82,22 @@ module.exports = function (app) {
         console.log("username is not from Guest, proceed to User Signin")
         try {
           const axiosResponse = await axios.post('http://ts-api-cont:9000/hmi/signin', {
-              username: uname,
-              password: pw
+            username: uname,
+            email: email,
+            password: pw
           });
+          
           if (axiosResponse.status === 200) {
-              res.status(200).redirect('/welcome')
-          } else {
-              // msg = {
-              //   status: axiosResponse.status,
-              //   message: axiosResponse.message,
-              // }
-              //console.log(msg)
-              res.status(axiosResponse.status).redirect('/login')
-          }
+            console.log('Status Code: ' + axiosResponse.status + ' ' + axiosResponse.statusText)
+            res.status(200).redirect('/welcome')
+          } 
         } catch (err) {
-          console.log(err)
-          res.status(500).json({ message: "Error occurred while making the external request." });
-        }     
-      } else {
+          console.log('Status Code: ' + err.response.status + ' ' + err.response.statusText)
+          console.log(err.response.data)
+          res.status(err.response.status).redirect('/login')
+        }  
+      } 
+      else {
         console.log("username is from Guest, proceed to Guest Signin")
         controller.guestsignin(req, res)
       }

@@ -173,7 +173,7 @@ def signup(user: schemas.UserSignupSchema):
 @router.post("/signin", status_code=status.HTTP_200_OK)
 def signin(user: schemas.UserLoginSchema):
     #Find if the username exist in our database
-    account = User.find_one({"username": user.username})
+    account = User.find_one({"$or": [{"username": user.username}, {"email": user.email}]})
     if(account is None):
         response = {"message": "User Not Found."}
         return JSONResponse(content=response, status_code=404)

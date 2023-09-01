@@ -152,7 +152,9 @@ class UserSignupSchema(BaseModel):
    
 class UserLoginSchema(BaseModel):
     username: str
+    email: str
     password: str
+    
 
     class Config:
         allow_population_by_field_name = True
