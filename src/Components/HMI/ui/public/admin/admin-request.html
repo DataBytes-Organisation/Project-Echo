@@ -22,7 +22,7 @@
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
   />
   <!--- Requests Page Styling -->
-  <link rel="stylesheet" href="./css/requests.css" type="text/css">
+  <link type="text/css" rel="stylesheet" href="./css/requests.css" >
   <!-- jQuery -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script> 
   <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
@@ -50,26 +50,7 @@
     <!--  Sidebar End -->
     <!--  Main wrapper -->
     <div class="body-wrapper">
-      <!--  Header Start -->
-      <header class="app-header">
-        <nav class="navbar navbar-expand-lg navbar-light">
-          <ul class="navbar-nav">
-            <li class="nav-item d-block d-xl-none">
-              <a class="nav-link sidebartoggler nav-icon-hover" id="headerCollapse" href="javascript:void(0)">
-                <i class="ti ti-menu-2"></i>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link nav-icon-hover" href="javascript:void(0)">
-                <i class="ti ti-bell-ringing"></i>
-                <div class="notification bg-primary rounded-circle"></div>
-              </a>
-            </li>
-          </ul>
-          
-        </nav>
-      </header>
-      <!--  Header End -->
+      <div id="header"></div>
       <div class="container-fluid">
         <div class="card">
           <div class="card-body">
@@ -109,6 +90,7 @@
               // Use jQuery's load() method to load component contents
               console.log("Start!")
               $("#sidebar").load("./admin/component/sidebar-component.html");
+              $("#header").load("./admin/component/header-component.html");
           });
   </script>
 </body>

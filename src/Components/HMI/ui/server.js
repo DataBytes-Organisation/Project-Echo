@@ -336,6 +336,10 @@ app.get("/admin-dashboard", (req,res)=> {
   return res.sendFile(path.join(__dirname, 'public/admin/dashboard.html'));
 })
 
+app.get("/admin-template", (req,res)=> {
+  return res.sendFile(path.join(__dirname, 'public/admin/template.html'));
+})
+
 app.get("/login", (req,res) => {
   [verifyToken]
   res.sendFile(path.join(__dirname, 'public/login.html'));
