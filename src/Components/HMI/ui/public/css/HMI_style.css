@@ -585,6 +585,21 @@ input[type="checkbox"]{
   overflow-wrap: break-word;
   font-family: 'Roboto', sans-serif;
 }
+.image-row,
+    .microphone-image-row {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .image-description,
+    .microphone-image {
+      text-align: center;
+    }
+    .image-description img,
+    .microphone-image img {
+      max-width: 100px;
+      margin: 10px;
+    }
 
 #filter-menu {
   padding: 0px 0px 0px 0px;
