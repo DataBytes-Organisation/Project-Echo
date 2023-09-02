@@ -171,7 +171,7 @@ class RecordingData(BaseModel):
     microphoneLLA: List[float] 
     animalEstLLA: List[float]
     animalTrueLLA: List[float]
-    animalLLAUncertainty: int 
+    animalLLAUncertainty: float
     audioClip: str 
     audioFile: str
     
