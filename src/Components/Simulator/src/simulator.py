@@ -36,6 +36,10 @@ class Simulator():
     
         # start the simulator loop
         await self.main_loop(animals, loops=int(os.environ['SIMULATOR_LOOPS']))
+
+    async def handle_recording_message(self, msg):
+        print("calling send recording")
+        self.config.comms_manager.mqtt_send_recording_msg(msg)
         
     async def main_loop(self, animals, loops=100000):
         for _ in range(loops):
@@ -62,7 +66,8 @@ class Simulator():
                         if ast.literal_eval(os.environ['RENDER_STATES']):  self.render_state.render_animal_vocalisation(animal)
                         predicted_lla, closest_mic, min_error = self.config.SENSOR_MANAGER.vocalisation(animal)
            
-                        self.config.comms_manager.mqtt_send_random_audio_msg(animal, predicted_lla, closest_mic, min_error)
+                        #TODO make alternate simulator modes
+                        #self.config.comms_manager.mqtt_send_random_audio_msg(animal, predicted_lla, closest_mic, min_error)
                         print("Animal Vocal....Complete.", flush=True)
 
                     animal.describe()
