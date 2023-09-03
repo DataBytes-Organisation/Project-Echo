@@ -121,11 +121,21 @@
                     <label for="confirmpassword"><b>Confirm Password</b></label>
                     <input type="password" placeholder="Enter Password Again" name="confirmpassword" required>
 
-                    <label for="roles"><b>Roles</b></label>
-                    <input type="text" placeholder="Enter your role" name="confirmpassword" required>
+                    <label for="roles"><b>Roles</b></label><br>            
+                    <select name="roles" id = "roles">
+                        <option value="" disabled selected>Roles</option>
+                        <option value="admin">Admin</option>
+                        <option value="user">User</option>
+                        <option value="guest">Guest</option>
+                    </select>
+                    
 
-                    <label for="gender"><b>Gender</b></label>
-                    <input type="text" placeholder="MALE/FEMALE" name="confirmpassword" required>
+                    <label for="gender"><b>Gender</b></label><br>
+                    <select name = 'gender' id = "gender">
+                        <option value="" disabled selected>Gender</option>
+                        <option value="MALE">Male</option>
+                        <option value="FEMALE">Female</option>
+                    </select>
 
                     <label for="DoB"><b>Date of Birth</b></label>
                     <input type="text" placeholder="DD/MM/YYYY" name="DoB" required>
@@ -140,7 +150,7 @@
                     <input type="text" placeholder="Enter your Organization" name="organization" required>
                     
                     <label for="phonenumber"><b>Phone Number</b></label>
-                    <input type="text" placeholder="Enter your Number" name="phnoenumber">
+                    <input type="text" placeholder="Enter your Number" name="phonenumber">
 
                     <button type="submit" class="btn10"><span>Sign Up</span></button>
                 </div>

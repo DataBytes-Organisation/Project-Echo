@@ -26,35 +26,23 @@ module.exports = function (app) {
   //   );
   app.post("/api/auth/signup", verifySignUp.confirmPassword, async (req, res) => {
     
-    
-    // // After signup page are completed and merged
-    // // Use this schema instead of the bottom one 
-    // let schema = {
-    //   uname : req.body.username,
-    //   pw : req.body.password,
-    //   email : req.body.email,
-    //   roles : req.body.roles,
-    //   gender : req.body.gender,
-    //   DoB : req.body.DoB,
-    //   organization : req.body.organization,
-    //   phonenumber : req.body.phonenumber,
-      
-    //   address : {"country": req.body.country, "state": req.body.state}   
-    // }
-
-    // Testing and working 
+    const rolesList = [req.body.roles]
+    // After signup page are completed and merged
+    // Use this schema instead of the bottom one 
     let schema = {
       username : req.body.username,
       password : req.body.password,
       email : req.body.email,
-      roles : ['admin', 'user'],
-      gender : 'M',
-      DoB : '01/01/2001',
-      organization : 'Deakin',
-      phonenumber : '0400000000',
+      roles : rolesList,
+      gender : req.body.gender,
+      DoB : req.body.DoB,
+      organization : req.body.organization,
+      phonenumber : req.body.phonenumber,
       
-      address : {"country": 'Australia', "state": 'VIC'}   
+      address : {"country": req.body.country, "state": req.body.state} 
     }
+
+  
       try {
         const axiosResponse = await axios.post('http://ts-api-cont:9000/hmi/signup',schema)
       
