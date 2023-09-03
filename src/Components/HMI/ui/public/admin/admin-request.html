@@ -93,6 +93,201 @@
               $("#header").load("./admin/component/header-component.html");
           });
   </script>
+
+
+<script>
+
+  function createDropdown(requestId, animal, to) {
+      const dropdown = document.createElement('div');
+      dropdown.classList.add('dropdown');
+  
+      const button = document.createElement('button');
+      button.textContent = 'Pending';
+      dropdown.appendChild(button);
+  
+      const options = document.createElement('div');
+      options.classList.add('dropdown-options');
+      options.innerHTML = `
+        <button class="approve-btn" data-request-id="${requestId}" data-animal="${animal}" data-to="${to}">Approve</button>
+        <button class="deny-btn" data-request-id="${requestId}">Deny</button>
+      `;
+      dropdown.appendChild(options);
+  
+      return dropdown;
+    }
+  
+      const dataBody = document.getElementById('data-body');
+  
+      
+  
+    function updateTable(){
+      fetch('/api/requests')
+          .then(response => response.json())
+          .then(data => {
+              data.forEach(item => {
+              const row = document.createElement('tr');
+              row.innerHTML = `
+                  <td>${item._id}</td>
+                  <td>${item.username}</td>
+                  <td>${item.animal}</td>
+                  <td>${item.requestingToChange}</td>
+                  <td>${item.from}</td>
+                  <td>${item.to}</td>
+                  <td>${item.source}</td>
+                  <td>${item.date}</td>
+  
+                  <td></td> <!-- Placeholder for status cell -->
+  
+               `;
+               dataBody.appendChild(row);
+  
+        // Get the newly created row's status cell
+          const statusCell = row.querySelector('td:last-child');
+  
+          if (item.status === 'pending') {
+              const dropdown = createDropdown(item._id, item.animal, item.to);
+              statusCell.appendChild(dropdown);
+          } else {
+              statusCell.textContent = item.status;
+          }
+      });
+    })
+    .catch(error => {
+      console.error('Error fetching data:', error);
+    });
+  }
+  
+  function clearTable() {
+    const dataBody = document.getElementById('data-body');
+    dataBody.innerHTML = ''; // Remove all rows
+  }
+  
+  updateTable();
+  
+    dataBody.addEventListener('click',event =>{
+      const target = event.target;
+      const requestId = target.getAttribute('data-request-id');
+      const animal = target.getAttribute('data-animal');
+      const to = target.getAttribute('data-to');
+  
+      if (target.classList.contains('approve-btn')) {
+        //const requestId = target.getAttribute('data-request-id');
+          console.log(`Approving request...`);
+          
+          console.log("Request ID select:   ", requestId)
+          console.log("Changing status to:  ", to)
+      
+          //Perform API call to update the status
+          fetch(`/api/requests/${requestId}`, {
+              method: 'PATCH',
+              headers: {
+                  'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                  status: 'approved'
+              })
+              })
+              .then(response => {
+                  if (!response.ok) {
+                  throw new Error('Network response was not ok');
+                  }
+                  // Return response text if the content type is not JSON
+                  const contentType = response.headers.get('content-type');
+                  if (contentType && contentType.indexOf('application/json') !== -1) {
+                  return response.json();
+                  } else {
+                  return response.text();
+                  }
+              })
+              .then(data => {
+                  // Handle the response data
+                  console.log('Request status updated:', data);
+                  clearTable();
+                  updateTable();
+              })
+              .catch(error => {
+                  console.error('Error updating request status:', error);
+           });
+  
+           
+           fetch(`/api/updateConservationStatus/${animal}`, {
+              method: 'PATCH',
+              headers: {
+                  'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                  status: 'vulnerable'
+              })
+              })
+              .then(response => {
+                  if (!response.ok) {
+                  throw new Error('Network response was not ok');
+                  }
+                  // Return response text if the content type is not JSON
+                  const contentType = response.headers.get('content-type');
+                  if (contentType && contentType.indexOf('application/json') !== -1) {
+                  return response.json();
+                  } else {
+                  return response.text();
+                  }
+              })
+              .then(data => {
+                  // Handle the response data
+                  console.log('Request status updated:', data);
+                  clearTable();
+                  updateTable();
+              })
+              .catch(error => {
+                  console.error('Error updating request status:', error);
+           });
+  
+      
+      } else if (target.classList.contains('deny-btn')) {
+        //const requestId = target.getAttribute('data-request-id');
+  
+              console.log(`Denying request...`);  
+              console.log("Request ID select:   ", requestId)
+  
+      
+          //Perform API call to update the status
+              fetch(`/api/requests/${requestId}`, {
+                  method: 'PATCH',
+                  headers: {
+                      'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({
+                      status: 'denied'
+                  })
+                  })
+                  .then(response => {
+                      if (!response.ok) {
+                      throw new Error('Network response was not ok');
+                      }
+                      // Return response text if the content type is not JSON
+                      const contentType = response.headers.get('content-type');
+                      if (contentType && contentType.indexOf('application/json') !== -1) {
+                      return response.json();
+                      } else {
+                      return response.text();
+                      }
+                  })
+                  .then(data => {
+                      // Handle the response data
+                      console.log('Request status updated:', data);
+                      clearTable();
+                      updateTable();
+                  })
+                  .catch(error => {
+                      console.error('Error updating request status:', error);
+           });
+        //console.log(requests[requestId-1].status);
+        //requests[requestId-1].status = "Denied"
+        //clearTable()
+        //updateTable()
+      }
+    })
+  </script> 
+
 </body>
 
 </html>
