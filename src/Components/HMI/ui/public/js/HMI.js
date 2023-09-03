@@ -14,6 +14,7 @@ var markups = ["elephant.png", "monkey.png", "tiger.png"];
 
 const EARTH_RADIUS = 6371000;
 const MIC_DETECTION_RANGE = 750;
+const MAX_RECORDING_TIME_S = "10";
 const DEG_TO_RAD = (Math.PI / 180);
 const RAD_TO_DEG = (180 / Math.PI);
 
@@ -1398,7 +1399,6 @@ export function hidePlaybackIndicator() {
 }
 
 var audioRecordStartTime = null;
-const MAX_RECORDING_TIME_S = "05";
 var durationTimer = null;
 
 export function testFunct(){
