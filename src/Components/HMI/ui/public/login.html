@@ -101,7 +101,7 @@
 
         <div id="signup-form" class="user-auth-form modal">
 
-            <form class="modal-content animate" action="/api/auth/signup" method="POST" id="form-sign-up">
+            <form class="modal-content animate" action="/api/auth/signup" method="POST" id="form-sign-up" style = 'margin-top: -75px;'>
                 <div class="imgcontainer">
                     <span onclick="{closeForm('signup-form')}" class="close" title="Close Modal">&times;</span>
                     <!-- <img src="img_avatar2.png" alt="Avatar" class="avatar"> -->
@@ -120,6 +120,27 @@
 
                     <label for="confirmpassword"><b>Confirm Password</b></label>
                     <input type="password" placeholder="Enter Password Again" name="confirmpassword" required>
+
+                    <label for="roles"><b>Roles</b></label>
+                    <input type="text" placeholder="Enter your role" name="confirmpassword" required>
+
+                    <label for="gender"><b>Gender</b></label>
+                    <input type="text" placeholder="MALE/FEMALE" name="confirmpassword" required>
+
+                    <label for="DoB"><b>Date of Birth</b></label>
+                    <input type="text" placeholder="DD/MM/YYYY" name="DoB" required>
+
+                    <label for="country"><b>Country</b></label>
+                    <input type="text" placeholder="Enter your Country" name="country" required>
+                    
+                    <label for="state"><b>State</b></label>
+                    <input type="text" placeholder="Required if Australia" name="state">
+                    
+                    <label for="organization"><b>Organization</b></label>
+                    <input type="text" placeholder="Enter your Organization" name="organization" required>
+                    
+                    <label for="phonenumber"><b>Phone Number</b></label>
+                    <input type="text" placeholder="Enter your Number" name="phnoenumber">
 
                     <button type="submit" class="btn10"><span>Sign Up</span></button>
                 </div>
