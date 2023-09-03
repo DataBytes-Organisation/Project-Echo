@@ -24,6 +24,8 @@ import requests
 import base64
 import io
 import json
+import base64
+import tempfile
 
 from platform import python_version
 
@@ -134,8 +136,16 @@ class EchoEngine():
     def string_to_audio(self, audio_string) -> bytes:
         base64_img_bytes = audio_string.encode('utf-8')
         decoded_data = base64.decodebytes(base64_img_bytes)
+        #file = io.BytesIO(decoded_data)
+        print(decoded_data)
         return decoded_data
     
+    ########################################################################################
+    # this method takes in string and ecodes to audio binary data
+    ########################################################################################
+    def recorded_string_to_audio(self, audio_string) -> bytes:
+        decoded_data = base64.b64decode(audio_string)
+        return decoded_data
     
     ########################################################################################
     # this function is adapted from generic_engine_pipeline.ipynb
@@ -172,14 +182,25 @@ class EchoEngine():
     # this function is adapted from generic_engine_pipeline.ipynb
     # TODO: need to create a pipeline library and link same code into engine
     ########################################################################################
-    def combined_pipeline(self, audio_clip):
+    def combined_pipeline(self, audio_clip, mode):
         
-        # Create a file-like object from the bytes.
-        file = io.BytesIO(audio_clip)
+        sample_rate = 0
 
-        # Load the audio data with librosa
-        audio_clip, sample_rate = librosa.load(file, sr=self.config['AUDIO_SAMPLE_RATE'])
-        
+        if(mode == 1):
+           print("mode 1")
+           # Create a file-like object from the bytes.
+           file = io.BytesIO(audio_clip)
+
+           # Load the audio data with librosa
+           audio_clip, sample_rate = librosa.load(file, sr=self.config['AUDIO_SAMPLE_RATE'])
+        else:
+           print("mode 2")
+           # Create a file-like object from the bytes.
+           file = io.BytesIO(audio_clip)
+
+           # Load the audio data with librosa
+           audio_clip, sample_rate = librosa.load(file, sr=self.config['AUDIO_SAMPLE_RATE'])
+
         # keep right channel only
         if audio_clip.ndim == 2 and audio_clip.shape[0] == 2:
             audio_clip = audio_clip[1, :]
@@ -255,14 +276,28 @@ class EchoEngine():
         try:   
             audio_event = json.loads(msg.payload)
             print(audio_event['timestamp'])
+
+            audio_clip = ""
+            image = None
+            sample_rate = 0
+
+            if(audio_event['audioFile'] == "live_recording"):
+                # convert to string representation of audio to binary for processing
+                audio_clip = self.string_to_audio(audio_event['audioClip'])
             
-            # convert to string representation of audio to binary for processing
-            audio_clip = self.string_to_audio(audio_event['audioClip'])
+                image, audio_clip, sample_rate = self.combined_pipeline(audio_clip, 2)
             
-            image, audio_clip, sample_rate = self.combined_pipeline(audio_clip)
+                # update the audio event with the re-sampled audio
+                audio_event["audioClip"] = self.audio_to_string(audio_clip)
+
+            else:
+                # convert to string representation of audio to binary for processing
+                audio_clip = self.string_to_audio(audio_event['audioClip'])
             
-            # update the audio event with the re-sampled audio
-            audio_event["audioClip"] = self.audio_to_string(audio_clip)
+                image, audio_clip, sample_rate = self.combined_pipeline(audio_clip, 1)
+            
+                # update the audio event with the re-sampled audio
+                audio_event["audioClip"] = self.audio_to_string(audio_clip)
             
             image = tf.expand_dims(image, 0) 
             
