@@ -136,8 +136,6 @@ class EchoEngine():
     def string_to_audio(self, audio_string) -> bytes:
         base64_img_bytes = audio_string.encode('utf-8')
         decoded_data = base64.decodebytes(base64_img_bytes)
-        #file = io.BytesIO(decoded_data)
-        print(decoded_data)
         return decoded_data
     
     ########################################################################################
