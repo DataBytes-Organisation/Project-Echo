@@ -1107,7 +1107,7 @@ function createMapClickEvent(hmiState){
             animal_data = result;
             document.getElementById("desc_name").innerText = result.common;
             //document.getElementById("markup_img_2").src = values.animalIcon;
-            document.getElementById("desc_confidence").innerText = values.animalLocConfidence + "%";
+            document.getElementById("desc_confidence").innerText = values.animalConfidence + "%";
             document.getElementById("desc_species").innerText = result.species;
             document.getElementById("desc_summary").innerText = result.summary;
 
@@ -1128,7 +1128,7 @@ function createMapClickEvent(hmiState){
 
             document.getElementById("desc_name").innerText = values.animalSpecies;
             //document.getElementById("markup_img_2").src = values.animalIcon;
-            document.getElementById("desc_confidence").innerText = values.animalLocConfidence + "%";
+            document.getElementById("desc_confidence").innerText = values.animalConfidence + "%";
             document.getElementById("desc_species").innerText = values.animalSpecies;
             document.getElementById("desc_summary").innerText = "Bio data coming soon.";
             let summary = document.getElementById("desc_details");
@@ -1142,7 +1142,7 @@ function createMapClickEvent(hmiState){
             document.getElementById("markup_details").innerHTML = values.animalType + " | " + values.animalDiet + " | " + statusPrintLookup[values.animalStatus];
             document.getElementById("markup_loc_lon").innerHTML = values.animalLon;
             document.getElementById("markup_loc_lat").innerHTML = values.animalLat;
-            document.getElementById("markup_confidence").innerHTML = values.animalConfidence + "%";
+            document.getElementById("markup_confidence").innerHTML = values.animalLocConfidence + "%";
             document.getElementById("markup_date").innerHTML = dateFormat.toUTCString()
 
             animal_toggled = true;
