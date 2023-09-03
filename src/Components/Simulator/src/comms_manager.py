@@ -131,6 +131,17 @@ class CommsManager():
         logger1.info(f'Vocal message sent {animal.getUUID()} time: {timestamp} species: {species_name}')
         print(f'Vocal message sent {animal.getUUID()} time: {timestamp} species: {species_name}', flush=True)
 
+        # send a random audio message for the given animal at the predicted lla
+    def mqtt_send_recording_msg(self, msg) -> None:
+        
+        #print(msg.payload)
+
+        # publish the audio message on the queue
+        (rc, mid) = self.mqtt_client.publish(os.environ['MQTT_PUBLISH_URL'], msg.payload)
+        
+        logger1.info(f'Recording message sent')
+        print(f'Recording message sent', flush=True)
+
 
     ########################################################################################
     # this function populates the database with animal movement events
