@@ -1661,7 +1661,8 @@ function playRecording(recordedChunks) {
         console.log("No recording available.");
         return;
     }else{
-      const blob = new Blob(recordedChunks, { type: 'audio/webm' });
+      const blob = new Blob(recordedChunks, { type: 'audio/wav; codecs=MS_PCM' });
+      //const blob = new Blob(recordedChunks, { type: 'audio/webm' });
       if(blob.size > 0){
         const url = URL.createObjectURL(blob);
         audioRecordingElement = document.getElementById("audioElem");
@@ -1683,6 +1684,41 @@ function playRecording(recordedChunks) {
     }
 }
 
+// Create an AudioContext
+var audioContext = null;
+
+
+var a_source = null;
+var decodedAudioStore = null;
+var fileContent = null;
+
+fileInput.addEventListener("change", function(event) {
+  const selectedFile = event.target.files[0];
+  audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+  if (selectedFile) {
+    const reader = new FileReader();
+
+    reader.onload = function(event) {
+      fileContent = event.target.result;
+      audioContext.decodeAudioData(fileContent.slice(0), function(decodedAudio) {
+          // Set the audio source
+          decodedAudioStore = decodedAudio;
+          a_source = audioContext.createBufferSource();
+          a_source.buffer = decodedAudioStore;
+
+          // Connect the source to the audio element
+          a_source.connect(audioContext.destination);
+
+          // Set the audio element's source to the selected file
+          audioElement.src = URL.createObjectURL(selectedFile);
+      });
+    };
+
+    reader.readAsArrayBuffer(selectedFile);
+  }
+});
+
 function stopRecordingPlayback(){
   muteRecordingPlaybackAnimation();
 
@@ -1690,16 +1726,38 @@ function stopRecordingPlayback(){
     clearTimeout(recordingPlaybackAnimTimeout);
   }
 
-  if(audioRecordingElement != null){
-    audioRecordingElement.pause();
-    audioRecordingElement.currentTime = 0; 
+  if(a_source == null){
+    if(audioRecordingElement != null){
+      audioRecordingElement.pause();
+      audioRecordingElement.currentTime = 0; 
+    }
+  }
+  else{
+    a_source.stop();
   }
 }
 
 export function playAudio() {
   console.log("play");
+  if(a_source == null){
+    playRecording(audioRecorder.audioBlobs);
+  }
+  else{
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    if(playNextRecordedTrack){
+      recordingPlaybackAnimTimeout = setTimeout(
+        muteRecordingPlaybackAnimation,
+        10000,
+        hmiState
+      );
+      a_source = audioContext.createBufferSource();
+      a_source.buffer = decodedAudioStore;
 
-  playRecording(audioRecorder.audioBlobs);
+      // Connect the source to the audio element
+      a_source.connect(audioContext.destination);
+      a_source.start();
+    }
+  }
 }
 
 export function initializeRecordingDuration() {
