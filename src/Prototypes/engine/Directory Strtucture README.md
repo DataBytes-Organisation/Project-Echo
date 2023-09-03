@@ -4,7 +4,7 @@ To keep the prototypes folder tidy, and to easily find the workbooks for each ta
 
 **You will find the following directories:**
 
-- Additional Data Colleciton Tasks
+- Additional Data Collection Tasks
 - Augmentation Tasks
 - Ensemble Learning Tasks
 - Event Detection Tasks
