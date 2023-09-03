@@ -94,11 +94,11 @@ var audioRecorder = {
               });
       
               // Audio Buffer Source
-              soundSource = offlineAudioCtx.createBufferSource();
+              var soundSource = offlineAudioCtx.createBufferSource();
               soundSource.buffer = buffer;
       
               // // Create Compressor Node
-              compressor = offlineAudioCtx.createDynamicsCompressor();
+              var compressor = offlineAudioCtx.createDynamicsCompressor();
       
               compressor.threshold.setValueAtTime(-20, offlineAudioCtx.currentTime);
               compressor.knee.setValueAtTime(30, offlineAudioCtx.currentTime);
@@ -109,7 +109,7 @@ var audioRecorder = {
       
       
               // Gain Node
-              gainNode = offlineAudioCtx.createGain();
+              var gainNode = offlineAudioCtx.createGain();
               gainNode.gain.setValueAtTime(1, offlineAudioCtx.currentTime);
               
               // Connect nodes to destination
@@ -170,18 +170,24 @@ var audioRecorder = {
         var blob = audioRecorder.bufferToWave(abuffer, total_samples);
       
       
-          console.log('blob');
+        console.log('blob');
         console.log(blob);
         // Generate audio file and assign URL
         var new_file = URL.createObjectURL(blob);
+
+        const filename = prompt("Enter a filename for the JSON file:", "data.json");
+
+        if (filename) {
       
-        // Make it downloadable
-        var download_link = document.getElementById("downloadLink");
-        download_link.href = new_file;
-        var d = new Date();
-        var name = "d" + d.getTime() + "_compressed.wav";
-        download_link.innerText = name;
-        download_link.download = name;
+          const downloadLink = document.createElement('a');
+          downloadLink.href = new_file;
+          downloadLink.download = filename;
+          downloadLink.textContent = 'Download JSON';
+      
+          document.getElementById("downloadLink").innerHTML = "";
+          document.getElementById("downloadLink").appendChild(downloadLink);
+          downloadLink.click();
+        }
       },
       
       
