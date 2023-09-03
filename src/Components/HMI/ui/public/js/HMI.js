@@ -1518,100 +1518,6 @@ function generateRandomCoordinate(latitude, longitude) {
   return { lat: newLat, lon: newLon };
 }
 
-/*function simulateRecording(recordedChunks, hmiState){
-  if (recordedChunks.length === 0) {
-    console.log("No recording available.");
-    return;
-  }else{
-
-
-    const base64AudioDataArray = recordedChunks.map(blob => {
-      const reader = new FileReader();
-      return new Promise((resolve, reject) => {
-          reader.onloadend = () => {
-              resolve(reader.result.split(',')[1]); // Extract Base64 data
-          };
-          reader.readAsDataURL(blob);
-      });
-    });
-
-    Promise.all(base64AudioDataArray)
-      .then(audioDataArray => {
-  
-        const recordingData = {
-          timestamp: Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000),
-          sensorId: current_mic_id,
-          microphoneLLA: [current_mic_lat, current_mic_lon, 0.0],
-          animalEstLLA: [coords.lat, coords.lon, 0.0],
-          animalTrueLLA: [coords.lat, coords.lon, 0.0],
-          animalLLAUncertainty: 50.0,
-          //audioClip: recordedChunks,
-          //audioClip: JSON.stringify(audioDataArray),
-          //audioClip: base64Data.toString('utf-8'),
-          audioClip: "test",
-          audioFile: "live_recording"
-        }
-  
-        postRecording(recordingData);
-
-      })
-      .catch(err => console.error("Error sending recording: ", err));
-  }
-}*/
-
-
-/*function simulateRecording(recordedChunks, hmiState){
-  if (recordedChunks.length === 0) {
-    console.log("No recording available.");
-    return;
-  }else{
-    const blob = new Blob(recordedChunks, { type: 'audio/wav; codecs=MS_PCM' });
-    if(blob.size > 0){
-
-      const reader = new FileReader();
-
-      reader.onload = function(event) {
-
-        const base64Data = btoa(event.target.result);
-
-        console.log(base64Data);
-
-        let coords = generateRandomCoordinate(current_mic_lat, current_mic_lon);
-
-        //timestamp
-        //sensorId
-        //microphone LLA  
-        //animal est LLA
-        //animal true LLA
-        //animal LLA uncertainty
-        //audio clip
-        //audio file
-  
-        const recordingData = {
-          timestamp: Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000),
-          sensorId: current_mic_id,
-          microphoneLLA: [current_mic_lat, current_mic_lon, 0.0],
-          animalEstLLA: [coords.lat, coords.lon, 0.0],
-          animalTrueLLA: [coords.lat, coords.lon, 0.0],
-          animalLLAUncertainty: 50.0,
-          //audioClip: recordedChunks,
-          audioClip: base64Data,
-          //audioClip: base64Data.toString('utf-8'),
-          //audioClip: "test",
-          audioFile: "live_recording"
-        }
-  
-        postRecording(recordingData);
-
-        // You can do whatever you want with the Base64 data, such as sending it to a server or using it in your application.
-      };
-
-      reader.readAsBinaryString(blob);
-    }
-  }
-}*/
-
-// Step 4: Encode the combined data as a base64 string
 function arrayBufferToBase64(buffer) {
   let binary = '';
   const bytes = new Uint8Array(buffer);
@@ -1622,171 +1528,49 @@ function arrayBufferToBase64(buffer) {
   return btoa(binary);
 }
 
-/*
-function simulateRecording(recordedChunks, hmiState){
-  if (recordedChunks.length === 0) {
-    console.log("No recording available.");
-    return;
-  }else{
-
-    // Step 1: Concatenate the binary chunks into a single binary array
-    const concatenatedAudioData = new Uint8Array(recordedChunks.reduce((acc, chunk) => acc.concat(Array.from(new Uint8Array(chunk))), []));
-
-    // Step 2: Create a WAV file header
-    const header = new Uint8Array(44); // 44-byte WAV header
-    const sampleRate = 44100; // Set the sample rate
-    const numChannels = 1; // Set the number of channels (1 for mono, 2 for stereo)
-    const bitsPerSample = 8; // Set the bits per sample
-
-    const fileSize = concatenatedAudioData.length + 44 - 8;
-    header.set([0x52, 0x49, 0x46, 0x46], 0); // "RIFF"
-    header.set(new Uint8Array([fileSize, fileSize >> 8, fileSize >> 16, fileSize >> 24]), 4); // File size
-    header.set([0x57, 0x41, 0x56, 0x45], 8); // "WAVE"
-    header.set([0x66, 0x6D, 0x74, 0x20], 12); // "fmt "
-    header.set(new Uint8Array([16, 0, 0, 0]), 16); // Subchunk1Size (16 for PCM)
-    header.set(new Uint8Array([1, 0]), 20); // Audio format (1 for PCM)
-    header.set(new Uint8Array([numChannels, 0]), 22); // Number of channels
-    header.set(new Uint8Array([sampleRate, sampleRate >> 8, sampleRate >> 16, sampleRate >> 24]), 24); // Sample rate
-    header.set(new Uint8Array([sampleRate * numChannels * (bitsPerSample / 8), sampleRate * numChannels * (bitsPerSample / 8) >> 8]), 28); // Byte rate
-    header.set(new Uint8Array([numChannels * (bitsPerSample / 8), 0]), 32); // Block align
-    header.set(new Uint8Array([bitsPerSample, 0]), 34); // Bits per sample
-    header.set([0x64, 0x61, 0x74, 0x61], 36); // "data"
-    header.set(new Uint8Array([concatenatedAudioData.length, concatenatedAudioData.length >> 8, concatenatedAudioData.length >> 16, concatenatedAudioData.length >> 24]), 40); // Data size
-
-    // Step 3: Combine the WAV header and audio data
-    const wavData = new Uint8Array(header.length + concatenatedAudioData.length);
-    wavData.set(header, 0);
-    wavData.set(concatenatedAudioData, header.length);
-
-    // Step 4: Encode the combined data as a base64 string
-    //const base64EncodedWav = arrayBufferToBase64(concatenatedAudioData);
-    const base64EncodedWav = arrayBufferToBase64(wavData);
-    //const base64EncodedWav = btoa(wavData);
-
-    // Step 5: Send base64EncodedWav to your server or use it as needed
-    console.log(base64EncodedWav);
-    
-    let coords = generateRandomCoordinate(current_mic_lat, current_mic_lon);
-
-        const recordingData = {
-          timestamp: Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000),
-          sensorId: current_mic_id,
-          microphoneLLA: [current_mic_lat, current_mic_lon, 0.0],
-          animalEstLLA: [coords.lat, coords.lon, 0.0],
-          animalTrueLLA: [coords.lat, coords.lon, 0.0],
-          animalLLAUncertainty: 50.0,
-          //audioClip: recordedChunks,
-          audioClip: base64EncodedWav,
-          //audioClip: base64Data.toString('utf-8'),
-          //audioClip: "test",
-          audioFile: "live_recording"
-        }
-  
-        postRecording(recordingData);
-      
-      let decodedAudio = stringToAudio(base64EncodedWav);
-
-      playAudioFromUint8Array(decodedAudio);
-  }
-}*/
-
 function simulateRecording(hmiState){
   if (decodedAudioStore.length === 0) {
     console.log("No recording available.");
     return;
   }else{
 
-    // Step 1: Concatenate the binary chunks into a single binary array
-    //const concatenatedAudioData = new Uint8Array(decodedAudioStore.reduce((acc, chunk) => acc.concat(Array.from(new Uint8Array(chunk))), []));
-
-    // Step 4: Encode the combined data as a base64 string
-    //const base64EncodedWav = arrayBufferToBase64(decodedAudioStore);
-    //const base64EncodedWav = arrayBufferToBase64(wavData);
-    //const base64EncodedWav = btoa(decodedAudioStore);
-
-    // Convert the audio data to base64
-    // Extract the audio data as a Float32Array
-
-    // Create a new Uint8Array without detaching the ArrayBuffer
-    //const uint8Array = new Uint8Array(fileContent);
-
-    // Create a TextEncoder (if available, otherwise use the older method)
-    //const textEncoder = new TextEncoder();
-
-    // Encode the Uint8Array as base64
-    //const base64String = btoa(String.fromCharCode(...new Uint16Array(textEncoder.encode(uint8Array.toString()))));
     const base64String = arrayBufferToBase64(fileContent);
-
-    // Encode the binary data as base64
-    //const base64String = btoa(String.fromCharCode.apply(null, uint8Array));
-
-    //const base64String = btoa(String.fromCharCode.apply(null, new Uint8Array(fileContent)));
-
-    //old method
-    /*
-    const audioDataArray = new Float32Array(decodedAudioStore.getChannelData(0));
-
-
-    // Create a DataView to handle the binary data
-    const audioDataView = new DataView(audioDataArray.buffer);
-
-    // Convert the DataView to a base64 string
-    let binary = '';
-    for (let i = 0; i < audioDataView.byteLength; i++) {
-      binary += String.fromCharCode(audioDataView.getUint8(i));
-    }
-    const base64String = btoa(binary);
-
-    // Now, you have the audio data as a base64 string
-    console.log(base64String);
-
-    //const base64String = btoa(String.fromCharCode.apply(null, audioDataArray));
-
-    // Step 5: Send base64EncodedWav to your server or use it as needed
-    //console.log(base64String);*/
     
     let coords = generateRandomCoordinate(current_mic_lat, current_mic_lon);
 
-        const recordingData = {
-          timestamp: Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000),
-          sensorId: current_mic_id,
-          microphoneLLA: [current_mic_lat, current_mic_lon, 0.0],
-          animalEstLLA: [coords.lat, coords.lon, 0.0],
-          animalTrueLLA: [coords.lat, coords.lon, 0.0],
-          animalLLAUncertainty: 50.0,
-          //audioClip: recordedChunks,
-          audioClip: base64String,
-          //audioClip: base64Data.toString('utf-8'),
-          //audioClip: "test",
-          audioFile: "live_recording"
-        }
+    const recordingData = {
+      timestamp: Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000),
+      sensorId: current_mic_id,
+      microphoneLLA: [current_mic_lat, current_mic_lon, 0.0],
+      animalEstLLA: [coords.lat, coords.lon, 0.0],
+      animalTrueLLA: [coords.lat, coords.lon, 0.0],
+      animalLLAUncertainty: 50.0,
+      audioClip: base64String,
+      audioFile: "live_recording"
+    }
   
-        postRecording(recordingData);
+    postRecording(recordingData);
       
-      //let decodedAudio = stringToAudio(base64String);
+    //let decodedAudio = stringToAudio(base64String);
 
-      //playAudioFromUint8Array(decodedAudio);
-      //testEncoding(base64String);
+    //playAudioFromUint8Array(decodedAudio);
+    //testEncoding(base64String);
   }
 }
 
 function testEncoding(base64String){
   audioContext = new (window.AudioContext || window.webkitAudioContext)();
-  // Decode the base64 string to binary data
   const binaryData = atob(base64String);
 
-  // Create a Float32Array from the binary data
   const float32Array = new Float32Array(binaryData.length / Float32Array.BYTES_PER_ELEMENT);
   const view = new DataView(float32Array.buffer);
   for (let i = 0; i < binaryData.length; i++) {
     view.setUint8(i, binaryData.charCodeAt(i));
   }
 
-  // Create a new audio buffer from the Float32Array
   const newBuffer = audioContext.createBuffer(1, float32Array.length, audioContext.sampleRate);
   newBuffer.copyToChannel(float32Array, 0);
 
-  // Play the audio buffer to ensure it's not corrupted
   const audioSource = audioContext.createBufferSource();
   audioSource.buffer = newBuffer;
   audioSource.connect(audioContext.destination);
@@ -1794,30 +1578,23 @@ function testEncoding(base64String){
 }
 
 function stringToAudio(base64String) {
-  // Decode the base64 string to binary data
   const binaryString = atob(base64String);
 
-  // Create a Uint8Array from the binary string
   const uint8Array = new Uint8Array(binaryString.length);
   for (let i = 0; i < binaryString.length; i++) {
     uint8Array[i] = binaryString.charCodeAt(i);
   }
 
-  // Return the binary audio data
   return uint8Array;
 }
 
 function playAudioFromUint8Array(uint8Array) {
-  // Convert the Uint8Array to a Blob
   const blob = new Blob([uint8Array], { type: 'audio/wav' }); // Change the MIME type if needed
 
-  // Create an Object URL from the Blob
   const audioUrl = URL.createObjectURL(blob);
 
-  // Create an <audio> element to play the audio
   const audioElement = new Audio(audioUrl);
 
-  // Play the audio
   audioElement.play();
 }
 
@@ -1878,37 +1655,6 @@ function save() {
 
 var fileInput = document.getElementById("fileInput");
 
-/*fileInput.addEventListener("change", function(event) {
-  const selectedFile = event.target.files[0];
-
-  if (selectedFile) {
-    const reader = new FileReader();
-
-    reader.onload = function(event) {
-      const fileContent = event.target.result;
-
-      const jsonData = JSON.parse(fileContent);
-      audioRecorder.audioBlobs = [];
-
-      const binaryAudioDataArray = jsonData.audioBlobs.map(base64Data => {
-        return atob(base64Data);
-      })
-
-      const audioBlobs = binaryAudioDataArray.map(binaryData => {
-        const byteArray = new Uint8Array(binaryData.length);
-        for (let i = 0; i < binaryData.length; i++) {
-          byteArray[i] = binaryData.charCodeAt(i);
-        }
-        return byteArray;
-      });
-
-      audioRecorder.audioBlobs = audioBlobs; 
-    };
-
-    reader.readAsText(selectedFile);
-  }
-});*/
-
 var playNextRecordedTrack = false;
 var audioAnimTimeout = null;
 
@@ -1932,8 +1678,9 @@ function playRecording(recordedChunks) {
         console.log("No recording available.");
         return;
     }else{
+
       const blob = new Blob(recordedChunks, { type: 'audio/wav; codecs=MS_PCM' });
-      //const blob = new Blob(recordedChunks, { type: 'audio/webm' });
+
       if(blob.size > 0){
         const url = URL.createObjectURL(blob);
         audioRecordingElement = document.getElementById("audioElem");
@@ -1955,10 +1702,8 @@ function playRecording(recordedChunks) {
     }
 }
 
-// Create an AudioContext
+
 var audioContext = null;
-
-
 var a_source = null;
 var decodedAudioStore = null;
 var fileContent = null;
@@ -1973,15 +1718,13 @@ fileInput.addEventListener("change", function(event) {
     reader.onload = function(event) {
       fileContent = event.target.result;
       audioContext.decodeAudioData(fileContent.slice(0), function(decodedAudio) {
-          // Set the audio source
+
           decodedAudioStore = decodedAudio;
           a_source = audioContext.createBufferSource();
           a_source.buffer = decodedAudioStore;
 
-          // Connect the source to the audio element
           a_source.connect(audioContext.destination);
 
-          // Set the audio element's source to the selected file
           audioElement.src = URL.createObjectURL(selectedFile);
       });
     };
@@ -2024,7 +1767,6 @@ export function playAudio() {
       a_source = audioContext.createBufferSource();
       a_source.buffer = decodedAudioStore;
 
-      // Connect the source to the audio element
       a_source.connect(audioContext.destination);
       a_source.start();
     }
