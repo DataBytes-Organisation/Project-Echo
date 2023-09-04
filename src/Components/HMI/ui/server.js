@@ -13,6 +13,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 //const axios = require('axios')
 
+const {createCaptchaSync} = require("captcha-canvas");
 //Add mongoDB module inside config folder
 const db = require("./model");
 const Role = db.role;
@@ -140,7 +141,13 @@ function initGuests() {
     }
   });
 }
-
+app.get('/data/captcha', (req, res) => {
+  const {image, text} = createCaptchaSync(300,100); // Use the package's functionality
+  fs.writeFileSync("./public/captchaImg.png", image);
+  console.log("text: ", text);
+  console.log("Image: ", image);
+  res.json({image, text});
+});
 //Background Process to automatically delete Guest role after exceeding expiration
 setInterval(() => {
   const now = new Date();
