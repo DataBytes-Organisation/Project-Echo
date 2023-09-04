@@ -23,6 +23,7 @@
     "ol": "^7.3.0",
     "path": "^0.12.7",
     "requirejs": "^2.3.6",
-    "serve-index": "^1.9.1"
+    "serve-index": "^1.9.1",
+    "stripe": "^13.3.0"
   }
 }
