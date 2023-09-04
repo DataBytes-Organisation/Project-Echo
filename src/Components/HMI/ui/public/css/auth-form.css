@@ -160,6 +160,25 @@ span.psw {
   padding-top: 15vh;
 }
 
+.captcha-block {
+  background-color: #fefefe;
+  display: none;
+  width: 100%;
+  border: 1px solid grey;
+  position: inherit;
+  
+}
+.captcha-img {
+  width: 300px;
+  height: 100px;
+}
+
+.disabled {
+  background-color: grey;
+  color: white;
+  opacity: 0.8;
+  cursor: not-allowed;
+}
 /* Modal Content/Box */
 .modal-content {
   background-color: #fefefe;
