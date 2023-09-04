@@ -15,14 +15,18 @@ from flask import jsonify
 import jwt
 import requests
 import datetime
+import json
+import paho.mqtt.client as paho
 
 
 
 router = APIRouter()
 
 MQTT_BROKER_URL = "ts-mqtt-server-cont"
+MQTT_ENGINE_URL = "projectecho/engine/2"
 MQTT_BROKER_PORT = 1883
-
+#mqtt_client = paho.Client()
+#mqtt_client.connect(MQTT_BROKER_URL, MQTT_BROKER_PORT)
 
 @router.get("/events_time", response_description="Get detection events within certain duration")
 def show_event_from_time(start: str, end: str):
@@ -133,6 +137,32 @@ def post_control(control: str):
     publish.single("Simulator_Controls", control, hostname=MQTT_BROKER_URL, port=MQTT_BROKER_PORT)
 
     return control
+
+@router.post("/post_recording", status_code=status.HTTP_201_CREATED)
+def post_recording(data: schemas.RecordingData):
+
+    # Create the vocalisation event
+    vocalisation_event = {
+        "timestamp": data.timestamp.isoformat(),
+        "sensorId": data.sensorId,
+        "microphoneLLA": data.microphoneLLA,
+        "animalEstLLA": data.animalEstLLA,
+        "animalTrueLLA": data.animalTrueLLA,
+        "animalLLAUncertainty": 50.0,
+        "audioClip" : data.audioClip, 
+        "audioFile" : data.audioFile      
+    }    
+    MQTT_MSG = json.dumps(vocalisation_event)
+    print("dumped")
+    #print(data)
+    publish.single("Simulate_Recording", MQTT_MSG, hostname=MQTT_BROKER_URL, port=MQTT_BROKER_PORT)
+    #publish.single("Simulate_Recording", payload= MQTT_MSG, hostname=MQTT_ENGINE_URL, port=MQTT_BROKER_PORT)
+
+    # publish the audio message on the queue
+    #(rc, mid) = mqtt_client.publish(MQTT_BROKER_URL, MQTT_MSG)
+    print("sent")
+
+    return data
     
 @router.post("/signup", status_code=status.HTTP_201_CREATED)
 def signup(user: schemas.UserSignupSchema):  
@@ -167,13 +197,13 @@ def signup(user: schemas.UserSignupSchema):
     user_dict["__v"] = 0
     User.insert_one(user_dict)
     response = {"message": "User was registered successfully!"}
-    return JSONResponse(content=response)
+    return JSONResponse(content=response, status_code=201)
 
 
 @router.post("/signin", status_code=status.HTTP_200_OK)
 def signin(user: schemas.UserLoginSchema):
     #Find if the username exist in our database
-    account = User.find_one({"username": user.username})
+    account = User.find_one({"$or": [{"username": user.username}, {"email": user.email}]})
     if(account is None):
         response = {"message": "User Not Found."}
         return JSONResponse(content=response, status_code=404)
@@ -208,7 +238,7 @@ def signin(user: schemas.UserLoginSchema):
 
     response = {"message": "User Login Successfully!"}
     print(result)
-    return JSONResponse(content=response)
+    return JSONResponse(content=response, status_code=200)
 
 @router.post("/signout", status_code=status.HTTP_200_OK)
 def signout():
@@ -244,6 +274,13 @@ def passwordchange(user: schemas.UserLoginSchema, newpw: str, cfm_newpw: str):
         {"username": account['username']},
         {"$set": {"password": newpw_hashed.decode('utf-8')}}
     )
+
+    response = {"message": "User Password Changed Sucessfully!"}
+    return JSONResponse(content=response)
+
+
+@router.get("/abc", status_code=status.HTTP_200_OK)
+def abc():
 
     response = {"message": "User Password Changed Sucessfully!"}
     return JSONResponse(content=response)

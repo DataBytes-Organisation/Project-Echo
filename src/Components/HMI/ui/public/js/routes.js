@@ -16,6 +16,7 @@ if (typeof window === 'undefined') {
 }
 
 const MESSAGE_API_URL = 'http://localhost:9000/hmi';
+//const MESSAGE_API_URL = 'http://ts-api-cont:9000/hmi';
 
 export function retrieveTruthEventsInTimeRange(from, to) {
   var start = parseInt(from);
@@ -38,6 +39,17 @@ export function retrieveAudio(id){
   return axios.get(`${MESSAGE_API_URL}/audio?id=${id}`);
 }
 
+export function postRecording(recordingData){
+  axios.post(`${MESSAGE_API_URL}/post_recording`, recordingData)
+  .then(response => {
+    console.log('Response:', response.data);
+  })
+  .catch(error => {
+    console.error('Error:', error);
+  });
+  //axios.post(`${MESSAGE_API_URL}/post_recording?data=${recordingData}`);
+}
+
 export function startSimulator(){
   axios.post(`${MESSAGE_API_URL}/sim_control?control=Start`);
 }
@@ -50,10 +62,15 @@ export function retrieveSimTime(){
   return axios.get(`${MESSAGE_API_URL}/latest_movement`);
 }
 
-export function signup(){
-  return axios.post(`${MESSAGE_API_URL}/signup`)
-}
+// export function signup(){
+//   return axios.post(`${MESSAGE_API_URL}/signup`)
+// }
 
-export function signin(){
-  return axios.post(`${MESSAGE_API_URL}/signin`)
-}
+// export function signin(username, password){
+//   return axios.post(`${MESSAGE_API_URL}/signin`, {
+//     username,
+//     password
+//   }).then(res => console.log(res))
+//   .catch(err => console.log(err))
+// }
+

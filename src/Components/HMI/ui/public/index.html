@@ -45,7 +45,7 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
     
     <!-- Axios -->
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
 		<!-- HMI -->
 		<link rel="stylesheet" href="./css/HMI_style.css" type="text/css">
@@ -502,9 +502,13 @@
                   </div>
                 </div>
                 <div id="recording_export_container" style="margin-top: 10px !important;" class="recording_controls controls_item_row">
-                  <i id="save_recording_button" style="width:100px !important" class="toggle-button btn btn-secondary btn-no-background select-all-btn" onclick="{saveRecordingEvent()}" aria-hidden="true">Save</i>
+                  <!--i id="save_recording_button" style="width:100px !important" class="toggle-button btn btn-secondary btn-no-background select-all-btn" onclick="{saveRecordingEvent()}" aria-hidden="true">Save</i-->
                   <!--i id="load_recording_button" class="toggle-button btn btn-secondary btn-no-background select-all-btn" onclick="{loadRecordingEvent()}" aria-hidden="true">Load</i-->
                   <input type="file" style="display: inline-block !important; width: 250px !important" id="fileInput">
+                </div>
+                <h2 id="audioHeader"style="margin-top: 20px !important;">Recording Simulation</h2>
+                <div id="recording_simulation_container" style="margin-top: 10px !important;" class="recording_controls controls_item_row">
+                  <i id="simulate_recording_button" style="width:100px !important" class="toggle-button btn btn-secondary btn-no-background select-all-btn" onclick="{simulateRecordingEvent()}" aria-hidden="true">Simulate</i>
                 </div>
                 <div id="downloadLink"></div>
               </div>
@@ -911,6 +915,16 @@
           })
 
     document.dispatchEvent(load_recording);
+  }
+
+  function simulateRecordingEvent(){
+    const simulate_recording = new CustomEvent('simulateRecording',{
+            detail: {
+              message: "simulate"
+            }
+          })
+
+    document.dispatchEvent(simulate_recording);
   }
 
   function animateRecordedAudioPlay() {

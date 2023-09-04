@@ -2,14 +2,16 @@ const express = require('express');
 const app = express();
 const path = require('path');
 const fs = require('fs');
-const cookieSession = require("cookie-session");
-const dbConfig = require("./config/db.config");
-const jwt = require("jsonwebtoken");
-const { authJwt } = require("./middleware");
-const controller = require("./controller/auth.controller");
-const crypto = require("crypto")
-var bcrypt = require("bcryptjs");
+const cookieSession = require('cookie-session');
+const dbConfig = require('./config/db.config');
+const jwt = require('jsonwebtoken');
+const { authJwt } = require('./middleware');
+const controller = require('./controller/auth.controller');
+const crypto = require('crypto');
+const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
+const cors = require('cors');
+//const axios = require('axios')
 
 //Add mongoDB module inside config folder
 const db = require("./model");
@@ -75,18 +77,18 @@ function initRequests(){
   });
 }
 //Add sample Users if none exists
-function initUsers(){
+function initUsers() {
   User.estimatedDocumentCount((err, count) => {
     if (!err && count === 0) {
       const userData = require(path.join(__dirname, "user-sample/user-seed.json"));
       User.insertMany(userData);
-      
+
     }
   });
 }
 
 //Add sample Guest users if none exists
-function initGuests(){
+function initGuests() {
   Guest.estimatedDocumentCount((err, count) => {
     if (!err && count === 0) {
       //Different from Roles and Users, 
@@ -99,12 +101,12 @@ function initGuests(){
         password: bcrypt.hashSync("guest_password", 8),
         roles: [
           {
-            "_id":"64be1d0f05225843178d91d7"
+            "_id": "64be1d0f05225843178d91d7"
           }
         ],
         expiresAt: new Date(Date.now() + 1800000) // Set the expiration duration for 30 mins = 1800 s = 1800000 ms from now
       });
-      
+
       // Save the new guest document to the collection
       newGuest1.save((err, doc) => {
         if (err) {
@@ -121,12 +123,12 @@ function initGuests(){
         password: bcrypt.hashSync("guest_password", 8),
         roles: [
           {
-            "_id":"64be1d0f05225843178d91d7"
+            "_id": "64be1d0f05225843178d91d7"
           }
         ],
         expiresAt: new Date(Date.now() + 300000) // Set the expiration duration for 5 mins = 300 s = 300000 ms from now
       });
-      
+
       // Save the new guest document to the collection
       newGuest2.save((err, doc) => {
         if (err) {
@@ -157,11 +159,9 @@ const port = 8080;
 // serve static files from the public directory
 app.use(express.static(path.join(__dirname, 'public')));
 
-//cors access to enable sending emails from different hosts
-const cors = require("cors");
 
 var corsOptions = {
-  origin: "http://localhost:8081"
+  origin: ["http://localhost:8081", "*"]
 };
 
 app.use(cors(corsOptions))
@@ -192,8 +192,8 @@ var transporter = nodemailer.createTransport({
   }
 });
 
-app.post("/send_email", (req,res) => {
-  const {email, query} = req.body;
+app.post("/send_email", (req, res) => {
+  const { email, query } = req.body;
   let html_text = '<div>';
   html_text += '<h2>A new query has been received for Project Echo HMI</h2>'
   html_text += '<img src="cid:logo@echo.hmi" style="height: 150px; width: 150px; display: flex; margin: auto;"/>'
@@ -201,7 +201,7 @@ app.post("/send_email", (req,res) => {
   html_text += '<p>Query: \t ' + query + '</p>';
   html_text += '<hr>';
   html_text += '<p>Yes, this mailbox is active. So please feel free to reply to this email if you have other queries.</p>'
-  
+
   html_text += '</div>';
   let mailOptions = {
     from: email,
@@ -213,9 +213,9 @@ app.post("/send_email", (req,res) => {
       filename: 'image.png',
       content: fs.createReadStream(path.join(__dirname, 'public/images/tabIcons/logo.png')),
       cid: 'logo@echo.hmi' //same cid value as in the html
-  }]
+    }]
   }
-  transporter.sendMail(mailOptions, function(error, info){
+  transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
       console.log(error);
     } else {
@@ -228,26 +228,26 @@ app.post("/send_email", (req,res) => {
 
 var chars = "0123456789abcdefghijklmnopqrstuvwxyz!@#$%^&*()ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-function genPass(length){
+function genPass(length) {
   let password = "";
   for (var i = 0; i <= parseInt(length); i++) {
     var randomNumber = Math.floor(Math.random() * chars.length);
-    password += chars.substring(randomNumber, randomNumber +1);
-   }
+    password += chars.substring(randomNumber, randomNumber + 1);
+  }
   return password;
 }
 
-app.post("/request_access", async (req,res) => {
+app.post("/request_access", async (req, res) => {
   console.log("email: ", req.body.email);
-  const {email} = req.body;
+  const { email } = req.body;
   //Generate Guest credentials + timestamp
   let salt = '';
-  while (salt.length < 8){
+  while (salt.length < 8) {
     salt = crypto.getRandomValues(new Uint32Array(1)).toString();
   }
   let username = 'guest_' + email.split('@')[0] + "_" + salt;
   console.log("username: ", username)
-  let password =  genPass(12);
+  let password = genPass(12);
   let timestamp = new Date(Date.now() + 1800000) //Set time to live of 1800000 ms = 1800 s = 30 mins
   let request = {
     "username": username,
@@ -258,8 +258,8 @@ app.post("/request_access", async (req,res) => {
   try {
     //Sending that to Guest signup
     const response = await controller.guestsignup(request);
-    
-    setTimeout(()=>{
+
+    setTimeout(() => {
       console.log("response is back! ", response);
       //Send email to user when success
       if (response && response.status === 'success') {
@@ -271,7 +271,7 @@ app.post("/request_access", async (req,res) => {
         html_text += '<p>Thank you for your patience, here is your login credential </p>'
         html_text += '<p><strong>Username:</strong> \t ' + username + '</p>'
         html_text += '<p><strong>Password:</strong> \t ' + password + '</p>'
-        html_text += '<br><p>Please take in mind that this account will only be valid until '+ timestamp.toString() + ' (Subject to change based on development)</p>'
+        html_text += '<br><p>Please take in mind that this account will only be valid until ' + timestamp.toString() + ' (Subject to change based on development)</p>'
         html_text += '</div>';
         let mailOptions = {
           from: email,
@@ -282,9 +282,9 @@ app.post("/request_access", async (req,res) => {
             filename: 'image.png',
             content: fs.createReadStream(path.join(__dirname, 'public/images/tabIcons/logo.png')),
             cid: 'logo@echo.hmi' //same cid value as in the html
-        }]
+          }]
         }
-        transporter.sendMail(mailOptions, function(error, info){
+        transporter.sendMail(mailOptions, function (error, info) {
           if (error) {
             console.log(error);
           } else {
@@ -297,24 +297,40 @@ app.post("/request_access", async (req,res) => {
         let error_box = document.getElementById("request-access-email-error");
         error_box.innerHTML = `Exception error occured: ${response.message}`;
         error_box.style.display = "block"
-        setTimeout(()=> {
+        setTimeout(() => {
           error_box.innerHTML = '';
           error_box.style.display = "none";
-        },3000)
+        }, 3000)
       }
 
-    },200)
-    
+    }, 200)
+
   } catch (error) {
     res.status(500).send({ message: 'An error occurred while sending the request access: ' + error });
   }
-  
- 
-
-
-  
-
 })
+
+// app.post("/login", async (req, res) => {
+//   const {username, password} = req.body;
+
+//   try {
+//     const user = await User.findOne({
+//       username: username
+//     });
+
+//     if (user && bcrypt.compareSync(password, user.password)) {
+//       res.json({
+//         message: "Login successful",
+//         redirectTo: "/" // Redirect to welcome.html on success
+//       });
+//       console.log("Successful login")
+//     } else {
+//       res.status(401).json({ error: "Invalid credentials" });
+//     }
+//   } catch (error) {
+//     res.status(500).json({ error: "Internal server error" });
+//   }
+// });
 
 // routes
 require('./routes/auth.routes')(app);
@@ -329,12 +345,18 @@ app.get("/", (req, res) => {
     console.log("This is not user sessions!")
     res.json("No available session, you have not logged in yet")
   }
-  
+
 })
 
+app.get("/admin-dashboard", (req,res)=> {
+  return res.sendFile(path.join(__dirname, 'public/admin/dashboard.html'));
+})
 
+app.get("/admin-template", (req,res)=> {
+  return res.sendFile(path.join(__dirname, 'public/admin/template.html'));
+})
 
-app.get("/login", (req,res) => {
+app.get("/login", (req, res) => {
   [verifyToken]
   res.sendFile(path.join(__dirname, 'public/login.html'));
 })
@@ -353,7 +375,7 @@ app.post("/api/submit", async (req, res) => {
 });
 
 app.get("/requests", (req,res) => {
-  res.sendFile(path.join(__dirname, 'public/requests.html'))
+  res.sendFile(path.join(__dirname, 'public/admin/admin-request.html'))
 })
 
 app.patch('/api/requests/:id', async (req, res) => {
@@ -388,24 +410,21 @@ app.get('/api/requests', async (req, res) => {
   }
 });
 
-app.get("*", (req,res) => {
-  if (authJwt.verifyToken){
-    let token = req.session.token;
-    console.log("Current token: ", req.session.token)
-    if (!token) {
-      console.log("Current user session unavailable")
-      res.sendFile(path.join(__dirname, 'public/login.html'));
-    } else {
-      console.log("redirect to homepage")
-      return res.sendFile(path.join(__dirname, 'public/index.html'))
-    }
-  }
-  else {
-    console.log("User token not assigned!");
-    res.sendFile(path.join(__dirname, 'public/login.html'));
-  }
+// app.get("*", (req,res) => {
+//   if (authJwt.verifyToken){
+//     let token = req.session.token;
+//     console.log("Current token: ", req.session.token)
+//     if (!token) {
+//       console.log("Current user session unavailable")
+//       res.sendFile(path.join(__dirname, 'public/login.html'));
+//     } 
+//   }
+//   else {
+//     console.log("User token not assigned!");
+//     res.sendFile(path.join(__dirname, 'public/login.html'));
+//   }
 
-})
+// })
 
 // start the server
 app.listen(port, () => {
