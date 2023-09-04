@@ -192,17 +192,24 @@ var transporter = nodemailer.createTransport({
   }
 });
 
+// Function to escape special characters to HTML entities
+function escapeHtmlEntities(input) {
+  return input.replace(/[\u00A0-\u9999<>&]/gim, function (i) {
+    return "&#" + i.charCodeAt(0) + ";";
+  });
+}
+
 app.post("/send_email", (req, res) => {
   const { email, query } = req.body;
   let html_text = '<div>';
-  html_text += '<h2>A new query has been received for Project Echo HMI</h2>'
-  html_text += '<img src="cid:logo@echo.hmi" style="height: 150px; width: 150px; display: flex; margin: auto;"/>'
-  html_text += '<p>Sender: \t ' + email + '</p>';
-  html_text += '<p>Query: \t ' + query + '</p>';
+  html_text += '<h2>A new query has been received for Project Echo HMI</h2>';
+  html_text += '<img src="cid:logo@echo.hmi" style="height: 150px; width: 150px; display: flex; margin: auto;"/>';
+  html_text += '<p>Sender: \t ' + escapeHtmlEntities(email) + '</p>'; // Convert sender's email to HTML entities
+  html_text += '<p>Query: \t ' + escapeHtmlEntities(query) + '</p>'; // Convert query to HTML entities
   html_text += '<hr>';
-  html_text += '<p>Yes, this mailbox is active. So please feel free to reply to this email if you have other queries.</p>'
-
+  html_text += '<p>Yes, this mailbox is active. So please feel free to reply to this email if you have other queries.</p>';
   html_text += '</div>';
+
   let mailOptions = {
     from: email,
     to: `echodatabytes@gmail.com, ${email}, databytes@deakin.edu.au`,
@@ -214,17 +221,17 @@ app.post("/send_email", (req, res) => {
       content: fs.createReadStream(path.join(__dirname, 'public/images/tabIcons/logo.png')),
       cid: 'logo@echo.hmi' //same cid value as in the html
     }]
-  }
+  };
+
   transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
       console.log(error);
     } else {
       console.log('Email sent: ' + info.response);
-      return res.redirect("/")
+      return res.redirect("/");
     }
   });
-
-})
+});
 
 var chars = "0123456789abcdefghijklmnopqrstuvwxyz!@#$%^&*()ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
