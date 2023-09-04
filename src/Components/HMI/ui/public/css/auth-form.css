@@ -195,6 +195,16 @@ span.psw {
   color: red;
 }
 
+select{
+  width: 100%;
+  border-radius: 5px;
+  padding: 10px 20px;
+  margin: 8px auto;
+  display: flex;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+
 @-webkit-keyframes animatezoom {
   from {-webkit-transform: scale(0)} 
   to {-webkit-transform: scale(1)}
