@@ -29,6 +29,7 @@ class SystemManager:
                 async with MqttClient(os.environ['MQTT_CLIENT_URL'], int(os.environ['MQTT_CLIENT_PORT']), clean_session=True) as mqtt_client:
                     print("Connected... waiting for start command", flush=True)
                     await mqtt_client.subscribe("Simulator_Controls")
+                    await mqtt_client.subscribe("Simulate_Recording")
                     await asyncio.gather(self.handle_messages(mqtt_client), self.run_loop())                   
             except Exception as e:
                 print(f"Exception {e} Retrying...", flush=True)
@@ -36,14 +37,22 @@ class SystemManager:
 
     async def handle_messages(self, mqtt_client):
         topic_filter = "Simulator_Controls"
+        topic_filter2 = "Simulate_Recording"
         async with mqtt_client.messages() as messages:
             async for msg in messages:
                 if str(topic_filter) == str(msg.topic):
                     await self.on_message(mqtt_client, None, msg)
+                if str(topic_filter2) == str(msg.topic):
+                    await self.on_recording_message(mqtt_client, None, msg)
+                
 
     async def on_message(self, client, userdata, msg):
         message = msg.payload.decode('utf-8')
         await self.command_queue.put(message)
+
+    async def on_recording_message(self, client, userdata, msg):
+        print("calling handle recording")
+        await self.simulator.handle_recording_message(msg)
 
     async def run_loop(self):
         while True:

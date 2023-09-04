@@ -16,6 +16,7 @@ if (typeof window === 'undefined') {
 }
 
 const MESSAGE_API_URL = 'http://localhost:9000/hmi';
+//const MESSAGE_API_URL = 'http://ts-api-cont:9000/hmi';
 
 export function retrieveTruthEventsInTimeRange(from, to) {
   var start = parseInt(from);
@@ -36,6 +37,17 @@ export function retrieveMicrophones() {
 export function retrieveAudio(id){
   //console.log(`${MESSAGE_API_URL}/audio?id=${id}`);
   return axios.get(`${MESSAGE_API_URL}/audio?id=${id}`);
+}
+
+export function postRecording(recordingData){
+  axios.post(`${MESSAGE_API_URL}/post_recording`, recordingData)
+  .then(response => {
+    console.log('Response:', response.data);
+  })
+  .catch(error => {
+    console.error('Error:', error);
+  });
+  //axios.post(`${MESSAGE_API_URL}/post_recording?data=${recordingData}`);
 }
 
 export function startSimulator(){

@@ -15,14 +15,18 @@ from flask import jsonify
 import jwt
 import requests
 import datetime
+import json
+import paho.mqtt.client as paho
 
 
 
 router = APIRouter()
 
 MQTT_BROKER_URL = "ts-mqtt-server-cont"
+MQTT_ENGINE_URL = "projectecho/engine/2"
 MQTT_BROKER_PORT = 1883
-
+#mqtt_client = paho.Client()
+#mqtt_client.connect(MQTT_BROKER_URL, MQTT_BROKER_PORT)
 
 @router.get("/events_time", response_description="Get detection events within certain duration")
 def show_event_from_time(start: str, end: str):
@@ -133,6 +137,32 @@ def post_control(control: str):
     publish.single("Simulator_Controls", control, hostname=MQTT_BROKER_URL, port=MQTT_BROKER_PORT)
 
     return control
+
+@router.post("/post_recording", status_code=status.HTTP_201_CREATED)
+def post_recording(data: schemas.RecordingData):
+
+    # Create the vocalisation event
+    vocalisation_event = {
+        "timestamp": data.timestamp.isoformat(),
+        "sensorId": data.sensorId,
+        "microphoneLLA": data.microphoneLLA,
+        "animalEstLLA": data.animalEstLLA,
+        "animalTrueLLA": data.animalTrueLLA,
+        "animalLLAUncertainty": 50.0,
+        "audioClip" : data.audioClip, 
+        "audioFile" : data.audioFile      
+    }    
+    MQTT_MSG = json.dumps(vocalisation_event)
+    print("dumped")
+    #print(data)
+    publish.single("Simulate_Recording", MQTT_MSG, hostname=MQTT_BROKER_URL, port=MQTT_BROKER_PORT)
+    #publish.single("Simulate_Recording", payload= MQTT_MSG, hostname=MQTT_ENGINE_URL, port=MQTT_BROKER_PORT)
+
+    # publish the audio message on the queue
+    #(rc, mid) = mqtt_client.publish(MQTT_BROKER_URL, MQTT_MSG)
+    print("sent")
+
+    return data
     
 @router.post("/signup", status_code=status.HTTP_201_CREATED)
 def signup(user: schemas.UserSignupSchema):  

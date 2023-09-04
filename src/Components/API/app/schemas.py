@@ -166,4 +166,21 @@ class UserLoginSchema(BaseModel):
 
 class RoleSchema(BaseModel):
     name: str
+
+class RecordingData(BaseModel):
+    timestamp: datetime
+    sensorId: str
+    microphoneLLA: List[float] 
+    animalEstLLA: List[float]
+    animalTrueLLA: List[float]
+    animalLLAUncertainty: float
+    audioClip: str 
+    audioFile: str
     
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+        schema_extra = {
+           
+        } 
