@@ -74,7 +74,3 @@ export function retrieveSimTime(){
 //   .catch(err => console.log(err))
 // }
 
-exports.abc = (req, res) => {
-  return axios.get(`${MESSAGE_API_URL}/abc`);
-}
-
