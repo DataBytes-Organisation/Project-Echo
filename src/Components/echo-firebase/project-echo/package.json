@@ -1,5 +1,13 @@
 {
   "dependencies": {
     "firebase": "^10.2.0"
+  },
+  "devDependencies": {
+    "webpack": "^5.88.2",
+    "webpack-cli": "^5.1.4"
+  },
+  "private": true,
+  "scripts":{
+    "build": "webpack"
   }
 }
