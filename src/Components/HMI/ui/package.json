@@ -16,7 +16,10 @@
     "captcha-canvas": "^3.2.1",
     "cookie-session": "^2.0.0",
     "cors": "^2.8.5",
+    "deep-email-validator": "^0.1.21",
+    "email-validator": "^2.0.4",
     "express": "^4.18.2",
+    "express-mongo-sanitize": "^2.2.0",
     "jquery": "^3.6.4",
     "jsonwebtoken": "^9.0.1",
     "mongoose": "^6.10.0",
@@ -26,7 +29,7 @@
     "path": "^0.12.7",
     "requirejs": "^2.3.6",
     "serve-index": "^1.9.1",
-    "stripe": "^13.3.0",
-    "simplebar": "^6.2.5"
+    "simplebar": "^6.2.5",
+    "stripe": "^13.3.0"
   }
 }

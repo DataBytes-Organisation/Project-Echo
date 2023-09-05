@@ -729,7 +729,6 @@
 
   emailValidate = function() {
     let email_value = document.getElementById("email").value;
-    console.log('current email: ', email_value);
     if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email_value)){
       $("#email_error_label").hide();
       button.disabled = false;

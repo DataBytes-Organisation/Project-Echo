@@ -20,6 +20,9 @@ const User = db.user;
 const Guest = db.guest;
 const Request = db.request;
 
+//Security verification for email account and body content validation:
+const validation = require('deep-email-validator')
+const mongoSanitize = require('express-mongo-sanitize');
 db.mongoose
   .connect(`mongodb://${dbConfig.USERNAME}:${dbConfig.PASSWORD}@${dbConfig.HOST}/${dbConfig.DB}?authSource=admin`, {
     useNewUrlParser: true,
@@ -171,6 +174,17 @@ const bodyParser = require("express");
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }))
 
+//MongoDB query sanitization
+//Run in dryRun = testing mode; prevent server interruption because of this process
+app.use(
+  mongoSanitize({
+    dryRun: true,
+    onSanitize: ({ req, key }) => {
+      console.warn(`[DryRun] This request[${key}] will be sanitized`, req);
+    },
+  }),
+)
+
 //const serveIndex = require('serve-index'); 
 //app.use('/images/bio', serveIndex(express.static(path.join(__dirname, '/images/bio'))));
 
@@ -198,75 +212,62 @@ function escapeHtmlEntities(input) {
     return "&#" + i.charCodeAt(0) + ";";
   });
 }
-async function validateEmail(email) {
-  // Step 1: Validate using regex pattern
-  if (!validator.validate(email)) {
-    return "Invalid email address (regex pattern)";
-  }
 
-  // Step 2: Extract the domain from the email
-  const domain = email.split("@")[1];
-
-  // Step 3: Check MX records for the domain
-  return new Promise((resolve, reject) => {
-    dns.resolveMx(domain, (err, addresses) => {
-      if (err) {
-        return reject("Error checking MX records");
-      }
-
-      if (addresses && addresses.length > 0) {
-        resolve("Valid email address");
-      } else {
-        reject("Invalid email address (no MX records)");
-      }
-    });
-  });
+async function testEmail(input) {
+  let res = await validation.validate(input)
+  return {result: res.valid, response: res.validators}
+  
 }
 
 app.post("/send_email", async (req, res) => {
   const { email, query } = req.body;
+  const validationResult = await testEmail(email);
+  if (validationResult.result){
+      // Validate the email address
+      // const validationResult = await validateEmail(email);
+      // console.log("Validate email result: ", validationResult);
+      // If email validation is successful, proceed to send the email
+      let html_text = '<div>';
+      html_text += '<h2>A new query has been received for Project Echo HMI</h2>';
+      html_text += '<img src="cid:logo@echo.hmi" style="height: 150px; width: 150px; display: flex; margin: auto;"/>';
+      html_text += '<p>Sender: \t ' + email + '</p>'; // Convert sender's email to HTML entities
+      html_text += '<p>Query: \t ' + escapeHtmlEntities(query) + '</p>'; // Convert query to HTML entities
+      html_text += '<hr>';
+      html_text += '<p>Yes, this mailbox is active. So please feel free to reply to this email if you have other queries.</p>';
+      html_text += '</div>';
 
-  try {
-    // Validate the email address
-    const validationResult = await validateEmail(email);
+      let mailOptions = {
+        from: email,
+        to: `echodatabytes@gmail.com, ${email}, databytes@deakin.edu.au`,
+        subject: 'New query received!',
+        text: query,
+        html: html_text,
+        attachments: [{   // stream as an attachment
+          filename: 'image.png',
+          content: fs.createReadStream(path.join(__dirname, 'public/images/tabIcons/logo.png')),
+          cid: 'logo@echo.hmi' //same cid value as in the html
+        }]
+      };
 
-    // If email validation is successful, proceed to send the email
-    let html_text = '<div>';
-    html_text += '<h2>A new query has been received for Project Echo HMI</h2>';
-    html_text += '<img src="cid:logo@echo.hmi" style="height: 150px; width: 150px; display: flex; margin: auto;"/>';
-    html_text += '<p>Sender: \t ' + escapeHtmlEntities(email) + '</p>'; // Convert sender's email to HTML entities
-    html_text += '<p>Query: \t ' + escapeHtmlEntities(query) + '</p>'; // Convert query to HTML entities
-    html_text += '<hr>';
-    html_text += '<p>Yes, this mailbox is active. So please feel free to reply to this email if you have other queries.</p>';
-    html_text += '</div>';
-
-    let mailOptions = {
-      from: email,
-      to: `echodatabytes@gmail.com, ${email}, databytes@deakin.edu.au`,
-      subject: 'New query received!',
-      text: query,
-      html: html_text,
-      attachments: [{   // stream as an attachment
-        filename: 'image.png',
-        content: fs.createReadStream(path.join(__dirname, 'public/images/tabIcons/logo.png')),
-        cid: 'logo@echo.hmi' //same cid value as in the html
-      }]
-    };
-
-    transporter.sendMail(mailOptions, function (error, info) {
-      if (error) {
-        console.log(error);
-      } else {
-        console.log('Email sent: ' + info.response);
-        return res.redirect("/");
-      }
-    });
-  } catch (validationError) {
-    // If email validation fails, return an error response
-    console.error(validationError);
-    return res.status(400).json({ error: validationError });
+      transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+          console.log(error);
+        } else {
+          console.log('Email sent: ' + info.response);
+          return res.redirect("/");
+        }
+      });
+    } else {
+      return res.status(400).json({ error: validationResult.response });
+    }
+    
   }
-});
+);
+
+  app.get("/send_email", (req,res) => {
+    setTimeout(() => res.redirect("/"), 5000)
+  });
+
 
 var chars = "0123456789abcdefghijklmnopqrstuvwxyz!@#$%^&*()ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
