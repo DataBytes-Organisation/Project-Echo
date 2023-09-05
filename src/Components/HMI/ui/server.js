@@ -11,6 +11,9 @@ const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
 const cors = require('cors');
+require('dotenv').config()
+//const shop = require("./shop/shop")
+const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY);
 //const axios = require('axios')
 
 //Add mongoDB module inside config folder
@@ -67,6 +70,76 @@ function initial() {
     }
   });
 }
+
+
+
+// async function getAllPayments() {
+
+//   while (true) {
+//     nextPage = null;
+//     firstPage = false;
+//     let charges;
+//     if(firstPage == false){
+//       charges = await stripe.charges.list({
+//         limit: 100,
+//       });
+//       firstPage = true;
+//     }
+//     charges.data.forEach(charge => {
+//       cumulativeTotal += charge.amount;
+//     });
+//     if (!charges.has_more) {
+//       break; // Exit the loop when there are no more pages
+//     }
+//     nextPage = charges[charges.length() - 1]
+//     charges = await stripe.charges.list({
+//       limit: 100,
+//       starting_next: nextPage
+//     });
+//     firstPage = true;
+//   }
+//   console.log('Cumulative Total:', cumulativeTotal);
+// }
+
+// getAllPayments();
+
+app.get('/cumulativeDonations', async(req, res) => {
+  let cumulativeTotal = 0;
+  try{
+    while (true) {
+      nextPage = null;
+      firstPage = false;
+      let charges;
+      if(firstPage == false){
+        charges = await stripe.charges.list({
+          limit: 100,
+        });
+        firstPage = true;
+      }
+      charges.data.forEach(charge => {
+        cumulativeTotal += charge.amount;
+      });
+      if (!charges.has_more) {
+        break; // Exit the loop when there are no more pages
+      }
+      nextPage = charges[charges.length() - 1]
+      charges = await stripe.charges.list({
+        limit: 100,
+        starting_next: nextPage
+      });
+      firstPage = true;
+    }
+    cumulativeTotal = cumulativeTotal / 100;
+    cumulativeTotal = cumulativeTotal.toFixed(2);
+    
+    console.log('Cumulative Total:', cumulativeTotal);
+    res.json({ cumulativeTotal });
+  }
+  catch(error){
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  } 
+})
 
 function initRequests(){
   Request.estimatedDocumentCount((err, count) => {
@@ -354,6 +427,10 @@ app.get("/admin-dashboard", (req,res)=> {
 
 app.get("/admin-template", (req,res)=> {
   return res.sendFile(path.join(__dirname, 'public/admin/template.html'));
+})
+
+app.get("/admin-donations", (req, res) => {
+  return res.sendFile(path.join(__dirname, 'public/admin/donations.html'));
 })
 
 app.get("/login", (req, res) => {
