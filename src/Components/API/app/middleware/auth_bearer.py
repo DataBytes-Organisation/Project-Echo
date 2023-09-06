@@ -5,6 +5,9 @@ from .auth import decodeJWT
 
 
 class JWTBearer(HTTPBearer):
+    isVerified = False
+    decodedUser = None
+
     def __init__(self, auto_error: bool = True):
         super(JWTBearer, self).__init__(auto_error=auto_error)
 
@@ -16,8 +19,9 @@ class JWTBearer(HTTPBearer):
             
             #VerifyJWTToken return bool and payload
             #Only need bool value
-            print("return of the verify function: ", self.verify_jwt(credentials.credentials))
-            if not self.verify_jwt(credentials.credentials):
+            (self.isVerified, self.decodedUser) = self.verify_jwt(credentials.credentials)
+            print("IsVerified result in bearer: ", self.isVerified)
+            if not self.isVerified:
                 raise HTTPException(status_code=403, detail="Invalid token or expired token.")
             #For now, return credentials when pass bearer
             return credentials.credentials
@@ -37,15 +41,14 @@ class JWTBearer(HTTPBearer):
         return (isTokenValid, payload)
     
     #Verify user role using JWT token
-    def verify_role(self, JWTToken: str, role: str) -> (bool, str):
+    def verify_role(self, role: str) -> (bool, str):
         res = None
         try:
-            isVerified, userInfo = self.verify_jwt(JWTToken)
-            print("JWT Verification: {}".format(isVerified))
-            print("UserInfo: {}".format(userInfo))
-            if isVerified:
-                print("decoded userInfo: {}".format(userInfo))
-                res = [i for i in userInfo["roles"] if role in i]
+            print("JWT Verification: {}".format(self.isVerified))
+            print("UserInfo: {}".format(self.decodedUser))
+            if self.isVerified:
+                print("decoded userInfo: {}".format(self.decodedUser))
+                res = [i for i in self.decodedUser["roles"] if role in i]
                 if res == None:
                     return (False, "User does not have the role {}".format(role))
                 else:

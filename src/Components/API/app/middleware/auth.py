@@ -29,7 +29,7 @@ def decodeJWT(token: str) -> dict:
     try:
         decoded_token = jwt.decode(token, JWT_SECRET, algorithms = [JWT_ALGORITHM])
         print("toggled decode function! The result is: {}".format(decoded_token))
-        return decoded_token if decoded_token["exp"] >= datetime.datetime.utcnow() else None
-    except:
-        print("Decode failed! Need to check on this step")
+        return decoded_token if datetime.datetime.utcfromtimestamp(decoded_token["exp"]) >= datetime.datetime.utcnow() else None
+    except Exception as e:
+        print("Decode failed! Need to check on this step: {}".format(e))
         return None

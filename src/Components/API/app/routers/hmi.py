@@ -301,10 +301,10 @@ def abc():
 async def checkAdmin(user: schemas.UserLoginSchema) -> dict:
     
     try:
-        isAdmin = JWTBearer.verify_role(user, "admin")
+        isAdmin = JWTBearer.verify_role(JWTBearer,role="admin")
         if isAdmin:
             return {"result": "User is indeed an admin"}
         else:
             return {"result": "User is not admin"}
-    except:
-        return {"error" : "Something unexpected occured"}
+    except Exception as e:
+        return {"error" : "Something unexpected occured - {}".format(e)}
