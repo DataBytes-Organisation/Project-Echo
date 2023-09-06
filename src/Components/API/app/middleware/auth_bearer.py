@@ -20,7 +20,6 @@ class JWTBearer(HTTPBearer):
             #VerifyJWTToken return bool and payload
             #Only need bool value
             (self.isVerified, self.decodedUser) = self.verify_jwt(credentials.credentials)
-            print("IsVerified result in bearer: ", self.isVerified)
             if not self.isVerified:
                 raise HTTPException(status_code=403, detail="Invalid token or expired token.")
             #For now, return credentials when pass bearer
@@ -48,7 +47,7 @@ class JWTBearer(HTTPBearer):
             print("UserInfo: {}".format(self.decodedUser))
             if self.isVerified:
                 print("decoded userInfo: {}".format(self.decodedUser))
-                res = [i for i in self.decodedUser["roles"] if role in i]
+                res = [i for i in self.decodedUser["roles"] if role.upper() in i.upper()]
                 if res == None:
                     return (False, "User does not have the role {}".format(role))
                 else:

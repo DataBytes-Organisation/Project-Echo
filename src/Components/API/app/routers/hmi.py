@@ -20,6 +20,7 @@ import paho.mqtt.client as paho
 from app.middleware.auth import signJWT, decodeJWT
 from app.middleware.auth_bearer import JWTBearer
 
+jwtBearer = JWTBearer()
 
 router = APIRouter()
 
@@ -297,11 +298,11 @@ def abc():
     return JSONResponse(content=response)
 
 
-@router.post("/admin-dashboard", dependencies=[Depends(JWTBearer())], status_code=status.HTTP_200_OK)
+@router.post("/admin-dashboard", dependencies=[Depends(jwtBearer)], status_code=status.HTTP_200_OK)
 async def checkAdmin(user: schemas.UserLoginSchema) -> dict:
     
     try:
-        isAdmin = JWTBearer.verify_role(JWTBearer,role="admin")
+        isAdmin = jwtBearer.verify_role(role="admin")
         if isAdmin:
             return {"result": "User is indeed an admin"}
         else:
