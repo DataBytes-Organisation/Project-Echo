@@ -1,5 +1,5 @@
 from fastapi import status, APIRouter
-from fastapi import FastAPI, Body, HTTPException, status, APIRouter
+from fastapi import FastAPI, Body, HTTPException, status, APIRouter, Depends
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from typing import Optional, List
@@ -17,7 +17,8 @@ import requests
 import datetime
 import json
 import paho.mqtt.client as paho
-
+from app.middleware.auth import signJWT, decodeJWT
+from app.middleware.auth_bearer import JWTBearer
 
 
 router = APIRouter()
@@ -214,13 +215,6 @@ def signin(user: schemas.UserLoginSchema):
         response = {"message": "Invalid Password!"}
         return JSONResponse(content=response, status_code=401)
 
-    #Create payload for our token
-    payload = {
-        "id": account["userId"],
-        "exp": datetime.datetime.utcnow() + datetime.timedelta(seconds=86400)
-    }
-    
-    token = jwt.encode(payload, "echo-auth-secret-key", algorithm = "HS256")
 
     authorities = []
     for role_id in account['roles']:
@@ -228,7 +222,18 @@ def signin(user: schemas.UserLoginSchema):
         if role:
             authorities.append("ROLE_" + role['name'].upper())
 
-    requests.session.token = token
+    #Create payload for our token
+    # payload = {
+    #     "id": account["userId"],
+    #     "roles": authorities,
+    #     "exp": datetime.datetime.utcnow() + datetime.timedelta(seconds=86400)
+    # }
+    
+    #Create JWT token using user info
+    jwtToken = signJWT(user=account, authorities=authorities)
+    
+    #Assign the session token with JWT
+    requests.session.token = jwtToken
     result = {
         "id": account["_id"],
         "username": account["username"],
@@ -236,7 +241,10 @@ def signin(user: schemas.UserLoginSchema):
         "role" : authorities,
     }
 
-    response = {"message": "User Login Successfully!"}
+    #Set up response (FOR TESTING ONLY)
+    response = {"message": "User Login Successfully!", "tkn" : jwtToken}
+
+    #Log result
     print(result)
     return JSONResponse(content=response, status_code=200)
 
@@ -249,7 +257,9 @@ def signout():
     
     except Exception as err:
         return JSONResponse({"Error": str(err)})
-    
+
+
+
 @router.post("/ChangePassword", status_code=status.HTTP_200_OK)
 def passwordchange(user: schemas.UserLoginSchema, newpw: str, cfm_newpw: str):
     #Find if the username exist in our database
@@ -279,8 +289,22 @@ def passwordchange(user: schemas.UserLoginSchema, newpw: str, cfm_newpw: str):
     return JSONResponse(content=response)
 
 
+
 @router.get("/abc", status_code=status.HTTP_200_OK)
 def abc():
 
     response = {"message": "User Password Changed Sucessfully!"}
     return JSONResponse(content=response)
+
+
+@router.post("/admin-dashboard", dependencies=[Depends(JWTBearer())], status_code=status.HTTP_200_OK)
+async def checkAdmin(user: schemas.UserLoginSchema) -> dict:
+    
+    try:
+        isAdmin = JWTBearer.verify_role(user, "admin")
+        if isAdmin:
+            return {"result": "User is indeed an admin"}
+        else:
+            return {"result": "User is not admin"}
+    except:
+        return {"error" : "Something unexpected occured"}
