@@ -3,7 +3,6 @@ from fastapi import FastAPI, Body, HTTPException, status, APIRouter
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from typing import Optional, List
-
 from bson import ObjectId
 import datetime
 from app import serializers
@@ -16,6 +15,8 @@ import jwt
 import requests
 import datetime
 import json
+from fastapi.responses import StreamingResponse
+import pandas as pd
 
 
 router = APIRouter()
@@ -32,8 +33,8 @@ def show_event_from_time(start: str, end: str):
     # print(datetime_end)
     aggregate = [
         {
-            '$match':{'timestamp': { '$gte' : datetime_start, '$lt' : datetime_end}}
-            
+            '$match': {'timestamp': {'$gte': datetime_start, '$lt': datetime_end}}
+
         },
         {
             '$lookup': {
@@ -44,111 +45,45 @@ def show_event_from_time(start: str, end: str):
             }
         },
         {
-            "$replaceRoot": { "newRoot": { "$mergeObjects": [ { "$arrayElemAt": [ "$info", 0 ] }, "$$ROOT" ] } }
+            "$replaceRoot": {"newRoot": {"$mergeObjects": [{"$arrayElemAt": ["$info", 0]}, "$$ROOT"]}}
         },
         {
-            '$project': { "audioClip": 0, "sampleRate": 0}
+            '$project': {"audioClip": 0, "sampleRate": 0}
         },
         {
             "$addFields": {
-            "timestamp": { "$toLong": "$timestamp" }}
-        }       
+                "timestamp": {"$toLong": "$timestamp"}}
+        }
 
     ]
     events = serializers.eventSpeciesListEntity(Events.aggregate(aggregate))
     return events
 
-# Return all species data
-
-
-@router.get("/record_animals", response_description="Get all record of animals")
-def list_species_data(events_time: str  = "", species: str = "", location_sensorId: str = ""):
-    Species_data = Species.find()
-    animals_record = []
-    filter_record = []
-    if events_time:
-        # events_time = events_time[1:]
-        events_time = events_time[:-1]
-    if species:
-        species = species[1:]
-        species = species[:-1]
-    if location_sensorId:
-        location_sensorId = location_sensorId[1:]
-        location_sensorId = location_sensorId[:-1]
-    
-
-    for each_species in Species_data:
-        each_species['species'] = each_species.pop('_id')
-        each_species['animalId'] = ''
-        each_species['events'] = []
-
-        Movements_data = Movements.find()
-        for moves in Movements_data:
-            if moves['species'] == each_species['species']:
-                each_species['animalId'] = moves['animalId']
-
-        events_data = Events.find()
-        for event in events_data:
-            if event['species'] == each_species['species']:
-                event['events_timestamp'] = event.pop('timestamp')
-                event.pop('species')
-                # event['id'] = str(event['_id']).replace('ObjectId', "")
-                del event['_id']
-                each_species['events'].append(event)
-
-        animals_record.append(each_species)
-
-    if len(events_time)>0:
-        for animal in animals_record:
-            temp = animal['events']
-            for each_event in temp:
-                if each_event['events_timestamp'] == events_time:
-                    filter_record.append(animal)
-
-    if len(species)>0:
-        for animal in animals_record:
-            if animal['species'] == species:
-                filter_record.append(animal)
-
-    if len(location_sensorId)>0:
-        for animal in animals_record:
-            temp = animal['events']
-            for each_event in temp:
-                if each_event['sensorId'] == location_sensorId:
-                    filter_record.append(animal)
-
-    if len(filter_record)>0:
-        print(filter_record)
-        return filter_record
-    else:
-        return animals_record
-
- 
-
 @router.get("/audio", response_description="returns audio given ID")
 def show_audio(id: str):
     aggregate = [
         {
-            '$match':{'_id': ObjectId(id)}
-        }, 
+            '$match': {'_id': ObjectId(id)}
+        },
         {
-            '$project': { "audioClip": 1, "sampleRate": 1}
+            '$project': {"audioClip": 1, "sampleRate": 1}
         }
     ]
     results = list(Events.aggregate(aggregate))
     audio = serializers.audioListEntity(results)[0]
     return audio
 
+
 @router.get("/movement_time", response_description="Get true animal movement data within certain duration")
 def show_event_from_time(start: str, end: str):
     datetime_start = datetime.datetime.fromtimestamp(float(start))
     datetime_end = datetime.datetime.fromtimestamp(float(end))
-    
+
     print(f'movement range: {datetime_start}  {datetime_end}')
-    
+
     aggregate = [
         {
-            '$match':{'timestamp': {'$gte' : datetime_start ,'$lt' : datetime_end}}
+            '$match': {'timestamp': {'$gte': datetime_start, '$lt': datetime_end}}
         },
         {
             '$lookup': {
@@ -159,19 +94,21 @@ def show_event_from_time(start: str, end: str):
             }
         },
         {
-            "$replaceRoot": { "newRoot": { "$mergeObjects": [ { "$arrayElemAt": [ "$info", 0 ] }, "$$ROOT" ] } }
+            "$replaceRoot": {"newRoot": {"$mergeObjects": [{"$arrayElemAt": ["$info", 0]}, "$$ROOT"]}}
         },
-        { "$project": { "info": 0 } },
+        {"$project": {"info": 0}},
         {
             "$addFields":
             {
-            "timestamp": { "$toLong": "$timestamp" }
+                "timestamp": {"$toLong": "$timestamp"}
             }
-        }       
+        }
 
     ]
-    events = serializers.movementSpeciesListEntity(Movements.aggregate(aggregate))
+    events = serializers.movementSpeciesListEntity(
+        Movements.aggregate(aggregate))
     return events
+
 
 @router.get("/microphones", response_description="returns location of all microphones")
 def list_microphones():
@@ -179,13 +116,14 @@ def list_microphones():
     microphones = serializers.microphoneListEntity(results)
     return microphones
 
+
 @router.get("/latest_movement", response_description="returns the latest simluated movement message")
 def latest_movememnt():
 
     aggregate = [
-    { "$sort" : { "timestamp" : -1 } },
-    { "$limit": 1 },
-    { "$project": { "timestamp": 1 } }]
+        {"$sort": {"timestamp": -1}},
+        {"$limit": 1},
+        {"$project": {"timestamp": 1}}]
 
     result = list(Movements.aggregate(aggregate))
     timestamp = serializers.timestampListEntity(result)[0]
@@ -193,42 +131,45 @@ def latest_movememnt():
     return timestamp
 
 
-
 @router.post("/sim_control", status_code=status.HTTP_201_CREATED)
 def post_control(control: str):
 
-    publish.single("Simulator_Controls", control, hostname=MQTT_BROKER_URL, port=MQTT_BROKER_PORT)
+    publish.single("Simulator_Controls", control,
+                   hostname=MQTT_BROKER_URL, port=MQTT_BROKER_PORT)
 
     return control
-    
+
+
 @router.post("/signup", status_code=status.HTTP_201_CREATED)
-def signup(user: schemas.UserSignupSchema):  
+def signup(user: schemas.UserSignupSchema):
     # Check to see if the request body has conflict with the database
-    existing_user = User.find_one({"$or": [{"username": user.username}, {"email": user.email}]})
+    existing_user = User.find_one(
+        {"$or": [{"username": user.username}, {"email": user.email}]})
     if existing_user:
         if existing_user['username'] == user.username:
             response = {"message": "Failed! Username is already in use!"}
         elif existing_user['email'] == user.email:
             response = {"message": "Failed! Email is already in use!"}
-        elif(user.roles not in ROLES):
+        elif (user.roles not in ROLES):
             response = {"message": "Failed! Role does not exist!"}
             return JSONResponse(content=response, status_code=404)
         else:
             response = {"message": "Failed! Conflict occurred."}
         return JSONResponse(content=response, status_code=409)
 
-    #Hash password using bcrypt
-    password_hashed = bcrypt.hashpw(user.password.encode('utf-8'), bcrypt.gensalt(rounds=8))
+    # Hash password using bcrypt
+    password_hashed = bcrypt.hashpw(
+        user.password.encode('utf-8'), bcrypt.gensalt(rounds=8))
     user.password = password_hashed.decode('utf-8')
 
-    #Store user role as an id 
+    # Store user role as an id
     user_role_id = []
     for role_name in user.roles:
         role = Role.find_one({"name": role_name})
         user_role_id.append(role["_id"])
     user.roles = user_role_id
 
-    #Convert into dictionary and insert into the database
+    # Convert into dictionary and insert into the database
     user_dict = user.dict()
     user_dict["userId"] = user.username
     user_dict["__v"] = 0
@@ -239,25 +180,26 @@ def signup(user: schemas.UserSignupSchema):
 
 @router.post("/signin", status_code=status.HTTP_200_OK)
 def signin(user: schemas.UserLoginSchema):
-    #Find if the username exist in our database
+    # Find if the username exist in our database
     account = User.find_one({"username": user.username})
-    if(account is None):
+    if (account is None):
         response = {"message": "User Not Found."}
         return JSONResponse(content=response, status_code=404)
-   
-    #Find if the password matches
-    passwordIsValid = bcrypt.checkpw(user.password.encode('utf-8'), account['password'].encode('utf-8'))
+
+    # Find if the password matches
+    passwordIsValid = bcrypt.checkpw(user.password.encode(
+        'utf-8'), account['password'].encode('utf-8'))
     if (passwordIsValid == False):
         response = {"message": "Invalid Password!"}
         return JSONResponse(content=response, status_code=401)
 
-    #Create payload for our token
+    # Create payload for our token
     payload = {
         "id": account["userId"],
         "exp": datetime.datetime.utcnow() + datetime.timedelta(seconds=86400)
     }
-    
-    token = jwt.encode(payload, "echo-auth-secret-key", algorithm = "HS256")
+
+    token = jwt.encode(payload, "echo-auth-secret-key", algorithm="HS256")
 
     authorities = []
     for role_id in account['roles']:
@@ -270,12 +212,13 @@ def signin(user: schemas.UserLoginSchema):
         "id": account["_id"],
         "username": account["username"],
         "email": account["email"],
-        "role" : authorities,
+        "role": authorities,
     }
 
     response = {"message": "User Login Successfully!"}
     print(result)
     return JSONResponse(content=response)
+
 
 @router.post("/signout", status_code=status.HTTP_200_OK)
 def signout():
@@ -283,20 +226,22 @@ def signout():
         requests.session.clear()
         response = {"message": "You've been signed out!"}
         return JSONResponse(content=response)
-    
+
     except Exception as err:
         return JSONResponse({"Error": str(err)})
-    
+
+
 @router.post("/ChangePassword", status_code=status.HTTP_200_OK)
 def passwordchange(user: schemas.UserLoginSchema, newpw: str, cfm_newpw: str):
-    #Find if the username exist in our database
+    # Find if the username exist in our database
     account = User.find_one({"username": user.username})
-    if(account is None):
+    if (account is None):
         response = {"message": "User Not Found."}
         return JSONResponse(content=response, status_code=401)
-   
-    #Find if the password matches
-    passwordIsValid = bcrypt.checkpw(user.password.encode('utf-8'), account['password'].encode('utf-8'))
+
+    # Find if the password matches
+    passwordIsValid = bcrypt.checkpw(user.password.encode(
+        'utf-8'), account['password'].encode('utf-8'))
     if (passwordIsValid == False):
         response = {"message": "Invalid Password!"}
         return JSONResponse(content=response, status_code=404)
@@ -304,8 +249,9 @@ def passwordchange(user: schemas.UserLoginSchema, newpw: str, cfm_newpw: str):
     if (newpw != cfm_newpw):
         response = {"message": "New Password Must Match Each Other"}
         return JSONResponse(content=response, status_code=401)
-    
-    newpw_hashed = bcrypt.hashpw(newpw.encode('utf-8'), bcrypt.gensalt(rounds=8))
+
+    newpw_hashed = bcrypt.hashpw(
+        newpw.encode('utf-8'), bcrypt.gensalt(rounds=8))
 
     User.update_one(
         {"username": account['username']},
