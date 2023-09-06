@@ -76,6 +76,20 @@ def timestampEntity(timestamp) -> dict:
         "timestamp": timestamp["timestamp"]
     }
 
+def requestEntity(request) -> dict:
+    return {
+        "_id": str(request["_id"]),
+        "requestId": str(request["requestId"]),
+        "username": str(request["username"]),
+        "animal": str(request["animal"]),
+        "requestingToChange": str(request["requestingToChange"]),
+        "initial": str(request["initial"]),
+        "modified": str(request["modified"]),
+        "source": str(request["source"]),
+        "date": str(request["date"]),
+        "status": str(request["status"])
+    }
+
 # def userEntity(user) -> dict:
 #     return{
 #         "userId": user["userId"]
@@ -112,3 +126,6 @@ def timestampListEntity(timestamps) -> list:
 
 def userListEntity(username) -> list:
     return [userEntity(userName) for userName in username]
+
+def requestListEntity(requests) -> list:
+    return [requestEntity(request) for request in requests]

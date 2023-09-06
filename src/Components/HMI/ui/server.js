@@ -5,13 +5,19 @@ const fs = require('fs');
 const cookieSession = require('cookie-session');
 const dbConfig = require('./config/db.config');
 const jwt = require('jsonwebtoken');
-const { authJwt } = require('./middleware');
+const { authJwt, client } = require('./middleware');
 const controller = require('./controller/auth.controller');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
+
+
+
+
 const cors = require('cors');
 //const axios = require('axios')
+
+
 
 const {createCaptchaSync} = require("captcha-canvas");
 //Add mongoDB module inside config folder
@@ -451,6 +457,7 @@ app.patch('/api/requests/:id', async (req, res) => {
   }
 });
 
+// OLD METHOD - USING DIRECT CONNECTION
 app.get('/api/requests', async (req, res) => {
   try {
     const requests = await Request.find();
@@ -459,6 +466,37 @@ app.get('/api/requests', async (req, res) => {
     res.status(500).json({ error: 'Error fetching data' });
   }
 });
+
+// NEW METHOD - CONNECT VIA API
+// app.get('/api/requests', async (req, res) => {
+//   try {
+
+//     let token = client.get('jwtToken', (err, storedToken) => {
+//       if (err) {
+//         console.error('Error retrieving token from Redis:', err);
+//         return null
+//       } else {
+//         console.log('Stored Token:', storedToken);
+//         return storedToken
+//       }
+//     })
+
+//     console.log("Current token: ", token)
+//     const axiosResponse = await axios.get('http://ts-api-cont:9000/hmi/requests', { headers: {"Authorization" : `Bearer ${token}`}})
+  
+//     if (axiosResponse.status === 200) {
+//       console.log("Fetch requests success! ", res.json(axiosResponse))
+//     } 
+//   } catch (err) {
+//     console.log('Status Code: ' + err.response.status + ' ' + err.response.statusText)
+//     console.log(err.response.data)
+//     res.status(err.response.status).redirect('/admin-dashboard')
+//   }
+// });
+
+app.get("/welcome", (req,res) => {
+  res.sendFile(path.join(__dirname, 'public/index.html'))
+})
 
 // app.get("*", (req,res) => {
 //   if (authJwt.verifyToken){

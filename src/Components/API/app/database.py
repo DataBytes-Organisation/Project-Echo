@@ -12,13 +12,12 @@ Movements = db.movements
 Species = db.species
 Microphones = db.microphones
 
-
-
 User_connection_string = "mongodb://root:root_password@ts-mongodb-cont/UserSample?authSource=admin"
 Userclient = pymongo.MongoClient(User_connection_string)
 Userdb = Userclient['UserSample']
 User = Userdb.users
 Role = Userdb.roles
+Requests = Userdb.requests
 ROLES = ["user", "admin", "guest"]
 STATES_CODE = ["vic", "nsw", "ts", "ql", "sa", "wa"]
 GENDER = ["male", "female", "m", "f" "prefer not to say"]

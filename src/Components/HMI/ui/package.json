@@ -27,6 +27,7 @@
     "nodemon": "^2.0.22",
     "ol": "^7.3.0",
     "path": "^0.12.7",
+    "redis": "^4.6.8",
     "requirejs": "^2.3.6",
     "serve-index": "^1.9.1",
     "simplebar": "^6.2.5",

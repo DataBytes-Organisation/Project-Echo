@@ -95,6 +95,26 @@ class AddressSchema(BaseModel):
         schema_extra = {
            
         } 
+class RequestSchema(BaseModel):
+    
+    requestId: str
+    username: str
+    animal: str
+    requestingToChange: str
+    initial: str
+    modified: str
+    source: str
+    date: str
+    status: str
+
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+        schema_extra = {
+           
+        } 
+
         
 class UserSignupSchema(BaseModel):
     username: str

@@ -8,7 +8,7 @@ from bson import ObjectId
 import datetime
 from app import serializers
 from app import schemas
-from app.database import Events, Movements, Microphones, User, Role, ROLES, GENDER, STATES_CODE, AUS_STATES
+from app.database import Events, Movements, Microphones, User, Role, ROLES, GENDER, STATES_CODE, AUS_STATES, Requests
 import paho.mqtt.publish as publish
 import bcrypt
 from flask import jsonify
@@ -243,7 +243,7 @@ def signin(user: schemas.UserLoginSchema):
     }
 
     #Set up response (FOR TESTING ONLY)
-    response = {"message": "User Login Successfully!", "tkn" : jwtToken}
+    response = {"message": "User Login Successfully!", "tkn" : jwtToken, "roles": authorities}
 
     #Log result
     print(result)
@@ -305,6 +305,19 @@ async def checkAdmin(user: schemas.UserLoginSchema) -> dict:
         isAdmin = jwtBearer.verify_role(role="admin")
         if isAdmin:
             return {"result": "User is indeed an admin"}
+        else:
+            return {"result": "User is not admin"}
+    except Exception as e:
+        return {"error" : "Something unexpected occured - {}".format(e)}
+    
+@router.get("/requests", dependencies=[Depends(jwtBearer)], status_code=status.HTTP_200_OK)
+async def getRequests():
+    
+    try:
+        isAdmin = jwtBearer.verify_role(role="admin")
+        if isAdmin:
+            results = Requests.find()
+            return serializers.requestListEntity(results)
         else:
             return {"result": "User is not admin"}
     except Exception as e:
