@@ -38,7 +38,7 @@ yamnet_model.load_weights('yamnet.h5')
 yamnet_classes = yamnet.class_names('yamnet_class_map.csv')
 
 #Load specialized engine
-model = tf.keras.models.load_model('Replace this with your own model path.')
+model = tf.keras.models.load_model('C:/Users/22396/PycharmProjects/temporaryEcho/models/Inception0/') # Replace this with your own model path.
 df = pd.read_csv('Classes.csv')
 class_names = df["Class Name"].tolist()
 
@@ -118,59 +118,77 @@ def process_audio(waveform):
 
     return sample
 
+# Detect events from an audio. Set a flag to mark the start and end of an event.
+def enhanced_event_detection(waveform, sample_rate, threshold=0.5, min_event_duration=1.0, max_silence_duration=0.5):
+    num_samples = len(waveform)
+    events = []
+    is_event = False
+    event_start = 0
 
-# Event detection. Automatically record the audio if the threshold is reached
-def record_and_process_audio(threshold=500):
-    CHUNK = 1024
-    FORMAT = pyaudio.paInt16
-    CHANNELS = 1
-    RATE = 44100
+    silence_samples = int(max_silence_duration * sample_rate)
+    min_event_samples = int(min_event_duration * sample_rate)
+    silence_counter = 0
 
-    p = pyaudio.PyAudio()
-    stream = p.open(format=FORMAT,
-                    channels=CHANNELS,
-                    rate=RATE,
-                    input=True,
-                    frames_per_buffer=CHUNK)
+    for i in range(num_samples):
+        if abs(waveform[i]) > threshold:
+            if not is_event:
+                is_event = True
+                event_start = i
+            silence_counter = 0
+        else:
+            if is_event:
+                silence_counter += 1
+                if silence_counter > silence_samples:
+                    if i - event_start > min_event_samples:
+                        events.append((event_start, i - silence_counter))
+                    is_event = False
+                    silence_counter = 0
 
-    frames = []
-    skip_next_n_frames = 0
-    print("Listening for events...")
-    while True:
-        audio_data = stream.read(CHUNK)
-        if skip_next_n_frames > 0:
-            skip_next_n_frames -= 1
-            frames.append(audio_data)
-            if skip_next_n_frames == 0:
-                print("Processing captured audio...")
-                # Turn the frames into waveform
-                waveform = np.frombuffer(b"".join(frames), dtype=np.int16).astype(np.float32) / 32768.0
-                waveform = librosa.resample(waveform, orig_sr=RATE, target_sr=params.SAMPLE_RATE)
-                # Classify the sound
-                should_classify_further = recognize_audio(waveform,
-                                                          ['Animal', 'Bird', 'Bird vocalization, bird call, bird song'])
-                # If the sound belongs to animals, using specialized engine to classify
-                if should_classify_further:
-                    audio_image = process_audio(waveform)
-                    audio_image = np.expand_dims(audio_image, axis=0)
-                    predictions = model.predict(audio_image)
-                    predicted_index = np.argmax(predictions[0])
-                    predicted_class = class_names[predicted_index]
-                    print(f"The predicted class is: {predicted_class}")
-                else:
-                    print("The audio doesn't match the criteria for further classification.")
+    # Handle case where the last detected event reaches the end of the waveform
+    if is_event:
+        events.append((event_start, num_samples))
 
-                frames = []
-            continue
-        data_int = np.frombuffer(audio_data, dtype=np.int16)
-        if max(data_int) > threshold:
-            print("Event detected!")
-            skip_next_n_frames = int((RATE / CHUNK) * 10)
-            frames.append(audio_data)
-    stream.stop_stream()
-    stream.close()
-    p.terminate()
+    print(f"Detected {len(events)} events.")
+
+    return events
+
+
+
+def process_audio_file(audio_filepath, threshold=0.05):
+    print("Processing audio file:", audio_filepath)
+    # Load the audio file
+    waveform, _ = librosa.load(audio_filepath, sr=SC['AUDIO_SAMPLE_RATE'])
+    print(f"Loaded waveform with {len(waveform)} samples.")
+
+    # Detect events in the audio
+    events = enhanced_event_detection(waveform, SC['AUDIO_SAMPLE_RATE'], threshold)
+
+    for start_sample, end_sample in events:
+        segment = waveform[start_sample:end_sample]
+
+        # Classify with YAMNet
+        is_bird_call = recognize_audio(segment, ['Animal', 'Bird', 'Bird vocalization, bird call, bird song'])
+        print(f"YAMNet prediction for segment: {is_bird_call}")
+
+        if is_bird_call:
+            audio_image = process_audio(segment)
+            audio_image = np.expand_dims(audio_image, axis=0)
+            predictions = model.predict(audio_image)
+            predicted_index = np.argmax(predictions[0])
+            predicted_class = class_names[predicted_index]
+            start_time = round(start_sample / SC['AUDIO_SAMPLE_RATE'], 1)
+            end_time = round(end_sample / SC['AUDIO_SAMPLE_RATE'], 1)
+            print(f"Specialized model prediction between {start_time}s to {end_time}s: {predicted_class}")
+        else:
+            start_time = round(start_sample / SC['AUDIO_SAMPLE_RATE'], 1)
+            end_time = round(end_sample / SC['AUDIO_SAMPLE_RATE'], 1)
+            print(f"Detected sound between {start_time}s to {end_time}s is not an animal sound.")
+
 
 
 if __name__ == "__main__":
-    record_and_process_audio()
+    audio_filepath = "C:/Users/22396/Downloads/test.wav"
+    try:
+        process_audio_file(audio_filepath)
+    except Exception as e:
+        print("An error occurred:", e)
