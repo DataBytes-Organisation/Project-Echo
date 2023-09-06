@@ -1,6 +1,6 @@
 import jwt
 from decouple import config
-from typing import Dict, Str, List
+# from typing import Dict, List
 import datetime
 
 
@@ -13,7 +13,7 @@ def token_response(token: str):
         "access_token": token
     }
 
-def signJWT(user: dict, authorities: List[str]) -> str:
+def signJWT(user: dict, authorities: list[str]) -> str:
     payload = {
         "id": user["userId"],
         "roles": authorities,
@@ -27,7 +27,9 @@ def signJWT(user: dict, authorities: List[str]) -> str:
 # Handle JWT token received from HMI
 def decodeJWT(token: str) -> dict:
     try:
-        decoded_token = jwt.decode(token, [JWT_SECRET], algorithms = [JWT_ALGORITHM])
-        return decoded_token if decoded_token["expires"] >= datetime.datetime.utcnow() else None
+        decoded_token = jwt.decode(token, JWT_SECRET, algorithms = [JWT_ALGORITHM])
+        print("toggled decode function! The result is: {}".format(decoded_token))
+        return decoded_token if decoded_token["exp"] >= datetime.datetime.utcnow() else None
     except:
-        return {}
+        print("Decode failed! Need to check on this step")
+        return None

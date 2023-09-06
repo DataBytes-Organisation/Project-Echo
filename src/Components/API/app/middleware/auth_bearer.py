@@ -1,7 +1,7 @@
 from fastapi import Request, HTTPException
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
-from middleware.auth import decodeJWT
+from .auth import decodeJWT
 
 
 class JWTBearer(HTTPBearer):
@@ -16,8 +16,8 @@ class JWTBearer(HTTPBearer):
             
             #VerifyJWTToken return bool and payload
             #Only need bool value
-            isVerified, payload = self.verify_jwt(credentials.credentials)
-            if not isVerified:
+            print("return of the verify function: ", self.verify_jwt(credentials.credentials))
+            if not self.verify_jwt(credentials.credentials):
                 raise HTTPException(status_code=403, detail="Invalid token or expired token.")
             #For now, return credentials when pass bearer
             return credentials.credentials
@@ -32,7 +32,7 @@ class JWTBearer(HTTPBearer):
             payload = decodeJWT(JWTToken)
         except:
             payload = None
-        if payload:
+        if payload != None:
             isTokenValid = True
         return (isTokenValid, payload)
     
@@ -41,6 +41,8 @@ class JWTBearer(HTTPBearer):
         res = None
         try:
             isVerified, userInfo = self.verify_jwt(JWTToken)
+            print("JWT Verification: {}".format(isVerified))
+            print("UserInfo: {}".format(userInfo))
             if isVerified:
                 print("decoded userInfo: {}".format(userInfo))
                 res = [i for i in userInfo["roles"] if role in i]
