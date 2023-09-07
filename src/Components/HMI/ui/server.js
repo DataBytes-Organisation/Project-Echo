@@ -11,8 +11,7 @@ const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
 
-
-
+client.connect()
 
 const cors = require('cors');
 //const axios = require('axios')
@@ -366,27 +365,7 @@ app.post("/request_access", async (req, res) => {
   }
 })
 
-// app.post("/login", async (req, res) => {
-//   const {username, password} = req.body;
 
-//   try {
-//     const user = await User.findOne({
-//       username: username
-//     });
-
-//     if (user && bcrypt.compareSync(password, user.password)) {
-//       res.json({
-//         message: "Login successful",
-//         redirectTo: "/" // Redirect to welcome.html on success
-//       });
-//       console.log("Successful login")
-//     } else {
-//       res.status(401).json({ error: "Invalid credentials" });
-//     }
-//   } catch (error) {
-//     res.status(500).json({ error: "Internal server error" });
-//   }
-// });
 
 // routes
 require('./routes/auth.routes')(app);
@@ -471,7 +450,7 @@ app.get('/api/requests', async (req, res) => {
 // app.get('/api/requests', async (req, res) => {
 //   try {
 
-//     let token = client.get('jwtToken', (err, storedToken) => {
+//     let token = await client.get('jwtToken', (err, storedToken) => {
 //       if (err) {
 //         console.error('Error retrieving token from Redis:', err);
 //         return null
@@ -488,13 +467,21 @@ app.get('/api/requests', async (req, res) => {
 //       console.log("Fetch requests success! ", res.json(axiosResponse))
 //     } 
 //   } catch (err) {
-//     console.log('Status Code: ' + err.response.status + ' ' + err.response.statusText)
-//     console.log(err.response.data)
-//     res.status(err.response.status).redirect('/admin-dashboard')
+//     console.log('Requests error: ', err)
+//     res.status(401).redirect('/admin-dashboard')
 //   }
 // });
 
-app.get("/welcome", (req,res) => {
+app.get("/welcome", async (req,res) => {
+  console.log("token: ", await client.get('JWT', (err, storedToken) => {
+          if (err) {
+            console.error('Error retrieving token from Redis:', err);
+            return null
+          } else {
+            console.log('Stored Token:', storedToken);
+            return storedToken
+          }
+  }))
   res.sendFile(path.join(__dirname, 'public/index.html'))
 })
 

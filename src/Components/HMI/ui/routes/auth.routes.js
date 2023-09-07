@@ -78,7 +78,15 @@ module.exports = function (app) {
           if (axiosResponse.status === 200) {
             console.log('Status Code: ' + axiosResponse.status + ' ' + axiosResponse.statusText)
             console.log("Login response: ", axiosResponse.data);
-            client.set("JWT", axiosResponse.data.tkn)
+            
+            await client.set("JWT", axiosResponse.data.tkn, (err, res)=> {
+              if (err) {
+                console.log("Set JWT Token error: ", err)
+              } else {
+                console.log("Set JWT successfully: ", res)
+              }
+            })
+            
             res.status(200).redirect('/welcome')
           } 
         } catch (err) {
