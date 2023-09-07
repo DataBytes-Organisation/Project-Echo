@@ -1063,15 +1063,15 @@ function submitRequest(){
   console.log(animal);
   checkFields();
   
-  from = currentStatus;
-  to = newConservationStatus;
+  initial = currentStatus;
+  modified = newConservationStatus;
 
   requestData = {
     username,
     animal,
     requestingToChange,
-    from,
-    to,
+    initial,
+    modified,
     source
   }
   
