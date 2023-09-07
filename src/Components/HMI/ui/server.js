@@ -14,7 +14,7 @@ const mongoose = require('mongoose');
 client.connect()
 
 const cors = require('cors');
-//const axios = require('axios')
+const axios = require('axios')
 
 
 
@@ -437,40 +437,42 @@ app.patch('/api/requests/:id', async (req, res) => {
 });
 
 // OLD METHOD - USING DIRECT CONNECTION
-app.get('/api/requests', async (req, res) => {
-  try {
-    const requests = await Request.find();
-    res.json(requests);
-  } catch (error) {
-    res.status(500).json({ error: 'Error fetching data' });
-  }
-});
-
-// NEW METHOD - CONNECT VIA API
 // app.get('/api/requests', async (req, res) => {
 //   try {
-
-//     let token = await client.get('jwtToken', (err, storedToken) => {
-//       if (err) {
-//         console.error('Error retrieving token from Redis:', err);
-//         return null
-//       } else {
-//         console.log('Stored Token:', storedToken);
-//         return storedToken
-//       }
-//     })
-
-//     console.log("Current token: ", token)
-//     const axiosResponse = await axios.get('http://ts-api-cont:9000/hmi/requests', { headers: {"Authorization" : `Bearer ${token}`}})
-  
-//     if (axiosResponse.status === 200) {
-//       console.log("Fetch requests success! ", res.json(axiosResponse))
-//     } 
-//   } catch (err) {
-//     console.log('Requests error: ', err)
-//     res.status(401).redirect('/admin-dashboard')
+//     const requests = await Request.find();
+//     res.json(requests);
+//   } catch (error) {
+//     res.status(500).json({ error: 'Error fetching data' });
 //   }
 // });
+
+// NEW METHOD - CONNECT VIA API
+app.get('/api/requests', async (req, res) => {
+  try {
+
+    let token = await client.get('JWT', (err, storedToken) => {
+      if (err) {
+        console.error('Error retrieving token from Redis:', err);
+        return null
+      } else {
+        console.log('Stored Token:', storedToken);
+        return storedToken
+      }
+    })
+
+    console.log("Current token: ", token)
+    const axiosResponse = await axios.get('http://ts-api-cont:9000/hmi/requests', { headers: {"Authorization" : `Bearer ${token}`}})
+  
+    if (axiosResponse.status === 200) {
+      res.json(axiosResponse.data);
+    } else {
+      res.status(500).json({ error: 'Error fetching data' });
+    }
+  } catch (err) {
+    console.log('Requests error: ', err)
+    res.status(401).redirect('/admin-dashboard')
+  }
+});
 
 app.get("/welcome", async (req,res) => {
   console.log("token: ", await client.get('JWT', (err, storedToken) => {
