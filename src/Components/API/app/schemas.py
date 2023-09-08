@@ -97,7 +97,7 @@ class AddressSchema(BaseModel):
         } 
 class RequestSchema(BaseModel):
     
-    requestId: str
+    #requestId: str
     username: str
     animal: str
     requestingToChange: str

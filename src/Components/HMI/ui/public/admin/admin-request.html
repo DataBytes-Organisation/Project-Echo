@@ -97,7 +97,7 @@
 
 <script>
 
-  function createDropdown(requestId, animal, to) {
+  function createDropdown(requestId, animal, modified) {
       const dropdown = document.createElement('div');
       dropdown.classList.add('dropdown');
   
@@ -108,7 +108,7 @@
       const options = document.createElement('div');
       options.classList.add('dropdown-options');
       options.innerHTML = `
-        <button class="approve-btn" data-request-id="${requestId}" data-animal="${animal}" data-to="${to}">Approve</button>
+        <button class="approve-btn" data-request-id="${requestId}" data-animal="${animal}" data-to="${modified}">Approve</button>
         <button class="deny-btn" data-request-id="${requestId}">Deny</button>
       `;
       dropdown.appendChild(options);
@@ -145,7 +145,7 @@
           const statusCell = row.querySelector('td:last-child');
   
           if (item.status === 'pending') {
-              const dropdown = createDropdown(item._id, item.animal, item.to);
+              const dropdown = createDropdown(item._id, item.animal, item.modified);
               statusCell.appendChild(dropdown);
           } else {
               statusCell.textContent = item.status;
@@ -168,14 +168,14 @@
       const target = event.target;
       const requestId = target.getAttribute('data-request-id');
       const animal = target.getAttribute('data-animal');
-      const to = target.getAttribute('data-to');
+      const modified = target.getAttribute('data-to');
   
       if (target.classList.contains('approve-btn')) {
         //const requestId = target.getAttribute('data-request-id');
           console.log(`Approving request...`);
           
           console.log("Request ID select:   ", requestId)
-          console.log("Changing status to:  ", to)
+          console.log("Changing status to:  ", modified)
       
           //Perform API call to update the status
           fetch(`/api/requests/${requestId}`, {
@@ -202,8 +202,8 @@
               .then(data => {
                   // Handle the response data
                   console.log('Request status updated:', data);
-                  clearTable();
-                  updateTable();
+                  // clearTable();
+                  // updateTable();
               })
               .catch(error => {
                   console.error('Error updating request status:', error);
@@ -216,7 +216,7 @@
                   'Content-Type': 'application/json'
               },
               body: JSON.stringify({
-                  status: 'vulnerable'
+                  status: modified
               })
               })
               .then(response => {
@@ -274,16 +274,16 @@
                   .then(data => {
                       // Handle the response data
                       console.log('Request status updated:', data);
-                      clearTable();
-                      updateTable();
+                      //clearTable();
+                      //updateTable();
                   })
                   .catch(error => {
                       console.error('Error updating request status:', error);
            });
         //console.log(requests[requestId-1].status);
         //requests[requestId-1].status = "Denied"
-        //clearTable()
-        //updateTable()
+        clearTable();
+        updateTable();
       }
     })
   </script> 

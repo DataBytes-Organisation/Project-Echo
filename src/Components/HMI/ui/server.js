@@ -26,6 +26,18 @@ const User = db.user;
 const Guest = db.guest;
 const Request = db.request;
 
+//for connecting to ts-mongo-db
+const MongoClient = require('mongodb').MongoClient;
+const url = "mongodb://modelUser:EchoNetAccess2023@ts-mongodb-cont:27017/EchoNet";
+
+// Create a function to test the MongoDB connection
+
+
+
+
+
+
+
 //Security verification for email account and body content validation:
 const validation = require('deep-email-validator')
 const mongoSanitize = require('express-mongo-sanitize');
@@ -46,6 +58,8 @@ db.mongoose
     console.error("Connection error", err);
     // process.exit();
   });
+
+
 
 //mongoose.connect("mongodb://modelUser:EchoNetAccess2023@localhost:27017/EchoNet")
 //Initalize the data if no user role existed
@@ -409,8 +423,40 @@ app.post("/api/submit", async (req, res) => {
   }
 });
 
+
+async function testMongoDBConnection() {
+  try {
+    // Attempt to connect to MongoDB
+    const client = new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true });
+    await client.connect();
+
+    // If the connection is successful, print a success message
+    console.log('MongoDB connection test: Connection successful');
+    
+    // Perform additional database operations here if needed
+
+    // Close the connection when done
+    await client.close();
+  } catch (error) {
+    // If there's an error, print an error message
+    console.error('MongoDB connection test: Connection failed');
+    console.error(error);
+  }
+}
+
+// Call the function to test the MongoDB connection
+testMongoDBConnection();
+
+app.post("/api/approve", async (req,res) => {
+
+})
+
 app.get("/requests", (req,res) => {
   res.sendFile(path.join(__dirname, 'public/admin/admin-request.html'))
+})
+
+app.get("/requestsOriginal", (req,res) => {
+  res.sendFile(path.join(__dirname, 'public/requests.html'))
 })
 
 app.patch('/api/requests/:id', async (req, res) => {
@@ -435,6 +481,40 @@ app.patch('/api/requests/:id', async (req, res) => {
     res.status(500).json({ error: 'Error updating request status' });
   }
 });
+
+app.patch('/api/updateConservationStatus/:animal', async (req,res) => {
+  const requestAnimal = req.params.animal;
+  const newStatus = req.body.status;
+  try{
+    const client = new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true });
+    await client.connect();
+    const EchoNet = client.db();
+    const collection = EchoNet.collection('species');
+    //const query = { _id : requestAnimal };
+    //const updateOperation = {status : newStatus};
+    const result = await collection.findOneAndUpdate(
+      {_id : requestAnimal},
+      {$set :{status: newStatus}},
+      {
+        collation: { locale: 'en', strength: 2 }, // Case-insensitive collation
+        returnOriginal: false // Set this to false to get the updated document
+      }
+    );
+    if (result.value) {
+      // If a matching document is found and updated, print it to the console
+      console.log('Updated animal:', result.value);
+    } else {
+      // If no matching document is found, print a message
+      console.log('Animal not found.');
+    }
+    client.close();
+    res.status(200).json({message: `updated animal status successfully ${result.value}, ${requestAnimal}, ${newStatus}`});
+  }
+  catch (error) {
+    console.error('MongoDB connection or update operation failed:', error);
+    res.status(500).json({error: 'Error updating animal'});
+  }
+})
 
 // OLD METHOD - USING DIRECT CONNECTION
 // app.get('/api/requests', async (req, res) => {

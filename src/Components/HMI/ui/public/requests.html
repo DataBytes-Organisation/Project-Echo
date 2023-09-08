@@ -64,8 +64,12 @@
                 <tbody id="data-body">
                 </tbody>
               </table>               
-        </div>  
+        </div>
+        
     </div>
+    
+    
+    
 </div>
     
 
@@ -106,7 +110,7 @@ function createDropdown(requestId, animal, to) {
 
     
 
-  function updateTable(){
+function updateTable(){
     fetch('/api/requests')
         .then(response => response.json())
         .then(data => {
@@ -195,14 +199,13 @@ updateTable();
                 console.error('Error updating request status:', error);
          });
 
-         
          fetch(`/api/updateConservationStatus/${animal}`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                status: 'vulnerable'
+                status: to
             })
             })
             .then(response => {

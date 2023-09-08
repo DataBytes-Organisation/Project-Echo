@@ -79,7 +79,7 @@ def timestampEntity(timestamp) -> dict:
 def requestEntity(request) -> dict:
     return {
         "_id": str(request["_id"]),
-        "requestId": str(request["requestId"]),
+        #"requestId": str(request["requestId"]),
         "username": str(request["username"]),
         "animal": str(request["animal"]),
         "requestingToChange": str(request["requestingToChange"]),

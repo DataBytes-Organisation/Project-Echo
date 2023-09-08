@@ -1,6 +1,6 @@
 [
     {
-        "requestId": "1",
+        
         "username": "TN-HMI",
         "animal": "Podargus strigoides",
         "requestingToChange": "Conservation Status",
@@ -12,7 +12,7 @@
     }
     ,
     {
-        "requestId": "2",
+        
         "username": "QC-HMI5",
         "animal": "Sus scrofa",
         "requestingToChange": "Conservation Status",
