@@ -1,0 +1,21 @@
+,primary_label,secondary_labels,type,latitude,longitude,scientific_name,common_name,author,license,rating,url,filename
+1896,blakit1,[],['flight call'],-38.0051,144.5904,Milvus migrans,Black Kite,nick talbot,Creative Commons Attribution-NonCommercial-ShareAlike 4.0,2.5,https://www.xeno-canto.org/290067,blakit1/XC290067.ogg
+2089,blakit1,[],[''],-12.3606,130.8701,Milvus migrans,Black Kite,nick talbot,Creative Commons Attribution-NonCommercial-ShareAlike 4.0,4.5,https://xeno-canto.org/740444,blakit1/XC740444.ogg
+3241,categr,[],['call'],-28.2119,153.521,Bubulcus ibis,Cattle Egret,nick talbot,Creative Commons Attribution-NonCommercial-ShareAlike 4.0,3.5,https://www.xeno-canto.org/210378,categr/XC210378.ogg
+3267,categr,[],['call'],-38.1169,147.0749,Bubulcus ibis,Cattle Egret,nick talbot,Creative Commons Attribution-NonCommercial-ShareAlike 4.0,3.0,https://www.xeno-canto.org/321214,categr/XC321214.ogg
+3299,categr,[],['call'],-26.7629,152.8483,Bubulcus ibis,Cattle Egret,Greg McLachlan,Creative Commons Attribution-NonCommercial-ShareAlike 4.0,3.5,https://www.xeno-canto.org/393573,categr/XC393573.ogg
+7801,grecor,[],['call'],-36.9423,149.9063,Phalacrocorax carbo,Great Cormorant,nick talbot,Creative Commons Attribution-NonCommercial-ShareAlike 4.0,2.5,https://www.xeno-canto.org/182031,grecor/XC182031.ogg
+7834,grecor,[],"['begging call', 'call', 'juvenile']",-33.8985,151.2327,Phalacrocorax carbo,Great Cormorant,Greg McLachlan,Creative Commons Attribution-NonCommercial-ShareAlike 4.0,5.0,https://www.xeno-canto.org/381459,grecor/XC381459.ogg
+7974,greegr,[],['call'],-38.0051,144.5904,Ardea alba,Great Egret,nick talbot,Creative Commons Attribution-NonCommercial-ShareAlike 4.0,4.0,https://www.xeno-canto.org/188602,greegr/XC188602.ogg
+8023,greegr,[],['call'],-34.7561,142.3439,Ardea alba,Great Egret,nick talbot,Creative Commons Attribution-NonCommercial-ShareAlike 4.0,3.0,https://www.xeno-canto.org/331744,greegr/XC331744.ogg
+8035,greegr,[],"['call', 'flight call']",-33.5608,150.8196,Ardea alba,Great Egret,Greg McLachlan,Creative Commons Attribution-NonCommercial-ShareAlike 4.0,4.5,https://www.xeno-canto.org/365950,greegr/XC365950.ogg
+8163,greegr,[],['flight call'],-12.7945,143.3212,Ardea alba,Great Egret,Phil Gregory,Creative Commons Attribution-NonCommercial-ShareAlike 4.0,4.0,http://xeno-canto.org/692235,greegr/XC692235.ogg
+8807,helgui,[],['call'],-17.1553,144.5243,Numida meleagris,Helmeted Guineafowl,Adrian Walsh,Creative Commons Attribution-NonCommercial-ShareAlike 3.0,4.0,https://www.xeno-canto.org/165726,helgui/XC165726.ogg
+8828,helgui,[],['call'],-27.268,152.86,Numida meleagris,Helmeted Guineafowl,Greg McLachlan,Creative Commons Attribution-NonCommercial-ShareAlike 4.0,3.5,https://www.xeno-canto.org/394468,helgui/XC394468.ogg
+8841,helgui,[],['call'],-36.146,144.7448,Numida meleagris,Helmeted Guineafowl,nick talbot,Creative Commons Attribution-NonCommercial-ShareAlike 4.0,4.0,https://www.xeno-canto.org/574813,helgui/XC574813.ogg
+9522,laudov1,[],['uncertain'],-31.9225,115.8333,Streptopelia senegalensis,Laughing Dove,Drew Davison,Creative Commons Attribution-NonCommercial-ShareAlike 4.0,4.0,https://www.xeno-canto.org/588096,laudov1/XC588096.ogg
+9702,litegr,[],['call'],-17.9753,122.3447,Egretta garzetta,Little Egret,Nigel Jackett,Creative Commons Attribution-NonCommercial-ShareAlike 4.0,5.0,https://www.xeno-canto.org/236290,litegr/XC236290.ogg
+12036,rerswa1,[],['song'],-16.443,145.3782,Cecropis daurica,Red-rumped Swallow,Tom Tarrant,Creative Commons Attribution-NonCommercial-ShareAlike 4.0,4.0,https://www.xeno-canto.org/502701,rerswa1/XC502701.ogg
+13308,strher,[],['call'],-28.1949,153.5512,Butorides striata,Striated Heron,nick talbot,Creative Commons Attribution-NonCommercial-ShareAlike 4.0,4.0,https://www.xeno-canto.org/210507,strher/XC210507.ogg
+13345,strher,[],"['alarm call', 'call']",-33.9454,151.1573,Butorides striata,Striated Heron,Greg McLachlan,Creative Commons Attribution-NonCommercial-ShareAlike 4.0,3.5,https://www.xeno-canto.org/354401,strher/XC354401.ogg
+13390,strher,[],['uncertain'],-28.1956,153.5514,Butorides striata,Striated Heron,nick talbot,Creative Commons Attribution-NonCommercial-ShareAlike 4.0,3.5,https://www.xeno-canto.org/659999,strher/XC659999.ogg
