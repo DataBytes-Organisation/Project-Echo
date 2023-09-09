@@ -358,5 +358,18 @@ def changeCredential(field:str, new: str, jwtToken: str):
     response = {"message": f"User {field} changed sucessfully!"}
     return JSONResponse(content=response)
 
+# @router.delete("/delete-account", status_code=status.HTTP_200_OK)
+# def deleteaccount(jwtToken: str):
+#     #Check if user has logged out
+#     if(jwtToken in logout_token):
+#         response = {"message": "Token does not exist"}
+#         return JSONResponse(content=response, status_code=403)   
+        
+#     #Retrieve Token
+#     isValid, payload = jwtBearer.verify_jwt(JWTToken = jwtToken)
 
+#     #Delete an account from User
+#     User.delete_one({"userId": payload.get('id')})
 
+#     response = {"message": "User has been deleted!"}
+#     return JSONResponse(content=response)
