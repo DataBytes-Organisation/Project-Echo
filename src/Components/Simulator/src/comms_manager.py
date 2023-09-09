@@ -132,7 +132,7 @@ class CommsManager():
         print(f'Vocal message sent {animal.getUUID()} time: {timestamp} species: {species_name}', flush=True)
 
         # send a random audio message for the given animal at the predicted lla
-    def mqtt_send_recording_msg(self, msg) -> None:
+    def mqtt_send_recording_msg(self, msg, mode) -> None:
         
         #print(msg.payload)
 
