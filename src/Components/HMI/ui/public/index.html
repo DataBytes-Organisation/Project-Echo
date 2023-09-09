@@ -1469,7 +1469,7 @@ closeFormButton.addEventListener('click', (event) => {
 
   function dataCleansing(json_data) {
     //Escape if there is no data
-    if (json_data === [] | json_data === null | typeof json_data === undefined | json_data.length === 0){
+    if (json_data === null | typeof json_data === undefined | json_data.length === 0){
       return null
     }
     //Add date column with converted timestamp value
