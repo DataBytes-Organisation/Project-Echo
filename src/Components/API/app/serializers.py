@@ -11,6 +11,7 @@ def eventEntity(event) -> dict:
         "confidence": event["confidence"],
     }
 
+
 def eventSpeciesEntity(event) -> dict:
     return {
         "_id": str(event["_id"]),
@@ -129,3 +130,43 @@ def userListEntity(username) -> list:
 
 def requestListEntity(requests) -> list:
     return [requestEntity(request) for request in requests]
+
+# converting cursor to dict for get request of animals data
+def animalEntity(animal) -> dict:
+    if len(animal.keys())>5:
+        return {
+            "species": animal["_id"],
+            "commonName": (animal["commonName"]),
+            "type" : (animal["type"]),
+            "status" : (animal["status"]),
+            "diet" : (animal["diet"]),
+            "timestamp": animal["timestamp"],
+            "sensorId": animal["sensorId"],
+            "microphoneLLA": str(animal["microphoneLLA"]),
+            "animalEstLLA": str(animal["animalEstLLA"]),
+            "animalTrueLLA": str(animal["animalTrueLLA"]),
+            "animalLLAUncertainty": animal["animalLLAUncertainty"],
+            "audioClip" : str(animal["audioClip"]),
+            "confidence": animal["confidence"],
+            "sampleRate" : animal["sampleRate"]
+        }
+    else:
+        return {
+            "species": animal["_id"],
+            "commonName": (animal["commonName"]),
+            "type" : (animal["type"]),
+            "status" : (animal["status"]),
+            "diet" : (animal["diet"]),
+            "timestamp": "",
+            "sensorId": "",
+            "microphoneLLA": "",
+            "animalEstLLA": "",
+            "animalTrueLLA": "",
+            "animalLLAUncertainty": "",
+            "audioClip" : "",
+            "confidence": "",
+            "sampleRate" : ""
+        }
+
+def animalListEntity(animals) -> list:
+    return [animalEntity(animal) for animal in animals]
