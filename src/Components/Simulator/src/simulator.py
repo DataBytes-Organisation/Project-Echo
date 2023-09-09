@@ -15,6 +15,7 @@ class TestConfig(simulator_init.TestConfig):
     def __init__(self, *args, config=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.config = config
+        self.mode = "Recording Mode"
 
 class Simulator():
     def __init__(self) -> None:
@@ -39,7 +40,10 @@ class Simulator():
 
     async def handle_recording_message(self, msg):
         print("calling send recording")
-        self.config.comms_manager.mqtt_send_recording_msg(msg)
+        self.config.comms_manager.mqtt_send_recording_msg(msg, self.mode)
+
+    async def set_mode(self, mode):
+        self.mode = mode
         
     async def main_loop(self, animals, loops=100000):
         for _ in range(loops):
@@ -53,8 +57,9 @@ class Simulator():
                 self.clock.update()
                 
                 run_sim = False
+                
 
-                if run_sim:
+                if self.mode == "Animal Mode":
 
                     for animal in animals:
                         print("Animals Loop....", flush=True)
