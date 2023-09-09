@@ -17,7 +17,7 @@ const cors = require('cors');
 require('dotenv').config()
 //const shop = require("./shop/shop")
 const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY);
-//const axios = require('axios')
+const axios = require('axios')
 
 const {createCaptchaSync} = require("captcha-canvas");
 //Add mongoDB module inside config folder
