@@ -39,7 +39,7 @@ function matchStatus(status){
 
 export function convertCSV(json) {
   if (json == null) return null
-  if (json === [] | typeof json === undefined | json.length === 0){
+  if (typeof json === undefined | json.length === 0){
     return null
   }
   let data = json;
