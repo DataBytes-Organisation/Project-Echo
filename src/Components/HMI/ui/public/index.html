@@ -274,10 +274,11 @@
                   </p>
                   <div class="toggle-switch-container">
                     <label for="toggle-switch" class="toggle-label">Simulator:</label>
+                    <!--label for="toggle-switch" class="toggle-label">Start Simulator:</label>
                     <label class="toggle-switch">
                       <input id="simulatorToggle" type="checkbox">
                       <span class="slider round"></span>
-                    </label>
+                    </label-->
                   </div>
             </div>
             </div>
@@ -1399,10 +1400,10 @@ closeFormButton.addEventListener('click', (event) => {
   simulatorSwitch.addEventListener('change', function() {
     if (this.checked) {
       console.log("starting");
-      startSimulator();
+      //startSimulator();
     } else {
       console.log("stopping");
-      stopSimulator();
+      //stopSimulator();
     }
   });
 
