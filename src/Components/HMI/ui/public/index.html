@@ -273,7 +273,22 @@
                     <strong>The Echo Simulator</strong> - an innovative system - aims to replicate the Otway’s National Forest environment by creating virtual microphone sensors strategically placed and interconnected in a mesh-like network. This advanced system effectively monitors semi-random simulated animal production events, contributing to wildlife research and conservation efforts. Upon detecting a sound, the simulator shows how our end-to-end solution is able to leverage the trigger times from the nearest microphones, employing a brute-force optimisation technique to accurately triangulate the source location of the sound. With minimal error, the audio sample and associated microphone IDs are seamlessly integrated and communicated throughout Echo-Net, a comprehensive framework comprising a bioacoustics engine, store, processing server, communications servers, and APIs. This rich data is then visually represented on our (HMI), allowing researchers and wildlife enthusiasts to analyse and better understand the complex acoustic interactions within the simulated Otway’s National Forest ecosystem.
                   </p>
                   <div class="toggle-switch-container">
-                    <label for="toggle-switch" class="toggle-label">Simulator:</label>
+                    <div class="radio-group">
+                      <input type="radio" id="option1" name="options" value="option1" onclick="{simModeSwitch('Animal_Mode')}">
+                      <label for="option1">Simulate Movement</label>
+                    </div>
+                    <div class="radio-group">
+                      <input type="radio" id="option2" name="options" value="option2" onclick="{simModeSwitch('Recording_Mode')}">
+                      <label for="option2">Live Recording</label>
+                    </div>
+                    <div class="radio-group">
+                      <input type="radio" id="option3" name="options" value="option3" onclick="{simModeSwitch('Recording_Mode_V2')}">
+                      <label for="option3">Live Recording V2</label>
+                    </div>
+                    <div class="radio-group">
+                      <input type="radio" id="option4" name="options" value="option4" onclick="{simModeSwitch('Stop')}">
+                      <label for="option4">Disable Simulator</label>
+                    </div>
                     <!--label for="toggle-switch" class="toggle-label">Start Simulator:</label>
                     <label class="toggle-switch">
                       <input id="simulatorToggle" type="checkbox">
@@ -896,6 +911,16 @@
       animateAudioMute();
     }			
   }
+
+  function simModeSwitch(mode){
+    const mode_switch = new CustomEvent('modeSwitch',{
+            detail: {
+              message: mode
+            }
+          })
+
+    document.dispatchEvent(mode_switch);
+  }
   
   function saveRecordingEvent(){
     const save_recording = new CustomEvent('saveRecording',{
@@ -1257,6 +1282,7 @@ closeFormButton.addEventListener('click', (event) => {
   hmiState.liveMode = true;
   hmiState.simUpdateDelay = 10000;
   hmiState.liveWindow = 60000;
+  hmiState.simMode = "Stop";
 
   //NOTE: Use the replay date to replay past data as though it were live
     //const replayDate = new Date('March 23, 2023 20:35:00');
