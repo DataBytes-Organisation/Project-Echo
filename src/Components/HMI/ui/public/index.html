@@ -1542,7 +1542,7 @@ closeFormButton.addEventListener('click', (event) => {
     
     console.log(`Download selected time range ${datepickerStart} - ${datepickerEnd}`)
     retrieveTruthEventsInTimeRange(datepickerStart, datepickerEnd).then((res) => {
-      if (res.data === [] | res.data === null | typeof res.data === undefined | res.data.length === 0){
+      if (res.data === null | typeof res.data === undefined | res.data.length === 0){
         ErrDisplay("There is no result");
         data = sampleJSONmovementEvents
       } else {
