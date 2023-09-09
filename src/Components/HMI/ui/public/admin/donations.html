@@ -52,7 +52,7 @@
     <div class="body-wrapper">
       <div id="header"></div>
       <div class="container-fluid">
-        <div class="card">
+        <div class="card" id="card-charges">
           <div class="card-body">
             <div class="screen-content">
 
@@ -104,17 +104,23 @@
             console.log("Data Fetched: ", charges);
             charges.forEach(item =>{
                 const row = document.createElement('tr');
-                console.log(item.amount);
+                // console.log(item.amount);
                 amount = item.amount / 100;
                 amount = amount.toFixed(2);
-                console.log(item.status);
-                console.log(item.billing_details.email);
-                console.log(item.created);
+                date = new Date(item.created * 1000); // Multiply by 1000 to convert to milliseconds
+
+                // Now, you can format the date as a string in your desired format
+                formattedDate = date.toLocaleDateString(); // Default format, e.g., "09/04/2023"
+
+                // You can also specify a custom date format
+                // console.log(item.status);
+                // console.log(item.billing_details.email);
+                // console.log(item.created);
                 row.innerHTML = `
                     <td>$${amount}</td>
                     <td>${item.status}</td>
                     <td>${item.billing_details.email}</td>
-                    <td>${item.created}</td>
+                    <td>${formattedDate}</td>
                 `;
                 dataBody.appendChild(row);
             })
