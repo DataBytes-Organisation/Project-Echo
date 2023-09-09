@@ -1011,41 +1011,41 @@
 
     </script>
 
-    <script>
-      function showImages() {
-        var imageRow = document.querySelector('.image-row');
-        var microphoneImageRow = document.querySelector('.microphone-image-row');
-        imageRow.style.display = 'flex';
-        microphoneImageRow.style.display = 'flex';
-      }
-    </script>
+<script>
+  function showImages() {
+    var imageRow = document.querySelector('.image-row');
+    var microphoneImageRow = document.querySelector('.microphone-image-row');
+    imageRow.style.display = 'flex';
+    microphoneImageRow.style.display = 'flex';
+  }
+</script>
 
-    <script>
-      // Sample data for the pie chart
-      var pieChartData = {
-        labels: ['Your Donation', 'Remaining'],
-        datasets: [{
-          data: [25, 75], // 25% for donation, 75% for remaining
-          backgroundColor: ['orange', 'lightgray'], // Colors for each segment
-        }]
-      };
+<script>
+  // Sample data for the pie chart
+  var pieChartData = {
+    labels: ['Your Donation', 'Remaining'],
+    datasets: [{
+      data: [25, 75], // 25% for donation, 75% for remaining
+      backgroundColor: ['orange', 'lightgray'], // Colors for each segment
+    }]
+  };
 
-      // Create the pie chart
-      var pieChartElement = document.getElementById('donationChart').getContext('2d');
-      var pieChart = new Chart(pieChartElement, {
-        type: 'pie',
-        data: pieChartData,
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              position: 'bottom'
-            }
-          }
+  // Create the pie chart
+  var pieChartElement = document.getElementById('donationChart').getContext('2d');
+  var pieChart = new Chart(pieChartElement, {
+    type: 'pie',
+    data: pieChartData,
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'bottom'
         }
-      });
-    </script>
+      }
+    }
+  });
+</script>
 
     <script>
       const requestButton = document.getElementById("request-edit-button")
