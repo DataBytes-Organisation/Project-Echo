@@ -132,6 +132,7 @@
                     <div class="row align-items-center">
                       <div class="col-8">
                         <h4 class="fw-semibold mb-3">Goal: AUD$1000</h4>
+                        <h4 class="" id="totalDonations" >Total Received: $</h4>
                         <div class="d-flex align-items-center">
                           <div class="me-4">
                             <span class="round-8 bg-primary rounded-circle me-2 d-inline-block"></span>
@@ -291,6 +292,22 @@
               $("#sidebar").load("./admin/component/sidebar-component.html");
               $("#header").load("./admin/component/header-component.html");
           });
+    
+    
+  
+  fetch('/cumulativeDonations')
+    .then(response => response.json()) // Parse the JSON data
+    .then(data => {
+      // Update the content of the "totalDonations" element
+      const totalDonationsElement = document.getElementById('totalDonations');
+      if (totalDonationsElement) {
+        totalDonationsElement.innerHTML = `Total Donations: $${data.cumulativeTotal}`;
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      // Handle any errors that occur during the fetch
+    });
   </script>
 
 </body>

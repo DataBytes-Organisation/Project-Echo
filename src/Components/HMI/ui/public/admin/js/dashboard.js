@@ -100,12 +100,13 @@ $(function () {
 
 
   };
-
+ 
   var chart = new ApexCharts(document.querySelector("#chart"), chart);
   chart.render();
   var endAngle = (Math.max(Math.round(sum/1000)*360, 360))
-  var series = [298, 438]
-  var sum = [298, 438].reduce((partialSum, a) => partialSum + a, 0)
+  var series = [50, 438]
+  var sum = [50, 438].reduce((partialSum, a) => partialSum + a, 0);
+
   // =====================================
   // Percentage - Donation
   // =====================================
