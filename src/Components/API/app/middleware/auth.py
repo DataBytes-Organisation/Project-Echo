@@ -2,7 +2,7 @@ import jwt
 from decouple import config
 # from typing import Dict, List
 import datetime
-
+from bson.objectid import ObjectId
 
 JWT_SECRET = "deff1952d59f883ece260e8683fed21ab0ad9a53323eca4f"
 JWT_ALGORITHM = "HS256"
@@ -15,7 +15,7 @@ def token_response(token: str):
 
 def signJWT(user: dict, authorities: list[str]) -> str:
     payload = {
-        "id": user["userId"],
+        "id": str(user["_id"]),
         "roles": authorities,
         "exp": datetime.datetime.utcnow() + datetime.timedelta(seconds=86400)
     }
