@@ -184,7 +184,7 @@ class EchoEngine():
         
         sample_rate = 0
 
-        if(mode == "Recording_Mode"):
+        if(str(mode) == "Recording_Mode"):
             print("recording mode 1")
             # Create a file-like object from the bytes.
             file = io.BytesIO(audio_clip)
@@ -192,7 +192,7 @@ class EchoEngine():
             # Load the audio data with librosa
             audio_clip, sample_rate = librosa.load(file, sr=self.config['AUDIO_SAMPLE_RATE'])
         
-        elif(mode == "Recording_Mode_V2"):
+        elif(str(mode) == "Recording_Mode_V2"):
             print("recording mode 2")
             # Create a file-like object from the bytes.
             file = io.BytesIO(audio_clip)
