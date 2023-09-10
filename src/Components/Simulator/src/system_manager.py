@@ -55,12 +55,12 @@ class SystemManager:
         print("calling handle recording")
         await self.simulator.handle_recording_message(msg)
 
-    async def start_sim(self):
+    async def start_sim(self, mode):
         if self.sim_running:
             print("Simulator is already running", flush=True)
         else:
             print("Starting Simulator....", flush=True)
-            self.sim_task = asyncio.create_task(self.run_sim())
+            self.sim_task = asyncio.create_task(self.run_sim(mode))
             self.sim_running = True
             print("Simulator Running....", flush=True)
 
@@ -73,10 +73,10 @@ class SystemManager:
             self.sim_running = False
             print("Simulator has stopped.", flush=True)
 
-    async def restart_sim(self):
+    async def restart_sim(self, mode):
         if self.sim_running:
             self.stop_sim()
-            self.start_sim()
+            self.start_sim(mode)
 
     async def run_loop(self):
         while True:
@@ -90,28 +90,26 @@ class SystemManager:
                 self.stop_sim()
 
             elif command == "Animal_Mode":
-                self.simulator.set_mode(command)
                 if self.sim_running:
-                    self.restart_sim()
+                    self.restart_sim(command)
                 else:
-                    self.start_sim()
+                    self.start_sim(command)
 
             elif command == "Recording_Mode":
-                self.simulator.set_mode(command)
                 if self.sim_running:
-                    self.restart_sim()
+                    self.restart_sim(command)
                 else:
-                    self.start_sim()
+                    self.start_sim(command)
 
             elif command == "Recording_Mode_V2":
-                self.simulator.set_mode(command)
                 if self.sim_running:
-                    self.restart_sim()
+                    self.restart_sim(command)
                 else:
-                    self.start_sim()
+                    self.start_sim(command)
                     
-    async def run_sim(self):
+    async def run_sim(self, mode):
         self.simulator = simulator.Simulator()
+        self.simulator.set_mode(mode)
         await self.simulator.execute()
 
 async def main():
