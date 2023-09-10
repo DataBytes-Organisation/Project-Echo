@@ -1826,16 +1826,15 @@ export function computeRecordingDuration(startTime) {
 document.addEventListener('modeSwitch', function(event){
   window.hmiState.simMode = event.detail.message;
   if(window.hmiState.simMode == "Animal_Mode"){
-
+    setSimModeAnimal();
   }
   else if(window.hmiState.simMode == "Recording_Mode"){
-    
+    setSimModeRecording();
   }
   else if(window.hmiState.simMode == "Recording_Mode_V2"){
-    
+    setSimModeRecordingV2();
   }
   else if(window.hmiState.simMode == "Stop"){
-    
+    stopSimulator();
   }
-
 });
