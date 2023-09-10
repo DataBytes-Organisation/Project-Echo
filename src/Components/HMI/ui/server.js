@@ -124,6 +124,37 @@ function initial() {
 
 // getAllPayments();
 
+app.get('/donations', async(req,res) => {
+  let charges;
+  try{
+    while (true) {
+      nextPage = null;
+      firstPage = false;
+      if(firstPage == false){
+        charges = await stripe.charges.list({
+          limit: 100,
+        });
+        firstPage = true;
+      }
+      
+      if (!charges.has_more) {
+        break; // Exit the loop when there are no more pages
+      }
+      nextPage = charges[charges.length() - 1]
+      charges = await stripe.charges.list({
+        limit: 100,
+        starting_next: nextPage
+      });
+      firstPage = true;
+    }
+    res.json({ charges });
+  }
+  catch(error){
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+})
+
 app.get('/cumulativeDonations', async(req, res) => {
   let cumulativeTotal = 0;
   try{

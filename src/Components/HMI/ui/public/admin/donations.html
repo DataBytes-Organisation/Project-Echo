@@ -21,6 +21,8 @@
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
   />
+  <!--- Requests Page Styling -->
+  <link type="text/css" rel="stylesheet" href="./css/requests.css" >
   <!-- jQuery -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script> 
   <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
@@ -50,10 +52,27 @@
     <div class="body-wrapper">
       <div id="header"></div>
       <div class="container-fluid">
-        <div class="card">
+        <div class="card" id="card-charges">
           <div class="card-body">
-            <h5 class="card-title fw-semibold mb-4">Donations Page</h5>
-            <p class="mb-0">This the donations page </p>
+            <div class="screen-content">
+
+              <h1>Donations</h1>
+              <!-- <i class="screen-icon fa-brands fa-codepen"></i> -->
+              
+              <div class="screen-user">
+                  <table>
+                      <thead>
+                        <tr>
+                          <th>Amount</th>
+                          <th>Status</th>
+                          <th>Customer</th>
+                          <th>Date</th>
+                        </tr>
+                      </thead>
+                      <tbody id="data-body">
+                      </tbody>
+                    </table>               
+              </div>
           </div>
         </div>
       </div>
@@ -69,6 +88,72 @@
               $("#header").load("./admin/component/header-component.html");
           });
   </script>
+
+
+<script>
+  
+    const dataBody = document.getElementById('data-body');
+  
+      
+  
+    function updateTable() {
+        fetch('/donations')
+        .then(response => response.json())
+        .then(data => {
+            let charges = data.charges.data;
+            console.log("Data Fetched: ", charges);
+
+            charges.forEach(item => {
+            const row = document.createElement('tr');
+
+            // Convert the amount and date as you did
+            const amount = (item.amount / 100).toFixed(2);
+            const date = new Date(item.created * 1000);
+            const formattedDate = date.toLocaleDateString();
+
+            // Create a td element for the donation status
+            const statusCell = document.createElement('td');
+            statusCell.textContent = item.status;
+
+            
+            //color status based on status
+            console.log("Coloring status");
+            statusCell.classList.add(item.status);
+
+            // Create td elements for other columns
+            const amountCell = document.createElement('td');
+            amountCell.textContent = `$${amount}`;
+
+            const emailCell = document.createElement('td');
+            emailCell.textContent = item.billing_details.email;
+
+            const dateCell = document.createElement('td');
+            dateCell.textContent = formattedDate;
+
+            // Append all td elements to the row
+            row.appendChild(amountCell);
+            row.appendChild(statusCell);
+            row.appendChild(emailCell);
+            row.appendChild(dateCell);
+
+            // Append the row to the table body
+            dataBody.appendChild(row);
+        });
+        })
+        .catch(error => {
+        console.error('Error fetching data:', error);
+        });
+}
+  
+  function clearTable() {
+    const dataBody = document.getElementById('data-body');
+    dataBody.innerHTML = ''; // Remove all rows
+  }
+  updateTable();
+  
+  
+  </script> 
+
 </body>
 
 </html>
