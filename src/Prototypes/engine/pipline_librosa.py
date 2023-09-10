@@ -21,27 +21,6 @@ Input_directory = "D:\\Downloads\\Data\\wind\\in"
 Trimmed_directory = "D:\\Downloads\\Data\\wind\\trimmed"
 Images_directory = "C:\\Users\\User\\Documents\\Uni\\2023\\Semester 2\\Project Echo\\test Audio\\images\\wind"
 
-#Select all of the files in the input directory
-for file in os.listdir(Input_directory):
-    try:
-        #Get the extension of the file we are working with
-        fileExtension = file.rsplit(".",1)[-1]
-    
-        file_path=os.path.join(Input_directory,file)
-        #load in audio file to be trimmed
-        audio =AudioSegment.from_file(file_path)
-        #Time in ms
-        start_time=0
-        #Time in ms (10s)
-        end_time=10000
-        #trim the Audio to specifyed time (0-10s) This value can be changed to suit optimal size for training the engine
-        trimmed_audio = audio[start_time:end_time]
-        output_path=os.path.join(Trimmed_directory,file)
-        #save the trimmed audio at the specifyed path
-        trimmed_audio.export(output_path, format=fileExtension)
-    except:
-        print("Unable to process file")
-
 #Create Filter banks for converting Audio to Mel Spectrogram
 #Source Valerio Velardo - The Sound of AI Youtube, Valerio Velardo - The Sound of AI 
 #(2020) Extracting Mel spectrograms with python, YouTube. Available at: 
