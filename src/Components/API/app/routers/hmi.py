@@ -279,7 +279,7 @@ def passwordchange(oldpw: str, newpw: str, cfm_newpw: str, jwtToken: str):
     isValid, payload = jwtBearer.verify_jwt(JWTToken = jwtToken)
 
     #Find if the username exist in our database
-    account = User.find_one({"userId": payload.get('id')})
+    account = User.find_one({"_id": ObjectId(payload.get('id'))})
     if(account is None):
         response = {"message": "User Not Found."}
         return JSONResponse(content=response, status_code=404)
@@ -346,17 +346,30 @@ def changeCredential(field:str, new: str, jwtToken: str):
     
     if field in ['country', "state"]:
         User.update_one(
-        {"userId": payload.get('id')},
+        {"_id": ObjectId(payload.get('id'))},
         {"$set": {"address."+field: new}}
     )
     else:
         User.update_one(
-            {"userId": payload.get('id')},
+            {"_id": ObjectId(payload.get('id'))},
             {"$set": {field: new}}
         )
 
     response = {"message": f"User {field} changed sucessfully!"}
     return JSONResponse(content=response)
 
+@router.delete("/delete-account", status_code=status.HTTP_200_OK)
+def deleteaccount(jwtToken: str):
+    #Check if user has logged out
+    if(jwtToken in logout_token):
+        response = {"message": "Token does not exist"}
+        return JSONResponse(content=response, status_code=403)   
+        
+    #Retrieve Token
+    isValid, payload = jwtBearer.verify_jwt(JWTToken = jwtToken)
 
+    #Delete an account from User
+    User.delete_one({"_id": ObjectId(payload.get('id'))})
 
+    response = {"message": "User has been deleted!"}
+    return JSONResponse(content=response)

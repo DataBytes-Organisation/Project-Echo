@@ -27,3 +27,4 @@ flask
 pyjwt==2.4.0
 requests
 python-decouple
+pandas
