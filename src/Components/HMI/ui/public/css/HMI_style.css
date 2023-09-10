@@ -1188,9 +1188,6 @@ i {
     pointer-events: auto;
   }
 
-  .toggle-switch-container{
-    margin-top: 20px;
-  }
   .toggle-label{
     color: rgb(141, 141, 141, 1.0);
     font-family: 'Roboto', sans-serif;
@@ -1740,4 +1737,38 @@ label {
 
 #dropdownContentNCS button:hover {
   background-color: rgb(189, 189, 189);
+}
+
+.toggle-switch-container{
+  margin-top: 20px;
+  display: block;
+}
+
+.radio-group {
+  display: block;
+  margin-bottom: 10px; /* Adjust the margin as needed */
+}
+
+.radio-group input[type="radio"] {
+  display: inline-block;
+  margin-right: 5px; /* Adjust the margin as needed */
+}
+
+.radio-group input[type="radio"] {
+  display: none; /* Hide the actual radio button */
+}
+
+/* Style the label to look like a button */
+.radio-group label {
+  display: inline-block;
+  padding: 10px 20px;
+  border: 1px solid rgba(247, 186, 206, 0.6);
+  background-color: rgba(0, 0, 0, 0.6);
+  cursor: pointer;
+}
+
+/* Style the label when the associated radio button is checked */
+.radio-group input[type="radio"]:checked + label {
+  background-color: rgba(247, 186, 206, 0.8);
+  border-color: rgba(247, 186, 206, 0.6);
 }
