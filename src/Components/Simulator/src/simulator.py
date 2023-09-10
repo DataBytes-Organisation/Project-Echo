@@ -23,7 +23,7 @@ class Simulator():
         self.clock  = Clock(step_interval=float(os.environ['STEP_INTERVAL'])) # 200 step interval 200 milliseconds
 
     # run the live simulators
-    async def execute(self):
+    async def execute(self, mode):
         # initialse the simulator configuration
         animals, sensors = self.config.initialise()
         
@@ -34,7 +34,8 @@ class Simulator():
         if ast.literal_eval(os.environ['RENDER_STATES']):
             self.render_state = RenderedState()
             self.render_state.render_initial_sensor_state(self.config, animals)
-    
+        
+        self.mode = mode
         # start the simulator loop
         await self.main_loop(animals, loops=int(os.environ['SIMULATOR_LOOPS']))
 
@@ -55,11 +56,9 @@ class Simulator():
 
                 # update the simulated time (advance the clock)
                 self.clock.update()
-                
-                run_sim = False
-                
+                print(self.mode) 
 
-                if self.mode == "Animal Mode":
+                if str(self.mode) == "Animal_Mode":
 
                     for animal in animals:
                         print("Animals Loop....", flush=True)
