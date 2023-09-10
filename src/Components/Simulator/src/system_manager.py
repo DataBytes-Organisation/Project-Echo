@@ -84,28 +84,28 @@ class SystemManager:
             print(f"Simulator got command {command}", flush=True)
             
             if command == "Start":
-                self.start_sim()
+                await self.start_sim()
 
             elif command == "Stop":
-                self.stop_sim()
+                await self.stop_sim()
 
             elif command == "Animal_Mode":
                 if self.sim_running:
-                    self.restart_sim(command)
+                    await self.restart_sim(command)
                 else:
-                    self.start_sim(command)
+                    await self.start_sim(command)
 
             elif command == "Recording_Mode":
                 if self.sim_running:
-                    self.restart_sim(command)
+                    await self.restart_sim(command)
                 else:
-                    self.start_sim(command)
+                    await self.start_sim(command)
 
             elif command == "Recording_Mode_V2":
                 if self.sim_running:
-                    self.restart_sim(command)
+                    await self.restart_sim(command)
                 else:
-                    self.start_sim(command)
+                    await self.start_sim(command)
                     
     async def run_sim(self, mode):
         self.simulator = simulator.Simulator()
