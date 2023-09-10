@@ -109,8 +109,8 @@ class SystemManager:
                     
     async def run_sim(self, mode):
         self.simulator = simulator.Simulator()
-        self.simulator.set_mode(mode)
-        await self.simulator.execute()
+        await self.simulator.execute(mode)
+        #await self.simulator.set_mode(mode)
 
 async def main():
     system_manager = SystemManager()
