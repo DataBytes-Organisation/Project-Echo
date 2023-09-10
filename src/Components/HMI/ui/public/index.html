@@ -35,6 +35,10 @@
     <!-- SplashScreen Styling -->
 		<link rel="stylesheet" type="text/css" href="./css/splash_screen_style.css">
 
+    <!-- Pie chart for donation -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
     <!-- xlsx -->
     <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
 
@@ -284,15 +288,48 @@
           </div> 
           <div id="donate">
             <div class="wrapper">
-            <div id="donate-contents">
-              <h2>Donations</h2>
-                  <p>
-                    As our project expands, we rely on the generosity of supporters like you to ensure the continuous operation of our mission. By donating, you contribute to the preservation of our endangered species. Thank you for being a crucial part of Project Echo's journey.
-                  </p>
-                  <button class="donate-button">DONATE NOW</button>
-            </div>
-            </div>
-          </div> 
+              <div id="donate-contents">
+                <h2>Donations</h2>
+                <p>
+                  As our project expands, we rely on the generosity of supporters like you to ensure the continuous
+                  operation of our mission. By donating, you contribute to the preservation of our endangered species.
+                  Thank you for being a crucial part of Project Echo's journey.
+                </p>
+                <h2>General Donations</h2>
+                <p>
+                  Your generous contribution helps us continue our mission of protecting and preserving wildlife. By
+                  making a general donation, you provide essential support that enables us to carry out our conservation
+                  efforts, conduct research, and educate the public about the importance of preserving our planet's
+                  biodiversity.
+                </p>
+                <button class="donate-button" id="show-images" onclick="showImages()">DONATE NOW</button>
+                <div class="image-row" id="image-row" style="display: none;">
+                  <div class="image-description">
+                    <img src="./images/$1.png" alt="Amphibian Vulnerable">
+                    <p class="image-amount">$1</p>
+                  </div>
+                  <div class="image-description">
+                    <img src="./images/vocalization/$5.png" alt="Mammal Endangered">
+                    <p class="image-amount">$5</p>
+                  </div>
+                  <div class="image-description">
+                    <img src="./images/vocalization/$10.png" alt="Bird Endangered">
+                    <p class="image-amount">$10</p>
+                  </div>
+                  <div class="image-description">
+                    <img src="./images/vocalization/$20.png" alt="Bird Invasive">
+                    <p class="image-amount">$20</p>
+                  </div>
+                  <div class="image-description">
+                    <img src="./images/vocalization/$50.png" alt="Bird Vulnerable">
+                    <p class="image-amount">$50</p>
+                  </div>
+                </div>
+                <div class="lightbulb-container" style="text-align: center;">
+                  <img src="./images/vocalization/Your Amount.png" alt="Light Bulb" style="max-width: 100px; margin: 10px;">
+                  <p class="donation-amount">Your Amount</p>
+                </div>
+
           <div id="animal-popup">
             <div class="wrapper">
             <div id="animal-popup-content">
@@ -1229,6 +1266,43 @@ closeFormButton.addEventListener('click', (event) => {
 
 
 
+</script>
+
+
+<script>
+  // Sample data for the pie chart
+  var pieChartData = {
+    labels: ['Your Donation', 'Remaining'],
+    datasets: [{
+      data: [25, 75], // 25% for donation, 75% for remaining
+      backgroundColor: ['orange', 'lightgray'], // Colors for each segment
+    }]
+  };
+
+  // Create the pie chart
+  var pieChartElement = document.getElementById('donationChart').getContext('2d');
+  var pieChart = new Chart(pieChartElement, {
+    type: 'pie',
+    data: pieChartData,
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'bottom'
+        }
+      }
+    }
+  });
+</script>
+
+<script>
+  function showImages() {
+    var imageRow = document.querySelector('.image-row');
+    var microphoneImageRow = document.querySelector('.microphone-image-row');
+    imageRow.style.display = 'flex';
+    microphoneImageRow.style.display = 'flex';
+  }
 </script>
 
 
