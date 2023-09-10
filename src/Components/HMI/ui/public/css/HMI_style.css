@@ -1188,9 +1188,6 @@ i {
     pointer-events: auto;
   }
 
-  .toggle-switch-container{
-    margin-top: 20px;
-  }
   .toggle-label{
     color: rgb(141, 141, 141, 1.0);
     font-family: 'Roboto', sans-serif;
@@ -1400,7 +1397,17 @@ i {
 #audio_playback_container {
   margin-top: 20px;
   width: 100%;
-  height: 100vh;
+  display: -webkit-flex;
+  display: -ms-flex;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+#recording_simulation_master_container {
+  margin-top: 20px;
+  width: 100%;
   display: -webkit-flex;
   display: -ms-flex;
   display: flex;
@@ -1663,6 +1670,9 @@ i {
 #audio_playback_container{
   width:440px;
 }
+#recording_simulation_master_container{
+  width:440px;
+}
 
 
 #request-edit-button {
@@ -1741,3 +1751,54 @@ label {
 #dropdownContentNCS button:hover {
   background-color: rgb(189, 189, 189);
 }
+
+.toggle-switch-container{
+  margin-top: 20px;
+  display: block;
+}
+
+.radio-group {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.radio-group input[type="radio"] {
+  display: inline-block;
+  margin-top: 10px;
+  width: 20px;
+}
+
+input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+}
+
+input[type="radio"]+span:before {
+  content: '';
+  border: 1px solid rgba(247, 186, 206, 0.8);
+  border-radius: 50%;
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  margin-right: 0.5em;
+  margin-top: 0.5em;
+  vertical-align: -2px;
+}
+
+input[type="radio"]:checked+span:before {
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.6);
+  border: 6px solid rgba(247, 186, 206, 0.8);
+}
+
+input[type="radio"]:focus+span:before,
+input[type="radio"]:not(:disabled)+span:hover:before {
+  box-shadow:
+    0px 0px 0px 1px rgba(0, 0, 0, 0.6),
+    0px 0px 0px 2px rgba(247, 186, 206, 0.8);
+
+  outline-color: transparent;
+  outline-width: 2px;
+  outline-style: dotted;
+  }
+  

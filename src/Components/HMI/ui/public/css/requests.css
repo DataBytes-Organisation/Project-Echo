@@ -1,5 +1,5 @@
 body {
-    color: white;
+    color: black;
 }
 
 table {
@@ -20,7 +20,7 @@ table {
   
   /* Style for alternating table rows */
   tbody tr:nth-child(even) {
-    background-color: rgba(0,0,0,0.5);
+    background-color: rgba(0,0,0,0.1);
 
   }
   
@@ -30,10 +30,6 @@ table {
     border-bottom: 1px solid #dddddd;
   }
   
-  /* Hover effect on table rows */
-  tbody tr:hover {
-    background-color: #e0e0e0;
-  }
 
   .dropdown {
     position: relative;

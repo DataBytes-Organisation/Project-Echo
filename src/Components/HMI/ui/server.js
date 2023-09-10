@@ -5,14 +5,21 @@ const fs = require('fs');
 const cookieSession = require('cookie-session');
 const dbConfig = require('./config/db.config');
 const jwt = require('jsonwebtoken');
-const { authJwt } = require('./middleware');
+const { authJwt, client } = require('./middleware');
 const controller = require('./controller/auth.controller');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
-const cors = require('cors');
-//const axios = require('axios')
 
+client.connect()
+
+const cors = require('cors');
+require('dotenv').config()
+//const shop = require("./shop/shop")
+const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY);
+const axios = require('axios')
+
+const {createCaptchaSync} = require("captcha-canvas");
 //Add mongoDB module inside config folder
 const db = require("./model");
 const Role = db.role;
@@ -20,6 +27,21 @@ const User = db.user;
 const Guest = db.guest;
 const Request = db.request;
 
+//for connecting to ts-mongo-db
+const MongoClient = require('mongodb').MongoClient;
+const url = "mongodb://modelUser:EchoNetAccess2023@ts-mongodb-cont:27017/EchoNet";
+
+// Create a function to test the MongoDB connection
+
+
+
+
+
+
+
+//Security verification for email account and body content validation:
+const validation = require('deep-email-validator')
+const mongoSanitize = require('express-mongo-sanitize');
 db.mongoose
   .connect(`mongodb://${dbConfig.USERNAME}:${dbConfig.PASSWORD}@${dbConfig.HOST}/${dbConfig.DB}?authSource=admin`, {
     useNewUrlParser: true,
@@ -37,6 +59,8 @@ db.mongoose
     console.error("Connection error", err);
     // process.exit();
   });
+
+
 
 //mongoose.connect("mongodb://modelUser:EchoNetAccess2023@localhost:27017/EchoNet")
 //Initalize the data if no user role existed
@@ -67,6 +91,107 @@ function initial() {
     }
   });
 }
+
+
+
+// async function getAllPayments() {
+
+//   while (true) {
+//     nextPage = null;
+//     firstPage = false;
+//     let charges;
+//     if(firstPage == false){
+//       charges = await stripe.charges.list({
+//         limit: 100,
+//       });
+//       firstPage = true;
+//     }
+//     charges.data.forEach(charge => {
+//       cumulativeTotal += charge.amount;
+//     });
+//     if (!charges.has_more) {
+//       break; // Exit the loop when there are no more pages
+//     }
+//     nextPage = charges[charges.length() - 1]
+//     charges = await stripe.charges.list({
+//       limit: 100,
+//       starting_next: nextPage
+//     });
+//     firstPage = true;
+//   }
+//   console.log('Cumulative Total:', cumulativeTotal);
+// }
+
+// getAllPayments();
+
+app.get('/donations', async(req,res) => {
+  let charges;
+  try{
+    while (true) {
+      nextPage = null;
+      firstPage = false;
+      if(firstPage == false){
+        charges = await stripe.charges.list({
+          limit: 100,
+        });
+        firstPage = true;
+      }
+      
+      if (!charges.has_more) {
+        break; // Exit the loop when there are no more pages
+      }
+      nextPage = charges[charges.length() - 1]
+      charges = await stripe.charges.list({
+        limit: 100,
+        starting_next: nextPage
+      });
+      firstPage = true;
+    }
+    res.json({ charges });
+  }
+  catch(error){
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+})
+
+app.get('/cumulativeDonations', async(req, res) => {
+  let cumulativeTotal = 0;
+  try{
+    while (true) {
+      nextPage = null;
+      firstPage = false;
+      let charges;
+      if(firstPage == false){
+        charges = await stripe.charges.list({
+          limit: 100,
+        });
+        firstPage = true;
+      }
+      charges.data.forEach(charge => {
+        cumulativeTotal += charge.amount;
+      });
+      if (!charges.has_more) {
+        break; // Exit the loop when there are no more pages
+      }
+      nextPage = charges[charges.length() - 1]
+      charges = await stripe.charges.list({
+        limit: 100,
+        starting_next: nextPage
+      });
+      firstPage = true;
+    }
+    cumulativeTotal = cumulativeTotal / 100;
+    cumulativeTotal = cumulativeTotal.toFixed(2);
+    
+    console.log('Cumulative Total:', cumulativeTotal);
+    res.json({ cumulativeTotal });
+  }
+  catch(error){
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  } 
+})
 
 function initRequests(){
   Request.estimatedDocumentCount((err, count) => {
@@ -140,7 +265,13 @@ function initGuests() {
     }
   });
 }
-
+app.get('/data/captcha', (req, res) => {
+  const {image, text} = createCaptchaSync(300,100); // Use the package's functionality
+  fs.writeFileSync("./public/captchaImg.png", image);
+  console.log("text: ", text);
+  console.log("Image: ", image);
+  res.json({image, text});
+});
 //Background Process to automatically delete Guest role after exceeding expiration
 setInterval(() => {
   const now = new Date();
@@ -171,6 +302,17 @@ const bodyParser = require("express");
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }))
 
+//MongoDB query sanitization
+//Run in dryRun = testing mode; prevent server interruption because of this process
+app.use(
+  mongoSanitize({
+    dryRun: true,
+    onSanitize: ({ req, key }) => {
+      console.warn(`[DryRun] This request[${key}] will be sanitized`, req);
+    },
+  }),
+)
+
 //const serveIndex = require('serve-index'); 
 //app.use('/images/bio', serveIndex(express.static(path.join(__dirname, '/images/bio'))));
 
@@ -192,39 +334,68 @@ var transporter = nodemailer.createTransport({
   }
 });
 
-app.post("/send_email", (req, res) => {
-  const { email, query } = req.body;
-  let html_text = '<div>';
-  html_text += '<h2>A new query has been received for Project Echo HMI</h2>'
-  html_text += '<img src="cid:logo@echo.hmi" style="height: 150px; width: 150px; display: flex; margin: auto;"/>'
-  html_text += '<p>Sender: \t ' + email + '</p>';
-  html_text += '<p>Query: \t ' + query + '</p>';
-  html_text += '<hr>';
-  html_text += '<p>Yes, this mailbox is active. So please feel free to reply to this email if you have other queries.</p>'
+// Function to escape special characters to HTML entities
+function escapeHtmlEntities(input) {
+  return input.replace(/[\u00A0-\u9999<>&]/gim, function (i) {
+    return "&#" + i.charCodeAt(0) + ";";
+  });
+}
 
-  html_text += '</div>';
-  let mailOptions = {
-    from: email,
-    to: `echodatabytes@gmail.com, ${email}, databytes@deakin.edu.au`,
-    subject: 'New query received!',
-    text: query,
-    html: html_text,
-    attachments: [{   // stream as an attachment
-      filename: 'image.png',
-      content: fs.createReadStream(path.join(__dirname, 'public/images/tabIcons/logo.png')),
-      cid: 'logo@echo.hmi' //same cid value as in the html
-    }]
-  }
-  transporter.sendMail(mailOptions, function (error, info) {
-    if (error) {
-      console.log(error);
+async function testEmail(input) {
+  let res = await validation.validate(input)
+  return {result: res.valid, response: res.validators}
+  
+}
+
+app.post("/send_email", async (req, res) => {
+  const { email, query } = req.body;
+  const validationResult = await testEmail(email);
+  if (validationResult.result){
+      // Validate the email address
+      // const validationResult = await validateEmail(email);
+      // console.log("Validate email result: ", validationResult);
+      // If email validation is successful, proceed to send the email
+      let html_text = '<div>';
+      html_text += '<h2>A new query has been received for Project Echo HMI</h2>';
+      html_text += '<img src="cid:logo@echo.hmi" style="height: 150px; width: 150px; display: flex; margin: auto;"/>';
+      html_text += '<p>Sender: \t ' + email + '</p>'; // Convert sender's email to HTML entities
+      html_text += '<p>Query: \t ' + escapeHtmlEntities(query) + '</p>'; // Convert query to HTML entities
+      html_text += '<hr>';
+      html_text += '<p>Yes, this mailbox is active. So please feel free to reply to this email if you have other queries.</p>';
+      html_text += '</div>';
+
+      let mailOptions = {
+        from: email,
+        to: `echodatabytes@gmail.com, ${email}, databytes@deakin.edu.au`,
+        subject: 'New query received!',
+        text: query,
+        html: html_text,
+        attachments: [{   // stream as an attachment
+          filename: 'image.png',
+          content: fs.createReadStream(path.join(__dirname, 'public/images/tabIcons/logo.png')),
+          cid: 'logo@echo.hmi' //same cid value as in the html
+        }]
+      };
+
+      transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+          console.log(error);
+        } else {
+          console.log('Email sent: ' + info.response);
+          return res.redirect("/");
+        }
+      });
     } else {
-      console.log('Email sent: ' + info.response);
-      return res.redirect("/")
+      return res.status(400).json({ error: validationResult.response });
     }
+    
+  }
+);
+
+  app.get("/send_email", (req,res) => {
+    setTimeout(() => res.redirect("/"), 5000)
   });
 
-})
 
 var chars = "0123456789abcdefghijklmnopqrstuvwxyz!@#$%^&*()ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
@@ -310,27 +481,7 @@ app.post("/request_access", async (req, res) => {
   }
 })
 
-// app.post("/login", async (req, res) => {
-//   const {username, password} = req.body;
 
-//   try {
-//     const user = await User.findOne({
-//       username: username
-//     });
-
-//     if (user && bcrypt.compareSync(password, user.password)) {
-//       res.json({
-//         message: "Login successful",
-//         redirectTo: "/" // Redirect to welcome.html on success
-//       });
-//       console.log("Successful login")
-//     } else {
-//       res.status(401).json({ error: "Invalid credentials" });
-//     }
-//   } catch (error) {
-//     res.status(500).json({ error: "Internal server error" });
-//   }
-// });
 
 // routes
 require('./routes/auth.routes')(app);
@@ -356,6 +507,10 @@ app.get("/admin-template", (req,res)=> {
   return res.sendFile(path.join(__dirname, 'public/admin/template.html'));
 })
 
+app.get("/admin-donations", (req, res) => {
+  return res.sendFile(path.join(__dirname, 'public/admin/donations.html'));
+})
+
 app.get("/login", (req, res) => {
   [verifyToken]
   res.sendFile(path.join(__dirname, 'public/login.html'));
@@ -374,8 +529,40 @@ app.post("/api/submit", async (req, res) => {
   }
 });
 
+
+async function testMongoDBConnection() {
+  try {
+    // Attempt to connect to MongoDB
+    const client = new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true });
+    await client.connect();
+
+    // If the connection is successful, print a success message
+    console.log('MongoDB connection test: Connection successful');
+    
+    // Perform additional database operations here if needed
+
+    // Close the connection when done
+    await client.close();
+  } catch (error) {
+    // If there's an error, print an error message
+    console.error('MongoDB connection test: Connection failed');
+    console.error(error);
+  }
+}
+
+// Call the function to test the MongoDB connection
+testMongoDBConnection();
+
+app.post("/api/approve", async (req,res) => {
+
+})
+
 app.get("/requests", (req,res) => {
   res.sendFile(path.join(__dirname, 'public/admin/admin-request.html'))
+})
+
+app.get("/requestsOriginal", (req,res) => {
+  res.sendFile(path.join(__dirname, 'public/requests.html'))
 })
 
 app.patch('/api/requests/:id', async (req, res) => {
@@ -401,14 +588,90 @@ app.patch('/api/requests/:id', async (req, res) => {
   }
 });
 
+app.patch('/api/updateConservationStatus/:animal', async (req,res) => {
+  const requestAnimal = req.params.animal;
+  const newStatus = req.body.status;
+  try{
+    const client = new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true });
+    await client.connect();
+    const EchoNet = client.db();
+    const collection = EchoNet.collection('species');
+    //const query = { _id : requestAnimal };
+    //const updateOperation = {status : newStatus};
+    const result = await collection.findOneAndUpdate(
+      {_id : requestAnimal},
+      {$set :{status: newStatus}},
+      {
+        collation: { locale: 'en', strength: 2 }, // Case-insensitive collation
+        returnOriginal: false // Set this to false to get the updated document
+      }
+    );
+    if (result.value) {
+      // If a matching document is found and updated, print it to the console
+      console.log('Updated animal:', result.value);
+    } else {
+      // If no matching document is found, print a message
+      console.log('Animal not found.');
+    }
+    client.close();
+    res.status(200).json({message: `updated animal status successfully ${result.value}, ${requestAnimal}, ${newStatus}`});
+  }
+  catch (error) {
+    console.error('MongoDB connection or update operation failed:', error);
+    res.status(500).json({error: 'Error updating animal'});
+  }
+})
+
+// OLD METHOD - USING DIRECT CONNECTION
+// app.get('/api/requests', async (req, res) => {
+//   try {
+//     const requests = await Request.find();
+//     res.json(requests);
+//   } catch (error) {
+//     res.status(500).json({ error: 'Error fetching data' });
+//   }
+// });
+
+// NEW METHOD - CONNECT VIA API
 app.get('/api/requests', async (req, res) => {
   try {
-    const requests = await Request.find();
-    res.json(requests);
-  } catch (error) {
-    res.status(500).json({ error: 'Error fetching data' });
+
+    let token = await client.get('JWT', (err, storedToken) => {
+      if (err) {
+        console.error('Error retrieving token from Redis:', err);
+        return null
+      } else {
+        console.log('Stored Token:', storedToken);
+        return storedToken
+      }
+    })
+
+    console.log("Current token: ", token)
+    const axiosResponse = await axios.get('http://ts-api-cont:9000/hmi/requests', { headers: {"Authorization" : `Bearer ${token}`}})
+  
+    if (axiosResponse.status === 200) {
+      res.json(axiosResponse.data);
+    } else {
+      res.status(500).json({ error: 'Error fetching data' });
+    }
+  } catch (err) {
+    console.log('Requests error: ', err)
+    res.status(401).redirect('/admin-dashboard')
   }
 });
+
+app.get("/welcome", async (req,res) => {
+  console.log("token: ", await client.get('JWT', (err, storedToken) => {
+          if (err) {
+            console.error('Error retrieving token from Redis:', err);
+            return null
+          } else {
+            console.log('Stored Token:', storedToken);
+            return storedToken
+          }
+  }))
+  res.sendFile(path.join(__dirname, 'public/index.html'))
+})
 
 // app.get("*", (req,res) => {
 //   if (authJwt.verifyToken){

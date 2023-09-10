@@ -123,6 +123,13 @@ services:
       - "27017:27017"
     volumes:
       - db-data:/data/db
+  redis:
+    image: redis:latest
+    container_name: echo-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - echo-net
 
  
 

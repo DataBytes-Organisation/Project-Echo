@@ -3,8 +3,10 @@
 import { getAudioTestString } from "./HMI-utils.js";
 import { getAudioRecorder } from "./audio_recorder.js";
 import { retrieveTruthEventsInTimeRange, retrieveVocalizationEventsInTimeRange, 
-  retrieveMicrophones, retrieveAudio, retrieveSimTime, postRecording } from "./routes.js";
-//import data from "./sample_data.json" assert { type: 'json' }; Browser assertions not yet supported in all browsers, alternative method used instead.
+  retrieveMicrophones, retrieveAudio, retrieveSimTime, postRecording, 
+  setSimModeAnimal, setSimModeRecording, setSimModeRecordingV2, stopSimulator } from "./routes.js";
+
+  //import data from "./sample_data.json" assert { type: 'json' }; Browser assertions not yet supported in all browsers, alternative method used instead.
 
 
 // import { parse } from 'json2csv';
@@ -39,7 +41,7 @@ function matchStatus(status){
 
 export function convertCSV(json) {
   if (json == null) return null
-  if (json === [] | typeof json === undefined | json.length === 0){
+  if (typeof json === undefined | json.length === 0){
     return null
   }
   let data = json;
@@ -1546,6 +1548,7 @@ function simulateRecording(hmiState){
       animalTrueLLA: [coords.lat, coords.lon, 0.0],
       animalLLAUncertainty: 50.0,
       audioClip: base64String,
+      mode: hmiState.simMode,
       audioFile: "live_recording"
     }
   
@@ -1819,3 +1822,19 @@ export function computeRecordingDuration(startTime) {
 
     return  "00:" + minutes + ":" + seconds;
 }
+
+document.addEventListener('modeSwitch', function(event){
+  window.hmiState.simMode = event.detail.message;
+  if(window.hmiState.simMode == "Animal_Mode"){
+    setSimModeAnimal();
+  }
+  else if(window.hmiState.simMode == "Recording_Mode"){
+    setSimModeRecording();
+  }
+  else if(window.hmiState.simMode == "Recording_Mode_V2"){
+    setSimModeRecordingV2();
+  }
+  else if(window.hmiState.simMode == "Stop"){
+    stopSimulator();
+  }
+});

@@ -1,8 +1,8 @@
-const { verifySignUp } = require("../middleware");
+const { verifySignUp, client } = require("../middleware");
 const controller = require("../controller/auth.controller");
 //const cntroller = require("../public/js/routes");
 const axios = require('axios');
-
+const redis = require("redis")
 
 module.exports = function (app) {
   app.use(function (req, res, next) {
@@ -53,7 +53,7 @@ module.exports = function (app) {
       } catch (err) {
         console.log('Status Code: ' + err.response.status + ' ' + err.response.statusText)
         console.log(err.response.data)
-        res.status(err.response.status).redirect('/login')
+        res.redirect('/login')
       }
 });
     
@@ -77,12 +77,21 @@ module.exports = function (app) {
           
           if (axiosResponse.status === 200) {
             console.log('Status Code: ' + axiosResponse.status + ' ' + axiosResponse.statusText)
+            console.log("Login response: ", axiosResponse.data);
+            
+            await client.set("JWT", axiosResponse.data.tkn, (err, res)=> {
+              if (err) {
+                console.log("Set JWT Token error: ", err)
+              } else {
+                console.log("Set JWT successfully: ", res)
+              }
+            })
+            
             res.status(200).redirect('/welcome')
           } 
         } catch (err) {
-          console.log('Status Code: ' + err.response.status + ' ' + err.response.statusText)
-          console.log(err.response.data)
-          res.status(err.response.status).redirect('/login')
+          console.log('Login exception error: ' + err)
+          res.redirect('/login')
         }  
       } 
       else {

@@ -1,5 +1,5 @@
 from fastapi import status, APIRouter
-from fastapi import FastAPI, Body, HTTPException, status, APIRouter
+from fastapi import FastAPI, Body, HTTPException, status, APIRouter, Depends
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from typing import Optional, List
@@ -8,7 +8,7 @@ from bson import ObjectId
 import datetime
 from app import serializers
 from app import schemas
-from app.database import Events, Movements, Microphones, User, Role, ROLES, GENDER, STATES_CODE, AUS_STATES
+from app.database import Events, Movements, Microphones, User, Role, ROLES, GENDER, STATES_CODE, AUS_STATES, Requests
 import paho.mqtt.publish as publish
 import bcrypt
 from flask import jsonify
@@ -17,8 +17,11 @@ import requests
 import datetime
 import json
 import paho.mqtt.client as paho
+from app.middleware.auth import signJWT, decodeJWT
+from app.middleware.auth_bearer import JWTBearer
+from bson.objectid import ObjectId
 
-
+jwtBearer = JWTBearer()
 
 router = APIRouter()
 
@@ -27,6 +30,8 @@ MQTT_ENGINE_URL = "projectecho/engine/2"
 MQTT_BROKER_PORT = 1883
 #mqtt_client = paho.Client()
 #mqtt_client.connect(MQTT_BROKER_URL, MQTT_BROKER_PORT)
+
+logout_token = []
 
 @router.get("/events_time", response_description="Get detection events within certain duration")
 def show_event_from_time(start: str, end: str):
@@ -130,7 +135,6 @@ def latest_movememnt():
     return timestamp
 
 
-
 @router.post("/sim_control", status_code=status.HTTP_201_CREATED)
 def post_control(control: str):
 
@@ -199,7 +203,6 @@ def signup(user: schemas.UserSignupSchema):
     response = {"message": "User was registered successfully!"}
     return JSONResponse(content=response, status_code=201)
 
-
 @router.post("/signin", status_code=status.HTTP_200_OK)
 def signin(user: schemas.UserLoginSchema):
     #Find if the username exist in our database
@@ -214,21 +217,24 @@ def signin(user: schemas.UserLoginSchema):
         response = {"message": "Invalid Password!"}
         return JSONResponse(content=response, status_code=401)
 
-    #Create payload for our token
-    payload = {
-        "id": account["userId"],
-        "exp": datetime.datetime.utcnow() + datetime.timedelta(seconds=86400)
-    }
-    
-    token = jwt.encode(payload, "echo-auth-secret-key", algorithm = "HS256")
-
     authorities = []
     for role_id in account['roles']:
         role = Role.find_one({"_id": ObjectId(role_id)})
         if role:
             authorities.append("ROLE_" + role['name'].upper())
 
-    requests.session.token = token
+    #Create payload for our token
+    # payload = {
+    #     "id": account["userId"],
+    #     "roles": authorities,
+    #     "exp": datetime.datetime.utcnow() + datetime.timedelta(seconds=86400)
+    # }
+    
+    #Create JWT token using user info
+    jwtToken = signJWT(user=account, authorities=authorities)
+    
+    #Assign the session token with JWT
+    requests.session.token = jwtToken
     result = {
         "id": account["_id"],
         "username": account["username"],
@@ -236,33 +242,53 @@ def signin(user: schemas.UserLoginSchema):
         "role" : authorities,
     }
 
-    response = {"message": "User Login Successfully!"}
+    #Set up response (FOR TESTING ONLY)
+    response = {"message": "User Login Successfully!", "tkn" : jwtToken, "roles": authorities}
+
+    #Log result
     print(result)
     return JSONResponse(content=response, status_code=200)
 
 @router.post("/signout", status_code=status.HTTP_200_OK)
-def signout():
+def signout(jwtToken: str):
     try:
-        requests.session.clear()
+        if jwtToken is None:
+            return jsonify({'message': 'Token is missing'}), 400
+
+        # Check if the token has been revoked
+        if jwtToken in logout_token:
+            return jsonify({'message': 'Token has already been revoked'}), 400
+
+        # Add the token to the revoked tokens list
+        logout_token.append(jwtToken)
         response = {"message": "You've been signed out!"}
         return JSONResponse(content=response)
     
     except Exception as err:
         return JSONResponse({"Error": str(err)})
-    
+
+
 @router.post("/ChangePassword", status_code=status.HTTP_200_OK)
-def passwordchange(user: schemas.UserLoginSchema, newpw: str, cfm_newpw: str):
+def passwordchange(oldpw: str, newpw: str, cfm_newpw: str, jwtToken: str):
+    #Check if user has logged out
+    if(jwtToken in logout_token):
+        response = {"message": "Token does not exist"}
+        return JSONResponse(content=response, status_code=403)   
+
+    #Retrieve Token
+    isValid, payload = jwtBearer.verify_jwt(JWTToken = jwtToken)
+
     #Find if the username exist in our database
-    account = User.find_one({"username": user.username})
+    account = User.find_one({"_id": ObjectId(payload.get('id'))})
     if(account is None):
         response = {"message": "User Not Found."}
-        return JSONResponse(content=response, status_code=401)
+        return JSONResponse(content=response, status_code=404)
    
     #Find if the password matches
-    passwordIsValid = bcrypt.checkpw(user.password.encode('utf-8'), account['password'].encode('utf-8'))
+    passwordIsValid = bcrypt.checkpw(oldpw.encode('utf-8'), account['password'].encode('utf-8'))
     if (passwordIsValid == False):
         response = {"message": "Invalid Password!"}
-        return JSONResponse(content=response, status_code=404)
+        return JSONResponse(content=response, status_code=401)
 
     if (newpw != cfm_newpw):
         response = {"message": "New Password Must Match Each Other"}
@@ -278,9 +304,72 @@ def passwordchange(user: schemas.UserLoginSchema, newpw: str, cfm_newpw: str):
     response = {"message": "User Password Changed Sucessfully!"}
     return JSONResponse(content=response)
 
+@router.post("/admin-dashboard", dependencies=[Depends(jwtBearer)], status_code=status.HTTP_200_OK)
+async def checkAdmin(user: schemas.UserLoginSchema) -> dict:
+    
+    try:
+        isAdmin = jwtBearer.verify_role(role="admin")
+        if isAdmin:
+            return {"result": "User is indeed an admin"}
+        else:
+            return {"result": "User is not admin"}
+    except Exception as e:
+        return {"error" : "Something unexpected occured - {}".format(e)}
+    
+@router.get("/requests", dependencies=[Depends(jwtBearer)], status_code=status.HTTP_200_OK)
+async def getRequests():
+    try:
+        isAdmin = jwtBearer.verify_role(role="admin")
+        if isAdmin:
+            results = Requests.find()
+            return serializers.requestListEntity(results)
+        else:
+            return {"result": "User is not admin"}
+    except Exception as e:
+        return {"error" : "Something unexpected occured - {}".format(e)}
 
-@router.get("/abc", status_code=status.HTTP_200_OK)
-def abc():
+@router.post("/change-credential", status_code=status.HTTP_200_OK)
+def changeCredential(field:str, new: str, jwtToken: str):
+    #Check if user has logged out
+    if(jwtToken in logout_token):
+        response = {"message": "Token does not exist"}
+        return JSONResponse(content=response, status_code=403)   
+        
+    #Retrieve Token
+    isValid, payload = jwtBearer.verify_jwt(JWTToken = jwtToken)
 
-    response = {"message": "User Password Changed Sucessfully!"}
+    #Check if fields can be changed
+    _field = ['gender', 'country', 'state', 'phonenumber']
+    if(field not in _field):
+        response = {"message": "This field can not be changed"}
+        return JSONResponse(content=response, status_code=422)
+    
+    if field in ['country', "state"]:
+        User.update_one(
+        {"_id": ObjectId(payload.get('id'))},
+        {"$set": {"address."+field: new}}
+    )
+    else:
+        User.update_one(
+            {"_id": ObjectId(payload.get('id'))},
+            {"$set": {field: new}}
+        )
+
+    response = {"message": f"User {field} changed sucessfully!"}
+    return JSONResponse(content=response)
+
+@router.delete("/delete-account", status_code=status.HTTP_200_OK)
+def deleteaccount(jwtToken: str):
+    #Check if user has logged out
+    if(jwtToken in logout_token):
+        response = {"message": "Token does not exist"}
+        return JSONResponse(content=response, status_code=403)   
+        
+    #Retrieve Token
+    isValid, payload = jwtBearer.verify_jwt(JWTToken = jwtToken)
+
+    #Delete an account from User
+    User.delete_one({"_id": ObjectId(payload.get('id'))})
+
+    response = {"message": "User has been deleted!"}
     return JSONResponse(content=response)

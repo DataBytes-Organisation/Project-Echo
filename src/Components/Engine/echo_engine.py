@@ -184,20 +184,29 @@ class EchoEngine():
         
         sample_rate = 0
 
-        if(mode == 1):
-           print("mode 1")
-           # Create a file-like object from the bytes.
-           file = io.BytesIO(audio_clip)
+        if(str(mode) == "Recording_Mode"):
+            print("recording mode 1")
+            # Create a file-like object from the bytes.
+            file = io.BytesIO(audio_clip)
 
-           # Load the audio data with librosa
-           audio_clip, sample_rate = librosa.load(file, sr=self.config['AUDIO_SAMPLE_RATE'])
+            # Load the audio data with librosa
+            audio_clip, sample_rate = librosa.load(file, sr=self.config['AUDIO_SAMPLE_RATE'])
+        
+        elif(str(mode) == "Recording_Mode_V2"):
+            print("recording mode 2")
+            # Create a file-like object from the bytes.
+            file = io.BytesIO(audio_clip)
+
+            # Load the audio data with librosa
+            audio_clip, sample_rate = librosa.load(file, sr=self.config['AUDIO_SAMPLE_RATE'])
+        
         else:
-           print("mode 2")
-           # Create a file-like object from the bytes.
-           file = io.BytesIO(audio_clip)
+            print("animal mode")
+            # Create a file-like object from the bytes.
+            file = io.BytesIO(audio_clip)
 
-           # Load the audio data with librosa
-           audio_clip, sample_rate = librosa.load(file, sr=self.config['AUDIO_SAMPLE_RATE'])
+            # Load the audio data with librosa
+            audio_clip, sample_rate = librosa.load(file, sr=self.config['AUDIO_SAMPLE_RATE'])
 
         # keep right channel only
         if audio_clip.ndim == 2 and audio_clip.shape[0] == 2:
@@ -279,20 +288,28 @@ class EchoEngine():
             image = None
             sample_rate = 0
 
-            if(audio_event['audioFile'] == "live_recording"):
+            if(audio_event['mode'] == "Recording_Mode"):
                 # convert to string representation of audio to binary for processing
                 audio_clip = self.string_to_audio(audio_event['audioClip'])
             
-                image, audio_clip, sample_rate = self.combined_pipeline(audio_clip, 2)
+                image, audio_clip, sample_rate = self.combined_pipeline(audio_clip, "Recording_Mode")
             
                 # update the audio event with the re-sampled audio
                 audio_event["audioClip"] = self.audio_to_string(audio_clip)
 
+            elif(audio_event['mode'] == "Recording_Mode_V2"):
+                # convert to string representation of audio to binary for processing
+                audio_clip = self.string_to_audio(audio_event['audioClip'])
+            
+                image, audio_clip, sample_rate = self.combined_pipeline(audio_clip, "Recording_Mode_V2")
+            
+                # update the audio event with the re-sampled audio
+                audio_event["audioClip"] = self.audio_to_string(audio_clip)
             else:
                 # convert to string representation of audio to binary for processing
                 audio_clip = self.string_to_audio(audio_event['audioClip'])
             
-                image, audio_clip, sample_rate = self.combined_pipeline(audio_clip, 1)
+                image, audio_clip, sample_rate = self.combined_pipeline(audio_clip, "Animal_Mode")
             
                 # update the audio event with the re-sampled audio
                 audio_event["audioClip"] = self.audio_to_string(audio_clip)
