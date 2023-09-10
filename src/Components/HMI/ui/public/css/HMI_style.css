@@ -1751,24 +1751,67 @@ label {
 
 .radio-group input[type="radio"] {
   display: inline-block;
-  margin-right: 5px; /* Adjust the margin as needed */
+  margin-top: 10px;
+  width: 20px;
+  /*margin-right: 5px; /* Adjust the margin as needed */
 }
 
-.radio-group input[type="radio"] {
-  display: none; /* Hide the actual radio button */
+input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  /*z-index: -1;
+  */
 }
 
-/* Style the label to look like a button */
-.radio-group label {
-  display: inline-block;
-  padding: 10px 20px;
-  border: 1px solid rgba(247, 186, 206, 0.6);
-  background-color: rgba(0, 0, 0, 0.6);
+/* Text color for the label 
+input[type="radio"]+span {
   cursor: pointer;
+  font: 16px sans-serif;
+  color: black;
+}*/
+
+/* Radio button not selected style */
+input[type="radio"]+span:before {
+  content: '';
+  border: 1px solid rgba(247, 186, 206, 0.8);
+  border-radius: 50%;
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  margin-right: 0.5em;
+  margin-top: 0.5em;
+  vertical-align: -2px;
 }
 
-/* Style the label when the associated radio button is checked */
-.radio-group input[type="radio"]:checked + label {
-  background-color: rgba(247, 186, 206, 0.8);
-  border-color: rgba(247, 186, 206, 0.6);
+/* Selected radio button style */
+input[type="radio"]:checked+span:before {
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.6);
+  border: 6px solid rgba(247, 186, 206, 0.8);
 }
+
+/* Adding a dotted border around the active tabbed-into radio button */
+input[type="radio"]:focus+span:before,
+input[type="radio"]:not(:disabled)+span:hover:before {
+  /* Visible in the full-color space.
+     Want a cool hover effect that gives the appearance of 
+     two borders? Stack the box-shadows! */
+  box-shadow:
+    0px 0px 0px 1px rgba(0, 0, 0, 0.6),
+    0px 0px 0px 2px rgba(247, 186, 206, 0.8);
+
+  /* Visible in Windows high-contrast themes
+     box-shadow will be hidden in these modes and
+     transparency will not be hidden in high-contrast
+     thus box-shadow will not show but the outline will
+     providing accessibility */
+  outline-color: transparent;
+  outline-width: 2px;
+  outline-style: dotted;
+  }
+  
+/* Disabled radio button styles */
+/*input[type="radio"]:disabled+span {
+  cursor: default;
+  opacity: 0.5;
+}*/
