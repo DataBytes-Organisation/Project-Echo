@@ -115,11 +115,10 @@
             const statusCell = document.createElement('td');
             statusCell.textContent = item.status;
 
-            // Check if the status is 'success' and add the class if true
-            if (item.status === "succeeded") {
-                console.log("Coloring status");
-                statusCell.classList.add('success-text');
-            }
+            
+            //color status based on status
+            console.log("Coloring status");
+            statusCell.classList.add(item.status);
 
             // Create td elements for other columns
             const amountCell = document.createElement('td');

@@ -16788,8 +16788,16 @@ ul {
 .card-title {
   font-size: 18px;
 }
-.success-text{
+.succeeded{
     color: #00db71 !important ;
+    font-weight: bold;
+}
+.pending{
+    color: #e8af1e !important ;
+    font-weight: bold;
+}
+.failed{
+    color: #f2492c !important ;
     font-weight: bold;
 }
 .card-subtitle {
