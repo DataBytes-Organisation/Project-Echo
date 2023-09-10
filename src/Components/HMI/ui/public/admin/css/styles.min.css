@@ -16788,6 +16788,9 @@ ul {
 .card-title {
   font-size: 18px;
 }
+#success-text{
+    color: green;
+}
 .card-subtitle {
   font-size: 14px;
 }

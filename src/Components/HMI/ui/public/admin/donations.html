@@ -96,40 +96,54 @@
   
       
   
-    function updateTable(){
-      fetch('/donations')
-          .then(response => response.json())
-          .then(data => {
-            let charges = data.charges.data
+    function updateTable() {
+        fetch('/donations')
+        .then(response => response.json())
+        .then(data => {
+            let charges = data.charges.data;
             console.log("Data Fetched: ", charges);
-            charges.forEach(item =>{
-                const row = document.createElement('tr');
-                // console.log(item.amount);
-                amount = item.amount / 100;
-                amount = amount.toFixed(2);
-                date = new Date(item.created * 1000); // Multiply by 1000 to convert to milliseconds
 
-                // Now, you can format the date as a string in your desired format
-                formattedDate = date.toLocaleDateString(); // Default format, e.g., "09/04/2023"
+            charges.forEach(item => {
+            const row = document.createElement('tr');
 
-                // You can also specify a custom date format
-                // console.log(item.status);
-                // console.log(item.billing_details.email);
-                // console.log(item.created);
-                row.innerHTML = `
-                    <td>$${amount}</td>
-                    <td>${item.status}</td>
-                    <td>${item.billing_details.email}</td>
-                    <td>${formattedDate}</td>
-                `;
-                dataBody.appendChild(row);
-            })
-            
-    })      
-    .catch(error => {
-      console.error('Error fetching data:', error);
-    });
-  }
+            // Convert the amount and date as you did
+            const amount = (item.amount / 100).toFixed(2);
+            const date = new Date(item.created * 1000);
+            const formattedDate = date.toLocaleDateString();
+
+            // Create a td element for the donation status
+            const statusCell = document.createElement('td');
+            statusCell.textContent = item.status;
+
+            // Check if the status is 'success' and add the class if true
+            if (item.status === "succeeded") {
+            statusCell.classList.add('success-text');
+            }
+
+            // Create td elements for other columns
+            const amountCell = document.createElement('td');
+            amountCell.textContent = `$${amount}`;
+
+            const emailCell = document.createElement('td');
+            emailCell.textContent = item.billing_details.email;
+
+            const dateCell = document.createElement('td');
+            dateCell.textContent = formattedDate;
+
+            // Append all td elements to the row
+            row.appendChild(amountCell);
+            row.appendChild(statusCell);
+            row.appendChild(emailCell);
+            row.appendChild(dateCell);
+
+            // Append the row to the table body
+            dataBody.appendChild(row);
+        });
+        })
+        .catch(error => {
+        console.error('Error fetching data:', error);
+        });
+}
   
   function clearTable() {
     const dataBody = document.getElementById('data-body');
