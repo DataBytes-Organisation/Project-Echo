@@ -15,11 +15,11 @@ class TestConfig(simulator_init.TestConfig):
     def __init__(self, *args, config=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.config = config
-        self.mode = "Recording Mode"
 
 class Simulator():
     def __init__(self) -> None:
         self.config = simulator_init.Config()
+        self.mode = "Recording_Mode"
         self.clock  = Clock(step_interval=float(os.environ['STEP_INTERVAL'])) # 200 step interval 200 milliseconds
 
     # run the live simulators
