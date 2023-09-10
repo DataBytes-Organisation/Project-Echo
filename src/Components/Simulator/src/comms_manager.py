@@ -119,7 +119,8 @@ class CommsManager():
             "animalEstLLA": list(predicted_lla),
             "animalTrueLLA": list(animal_true_lla),
             "animalLLAUncertainty": min_error,
-            "audioClip" : audio_str, 
+            "audioClip" : audio_str,
+            "mode" : "Animal_Mode", 
             "audioFile" : audio_file      
         }    
         
