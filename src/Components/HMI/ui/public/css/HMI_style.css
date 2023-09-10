@@ -1397,7 +1397,17 @@ i {
 #audio_playback_container {
   margin-top: 20px;
   width: 100%;
-  height: 100vh;
+  display: -webkit-flex;
+  display: -ms-flex;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+#recording_simulation_master_container {
+  margin-top: 20px;
+  width: 100%;
   display: -webkit-flex;
   display: -ms-flex;
   display: flex;
@@ -1660,6 +1670,9 @@ i {
 #audio_playback_container{
   width:440px;
 }
+#recording_simulation_master_container{
+  width:440px;
+}
 
 
 #request-edit-button {
@@ -1746,31 +1759,20 @@ label {
 
 .radio-group {
   display: block;
-  margin-bottom: 10px; /* Adjust the margin as needed */
+  margin-bottom: 10px;
 }
 
 .radio-group input[type="radio"] {
   display: inline-block;
   margin-top: 10px;
   width: 20px;
-  /*margin-right: 5px; /* Adjust the margin as needed */
 }
 
 input[type="radio"] {
   position: absolute;
   opacity: 0;
-  /*z-index: -1;
-  */
 }
 
-/* Text color for the label 
-input[type="radio"]+span {
-  cursor: pointer;
-  font: 16px sans-serif;
-  color: black;
-}*/
-
-/* Radio button not selected style */
 input[type="radio"]+span:before {
   content: '';
   border: 1px solid rgba(247, 186, 206, 0.8);
@@ -1783,35 +1785,20 @@ input[type="radio"]+span:before {
   vertical-align: -2px;
 }
 
-/* Selected radio button style */
 input[type="radio"]:checked+span:before {
   border-radius: 50%;
   background-color: rgba(0, 0, 0, 0.6);
   border: 6px solid rgba(247, 186, 206, 0.8);
 }
 
-/* Adding a dotted border around the active tabbed-into radio button */
 input[type="radio"]:focus+span:before,
 input[type="radio"]:not(:disabled)+span:hover:before {
-  /* Visible in the full-color space.
-     Want a cool hover effect that gives the appearance of 
-     two borders? Stack the box-shadows! */
   box-shadow:
     0px 0px 0px 1px rgba(0, 0, 0, 0.6),
     0px 0px 0px 2px rgba(247, 186, 206, 0.8);
 
-  /* Visible in Windows high-contrast themes
-     box-shadow will be hidden in these modes and
-     transparency will not be hidden in high-contrast
-     thus box-shadow will not show but the outline will
-     providing accessibility */
   outline-color: transparent;
   outline-width: 2px;
   outline-style: dotted;
   }
   
-/* Disabled radio button styles */
-/*input[type="radio"]:disabled+span {
-  cursor: default;
-  opacity: 0.5;
-}*/
