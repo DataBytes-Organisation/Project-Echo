@@ -75,8 +75,8 @@ class SystemManager:
 
     async def restart_sim(self, mode):
         if self.sim_running:
-            self.stop_sim()
-            self.start_sim(mode)
+            await self.stop_sim()
+            await self.start_sim(mode)
 
     async def run_loop(self):
         while True:
