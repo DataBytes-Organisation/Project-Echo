@@ -50,8 +50,16 @@ export function postRecording(recordingData){
   //axios.post(`${MESSAGE_API_URL}/post_recording?data=${recordingData}`);
 }
 
-export function startSimulator(){
-  axios.post(`${MESSAGE_API_URL}/sim_control?control=Start`);
+export function setSimModeAnimal(){
+  axios.post(`${MESSAGE_API_URL}/sim_control?control=Animal_Mode`);
+}
+
+export function setSimModeRecording(){
+  axios.post(`${MESSAGE_API_URL}/sim_control?control=Recording_Mode`);
+}
+
+export function setSimModeRecordingV2(){
+  axios.post(`${MESSAGE_API_URL}/sim_control?control=Recording_Mode_V2`);
 }
 
 export function stopSimulator(){

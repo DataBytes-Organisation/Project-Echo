@@ -11,6 +11,7 @@ class SystemManager:
         self.sim_running = False
         self.sim_task = None
         self.command_queue = asyncio.Queue()
+        self.sim_mode = "Animal Mode"
 
     def read_configuration(self):
         config_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config', '.config')
@@ -54,30 +55,62 @@ class SystemManager:
         print("calling handle recording")
         await self.simulator.handle_recording_message(msg)
 
+    async def start_sim(self, mode):
+        if self.sim_running:
+            print("Simulator is already running", flush=True)
+        else:
+            print("Starting Simulator....", flush=True)
+            self.sim_task = asyncio.create_task(self.run_sim(mode))
+            self.sim_running = True
+            print("Simulator Running....", flush=True)
+
+    async def stop_sim(self):
+        if not self.sim_running:
+            print("Simulator is not running", flush=True)
+        else:
+            print("Stopping Simulator", flush=True)
+            self.sim_task.cancel()
+            self.sim_running = False
+            print("Simulator has stopped.", flush=True)
+
+    async def restart_sim(self, mode):
+        if self.sim_running:
+            await self.stop_sim()
+            await self.start_sim(mode)
+
     async def run_loop(self):
         while True:
             command = await self.command_queue.get()
             print(f"Simulator got command {command}", flush=True)
-            if command == "Start":
-                if self.sim_running:
-                    print("Simulator is already running", flush=True)
-                else:
-                    print("Starting Simulator....", flush=True)
-                    self.sim_task = asyncio.create_task(self.run_sim())
-                    self.sim_running = True
-                    print("Simulator Running....", flush=True)
-            elif command == "Stop":
-                if not self.sim_running:
-                    print("Simulator is not running", flush=True)
-                else:
-                    print("Stopping Simulator", flush=True)
-                    self.sim_task.cancel()
-                    self.sim_running = False
-                    print("Simulator has stopped.", flush=True)
+            
+            if str(command) == str("Start"):
+                await self.start_sim()
 
-    async def run_sim(self):
+            elif str(command) == str("Stop"):
+                await self.stop_sim()
+
+            elif str(command) == str("Animal_Mode"):
+                if self.sim_running:
+                    await self.restart_sim(command)
+                else:
+                    await self.start_sim(command)
+
+            elif str(command) == str("Recording_Mode"):
+                if self.sim_running:
+                    await self.restart_sim(command)
+                else:
+                    await self.start_sim(command)
+
+            elif str(command) == str("Recording_Mode_V2"):
+                if self.sim_running:
+                    await self.restart_sim(command)
+                else:
+                    await self.start_sim(command)
+                    
+    async def run_sim(self, mode):
         self.simulator = simulator.Simulator()
-        await self.simulator.execute()
+        await self.simulator.execute(mode)
+        #await self.simulator.set_mode(mode)
 
 async def main():
     system_manager = SystemManager()

@@ -194,7 +194,8 @@ class RecordingData(BaseModel):
     animalEstLLA: List[float]
     animalTrueLLA: List[float]
     animalLLAUncertainty: float
-    audioClip: str 
+    audioClip: str
+    mode: str 
     audioFile: str
     
     class Config:

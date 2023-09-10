@@ -273,12 +273,29 @@
                   <p>
                     <strong>The Echo Simulator</strong> - an innovative system - aims to replicate the Otway’s National Forest environment by creating virtual microphone sensors strategically placed and interconnected in a mesh-like network. This advanced system effectively monitors semi-random simulated animal production events, contributing to wildlife research and conservation efforts. Upon detecting a sound, the simulator shows how our end-to-end solution is able to leverage the trigger times from the nearest microphones, employing a brute-force optimisation technique to accurately triangulate the source location of the sound. With minimal error, the audio sample and associated microphone IDs are seamlessly integrated and communicated throughout Echo-Net, a comprehensive framework comprising a bioacoustics engine, store, processing server, communications servers, and APIs. This rich data is then visually represented on our (HMI), allowing researchers and wildlife enthusiasts to analyse and better understand the complex acoustic interactions within the simulated Otway’s National Forest ecosystem.
                   </p>
+              <h2>Select Simulator Mode</h2>
                   <div class="toggle-switch-container">
-                    <label for="toggle-switch" class="toggle-label">Simulator:</label>
+                    <div class="radio-group">
+                      <input type="radio" id="option1" name="options" value="option1" onclick="{simModeSwitch('Animal_Mode')}">
+                      <span for="option1">Simulate Movement</span>
+                    </div>
+                    <div class="radio-group">
+                      <input type="radio" id="option2" name="options" value="option2" onclick="{simModeSwitch('Recording_Mode')}">
+                      <span for="option2">Live Recording</span>
+                    </div>
+                    <div class="radio-group">
+                      <input type="radio" id="option3" name="options" value="option3" onclick="{simModeSwitch('Recording_Mode_V2')}">
+                      <span for="option3">Live Recording V2</span>
+                    </div>
+                    <div class="radio-group">
+                      <input type="radio" id="option4" name="options" value="option4" onclick="{simModeSwitch('Stop')}" checked>
+                      <span for="option4">Disable Simulator</span>
+                    </div>
+                    <!--label for="toggle-switch" class="toggle-label">Start Simulator:</label>
                     <label class="toggle-switch">
                       <input id="simulatorToggle" type="checkbox">
                       <span class="slider round"></span>
-                    </label>
+                    </label-->
                   </div>
             </div>
             </div>
@@ -896,6 +913,16 @@
       animateAudioMute();
     }			
   }
+
+  function simModeSwitch(mode){
+    const mode_switch = new CustomEvent('modeSwitch',{
+            detail: {
+              message: mode
+            }
+          })
+
+    document.dispatchEvent(mode_switch);
+  }
   
   function saveRecordingEvent(){
     const save_recording = new CustomEvent('saveRecording',{
@@ -1237,7 +1264,7 @@ closeFormButton.addEventListener('click', (event) => {
   import { updateLayers, initialiseHMI, showMics, hideMics, updateAnimalMovementLayerFromPastData, updateVocalizationLayerFromPastData,
   resetWildlifeLayers, MapOpenNav, MapCloseNav, getAnimalToggled, enableMicAnimation, disableMicAnimation, getUTC, startAudioRecording,
   stopAudioRecording, cancelAudioRecording, testFunct, convertCSV} from "./js/HMI.js";
-  import {retrieveTruthEventsInTimeRange, retrieveVocalizationEventsInTimeRange, startSimulator, stopSimulator} from "./js/routes.js";
+  import {retrieveTruthEventsInTimeRange, retrieveVocalizationEventsInTimeRange} from "./js/routes.js";
   window.updateMics = updateMics;
   window.downloadCSV = downloadCSV;
   window.downloadXLSX = downloadXLSX;
@@ -1257,6 +1284,7 @@ closeFormButton.addEventListener('click', (event) => {
   hmiState.liveMode = true;
   hmiState.simUpdateDelay = 10000;
   hmiState.liveWindow = 60000;
+  hmiState.simMode = "Stop";
 
   //NOTE: Use the replay date to replay past data as though it were live
     //const replayDate = new Date('March 23, 2023 20:35:00');
@@ -1397,6 +1425,7 @@ closeFormButton.addEventListener('click', (event) => {
     }
   });
 
+  /*
   simulatorSwitch.addEventListener('change', function() {
     if (this.checked) {
       console.log("starting");
@@ -1405,8 +1434,7 @@ closeFormButton.addEventListener('click', (event) => {
       console.log("stopping");
       stopSimulator();
     }
-  });
-
+  });*/
 
   $(function() {
     $('#datetime-range').daterangepicker({
@@ -1469,7 +1497,7 @@ closeFormButton.addEventListener('click', (event) => {
 
   function dataCleansing(json_data) {
     //Escape if there is no data
-    if (json_data === [] | json_data === null | typeof json_data === undefined | json_data.length === 0){
+    if (json_data === null | typeof json_data === undefined | json_data.length === 0){
       return null
     }
     //Add date column with converted timestamp value
@@ -1542,7 +1570,7 @@ closeFormButton.addEventListener('click', (event) => {
     
     console.log(`Download selected time range ${datepickerStart} - ${datepickerEnd}`)
     retrieveTruthEventsInTimeRange(datepickerStart, datepickerEnd).then((res) => {
-      if (res.data === [] | res.data === null | typeof res.data === undefined | res.data.length === 0){
+      if (res.data === null | typeof res.data === undefined | res.data.length === 0){
         ErrDisplay("There is no result");
         data = sampleJSONmovementEvents
       } else {
