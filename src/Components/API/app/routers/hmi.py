@@ -373,3 +373,11 @@ def deleteaccount(jwtToken: str):
 
     response = {"message": "User has been deleted!"}
     return JSONResponse(content=response)
+
+
+# Get request for filter algorithm phase 1
+
+@router.get("/filter_algorithm", response_description="returns the running filter algorithm name")
+def filter_name():
+    filter_name = {'filter_algorithm' : "Echo-Engine-Algorithm"}
+    return filter_name
