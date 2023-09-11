@@ -228,7 +228,28 @@ body{
     max-width: 520px;
   }
 }
+#notification {
+  position: fixed;
+  bottom: 20px; /* Adjust the distance from the bottom */
+  left: 20px; /* Adjust the distance from the left */
+  background-color: rgb(10, 10, 25, 0.8);
+  border-radius: 10px;
+  padding: 10px;
+  color: rgba(247, 186, 206, 1);
+  display: none;
+  z-index: 1000;
+}
 
+#notification-content {
+  display: flex;
+  justify-content: space-between;
+  color: rgba(247, 186, 206, 1);
+  font-weight: lighter;
+}
+
+#notification-close {
+  cursor: pointer;
+}
 .navbar {
   margin-top: 50px;
   margin-left: 40px;
