@@ -94,7 +94,7 @@
       <div id="notification" class="hidden">
         <div id="notification-content">
             <span id="notification-text">Your notification text here</span>
-            <span id="notification-close">x</span>
+            <span id="notification-close" class="exit-icon">x</span>
         </div>
       </div>
 
@@ -1140,7 +1140,7 @@ function submitRequest(){
   .then(response => {
     if (response.status===200){
       console.log("Submission Success...");
-      vrSuccessfulSubmission("Thanky you. Your submission was succesfully received and is now awaiting review.");
+      vrSuccessfulSubmission("Thank you. Your submission was succesfully received and is now awaiting review.");
     }
     else {
       console.log("Submission Unsuccessful...");

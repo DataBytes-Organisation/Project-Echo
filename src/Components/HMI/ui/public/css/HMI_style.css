@@ -232,9 +232,9 @@ body{
   position: fixed;
   bottom: 20px; /* Adjust the distance from the bottom */
   left: 20px; /* Adjust the distance from the left */
-  background-color: rgb(10, 10, 25, 0.8);
+  background-color: rgb(10, 10, 25, 0.6);
   border-radius: 10px;
-  padding: 10px;
+  padding: 40px;
   color: rgba(247, 186, 206, 1);
   display: none;
   z-index: 1000;
@@ -247,6 +247,23 @@ body{
   font-weight: lighter;
 }
 
+#notification-close {
+  cursor: pointer;
+}
+
+.exit-icon {
+  position: absolute;
+  top: 5px; /* Adjust the distance from the top */
+  right: 5px; /* Adjust the distance from the right */
+  padding-right: 10px;
+  font-size: 20px;
+  color: white !important;
+}
+
+.exit-icon a:hover{
+  opacity: 0.8;
+  transition: 0.2s;
+}
 #notification-close {
   cursor: pointer;
 }
