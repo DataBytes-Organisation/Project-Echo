@@ -251,6 +251,12 @@ body{
   cursor: pointer;
 }
 
+#notification-close:hover{
+  cursor: pointer;
+  opacity: 0.7 !important;
+  transition: 0.2s;
+}
+
 .exit-icon {
   position: absolute;
   top: 5px; /* Adjust the distance from the top */
@@ -260,10 +266,6 @@ body{
   color: white !important;
 }
 
-.exit-icon a:hover{
-  opacity: 0.8;
-  transition: 0.2s;
-}
 #notification-close {
   cursor: pointer;
 }
