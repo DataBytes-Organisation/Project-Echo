@@ -484,9 +484,28 @@ app.post("/request_access", async (req, res) => {
 require('./routes/auth.routes')(app);
 require('./routes/user.routes')(app);
 
-app.get("/", (req, res) => {
+app.get("/", async (req, res) => {
   checkUserSession
-  res.redirect("/welcome")
+  console.log("token: ", await client.get('JWT', (err, storedToken) => {
+          if (err) {
+            return `Error retrieving token from Redis: ${err}`
+          } else {
+            return storedToken
+          }
+  }))
+  let role = await client.get('Roles', (err, storedToken) => {
+    if (err) {
+      return `Error retrieving user role from Redis: ${err}`
+    } else {
+      return storedToken
+    }
+  })
+
+  if (role.toLowerCase().includes("admin")) {
+    res.redirect("/admin-dashboard")
+  } else {
+    res.redirec("/map")
+  }
 })
 
 app.get("/admin-dashboard", (req,res)=> {

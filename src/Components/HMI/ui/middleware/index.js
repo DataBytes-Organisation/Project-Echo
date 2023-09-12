@@ -1,4 +1,3 @@
-const authJwt = require("./authJwt");
 const verifySignUp = require("./verifySignup");
 const redis = require('redis');
 
@@ -33,7 +32,6 @@ async function checkUserSession(req, res, next) {
 }
 
 module.exports = {
-  authJwt,
   verifySignUp,
   checkUserSession,
   client
