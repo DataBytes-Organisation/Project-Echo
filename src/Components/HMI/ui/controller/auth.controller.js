@@ -107,10 +107,17 @@ exports.signout = async (req, res) => {
       if (err) {
         console.log("Remove JWT Token error: ", err)
       } else {
-        console.log("Remove JWT successfully: ", res)
+        console.log("Remove JWT successfully: ")
       }
     })
-    return res.status(200).send({ message: "You've been signed out!", session: req.session });
+    await client.set("Roles", null, (err, res)=> {
+      if (err) {
+        console.log("Remove Roles Token error: ", err)
+      } else {
+        console.log("Remove Roles successfully: ")
+      }
+    })
+    return res.status(200).send('<script> alert("User logout successfully!"); window.location.href = "/login"</script>')
   } catch (err) {
     this.next(err);
   }

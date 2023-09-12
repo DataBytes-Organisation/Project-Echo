@@ -321,8 +321,6 @@ app.use(
 );
 
 const nodemailer = require('nodemailer');
-const { verifyToken } = require('./middleware/authJwt');
-const { isNullOrUndefined } = require('util');
 var transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -349,8 +347,6 @@ app.post("/send_email", async (req, res) => {
   const validationResult = await testEmail(email);
   if (validationResult.result){
       // Validate the email address
-      // const validationResult = await validateEmail(email);
-      // console.log("Validate email result: ", validationResult);
       // If email validation is successful, proceed to send the email
       let html_text = '<div>';
       html_text += '<h2>A new query has been received for Project Echo HMI</h2>';
@@ -379,11 +375,11 @@ app.post("/send_email", async (req, res) => {
           console.log(error);
         } else {
           console.log('Email sent: ' + info.response);
-          return res.redirect("/");
+          return res.send('<script> alert("user query sent! Please check your mailbox for further communication"); window.location.href = "/"; </script>')
         }
       });
     } else {
-      return res.status(400).json({ error: validationResult.response });
+      return res.status(400).send("<script> alert(`Sender's email is not valid!`)</script>");
     }
     
   }
@@ -457,7 +453,7 @@ app.post("/request_access", async (req, res) => {
             console.log(error);
           } else {
             console.log('Email sent: ' + info.response);
-            return res.redirect("/login")
+            return res.send('<script> alert("Temporary credential granted! Please check your mailbox."); window.location.href = "/login"; </script>')
           }
         });
       } else {
