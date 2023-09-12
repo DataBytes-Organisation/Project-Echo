@@ -13,17 +13,6 @@ module.exports = function (app) {
     next();
   });
 
-  // app.post(
-  //   "/api/auth/signup",
-  //   [
-  //    verifySignUp.checkDuplicateUsernameOrEmail,
-  //    verifySignUp.checkRolesExisted,
-  //    verifySignUp.confirmPassword
-  //   ],
-  //    controller.signup
-        
-  
-  //   );
   app.post("/api/auth/signup", verifySignUp.confirmPassword, async (req, res) => {
     
     const rolesList = [req.body.roles]

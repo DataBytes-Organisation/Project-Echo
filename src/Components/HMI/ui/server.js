@@ -682,7 +682,7 @@ app.get("/welcome", async (req,res) => {
   if (role.toLowerCase().includes("admin")) {
     res.redirect("/admin-dashboard")
   } else {
-    res.redirec("/map")
+    res.redirect("/map")
   }
 })
 
