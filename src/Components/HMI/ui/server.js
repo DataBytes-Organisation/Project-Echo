@@ -664,25 +664,30 @@ app.get('/api/requests', async (req, res) => {
 });
 
 app.get("/welcome", async (req,res) => {
-  console.log("token: ", await client.get('JWT', (err, storedToken) => {
-          if (err) {
-            return `Error retrieving token from Redis: ${err}`
-          } else {
-            return storedToken
-          }
-  }))
-  let role = await client.get('Roles', (err, storedToken) => {
-    if (err) {
-      return `Error retrieving user role from Redis: ${err}`
-    } else {
-      return storedToken
-    }
-  })
+  try {
+    console.log("token: ", await client.get('JWT', (err, storedToken) => {
+            if (err) {
+              return `Error retrieving token from Redis: ${err}`
+            } else {
+              return storedToken
+            }
+    }))
+    let role = await client.get('Roles', (err, storedToken) => {
+      if (err) {
+        return `Error retrieving user role from Redis: ${err}`
+      } else {
+        return storedToken
+      }
+    })
 
-  if (role.toLowerCase().includes("admin")) {
-    res.redirect("/admin-dashboard")
-  } else {
-    res.redirect("/map")
+    if (role.toLowerCase().includes("admin")) {
+      res.redirect("/admin-dashboard")
+    } else {
+      res.redirect("/map")
+    }
+  }
+  catch {
+    res.send(`<script> alert("No user info detected! Please login again"); window.location.href = "/login"; </script>`);
   }
 })
 
