@@ -37,12 +37,14 @@ module.exports = function (app) {
       
         if (axiosResponse.status === 201) {
           console.log('Status Code: ' + axiosResponse.status + ' ' + axiosResponse.statusText)
-          res.status(201).redirect('/welcome')
-        } 
+          res.status(201).send(`<script> window.location.href = "/login"; alert("User registered successfully");</script>`);
+        } else {
+          res.status(400).send(`<script> window.location.href = "/login"; alert("Ooops! Something went wrong");</script>`);
+        }
       } catch (err) {
         console.log('Status Code: ' + err.response.status + ' ' + err.response.statusText)
         console.log(err.response.data)
-        res.redirect('/login')
+        res.status(404).send(`<script> window.location.href = "/login"; alert("Register exception error occured!");</script>`);
       }
 });
     
@@ -95,7 +97,7 @@ module.exports = function (app) {
           }
         } catch (err) {
           console.log('Login exception error: ' + err)
-          res.redirect('/login')
+          res.send(`<script> window.location.href = "/login"; alert("Login exception Error: ${err}!");</script>`);
         }  
       } 
       else {
