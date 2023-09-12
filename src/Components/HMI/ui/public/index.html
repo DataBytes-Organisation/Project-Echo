@@ -1359,55 +1359,55 @@
     </script>
 
 
-    <script>
+<script>
 
-      // Sample data for donation amounts and their corresponding image filenames
-      var donationData = [
-        { amount: 1, image: '$1.png' },
-        { amount: 5, image: '$5.png' },
-        { amount: 10, image: '$10.png' },
-        { amount: 20, image: '$20.png' },
-        { amount: 50, image: '$50.png' }
-      ];
+  // Sample data for donation amounts and their corresponding image filenames
+  var donationData = [
+    { amount: 1, image: '$1.png' },
+    { amount: 5, image: '$5.png' },
+    { amount: 10, image: '$10.png' },
+    { amount: 20, image: '$20.png' },
+    { amount: 50, image: '$50.png' }
+  ];
 
-      // Update the image sources based on the donation amounts
-      var imageDescriptions = document.querySelectorAll('.image-description');
-      imageDescriptions.forEach(function (description, index) {
-        var image = description.querySelector('img');
-        var amount = description.querySelector('.image-amount');
-        var donationAmount = donationData[index].amount;
-        var imageFilename = donationData[index].image;
+  // Update the image sources based on the donation amounts
+  var imageDescriptions = document.querySelectorAll('.image-description');
+  imageDescriptions.forEach(function (description, index) {
+    var image = description.querySelector('img');
+    var amount = description.querySelector('.image-amount');
+    var donationAmount = donationData[index].amount;
+    var imageFilename = donationData[index].image;
 
-        image.src = './images/' + imageFilename;
+    image.src = './images/' + imageFilename;
 
-      });
+  });
 
-      // Add event listeners for image hover and click effects
-      imageDescriptions.forEach(function (description) {
-        var image = description.querySelector('img');
-        var amount = description.querySelector('.image-amount');
-        var yourAmountElement = document.querySelector('.donation-amount'); // Get the "Your Amount" element
-        var lightbulbIcon = document.querySelector('.lightbulb-container img'); // Get the lightbulb icon element
+  // Add event listeners for image hover and click effects
+  imageDescriptions.forEach(function (description) {
+    var image = description.querySelector('img');
+    var amount = description.querySelector('.image-amount');
+    var yourAmountElement = document.querySelector('.donation-amount'); // Get the "Your Amount" element
+    var lightbulbIcon = document.querySelector('.lightbulb-container img'); // Get the lightbulb icon element
 
-        // Change opacity on hover
-        image.addEventListener('mouseenter', function () {
-          image.style.opacity = '0.8';
-        });
+    // Change opacity on hover
+    image.addEventListener('mouseenter', function () {
+      image.style.opacity = '0.8';
+    });
 
-        image.addEventListener('mouseleave', function () {
-          image.style.opacity = '1'; // Restore original opacity
-        });
+    image.addEventListener('mouseleave', function () {
+      image.style.opacity = '1'; // Restore original opacity
+    });
 
-        // Display donation amount on click
-        image.addEventListener('click', function () {
-          var donationAmount = amount.textContent;
-          yourAmountElement.textContent = 'Your Amount: $' + donationAmount;
+    // Display donation amount on click
+    image.addEventListener('click', function () {
+      var donationAmount = amount.textContent;
+      yourAmountElement.textContent = 'Your Amount: $' + donationAmount;
 
-          // Fill the lightbulb container with the clicked icon
-          lightbulbIcon.src = image.src;
-        });
-      });
-    </script>
+      // Fill the lightbulb container with the clicked icon
+      lightbulbIcon.src = image.src;
+    });
+  });
+</script>
 
 
 
