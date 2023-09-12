@@ -1,0 +1,12 @@
+User-agent: *
+Disallow: 
+Crawl-delay: 10
+Disallow: /public/js/
+Disallow: /public/admin/
+Disallow: /public/audio/
+Disallow: /public/images/
+Disallow: /middlewares/
+Disallow: /server.js
+Disallow: /model/
+Disallow: /user-sample/
+Sitemap: http://localhost:8080/

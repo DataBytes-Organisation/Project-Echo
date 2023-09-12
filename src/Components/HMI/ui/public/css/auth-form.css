@@ -160,6 +160,14 @@ span.psw {
   padding-top: 15vh;
 }
 
+.popup {
+  z-index: 30;
+  position: fixed;
+  top: 10px;
+  margin: auto;
+  transition: 0.3s ease-in-out;
+}
+
 .captcha-block {
   background-color: #fefefe;
   display: none;

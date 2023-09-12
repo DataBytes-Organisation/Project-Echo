@@ -86,9 +86,24 @@ module.exports = function (app) {
                 console.log("Set JWT successfully: ", res)
               }
             })
+            await client.set("Roles", axiosResponse.data.roles.toString(), (err, res)=> {
+              if (err) {
+                console.log("Set User Roles Token error: ", err)
+              } else {
+                console.log("Set User roles successfully: ", res)
+              }
+            })
+            res.status(200).send(
+            `<script> 
+              alert("Login Successfully");
+              window.location.href = "/welcome"
+            </script>`);
+              
             
-            res.status(200).redirect('/welcome')
-          } 
+          } else {
+            console.log("Login response: ", axiosResponse.data);
+            res.status(400).send('<script> window.location.href = "/login"; alert("Failed! Invalid credentials!");</script>');
+          }
         } catch (err) {
           console.log('Login exception error: ' + err)
           res.redirect('/login')

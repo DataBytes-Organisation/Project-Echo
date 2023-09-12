@@ -5,7 +5,7 @@ const fs = require('fs');
 const cookieSession = require('cookie-session');
 const dbConfig = require('./config/db.config');
 const jwt = require('jsonwebtoken');
-const { authJwt, client } = require('./middleware');
+const { authJwt, client, checkUserSession } = require('./middleware');
 const controller = require('./controller/auth.controller');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
@@ -27,14 +27,10 @@ const User = db.user;
 const Guest = db.guest;
 const Request = db.request;
 
+
 //for connecting to ts-mongo-db
 const MongoClient = require('mongodb').MongoClient;
 const url = "mongodb://modelUser:EchoNetAccess2023@ts-mongodb-cont:27017/EchoNet";
-
-// Create a function to test the MongoDB connection
-
-
-
 
 
 
@@ -326,6 +322,7 @@ app.use(
 
 const nodemailer = require('nodemailer');
 const { verifyToken } = require('./middleware/authJwt');
+const { isNullOrUndefined } = require('util');
 var transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -488,15 +485,8 @@ require('./routes/auth.routes')(app);
 require('./routes/user.routes')(app);
 
 app.get("/", (req, res) => {
-  if (authJwt.verifyToken && authJwt.isUser) {
-    console.log("This is user session!")
-    res.sendFile(path.join(__dirname, 'public/index.html'))
-  }
-  else {
-    console.log("This is not user sessions!")
-    res.json("No available session, you have not logged in yet")
-  }
-
+  checkUserSession
+  res.redirect("/welcome")
 })
 
 app.get("/admin-dashboard", (req,res)=> {
@@ -512,7 +502,6 @@ app.get("/admin-donations", (req, res) => {
 })
 
 app.get("/login", (req, res) => {
-  [verifyToken]
   res.sendFile(path.join(__dirname, 'public/login.html'));
 })
 
@@ -646,7 +635,6 @@ app.get('/api/requests', async (req, res) => {
       }
     })
 
-    console.log("Current token: ", token)
     const axiosResponse = await axios.get('http://ts-api-cont:9000/hmi/requests', { headers: {"Authorization" : `Bearer ${token}`}})
   
     if (axiosResponse.status === 200) {
@@ -663,31 +651,29 @@ app.get('/api/requests', async (req, res) => {
 app.get("/welcome", async (req,res) => {
   console.log("token: ", await client.get('JWT', (err, storedToken) => {
           if (err) {
-            console.error('Error retrieving token from Redis:', err);
-            return null
+            return `Error retrieving token from Redis: ${err}`
           } else {
-            console.log('Stored Token:', storedToken);
             return storedToken
           }
   }))
-  res.sendFile(path.join(__dirname, 'public/index.html'))
+  let role = await client.get('Roles', (err, storedToken) => {
+    if (err) {
+      return `Error retrieving user role from Redis: ${err}`
+    } else {
+      return storedToken
+    }
+  })
+
+  if (role.toLowerCase().includes("admin")) {
+    res.redirect("/admin-dashboard")
+  } else {
+    res.redirec("/map")
+  }
 })
 
-// app.get("*", (req,res) => {
-//   if (authJwt.verifyToken){
-//     let token = req.session.token;
-//     console.log("Current token: ", req.session.token)
-//     if (!token) {
-//       console.log("Current user session unavailable")
-//       res.sendFile(path.join(__dirname, 'public/login.html'));
-//     } 
-//   }
-//   else {
-//     console.log("User token not assigned!");
-//     res.sendFile(path.join(__dirname, 'public/login.html'));
-//   }
-
-// })
+app.get("/map", async(req,res) => {
+  res.sendFile(path.join(__dirname, 'public/index.html'))
+})
 
 // start the server
 app.listen(port, () => {
