@@ -367,6 +367,23 @@ class EchoEngine():
         print(x.text)
         
 
+    def generate_random_location(lat, lon, min_distance, max_distance):
+        # Generate a random direction in radians (0 to 2*pi)
+        random_direction = random.uniform(0, 2 * 3.14159265359)
+
+        # Generate a random distance between min and max distances
+        random_distance = random.uniform(min_distance, max_distance)
+
+        # Calculate the latitude and longitude offsets
+        lat_offset = random_distance * math.cos(random_direction) / 111.32
+        lon_offset = random_distance * math.sin(random_direction) / (111.32 * math.cos(lat))
+
+        # Calculate the new latitude and longitude
+        new_lat = lat + lat_offset
+        new_lon = lon + lon_offset
+
+        return new_lat, new_lon
+
     ########################################################################################
     # Execute the main engine loop (which waits for messages to arrive from MQTT)
     ########################################################################################
