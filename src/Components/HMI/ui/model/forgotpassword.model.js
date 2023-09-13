@@ -5,7 +5,7 @@ const forgotpassword = mongoose.model(
   new mongoose.Schema({
     userId: String,
     newPassword: String,
-    modifiedDate: Date
+    modified_date: Date
   })
 );
 

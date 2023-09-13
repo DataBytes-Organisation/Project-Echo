@@ -184,8 +184,17 @@ class UserLoginSchema(BaseModel):
            
         } 
 
-class RoleSchema(BaseModel):
-    name: str
+class ForgotPasswordSchema(BaseModel):
+    user: str
+    
+
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+        schema_extra = {
+           
+        } 
 
 class RecordingData(BaseModel):
     timestamp: datetime

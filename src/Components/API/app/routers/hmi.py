@@ -377,8 +377,8 @@ def deleteaccount(jwtToken: str):
     return JSONResponse(content=response)
 
 @router.post("/forgot-password", status_code=status.HTTP_201_CREATED)
-def forgotpassword(user: str):
-    existing_user = User.find_one({"$or": [{"username": user}, {"email": user}]})
+def forgotpassword(user: schemas.ForgotPasswordSchema):
+    existing_user = User.find_one({"$or": [{"username": user.user}, {"email": user.user}]})
     if existing_user:
         newpassword = randompassword()
         print(newpassword)
@@ -391,11 +391,11 @@ def forgotpassword(user: str):
         ForgotPassword.insert_one(user_dict)
 
         User.update_one(
-           {"$or": [{"username": user}, {"email": user}]},
+           {"$or": [{"username": user.user}, {"email": user.user}]},
            {"$set": {"password": password_hashed.decode('utf-8')}}
         )
         
-        response = {"message": "Password has been reset. Please check your email", "password": newpassword}
+        response = {"message": "Password has been reset. Please check your email", "email": existing_user["email"], "password": newpassword}
         return JSONResponse(content=response, status_code = 201)
     
     response = {"message": "User not Found!"}
