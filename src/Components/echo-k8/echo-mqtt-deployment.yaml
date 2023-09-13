@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --file docker-compose.yml --out ./k8s
+    kompose.version: 1.30.0 (9d8dcb518)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: echo-mqtt
+  name: echo-mqtt
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: echo-mqtt
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert --file docker-compose.yml --out ./k8s
+        kompose.version: 1.30.0 (9d8dcb518)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/echo-net-echo-net: "true"
+        io.kompose.service: echo-mqtt
+    spec:
+      containers:
+        - image: ts-mqtt-server
+          name: ts-mqtt-server-cont
+          ports:
+            - containerPort: 1883
+              hostPort: 1883
+              protocol: TCP
+            - containerPort: 7001
+              hostPort: 7001
+              protocol: TCP
+            - containerPort: 7070
+              hostPort: 7070
+              protocol: TCP
+          resources: {}
+          tty: true
+      restartPolicy: Always
+status: {}

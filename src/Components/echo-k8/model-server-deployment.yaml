@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --file docker-compose.yml --out ./k8s
+    kompose.version: 1.30.0 (9d8dcb518)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: model-server
+  name: model-server
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: model-server
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert --file docker-compose.yml --out ./k8s
+        kompose.version: 1.30.0 (9d8dcb518)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/echo-net-echo-net: "true"
+        io.kompose.service: model-server
+    spec:
+      containers:
+        - image: ts-echo-model
+          name: ts-echo-model-cont
+          ports:
+            - containerPort: 8501
+              hostPort: 8501
+              protocol: TCP
+          resources: {}
+          tty: true
+          volumeMounts:
+            - mountPath: /root/.config/gcloud
+              name: credentials-volume
+      restartPolicy: Always
+      volumes:
+        - name: credentials-volume
+          persistentVolumeClaim:
+            claimName: credentials-volume
+status: {}
