@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --file docker-compose.yml --out ./k8s
+    kompose.version: 1.30.0 (9d8dcb518)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: model-server
+  name: model_server
+  namespace: default
+spec:
+  ports:
+    - name: "8501"
+      port: 8501
+      targetPort: 8501
+  selector:
+    io.kompose.service: model-server
+status:
+  loadBalancer: {}
