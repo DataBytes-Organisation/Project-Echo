@@ -104,7 +104,7 @@
 
                 <div class="container" style="background-color:#f1f1f1">
                     <button type="button" onclick="{closeForm('login-form')}" class="cancelbtn">Cancel</button>
-                    <span class="psw"><a href="#">Forgot password?</a></span>
+                    <span class="psw" onclick="{closeForm('login-form')} {openForm('forgotpassword-form')}"><a href="#">Forgot password?</a></span>
                 </div>
             </form>
         </div>
@@ -189,6 +189,30 @@
 
                 <div class="container" style="background-color:#f1f1f1">
                     <button type="button" onclick="{closeForm('request-access-form')}" class="cancelbtn">Cancel</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="forgotpassword-form" class="user-auth-form modal">
+
+            <form class="modal-content animate" id="forgotpassword-form" action="/api/auth/forgot" method="POST">
+                <div class="imgcontainer">
+                    <span onclick="{closeForm('forgotpassword-form')}" class="close" title="Close Modal">&times;</span>
+                    <!-- <img src="img_avatar2.png" alt="Avatar" class="avatar"> -->
+                </div>
+
+                <div class="container">
+   
+                    <label for="account"><b>Account</b></label>
+                    <input type="text" placeholder="Email or Username" name="account">
+
+                    <button id="login-form-submit" type="submit"><span>Reset Password</span></button>
+        
+                </div>
+
+                <div class="container" style="background-color:#f1f1f1">
+                    <button type="button" onclick="{closeForm('forgotpassword-form')}" class="cancelbtn">Cancel</button>
+ 
                 </div>
             </form>
         </div>

@@ -106,6 +106,36 @@ module.exports = function (app) {
       }
   });
 
+  app.post("/api/auth/forgot", async (req, res) => {
+    let account = req.body.account;
+    
+    try {
+      const axiosResponse = await axios.post('http://ts-api-cont:9000/hmi/forgotpassword', {
+        user: account
+      });
+      
+      if (axiosResponse.status === 201) {
+        console.log('Status Code: ' + axiosResponse.status + ' ' + axiosResponse.statusText)
+        console.log("Server's response: ", axiosResponse.data);
+        
+        res.status(201).send(
+        `<script> 
+          alert("Password has been changed");
+          window.location.href = "/login"
+        </script>`);
+          
+        
+      } else {
+        console.log("Error response: ", axiosResponse.data);
+        res.status(404).send('<script> window.location.href = "/login"; alert("Failed! Account not found!");</script>');
+      }
+    } catch (err) {
+      console.log('Exception error: ' + err)
+      res.send(`<script> window.location.href = "/login"; alert("Exception Error: ${err}!");</script>`);
+    }  
+ 
+});
+
   app.post("/api/auth/signout", controller.signout);
 
   app.post("/api/auth/guestsignup", controller.guestsignup);
