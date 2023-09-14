@@ -491,7 +491,109 @@ class EchoEngine():
         print(x.text)
         
 
-    def generate_random_location(lat, lon, min_distance, max_distance):
+    def load_audio_file(self, file_path):
+        wav, sr = librosa.load(file_path, sr=16000)
+        return np.array([wav])
+
+    def extract_features(self, model, X):
+        features = []
+        for wav in X:
+            scores, embeddings, spectrogram = model(wav)
+            features.append(embeddings.numpy().mean(axis=0))
+        return np.array(features)
+
+    def predict_on_audio(self, binary_audio):
+        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp_audio_file:
+            with open(temp_audio_file.name, 'wb') as f:
+                f.write(binary_audio)
+            X_new = self.load_audio_file(temp_audio_file.name)
+            X_new_features = self.extract_features(yamnet_model, X_new)
+
+            predictions = model.predict(X_new_features)
+            top_two_prob_indices = np.argsort(predictions[0])[-2:]
+            top_two_prob_values = predictions[0][top_two_prob_indices]
+
+            top_two_class_names = le.inverse_transform(top_two_prob_indices)
+        
+            return [(class_names[top_two_prob_indices[1-i]], top_two_prob_values[1-i]) for i in range(2)]
+
+    def sound_event_detection(self, filepath, sample_rate):
+        data, sr = librosa.load(filepath, sr=sample_rate)
+        frame_len = int(sr * 1)
+        num_chunks = len(data) // frame_len
+        chunks = [data[i*frame_len:(i+1)*frame_len] for i in range(num_chunks)]
+
+        # Adding the last chunk which can be less than 1 second
+        last_chunk = data[num_chunks*frame_len:]
+        if len(last_chunk) > 0:
+            chunks.append(last_chunk)
+
+        animal_related_classes = [
+            'Dog', 'Cat', 'Bird', 'Animal', 'Birdsong', 'Canidae', 'Feline', 'Livestock',
+            'Rodents, Mice', 'Wild animals', 'Pets', 'Frogs', 'Insect', 'Snake', 
+            'Domestic animals, pets', 'crow'
+        ]
+
+        df_rows = []
+        buffer = []
+        start_time = None
+        for cnt, frame_data in enumerate(chunks):
+            frame_data = np.reshape(frame_data, (-1,)) # Flatten the array to 1D
+            frame_data = np.array([frame_data]) # Wrapping it back into a 2D array
+            outputs = yamnet(frame_data)
+            yamnet_prediction = np.mean(outputs[0], axis=0)
+            top2_i = np.argsort(yamnet_prediction)[::-1][:2]
+
+            if any(cls in animal_related_classes for cls in [yamnet_classes[top2_i[0]], yamnet_classes[top2_i[1]]]):
+                if start_time is None:
+                    start_time = cnt
+                buffer.append(frame_data)
+            else:
+                if start_time is not None:
+                    segment_data = np.concatenate(buffer, axis=1)[0]
+                    with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp_audio_file:
+                        sf.write(temp_audio_file.name, segment_data, sr)
+                        with open(temp_audio_file.name, 'rb') as binary_file:
+                            top2_predictions = self.predict_on_audio(binary_file.read())
+
+                    df_row = {'start_time': start_time, 'end_time': cnt}
+                
+                    for i, pred in enumerate(top2_predictions[:2]):
+                        df_row[f'echonet_label_{i+1}'] = pred[0] if pred[0] is not None else None
+                        df_row[f'echonet_confidence_{i+1}'] = pred[1] if pred[1] is not None else None
+
+                    df_rows.append(df_row)
+                    buffer = []
+                    start_time = None
+
+        # Handling the case where the last chunk contains an animal-related sound
+        if start_time is not None:
+            segment_data = np.concatenate(buffer, axis=1)[0]
+            with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp_audio_file:
+                sf.write(temp_audio_file.name, segment_data, sr)
+                with open(temp_audio_file.name, 'rb') as binary_file:
+                    top2_predictions = self.predict_on_audio(binary_file.read())
+
+            df_row = {'start_time': start_time, 'end_time': len(chunks)}
+        
+            for i, pred in enumerate(top2_predictions[:2]):
+                df_row[f'echonet_label_{i+1}'] = pred[0] if pred[0] is not None else None
+                df_row[f'echonet_confidence_{i+1}'] = pred[1] if pred[1] is not None else None
+
+            df_rows.append(df_row)
+
+        df = pd.DataFrame(df_rows)
+
+        # keep right channel only
+        if data.ndim == 2 and data.shape[0] == 2:
+            data = data[1, :]
+        
+        # cast to float32 type
+        data = data.astype(np.float32)
+
+        return df, data
+
+    def generate_random_location(self, lat, lon, min_distance, max_distance):
         # Generate a random direction in radians (0 to 2*pi)
         random_direction = random.uniform(0, 2 * 3.14159265359)
 
