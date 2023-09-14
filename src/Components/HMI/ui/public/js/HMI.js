@@ -1549,7 +1549,7 @@ function simulateRecording(hmiState){
       animalLLAUncertainty: 50.0,
       audioClip: base64String,
       mode: hmiState.simMode,
-      audioFile: "live_recording"
+      audioFile: hmiState.simMode
     }
   
     postRecording(recordingData);
