@@ -10,9 +10,7 @@ const controller = require('./controller/auth.controller');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
-
 client.connect()
-
 const cors = require('cors');
 require('dotenv').config()
 //const shop = require("./shop/shop")
@@ -119,6 +117,42 @@ function initial() {
 // }
 
 // getAllPayments();
+
+const storeItems = new Map([[
+  1, { priceInCents: 100, name: "donation"}
+]])
+app.use(express.json());
+
+app.post("/api/create-checkout-session", async (req, res) => {
+  try {
+    console.log(req.body.items);
+    const session = await stripe.checkout.sessions.create({
+      customer_email: 'bndct.dev@gmail.com',
+      submit_type: 'donate',
+      payment_method_types: ["card"],
+      mode: "payment",
+      line_items: req.body.items.map(item => {
+        const storeItem = storeItems.get(item.id)
+        return {
+          price_data: {
+            currency: "aud",
+            product_data: {
+              name: storeItem.name,
+            },
+            unit_amount: item.quantity * 100,
+          },
+          quantity: 1,
+        }
+      }),
+      success_url: "http://localhost:8080", //`${process.env.CLIENT_URL}`,
+      cancel_url: "http://localhost:8080"//`${process.env.CLIENT_URL}`,
+    })
+    console.log("two");
+    res.json({ url: session.url })
+  } catch (e) {
+    res.status(500).json({ error: e.message })
+  }
+})
 
 app.get('/donations', async(req,res) => {
   let charges;
