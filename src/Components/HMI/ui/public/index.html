@@ -368,29 +368,7 @@
                 </div>
 
                 <!-- DONATE NOW button (without functionality) -->
-                <button class="donate-button">DONATE NOW</button>
-
-                <h2>Microphone Donation</h2>
-                <p>
-                  At Project Echo, we believe in employing innovative methods to safeguard and study our planet's most
-                  vulnerable species. Our microphone donation initiative is a testament to this commitment. When you
-                  choose to make a contribution of <span class="donation-amount">$25</span> or more, you're not only
-                  supporting our ongoing conservation efforts but also becoming an integral part of a groundbreaking
-                  research endeavor.
-                </p>
-                <h3>Your Donation</h3>
-                <p>
-                  At Project Echo, we are dedicated to the preservation and protection of our planet's precious
-                  wildlife. We understand that the future of our endangered species relies on the generosity of
-                  supporters like you. By choosing to donate, you become an essential part of our mission, helping us
-                  ensure the continuous operation of our efforts. Explore the various ways you can make a difference and
-                  contribute to the preservation of our planet's incredible biodiversity. Thank you for joining us on
-                  this crucial journey.
-                </p>
-
-                <div class="pie-chart-container">
-                  <canvas id="donationChart"></canvas>
-                </div>
+                <button class="donate-button">DONATE NOW</button>         
               </div>
             </div>
           </div>
@@ -1434,29 +1412,29 @@
 
 
       // Sample data for the pie chart
-      var pieChartData = {
-        labels: ['Your Donation', 'Remaining'],
-        datasets: [{
-          data: [25, 75], // 25% for donation, 75% for remaining
-          backgroundColor: ['pink', 'lightgray'], // Colors for each segment
-        }]
-      };
+      // var pieChartData = {
+      //   labels: ['Your Donation', 'Remaining'],
+      //   datasets: [{
+      //     data: [25, 75], // 25% for donation, 75% for remaining
+      //     backgroundColor: ['pink', 'lightgray'], // Colors for each segment
+      //   }]
+      // };
 
       // Create the pie chart
-      var pieChartElement = document.getElementById('donationChart').getContext('2d');
-      var pieChart = new Chart(pieChartElement, {
-        type: 'pie',
-        data: pieChartData,
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              position: 'bottom'
-            }
-          }
-        }
-      });
+      // var pieChartElement = document.getElementById('donationChart').getContext('2d');
+      // var pieChart = new Chart(pieChartElement, {
+      //   type: 'pie',
+      //   data: pieChartData,
+      //   options: {
+      //     responsive: true,
+      //     maintainAspectRatio: false,
+      //     plugins: {
+      //       legend: {
+      //         position: 'bottom'
+      //       }
+      //     }
+      //   }
+      // });
     </script>
 
 
