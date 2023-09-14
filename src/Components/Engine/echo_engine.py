@@ -339,8 +339,9 @@ class EchoEngine():
             image = None
             sample_rate = 0
 
-            if(audio_event['mode'] == "Recording_Mode"):
+            if(audio_event['audioFile'] == "Recording_Mode"): # classic model
                 # convert to string representation of audio to binary for processing
+                print("Recording_Mode")
                 audio_clip = self.string_to_audio(audio_event['audioClip'])
             
                 image, audio_clip, sample_rate = self.combined_pipeline(audio_clip, "Recording_Mode")
@@ -348,15 +349,83 @@ class EchoEngine():
                 # update the audio event with the re-sampled audio
                 audio_event["audioClip"] = self.audio_to_string(audio_clip)
 
-            elif(audio_event['mode'] == "Recording_Mode_V2"):
+                image = tf.expand_dims(image, 0) 
+            
+                image_list = image.numpy().tolist()
+            
+                # Run the model via tensorflow serve
+                data = json.dumps({"signature_name": "serving_default", "inputs": image_list})
+                url = self.config['MODEL_SERVER']
+                headers = {"content-type": "application/json"}
+                json_response = requests.post(url, data=data, headers=headers)
+                model_result   = json.loads(json_response.text)
+                predictions = model_result['outputs'][0]
+                    
+                # Predict class and probability using the prediction function
+                predicted_class, predicted_probability = self.predict_class(predictions)
+
+                print(f'Predicted class : {predicted_class}')
+                print(f'Predicted probability : {predicted_probability}')
+            
+                # populate the database with the result
+                self.echo_api_send_detection_event(
+                    audio_event,
+                    sample_rate,
+                    predicted_class,
+                    predicted_probability)
+            
+                image = tf.expand_dims(image, 0) 
+            
+                image_list = image.numpy().tolist()
+
+            elif(audio_event['audioFile'] == "Recording_Mode_V2"):
                 # convert to string representation of audio to binary for processing
+                print("Recording_Mode_V2")
+                sample_rate = 16000
                 audio_clip = self.string_to_audio(audio_event['audioClip'])
+                file = io.BytesIO(audio_clip)
+                data_frame, audio_clip = self.sound_event_detection(file, sample_rate)
+                iteration_count = 0
             
-                image, audio_clip, sample_rate = self.combined_pipeline(audio_clip, "Recording_Mode_V2")
-            
-                # update the audio event with the re-sampled audio
-                audio_event["audioClip"] = self.audio_to_string(audio_clip)
-            else:
+                for index, row in data_frame.iterrows():
+                    #start_time	end_time	echonet_label_1	echonet_confidence_1
+                    start_time = float(row['start_time'])
+                    end_time = float(row['end_time'])
+                    predicted_class = row['echonet_label_1']
+                    predicted_probability = float(row['echonet_confidence_1']) * 100.0
+
+                    print(f'Predicted class : {predicted_class}')
+                    print(f'Predicted probability : {predicted_probability}')
+
+                    audio_subsection = self.load_specific_subsection(audio_clip, start_time, end_time, sample_rate)
+
+                    # update the audio event with the re-sampled audio
+                    audio_event["audioClip"] = self.audio_to_string(audio_subsection)
+
+                    new_lat = audio_event['animalEstLLA'][0]
+                    new_lon = audio_event['animalEstLLA'][1]
+
+                    if(iteration_count > 0):
+                        lat = audio_event['animalEstLLA'][0]
+                        lon = audio_event['animalEstLLA'][1]
+
+                        new_lat, new_lon = self.generate_random_location(lat, lon, 50, 100)
+
+                    new_lla = [new_lat, new_lon, 0.0]
+
+                    audio_event['animalEstLLA'] = new_lla
+                    audio_event['animalTrueLLA'] = new_lla
+
+                    # populate the database with the result
+                    self.echo_api_send_detection_event(
+                        audio_event,
+                        sample_rate,
+                        predicted_class,
+                        predicted_probability)
+                    
+                    iteration_count = iteration_count + 1
+
+            else: # simulate animals mode
                 # convert to string representation of audio to binary for processing
                 audio_clip = self.string_to_audio(audio_event['audioClip'])
             
@@ -364,31 +433,35 @@ class EchoEngine():
             
                 # update the audio event with the re-sampled audio
                 audio_event["audioClip"] = self.audio_to_string(audio_clip)
+                
+                image = tf.expand_dims(image, 0) 
             
-            image = tf.expand_dims(image, 0) 
+                image_list = image.numpy().tolist()
             
-            image_list = image.numpy().tolist()
-            
-            # Run the model via tensorflow serve
-            data = json.dumps({"signature_name": "serving_default", "inputs": image_list})
-            url = self.config['MODEL_SERVER']
-            headers = {"content-type": "application/json"}
-            json_response = requests.post(url, data=data, headers=headers)
-            model_result   = json.loads(json_response.text)
-            predictions = model_result['outputs'][0]
+                # Run the model via tensorflow serve
+                data = json.dumps({"signature_name": "serving_default", "inputs": image_list})
+                url = self.config['MODEL_SERVER']
+                headers = {"content-type": "application/json"}
+                json_response = requests.post(url, data=data, headers=headers)
+                model_result   = json.loads(json_response.text)
+                predictions = model_result['outputs'][0]
                     
-            # Predict class and probability using the prediction function
-            predicted_class, predicted_probability = self.predict_class(predictions)
+                # Predict class and probability using the prediction function
+                predicted_class, predicted_probability = self.predict_class(predictions)
 
-            print(f'Predicted class : {predicted_class}')
-            print(f'Predicted probability : {predicted_probability}')
+                print(f'Predicted class : {predicted_class}')
+                print(f'Predicted probability : {predicted_probability}')
             
-            # populate the database with the result
-            self.echo_api_send_detection_event(
-                audio_event,
-                sample_rate,
-                predicted_class,
-                predicted_probability)
+                # populate the database with the result
+                self.echo_api_send_detection_event(
+                    audio_event,
+                    sample_rate,
+                    predicted_class,
+                    predicted_probability)
+            
+                image = tf.expand_dims(image, 0) 
+            
+                image_list = image.numpy().tolist()
             
         except Exception as e:
             # Catch the exception and print it to the console
