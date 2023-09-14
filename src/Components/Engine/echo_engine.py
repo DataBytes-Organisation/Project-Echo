@@ -205,6 +205,27 @@ class EchoEngine():
 
         return subsection
     
+    def load_specific_subsection(self, tmp_audio_t, start_time_secs, end_time_secs, sample_rate):
+        # Ensure start and end times are within the audio duration
+        audio_duration_secs = tf.shape(tmp_audio_t)[0] / sample_rate
+        if end_time_secs > audio_duration_secs:
+            end_time_secs = audio_duration_secs
+
+        # Convert start and end times to sample indices
+        start_index = tf.cast(start_time_secs * sample_rate, dtype=tf.int32)
+        end_index = tf.cast(end_time_secs * sample_rate, dtype=tf.int32)
+
+        # Load the specified subsection
+        subsection = tmp_audio_t[start_index:end_index]
+
+        # If the subsection is shorter than expected, pad it with silence
+        expected_length = int((end_time_secs - start_time_secs) * sample_rate)
+        if subsection.shape[0] < expected_length:
+            padding_length = expected_length - subsection.shape[0]
+            padding = tf.zeros([padding_length], dtype=tmp_audio_t.dtype)
+            subsection = tf.concat([subsection, padding], axis=0)
+
+        return subsection
     
     ########################################################################################
     # this function is adapted from generic_engine_pipeline.ipynb
