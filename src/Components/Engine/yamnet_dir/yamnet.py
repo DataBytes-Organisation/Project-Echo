@@ -21,8 +21,8 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras import Model, layers
 
-import yamnet.features as features_lib
-import yamnet.params as params
+from . import features as features_lib
+from . import params as params
 
 
 def _batch_norm(name):
