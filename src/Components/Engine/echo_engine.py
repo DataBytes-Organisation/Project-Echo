@@ -26,13 +26,18 @@ import io
 import json
 import base64
 import tempfile
+import pickle
+import numpy as np
+import pandas as pd
+import soundfile as sf
+import sys
+sys.path.append("yamnet/")
 
 from platform import python_version
 
 import diskcache as dc
 # image processing related libraries
 import librosa
-import numpy as np
 # generic libraries
 import paho.mqtt.client as paho
 # tensor flow / keras related libraries
@@ -40,7 +45,17 @@ import tensorflow as tf
 import tensorflow_addons as tfa
 import tensorflow_hub as hub
 import tensorflow_io as tfio
+from tensorflow.keras.models import load_model
+
 from google.cloud import storage
+
+# yamnet related imports
+from yamnet_dir import params as params
+from yamnet_dir import yamnet as yamnet_model
+
+# lat long approximation
+import random
+from geopy.distance import geodesic
 
 # database libraries
 import pymongo
@@ -51,6 +66,21 @@ print('TensorFlow Version       : ', tf.__version__)
 print('TensorFlow IO Version    : ', tfio.__version__)
 print('Librosa Version          : ', librosa.__version__)
 
+# Load the necessary data and models
+with open('yamnet_dir/class_names.pkl', 'rb') as f:
+    class_names = pickle.load(f)
+
+with open('yamnet_dir/label_encoder.pkl', 'rb') as f:
+    le = pickle.load(f)
+
+yamnet = yamnet_model.yamnet_frames_model(params)
+yamnet.load_weights('yamnet_dir/yamnet.h5')
+yamnet_classes = yamnet_model.class_names('yamnet_dir/yamnet_class_map.csv')
+model = load_model('yamnet_dir/model_2_79.h5')
+
+# Load the YAMNet model
+yamnet_model_handle = 'https://tfhub.dev/google/yamnet/1'
+yamnet_model = hub.load(yamnet_model_handle)
 
 class EchoEngine():
 
@@ -413,6 +443,8 @@ class EchoEngine():
 
         print("Engine waiting for audio to arrive...")
         client.loop_forever()
+
+    
 
 
 if __name__ == "__main__":
