@@ -794,7 +794,7 @@
         var imageFilename = donationData[index].image;
 
         image.src = './images/' + imageFilename;
-        amount.textContent = '$' + donationAmount;
+        amount.textContent = donationAmount;
 
       });
 
@@ -817,8 +817,7 @@
         // Display donation amount on click
         image.addEventListener('click', function () {
           var donationAmount = amount.textContent;
-          yourAmountElement.textContent = 'Your Amount: ' + donationAmount;
-
+          yourAmountElement.textContent = 'Your Amount: $' + donationAmount;
           // Fill the lightbulb container with the clicked icon
           lightbulbIcon.src = image.src;
           lightbulbIcon.style.transform = 'scale(1.3)';
