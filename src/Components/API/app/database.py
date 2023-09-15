@@ -18,6 +18,9 @@ Userdb = Userclient['UserSample']
 User = Userdb.users
 Role = Userdb.roles
 Requests = Userdb.requests
+ForgotPassword = Userdb.forgotpasswords
+LogoutToken = Userdb.logouttokens
+
 ROLES = ["user", "admin", "guest"]
 STATES_CODE = ["vic", "nsw", "ts", "ql", "sa", "wa"]
 GENDER = ["male", "female", "m", "f" "prefer not to say"]
