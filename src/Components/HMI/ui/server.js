@@ -284,6 +284,7 @@ app.get('/data/captcha', (req, res) => {
   console.log("Image: ", image);
   res.json({image, text});
 });
+
 //Background Process to automatically delete Guest role after exceeding expiration
 setInterval(() => {
   const now = new Date();
@@ -375,7 +376,7 @@ app.post("/send_email", async (req, res) => {
 
       let mailOptions = {
         from: email,
-        to: `echodatabytes@gmail.com, ${email}, databytes@deakin.edu.au`,
+        to: `echodatabytes@gmail.com, ${email}`,
         subject: 'New query received!',
         text: query,
         html: html_text,
