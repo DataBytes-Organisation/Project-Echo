@@ -3,7 +3,6 @@ from fastapi import FastAPI, Body, HTTPException, status, APIRouter, Depends
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from typing import Optional, List
-
 from bson import ObjectId
 import datetime
 from app import serializers
@@ -377,7 +376,11 @@ def deleteaccount(jwtToken: str):
 
 # Get request for filter algorithm phase 1
 
-@router.get("/filter_algorithm", response_description="returns the running filter algorithm name")
-def filter_name():
-    filter_name = {'filter_algorithm' : "Echo-Engine-Algorithm"}
-    return filter_name
+@router.get("/filter_algorithm/{algorithm_type}", response_description="returns the running filter algorithm name")
+def filter_name(algorithm_type : str):
+    algorithms_running = requests.get("http://localhost:8000/engine/algorithms_data")
+    try:
+        algorithm_name = algorithms_running.json()[algorithm_type]
+    except:
+        return ("Enter correct algorithm to be filtered")
+    return (algorithm_name)
