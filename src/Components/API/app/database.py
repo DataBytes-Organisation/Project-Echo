@@ -1,8 +1,17 @@
+import os
 import pymongo
+
 # import mongoose
 
 # please use echonet credentials here, this connection string is just a placeholder
-connection_string="mongodb://modelUser:EchoNetAccess2023@ts-mongodb-cont:27017/EchoNet"
+db_host = os.getenv("DB_HOST")
+db_user = os.getenv("DB_USER")
+db_user_pswd = os.getenv("DB_USER_PASS")
+db_root_user = os.getenv("DB_ROOT_USER")
+db_root_user_pswd = os.getenv("DB_ROOT_USER_PASS")
+
+
+connection_string=f"mongodb://{db_user}:{db_user_pswd}@{db_host}:27017/EchoNet"
 #connection_string="mongodb+srv://projectechodeakin:uKRBgDwBmimUuV2Q@cluster0.gu2idc8.mongodb.net/test"
 client = pymongo.MongoClient(connection_string)
 db = client['EchoNet']
@@ -14,7 +23,7 @@ Microphones = db.microphones
 
 
 
-User_connection_string = "mongodb://root:root_password@ts-mongodb-cont/UserSample?authSource=admin"
+User_connection_string = "mongodb://{root}:root_password@ts-mongodb-cont/UserSample?authSource=admin"
 Userclient = pymongo.MongoClient(User_connection_string)
 Userdb = Userclient['UserSample']
 User = Userdb.users
