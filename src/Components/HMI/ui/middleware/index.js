@@ -13,22 +13,25 @@ const client = redis.createClient({
 });
 
 async function checkUserSession(req, res, next) {
-  if ( req.path == '/login') return next();
-  let token = await client.get('JWT', (err, storedToken) => {
-    if (err) {
-      console.error('Error retrieving token from Redis:', err);
-      return null
-    } else {
-      console.log('Stored Token:', storedToken);
-      return storedToken
+  console.log("Get user session: ", req.path)
+  if (req.path == '/welcome' || req.path == '/' || req.path == '/map' | req.path.includes("admin") | req.path == null | req.path == undefined) {
+
+    let token = await client.get('JWT', (err, storedToken) => {
+      if (err) {
+        console.error('Error retrieving token from Redis:', err);
+        return null
+      } else {
+        console.log('Stored Token:', storedToken);
+        return storedToken
+      }
+    })
+    if (token == null) {
+      // Token is missing, redirect the user to the login page
+      console.log("No stored token, return to login")
+      return res.redirect('/login');
     }
-  })
-  if (token == null) {
-    // Token is missing, redirect the user to the login page
-    console.log("No stored token, return to login")
-    return res.redirect('/login');
   }
-  next()
+  return next()
 }
 
 module.exports = {

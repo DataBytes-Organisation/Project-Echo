@@ -61,24 +61,6 @@ db.mongoose
 function initial() {
   Role.estimatedDocumentCount((err, count) => {
     if (!err && count === 0) {
-      // new Role({
-      //   name: "user"
-      // }).save(err => {
-      //   if (err) {
-      //     console.log("error", err);
-      //   }
-
-      //   console.log("added 'user' to roles collection");
-      // });
-      // new Role({
-      //   name: "admin"
-      // }).save(err => {
-      //   if (err) {
-      //     console.log("error", err);
-      //   }
-
-      //   console.log("added 'admin' to roles collection");
-      // });
       const roleData = require(path.join(__dirname, "user-sample/role-seed.json"));
 
       Role.insertMany(roleData);
@@ -318,8 +300,8 @@ setInterval(() => {
 const port = 8080;
 
 // serve static files from the public directory
-app.use(express.static(path.join(__dirname, 'public')));
-
+// app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public'), { index: path.join(__dirname, 'public/login.html')}))
 
 var corsOptions = {
   origin: ["http://localhost:8081", "*"]
@@ -513,9 +495,8 @@ app.post("/request_access", async (req, res) => {
 // routes
 require('./routes/auth.routes')(app);
 require('./routes/user.routes')(app);
-
+app.get('*', checkUserSession);
 app.get("/", async (req, res) => {
-  checkUserSession
   console.log("token: ", await client.get('JWT', (err, storedToken) => {
           if (err) {
             return `Error retrieving token from Redis: ${err}`
@@ -534,7 +515,7 @@ app.get("/", async (req, res) => {
   if (role.toLowerCase().includes("admin")) {
     res.redirect("/admin-dashboard")
   } else {
-    res.redirec("/map")
+    res.redirect("/map")
   }
 })
 
