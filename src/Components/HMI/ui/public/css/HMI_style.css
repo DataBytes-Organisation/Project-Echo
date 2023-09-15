@@ -227,6 +227,9 @@ body{
   #mic-popup{
     max-width: 520px;
   }
+  #userProfile{
+    max-width: 520px;
+  }
 }
 
 .navbar {
@@ -564,6 +567,54 @@ input[type="checkbox"]{
   overflow-wrap: break-word;
   font-family: 'Roboto', sans-serif;
 }
+
+#userProfile{
+  padding: 0px 0px 0px 0px;
+  height: 100%;
+  width: 0%;
+  position: fixed;
+  z-index: 995;
+  top: 0;
+  right: 0;
+  background-color: none;
+  color: rgb(141, 141, 141, 1.0);
+  overflow-x: hidden;
+  
+  padding-top: 180px;
+  margin-top: 30px;
+}
+
+#userProfile-contents{
+  color: rgb(106, 246, 239);
+  padding-top: 20px;
+  margin-left: 10px;
+  margin-right: 30px;
+  height: 3000px;
+  /*position: fixed;*/
+  width: 440px;
+  /*top: 110px;*/
+  overflow-wrap: break-word;
+  font-family: 'Roboto', sans-serif;
+  /*overflow-y: scroll;
+  overflow-x: hidden;*/
+}
+
+#userProfile-contents button{
+  color: #e48595;
+  background:#fff !important;
+  font-weight: 400;
+  border: none;
+  padding: 10px;
+  margin-top: 50px;
+  border-radius: 6px;
+}
+
+#userProfile-contents button:hover{
+  color: #fff;
+  background: #e48595 !important;
+  transition: .5s;
+}
+
 
 #donate {  
   padding: 0px 0px 0px 0px;

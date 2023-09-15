@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <style>
+        /* Stylish CSS styles for the user profile page */
+        body {
+            background-image: linear-gradient(135deg, #FAB2FF 10%, #1904E5 50%, #0E2941 100%); /* Dark Green, Green, Dark Blue */
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            font-family: "Arial", sans-serif;
+            color: #333333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 80%;
+            background: #FFFFFF;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 20px 6px #090b6f85;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .container div {
+            height: auto;
+        }
+
+        .left {
+            color: #FFFFFF;
+            background-image: url("https://i.pinimg.com/736x/5d/73/ea/5d73eaabb25e3805de1f8cdea7df4a42--tumblr-backgrounds-iphone-phone-wallpapers-iphone-wallaper-tumblr.jpg");
+            background-size: cover;
+            background-repeat: no-repeat;
+            overflow: hidden;
+        }
+
+        .left .overlay {
+            padding: 30px;
+            width: 100%;
+            height: 100%;
+            background: #5961f9ad;
+            box-sizing: border-box;
+        }
+
+        .left .overlay h1 {
+            font-size: 10vmax;
+            font-weight: 900;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            font-family: "Verdana", sans-serif;
+        }
+
+        .left .overlay span p {
+            margin-top: 30px;
+            font-weight: 900;
+        }
+
+        .left .overlay span a {
+            background: #3b5998;
+            color: #FFFFFF;
+            margin-top: 10px;
+            padding: 14px 50px;
+            border-radius: 100px;
+            display: inline-block;
+            box-shadow: 0 3px 6px 1px #042d4657;
+            text-decoration: none;
+            font-family: "Verdana", sans-serif;
+        }
+
+        .left .overlay span a:last-child {
+            background: #1dcaff;
+            margin-left: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="left">
+            <div class="overlay">
+                <h1>User Profile</h1>
+                <span>
+                    <p><strong>Username:</strong> Yohjit</p>
+                    <p><strong>Email:</strong> dipansh@echo.com</p>
+                    <p><strong>Personal Details:</strong> Task ON Creating user Profile UI.</p>
+                </span>
+                <span>
+                    <a href="#" id="updatePasswordBtn">Update Password</a>
+                    <a href="#" id="signOutBtn">Sign Out</a>
+                    <a href="#" id="deleteAccountBtn" class="delete">Delete Account</a>
+                </span>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Find the "Update Password" button by its ID
+            const updatePasswordBtn = document.getElementById("updatePasswordBtn");
+    
+            // Add a click event listener to the button
+            updatePasswordBtn.addEventListener("click", function (event) {
+                event.preventDefault(); // Prevent the default form submission behavior
+    
+                // Prompt the user for the new password
+                const newPassword = prompt("Enter your new password:");
+                if (newPassword === null) {
+                    // User canceled the prompt, do nothing
+                    return;
+                }
+    
+                // Prompt the user to confirm the new password
+                const confirmPassword = prompt("Confirm your new password:");
+                if (confirmPassword === null) {
+                    // User canceled the confirmation prompt, do nothing
+                    return;
+                }
+    
+                // Check if the passwords match
+                if (newPassword !== confirmPassword) {
+                    // Passwords do not match, show an error message
+                    alert("Passwords do not match. Please try again.");
+                    return;
+                }
+
+                if (newPassword == confirmPassword) {
+                    // Passwords do not match, show an error message
+                    alert("Password Has been changed successfully !!!");
+
+                    // Make an AJAX request to your server to update the password
+                fetch('/updatePassword', {
+                    method: 'POST', // You should use the appropriate HTTP method
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ newPassword }), // Send the new password to the server
+                })
+                    .then((response) => response.json())
+                    .then((data) => {
+                        // Handle the response from the server, e.g., show a success message or error message
+                        if (data.success) {
+                            alert("Password updated successfully!");
+                        } else {
+                            alert("Password update failed. Please try again later.");
+                        }
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                    });
+                    return;
+                }
+    
+                
+            });
+
+            
+        });
+
+        
+    </script>
+    
+</body>
+</html>

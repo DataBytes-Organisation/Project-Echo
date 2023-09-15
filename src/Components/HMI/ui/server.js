@@ -631,6 +631,10 @@ app.patch('/api/updateConservationStatus/:animal', async (req,res) => {
 //     res.status(500).json({ error: 'Error fetching data' });
 //   }
 // });
+app.get("/user_profile", (req, res) => {
+  [verifyToken]
+  res.sendFile(path.join(__dirname, 'public/user_profile.html'));
+})
 
 // NEW METHOD - CONNECT VIA API
 app.get('/api/requests', async (req, res) => {

@@ -157,6 +157,16 @@ exports.signin = (req, res) => {
     });
 };
 
+exports.updatepassword = (req, res) => {
+  User.findOne({
+    $or: [
+      { username: req.body.username },
+      { email: req.body.email }
+    ]
+  })
+  
+}
+
 //Guest signup, with random UserId and Password
 exports.guestsignup = async (req) => {
   const guest = new Guest({
