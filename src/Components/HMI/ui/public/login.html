@@ -166,8 +166,8 @@
                     </div>
         
                     <div class="container" style="background-color:#f1f1f1">
-                        <button type="button" onclick="prevPage()">Previous</button>
-                        <button type="button" onclick="nextPage()">Next</button>
+                        <button type="button" id="prev-button" onclick="prevPage()">Previous</button>
+                        <button type="button" id="next-button" onclick="nextPage()">Next</button>
                         <button type="submit" class="btn10" id="submit-button">Sign Up</button>
                     </div>
                 </div>
@@ -178,6 +178,8 @@
             const pages = document.querySelectorAll('.page');
             let currentPage = 1;
             const submitButton = document.getElementById('submit-button');
+            const prevButton = document.getElementById('prev-button');
+            const nextButton = document.getElementById('next-button');
         
             function showPage(pageNum) {
                 pages.forEach((page, index) => {
@@ -187,11 +189,19 @@
                         page.style.display = 'none';
                     }
                 });
-                if (pageNum === pages.length) {
-                    submitButton.style.display = 'block';
-                } else {
-                    submitButton.style.display = 'none';
-                }
+                if (pageNum === 1) {
+                prevButton.style.display = 'none';
+                nextButton.style.display = 'block';
+                submitButton.style.display = 'none';
+            } else if (pageNum === pages.length) {
+                prevButton.style.display = 'block';
+                nextButton.style.display = 'none';
+                submitButton.style.display = 'block';
+            } else {
+                prevButton.style.display = 'block';
+                nextButton.style.display = 'block';
+                submitButton.style.display = 'none';
+            }
             }
         
             function prevPage() {
