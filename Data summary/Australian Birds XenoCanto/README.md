@@ -12,7 +12,7 @@ This database contains audio recordings of various Australian bird species such 
 These audio files are of crucial importance to project Echo, when training models related to bird sounds.
 
 ## Sources 
-These sounds were scraped from Xeno-Canto - https://xeno-canto.org/
+These sounds were downloaded from Xeno-Canto - https://xeno-canto.org/
 
 ## Sample Audio Details 
 
