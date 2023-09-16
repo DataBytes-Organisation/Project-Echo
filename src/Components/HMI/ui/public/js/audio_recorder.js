@@ -15,35 +15,6 @@ var audioRecorder = {
         }
 
         else {
-            /*return navigator.mediaDevices.getUserMedia({ audio: true })
-                .then(stream => {
-              // Create an audio source from the microphone stream
-              const audioSource = audioContext.createMediaStreamSource(stream);
-
-              // Create an AudioWorkletNode for resampling
-              audioContext.audioWorklet.addModule('resampler-processor.js').then(() => {
-                const resamplerNode = new AudioWorkletNode(audioContext, 'resampler-processor');
-
-                // Set the desired sample rate (e.g., 16000 Hz)
-                resamplerNode.port.postMessage({ targetSampleRate: 16000 });
-
-                // Connect the audio source to the resampler
-                audioSource.connect(resamplerNode);
-
-                // Connect the resampler to the MediaRecorder
-                const mediaRecorder = new MediaRecorder(resamplerNode.stream);
-
-                console.log(mediaRecorder.audioBitsPerSecond);
-
-                mediaRecorder.addEventListener("dataavailable", event => {
-                  audioRecorder.audioBlobs.push(event.data);
-                });
-
-                mediaRecorder.start();
-              });
-
-            })
-            .catch(err => console.error("Error accessing microphone: ", err));*/
             
             return navigator.mediaDevices.getUserMedia({ audio: true })
                 .then(stream => {
@@ -89,8 +60,8 @@ var audioRecorder = {
               // Process Audio
               var offlineAudioCtx = new OfflineAudioContext({
                 numberOfChannels: 2,
-                length: 44100 * buffer.duration,
-                sampleRate: 44100,
+                length: 16000 * buffer.duration,
+                sampleRate: 16000,
               });
       
               // Audio Buffer Source

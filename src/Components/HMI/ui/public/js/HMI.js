@@ -16,7 +16,7 @@ var markups = ["elephant.png", "monkey.png", "tiger.png"];
 
 const EARTH_RADIUS = 6371000;
 const MIC_DETECTION_RANGE = 300;
-const MAX_RECORDING_TIME_S = "10";
+const MAX_RECORDING_TIME_S = "15";
 const DEG_TO_RAD = (Math.PI / 180);
 const RAD_TO_DEG = (180 / Math.PI);
 
@@ -114,6 +114,14 @@ export function initialiseHMI(hmiState) {
   //console.log("Get sample element from document: ", document.getElementById("menuPanel"))
   addTruthLayers(hmiState);
   addVocalisationLayers(hmiState);
+  
+  for(let i=1; i<26; i++){
+    addVectorLayerTopDown(hmiState, `mic_layer_${i}`);
+    console.log(`Adding microphone layer:${i}`);
+  }
+  
+  addVectorLayerTopDown(hmiState, "mic_layer");
+  /*
   addVectorLayerTopDown(hmiState, "mic_layer");
   addVectorLayerTopDown(hmiState, "mic_layer_1");
   addVectorLayerTopDown(hmiState, "mic_layer_2");
@@ -124,7 +132,7 @@ export function initialiseHMI(hmiState) {
   addVectorLayerTopDown(hmiState, "mic_layer_7");
   addVectorLayerTopDown(hmiState, "mic_layer_8");
   addVectorLayerTopDown(hmiState, "mic_layer_9");
-
+  */
   addAllTruthFeatures(hmiState);
   addAllVocalizationFeatures(hmiState);
 
@@ -768,7 +776,7 @@ function addMicrophonesByLayer(hmiState, layerName, iconPath){
       image: new ol.style.Icon({
         src: iconPath,
         anchor: [0.5, 1],
-        scale: 0.75,
+        scale: 0.175,
       }),
     });
     mic.setStyle(icon);
@@ -801,7 +809,7 @@ function addMicrophonesByHiddenLayer(hmiState, layerName, iconPath){
       image: new ol.style.Icon({
         src: iconPath,
         anchor: [0.5, 1],
-        scale: 1.0,
+        scale: 1,
       }),
     });
     mic.setStyle(icon);
@@ -821,7 +829,12 @@ var micAnimFrameIndex = 1;
 var animTimeout = null;
 
 function addmicrophones(hmiState) {
-
+  
+  for(let i=25; i>0;i--){
+    addMicrophonesByLayer(hmiState,`mic_layer_${i}`, `./../images/${i}-01.png`);
+  }
+  
+  /*
   addMicrophonesByLayer(hmiState, "mic_layer_9", "./../images/Microphone - 3-ai-9.png");
   addMicrophonesByLayer(hmiState, "mic_layer_8", "./../images/Microphone - 3-ai-8.png");
   addMicrophonesByLayer(hmiState, "mic_layer_7", "./../images/Microphone - 3-ai-7.png");
@@ -831,7 +844,7 @@ function addmicrophones(hmiState) {
   addMicrophonesByLayer(hmiState, "mic_layer_3", "./../images/Microphone - 3-ai-3.png");
   addMicrophonesByLayer(hmiState, "mic_layer_2", "./../images/Microphone - 3-ai-2.png");
   addMicrophonesByLayer(hmiState, "mic_layer_1", "./../images/Microphone - 3-ai-1.png");
-
+  */
   addMicrophonesByHiddenLayer(hmiState, "mic_layer", "./../images/mic2.png");
 }
 
@@ -839,7 +852,7 @@ export function enableMicAnimation(hmiState){
   var staticLayer = findMapLayerWithName(hmiState, "mic_layer");
   staticLayer.setVisible(false);
 
-  for(var i = 1; i <= 9; i++){
+  for(var i = 1; i <= 25; i++){
     var nextLayer = findMapLayerWithName(hmiState, "mic_layer_" + i);
     nextLayer.setVisible(true);
   }
@@ -852,7 +865,7 @@ export function disableMicAnimation(hmiState){
     clearTimeout(animTimeout);
   }
 
-  for(var i = 1; i <= 9; i++){
+  for(var i = 1; i <= 25; i++){
     var nextLayer = findMapLayerWithName(hmiState, "mic_layer_" + i);
     nextLayer.setVisible(false);
   }
@@ -860,7 +873,7 @@ export function disableMicAnimation(hmiState){
 
 function stepMicAnimation(hmiState) {
   var currentIndex = micAnimFrameIndex;
-  micAnimFrameIndex = (micAnimFrameIndex % 9) + 1;
+  micAnimFrameIndex = (micAnimFrameIndex % 25) + 1;
 
   var nextLayer = findMapLayerWithName(hmiState, "mic_layer_" + micAnimFrameIndex);
   nextLayer.setVisible(true);
@@ -1549,7 +1562,7 @@ function simulateRecording(hmiState){
       animalLLAUncertainty: 50.0,
       audioClip: base64String,
       mode: hmiState.simMode,
-      audioFile: "live_recording"
+      audioFile: hmiState.simMode
     }
   
     postRecording(recordingData);

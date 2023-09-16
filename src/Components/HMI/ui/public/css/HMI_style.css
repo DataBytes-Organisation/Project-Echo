@@ -228,7 +228,47 @@ body{
     max-width: 520px;
   }
 }
+#notification {
+  position: fixed;
+  bottom: 20px; /* Adjust the distance from the bottom */
+  left: 20px; /* Adjust the distance from the left */
+  background-color: rgb(10, 10, 25, 0.6);
+  border-radius: 10px;
+  padding: 40px;
+  color: rgba(247, 186, 206, 1);
+  display: none;
+  z-index: 1000;
+}
 
+#notification-content {
+  display: flex;
+  justify-content: space-between;
+  color: rgba(247, 186, 206, 1);
+  font-weight: lighter;
+}
+
+#notification-close {
+  cursor: pointer;
+}
+
+#notification-close:hover{
+  cursor: pointer;
+  opacity: 0.7 !important;
+  transition: 0.2s;
+}
+
+.exit-icon {
+  position: absolute;
+  top: 5px; /* Adjust the distance from the top */
+  right: 5px; /* Adjust the distance from the right */
+  padding-right: 10px;
+  font-size: 20px;
+  color: white !important;
+}
+
+#notification-close {
+  cursor: pointer;
+}
 .navbar {
   margin-top: 50px;
   margin-left: 40px;
@@ -488,6 +528,102 @@ input[type="checkbox"]{
     padding-top: 60px;
     margin-top: 30px;
 
+}
+
+#donate {
+  padding: 0px;
+  height: 100%;
+  width: 0%;
+  position: fixed;
+  z-index: 995;
+  top: 0;
+  right: 0;
+  background-color: none;
+  color: rgba(141, 141, 141, 1.0);
+  overflow-x: hidden;
+  padding-top: 180px;
+  margin-top: 30px;
+}
+
+#donate-contents {
+  padding-top: 20px;
+  margin-left: 10px;
+  margin-right: 30px;
+  height: 3000px;
+  width: 440px;
+  overflow-wrap: break-word;
+  font-family: 'Roboto', sans-serif;
+}
+
+
+/* Styles for the image container */
+.image-row {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.image-description {
+  text-align: center;
+}
+
+.image-description img {
+  max-width: 70px;
+  margin: 7px;
+  transition: opacity 0.3s ease;
+  cursor: pointer;
+}
+
+/* Adjust text alignment for donation amounts */
+.image-amount {
+  text-align: center;
+}
+
+/* Styles for the dollar sign */
+.image-amount::before {
+  content: '$';
+  /* Display the dollar sign before the amount */
+  margin-right: 5px;
+  /* Add some spacing between the dollar sign and amount */
+}
+
+/* Adjust text alignment for donation amounts */
+.image-amount {
+  text-align: center;
+  max-width: 70px;
+  margin: 7px;
+  transition: opacity 0.3s ease;
+  cursor: pointer;
+}
+
+/* Change opacity on hover for animal donation icons */
+.image-description:hover img {
+  opacity: 0.8;
+}
+
+/* Show donation amount when clicking on an animal donation icon */
+.image-description.clicked img {
+  opacity: 0.8;
+}
+
+/* Styles for the "Your Amount" display */
+.donation-amount {
+  margin-top: 15px;
+  font-weight: bold;
+  font-size: 12px;
+  /* Adjust the font size as needed */
+}
+
+/* Adjust the size of the Your Amount.png image */
+.lightbulb-container img {
+  max-width: 70px;
+  /* Adjust the value as needed */
+  margin: 7px;
+}
+
+/* Adjust text alignment for donation amounts */
+.image-amount {
+  text-align: center;
 }
 
 #FAQ {  

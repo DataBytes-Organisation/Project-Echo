@@ -45,6 +45,8 @@ services:
     ports:
       - "8080:8080" 
     restart: on-failure
+    depends_on:
+      - redis
 
   echo_mqtt:
     build:
@@ -130,6 +132,8 @@ services:
       - "6379:6379"
     networks:
       - echo-net
+    command: sh -c "redis-server & sleep 5 && redis-cli flushall & redis-server"
+    restart: on-failure
 
  
 

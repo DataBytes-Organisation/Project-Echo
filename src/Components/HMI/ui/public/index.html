@@ -91,6 +91,13 @@
         <span></span>
       </div>
 
+      <div id="notification" class="hidden">
+        <div id="notification-content">
+            <span id="notification-text">Your notification text here</span>
+            <span id="notification-close" class="exit-icon">x</span>
+        </div>
+      </div>
+
       <!-- Row 2 with main contents spanning the entire width-->
       
       <div class="row main bg-black" style="padding: 0px !important;">
@@ -270,6 +277,7 @@
             <div class="wrapper">
             <div id="SIM-contents">
               <h2>Simulator</h2>
+              
                   <p>
                     <strong>The Echo Simulator</strong> - an innovative system - aims to replicate the Otway’s National Forest environment by creating virtual microphone sensors strategically placed and interconnected in a mesh-like network. This advanced system effectively monitors semi-random simulated animal production events, contributing to wildlife research and conservation efforts. Upon detecting a sound, the simulator shows how our end-to-end solution is able to leverage the trigger times from the nearest microphones, employing a brute-force optimisation technique to accurately triangulate the source location of the sound. With minimal error, the audio sample and associated microphone IDs are seamlessly integrated and communicated throughout Echo-Net, a comprehensive framework comprising a bioacoustics engine, store, processing server, communications servers, and APIs. This rich data is then visually represented on our (HMI), allowing researchers and wildlife enthusiasts to analyse and better understand the complex acoustic interactions within the simulated Otway’s National Forest ecosystem.
                   </p>
@@ -277,15 +285,15 @@
                   <div class="toggle-switch-container">
                     <div class="radio-group">
                       <input type="radio" id="option1" name="options" value="option1" onclick="{simModeSwitch('Animal_Mode')}">
-                      <span for="option1">Simulate Movement</span>
+                      <span for="option1">Simulate Animals - CNN</span>
                     </div>
                     <div class="radio-group">
                       <input type="radio" id="option2" name="options" value="option2" onclick="{simModeSwitch('Recording_Mode')}">
-                      <span for="option2">Live Recording</span>
+                      <span for="option2">Live Recording - CNN</span>
                     </div>
                     <div class="radio-group">
                       <input type="radio" id="option3" name="options" value="option3" onclick="{simModeSwitch('Recording_Mode_V2')}">
-                      <span for="option3">Live Recording V2</span>
+                      <span for="option3">Live Recording - SNN + Event Detection</span>
                     </div>
                     <div class="radio-group">
                       <input type="radio" id="option4" name="options" value="option4" onclick="{simModeSwitch('Stop')}" checked>
@@ -307,7 +315,36 @@
                   <p>
                     As our project expands, we rely on the generosity of supporters like you to ensure the continuous operation of our mission. By donating, you contribute to the preservation of our endangered species. Thank you for being a crucial part of Project Echo's journey.
                   </p>
-                  <button class="donate-button">DONATE NOW</button>
+                  <!-- Animal donation images with hover and click effects -->
+                <div class="image-row" id="image-row">
+                  <div class="image-description">
+                    <img src="./images/$1.png" alt="Amphibian Vulnerable">
+                    <p class="image-amount">1</p>
+                  </div>
+                  <div class="image-description">
+                    <img src="./images/$5.png" alt="Mammal Endangered">
+                    <p class="image-amount">5</p>
+                  </div>
+                  <div class="image-description">
+                    <img src="./images/$10.png" alt="Bird Endangered">
+                    <p class="image-amount">10</p>
+                  </div>
+                  <div class="image-description">
+                    <img src="./images/$20.png" alt="Bird Invasive">
+                    <p class="image-amount">20</p>
+                  </div>
+                  <div class="image-description">
+                    <img src="./images/$50.png" alt="Bird Vulnerable">
+                    <p class="image-amount">50</p>
+                  </div>
+                </div>
+
+                <!-- Donation amount display -->
+                <div class="lightbulb-container" style="text-align: center;">
+                  <img src="./images/Your Amount.png" alt="Light Bulb">
+                  <p class="donation-amount">Your Amount:</p>
+                </div>
+                  <button class="donate-button" id="donation-button">DONATE NOW</button>
             </div>
             </div>
           </div> 
@@ -746,6 +783,93 @@
     </div>
 
 <script>
+  // Variable to keep track of which donation amount has been selected
+  let donorAmount;
+  // Donation amounts
+  var donationData = [
+        { amount: 1, image: '$1.png' },
+        { amount: 5, image: '$5.png' },
+        { amount: 10, image: '$10.png' },
+        { amount: 20, image: '$20.png' },
+        { amount: 50, image: '$50.png' }
+      ];
+
+      // Update the image sources based on the donation amounts
+      var imageDescriptions = document.querySelectorAll('.image-description');
+      imageDescriptions.forEach(function (description, index) {
+        var image = description.querySelector('img');
+        var amount = description.querySelector('.image-amount');
+        amount.textContent = donationData[index].amount;
+        var imageFilename = donationData[index].image;
+
+        image.src = './images/' + imageFilename;
+
+      });
+
+      // Add event listeners for image hover and click effects
+      imageDescriptions.forEach(function (description) {
+        var image = description.querySelector('img');
+        var amount = description.querySelector('.image-amount');
+        var yourAmountElement = document.querySelector('.donation-amount'); // Get the "Your Amount" element
+        var lightbulbIcon = document.querySelector('.lightbulb-container img'); // Get the lightbulb icon element
+
+        // Change opacity on hover
+        image.addEventListener('mouseenter', function () {
+          image.style.opacity = '0.8';
+        });
+
+        image.addEventListener('mouseleave', function () {
+          image.style.opacity = '1'; // Restore original opacity
+        });
+
+        // Display donation amount on click
+        image.addEventListener('click', function () {
+          donorAmount = amount.textContent;
+          yourAmountElement.textContent = 'Your Amount: $' + donorAmount;
+          // Fill the lightbulb container with the clicked icon
+          lightbulbIcon.src = image.src;
+          lightbulbIcon.style.transform = 'scale(1.3)';
+        });
+      });
+
+  let cart = [
+    { id: 1, quantity: 0 }
+  ];
+  // Donation Button Functionality
+
+  const donationButton = document.getElementById('donation-button');
+  donationButton.addEventListener("click", () => {
+    // Check to see if a donation amount has been selected
+    // before executing the api call to the stripe session
+    console.log(cart);
+    if (donorAmount == undefined){
+      console.log("Must choose a donation amount");
+      return
+    }
+    // Update the quantity with the chosen donation amount
+    cart[0].quantity=donorAmount;
+    fetch("/api/create-checkout-session", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        items: cart,
+      }),
+    })
+      .then(res => {
+        if (res.ok) return res.json()
+        return res.json().then(json => Promise.reject(json))
+      })
+      .then(({ url }) => {
+        window.location = url
+      })
+      .catch(e => {
+        console.error(e.error)
+      })
+})
+</script>
+<script>
   let button = document.getElementById("query_submit_button");
 
   emailValidate = function() {
@@ -1084,6 +1208,23 @@ var source;
 var animal;
 var requestData;
 
+const notification = document.getElementById('notification');
+const notificationText = document.getElementById('notification-text');
+const notificationClose = document.getElementById('notification-close');
+
+function vrSuccessfulSubmission(text){
+  
+// Function to show the notification
+  notificationText.textContent = text;
+  notification.style.display = 'block';
+}
+
+function hideNotification() {
+    notification.style.display = 'none';
+}
+// Event listener for the close button
+notificationClose.addEventListener('click', hideNotification);
+
 function submitRequest(){
   animal = document.getElementById("desc_species").innerHTML;
   source = document.getElementById("citationSneeded").value;
@@ -1112,8 +1253,19 @@ function submitRequest(){
     "Content-Type": "application/json"
   },
   body: JSON.stringify(requestData)
+  })
+  .then(response => {
+    if (response.status===200){
+      console.log("Submission Success...");
+      vrSuccessfulSubmission("Thank you. Your submission was succesfully received and is now awaiting review.");
+    }
+    else {
+      console.log("Submission Unsuccessful...");
+    }
+  })
+  .catch(error => {
+    console.log("Error here.");
   });
-  
 }
 
 function checkFields(){

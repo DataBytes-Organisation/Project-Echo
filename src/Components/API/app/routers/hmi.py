@@ -8,7 +8,7 @@ from bson import ObjectId
 import datetime
 from app import serializers
 from app import schemas
-from app.database import Events, Movements, Microphones, User, Role, ROLES, GENDER, STATES_CODE, AUS_STATES, Requests
+from app.database import Events, Movements, Microphones, User, Role, ROLES, Requests, ForgotPassword, LogoutToken
 import paho.mqtt.publish as publish
 import bcrypt
 from flask import jsonify
@@ -19,6 +19,7 @@ import json
 import paho.mqtt.client as paho
 from app.middleware.auth import signJWT, decodeJWT
 from app.middleware.auth_bearer import JWTBearer
+from app.middleware.random import randompassword
 from bson.objectid import ObjectId
 
 jwtBearer = JWTBearer()
@@ -31,7 +32,6 @@ MQTT_BROKER_PORT = 1883
 #mqtt_client = paho.Client()
 #mqtt_client.connect(MQTT_BROKER_URL, MQTT_BROKER_PORT)
 
-logout_token = []
 
 @router.get("/events_time", response_description="Get detection events within certain duration")
 def show_event_from_time(start: str, end: str):
@@ -256,11 +256,13 @@ def signout(jwtToken: str):
             return jsonify({'message': 'Token is missing'}), 400
 
         # Check if the token has been revoked
-        if jwtToken in logout_token:
+        if LogoutToken.find_one({'jwtToken' : jwtToken}):
             return jsonify({'message': 'Token has already been revoked'}), 400
 
         # Add the token to the revoked tokens list
-        logout_token.append(jwtToken)
+        token = {}
+        token['jwtToken'] = jwtToken
+        LogoutToken.insert_one(token)
         response = {"message": "You've been signed out!"}
         return JSONResponse(content=response)
     
@@ -271,7 +273,7 @@ def signout(jwtToken: str):
 @router.post("/ChangePassword", status_code=status.HTTP_200_OK)
 def passwordchange(oldpw: str, newpw: str, cfm_newpw: str, jwtToken: str):
     #Check if user has logged out
-    if(jwtToken in logout_token):
+    if LogoutToken.find_one({'jwtToken' : jwtToken}):
         response = {"message": "Token does not exist"}
         return JSONResponse(content=response, status_code=403)   
 
@@ -331,7 +333,7 @@ async def getRequests():
 @router.post("/change-credential", status_code=status.HTTP_200_OK)
 def changeCredential(field:str, new: str, jwtToken: str):
     #Check if user has logged out
-    if(jwtToken in logout_token):
+    if LogoutToken.find_one({'jwtToken' : jwtToken}):
         response = {"message": "Token does not exist"}
         return JSONResponse(content=response, status_code=403)   
         
@@ -361,7 +363,7 @@ def changeCredential(field:str, new: str, jwtToken: str):
 @router.delete("/delete-account", status_code=status.HTTP_200_OK)
 def deleteaccount(jwtToken: str):
     #Check if user has logged out
-    if(jwtToken in logout_token):
+    if LogoutToken.find_one({'jwtToken' : jwtToken}):
         response = {"message": "Token does not exist"}
         return JSONResponse(content=response, status_code=403)   
         
@@ -373,3 +375,28 @@ def deleteaccount(jwtToken: str):
 
     response = {"message": "User has been deleted!"}
     return JSONResponse(content=response)
+
+@router.post("/forgot-password", status_code=status.HTTP_201_CREATED)
+def forgotpassword(user: schemas.ForgotPasswordSchema):
+    existing_user = User.find_one({"$or": [{"username": user.user}, {"email": user.user}]})
+    if existing_user:
+        newpassword = randompassword()
+        print(newpassword)
+        password_hashed = bcrypt.hashpw(newpassword.encode('utf-8'), bcrypt.gensalt(rounds=8))
+
+        user_dict = {}
+        user_dict["userId"] = str(existing_user['_id'])
+        user_dict["newPassword"] = password_hashed.decode('utf-8')
+        user_dict["modified_date"] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        ForgotPassword.insert_one(user_dict)
+
+        User.update_one(
+           {"$or": [{"username": user.user}, {"email": user.user}]},
+           {"$set": {"password": password_hashed.decode('utf-8')}}
+        )
+        
+        response = {"message": "Password has been reset. Please check your email", "email": existing_user["email"], "password": newpassword}
+        return JSONResponse(content=response, status_code = 201)
+    
+    response = {"message": "User not Found!"}
+    return JSONResponse(content=response, status_code = 404)

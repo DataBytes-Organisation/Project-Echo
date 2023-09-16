@@ -26,13 +26,19 @@ import io
 import json
 import base64
 import tempfile
+import pickle
+import math
+import numpy as np
+import pandas as pd
+import soundfile as sf
+import sys
+sys.path.append("yamnet/")
 
 from platform import python_version
 
 import diskcache as dc
 # image processing related libraries
 import librosa
-import numpy as np
 # generic libraries
 import paho.mqtt.client as paho
 # tensor flow / keras related libraries
@@ -40,7 +46,17 @@ import tensorflow as tf
 import tensorflow_addons as tfa
 import tensorflow_hub as hub
 import tensorflow_io as tfio
+from tensorflow.keras.models import load_model
+
 from google.cloud import storage
+
+# yamnet related imports
+from yamnet_dir import params as params
+from yamnet_dir import yamnet as yamnet_model
+
+# lat long approximation
+import random
+from geopy.distance import geodesic
 
 # database libraries
 import pymongo
@@ -51,6 +67,21 @@ print('TensorFlow Version       : ', tf.__version__)
 print('TensorFlow IO Version    : ', tfio.__version__)
 print('Librosa Version          : ', librosa.__version__)
 
+# Load the necessary data and models
+with open('yamnet_dir/class_names.pkl', 'rb') as f:
+    class_names = pickle.load(f)
+
+with open('yamnet_dir/label_encoder.pkl', 'rb') as f:
+    le = pickle.load(f)
+
+yamnet = yamnet_model.yamnet_frames_model(params)
+yamnet.load_weights('yamnet_dir/yamnet.h5')
+yamnet_classes = yamnet_model.class_names('yamnet_dir/yamnet_class_map.csv')
+model = load_model('yamnet_dir/model_2_79.h5')
+
+# Load the YAMNet model
+yamnet_model_handle = 'https://tfhub.dev/google/yamnet/1'
+yamnet_model = hub.load(yamnet_model_handle)
 
 class EchoEngine():
 
@@ -175,6 +206,27 @@ class EchoEngine():
 
         return subsection
     
+    def load_specific_subsection(self, tmp_audio_t, start_time_secs, end_time_secs, sample_rate):
+        # Ensure start and end times are within the audio duration
+        audio_duration_secs = tf.shape(tmp_audio_t)[0] / sample_rate
+        if end_time_secs > audio_duration_secs:
+            end_time_secs = audio_duration_secs
+
+        # Convert start and end times to sample indices
+        start_index = tf.cast(start_time_secs * sample_rate, dtype=tf.int32)
+        end_index = tf.cast(end_time_secs * sample_rate, dtype=tf.int32)
+
+        # Load the specified subsection
+        subsection = tmp_audio_t[start_index:end_index]
+
+        # If the subsection is shorter than expected, pad it with silence
+        expected_length = int((end_time_secs - start_time_secs) * sample_rate)
+        if subsection.shape[0] < expected_length:
+            padding_length = expected_length - subsection.shape[0]
+            padding = tf.zeros([padding_length], dtype=tmp_audio_t.dtype)
+            subsection = tf.concat([subsection, padding], axis=0)
+
+        return subsection
     
     ########################################################################################
     # this function is adapted from generic_engine_pipeline.ipynb
@@ -288,8 +340,9 @@ class EchoEngine():
             image = None
             sample_rate = 0
 
-            if(audio_event['mode'] == "Recording_Mode"):
+            if(audio_event['audioFile'] == "Recording_Mode"): # classic model
                 # convert to string representation of audio to binary for processing
+                print("Recording_Mode")
                 audio_clip = self.string_to_audio(audio_event['audioClip'])
             
                 image, audio_clip, sample_rate = self.combined_pipeline(audio_clip, "Recording_Mode")
@@ -297,15 +350,87 @@ class EchoEngine():
                 # update the audio event with the re-sampled audio
                 audio_event["audioClip"] = self.audio_to_string(audio_clip)
 
-            elif(audio_event['mode'] == "Recording_Mode_V2"):
+                image = tf.expand_dims(image, 0) 
+            
+                image_list = image.numpy().tolist()
+            
+                # Run the model via tensorflow serve
+                data = json.dumps({"signature_name": "serving_default", "inputs": image_list})
+                url = self.config['MODEL_SERVER']
+                headers = {"content-type": "application/json"}
+                json_response = requests.post(url, data=data, headers=headers)
+                model_result   = json.loads(json_response.text)
+                predictions = model_result['outputs'][0]
+                    
+                # Predict class and probability using the prediction function
+                predicted_class, predicted_probability = self.predict_class(predictions)
+
+                print(f'Predicted class : {predicted_class}')
+                print(f'Predicted probability : {predicted_probability}')
+            
+                # populate the database with the result
+                self.echo_api_send_detection_event(
+                    audio_event,
+                    sample_rate,
+                    predicted_class,
+                    predicted_probability)
+            
+                image = tf.expand_dims(image, 0) 
+            
+                image_list = image.numpy().tolist()
+
+            elif(audio_event['audioFile'] == "Recording_Mode_V2"):
                 # convert to string representation of audio to binary for processing
+                print("Recording_Mode_V2")
+                sample_rate = 16000
                 audio_clip = self.string_to_audio(audio_event['audioClip'])
+                file = io.BytesIO(audio_clip)
+                data_frame, audio_clip = self.sound_event_detection(file, sample_rate)
+                iteration_count = 0
             
-                image, audio_clip, sample_rate = self.combined_pipeline(audio_clip, "Recording_Mode_V2")
-            
-                # update the audio event with the re-sampled audio
-                audio_event["audioClip"] = self.audio_to_string(audio_clip)
-            else:
+                for index, row in data_frame.iterrows():
+                    #start_time	end_time	echonet_label_1	echonet_confidence_1
+                    start_time = float(row['start_time'])
+                    end_time = float(row['end_time'])
+                    predicted_class = row['echonet_label_1']
+
+                    if predicted_class == "Sus_Scrofa":
+                        predicted_class = "Sus Scrofa"
+                    
+                    predicted_probability = round(float(row['echonet_confidence_1']) * 100.0, 2)
+
+                    print(f'Predicted class : {predicted_class}')
+                    print(f'Predicted probability : {predicted_probability}')
+
+                    audio_subsection = self.load_specific_subsection(audio_clip, start_time, end_time, sample_rate)
+
+                    # update the audio event with the re-sampled audio
+                    audio_event["audioClip"] = self.audio_to_string(audio_subsection)
+
+                    new_lat = audio_event['animalEstLLA'][0]
+                    new_lon = audio_event['animalEstLLA'][1]
+
+                    if(iteration_count > 0):
+                        lat = audio_event['animalEstLLA'][0]
+                        lon = audio_event['animalEstLLA'][1]
+
+                        new_lat, new_lon = self.generate_random_location(lat, lon, 50, 100)
+
+                    new_lla = [new_lat, new_lon, 0.0]
+
+                    audio_event['animalEstLLA'] = new_lla
+                    audio_event['animalTrueLLA'] = new_lla
+
+                    # populate the database with the result
+                    self.echo_api_send_detection_event(
+                        audio_event,
+                        sample_rate,
+                        predicted_class,
+                        predicted_probability)
+                    
+                    iteration_count = iteration_count + 1
+
+            else: # simulate animals mode
                 # convert to string representation of audio to binary for processing
                 audio_clip = self.string_to_audio(audio_event['audioClip'])
             
@@ -313,31 +438,35 @@ class EchoEngine():
             
                 # update the audio event with the re-sampled audio
                 audio_event["audioClip"] = self.audio_to_string(audio_clip)
+                
+                image = tf.expand_dims(image, 0) 
             
-            image = tf.expand_dims(image, 0) 
+                image_list = image.numpy().tolist()
             
-            image_list = image.numpy().tolist()
-            
-            # Run the model via tensorflow serve
-            data = json.dumps({"signature_name": "serving_default", "inputs": image_list})
-            url = self.config['MODEL_SERVER']
-            headers = {"content-type": "application/json"}
-            json_response = requests.post(url, data=data, headers=headers)
-            model_result   = json.loads(json_response.text)
-            predictions = model_result['outputs'][0]
+                # Run the model via tensorflow serve
+                data = json.dumps({"signature_name": "serving_default", "inputs": image_list})
+                url = self.config['MODEL_SERVER']
+                headers = {"content-type": "application/json"}
+                json_response = requests.post(url, data=data, headers=headers)
+                model_result   = json.loads(json_response.text)
+                predictions = model_result['outputs'][0]
                     
-            # Predict class and probability using the prediction function
-            predicted_class, predicted_probability = self.predict_class(predictions)
+                # Predict class and probability using the prediction function
+                predicted_class, predicted_probability = self.predict_class(predictions)
 
-            print(f'Predicted class : {predicted_class}')
-            print(f'Predicted probability : {predicted_probability}')
+                print(f'Predicted class : {predicted_class}')
+                print(f'Predicted probability : {predicted_probability}')
             
-            # populate the database with the result
-            self.echo_api_send_detection_event(
-                audio_event,
-                sample_rate,
-                predicted_class,
-                predicted_probability)
+                # populate the database with the result
+                self.echo_api_send_detection_event(
+                    audio_event,
+                    sample_rate,
+                    predicted_class,
+                    predicted_probability)
+            
+                image = tf.expand_dims(image, 0) 
+            
+                image_list = image.numpy().tolist()
             
         except Exception as e:
             # Catch the exception and print it to the console
@@ -366,6 +495,125 @@ class EchoEngine():
         x = requests.post(url, json = detection_event)
         print(x.text)
         
+
+    def load_audio_file(self, file_path):
+        wav, sr = librosa.load(file_path, sr=16000)
+        return np.array([wav])
+
+    def extract_features(self, model, X):
+        features = []
+        for wav in X:
+            scores, embeddings, spectrogram = model(wav)
+            features.append(embeddings.numpy().mean(axis=0))
+        return np.array(features)
+
+    def predict_on_audio(self, binary_audio):
+        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp_audio_file:
+            with open(temp_audio_file.name, 'wb') as f:
+                f.write(binary_audio)
+            X_new = self.load_audio_file(temp_audio_file.name)
+            X_new_features = self.extract_features(yamnet_model, X_new)
+
+            predictions = model.predict(X_new_features)
+            top_two_prob_indices = np.argsort(predictions[0])[-2:]
+            top_two_prob_values = predictions[0][top_two_prob_indices]
+
+            top_two_class_names = le.inverse_transform(top_two_prob_indices)
+        
+            return [(class_names[top_two_prob_indices[1-i]], top_two_prob_values[1-i]) for i in range(2)]
+
+    def sound_event_detection(self, filepath, sample_rate):
+        data, sr = librosa.load(filepath, sr=sample_rate)
+        frame_len = int(sr * 1)
+        num_chunks = len(data) // frame_len
+        chunks = [data[i*frame_len:(i+1)*frame_len] for i in range(num_chunks)]
+
+        # Adding the last chunk which can be less than 1 second
+        last_chunk = data[num_chunks*frame_len:]
+        if len(last_chunk) > 0:
+            chunks.append(last_chunk)
+
+        animal_related_classes = [
+            'Dog', 'Cat', 'Bird', 'Animal', 'Birdsong', 'Canidae', 'Feline', 'Livestock',
+            'Rodents, Mice', 'Wild animals', 'Pets', 'Frogs', 'Insect', 'Snake', 
+            'Domestic animals, pets', 'crow'
+        ]
+
+        df_rows = []
+        buffer = []
+        start_time = None
+        for cnt, frame_data in enumerate(chunks):
+            frame_data = np.reshape(frame_data, (-1,)) # Flatten the array to 1D
+            frame_data = np.array([frame_data]) # Wrapping it back into a 2D array
+            outputs = yamnet(frame_data)
+            yamnet_prediction = np.mean(outputs[0], axis=0)
+            top2_i = np.argsort(yamnet_prediction)[::-1][:2]
+
+            if any(cls in animal_related_classes for cls in [yamnet_classes[top2_i[0]], yamnet_classes[top2_i[1]]]):
+                if start_time is None:
+                    start_time = cnt
+                buffer.append(frame_data)
+            else:
+                if start_time is not None:
+                    segment_data = np.concatenate(buffer, axis=1)[0]
+                    with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp_audio_file:
+                        sf.write(temp_audio_file.name, segment_data, sr)
+                        with open(temp_audio_file.name, 'rb') as binary_file:
+                            top2_predictions = self.predict_on_audio(binary_file.read())
+
+                    df_row = {'start_time': start_time, 'end_time': cnt}
+                
+                    for i, pred in enumerate(top2_predictions[:2]):
+                        df_row[f'echonet_label_{i+1}'] = pred[0] if pred[0] is not None else None
+                        df_row[f'echonet_confidence_{i+1}'] = pred[1] if pred[1] is not None else None
+
+                    df_rows.append(df_row)
+                    buffer = []
+                    start_time = None
+
+        # Handling the case where the last chunk contains an animal-related sound
+        if start_time is not None:
+            segment_data = np.concatenate(buffer, axis=1)[0]
+            with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp_audio_file:
+                sf.write(temp_audio_file.name, segment_data, sr)
+                with open(temp_audio_file.name, 'rb') as binary_file:
+                    top2_predictions = self.predict_on_audio(binary_file.read())
+
+            df_row = {'start_time': start_time, 'end_time': len(chunks)}
+        
+            for i, pred in enumerate(top2_predictions[:2]):
+                df_row[f'echonet_label_{i+1}'] = pred[0] if pred[0] is not None else None
+                df_row[f'echonet_confidence_{i+1}'] = pred[1] if pred[1] is not None else None
+
+            df_rows.append(df_row)
+
+        df = pd.DataFrame(df_rows)
+
+        # keep right channel only
+        if data.ndim == 2 and data.shape[0] == 2:
+            data = data[1, :]
+        
+        # cast to float32 type
+        data = data.astype(np.float32)
+
+        return df, data
+
+    def generate_random_location(self, lat, lon, min_distance, max_distance):
+        # Generate a random direction in radians (0 to 2*pi)
+        random_direction = random.uniform(0, 2 * 3.14159265359)
+
+        # Generate a random distance between min and max distances
+        random_distance = random.uniform(min_distance, max_distance) / 6371000 #Earth Radius
+
+        # Calculate the latitude and longitude offsets
+        lat_offset = random_distance * math.cos(random_direction)
+        lon_offset = random_distance * math.sin(random_direction)
+
+        # Calculate the new latitude and longitude
+        new_lat = lat + lat_offset
+        new_lon = lon + lon_offset
+
+        return new_lat, new_lon
 
     ########################################################################################
     # Execute the main engine loop (which waits for messages to arrive from MQTT)
@@ -396,6 +644,8 @@ class EchoEngine():
 
         print("Engine waiting for audio to arrive...")
         client.loop_forever()
+
+    
 
 
 if __name__ == "__main__":

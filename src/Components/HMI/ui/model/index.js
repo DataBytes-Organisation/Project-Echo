@@ -8,6 +8,8 @@ db.user = require("./user.model");
 db.role = require("./role.model");
 db.guest = require("./guest.model")
 db.request = require("./request.model");
+db.forgotpassword = require("./forgotpassword.model");
+db.logouttoken = require('./logouttoken.model')
 
 db.ROLES = ["user", "admin", "guest"];
 

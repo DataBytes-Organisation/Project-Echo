@@ -3,6 +3,7 @@
 <head>
     <!-- Imports -->
     <meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1"> 
     <!-- Open Layers -->
     <link rel="stylesheet" type="text/css" href="./css/ol.css" />
 
@@ -104,74 +105,124 @@
 
                 <div class="container" style="background-color:#f1f1f1">
                     <button type="button" onclick="{closeForm('login-form')}" class="cancelbtn">Cancel</button>
-                    <span class="psw"><a href="#">Forgot password?</a></span>
+                    <span class="psw" onclick="{closeForm('login-form')} {openForm('forgotpassword-form')}"><a href="#">Forgot password?</a></span>
                 </div>
             </form>
         </div>
 
         <div id="signup-form" class="user-auth-form modal">
 
-            <form class="modal-content animate" action="/api/auth/signup" method="POST" id="form-sign-up" style = 'margin-top: -75px;'>
+            <form class="modal-content animate" action="/api/auth/signup" method="POST" id="form-sign-up" style="margin-top: -75px;">
                 <div class="imgcontainer">
                     <span onclick="{closeForm('signup-form')}" class="close" title="Close Modal">&times;</span>
-                    <!-- <img src="img_avatar2.png" alt="Avatar" class="avatar"> -->
                 </div>
-
+        
                 <div class="container">
-
-                    <label for="username"><b>Username</b></label>
-                    <input type="text" placeholder="Enter Username" name="username" required>
-
-                    <label for="email"><b>Email</b></label>
-                    <input type="email" placeholder="Enter Email" name="email" required>
-
-                    <label for="password"><b>Password</b></label>
-                    <input type="password" placeholder="Enter Password" name="password" required>
-
-                    <label for="confirmpassword"><b>Confirm Password</b></label>
-                    <input type="password" placeholder="Enter Password Again" name="confirmpassword" required>
-
-                    <label for="roles"><b>Roles</b></label><br>            
-                    <select name="roles" id = "roles">
-                        <option value="" disabled selected>Roles</option>
-                        <option value="admin">Admin</option>
-                        <option value="user">User</option>
-                        <option value="guest">Guest</option>
-                    </select>
-                    
-
-                    <label for="gender"><b>Gender</b></label><br>
-                    <select name = 'gender' id = "gender">
-                        <option value="" disabled selected>Gender</option>
-                        <option value="MALE">Male</option>
-                        <option value="FEMALE">Female</option>
-                    </select>
-
-                    <label for="DoB"><b>Date of Birth</b></label>
-                    <input type="text" placeholder="DD/MM/YYYY" name="DoB" required>
-
-                    <label for="country"><b>Country</b></label>
-                    <input type="text" placeholder="Enter your Country" name="country" required>
-                    
-                    <label for="state"><b>State</b></label>
-                    <input type="text" placeholder="Required if Australia" name="state">
-                    
-                    <label for="organization"><b>Organization</b></label>
-                    <input type="text" placeholder="Enter your Organization" name="organization" required>
-                    
-                    <label for="phonenumber"><b>Phone Number</b></label>
-                    <input type="text" placeholder="Enter your Number" name="phonenumber">
-
-                    <button type="submit" class="btn10"><span>Sign Up</span></button>
-                </div>
-
-                <div class="container" style="background-color:#f1f1f1">
-                    <button type="button" onclick="{closeForm('signup-form')}" class="cancelbtn">Cancel</button>
+                    <div class="page" data-page="1">
+                        <label for="username"><b>Username</b></label>
+                        <input type="text" placeholder="Enter Username" name="username" required>
+        
+                        <label for="email"><b>Email</b></label>
+                        <input type="email" placeholder="Enter Email" name="email" required>
+        
+                        <label for="password"><b>Password</b></label>
+                        <input type="password" placeholder="Enter Password" name="password" required>
+        
+                        <label for="confirmpassword"><b>Confirm Password</b></label>
+                        <input type="password" placeholder="Enter Password Again" name="confirmpassword" required>
+                    </div>
+        
+                    <div class="page" data-page="2">
+                        <label for="roles"><b>Roles</b></label><br>
+                        <select name="roles" id="roles">
+                            <option value="" disabled selected>Roles</option>
+                            <option value="admin">Admin</option>
+                            <option value="user">User</option>
+                            <option value="guest">Guest</option>
+                        </select>
+        
+                        <label for="gender"><b>Gender</b></label><br>
+                        <select name="gender" id="gender">
+                            <option value="" disabled selected>Gender</option>
+                            <option value="MALE">Male</option>
+                            <option value="FEMALE">Female</option>
+                        </select>
+        
+                        <label for="DoB"><b>Date of Birth</b></label>
+                        <input type="text" placeholder="DD/MM/YYYY" name="DoB" required>
+                    </div>
+        
+                    <div class="page" data-page="3">
+                        <label for="country"><b>Country</b></label>
+                        <input type="text" placeholder="Enter your Country" name="country" required>
+        
+                        <label for="state"><b>State</b></label>
+                        <input type="text" placeholder="Required if Australia" name="state">
+        
+                        <label for="organization"><b>Organization</b></label>
+                        <input type="text" placeholder="Enter your Organization" name="organization" required>
+        
+                        <label for="phonenumber"><b>Phone Number</b></label>
+                        <input type="text" placeholder="Enter your Number" name="phonenumber">
+                    </div>
+        
+                    <div class="container" style="background-color:#f1f1f1">
+                        <button type="button" id="prev-button" onclick="prevPage()">Previous</button>
+                        <button type="button" id="next-button" onclick="nextPage()">Next</button>
+                        <button type="submit" class="btn10" id="submit-button">Sign Up</button>
+                    </div>
                 </div>
             </form>
         </div>
-
-
+        
+        <script>
+            const pages = document.querySelectorAll('.page');
+            let currentPage = 1;
+            const submitButton = document.getElementById('submit-button');
+            const prevButton = document.getElementById('prev-button');
+            const nextButton = document.getElementById('next-button');
+        
+            function showPage(pageNum) {
+                pages.forEach((page, index) => {
+                    if (index + 1 === pageNum) {
+                        page.style.display = 'block';
+                    } else {
+                        page.style.display = 'none';
+                    }
+                });
+                if (pageNum === 1) {
+                prevButton.style.display = 'none';
+                nextButton.style.display = 'block';
+                submitButton.style.display = 'none';
+            } else if (pageNum === pages.length) {
+                prevButton.style.display = 'block';
+                nextButton.style.display = 'none';
+                submitButton.style.display = 'block';
+            } else {
+                prevButton.style.display = 'block';
+                nextButton.style.display = 'block';
+                submitButton.style.display = 'none';
+            }
+            }
+        
+            function prevPage() {
+                if (currentPage > 1) {
+                    currentPage--;
+                    showPage(currentPage);
+                }
+            }
+        
+            function nextPage() {
+                if (currentPage < pages.length) {
+                    currentPage++;
+                    showPage(currentPage);
+                }
+            }
+        
+            showPage(currentPage);
+        </script>
+        
+        
         <div id="request-access-form" class="user-auth-form modal">
 
             <form class="modal-content animate" action="/request_access" method="POST">
@@ -189,6 +240,30 @@
 
                 <div class="container" style="background-color:#f1f1f1">
                     <button type="button" onclick="{closeForm('request-access-form')}" class="cancelbtn">Cancel</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="forgotpassword-form" class="user-auth-form modal">
+
+            <form class="modal-content animate" id="forgotpassword-form" action="/api/auth/forgot" method="POST">
+                <div class="imgcontainer">
+                    <span onclick="{closeForm('forgotpassword-form')}" class="close" title="Close Modal">&times;</span>
+                    <!-- <img src="img_avatar2.png" alt="Avatar" class="avatar"> -->
+                </div>
+
+                <div class="container">
+   
+                    <label for="account"><b>Account</b></label>
+                    <input type="text" placeholder="Email or Username" name="account">
+
+                    <button type="submit"><span>Reset Password</span></button>
+        
+                </div>
+
+                <div class="container" style="background-color:#f1f1f1">
+                    <button type="button" onclick="{closeForm('forgotpassword-form')}" class="cancelbtn">Cancel</button>
+ 
                 </div>
             </form>
         </div>

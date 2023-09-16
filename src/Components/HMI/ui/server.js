@@ -5,14 +5,12 @@ const fs = require('fs');
 const cookieSession = require('cookie-session');
 const dbConfig = require('./config/db.config');
 const jwt = require('jsonwebtoken');
-const { authJwt, client } = require('./middleware');
+const { authJwt, client, checkUserSession } = require('./middleware');
 const controller = require('./controller/auth.controller');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
-
 client.connect()
-
 const cors = require('cors');
 require('dotenv').config()
 //const shop = require("./shop/shop")
@@ -27,14 +25,10 @@ const User = db.user;
 const Guest = db.guest;
 const Request = db.request;
 
+
 //for connecting to ts-mongo-db
 const MongoClient = require('mongodb').MongoClient;
 const url = "mongodb://modelUser:EchoNetAccess2023@ts-mongodb-cont:27017/EchoNet";
-
-// Create a function to test the MongoDB connection
-
-
-
 
 
 
@@ -67,24 +61,6 @@ db.mongoose
 function initial() {
   Role.estimatedDocumentCount((err, count) => {
     if (!err && count === 0) {
-      // new Role({
-      //   name: "user"
-      // }).save(err => {
-      //   if (err) {
-      //     console.log("error", err);
-      //   }
-
-      //   console.log("added 'user' to roles collection");
-      // });
-      // new Role({
-      //   name: "admin"
-      // }).save(err => {
-      //   if (err) {
-      //     console.log("error", err);
-      //   }
-
-      //   console.log("added 'admin' to roles collection");
-      // });
       const roleData = require(path.join(__dirname, "user-sample/role-seed.json"));
 
       Role.insertMany(roleData);
@@ -123,6 +99,42 @@ function initial() {
 // }
 
 // getAllPayments();
+
+const storeItems = new Map([[
+  1, { priceInCents: 100, name: "donation"}
+]])
+app.use(express.json());
+
+app.post("/api/create-checkout-session", async (req, res) => {
+  try {
+    console.log(req.body.items);
+    const session = await stripe.checkout.sessions.create({
+      customer_email: 'bndct.dev@gmail.com',
+      submit_type: 'donate',
+      payment_method_types: ["card"],
+      mode: "payment",
+      line_items: req.body.items.map(item => {
+        const storeItem = storeItems.get(item.id)
+        return {
+          price_data: {
+            currency: "aud",
+            product_data: {
+              name: storeItem.name,
+            },
+            unit_amount: item.quantity * 100,
+          },
+          quantity: 1,
+        }
+      }),
+      success_url: "http://localhost:8080", //`${process.env.CLIENT_URL}`,
+      cancel_url: "http://localhost:8080"//`${process.env.CLIENT_URL}`,
+    })
+    console.log("two");
+    res.json({ url: session.url })
+  } catch (e) {
+    res.status(500).json({ error: e.message })
+  }
+})
 
 app.get('/donations', async(req,res) => {
   let charges;
@@ -272,6 +284,7 @@ app.get('/data/captcha', (req, res) => {
   console.log("Image: ", image);
   res.json({image, text});
 });
+
 //Background Process to automatically delete Guest role after exceeding expiration
 setInterval(() => {
   const now = new Date();
@@ -288,8 +301,8 @@ setInterval(() => {
 const port = 8080;
 
 // serve static files from the public directory
-app.use(express.static(path.join(__dirname, 'public')));
-
+// app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public'), { index: path.join(__dirname, 'public/login.html')}))
 
 var corsOptions = {
   origin: ["http://localhost:8081", "*"]
@@ -325,7 +338,6 @@ app.use(
 );
 
 const nodemailer = require('nodemailer');
-const { verifyToken } = require('./middleware/authJwt');
 var transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -352,8 +364,6 @@ app.post("/send_email", async (req, res) => {
   const validationResult = await testEmail(email);
   if (validationResult.result){
       // Validate the email address
-      // const validationResult = await validateEmail(email);
-      // console.log("Validate email result: ", validationResult);
       // If email validation is successful, proceed to send the email
       let html_text = '<div>';
       html_text += '<h2>A new query has been received for Project Echo HMI</h2>';
@@ -366,7 +376,7 @@ app.post("/send_email", async (req, res) => {
 
       let mailOptions = {
         from: email,
-        to: `echodatabytes@gmail.com, ${email}, databytes@deakin.edu.au`,
+        to: `echodatabytes@gmail.com, ${email}`,
         subject: 'New query received!',
         text: query,
         html: html_text,
@@ -382,11 +392,11 @@ app.post("/send_email", async (req, res) => {
           console.log(error);
         } else {
           console.log('Email sent: ' + info.response);
-          return res.redirect("/");
+          return res.send('<script> alert("user query sent! Please check your mailbox for further communication"); window.location.href = "/"; </script>')
         }
       });
     } else {
-      return res.status(400).json({ error: validationResult.response });
+      return res.status(400).send("<script> alert(`Sender's email is not valid!`)</script>");
     }
     
   }
@@ -460,7 +470,7 @@ app.post("/request_access", async (req, res) => {
             console.log(error);
           } else {
             console.log('Email sent: ' + info.response);
-            return res.redirect("/login")
+            return res.send('<script> alert("Temporary credential granted! Please check your mailbox."); window.location.href = "/login"; </script>')
           }
         });
       } else {
@@ -486,17 +496,28 @@ app.post("/request_access", async (req, res) => {
 // routes
 require('./routes/auth.routes')(app);
 require('./routes/user.routes')(app);
+app.get('*', checkUserSession);
+app.get("/", async (req, res) => {
+  console.log("token: ", await client.get('JWT', (err, storedToken) => {
+          if (err) {
+            return `Error retrieving token from Redis: ${err}`
+          } else {
+            return storedToken
+          }
+  }))
+  let role = await client.get('Roles', (err, storedToken) => {
+    if (err) {
+      return `Error retrieving user role from Redis: ${err}`
+    } else {
+      return storedToken
+    }
+  })
 
-app.get("/", (req, res) => {
-  if (authJwt.verifyToken && authJwt.isUser) {
-    console.log("This is user session!")
-    res.sendFile(path.join(__dirname, 'public/index.html'))
+  if (role.toLowerCase().includes("admin")) {
+    res.redirect("/admin-dashboard")
+  } else {
+    res.redirect("/map")
   }
-  else {
-    console.log("This is not user sessions!")
-    res.json("No available session, you have not logged in yet")
-  }
-
 })
 
 app.get("/admin-dashboard", (req,res)=> {
@@ -512,7 +533,6 @@ app.get("/admin-donations", (req, res) => {
 })
 
 app.get("/login", (req, res) => {
-  [verifyToken]
   res.sendFile(path.join(__dirname, 'public/login.html'));
 })
 
@@ -646,7 +666,6 @@ app.get('/api/requests', async (req, res) => {
       }
     })
 
-    console.log("Current token: ", token)
     const axiosResponse = await axios.get('http://ts-api-cont:9000/hmi/requests', { headers: {"Authorization" : `Bearer ${token}`}})
   
     if (axiosResponse.status === 200) {
@@ -661,33 +680,36 @@ app.get('/api/requests', async (req, res) => {
 });
 
 app.get("/welcome", async (req,res) => {
-  console.log("token: ", await client.get('JWT', (err, storedToken) => {
-          if (err) {
-            console.error('Error retrieving token from Redis:', err);
-            return null
-          } else {
-            console.log('Stored Token:', storedToken);
-            return storedToken
-          }
-  }))
-  res.sendFile(path.join(__dirname, 'public/index.html'))
+  try {
+    console.log("token: ", await client.get('JWT', (err, storedToken) => {
+            if (err) {
+              return `Error retrieving token from Redis: ${err}`
+            } else {
+              return storedToken
+            }
+    }))
+    let role = await client.get('Roles', (err, storedToken) => {
+      if (err) {
+        return `Error retrieving user role from Redis: ${err}`
+      } else {
+        return storedToken
+      }
+    })
+
+    if (role.toLowerCase().includes("admin")) {
+      res.redirect("/admin-dashboard")
+    } else {
+      res.redirect("/map")
+    }
+  }
+  catch {
+    res.send(`<script> alert("No user info detected! Please login again"); window.location.href = "/login"; </script>`);
+  }
 })
 
-// app.get("*", (req,res) => {
-//   if (authJwt.verifyToken){
-//     let token = req.session.token;
-//     console.log("Current token: ", req.session.token)
-//     if (!token) {
-//       console.log("Current user session unavailable")
-//       res.sendFile(path.join(__dirname, 'public/login.html'));
-//     } 
-//   }
-//   else {
-//     console.log("User token not assigned!");
-//     res.sendFile(path.join(__dirname, 'public/login.html'));
-//   }
-
-// })
+app.get("/map", async(req,res) => {
+  res.sendFile(path.join(__dirname, 'public/index.html'))
+})
 
 // start the server
 app.listen(port, () => {

@@ -245,7 +245,7 @@
   @media only screen and (max-width: 980px) and (orientation: portrait) { /* Mobile vers. (Portrait) */
     .screen > .screen-content {
       justify-content: center;
-      padding-bottom: 8rem;
+      padding-bottom: 2rem;
     }
   }
 
@@ -300,22 +300,20 @@
     border-radius: 1rem;
     box-shadow: 0px 0px 8px 4px rgb(var(--primary-rgb) / 60%);
   }
-  
-
 
   /* Controls the dark green line under logo */
   .screen > .screen-content > .screen-user:before {
-	height: 2px;
-	width: 50px;
+    height: 2px;
+    width: 50px;
     translate: -20px -1rem;
-	opacity: 0.75;
+    opacity: 0.75;
   }
 
   
   @media only screen and (max-width: 980px) and (orientation: portrait) { /* Mobile vers. (Portrait) */
     .screen > .screen-content > .screen-user:before {
       height: 5px;
-      width: 36vw;
+      width: 38vw;
       translate: -12vw -1rem;
     }
   }
@@ -330,17 +328,17 @@
   
   /* Controls the bright green line under logo */
   .screen > .screen-content > .screen-user:after {
-	height: 3px;
-	width: 30px;
-	translate: 26px calc(-1rem - 0.5px);
+    height: 3px;
+    width: 30px;
+    translate: 26px calc(-1rem - 0.5px);
   }
 
   
   @media only screen and (max-width: 980px) and (orientation: portrait) { /* Mobile vers. (Portrait) */
     .screen > .screen-content > .screen-user:after {
       height: 7px;
-      width: 16vw;
-      translate: 18vw calc(-1rem - 0.5px);
+      width: 20vw;
+      translate: 22vw calc(-1rem - 0.5px);
     }
   }
 
@@ -376,6 +374,50 @@
   @media only screen and (max-width: 930px) and (orientation: landscape) { /* Mobile vers. (Landscape) */
     .screen > .screen-content > .screen-user > .name {
       font-size: 5vw;
+    }
+  }
+
+  /* Controls the list of buttons in portrait mode  */
+  @media only screen and (max-width: 980px) and (orientation: portrait) { /* Mobile vers. (Portrait) */
+    .screen > .screen-content > .screen-user > ul {
+      flex-direction: column;
+    }
+  }
+
+  @media only screen and (max-width: 930px) and (orientation: landscape) { /* Mobile vers. (Landscape) */
+    .screen > .screen-content > .screen-user > ul {
+      margin-bottom: 0;
+    }
+  }
+
+  /* Scale the buttons for tablets in portrait */
+  @media only screen and (max-width: 980px) and (min-width: 800px) and (orientation: portrait) { /* Mobile vers. (Portrait) */
+    .screen > .screen-content > .screen-user > ul > li {
+      font-size: 5vw;
+      margin-bottom: 0.5rem;
+    }
+  }
+
+  /* For the login and register forms */
+  @media only screen and (max-width: 980px) and (orientation: portrait) { /* Mobile vers. (Portrait) */
+    .screen > .user-auth-form > .modal-content {
+      position: absolute;
+      left: 10vw;
+      width: 80vw;
+      min-width: 0px;
+      margin: 0;
+    }
+  }
+
+  @media only screen and (max-width: 930px) and (orientation: landscape) { /* Mobile vers. (Landscape) */
+    .screen > .user-auth-form > .modal-content {
+      position: absolute;
+      top: -1vw;
+      left: 10vw;
+      width: 80vw;
+      min-width: 0px;
+      margin: 0;
+      scale: 85%;
     }
   }
 
