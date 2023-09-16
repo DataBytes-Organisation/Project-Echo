@@ -783,9 +783,9 @@
     </div>
 
 <script>
-  // Sample data for donation amounts and their corresponding image filenames
-  let donationAmount;
+  // Variable to keep track of which donation amount has been selected
   let donorAmount;
+  // Donation amounts
   var donationData = [
         { amount: 1, image: '$1.png' },
         { amount: 5, image: '$5.png' },
@@ -799,11 +799,10 @@
       imageDescriptions.forEach(function (description, index) {
         var image = description.querySelector('img');
         var amount = description.querySelector('.image-amount');
-        donationAmount = donationData[index].amount;
+        amount.textContent = donationData[index].amount;
         var imageFilename = donationData[index].image;
 
         image.src = './images/' + imageFilename;
-        amount.textContent = donationAmount;
 
       });
 
@@ -836,14 +835,18 @@
   let cart = [
     { id: 1, quantity: 0 }
   ];
-  //Donations
+  // Donation Button Functionality
+
   const donationButton = document.getElementById('donation-button');
   donationButton.addEventListener("click", () => {
+    // Check to see if a donation amount has been selected
+    // before executing the api call to the stripe session
     console.log(cart);
     if (donorAmount == undefined){
       console.log("Must choose a donation amount");
       return
     }
+    // Update the quantity with the chosen donation amount
     cart[0].quantity=donorAmount;
     fetch("/api/create-checkout-session", {
       method: "POST",
