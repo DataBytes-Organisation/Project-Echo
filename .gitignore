@@ -9,5 +9,10 @@ logs/
 models/
 src\Prototypes\api\__pycache__
 
+env_api.txt
+env_hmi.txt
+env_db.txt
+script.sh
+
 src/Prototypes/hmi/ui/node_modules/*
 src/Components/HMI/ui/node_modules/*

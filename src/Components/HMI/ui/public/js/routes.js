@@ -9,19 +9,21 @@ requirejs.config({
 
 let axios;
 
-if (typeof window === 'undefined') {
-  axios = require('axios');
+if (typeof window === "undefined") {
+  axios = require("axios");
 } else {
   axios = window.axios;
 }
 
-const MESSAGE_API_URL = 'http://localhost:9000/hmi';
+const MESSAGE_API_URL = "http://172.17.0.2:9000/hmi";
 //const MESSAGE_API_URL = 'http://ts-api-cont:9000/hmi';
 
 export function retrieveTruthEventsInTimeRange(from, to) {
   var start = parseInt(from);
   var end = parseInt(to);
-  return axios.get(`${MESSAGE_API_URL}/movement_time?start=${start}&end=${end}`);
+  return axios.get(
+    `${MESSAGE_API_URL}/movement_time?start=${start}&end=${end}`
+  );
 }
 
 export function retrieveVocalizationEventsInTimeRange(from, to) {
@@ -34,39 +36,40 @@ export function retrieveMicrophones() {
   return axios.get(`${MESSAGE_API_URL}/microphones`);
 }
 
-export function retrieveAudio(id){
+export function retrieveAudio(id) {
   //console.log(`${MESSAGE_API_URL}/audio?id=${id}`);
   return axios.get(`${MESSAGE_API_URL}/audio?id=${id}`);
 }
 
-export function postRecording(recordingData){
-  axios.post(`${MESSAGE_API_URL}/post_recording`, recordingData)
-  .then(response => {
-    console.log('Response:', response.data);
-  })
-  .catch(error => {
-    console.error('Error:', error);
-  });
+export function postRecording(recordingData) {
+  axios
+    .post(`${MESSAGE_API_URL}/post_recording`, recordingData)
+    .then((response) => {
+      console.log("Response:", response.data);
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
   //axios.post(`${MESSAGE_API_URL}/post_recording?data=${recordingData}`);
 }
 
-export function setSimModeAnimal(){
+export function setSimModeAnimal() {
   axios.post(`${MESSAGE_API_URL}/sim_control?control=Animal_Mode`);
 }
 
-export function setSimModeRecording(){
+export function setSimModeRecording() {
   axios.post(`${MESSAGE_API_URL}/sim_control?control=Recording_Mode`);
 }
 
-export function setSimModeRecordingV2(){
+export function setSimModeRecordingV2() {
   axios.post(`${MESSAGE_API_URL}/sim_control?control=Recording_Mode_V2`);
 }
 
-export function stopSimulator(){
+export function stopSimulator() {
   axios.post(`${MESSAGE_API_URL}/sim_control?control=Stop`);
 }
 
-export function retrieveSimTime(){
+export function retrieveSimTime() {
   return axios.get(`${MESSAGE_API_URL}/latest_movement`);
 }
 
@@ -81,4 +84,3 @@ export function retrieveSimTime(){
 //   }).then(res => console.log(res))
 //   .catch(err => console.log(err))
 // }
-

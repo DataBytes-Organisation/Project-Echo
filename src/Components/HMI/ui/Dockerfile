@@ -4,13 +4,13 @@
 FROM node:20.4.0 
 
 # Set the working directory in the Docker container
-WORKDIR /usr/src/app
+WORKDIR /app
 
 # Copy the entire contents of the current directory to the Docker image
 COPY . .
 
 # Change to the UI directory where your package.json file is located
-WORKDIR /usr/src/app/ui
+WORKDIR /app/
 
 # Install your application's dependencies
 RUN npm install
