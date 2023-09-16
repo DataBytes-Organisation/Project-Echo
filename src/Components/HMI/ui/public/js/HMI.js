@@ -16,7 +16,7 @@ var markups = ["elephant.png", "monkey.png", "tiger.png"];
 
 const EARTH_RADIUS = 6371000;
 const MIC_DETECTION_RANGE = 300;
-const MAX_RECORDING_TIME_S = "10";
+const MAX_RECORDING_TIME_S = "15";
 const DEG_TO_RAD = (Math.PI / 180);
 const RAD_TO_DEG = (180 / Math.PI);
 
@@ -1562,7 +1562,7 @@ function simulateRecording(hmiState){
       animalLLAUncertainty: 50.0,
       audioClip: base64String,
       mode: hmiState.simMode,
-      audioFile: "live_recording"
+      audioFile: hmiState.simMode
     }
   
     postRecording(recordingData);

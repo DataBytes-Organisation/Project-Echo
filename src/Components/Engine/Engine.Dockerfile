@@ -1,11 +1,15 @@
 # Use an official TensorFlow GPU image as the base image
 FROM tensorflow/tensorflow:latest-gpu
+#FROM python:3.9
 
 # Set the working directory
 WORKDIR /app
 
 # Copy the requirements.txt file into the container
 COPY requirements.txt ./
+
+# Copy yamnet to the container
+COPY yamnet_dir/ ./yamnet_dir/
 
 # Install any needed Python packages specified in requirements.txt
 ENV DEBIAN_FRONTEND=noninteractive
