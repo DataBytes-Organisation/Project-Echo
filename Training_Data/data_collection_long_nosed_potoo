@@ -1,0 +1,18 @@
+from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+
+
+# Xeno
+driver = webdriver.Chrome()
+url_xeno = 'https://xeno-canto.org/species/Nyctibius-aethereus?query=ssp:%22aethereus%22'
+
+# Increase the range value to get more audio files loaded into specified directory
+for n in range(100):
+        try:
+                driver.get(url_xeno)
+                titles = driver.find_elements(By.XPATH, '/html/body/div[1]/table[2]/tbody/tr[1]/td[12]/a[1]')
+                titles[n].click() 
+        except :
+                print("Exception")
+driver.quit()

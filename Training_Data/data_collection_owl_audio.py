@@ -5,6 +5,7 @@ import os
 import requests as r
 import csv
 from lxml import etree
+import pandas as pd
 
 
 driver = webdriver.Chrome()
@@ -43,9 +44,9 @@ for x in range(1000):
                 with open(f'G:/sounds/files/{file_name}.mp3', 'wb') as file:
                     file.write(doc.content)
                     driver.implicitly_wait(5)
-                    with open('G:/sounds/owl_sounds.csv', 'a', newline='\n') as file:
-                            writer = csv.writer(file)
-                            writer.writerow([file_name, sound_author, sound_information_length, file_size, sample_rate,
+                with open('G:/sounds/owl_sounds.csv', 'a', newline='\n') as file:
+                        writer = csv.writer(file)
+                        writer.writerow([file_name, sound_author, sound_information_length, file_size, sample_rate,
                                              bit_depth, sound_description, video_url])
                 driver.back()
                 driver.find_element(By.XPATH, '//*[@id="cookie-accept"]').click()
@@ -54,4 +55,19 @@ for x in range(1000):
         except:
                 print("Exception")
 
+driver.quit()
+
+
+# Xeno
+driver = webdriver.Chrome()
+url_xeno = 'https:/xeno-canto.org/species/Ninox-strenua'
+
+# Increase the range value to get more audio files loaded into specified directory
+for n in range(100):
+        try:
+                driver.get(url_xeno)
+                titles = driver.find_elements(By.XPATH, '/html/body/div[1]/table[2]/tbody/tr[1]/td[12]/a[1]')
+                titles[n].click() 
+        except :
+                print("Exception")
 driver.quit()
