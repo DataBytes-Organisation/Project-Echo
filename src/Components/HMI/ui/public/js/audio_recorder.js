@@ -60,8 +60,8 @@ var audioRecorder = {
               // Process Audio
               var offlineAudioCtx = new OfflineAudioContext({
                 numberOfChannels: 2,
-                length: 44100 * buffer.duration,
-                sampleRate: 44100,
+                length: 16000 * buffer.duration,
+                sampleRate: 16000,
               });
       
               // Audio Buffer Source
