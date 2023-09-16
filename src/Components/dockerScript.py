@@ -19,7 +19,6 @@ def delete_containers(container_names):
             print(f"Container {container_name} not found.")
 
 
-
 def delete_unused_volumes(preserved_volume_names):
     client = docker.from_env()
 

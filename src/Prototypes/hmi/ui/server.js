@@ -4,28 +4,33 @@ const path = require('path');
 const fs = require('fs');
 const cookieSession = require("cookie-session");
 const dbConfig = require("./config/db.config");
-
-
+const mongoose = require("mongoose");
+require('dotenv').config()
+//const shop = require("./shop/shop")
+const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY);
 
 //Add mongoDB module inside config folder
 const db = require("./model");
+
 const Role = db.role;
 
-//Establish Mongo Client connection to mongoDB
+//added in
+const Request = require("./public/js/sampleRequests")
+
+
 db.mongoose
-  .connect(`mongodb://${dbConfig.USERNAME}:${dbConfig.PASSWORD}@${dbConfig.HOST}:${dbConfig.PORT}/${dbConfig.DB}`, {
+  .connect(`mongodb://root:root_password@localhost:27017/?authMechanism=DEFAULT`, {
     useNewUrlParser: true,
     useUnifiedTopology: true
   })
   .then(() => {
     console.log("Successfully connect to MongoDB.");
-    initial();
+    //initial();
   })
   .catch(err => {
     console.error("Connection error", err);
     process.exit();
   });
-
 
 //Initalize the data if no user role existed
 function initial() {
@@ -52,8 +57,7 @@ function initial() {
     }
   });
 }
-
-const port = 8080;
+const port = 7080;
 
 // serve static files from the public directory
 app.use(express.static(path.join(__dirname, 'public')));
@@ -61,11 +65,15 @@ app.use(express.static(path.join(__dirname, 'public')));
 //cors access to enable sending emails from different hosts
 const cors = require("cors");
 
+
 var corsOptions = {
-  origin: "http://localhost:8080"
+  origin: "http://localhost:7080"
 };
 
+
+
 app.use(cors(corsOptions))
+
 
 //bodyParser to make sure post form data is read
 const bodyParser = require("express");
@@ -91,6 +99,43 @@ var transporter = nodemailer.createTransport({
     pass: 'ltzoycrrkpeipngi'
   }
 });
+
+//Donations
+
+const storeItems = new Map([[
+  1, { priceInCents: 100, name: "microphone"}
+]])
+
+app.post("/create-checkout-session", async (req, res) => {
+  try {
+    console.log("Once!");
+    const session = await stripe.checkout.sessions.create({
+      customer_email: 'bndct.dev@gmail.com',
+      submit_type: 'donate',
+      payment_method_types: ["card"],
+      mode: "payment",
+      line_items: req.body.items.map(item => {
+        const storeItem = storeItems.get(item.id)
+        return {
+          price_data: {
+            currency: "cad",
+            product_data: {
+              name: storeItem.name,
+            },
+            unit_amount: storeItem.priceInCents,
+          },
+          quantity: item.quantity,
+        }
+      }),
+      success_url: `${process.env.CLIENT_URL}`,
+      cancel_url: `${process.env.CLIENT_URL}`,
+    })
+    console.log("two");
+    res.json({ url: session.url })
+  } catch (e) {
+    res.status(500).json({ error: e.message })
+  }
+})
 
 app.post("/send_email", (req,res) => {
   const {email, query} = req.body;
@@ -126,6 +171,20 @@ app.post("/send_email", (req,res) => {
 
 })
 
+app.get('/api/requests', async (req, res) => {
+  try {
+    const requests = await Request.find();
+    console.log(requests);
+    res.json(requests);
+  } catch (error) {
+    res.status(500).json({ error: 'Error fetching data' });
+  }
+});
+
+app.get("/requests", (req,res) => {
+  res.sendFile(path.join(__dirname, 'public/requests.html'))
+})
+
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, 'public/index.html'))
 })
@@ -133,6 +192,9 @@ app.get("/", (req, res) => {
 // routes
 require('./routes/auth.routes')(app);
 require('./routes/user.routes')(app);
+
+
+
 
 // start the server
 app.listen(port, () => {

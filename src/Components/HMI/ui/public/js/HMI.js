@@ -3,14 +3,22 @@
 import { getAudioTestString } from "./HMI-utils.js";
 import { getAudioRecorder } from "./audio_recorder.js";
 import { retrieveTruthEventsInTimeRange, retrieveVocalizationEventsInTimeRange, 
-  retrieveMicrophones, retrieveAudio, retrieveSimTime } from "./routes.js";
-//import data from "./sample_data.json" assert { type: 'json' }; Browser assertions not yet supported in all browsers, alternative method used instead.
+  retrieveMicrophones, retrieveAudio, retrieveSimTime, postRecording, 
+  setSimModeAnimal, setSimModeRecording, setSimModeRecordingV2, stopSimulator } from "./routes.js";
+
+  //import data from "./sample_data.json" assert { type: 'json' }; Browser assertions not yet supported in all browsers, alternative method used instead.
 
 
 // import { parse } from 'json2csv';
 
 
 var markups = ["elephant.png", "monkey.png", "tiger.png"];
+
+const EARTH_RADIUS = 6371000;
+const MIC_DETECTION_RANGE = 300;
+const MAX_RECORDING_TIME_S = "10";
+const DEG_TO_RAD = (Math.PI / 180);
+const RAD_TO_DEG = (180 / Math.PI);
 
 var audioRecorder = getAudioRecorder();
 
@@ -33,7 +41,7 @@ function matchStatus(status){
 
 export function convertCSV(json) {
   if (json == null) return null
-  if (json === [] | typeof json === undefined | json.length === 0){
+  if (typeof json === undefined | json.length === 0){
     return null
   }
   let data = json;
@@ -392,6 +400,16 @@ export function convertJSONtoMicrophone(hmiState, data){
 
 export function muteAudioAnimation(){
   const mute_audio = new CustomEvent('muteAnimation',{
+    detail: {
+      message: "mute animation"
+    }
+  })
+
+  document.dispatchEvent(mute_audio);
+}
+
+export function muteRecordingPlaybackAnimation(){
+  const mute_audio = new CustomEvent('muteRecordingAnimation',{
     detail: {
       message: "mute animation"
     }
@@ -995,6 +1013,11 @@ function createBasemap(hmiState) {
   return basemap;
 }
 
+var current_mic_lat = 0.0;
+var current_mic_lon = 0.0;
+var current_mic_id = "";
+
+
 function createMapClickEvent(hmiState){
   hmiState.basemap.on("click", function (evt) {
     const feature = hmiState.basemap.forEachFeatureAtPixel(evt.pixel, function (feature) {
@@ -1030,10 +1053,15 @@ function createMapClickEvent(hmiState){
         let dateFormat = new Date();
         document.getElementById("mic_markup_img").src = values.micIcon;
         document.getElementById("mic_markup_details").innerHTML = "Microphone";
-        document.getElementById("mic_markup_loc_lon").innerHTML = values.micLon;
         document.getElementById("mic_markup_loc_lat").innerHTML = values.micLat;
+        document.getElementById("mic_markup_loc_lon").innerHTML = values.micLon;
         document.getElementById("mic_markup_date").innerHTML = dateFormat.toUTCString()
-        
+
+        current_mic_lat = values.micLat;
+        current_mic_lon = values.micLon;
+        current_mic_id = values.id;
+
+
         animal_toggled = true;
         const toggled_mic = new CustomEvent('micToggled',{
         detail: {
@@ -1082,7 +1110,7 @@ function createMapClickEvent(hmiState){
             animal_data = result;
             document.getElementById("desc_name").innerText = result.common;
             //document.getElementById("markup_img_2").src = values.animalIcon;
-            document.getElementById("desc_confidence").innerText = values.animalLocConfidence + "%";
+            document.getElementById("desc_confidence").innerText = values.animalConfidence + "%";
             document.getElementById("desc_species").innerText = result.species;
             document.getElementById("desc_summary").innerText = result.summary;
 
@@ -1103,7 +1131,7 @@ function createMapClickEvent(hmiState){
 
             document.getElementById("desc_name").innerText = values.animalSpecies;
             //document.getElementById("markup_img_2").src = values.animalIcon;
-            document.getElementById("desc_confidence").innerText = values.animalLocConfidence + "%";
+            document.getElementById("desc_confidence").innerText = values.animalConfidence + "%";
             document.getElementById("desc_species").innerText = values.animalSpecies;
             document.getElementById("desc_summary").innerText = "Bio data coming soon.";
             let summary = document.getElementById("desc_details");
@@ -1117,7 +1145,7 @@ function createMapClickEvent(hmiState){
             document.getElementById("markup_details").innerHTML = values.animalType + " | " + values.animalDiet + " | " + statusPrintLookup[values.animalStatus];
             document.getElementById("markup_loc_lon").innerHTML = values.animalLon;
             document.getElementById("markup_loc_lat").innerHTML = values.animalLat;
-            document.getElementById("markup_confidence").innerHTML = values.animalConfidence + "%";
+            document.getElementById("markup_confidence").innerHTML = values.animalLocConfidence + "%";
             document.getElementById("markup_date").innerHTML = dateFormat.toUTCString()
 
             animal_toggled = true;
@@ -1373,7 +1401,6 @@ export function hidePlaybackIndicator() {
 }
 
 var audioRecordStartTime = null;
-const MAX_RECORDING_TIME_S = "10";
 var durationTimer = null;
 
 export function testFunct(){
@@ -1461,45 +1488,216 @@ export function cancelAudioRecording() {
   hideRecordingControls();
 }
 
-/*
-let mediaRecorder;
+document.addEventListener('saveRecording', function(event){
+  save();
+})
 
-function startRecording() {
-    navigator.mediaDevices.getUserMedia({ audio: true })
-        .then(stream => {
-            mediaRecorder = new MediaRecorder(stream);
-            mediaRecorder.ondataavailable = handleDataAvailable;
-            mediaRecorder.start();
-        })
-        .catch(err => console.error("Error accessing microphone: ", err));
+document.addEventListener('loadRecording', function(event){
+  //console.log("stop audio");
+  //playNextTrack = false;
+  //stopAudioPlayback();
+})
+
+document.addEventListener('simulateRecording', function(event){
+  //simulateRecording(audioRecorder.audioBlobs, window.hmiState);
+  simulateRecording(window.hmiState);
+})
+
+function generateRandomCoordinate(latitude, longitude) {
+  const latRad = latitude * DEG_TO_RAD;
+  const lonRad = longitude * DEG_TO_RAD;
+
+  const dist = (Math.random() * MIC_DETECTION_RANGE) + 50;
+
+  const theta = Math.random() * 2 * Math.PI;
+
+  const newLatRad = latRad + (dist / EARTH_RADIUS) * Math.cos(theta);
+  const newLonRad = lonRad + (dist / EARTH_RADIUS) * Math.sin(theta);
+
+  const newLat = newLatRad * RAD_TO_DEG;
+  const newLon = newLonRad * RAD_TO_DEG;
+
+  return { lat: newLat, lon: newLon };
 }
 
-function stopRecording() {
-    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-        mediaRecorder.stop();
-    }
+function arrayBufferToBase64(buffer) {
+  let binary = '';
+  const bytes = new Uint8Array(buffer);
+  const len = bytes.byteLength;
+  for (let i = 0; i < len; i++) {
+      binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
 }
 
-function handleDataAvailable(event) {
-    if (event.data.size > 0) {
-        recordedChunks.push(event.data);
+function simulateRecording(hmiState){
+  if (decodedAudioStore.length === 0) {
+    console.log("No recording available.");
+    return;
+  }else{
+
+    const base64String = arrayBufferToBase64(fileContent);
+    
+    let coords = generateRandomCoordinate(current_mic_lat, current_mic_lon);
+
+    const recordingData = {
+      timestamp: Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000),
+      sensorId: current_mic_id,
+      microphoneLLA: [current_mic_lat, current_mic_lon, 0.0],
+      animalEstLLA: [coords.lat, coords.lon, 0.0],
+      animalTrueLLA: [coords.lat, coords.lon, 0.0],
+      animalLLAUncertainty: 50.0,
+      audioClip: base64String,
+      mode: hmiState.simMode,
+      audioFile: "live_recording"
     }
-}*/
+  
+    postRecording(recordingData);
+      
+    //let decodedAudio = stringToAudio(base64String);
+
+    //playAudioFromUint8Array(decodedAudio);
+    //testEncoding(base64String);
+  }
+}
+
+function testEncoding(base64String){
+  audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  const binaryData = atob(base64String);
+
+  const float32Array = new Float32Array(binaryData.length / Float32Array.BYTES_PER_ELEMENT);
+  const view = new DataView(float32Array.buffer);
+  for (let i = 0; i < binaryData.length; i++) {
+    view.setUint8(i, binaryData.charCodeAt(i));
+  }
+
+  const newBuffer = audioContext.createBuffer(1, float32Array.length, audioContext.sampleRate);
+  newBuffer.copyToChannel(float32Array, 0);
+
+  const audioSource = audioContext.createBufferSource();
+  audioSource.buffer = newBuffer;
+  audioSource.connect(audioContext.destination);
+  audioSource.start();
+}
+
+function stringToAudio(base64String) {
+  const binaryString = atob(base64String);
+
+  const uint8Array = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) {
+    uint8Array[i] = binaryString.charCodeAt(i);
+  }
+
+  return uint8Array;
+}
+
+function playAudioFromUint8Array(uint8Array) {
+  const blob = new Blob([uint8Array], { type: 'audio/wav' }); // Change the MIME type if needed
+
+  const audioUrl = URL.createObjectURL(blob);
+
+  const audioElement = new Audio(audioUrl);
+
+  audioElement.play();
+}
+
+
+function save() {
+  if(audioRecorder.audioBlobs.length != 0){
+    let exportData = {};
+    exportData.audioBlobs = [];
+
+    audioRecorder.audioBlobs.forEach(item => {
+      exportData.audioBlobs.push(btoa(item));
+    });
+
+    const base64AudioDataArray = audioRecorder.audioBlobs.map(blob => {
+      const reader = new FileReader();
+      return new Promise((resolve, reject) => {
+          reader.onloadend = () => {
+              resolve(reader.result.split(',')[1]); // Extract Base64 data
+          };
+          reader.readAsDataURL(blob);
+      });
+    });
+
+    var jsonDataStr = "";
+
+    Promise.all(base64AudioDataArray)
+      .then(audioDataArray => {
+          const jsonData = {
+              audioBlobs: audioDataArray,
+          };
+
+          jsonDataStr = JSON.stringify(jsonData);
+          
+
+          const filename = prompt("Enter a filename for the JSON file:", "data.json");
+
+          if (filename) {
+      
+            const jsonDataString = jsonDataStr;
+            const blob = new Blob([jsonDataString], { type: 'application/json' });
+      
+            const blobURL = URL.createObjectURL(blob);
+      
+            const downloadLink = document.createElement('a');
+            downloadLink.href = blobURL;
+            downloadLink.download = filename;
+            downloadLink.textContent = 'Download JSON';
+      
+            document.getElementById("downloadLink").innerHTML = "";
+            document.getElementById("downloadLink").appendChild(downloadLink);
+            console.log(jsonDataString);
+            downloadLink.click();
+          }
+      })
+      .catch(err => console.error("Error processing audio blobs: ", err));
+  }
+}
+
+var fileInput = document.getElementById("fileInput");
+
+var playNextRecordedTrack = false;
+var audioAnimTimeout = null;
+
+document.addEventListener('playRecordedAudio', function(event){
+  //console.log("play audio");
+  playNextRecordedTrack = true;
+  playAudio()
+})
+
+document.addEventListener('stopRecordedAudio', function(event){
+  //console.log("stop audio");
+  playNextRecordedTrack = false;
+  stopRecordingPlayback();
+})
+
+var audioRecordingElement = null;
+var recordingPlaybackAnimTimeout = null;
 
 function playRecording(recordedChunks) {
     if (recordedChunks.length === 0) {
         console.log("No recording available.");
         return;
     }else{
-      const blob = new Blob(recordedChunks, { type: 'audio/webm' });
+
+      const blob = new Blob(recordedChunks, { type: 'audio/wav; codecs=MS_PCM' });
+
       if(blob.size > 0){
         const url = URL.createObjectURL(blob);
-        const audioElement = document.getElementById("audioElem");
+        audioRecordingElement = document.getElementById("audioElem");
   
-        audioElement.src = url;
-        audioElement.load();
-        audioElement.play();
-        showPlaybackIndicator();
+        audioRecordingElement.src = url;
+        audioRecordingElement.load();
+        if(playNextRecordedTrack){
+          recordingPlaybackAnimTimeout = setTimeout(
+            muteRecordingPlaybackAnimation,
+            10000,
+            hmiState
+          );
+          audioRecordingElement.play();
+        }
       }
       else{
         console.log("Recording failed check microphone configuration settings.");
@@ -1507,10 +1705,75 @@ function playRecording(recordedChunks) {
     }
 }
 
+
+var audioContext = null;
+var a_source = null;
+var decodedAudioStore = null;
+var fileContent = null;
+
+fileInput.addEventListener("change", function(event) {
+  const selectedFile = event.target.files[0];
+  audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+  if (selectedFile) {
+    const reader = new FileReader();
+
+    reader.onload = function(event) {
+      fileContent = event.target.result;
+      audioContext.decodeAudioData(fileContent.slice(0), function(decodedAudio) {
+
+          decodedAudioStore = decodedAudio;
+          a_source = audioContext.createBufferSource();
+          a_source.buffer = decodedAudioStore;
+
+          a_source.connect(audioContext.destination);
+
+          audioElement.src = URL.createObjectURL(selectedFile);
+      });
+    };
+
+    reader.readAsArrayBuffer(selectedFile);
+  }
+});
+
+function stopRecordingPlayback(){
+  muteRecordingPlaybackAnimation();
+
+  if(recordingPlaybackAnimTimeout){
+    clearTimeout(recordingPlaybackAnimTimeout);
+  }
+
+  if(a_source == null){
+    if(audioRecordingElement != null){
+      audioRecordingElement.pause();
+      audioRecordingElement.currentTime = 0; 
+    }
+  }
+  else{
+    a_source.stop();
+  }
+}
+
 export function playAudio() {
   console.log("play");
+  if(a_source == null){
+    playRecording(audioRecorder.audioBlobs);
+  }
+  else{
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    if(playNextRecordedTrack){
+      recordingPlaybackAnimTimeout = setTimeout(
+        muteRecordingPlaybackAnimation,
+        10000,
+        hmiState
+      );
+      a_source = audioContext.createBufferSource();
+      a_source.buffer = decodedAudioStore;
 
-  playRecording(audioRecorder.audioBlobs);
+      a_source.connect(audioContext.destination);
+      a_source.start();
+    }
+  }
 }
 
 export function initializeRecordingDuration() {
@@ -1559,3 +1822,19 @@ export function computeRecordingDuration(startTime) {
 
     return  "00:" + minutes + ":" + seconds;
 }
+
+document.addEventListener('modeSwitch', function(event){
+  window.hmiState.simMode = event.detail.message;
+  if(window.hmiState.simMode == "Animal_Mode"){
+    setSimModeAnimal();
+  }
+  else if(window.hmiState.simMode == "Recording_Mode"){
+    setSimModeRecording();
+  }
+  else if(window.hmiState.simMode == "Recording_Mode_V2"){
+    setSimModeRecordingV2();
+  }
+  else if(window.hmiState.simMode == "Stop"){
+    stopSimulator();
+  }
+});
