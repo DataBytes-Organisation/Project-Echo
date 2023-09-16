@@ -4,6 +4,8 @@ const path = require('path');
 const fs = require('fs');
 const cookieSession = require('cookie-session');
 const dbConfig = require('./config/db.config');
+const helmet = require('helmet');
+const mongoSanitize = require('express-mongo-sanitize');
 const jwt = require('jsonwebtoken');
 const { authJwt, client, checkUserSession } = require('./middleware');
 const controller = require('./controller/auth.controller');
@@ -30,7 +32,7 @@ const Request = db.request;
 const MongoClient = require('mongodb').MongoClient;
 const url = "mongodb://modelUser:EchoNetAccess2023@ts-mongodb-cont:27017/EchoNet";
 
-
+const rootDirectory = __dirname; // This assumes the root directory is the current directory
 
 
 //Security verification for email account and body content validation:
@@ -104,6 +106,26 @@ const storeItems = new Map([[
   1, { priceInCents: 100, name: "donation"}
 ]])
 app.use(express.json());
+// Use helmet middleware to set security headers
+app.use(helmet());
+// Function to sanitize and normalize file paths
+function sanitizeFilePath(filePath) {
+  // Use path.normalize to ensure the path is in normalized form
+  const normalizedPath = path.normalize(filePath);
+
+  // Use path.join to join the normalized path with the root directory
+  const rootDirectory = __dirname; // This assumes the root directory is the current directory of the script
+  const absolutePath = path.join(rootDirectory, normalizedPath);
+
+  // Ensure that the resulting path is still within the root directory
+  if (absolutePath.startsWith(rootDirectory)) {
+    return absolutePath;
+  } else {
+    // If the path goes outside the root directory, return null or handle the error as needed
+    return null;
+  }
+}
+
 
 app.post("/api/create-checkout-session", async (req, res) => {
   try {
