@@ -56,7 +56,7 @@
                     <th>Requesting To Change</th>
                     <th>From</th>
                     <th>To</th>
-                    <th>Reason</th>
+                    <th>Source</th>
                     <th>Date</th>
                     <th>Status</th>
                   </tr>
@@ -110,7 +110,7 @@ function createDropdown(requestId, animal, to) {
 
     
 
-  function updateTable(){
+function updateTable(){
     fetch('/api/requests')
         .then(response => response.json())
         .then(data => {
@@ -199,14 +199,13 @@ updateTable();
                 console.error('Error updating request status:', error);
          });
 
-         
          fetch(`/api/updateConservationStatus/${animal}`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                status: 'vulnerable'
+                status: to
             })
             })
             .then(response => {

@@ -12,11 +12,12 @@
 }
 
 /* Full-width input fields */
-input[type=text], input[type=password] {
+input[type=text], input[type=email], input[type=password] {
   width: 100%;
-  padding: 12px 20px;
-  margin: 8px 0;
-  display: inline-block;
+  border-radius: 5px;
+  padding: 10px 20px;
+  margin: 8px auto;
+  display: flex;
   border: 1px solid #ccc;
   box-sizing: border-box;
 }
@@ -159,6 +160,25 @@ span.psw {
   padding-top: 15vh;
 }
 
+.captcha-block {
+  background-color: #fefefe;
+  display: none;
+  width: 100%;
+  border: 1px solid grey;
+  position: inherit;
+  
+}
+.captcha-img {
+  width: 300px;
+  height: 100px;
+}
+
+.disabled {
+  background-color: grey;
+  color: white;
+  opacity: 0.8;
+  cursor: not-allowed;
+}
 /* Modal Content/Box */
 .modal-content {
   background-color: #fefefe;
@@ -192,6 +212,16 @@ span.psw {
 
 .error-text{
   color: red;
+}
+
+select{
+  width: 100%;
+  border-radius: 5px;
+  padding: 10px 20px;
+  margin: 8px auto;
+  display: flex;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
 }
 
 @-webkit-keyframes animatezoom {

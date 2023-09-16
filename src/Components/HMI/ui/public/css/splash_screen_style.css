@@ -10,6 +10,14 @@
     box-sizing: border-box;
   }
   
+  /* When making changes depending on device type (like on Mobile), have a global standard, and then one that changes just the properties for the device type specified. */
+  /* See '.screen > .screen-content > .screen-user > .name' to see what I mean. Like it only changes the font size while has the weight and position set in the global. */
+
+  @viewport { /* Having this permits device size control */
+    width: device-width;
+    zoom: 1.0 ;
+  } 
+  
   body {
     height: 100vh;
     display: grid;
@@ -90,58 +98,116 @@
     left: 0px;
     top: 0px;
   }
-  
+
+  /* Controls the images in the panning background */
   @keyframes pan-image {  
     0% {
-      background-position: 36% 42%;
-      background-size: 200%;
+    background-position: 36% 42%;
+    background-size: 200%;
     }
-    
+
     20% {
-      background-position: 30% 35%;
-      background-size: 200%;
+    background-position: 30% 35%;
+    background-size: 200%;
     }
-    
+
     20.0001% { /* -- View 2 -- */
-      background-position: 60% 85%;
-      background-size: 500%;
+    background-position: 60% 85%;
+    background-size: 500%;
     }
-    
+
     40% {
-      background-position: 49% 81%;
-      background-size: 500%;
+    background-position: 49% 81%;
+    background-size: 500%;
     }
-    
+
     40.0001% { /* -- View 3 -- */
-      background-position: 80% 42%;
-      background-size: 300%;
+    background-position: 80% 42%;
+    background-size: 300%;
     }
-    
+
     60% {
-      background-position: 84% 33%;
-      background-size: 300%;
+    background-position: 84% 33%;
+    background-size: 300%;
     }
-    
+
     60.0001% { /* -- View 4 -- */
-      background-position: 0% 0%;
-      background-size: 300%;
+    background-position: 0% 0%;
+    background-size: 300%;
     }
-    
+
     80% {
-      background-position: 15% 4%;
-      background-size: 300%;
+    background-position: 15% 4%;
+    background-size: 300%;
     }
-    
+
     80.0001% { /* -- View 5 -- */
-      background-position: 80% 10%;
-      background-size: 300%;
+    background-position: 80% 10%;
+    background-size: 300%;
     }
-    
+
     100% {
-      background-position: 72% 14%;
-      background-size: 300%;
+    background-position: 72% 14%;
+    background-size: 300%;
     }
   }
+  
+
+  @media only screen and (max-width: 980px) { /* Mobile vers. */
+    @keyframes pan-image {  
+      0% {
+        background-position: 36% 42%;
+        background-size: 500%;
+      }
+
+      20% {
+        background-position: 30% 35%;
+        background-size: 500%;
+      }
+
+      20.0001% { /* -- View 2 -- */
+        background-position: 60% 85%;
+        background-size: 500%;
+      }
+
+      40% {
+        background-position: 49% 81%;
+        background-size: 500%;
+      }
+
+      40.0001% { /* -- View 3 -- */
+        background-position: 80% 42%;
+        background-size: 400%;
+      }
+
+      60% {
+        background-position: 84% 33%;
+        background-size: 400%;
+      }
+
+      60.0001% { /* -- View 4 -- */
+        background-position: 0% 0%;
+        background-size: 400%;
+      }
+
+      80% {
+        background-position: 15% 4%;
+        background-size: 400%;
+      }
+
+      80.0001% { /* -- View 5 -- */
+        background-position: 80% 10%;
+        background-size: 500%;
+      }
+
+      100% {
+        background-position: 72% 14%;
+        background-size: 500%;
+      }
+    }
+  }
+
+
   /* IMAGE: https://wallpaperaccess.com/magical-forest */
   .screen > .screen-image {
 	-webkit-transform: translate3d(0, 0, 0); /* Using this translate command not only will enable the HW renderer, but it should also assist with the prevention of screen cutoff due to it rendering differently to the map section, fixing the other issue */
@@ -159,6 +225,7 @@
     animation: pan-image 15s linear infinite;
   }
   
+  /* Controls the primary frame */
   .screen > .screen-content {
     display: flex;
     flex-direction: column;
@@ -172,6 +239,36 @@
     padding-bottom: 6rem;
     border: 1px solid rgb(var(--primary-rgb) / 50%);
     border-radius: 0.6rem;
+  }
+
+
+  @media only screen and (max-width: 980px) and (orientation: portrait) { /* Mobile vers. (Portrait) */
+    .screen > .screen-content {
+      justify-content: center;
+      padding-bottom: 8rem;
+    }
+  }
+
+  @media only screen and (max-width: 930px) and (orientation: landscape) { /* Mobile vers. (Landscape) */
+    .screen > .screen-content {
+      justify-content: center;
+      gap: 2rem;
+      padding-bottom: 1rem;
+    }
+  }
+
+  @media only screen and (max-width: 980px) and (orientation: portrait) { /* Mobile exclusive (Portrait) */
+    .screen > .screen-content > img {
+      min-height: 40vw;
+      min-width: 50vw;
+    }
+  }
+
+  @media only screen and (max-width: 930px) and (orientation: landscape) { /* Mobile exclusive (Landscape) */
+    .screen > .screen-content > img {
+      min-height: 16vw;
+      min-width: 20vw;
+    }
   }
   
   .screen > .screen-content > .screen-icon {
@@ -187,44 +284,144 @@
     gap: 1rem;
     position: relative;
   }
+
+  @media only screen and (max-width: 930px) and (orientation: landscape) { /* Mobile vers. (Landscape) */
+    .screen > .screen-content > .screen-user{
+      gap: 0rem;
+    }
+  }
   
   .screen > .screen-content > .screen-user:before,
-  .screen > .screen-content > .screen-user:after {
+  .screen > .screen-content > .screen-user:after { /* Controls the green lines under logo */
     content: "";
     position: absolute;
     top: 0px;
     background-color: rgb(var(--primary-rgb));
     border-radius: 1rem;
-    box-shadow: 0px 0px 8px 3px rgb(var(--primary-rgb) / 60%);
+    box-shadow: 0px 0px 8px 4px rgb(var(--primary-rgb) / 60%);
   }
   
+
+
+  /* Controls the dark green line under logo */
   .screen > .screen-content > .screen-user:before {
-    height: 2px;
-    width: 50px;
+	height: 2px;
+	width: 50px;
     translate: -20px -1rem;
-    opacity: 0.75;
+	opacity: 0.75;
+  }
+
+  
+  @media only screen and (max-width: 980px) and (orientation: portrait) { /* Mobile vers. (Portrait) */
+    .screen > .screen-content > .screen-user:before {
+      height: 5px;
+      width: 36vw;
+      translate: -12vw -1rem;
+    }
+  }
+
+  @media only screen and (max-width: 930px) and (orientation: landscape) { /* Mobile vers. (Landscape) */
+    .screen > .screen-content > .screen-user:before {
+      height: 5px;
+      width: 14vw;
+      translate: -4vw -1rem;
+    }
   }
   
+  /* Controls the bright green line under logo */
   .screen > .screen-content > .screen-user:after {
-    height: 3px;
-    width: 30px;
-    translate: 26px calc(-1rem - 0.5px);
+	height: 3px;
+	width: 30px;
+	translate: 26px calc(-1rem - 0.5px);
   }
+
   
+  @media only screen and (max-width: 980px) and (orientation: portrait) { /* Mobile vers. (Portrait) */
+    .screen > .screen-content > .screen-user:after {
+      height: 7px;
+      width: 16vw;
+      translate: 18vw calc(-1rem - 0.5px);
+    }
+  }
+
+  @media only screen and (max-width: 930px) and (orientation: landscape) { /* Mobile vers. (Landscape) */
+    .screen > .screen-content > .screen-user:after {
+      height: 7px;
+      width: 6vw;
+      translate: 8vw calc(-1rem - 0.5px);
+    }
+  }
+
   .screen > .screen-content > .screen-user > :is(.name, .subtitle) { /* While the text animation did also use the SW renderer and cause some CPU usage, it shouldn't need the HW renderer for now... */
     font-family: "EarthOrbiterCondensed Local";
     color: white; 
     text-align: center;
     text-transform: uppercase; 
   }
-  
-  
+
+  /* Controls the Project Echo text */
   .screen > .screen-content > .screen-user > .name {
     position: relative;
     font-size: 4.25rem;
     font-weight: 400;
   }
-  
+
+
+  @media only screen and (max-width: 980px) and (orientation: portrait) { /* Mobile vers. (Portrait) */
+    .screen > .screen-content > .screen-user > .name {
+      font-size: 10vw;
+    }
+  }
+
+  @media only screen and (max-width: 930px) and (orientation: landscape) { /* Mobile vers. (Landscape) */
+    .screen > .screen-content > .screen-user > .name {
+      font-size: 5vw;
+    }
+  }
+
+  @media only screen and (max-width: 980px) { /* Ensure on touch devices, the text says 'Touch to Start' */
+    .screen > .screen-content > .screen-user > .subtitle{
+      visibility: hidden;
+    }
+  }
+
+  @media (pointer: coarse) or ((pointer: fine) and (any-pointer: coarse)) { /* --- */
+    .screen > .screen-content > .screen-user > .subtitle{
+      visibility: hidden;
+    }
+  }
+
+  @media only screen and (max-width: 980px) and (orientation: portrait) { /* --- */
+    .screen > .screen-content > .screen-user > .subtitle:after{
+      position: relative;
+      font-size: 8vw;
+      font-weight: 750;      
+      content: "Touch to start";
+      display: block;
+      visibility: visible;
+    }
+  }
+
+  @media only screen and (max-width: 980px) and (orientation: landscape) { /* --- */
+    .screen > .screen-content > .screen-user > .subtitle:after{
+      position: relative;
+      font-size: 3vw;
+      font-weight: 750;      
+      content: "Touch to start";
+      display: block;
+      visibility: visible;
+    }
+  }
+
+  @media (pointer: coarse) or ((pointer: fine) and (any-pointer: coarse)) { /* --- */
+    .screen > .screen-content > .screen-user > .subtitle:after{
+      content: "Touch to start";
+      display: block;
+      visibility: visible;
+    }
+  }
+
+  /* Controls the 2 dots on either side of text*/
   .screen > .screen-content > .screen-user > .name:before,
   .screen > .screen-content > .screen-user > .name:after {
     content: "";
@@ -234,9 +431,18 @@
     border: 2px solid white;
     border-radius: 2px;
   }
+
+
+  @media only screen and (max-width: 980px) { /* Mobile vers. */
+    .screen > .screen-content > .screen-user > .name:before,
+    .screen > .screen-content > .screen-user > .name:after {
+      border: 4px solid white;
+      border-radius: 4px;
+    }
+  }
   
   .screen > .screen-content > .screen-user > .name:before {
-    top: 55%;
+    top: 45%;
     right: -1.5rem;
   }
   
