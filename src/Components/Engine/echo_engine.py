@@ -603,11 +603,11 @@ class EchoEngine():
         random_direction = random.uniform(0, 2 * 3.14159265359)
 
         # Generate a random distance between min and max distances
-        random_distance = random.uniform(min_distance, max_distance)
+        random_distance = random.uniform(min_distance, max_distance) / 6371000 #Earth Radius
 
         # Calculate the latitude and longitude offsets
-        lat_offset = random_distance * math.cos(random_direction) / 111.32
-        lon_offset = random_distance * math.sin(random_direction) / (111.32 * math.cos(lat))
+        lat_offset = random_distance * math.cos(random_direction)
+        lon_offset = random_distance * math.sin(random_direction)
 
         # Calculate the new latitude and longitude
         new_lat = lat + lat_offset
