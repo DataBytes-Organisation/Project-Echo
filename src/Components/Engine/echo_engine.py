@@ -393,6 +393,10 @@ class EchoEngine():
                     start_time = float(row['start_time'])
                     end_time = float(row['end_time'])
                     predicted_class = row['echonet_label_1']
+
+                    if predicted_class == "Sus_Scrofa":
+                        predicted_class = "Sus Scrofa"
+                    
                     predicted_probability = round(float(row['echonet_confidence_1']) * 100.0, 2)
 
                     print(f'Predicted class : {predicted_class}')
