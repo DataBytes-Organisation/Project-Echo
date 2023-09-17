@@ -247,7 +247,7 @@
     "_id": "Aphelocephala leucopsis",
     "commonName": "Southern Whiteface",
     "type": "Bird",
-    "status": "Least Concern",
+    "status": "Near Threatened",
     "diet": "Omnivore"
 },
 {
@@ -373,7 +373,7 @@
     "_id": "Carduelis carduelis",
     "commonName": "European Goldfinch",
     "type": "Bird",
-    "status": "Least Concern",
+    "status": "Invasive",
     "diet": "Herbivore"
 },
 {
@@ -415,7 +415,7 @@
     "_id": "Cincloramphus mathewsi",
     "commonName": "Buff-rumped Thornbill",
     "type": "Bird",
-    "status": "Least Concern",
+    "status": "Endangered",
     "diet": "Omnivore"
 },
 {
