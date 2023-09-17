@@ -802,5 +802,194 @@
     "type": "Bird",
     "status": "Least Concern",
     "diet": "Insectivore"
+},
+{
+    "_id": "Sericornis frontalis",
+    "commonName": "White-browed Scrubwren",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Insectivore"
+},
+{
+    "_id": "Sericornis magnirostra",
+    "commonName": "Large-billed Scrubwren",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Insectivore"
+},
+{
+    "_id": "Smicrornis brevirostris",
+    "commonName": "Weebill",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Insectivore"
+},
+{
+    "_id": "Sphecotheres vieilloti",
+    "commonName": "Australasian Figbird",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Omnivore"
+},
+{
+    "_id": "Spilopelia chinensis",
+    "commonName": "Eastern Spotted Dove",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Herbivore"
+},
+{
+    "_id": "Stagonopleura guttata",
+    "commonName": "Diamond Firetail",
+    "type": "Bird",
+    "status": "Vulnerable",
+    "diet": "Herbivore"
+},
+{
+    "_id": "Stipiturus ruficeps",
+    "commonName": "Rufous-crowned Emuwren",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Insectivore"
+},
+{
+    "_id": "Stizoptera Bichenovii",
+    "commonName": "Double-barred Finch",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Herbivore"
+},
+{
+    "_id": "Stomiopera Unicolor",
+    "commonName": "White-gaped Honeyeater",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Omnivore"
+},
+{
+    "_id": "Strepera Graculina",
+    "commonName": "Pied Currawong",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Omnivore"
+},
+{
+    "_id": "Strepera Versicolor",
+    "commonName": "Grey Currawong",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Omnivore"
+},
+{
+    "_id": "Struthidea Cinerea",
+    "commonName": "Apostlebird",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Omnivore"
+},
+{
+    "_id": "Symposiachrus Trivirgatus",
+    "commonName": "Spectacled Monarch",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Insectivore"
+},
+{
+    "_id": "Tachybaptus Novaehollandiae",
+    "commonName": "Australasian Grebe",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Carnivore"
+},
+{
+    "_id": "Taeniopygia guttata",
+    "commonName": "Timor Zebra Finch",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Herbivore"
+},
+{
+    "_id": "Todiramphus sanctus",
+    "commonName": "Sacred Kingfisher",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Carnivore"
+},
+{
+    "_id": "Tregellasia capito",
+    "commonName": "Pale-yellow Robin",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Insectivore"
+},
+{
+    "_id": "Trichoglossus chlorolepidotus",
+    "commonName": "Scaly-breasted Lorikeet",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Herbivore"
+},
+{
+    "_id": "Trichosurus vulpecula",
+    "commonName": "Common Brushtail Possum",
+    "type": "Mammal",
+    "status": "Least Concern",
+    "diet": "Omnivore"
+},
+{
+    "_id": "Turdus Merula",
+    "commonName": "Eurasian Blackbird",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Omnivore"
+},
+{
+    "_id": "Turnix Varius",
+    "commonName": "Painted Buttonquail",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Omnivore"
+},
+{
+    "_id": "Uperoleia Altissima",
+    "commonName": "Montane Toadlet",
+    "type": "Amphibian",
+    "status": "Least Concern",
+    "diet": "Omnivore"
+},
+{
+    "_id": "Uperoleia Mimula",
+    "commonName": "Mimic Toadlet",
+    "type": "Amphibian",
+    "status": "Least Concern",
+    "diet": "Carnivore"
+},
+{
+    "_id": "Vanellus Miles",
+    "commonName": "Masked Lapwing",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Insectivore"
+},
+{
+    "_id": "Zoothera Heinei",
+    "commonName": "Russet-tailed Thrush",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Omnivore"
+},
+{
+    "_id": "Zoothera Lunulata",
+    "commonName": "Bassian Thrush",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Insectivore"
+},
+{
+    "_id": "Zosterops Lateralis",
+    "commonName": "Silvereye",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Omnivore"
 }
 ]
