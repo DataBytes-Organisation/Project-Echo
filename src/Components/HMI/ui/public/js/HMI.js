@@ -532,11 +532,11 @@ function addAllTruthFeatures(hmiState) {
     let entry = hmiState.movementEvents[key];
 
     var iconPath = "";
-    if(entry.animalDiet === "herbavore" || entry.animalDiet === "frugivore"){
-      iconPath = './../images/sim/' + getIconName(entry.animalStatus, entry.animalType);
+    if(entry.animalDiet === "insectivore" || entry.animalDiet === "omnivore" || entry.animalDiet === "carnivore"){
+      iconPath = './../images/Predator/sim/' + getIconName(entry.animalStatus, entry.animalType);
     }
     else{
-      iconPath ='./../images/Predator/sim/' + getIconName(entry.animalStatus, entry.animalType);
+      iconPath ='./../images/sim/' + getIconName(entry.animalStatus, entry.animalType);
     }
     
     var trueLocation = new ol.Feature({
