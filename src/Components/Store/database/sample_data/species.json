@@ -10,7 +10,7 @@
     "commonName": "Sambar Deer",
     "type": "Mammal",
     "status": "Invasive",
-    "diet": "Herbavore"
+    "diet": "Herbivore"
 },
 {
     "_id": "Aegotheles Cristatus",
@@ -38,7 +38,7 @@
     "commonName": "Feral Goat",
     "type": "Mammal",
     "status": "Invasive",
-    "diet": "Herbavore"
+    "diet": "Herbivore"
 },
 {
     "_id": "Colluricincla Harmonica",
@@ -59,7 +59,7 @@
     "commonName": "Fallow Deer",
     "type": "Mammal",
     "status": "Invasive",
-    "diet": "Herbavore"
+    "diet": "Herbivore"
 },
 {
     "_id": "Eopsaltria Australis",
@@ -991,5 +991,355 @@
     "type": "Bird",
     "status": "Least Concern",
     "diet": "Omnivore"
+},
+{
+    "_id": "Grallina cyanoleuca",
+    "commonName": "Magpie Lark",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Carnivore"
+},
+{
+    "_id": "Gymnorhina tibicen",
+    "commonName": "Australian Magpie",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Omnivore"
+},
+{
+    "_id": "Haliastur sphenurus",
+    "commonName": "Whsitling Kite",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Carnivore"
+},
+{
+    "_id": "Hirundo neoxena",
+    "commonName": "Welcome Swallow",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Insectivore"
+},
+{
+    "_id": "Irediparra gallinacea",
+    "commonName": "Comb-crested Jacana",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Insectivore"
+},
+{
+    "_id": "Lalage leucomela",
+    "commonName": "Varied Triller",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Insectivore"
+},
+{
+    "_id": "Lalage tricolor",
+    "commonName": "White Winged Triller",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Insectivore"
+},
+{
+    "_id": "Lathamus discolor",
+    "commonName": "Swift Parrot",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Insectivore"
+},
+{
+    "_id": "Lichmera indistincta",
+    "commonName": "Brown Honeyeater",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Herbivore"
+},
+{
+    "_id": "Litoria inermis",
+    "commonName": "Bumpy Rocket Frog",
+    "type": "Frog",
+    "status": "Least Concern",
+    "diet": "Insectivore"
+},
+{
+    "_id": "Lophochroa leadbeateri",
+    "commonName": "Pink Cockatoo",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Herbivore"
+},
+{
+    "_id": "Malurus cyaneus",
+    "commonName": "Superb Fairywren",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Insectivore"
+},
+{
+    "_id": "Malurus lamberti",
+    "commonName": "Variegated Fairywren",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Insectivore"
+},
+{
+    "_id": "Malurus leucopterus",
+    "commonName": "White-winged Fairywren",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Insectivore"
+},
+{
+    "_id": "Malurus splendens",
+    "commonName": "Splendid Fairywren",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Insectivore"
+},
+{
+    "_id": "Manorina flavigula",
+    "commonName": "Yellow-throated Miner",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Insectivore"
+},
+{
+    "_id": "Manorina melanocephala",
+    "commonName": "Noisy Miner",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Insectivore"
+},
+{
+    "_id": "Manorina melanophrys",
+    "commonName": "Bell Miner",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Insectivore"
+},
+{
+    "_id": "Megapodius reinwardt",
+    "commonName": "Orange-footed Scrubfowl",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Insectivore"
+},
+{
+    "_id": "Meliphaga lewinii",
+    "commonName": "Lewin's Honeyeater",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Insectivore"
+},
+{
+    "_id": "Melithreptus albogularis",
+    "commonName": "White-throated Honeyeater",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Insectivore"
+},
+{
+    "_id": "Melithreptus brevirostris",
+    "commonName": "Brown-headed Honeyeater",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Herbivore"
+},
+{
+    "_id": "Melithreptus gularis",
+    "commonName": "Black-chinned Honeyeater",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Insectivore"
+},
+{
+    "_id": "Melithreptus lunatus",
+    "commonName": "White-naped Honeyeater",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Insectivore"
+},
+{
+    "_id": "Melopsittacus undulatus",
+    "commonName": "Budgerigar",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Herbivore"
+},
+{
+    "_id": "Menura alberti",
+    "commonName": "Albert's Lyrebird",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Insectivore"
+},
+{
+    "_id": "Menura novaehollandiae",
+    "commonName": "Superb Lyrebird",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Insectivore"
+},
+{
+    "_id": "Merops ornatus",
+    "commonName": "Rainbow Bee-eater",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Insectivore"
+},
+{
+    "_id": "Microeca fascinans",
+    "commonName": "Jacky Winter",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Insectivore"
+},
+{
+    "_id": "Microeca flavigaster",
+    "commonName": "Lemon-bellied Flyrobin",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Insectivore"
+},
+{
+    "_id": "Myiagra alecto",
+    "commonName": "Shining Flycatcher",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Insectivore"
+},
+{
+    "_id": "Myiagra cyanoleuca",
+    "commonName": "Satin Flycatcher",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Insectivore"
+},
+{
+    "_id": "Myiagra inquieta",
+    "commonName": "Restless Flycatcher",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Insectivore"
+},
+{
+    "_id": "Myiagra rubecula",
+    "commonName": "Leaden Flycatcher",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Insectivore"
+},
+{
+    "_id": "Myzomela erythrocephala",
+    "commonName": "Red-headed Myzomela",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Insectivore"
+},
+{
+    "_id": "Myzomela sanguinolenta",
+    "commonName": "Scarlet Myzomela",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Omnivore"
+},
+{
+    "_id": "Neochmia phaeton",
+    "commonName": "Crimson Finch",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Insectivore"
+},
+{
+    "_id": "Neochmia temporalis",
+    "commonName": "Red-browed Finch",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Insectivore"
+},
+{
+    "_id": "Neophema pulchella",
+    "commonName": "Turquoise Parrot",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Herbivore"
+},
+{
+    "_id": "Neosericornis citreogularis",
+    "commonName": "Yellow-throated Scrubwren",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Insectivore"
+},
+{
+    "_id": "Nesoptilotis leucotis",
+    "commonName": "White-eared honeyeater",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Insectivore"
+},
+{
+    "_id": "Ninox boobook",
+    "commonName": "Australian Boobook",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Carnivore"
+},
+{
+    "_id": "Ninox connivens",
+    "commonName": "Barking Owl",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Carnivore"
+},
+{
+    "_id": "Ninox strenua",
+    "commonName": "Powerful Owl",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Carnivore"
+},
+{
+    "_id": "Nymphicus hollandicus",
+    "commonName": "Cockatiel",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Herbivore"
+},
+{
+    "_id": "Ocyphaps lophotes",
+    "commonName": "Crested Pigeon",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Herbivore"
+},
+{
+    "_id": "Oreoica gutturalis",
+    "commonName": "Crested Bellbird",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Insectivore"
+},
+{
+    "_id": "Origma solitaria",
+    "commonName": "Rockwarbler",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Insectivore"
+},
+{
+    "_id": "Oriolus flavocinctus",
+    "commonName": "Green Oriole",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Herbivore"
+},
+{
+    "_id": "Oriolus sagittatus",
+    "commonName": "Olive-backed Oriole",
+    "type": "Bird",
+    "status": "Least Concern",
+    "diet": "Insectivore"
 }
 ]
