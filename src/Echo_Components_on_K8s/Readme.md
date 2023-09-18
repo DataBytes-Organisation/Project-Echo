@@ -1,6 +1,8 @@
 # Echo on Kubernetes 🔥
 
-Welcome to this repo! This repository is designed to help anyone interested in learning about the DevOps side of projects, mainly Ops side (Operations). Whether you're a seasoned DevOps engineer or just starting out, you'll find valuable resources and projects to enhance your skills.
+Welcome to this repo! This repository is designed to help anyone interested in learning about the DevOps side of projects, mainly Ops side (Operations). Whether you're a seasoned DevOps engineer or just starting out, you'll find this repo valuable to enhance your software delivery skills.
+
+> **Note**: These tasks require individuals who are willing to dive into the codebase, understand how the components interact, and have the patience and critical thinking skills to troubleshoot and experiment. Whether you're a seasoned senior or an ambitious junior, this repository offers a chance to learn and work independently. There might not be immediate assistance available, so be prepared to explore and learn on your own.
 
 ## Objective of this Repository
 
@@ -48,8 +50,6 @@ This folder is set up in a way that things are entities here, and things are loo
 - Create equivalent scripts for Mac and Linux users to run the EchoNet locally.
 - Configure additional components like Engine, Model, and Simulator to integrate with the frontend API and database.
 - Explore options for implementing CI/CD using tools like Terraform, Ansible, GitHub Actions, or Cloud Build.
-
-> **Note**: These tasks require individuals who are willing to dive into the codebase, understand how the components interact, and have the patience and critical thinking skills to troubleshoot and experiment. Whether you're a seasoned senior or an ambitious junior, this repository offers a chance to learn and work independently. There might not be immediate assistance available, so be prepared to explore and learn on your own.
 
 Feel free to explore the existing projects and dive into the various branches to see different stages of development. Happy learning!
 
