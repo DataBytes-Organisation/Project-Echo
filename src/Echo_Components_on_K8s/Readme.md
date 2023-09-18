@@ -2,7 +2,7 @@
 
 Welcome to this repo! This repository is designed to help anyone interested in learning about the DevOps side of projects, mainly Ops side (Operations). Whether you're a seasoned DevOps engineer or just starting out, you'll find this repo valuable to enhance your software delivery skills.
 
-> **Note**: These tasks require individuals who are willing to dive into the codebase, understand how the components interact, and have the patience and critical thinking skills to troubleshoot and experiment. Whether you're a seasoned senior or an ambitious junior, this repository offers a chance to learn and work independently. There might not be immediate assistance available, so be prepared to explore and learn on your own.
+> **Note**: Before you being, grasp very good understanding of how echonet works. These tasks require individuals who are willing to dive into the codebase, understand how the components interact, and have the patience and critical thinking skills to troubleshoot and experiment. Whether you're a seasoned senior or an ambitious junior, this repository offers a chance to learn and work independently. There might not be immediate assistance available, so be prepared to explore and learn on your own.
 
 ## Objective of this Repository
 
@@ -70,11 +70,52 @@ To test the components locally, follow these steps:
 
    - Move to this repository on your local machine.
 
-2. **Start Docker Engine**:
+2. **Create Environment Files**:
+
+   - Before running the `start_echo_network.bat` file, create environment files in the root folder. Use the example image below as a reference.
+
+   ![Example Environment Files](![Alt text](folderSetupLocal.png))
+
+   > **Note**: Make sure to add these environment files to the `.gitignore` file to prevent them from being pushed to GitHub.
+
+### EXAMPLE Environment Files
+
+Create the following environment files with their corresponding values:
+
+- `.env_api.txt`:
+
+  - ```
+    DB_HOST=value(private IP of db container or dns name if in K8s)
+    DB_USER=modelUser(this is hardcoded in frontend at the moment)
+    DB_USER_PASS=EchoNetAccess2023((this is hardcoded in frontend at the moment))
+    DB_ROOT_USER=root(match this with whatever your db init root username is)
+    DB_ROOT_USER_PASS=root_password(match this with whatever your db init root password is)
+    ```
+
+- `.env_db.txt`:
+
+  - ```
+    MONGO_INITDB_ROOT_USERNAME=root(examples value)
+    MONGO_INITDB_ROOT_PASSWORD=root_password(example value)
+    MONGO_INITDB_DATABASE=EchoNet(This is the name of our database)
+    ```
+
+- `.env_hmi.txt`:
+  - ```
+    DB_USER=modelUser(this is hardcoded in frontend at the moment)
+    DB_USER_PASS=EchoNetAccess2023(this is hardcoded in frontend at the moment)
+    DB_ROOT_USER=root(match this with whatever your db init root username is)
+    DB_ROOT_USER_PASS=root_password(match this with whatever your db init root password is)
+    REDIS_HOST=value(private IP of redis container or dns name if in K8s)
+    DB_HOST=value(private IP of db container or dns name if in K8s)
+    API_HOST=value(private IP of api container or dns name if in K8s)
+    ```
+
+3. **Start Docker Engine**:
 
    - Ensure you have Docker installed and running on your system.
 
-3. **Run the EchoNet**:
+4. **Run the EchoNet**:
    - Execute the `start_echo_network.bat` file in your preferred command-line interface.
 
 Note: To stop the containers and network, you can execute the `stop_echo_network.bat`. Also, While running these scripts, docker tend to sometimes create dangling images, which consume a lot of disk space sometimes. So keep checking for that.
