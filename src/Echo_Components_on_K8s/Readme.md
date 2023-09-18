@@ -82,7 +82,7 @@ To test the components locally, follow these steps:
 
 Create the following environment files with their corresponding values:
 
-- `.env_api.txt`:
+- `env_api.txt`:
 
   - ```
     DB_HOST=value(private IP of db container or dns name if in K8s)
@@ -92,7 +92,7 @@ Create the following environment files with their corresponding values:
     DB_ROOT_USER_PASS=root_password(match this with whatever your db init root password is)
     ```
 
-- `.env_db.txt`:
+- `env_db.txt`:
 
   - ```
     MONGO_INITDB_ROOT_USERNAME=root(examples value)
@@ -100,7 +100,7 @@ Create the following environment files with their corresponding values:
     MONGO_INITDB_DATABASE=EchoNet(This is the name of our database)
     ```
 
-- `.env_hmi.txt`:
+- `env_hmi.txt`:
   - ```
     DB_USER=modelUser(this is hardcoded in frontend at the moment)
     DB_USER_PASS=EchoNetAccess2023(this is hardcoded in frontend at the moment)
