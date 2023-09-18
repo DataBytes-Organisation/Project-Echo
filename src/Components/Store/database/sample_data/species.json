@@ -1677,6 +1677,28 @@
     "type": "Bird",
     "status": "Least Concern",
     "diet": "Herbivore"
+},
+{
+    "_id": "Perameles nasuta",
+    "commonName": "Long-nosed bandicoot",
+    "type": "Mammal",
+    "status": "Least Concern",
+    "diet": "Omnivore"
+},
+{
+    "_id": "Pezoporus wallicus",
+    "commonName": "Ground parrot",
+    "type": "Bird",
+    "status": "Vulnerable",
+    "diet": "Herbivore"
+},
+{
+    "_id": "Rhinella marina",
+    "commonName": "Cane Toad",
+    "type": "Amphibian",
+    "status": "Invasive",
+    "diet": "Insectivore"
+},
 {
     "_id": "Dasyurus maculatus",
     "commonName": "Tiger Quoll",
