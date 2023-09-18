@@ -23,7 +23,7 @@ This folder is set up in a way that things are entities here, and things are loo
 
 - [Docker Documentation](https://docs.docker.com/)
 - [Kubernetes Official Documentation](https://kubernetes.io/docs/home/)
-- [Terraform Documentation](https://registry.terraform.io/providers/hashicorp/aws/latest/docs)
+- [Terraform Documentation](https://registry.terraform.io/providers/hashicorp/google/latest/docs)
 - [DevOps Institute](https://devopsinstitute.com/)
 
 ## Kubernetes Landscape Terminology:
