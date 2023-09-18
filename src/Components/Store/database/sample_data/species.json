@@ -1677,5 +1677,11 @@
     "type": "Bird",
     "status": "Least Concern",
     "diet": "Herbivore"
+{
+    "_id": "Dasyurus maculatus",
+    "commonName": "Tiger Quoll",
+    "type": "Mammal",
+    "status": "Near Threatened",
+    "diet": "Carnivore"
 }
 ]
