@@ -1,4 +1,4 @@
-# Echo on Kubernetes
+# Echo on Kubernetes 🔥
 
 Welcome to this repo! This repository is designed to help anyone interested in learning about the DevOps side of projects, mainly Ops side (Operations). Whether you're a seasoned DevOps engineer or just starting out, you'll find valuable resources and projects to enhance your skills.
 
@@ -25,6 +25,8 @@ This folder is set up in a way that things are entities here, and things are loo
 - [Kubernetes Official Documentation](https://kubernetes.io/docs/home/)
 - [Terraform Documentation](https://registry.terraform.io/providers/hashicorp/google/latest/docs)
 - [DevOps Institute](https://devopsinstitute.com/)
+- [Github Actions Documentation](https://docs.github.com/en/actions)
+- [CI/CD Explained](https://www.redhat.com/en/topics/devops/what-is-ci-cd)
 
 ## Kubernetes Landscape Terminology:
 
@@ -74,5 +76,7 @@ To test the components locally, follow these steps:
 
 3. **Run the EchoNet**:
    - Execute the `start_echo_network.bat` file in your preferred command-line interface.
+
+Note: To stop the containers and network, you can execute the `stop_echo_network.bat`. Also, While running these scripts, docker tend to sometimes create dangling images, which consume a lot of disk space sometimes. So keep checking for that.
 
 Happy testing!
