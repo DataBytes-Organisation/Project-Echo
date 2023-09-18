@@ -1,0 +1,5 @@
+IPython
+matplotlib
+numpy
+librosa
+tensorflow==2.10.1
