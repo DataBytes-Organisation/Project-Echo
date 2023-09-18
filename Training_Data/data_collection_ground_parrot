@@ -8,6 +8,8 @@ from lxml import etree
 
 
 driver = webdriver.Chrome()
+
+# Change to your respective directory
 with open('G:/sounds/owl_sounds.csv', 'w', newline='\n') as file:
         writer = csv.writer(file)
         writer.writerow(['name', 'uploaded_by', 'length', 'file_size', 'sample_rate', 'bit_depth', 'description', 'link'])

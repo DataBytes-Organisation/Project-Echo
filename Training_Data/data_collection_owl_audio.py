@@ -7,7 +7,7 @@ import csv
 from lxml import etree
 import pandas as pd
 
-
+# Change to your respective directory
 driver = webdriver.Chrome()
 with open('G:/sounds/owl_sounds.csv', 'w', newline='\n') as file:
         writer = csv.writer(file)
