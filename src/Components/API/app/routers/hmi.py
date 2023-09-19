@@ -378,7 +378,7 @@ def deleteaccount(jwtToken: str):
 
 @router.get("/filter_algorithm/{algorithm_type}", response_description="returns the running filter algorithm name")
 def filter_name(algorithm_type : str):
-    algorithms_running = requests.get("http://localhost:8000/engine/algorithms_data")
+    algorithms_running = requests.get("http://localhost:9000/engine/algorithms_data")
     try:
         algorithm_name = algorithms_running.json()[algorithm_type]
     except:
