@@ -1229,6 +1229,8 @@ notificationClose.addEventListener('click', hideNotification);
 function submitRequest(){
   animal = document.getElementById("desc_species").innerHTML;
   source = document.getElementById("citationSneeded").value;
+  initial = currentStatus;
+  modified = newConservationStatus;
   console.log(newConservationStatus);
   //console.log(currentUser);
   //console.log(thirdItem);
@@ -1239,8 +1241,7 @@ function submitRequest(){
 
   checkFields();
   
-  initial = currentStatus;
-  modified = newConservationStatus;
+  
 
   if (initial === modified){
     return;
