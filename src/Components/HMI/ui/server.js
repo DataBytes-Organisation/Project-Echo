@@ -4,7 +4,7 @@ const path = require('path');
 const fs = require('fs');
 const cookieSession = require('cookie-session');
 const dbConfig = require('./config/db.config');
-const helmet = require('helmet');
+//const helmet = require('helmet');
 //const mongoSanitize = require('express-mongo-sanitize');
 const jwt = require('jsonwebtoken');
 const { authJwt, client, checkUserSession } = require('./middleware');
@@ -32,7 +32,7 @@ const Request = db.request;
 const MongoClient = require('mongodb').MongoClient;
 const url = "mongodb://modelUser:EchoNetAccess2023@ts-mongodb-cont:27017/EchoNet";
 
-const rootDirectory = __dirname; // This assumes the root directory is the current directory
+//const rootDirectory = __dirname; // This assumes the root directory is the current directory
 
 
 //Security verification for email account and body content validation:
@@ -107,9 +107,10 @@ const storeItems = new Map([[
 ]])
 app.use(express.json());
 // Use helmet middleware to set security headers
-
+/*
 app.use(helmet());
 // Function to sanitize and normalize file paths
+
 function sanitizeFilePath(filePath) {
   // Use path.normalize to ensure the path is in normalized form
   const normalizedPath = path.normalize(filePath);
@@ -126,6 +127,7 @@ function sanitizeFilePath(filePath) {
     return null;
   }
 }
+*/
 
 app.post("/api/create-checkout-session", async (req, res) => {
   try {

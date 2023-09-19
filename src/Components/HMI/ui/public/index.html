@@ -285,15 +285,15 @@
                   <div class="toggle-switch-container">
                     <div class="radio-group">
                       <input type="radio" id="option1" name="options" value="option1" onclick="{simModeSwitch('Animal_Mode')}">
-                      <span for="option1">Simulate Animals - CNN</span>
+                      <span for="option1">Simulate Movement</span>
                     </div>
                     <div class="radio-group">
                       <input type="radio" id="option2" name="options" value="option2" onclick="{simModeSwitch('Recording_Mode')}">
-                      <span for="option2">Live Recording - CNN</span>
+                      <span for="option2">Live Recording</span>
                     </div>
                     <div class="radio-group">
                       <input type="radio" id="option3" name="options" value="option3" onclick="{simModeSwitch('Recording_Mode_V2')}">
-                      <span for="option3">Live Recording - SNN + Event Detection</span>
+                      <span for="option3">Live Recording V2</span>
                     </div>
                     <div class="radio-group">
                       <input type="radio" id="option4" name="options" value="option4" onclick="{simModeSwitch('Stop')}" checked>
@@ -308,6 +308,7 @@
             </div>
             </div>
           </div> 
+          <!--DONATIONS TAB--->
           <div id="donate">
             <div class="wrapper">
             <div id="donate-contents">
@@ -338,12 +339,13 @@
                     <p class="image-amount">50</p>
                   </div>
                 </div>
-
+                <!-- TO ADD - ENTER CUSTOM DONATION AMOUNT HERE --->
                 <!-- Donation amount display -->
                 <div class="lightbulb-container" style="text-align: center;">
                   <img src="./images/Your Amount.png" alt="Light Bulb">
                   <p class="donation-amount">Your Amount:</p>
                 </div>
+                
                   <button class="donate-button" id="donation-button">DONATE NOW</button>
             </div>
             </div>
@@ -801,7 +803,6 @@
         var amount = description.querySelector('.image-amount');
         amount.textContent = donationData[index].amount;
         var imageFilename = donationData[index].image;
-
         image.src = './images/' + imageFilename;
 
       });
@@ -832,11 +833,11 @@
         });
       });
 
+  // Cart that is sent in the body of the API request
   let cart = [
     { id: 1, quantity: 0 }
   ];
   // Donation Button Functionality
-
   const donationButton = document.getElementById('donation-button');
   donationButton.addEventListener("click", () => {
     // Check to see if a donation amount has been selected
@@ -1231,12 +1232,27 @@ function submitRequest(){
   console.log(newConservationStatus);
   //console.log(currentUser);
   //console.log(thirdItem);
-  console.log(source);
-  console.log(animal);
+  console.log("Source:", source);
+  console.log("Animal:", animal);
+  console.log("New Status: ", modified);
+  console.log("Initial: ", initial);
+
   checkFields();
   
   initial = currentStatus;
   modified = newConservationStatus;
+
+  if (initial === modified){
+    return;
+  }
+
+  if (modified === undefined){
+    return;
+  }
+
+  if (source === ""){
+    return
+  }
 
   requestData = {
     username,
