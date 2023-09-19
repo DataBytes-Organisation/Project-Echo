@@ -4,7 +4,7 @@ const path = require('path');
 const fs = require('fs');
 const cookieSession = require('cookie-session');
 const dbConfig = require('./config/db.config');
-//const helmet = require('helmet');
+const helmet = require('helmet');
 //const mongoSanitize = require('express-mongo-sanitize');
 const jwt = require('jsonwebtoken');
 const { authJwt, client, checkUserSession } = require('./middleware');
@@ -107,7 +107,7 @@ const storeItems = new Map([[
 ]])
 app.use(express.json());
 // Use helmet middleware to set security headers
-/*
+
 app.use(helmet());
 // Function to sanitize and normalize file paths
 function sanitizeFilePath(filePath) {
@@ -126,7 +126,6 @@ function sanitizeFilePath(filePath) {
     return null;
   }
 }
-*/
 
 app.post("/api/create-checkout-session", async (req, res) => {
   try {
