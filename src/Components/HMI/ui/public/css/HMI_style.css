@@ -8,6 +8,13 @@
   src: url("./EarthOrbiterCondensed-nzeV.otf");
 }
 
+@viewport { /* Having this permits device size control */
+  width: device-width;
+  height: device-height;
+  zoom: 1.0 ;
+} 
+
+
 body {
     background: #1a1a1a;
     font-size: 17px;
@@ -89,6 +96,8 @@ h2 {
   overflow-x: hidden;
   position: fixed; 
 }
+
+
 
 @keyframes quiet {
   25%{
@@ -229,6 +238,17 @@ body{
   }
 }
 
+@media only screen and (max-width: 980px) and (orientation: portrait) { /* Mobile vers. (Portrait) */
+  #menu {
+    max-width: 100vw;
+    overflow-y: hidden;
+  }
+  
+  #filter-menu {
+    overflow-y: hidden;
+  }
+}
+
 .navbar {
   margin-top: 50px;
   margin-left: 40px;
@@ -236,8 +256,16 @@ body{
   height: 80px;
   display: flex;
   justify-content: left;
-  align-items: left;
+  align-items: center;
   z-index: 997;
+}
+
+@media only screen and (max-width: 980px) and (orientation: portrait) { /* Mobile vers. (Portrait) */
+  .navbar {
+    margin-top: 12vw;
+    margin-left: 7vw;
+    justify-content: center;
+  }
 }
 
 #I {
@@ -266,6 +294,15 @@ body{
     right: 10px; /* adjust this value to set the distance from the right of the container */
     z-index: 999; /* ensure the icon is on top of other content */
     transition: 1s all ease-in-out;
+  }
+
+  @media only screen and (max-width: 980px) and (orientation: portrait) { /* Mobile vers. (Portrait) */
+    .hamburger-icon {
+      right: 50%;
+      translate: 15px;
+      top: 2.5%;
+      scale: 150%;
+    }
   }
   
   .hamburger-icon span {
@@ -1266,6 +1303,22 @@ i {
   opacity: 1;
 }
 
+@media only screen and (max-width: 980px) and (orientation: portrait) { /* Mobile vers. (Portrait) */
+  .tabs-button {
+    margin-left: 4vw;
+    margin-bottom: 4vw;
+    width: 16vw;
+    height: 16vw;
+  }
+  
+  .tabs-button.active {
+    margin-left: 4vw;
+    margin-bottom: 4vw;
+    width: 16vw;
+    height: 16vw;
+  }
+}
+
 #filter-menu-btn {
   background-image: url("../images/tabIcons/filter.png");
   background-size: cover;
@@ -1314,6 +1367,22 @@ i {
   background-position: center;
 }
 
+#pink-line {
+  position: fixed; 
+  border-top: 6px solid rgba(247, 186, 206, 0.8); 
+  height: 2px; 
+  width: 440; 
+  margin-top: 36px;
+}
+
+@media only screen and (max-width: 980px) and (orientation: portrait) { /* Mobile vers. (Portrait) */
+  #pink-line {
+    width: 100vw; 
+    margin-top: 65vw;
+    margin-bottom: 4vh;
+  }
+}
+
 #filter-menu-btn::before {
   opacity: 0.5;
 }
@@ -1341,13 +1410,25 @@ i {
 }
 .wrapper{
   position: relative;
-  /*width: 500px;*/ 
+  width: 500px;
   height: 100%; 
   padding: 0; 
-  overflow-y: scroll; 
+  overflow-y: scroll;
   overflow-x: hidden;
   margin-right: 30px; 
 }
+
+@media only screen and (max-width: 980px) and (orientation: portrait) { /* Mobile vers. (Portrait) */
+  .wrapper {
+    top: 2.5%;
+    margin-top: 23vw;
+    width: 95vw;
+    display: flex;
+    float: right;
+    margin-right: 0; 
+  }
+}
+
 /* Width and height of the scrollbar */
 .wrapper::-webkit-scrollbar {
   display: block;
