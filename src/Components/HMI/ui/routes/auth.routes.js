@@ -50,14 +50,17 @@ module.exports = function (app) {
 });
     
   app.post("/api/auth/signin", async (req, res) => {
-    const schema = {
-      username: req.body.username,
-      email: req.body.password,
-      password: req.body.email
-    }
+    let uname = req.body.username;
+    let pw = req.body.password;
+
+    let email = req.body.email;
       
     try {
-      const axiosResponse = await axios.post('http://ts-api-cont:9000/hmi/signin', schema);
+      const axiosResponse = await axios.post('http://ts-api-cont:9000/hmi/signin',{
+        username: uname,
+        email: email,
+        password: pw
+      });
       
       if (axiosResponse.status === 200) {
         console.log('Status Code: ' + axiosResponse.status + ' ' + axiosResponse.statusText)

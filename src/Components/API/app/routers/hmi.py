@@ -214,16 +214,14 @@ def signin(user: schemas.UserLoginSchema):
         if(guestAcc is None):
             response = {"message": "User Not Found in Database."}
             return JSONResponse(content=response, status_code=404)
-        print("Guest account details: {}".format(guestAcc))
         #Verify credentials in User Collections
         passwordIsValid = bcrypt.checkpw(user.password.encode('utf-8'), guestAcc['password'].encode('utf-8'))
         if (passwordIsValid == False):
             response = {"message": "Invalid Password!"}
             return JSONResponse(content=response, status_code=401)
-
         authorities = []
         for role_id in guestAcc['roles']:
-            role = Role.find_one({"_id": ObjectId(role_id)})
+            role = Role.find_one({"_id": role_id})
             if role:
                 authorities.append("ROLE_" + role['name'].upper())
         #Create JWT token using user info
@@ -255,7 +253,7 @@ def signin(user: schemas.UserLoginSchema):
 
     authorities = []
     for role_id in account['roles']:
-        role = Role.find_one({"_id": ObjectId(role_id)})
+        role = Role.find_one({"_id": role_id})
         if role:
             authorities.append("ROLE_" + role['name'].upper())
     
@@ -302,26 +300,23 @@ def signout(jwtToken: str):
 def guestsignup(guestSign: schemas.GuestSignupSchema):
     try:
         #Hash password using bcrypt
-        print("guest detail: {}".format(guestSign))
         password_hashed = bcrypt.hashpw(guestSign.password.encode('utf-8'), bcrypt.gensalt(rounds=8))
-        # guestSign.password = password_hashed.decode('utf-8')
+        recorded_password = password_hashed.decode('utf-8')
 
         #Create a GuestShema dict and insert values accordingly
         
         role = Role.find_one({'name': 'guest'})
         role.pop("name", None) 
-        guest = schemas.GuestSchema(
+        guest = dict(
             username= guestSign.username,
             email= guestSign.email,
-            password= password_hashed,
+            password= recorded_password,
             userId= guestSign.username + str(uuid.uuid4()).replace("-", "")[:8],
             roles= [role],
             expiresAt= guestSign.timestamp
         )
-        print("guest detail: {}".format(guest))
 
-        guest_dict = guest.dict()
-        Guest.insert_one(guest_dict)
+        Guest.insert_one(guest)
         response = {"message": "Guests was registered successfully!"}
         return JSONResponse(content=response, status_code=201)
 
