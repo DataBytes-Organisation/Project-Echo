@@ -450,14 +450,30 @@ app.get("/login", (req, res) => {
 })
 
 app.post("/api/submit", async (req, res) => {
+  let token = await client.get('JWT', (err, storedToken) => {
+    if (err) {
+      console.error('Error retrieving token from Redis:', err);
+      return null
+    } else {
+      console.log('Stored Token:', storedToken);
+      return storedToken
+    }
+  })
+  let schema = req.body;
+  schema.status = "pending";
+  schema.date = new Date();
   try {
-    const newRequest = new Request(req.body);
-    newRequest.date = new Date();
-    newRequest.status = "pending";
-    await newRequest.save();
-    res.status(200).send("Request submitted successfully");
+    console.log("Request submission data: ", JSON.stringify(schema));
+    const axiosResponse = await axios.post('http://ts-api-cont:9000/hmi/api/submit', JSON.stringify(schema), { headers: {"Authorization" : `Bearer ${token}`, 'Content-Type': 'application/json'}})
+
+    if (axiosResponse.status === 201) {
+      console.log('Status Code: ' + axiosResponse.status + ' ' + axiosResponse.statusText)
+      res.status(201).send(`<script> window.location.href = "/login"; alert("Request Submitted successfully");</script>`);
+    } else {
+      res.status(400).send(`<script> window.location.href = "/login"; alert("Ooops! Something went wrong");</script>`);
+    }
   } catch (error) {
-    console.error(error);
+    console.error(error.data);
     res.status(500).send("An error occurred");
   }
 });

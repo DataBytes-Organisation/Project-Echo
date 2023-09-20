@@ -136,6 +136,17 @@ def latest_movememnt():
     return timestamp
 
 
+@router.post("/api/submit", dependencies=[Depends(jwtBearer)], status_code=status.HTTP_201_CREATED)
+def submit_request(request: schemas.RequestSchema):
+    try:
+        request_dict = request.dict()
+        Requests.insert_one(request_dict)
+        response = {"message": "Request submitted succesfully."}
+        return JSONResponse(content=response, status_code=201)
+    except Exception as e:
+        response = {"message": "Exception error", "exception": str(e)}
+        return JSONResponse(content=response, status_code=422)
+
 @router.post("/sim_control", status_code=status.HTTP_201_CREATED)
 def post_control(control: str):
 
@@ -192,7 +203,7 @@ def signup(user: schemas.UserSignupSchema):
     #Store user role as an id 
     user_role_id = []
     for role_name in user.roles:
-        role = Role.find_one({"name": role_name})
+        role = Role.find_one({"name": role_name["_id"]})
         user_role_id.append(role["_id"])
     user.roles = user_role_id
 
@@ -221,7 +232,7 @@ def signin(user: schemas.UserLoginSchema):
             return JSONResponse(content=response, status_code=401)
         authorities = []
         for role_id in guestAcc['roles']:
-            role = Role.find_one({"_id": role_id})
+            role = Role.find_one({"_id": role_id["_id"]})
             if role:
                 authorities.append("ROLE_" + role['name'].upper())
         #Create JWT token using user info
@@ -250,10 +261,9 @@ def signin(user: schemas.UserLoginSchema):
     if (passwordIsValid == False):
         response = {"message": "Invalid Password!"}
         return JSONResponse(content=response, status_code=401)
-
     authorities = []
     for role_id in account['roles']:
-        role = Role.find_one({"_id": role_id})
+        role = Role.find_one({"_id": str(role_id["_id"])})
         if role:
             authorities.append("ROLE_" + role['name'].upper())
     

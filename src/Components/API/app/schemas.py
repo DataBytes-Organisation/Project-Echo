@@ -104,7 +104,7 @@ class RequestSchema(BaseModel):
     initial: str
     modified: str
     source: str
-    date: str
+    date: datetime
     status: str
 
     class Config:
