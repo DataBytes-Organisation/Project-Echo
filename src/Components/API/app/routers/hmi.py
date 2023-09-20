@@ -8,7 +8,7 @@ from bson import ObjectId
 import datetime
 from app import serializers
 from app import schemas
-from app.database import Events, Movements, Microphones, User, Role, ROLES, Requests, Guest, ForgotPassword, LogoutToken
+from app.database import Events, Movements, Microphones, User, Role, ROLES, Requests, Guest, ForgotPassword, LogoutToken, Species
 import paho.mqtt.publish as publish
 import bcrypt
 from flask import jsonify
@@ -335,8 +335,8 @@ def guestsignup(guestSign: schemas.GuestSignupSchema):
         return JSONResponse(content=response, status_code=500)
 
 @router.patch('/api/requests', dependencies=[Depends(jwtBearer)], status_code=status.HTTP_200_OK)
-def update_request_status(requestData):
-    request_dict = requestData.dict()
+def update_request_status(request_dict : dict):
+    print("Admin Request Status Data: {}".format(request_dict))
 
     if request_dict["newStatus"] is None:
         response = {"message": "Invalid request status data"}
@@ -346,7 +346,7 @@ def update_request_status(requestData):
         return JSONResponse(content=response, status_code=400)
 
     updated_request = Requests.find_one_and_update(
-        {'_id': request_dict["requestId"]},
+        {'_id': ObjectId(request_dict["requestId"])},
         {'$set': {'status': request_dict["newStatus"]}},
         return_document=True
     )
@@ -359,9 +359,10 @@ def update_request_status(requestData):
     return JSONResponse(content=response, status_code=200)
 
 @router.patch('/api/updateConservationStatus', dependencies=[Depends(jwtBearer)], status_code=status.HTTP_200_OK)
-def update_request_status(speciesUpdateData):
-    request_dict = speciesUpdateData.dict()
-
+def update_request_status(request_dict : dict):
+    print("AnimalStatusUpdateData : {}".format(request_dict))
+    print("Animal requestAnimal value: {}".format(request_dict["requestAnimal"]))
+    print("Animal newStatus value: {}".format(request_dict["newStatus"]))
     if request_dict["newStatus"] is None:
         response = {"message": "Invalid request status data"}
         return JSONResponse(content=response, status_code=400)
@@ -369,8 +370,9 @@ def update_request_status(speciesUpdateData):
         response = {"message": "Invalid Animal data"}
         return JSONResponse(content=response, status_code=400)
 
-    updated_request = Requests.find_one_and_update(
+    updated_request = Species.find_one_and_update(
         {'_id': request_dict["requestAnimal"]},
+        # {'_id': "Aegotheles Cristatus"},
         {'$set': {'status': request_dict["newStatus"]}},
         return_document=True
     )
