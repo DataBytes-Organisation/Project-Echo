@@ -384,7 +384,6 @@ def filter_name(algorithm_type : str):
         if(algorithm_name is not None):
             response = {"message": algorithm_name}
             return JSONResponse(content=response, status_code=200) 
-        
     except Exception as e:
         return JSONResponse({"error" : "Algorithm not Found - {}".format(e)}, status_code=404)
         
