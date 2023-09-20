@@ -375,6 +375,7 @@ app.post("/request_access", async (req, res) => {
 // routes
 require('./routes/auth.routes')(app);
 require('./routes/user.routes')(app);
+require('./routes/map.routes')(app);
 app.get('*', checkUserSession);
 app.get("/", async (req, res) => {
   console.log("token: ", await client.get('JWT', (err, storedToken) => {
