@@ -1,4 +1,3 @@
-const config = require("../config/auth.config");
 const {client} = require("../middleware")
 const axios = require('axios');
 
