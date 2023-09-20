@@ -29,20 +29,20 @@ STATES_CODE = ["vic", "nsw", "ts", "ql", "sa", "wa"]
 GENDER = ["male", "female", "m", "f" "prefer not to say"]
 AUS_STATES = ["victoria", "newsouthwales", "tasmania", "queensland", "southaustralia", "westernaustralia"]
 
-# Define the interval in seconds (6 minutes)
-interval_seconds = 360
+# # Define the interval in seconds (6 minutes)
+# interval_seconds = 360
 
-# Check and delete expired guests data 
-while True:
-    now = datetime.datetime.now()
-    print("Background monitor at", now)
+# # Check and delete expired guests data 
+# while True:
+#     now = datetime.datetime.now()
+#     print("Background monitor at", now)
 
-    # Define the cutoff time for deleting records
-    cutoff_time = now - datetime.timedelta(seconds=interval_seconds)
+#     # Define the cutoff time for deleting records
+#     cutoff_time = now - datetime.timedelta(seconds=interval_seconds)
 
-    # Delete expired documents
-    deleted_count = Guest.delete_many({"expiresAt": {"$lte": cutoff_time}}).deleted_count
-    print(f"Deleted {deleted_count} expired documents.")
+#     # Delete expired documents
+#     deleted_count = Guest.delete_many({"expiresAt": {"$lte": cutoff_time}}).deleted_count
+#     print(f"Deleted {deleted_count} expired documents.")
 
-    # Sleep for the specified interval before running again
-    time.sleep(interval_seconds)
+#     # Sleep for the specified interval before running again
+#     time.sleep(interval_seconds)

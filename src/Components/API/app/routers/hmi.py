@@ -8,7 +8,7 @@ from bson import ObjectId
 import datetime
 from app import serializers
 from app import schemas
-from app.database import Events, Movements, Microphones, User, Role, ROLES, Requests, ForgotPassword, LogoutToken
+from app.database import Events, Movements, Microphones, User, Role, ROLES, Requests, Guest, ForgotPassword, LogoutToken
 import paho.mqtt.publish as publish
 import bcrypt
 from flask import jsonify
@@ -21,6 +21,7 @@ from app.middleware.auth import signJWT, decodeJWT
 from app.middleware.auth_bearer import JWTBearer
 from app.middleware.random import randompassword
 from bson.objectid import ObjectId
+import uuid
 
 jwtBearer = JWTBearer()
 
@@ -208,9 +209,44 @@ def signin(user: schemas.UserLoginSchema):
     #Find if the username exist in our database
     account = User.find_one({"$or": [{"username": user.username}, {"email": user.email}]})
     if(account is None):
-        response = {"message": "User Not Found."}
-        return JSONResponse(content=response, status_code=404)
-   
+        #User Not exist - Checking inside Guest Collections
+        guestAcc = Guest.find_one({"$or": [{"username": user.username}, {"email": user.email}]})
+        if(guestAcc is None):
+            response = {"message": "User Not Found in Database."}
+            return JSONResponse(content=response, status_code=404)
+        print("Guest account details: {}".format(guestAcc))
+        #Verify credentials in User Collections
+        passwordIsValid = bcrypt.checkpw(user.password.encode('utf-8'), guestAcc['password'].encode('utf-8'))
+        if (passwordIsValid == False):
+            response = {"message": "Invalid Password!"}
+            return JSONResponse(content=response, status_code=401)
+
+        authorities = []
+        for role_id in guestAcc['roles']:
+            role = Role.find_one({"_id": ObjectId(role_id)})
+            if role:
+                authorities.append("ROLE_" + role['name'].upper())
+        #Create JWT token using user info
+        jwtToken = signJWT(user=guestAcc, authorities=authorities)
+        
+        #Assign the session token with JWT
+        requests.session.token = jwtToken
+        result = {
+            "id": guestAcc["_id"],
+            "username": guestAcc["username"],
+            "email": guestAcc["email"],
+            "role" : authorities,
+        }
+
+        #Set up response (FOR TESTING ONLY)
+        response = {"message": "User Login Successfully!", "tkn" : jwtToken, "roles": authorities}
+
+        #Log result
+        print(result)
+        return JSONResponse(content=response, status_code=200)
+    
+    #User Exist
+    #Verify credentials in User Collections
     #Find if the password matches
     passwordIsValid = bcrypt.checkpw(user.password.encode('utf-8'), account['password'].encode('utf-8'))
     if (passwordIsValid == False):
@@ -222,13 +258,6 @@ def signin(user: schemas.UserLoginSchema):
         role = Role.find_one({"_id": ObjectId(role_id)})
         if role:
             authorities.append("ROLE_" + role['name'].upper())
-
-    #Create payload for our token
-    # payload = {
-    #     "id": account["userId"],
-    #     "roles": authorities,
-    #     "exp": datetime.datetime.utcnow() + datetime.timedelta(seconds=86400)
-    # }
     
     #Create JWT token using user info
     jwtToken = signJWT(user=account, authorities=authorities)
@@ -269,10 +298,43 @@ def signout(jwtToken: str):
     except Exception as err:
         return JSONResponse({"Error": str(err)})
 
+@router.post("/guestsignup", status_code=status.HTTP_200_OK)
+def guestsignup(guestSign: schemas.GuestSignupSchema):
+    try:
+        #Hash password using bcrypt
+        print("guest detail: {}".format(guestSign))
+        password_hashed = bcrypt.hashpw(guestSign.password.encode('utf-8'), bcrypt.gensalt(rounds=8))
+        # guestSign.password = password_hashed.decode('utf-8')
+
+        #Create a GuestShema dict and insert values accordingly
+        
+        role = Role.find_one({'name': 'guest'})
+        role.pop("name", None) 
+        guest = schemas.GuestSchema(
+            username= guestSign.username,
+            email= guestSign.email,
+            password= password_hashed,
+            userId= guestSign.username + str(uuid.uuid4()).replace("-", "")[:8],
+            roles= [role],
+            expiresAt= guestSign.timestamp
+        )
+        print("guest detail: {}".format(guest))
+
+        guest_dict = guest.dict()
+        Guest.insert_one(guest_dict)
+        response = {"message": "Guests was registered successfully!"}
+        return JSONResponse(content=response, status_code=201)
+
+    except Exception as e:
+        response = {"message": "Error creating a new Guest account", "error":  str(e)}
+      
+        return JSONResponse(content=response, status_code=500)
+
+
 
 @router.post("/ChangePassword", status_code=status.HTTP_200_OK)
 def passwordchange(oldpw: str, newpw: str, cfm_newpw: str, jwtToken: str):
-    #Check if user has logged out
+    #Check if  has logged out
     if LogoutToken.find_one({'jwtToken' : jwtToken}):
         response = {"message": "Token does not exist"}
         return JSONResponse(content=response, status_code=403)   

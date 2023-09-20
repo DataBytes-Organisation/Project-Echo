@@ -23,6 +23,8 @@ const {createCaptchaSync} = require("captcha-canvas");
 const db = require("./model");
 const Request = db.request;
 
+const port = 8080;
+
 
 //for connecting to ts-mongo-db
 const MongoClient = require('mongodb').MongoClient;
@@ -84,7 +86,7 @@ const storeItems = new Map([[
 app.use(express.json());
 // Use helmet middleware to set security headers
 
-app.use(helmet());
+// app.use(helmet());
 // Function to sanitize and normalize file paths
 // function sanitizeFilePath(filePath) {
 //   // Use path.normalize to ensure the path is in normalized form
@@ -338,7 +340,6 @@ app.post("/request_access", async (req, res) => {
     salt = crypto.getRandomValues(new Uint32Array(1)).toString();
   }
   let username = 'guest_' + email.split('@')[0] + "_" + salt;
-  console.log("username: ", username)
   let password = genPass(12);
   let timestamp = new Date(Date.now() + 1800000) //Set time to live of 1800000 ms = 1800 s = 30 mins
   let request = {
@@ -347,6 +348,7 @@ app.post("/request_access", async (req, res) => {
     "password": password,
     "timestamp": timestamp
   }
+  console.log("Guest details: ", request)
   try {
     //Sending that to Guest signup
     const response = await controller.guestsignup(request);
