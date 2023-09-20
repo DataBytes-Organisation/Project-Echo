@@ -3,14 +3,12 @@ const app = express();
 const path = require('path');
 const fs = require('fs');
 const cookieSession = require('cookie-session');
-const dbConfig = require('./config/db.config');
 const helmet = require('helmet');
 const jwt = require('jsonwebtoken');
-const { authJwt, client, checkUserSession } = require('./middleware');
+const { client, checkUserSession } = require('./middleware');
 const controller = require('./controller/auth.controller');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
-const mongoose = require('mongoose');
 client.connect()
 const cors = require('cors');
 require('dotenv').config()
@@ -19,36 +17,15 @@ const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY);
 const axios = require('axios')
 
 const {createCaptchaSync} = require("captcha-canvas");
-//Add mongoDB module inside config folder
-const db = require("./model");
-const Request = db.request;
+
 
 const port = 8080;
-
-
-//for connecting to ts-mongo-db
-const MongoClient = require('mongodb').MongoClient;
-const url = "mongodb://modelUser:EchoNetAccess2023@ts-mongodb-cont:27017/EchoNet";
 
 const rootDirectory = __dirname; // This assumes the root directory is the current directory
 
 
 //Security verification for email account and body content validation:
 const validation = require('deep-email-validator')
-const mongoSanitize = require('express-mongo-sanitize');
-// db.mongoose
-//   .connect(`mongodb://${dbConfig.USERNAME}:${dbConfig.PASSWORD}@${dbConfig.HOST}/${dbConfig.DB}?authSource=admin`, {
-//     useNewUrlParser: true,
-//     useUnifiedTopology: true
-//   })
-//   .then(() => {
-//     console.log("Successfully connect to MongoDB.");
-//   })
-//   .catch(err => {
-//     console.log("ConnString: ", `mongodb://${dbConfig.USERNAME}:${dbConfig.PASSWORD}@${dbConfig.HOST}/${dbConfig.DB}?authSource=admin`)
-//     console.error("Connection error", err);
-//     // process.exit();
-//   });
 
 // async function getAllPayments() {
 
@@ -227,17 +204,6 @@ app.use(cors(corsOptions))
 const bodyParser = require("express");
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }))
-
-//MongoDB query sanitization
-//Run in dryRun = testing mode; prevent server interruption because of this process
-app.use(
-  mongoSanitize({
-    dryRun: true,
-    onSanitize: ({ req, key }) => {
-      console.warn(`[DryRun] This request[${key}] will be sanitized`, req);
-    },
-  }),
-)
 
 //const serveIndex = require('serve-index'); 
 //app.use('/images/bio', serveIndex(express.static(path.join(__dirname, '/images/bio'))));
@@ -478,30 +444,6 @@ app.post("/api/submit", async (req, res) => {
   }
 });
 
-
-async function testMongoDBConnection() {
-  try {
-    // Attempt to connect to MongoDB
-    const client = new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true });
-    await client.connect();
-
-    // If the connection is successful, print a success message
-    console.log('MongoDB connection test: Connection successful');
-    
-    // Perform additional database operations here if needed
-
-    // Close the connection when done
-    await client.close();
-  } catch (error) {
-    // If there's an error, print an error message
-    console.error('MongoDB connection test: Connection failed');
-    console.error(error);
-  }
-}
-
-// Call the function to test the MongoDB connection
-testMongoDBConnection();
-
 app.post("/api/approve", async (req,res) => {
 
 })
@@ -514,27 +456,7 @@ app.get("/requestsOriginal", (req,res) => {
   res.sendFile(path.join(__dirname, 'public/requests.html'))
 })
 
-// app.patch('/api/requests/:id', async (req, res) => {
-//   const requestId = req.params.id; // Get the request ID from the URL parameter
-//   const newStatus = req.body.status; // Get the new status from the request body
-//   try {
-//     // Find the request by ID and update the status
-//     const updatedRequest = await Request.findByIdAndUpdate(
-//       requestId,
-//       { $set: { status: newStatus } },
-//       { new: true } // Return the updated document
-//     );
 
-//     if (!updatedRequest) {
-//       return res.status(404).json({ error: 'Request not found' });
-//     }
-
-//     res.json({ message: 'Request status updated successfully', updatedRequest });
-//   } catch (error) {
-//     console.error('Error updating request status:', error);
-//     res.status(500).json({ error: 'Error updating request status' });
-//   }
-// });
 
 app.patch('/api/requests/:id', async (req, res) => {
   const requestId = req.params.id; // Get the request ID from the URL parameter
@@ -592,51 +514,6 @@ app.patch('/api/updateConservationStatus/:animal', async (req, res) => {
   }
 });
 
-// app.patch('/api/updateConservationStatus/:animal', async (req,res) => {
-//   const requestAnimal = req.params.animal;
-//   const newStatus = req.body.status;
-//   try{
-//     const client = new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true });
-//     await client.connect();
-//     const EchoNet = client.db();
-//     const collection = EchoNet.collection('species');
-//     //const query = { _id : requestAnimal };
-//     //const updateOperation = {status : newStatus};
-//     const result = await collection.findOneAndUpdate(
-//       {_id : requestAnimal},
-//       {$set :{status: newStatus}},
-//       {
-//         collation: { locale: 'en', strength: 2 }, // Case-insensitive collation
-//         returnOriginal: false // Set this to false to get the updated document
-//       }
-//     );
-//     if (result.value) {
-//       // If a matching document is found and updated, print it to the console
-//       console.log('Updated animal:', result.value);
-//     } else {
-//       // If no matching document is found, print a message
-//       console.log('Animal not found.');
-//     }
-//     client.close();
-//     res.status(200).json({message: `updated animal status successfully ${result.value}, ${requestAnimal}, ${newStatus}`});
-//   }
-//   catch (error) {
-//     console.error('MongoDB connection or update operation failed:', error);
-//     res.status(500).json({error: 'Error updating animal'});
-//   }
-// })
-
-// OLD METHOD - USING DIRECT CONNECTION
-// app.get('/api/requests', async (req, res) => {
-//   try {
-//     const requests = await Request.find();
-//     res.json(requests);
-//   } catch (error) {
-//     res.status(500).json({ error: 'Error fetching data' });
-//   }
-// });
-
-// NEW METHOD - CONNECT VIA API
 app.get('/api/requests', async (req, res) => {
   try {
 
