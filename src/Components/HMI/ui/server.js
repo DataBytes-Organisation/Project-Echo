@@ -5,7 +5,6 @@ const fs = require('fs');
 const cookieSession = require('cookie-session');
 const dbConfig = require('./config/db.config');
 const helmet = require('helmet');
-//const mongoSanitize = require('express-mongo-sanitize');
 const jwt = require('jsonwebtoken');
 const { authJwt, client, checkUserSession } = require('./middleware');
 const controller = require('./controller/auth.controller');
@@ -22,9 +21,6 @@ const axios = require('axios')
 const {createCaptchaSync} = require("captcha-canvas");
 //Add mongoDB module inside config folder
 const db = require("./model");
-const Role = db.role;
-const User = db.user;
-const Guest = db.guest;
 const Request = db.request;
 
 
@@ -38,39 +34,19 @@ const rootDirectory = __dirname; // This assumes the root directory is the curre
 //Security verification for email account and body content validation:
 const validation = require('deep-email-validator')
 const mongoSanitize = require('express-mongo-sanitize');
-db.mongoose
-  .connect(`mongodb://${dbConfig.USERNAME}:${dbConfig.PASSWORD}@${dbConfig.HOST}/${dbConfig.DB}?authSource=admin`, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-  })
-  .then(() => {
-    console.log("Successfully connect to MongoDB.");
-    initial();
-    initUsers();
-    initGuests();
-    initRequests();
-  })
-  .catch(err => {
-    console.log("ConnString: ", `mongodb://${dbConfig.USERNAME}:${dbConfig.PASSWORD}@${dbConfig.HOST}/${dbConfig.DB}?authSource=admin`)
-    console.error("Connection error", err);
-    // process.exit();
-  });
-
-
-
-//mongoose.connect("mongodb://modelUser:EchoNetAccess2023@localhost:27017/EchoNet")
-//Initalize the data if no user role existed
-function initial() {
-  Role.estimatedDocumentCount((err, count) => {
-    if (!err && count === 0) {
-      const roleData = require(path.join(__dirname, "user-sample/role-seed.json"));
-
-      Role.insertMany(roleData);
-    }
-  });
-}
-
-
+// db.mongoose
+//   .connect(`mongodb://${dbConfig.USERNAME}:${dbConfig.PASSWORD}@${dbConfig.HOST}/${dbConfig.DB}?authSource=admin`, {
+//     useNewUrlParser: true,
+//     useUnifiedTopology: true
+//   })
+//   .then(() => {
+//     console.log("Successfully connect to MongoDB.");
+//   })
+//   .catch(err => {
+//     console.log("ConnString: ", `mongodb://${dbConfig.USERNAME}:${dbConfig.PASSWORD}@${dbConfig.HOST}/${dbConfig.DB}?authSource=admin`)
+//     console.error("Connection error", err);
+//     // process.exit();
+//   });
 
 // async function getAllPayments() {
 
@@ -110,22 +86,22 @@ app.use(express.json());
 
 app.use(helmet());
 // Function to sanitize and normalize file paths
-function sanitizeFilePath(filePath) {
-  // Use path.normalize to ensure the path is in normalized form
-  const normalizedPath = path.normalize(filePath);
+// function sanitizeFilePath(filePath) {
+//   // Use path.normalize to ensure the path is in normalized form
+//   const normalizedPath = path.normalize(filePath);
 
-  // Use path.join to join the normalized path with the root directory
-  const rootDirectory = __dirname; // This assumes the root directory is the current directory of the script
-  const absolutePath = path.join(rootDirectory, normalizedPath);
+//   // Use path.join to join the normalized path with the root directory
+//   const rootDirectory = __dirname; // This assumes the root directory is the current directory of the script
+//   const absolutePath = path.join(rootDirectory, normalizedPath);
 
-  // Ensure that the resulting path is still within the root directory
-  if (absolutePath.startsWith(rootDirectory)) {
-    return absolutePath;
-  } else {
-    // If the path goes outside the root directory, return null or handle the error as needed
-    return null;
-  }
-}
+//   // Ensure that the resulting path is still within the root directory
+//   if (absolutePath.startsWith(rootDirectory)) {
+//     return absolutePath;
+//   } else {
+//     // If the path goes outside the root directory, return null or handle the error as needed
+//     return null;
+//   }
+// }
 
 app.post("/api/create-checkout-session", async (req, res) => {
   try {
@@ -227,78 +203,6 @@ app.get('/cumulativeDonations', async(req, res) => {
   } 
 })
 
-function initRequests(){
-  Request.estimatedDocumentCount((err, count) => {
-    if (!err && count === 0) {
-      const requestData = require(path.join(__dirname, "user-sample/request-seed.json"));
-      Request.insertMany(requestData);
-    }
-  });
-}
-//Add sample Users if none exists
-function initUsers() {
-  User.estimatedDocumentCount((err, count) => {
-    if (!err && count === 0) {
-      const userData = require(path.join(__dirname, "user-sample/user-seed.json"));
-      User.insertMany(userData);
-
-    }
-  });
-}
-
-//Add sample Guest users if none exists
-function initGuests() {
-  Guest.estimatedDocumentCount((err, count) => {
-    if (!err && count === 0) {
-      //Different from Roles and Users, 
-      // another approach is to manually seed mongoDB document
-      // Only feasible if there are only 1-2 sample documents
-      const newGuest1 = new Guest({
-        userId: "HMITest1",
-        username: "guest_tester1_0987654321",
-        email: "guest@echo.com",
-        password: bcrypt.hashSync("guest_password", 8),
-        roles: [
-          {
-            "_id": "64be1d0f05225843178d91d7"
-          }
-        ],
-        expiresAt: new Date(Date.now() + 1800000) // Set the expiration duration for 30 mins = 1800 s = 1800000 ms from now
-      });
-
-      // Save the new guest document to the collection
-      newGuest1.save((err, doc) => {
-        if (err) {
-          console.error(err);
-        } else {
-          console.log('Guest document inserted successfully:', doc);
-        }
-      });
-
-      const newGuest2 = new Guest({
-        userId: "HMITest2",
-        username: "guest_tester2_1234567890",
-        email: "guest@hmi.com",
-        password: bcrypt.hashSync("guest_password", 8),
-        roles: [
-          {
-            "_id": "64be1d0f05225843178d91d7"
-          }
-        ],
-        expiresAt: new Date(Date.now() + 300000) // Set the expiration duration for 5 mins = 300 s = 300000 ms from now
-      });
-
-      // Save the new guest document to the collection
-      newGuest2.save((err, doc) => {
-        if (err) {
-          console.error(err);
-        } else {
-          console.log('Guest document inserted successfully:', doc);
-        }
-      });
-    }
-  });
-}
 app.get('/data/captcha', (req, res) => {
   const {image, text} = createCaptchaSync(300,100); // Use the package's functionality
   fs.writeFileSync("./public/captchaImg.png", image);
@@ -306,21 +210,6 @@ app.get('/data/captcha', (req, res) => {
   console.log("Image: ", image);
   res.json({image, text});
 });
-
-//Background Process to automatically delete Guest role after exceeding expiration
-setInterval(() => {
-  const now = new Date();
-  console.log("Background monitor at ", now.toString())
-  Guest.deleteMany({ expiresAt: { $lte: now } }, (err) => {
-    if (err) {
-      console.error('Error deleting expired documents:', err);
-    } else {
-      console.log('Expired documents deleted successfully.');
-    }
-  });
-}, 360000); // Run every 6 mins = 360 s = 360000 ms (adjust as needed)
-
-const port = 8080;
 
 // serve static files from the public directory
 // app.use(express.static(path.join(__dirname, 'public')));
