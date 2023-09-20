@@ -332,10 +332,55 @@ def guestsignup(guestSign: schemas.GuestSignupSchema):
 
     except Exception as e:
         response = {"message": "Error creating a new Guest account", "error":  str(e)}
-      
         return JSONResponse(content=response, status_code=500)
 
+@router.patch('/api/requests', dependencies=[Depends(jwtBearer)], status_code=status.HTTP_200_OK)
+def update_request_status(requestData):
+    request_dict = requestData.dict()
 
+    if request_dict["newStatus"] is None:
+        response = {"message": "Invalid request status data"}
+        return JSONResponse(content=response, status_code=400)
+    if request_dict["requestId"] is None:
+        response = {"message": "Invalid requestId data"}
+        return JSONResponse(content=response, status_code=400)
+
+    updated_request = Requests.find_one_and_update(
+        {'_id': request_dict["requestId"]},
+        {'$set': {'status': request_dict["newStatus"]}},
+        return_document=True
+    )
+
+    if updated_request is None:
+        response = {"message": "Request data not found"}
+        return JSONResponse(content=response, status_code=404)
+
+    response = {"message": "Update request data successful"}
+    return JSONResponse(content=response, status_code=200)
+
+@router.patch('/api/updateConservationStatus', dependencies=[Depends(jwtBearer)], status_code=status.HTTP_200_OK)
+def update_request_status(speciesUpdateData):
+    request_dict = speciesUpdateData.dict()
+
+    if request_dict["newStatus"] is None:
+        response = {"message": "Invalid request status data"}
+        return JSONResponse(content=response, status_code=400)
+    if request_dict["requestAnimal"] is None:
+        response = {"message": "Invalid Animal data"}
+        return JSONResponse(content=response, status_code=400)
+
+    updated_request = Requests.find_one_and_update(
+        {'_id': request_dict["requestAnimal"]},
+        {'$set': {'status': request_dict["newStatus"]}},
+        return_document=True
+    )
+
+    if updated_request is None:
+        response = {"message": "Animal data not found"}
+        return JSONResponse(content=response, status_code=404)
+
+    response = {"message": "Update species data successful"}
+    return JSONResponse(content=response, status_code=200)
 
 @router.post("/ChangePassword", status_code=status.HTTP_200_OK)
 def passwordchange(oldpw: str, newpw: str, cfm_newpw: str, jwtToken: str):

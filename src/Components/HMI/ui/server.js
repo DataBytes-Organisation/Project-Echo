@@ -514,62 +514,117 @@ app.get("/requestsOriginal", (req,res) => {
   res.sendFile(path.join(__dirname, 'public/requests.html'))
 })
 
+// app.patch('/api/requests/:id', async (req, res) => {
+//   const requestId = req.params.id; // Get the request ID from the URL parameter
+//   const newStatus = req.body.status; // Get the new status from the request body
+//   try {
+//     // Find the request by ID and update the status
+//     const updatedRequest = await Request.findByIdAndUpdate(
+//       requestId,
+//       { $set: { status: newStatus } },
+//       { new: true } // Return the updated document
+//     );
+
+//     if (!updatedRequest) {
+//       return res.status(404).json({ error: 'Request not found' });
+//     }
+
+//     res.json({ message: 'Request status updated successfully', updatedRequest });
+//   } catch (error) {
+//     console.error('Error updating request status:', error);
+//     res.status(500).json({ error: 'Error updating request status' });
+//   }
+// });
+
 app.patch('/api/requests/:id', async (req, res) => {
   const requestId = req.params.id; // Get the request ID from the URL parameter
   const newStatus = req.body.status; // Get the new status from the request body
-
-  try {
-    // Find the request by ID and update the status
-    const updatedRequest = await Request.findByIdAndUpdate(
-      requestId,
-      { $set: { status: newStatus } },
-      { new: true } // Return the updated document
-    );
-
-    if (!updatedRequest) {
-      return res.status(404).json({ error: 'Request not found' });
+  let schema = {requestId:requestId, newStatus: newStatus};
+  let token = await client.get('JWT', (err, storedToken) => {
+    if (err) {
+      console.error('Error retrieving token from Redis:', err);
+      return null
+    } else {
+      console.log('Stored Token:', storedToken);
+      return storedToken
     }
-
-    res.json({ message: 'Request status updated successfully', updatedRequest });
+  })
+  try {
+    console.log("Admin Request update data: ", JSON.stringify(schema));
+    const axiosResponse = await axios.patch('http://ts-api-cont:9000/hmi/api/requests', JSON.stringify(schema), { headers: {"Authorization" : `Bearer ${token}`, 'Content-Type': 'application/json'}})
+    if (axiosResponse.status === 200) {
+      console.log('Status Code: ' + axiosResponse.status + ' ' + axiosResponse.statusText)
+      res.status(200).send(`<script> window.location.href = "/login"; alert("Request data updated successfully");</script>`);
+    } else {
+      res.status(400).send(`<script> window.location.href = "/login"; alert("Ooops! Something went wrong with updating request table");</script>`);
+    }
   } catch (error) {
-    console.error('Error updating request status:', error);
-    res.status(500).json({ error: 'Error updating request status' });
+    console.error(error.data);
+    res.status(500).send({ error: 'Error updating request status' });
   }
 });
 
-app.patch('/api/updateConservationStatus/:animal', async (req,res) => {
+app.patch('/api/updateConservationStatus/:animal', async (req, res) => {
   const requestAnimal = req.params.animal;
   const newStatus = req.body.status;
-  try{
-    const client = new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true });
-    await client.connect();
-    const EchoNet = client.db();
-    const collection = EchoNet.collection('species');
-    //const query = { _id : requestAnimal };
-    //const updateOperation = {status : newStatus};
-    const result = await collection.findOneAndUpdate(
-      {_id : requestAnimal},
-      {$set :{status: newStatus}},
-      {
-        collation: { locale: 'en', strength: 2 }, // Case-insensitive collation
-        returnOriginal: false // Set this to false to get the updated document
-      }
-    );
-    if (result.value) {
-      // If a matching document is found and updated, print it to the console
-      console.log('Updated animal:', result.value);
+  let schema = {requestAnimal:requestAnimal, newStatus: newStatus};
+  let token = await client.get('JWT', (err, storedToken) => {
+    if (err) {
+      console.error('Error retrieving token from Redis:', err);
+      return null
     } else {
-      // If no matching document is found, print a message
-      console.log('Animal not found.');
+      console.log('Stored Token:', storedToken);
+      return storedToken
     }
-    client.close();
-    res.status(200).json({message: `updated animal status successfully ${result.value}, ${requestAnimal}, ${newStatus}`});
+  })
+  try {
+    console.log("Admin update species data: ", JSON.stringify(schema));
+    const axiosResponse = await axios.patch('http://ts-api-cont:9000/hmi/api/updateConservationStatus', JSON.stringify(schema), { headers: {"Authorization" : `Bearer ${token}`, 'Content-Type': 'application/json'}})
+    if (axiosResponse.status === 200) {
+      console.log('Status Code: ' + axiosResponse.status + ' ' + axiosResponse.statusText)
+      res.status(200).send(`<script> window.location.href = "/login"; alert("Species Data updated successfully");</script>`);
+    } else {
+      res.status(400).send(`<script> window.location.href = "/login"; alert("Ooops! Something went wrong with updating species data");</script>`);
+    }
+  } catch (error) {
+    console.error(error.data);
+    res.status(500).send({ error: 'Error updating species status' });
   }
-  catch (error) {
-    console.error('MongoDB connection or update operation failed:', error);
-    res.status(500).json({error: 'Error updating animal'});
-  }
-})
+});
+
+// app.patch('/api/updateConservationStatus/:animal', async (req,res) => {
+//   const requestAnimal = req.params.animal;
+//   const newStatus = req.body.status;
+//   try{
+//     const client = new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true });
+//     await client.connect();
+//     const EchoNet = client.db();
+//     const collection = EchoNet.collection('species');
+//     //const query = { _id : requestAnimal };
+//     //const updateOperation = {status : newStatus};
+//     const result = await collection.findOneAndUpdate(
+//       {_id : requestAnimal},
+//       {$set :{status: newStatus}},
+//       {
+//         collation: { locale: 'en', strength: 2 }, // Case-insensitive collation
+//         returnOriginal: false // Set this to false to get the updated document
+//       }
+//     );
+//     if (result.value) {
+//       // If a matching document is found and updated, print it to the console
+//       console.log('Updated animal:', result.value);
+//     } else {
+//       // If no matching document is found, print a message
+//       console.log('Animal not found.');
+//     }
+//     client.close();
+//     res.status(200).json({message: `updated animal status successfully ${result.value}, ${requestAnimal}, ${newStatus}`});
+//   }
+//   catch (error) {
+//     console.error('MongoDB connection or update operation failed:', error);
+//     res.status(500).json({error: 'Error updating animal'});
+//   }
+// })
 
 // OLD METHOD - USING DIRECT CONNECTION
 // app.get('/api/requests', async (req, res) => {
