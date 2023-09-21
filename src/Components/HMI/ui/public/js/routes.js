@@ -40,13 +40,6 @@ export function retrieveAudio(id){
 
 export function postRecording(recordingData){
   axios.post(`/post_recording`, recordingData)
-  .then(response => {
-    console.log('Response from MAP routes:', response);
-  })
-  .catch(error => {
-    console.error('Error:', error);
-  });
-  //axios.post(`/post_recording?data=${recordingData}`);
 }
 
 export function setSimModeAnimal(){
