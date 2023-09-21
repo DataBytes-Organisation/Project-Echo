@@ -88,9 +88,6 @@
 		"password": "$2a$08$cuJfjVi6G06u6I5FaYrHAOXbnqXMBsWn1xbYKowdr3wsQNfmTh2yC",
 		"roles": [
 			{
-				"_id":"64be1d0f05225843178d91d5"
-			},
-			{
 				"_id": "64be1d0f05225843178d91d6"
 			}	
 		],
@@ -116,9 +113,6 @@
 		"roles": [
 			{
 				"_id":"64be1d0f05225843178d91d5"
-			},
-			{
-				"_id": "64be1d0f05225843178d91d6"
 			}	
 		],
 		"__v": 1,
