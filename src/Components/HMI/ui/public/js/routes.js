@@ -55,7 +55,7 @@ export function setSimModeRecordingV2(){
 }
 
 export function stopSimulator(){
-  axios.post(`/sim_control?control=Stop`);
+  axios.post(`/sim_control/Stop`);
 }
 
 export function retrieveSimTime(){
