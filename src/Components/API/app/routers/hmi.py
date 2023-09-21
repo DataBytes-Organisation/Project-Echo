@@ -3,7 +3,7 @@ from fastapi import FastAPI, Body, HTTPException, status, APIRouter, Depends
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from typing import Optional, List
-
+import re
 from bson import ObjectId
 import datetime
 from app import serializers
@@ -371,7 +371,7 @@ def update_request_status(request_dict : dict):
         return JSONResponse(content=response, status_code=400)
 
     updated_request = Species.find_one_and_update(
-        {'_id': request_dict["requestAnimal"]},
+        {'_id': {"$regex": re.compile(re.escape(request_dict["requestAnimal"]), re.IGNORECASE)}},
         # {'_id': "Aegotheles Cristatus"},
         {'$set': {'status': request_dict["newStatus"]}},
         return_document=True
