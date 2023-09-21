@@ -21,10 +21,23 @@ pip install dist/echo_spectogram-0.1.0-py3-none-any.whl
 
 # How to use the library
 
-from echo_spectogram import plot_waveform, plot_mel_spectrogram
+from echo_spectogram import DisplayWave, DisplayMelSpec, show_example_images, display_img_after_aug, apply_augmentation
 
 ## To plot waveform
-plot_waveform('audio_filepath')
+DisplayWave("/path/to/your/audio_file.wav",True,True,True,"This is the Image Title")
 
 ## To plot MelSpectogram
-plot_mel_spectrogram('audio_filepath')
+DisplayMelSpec("/path/to/your/audio_file.wav",True,True,True,True,True,"This is the Image Title")
+
+## To display Show Example Image
+show_example_images("/path/to/your/audio/directory",2)
+
+## To Show Images after applying augmentations
+output_path= "/path/to/your/ouput/directory"
+input_path = "/path/to/your/audio_file.wav"
+display_img_after_aug(input_path,output_path)
+
+## Apply Single Augmentation
+output_path= "/path/to/your/ouput/directory"
+input_path = "/path/to/your/audio_file.wav"
+apply_augmentation(input_path,output_path,AddGaussianNoise,0.001,0.015)
