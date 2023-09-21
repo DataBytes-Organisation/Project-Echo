@@ -59,9 +59,9 @@ module.exports = function(app) {
 
   app.post(`/post_recording`, async (req, res, next) => {
     let data = req.body
-    axios.post(`${MESSAGE_API_URL}/post_recording`, JSON.stringify(data))
+    axios.post(`${MESSAGE_API_URL}/post_recording`, data)
     .then(response => {
-      console.log('Response:', response.data);
+      console.log('Record response:', response.data);
     })
     .catch(error => {
       console.error('Error:', error);
