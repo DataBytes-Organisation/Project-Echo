@@ -21,7 +21,7 @@ const {createCaptchaSync} = require("captcha-canvas");
 
 const port = 8080;
 
-//const rootDirectory = __dirname; // This assumes the root directory is the current directory
+const rootDirectory = __dirname; // This assumes the root directory is the current directory
 
 
 //Security verification for email account and body content validation:
@@ -86,6 +86,7 @@ app.post("/api/create-checkout-session", async (req, res) => {
   try {
     console.log(req.body.items);
     const session = await stripe.checkout.sessions.create({
+      customer_email: 'bndct.dev@gmail.com',
       submit_type: 'donate',
       payment_method_types: ["card"],
       mode: "payment",
