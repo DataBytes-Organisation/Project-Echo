@@ -311,36 +311,6 @@
   "status": "Least Concern",
   "diet": "Herbivore"
 },{
-  "_id": "Cacatua sanguinea",
-  "commonName": "Little Corella",
-  "type": "Bird",
-  "status": "Least Concern",
-  "diet": "Herbivore"
-},{
-  "_id": "Cacomantis flabelliformis",
-  "commonName": "Fan-tailed Cuckoo",
-  "type": "Bird",
-  "status": "Least Concern",
-  "diet": "Insectivore"
-},{
-  "_id": "Cacomantis pallidus",
-  "commonName": "Pallid Cuckoo",
-  "type": "Bird",
-  "status": "Least Concern",
-  "diet": "Insectivore"
-},{
-  "_id": "Cacomantis variolosus",
-  "commonName": "Brush Cuckoo",
-  "type": "Bird",
-  "status": "Least Concern",
-  "diet": "Insectivore"
-},{
-  "_id": "Caligavis chrysops",
-  "commonName": "Yellow-faced Honeyeater",
-  "type": "Bird",
-  "status": "Least Concern",
-  "diet": "Nectarivore"
-},{
   "_id": "Callocephalon fimbriatum",
   "commonName": "Gang-gang Cockatoo",
   "type": "Bird",
