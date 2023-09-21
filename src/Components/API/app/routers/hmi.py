@@ -203,8 +203,8 @@ def signup(user: schemas.UserSignupSchema):
     #Store user role as an id 
     user_role_id = []
     for role_name in user.roles:
-        role = Role.find_one({"name": role_name["_id"]})
-        user_role_id.append(role["_id"])
+        role = Role.find_one({"name": role_name})
+        user_role_id.append({"_id": role["_id"]})
     user.roles = user_role_id
 
     #Convert into dictionary and insert into the database
