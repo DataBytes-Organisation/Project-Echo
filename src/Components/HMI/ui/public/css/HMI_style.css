@@ -243,9 +243,35 @@ body{
     max-width: 100vw;
     overflow-y: hidden;
   }
-  
-  #filter-menu {
+  #filter-menu{
     overflow-y: hidden;
+  }
+  #animal-popup{
+    overflow-y: hidden;
+  }
+  #FAQ{
+    overflow-y: hidden;
+  }
+  #SIM{
+    overflow-y: hidden;
+  }
+  #donate{
+    overflow-y: hidden;
+  }
+  #statistics{
+    overflow-y: hidden;
+  }
+  #mic-popup{
+    overflow-y: hidden;
+  }
+  #mic-popup{
+    overflow-y: hidden;
+  }
+}
+
+@media only screen and (min-width: 600px) and (max-width: 1050px) and (orientation: portrait) { /* Tablet vers. (Portrait) */
+  #filter-menu, #animal-popup, #FAQ, #SIM, #donate, #statistics, #mic-popup, #mic-popup {
+    max-width: 100vw;
   }
 }
 
@@ -263,6 +289,14 @@ body{
 @media only screen and (max-width: 980px) and (orientation: portrait) { /* Mobile vers. (Portrait) */
   .navbar {
     margin-top: 12vw;
+    margin-left: 7vw;
+    justify-content: center;
+  }
+}
+
+@media only screen and (min-width: 600px) and (max-width: 1050px) and (orientation: portrait) { /* Tablet vers. (Portrait) */
+  .navbar {
+    margin-top: 6vw;
     margin-left: 7vw;
     justify-content: center;
   }
@@ -406,7 +440,7 @@ body{
 }
 
 .export-tab {
-  position: sticky;
+  position: relative;
   bottom: 10px;
   height: 20vh;
   min-height: 30px;
@@ -510,6 +544,12 @@ input[type="checkbox"]{
     /*font-family: 'Roboto', sans-serif;*/
 }
 
+@media only screen and (max-width: 930px) and (orientation: landscape) { /* Mobile vers. (Landscape) */
+  #export-tab{
+    position: relative;
+  }
+
+}
 
 #ABOUT{
     height: 0;
@@ -687,6 +727,20 @@ input[type="checkbox"]{
   font-family: 'Roboto', sans-serif;
   /*overflow-y: scroll;
   overflow-x: hidden;*/
+}
+
+/* Tablet Finetuning Aspects */
+
+@media only screen and (min-width: 600px) and (max-width: 1050px) and (orientation: portrait) { /* Tablet vers. (Portrait) */
+  #filter-menu, #FAQ, #SIM, #donate, #statistics {
+    right: 15vw;
+    margin-right: -30vw;
+  }
+  
+  #animal-popup, #mic-popup, #mic-popup {
+    right: 15vw;
+    margin-right: -15vw;
+  }
 }
 
 #animal-popup{
@@ -1319,6 +1373,23 @@ i {
   }
 }
 
+@media only screen and (min-width: 600px) and (max-width: 1050px) and (orientation: portrait) { /* Tablet vers. (Portrait) */
+  .tabs-button {
+    margin-left: 4vw;
+    margin-bottom: 4vw;
+    width: 12vw;
+    height: 12vw;
+    margin-right: 4vw;
+  }
+  
+  .tabs-button.active {
+    margin-left: 4vw;
+    margin-bottom: 4vw;
+    width: 12vw;
+    height: 12vw;
+  }
+}
+
 #filter-menu-btn {
   background-image: url("../images/tabIcons/filter.png");
   background-size: cover;
@@ -1383,6 +1454,14 @@ i {
   }
 }
 
+@media only screen and (min-width: 600px) and (max-width: 1050px) and (orientation: portrait) { /* Tablet vers. (Portrait) */
+  #pink-line {
+    width: 100vw; 
+    margin-top: 60vw;
+    margin-bottom: 4vh;
+  }
+}
+
 #filter-menu-btn::before {
   opacity: 0.5;
 }
@@ -1425,7 +1504,7 @@ i {
     width: 95vw;
     display: flex;
     float: right;
-    margin-right: 0; 
+    margin-right: 0;
   }
 }
 

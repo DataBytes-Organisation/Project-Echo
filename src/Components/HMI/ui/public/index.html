@@ -749,7 +749,14 @@
   }
 
   var hamburgerStatus = false;
-  var currentTab = document.getElementById('filter-menu'); 
+  var currentTab = document.getElementById('filter-menu');
+
+	if(hamburgerStatus == false){
+	  document.getElementById("pink-line").style.width = "0px";
+	}
+	else {
+	  document.getElementById("pink-line").style.width = "100vw";
+	}  
 
   function toggleNav() {
     var hamburger = document.querySelector('.hamburger-icon');
@@ -765,16 +772,18 @@
   }
   
   function openMenu() {
-    document.getElementById("menu").style.width = "550px";
+    document.getElementById("menu").style.width = "100vw";
     document.getElementById("menu").style.height = "100%";
     hamburgerStatus = true;
     openTab("filter-menu")
+	document.getElementById("pink-line").style.width = "100vw";
   }
 
   function closeMenu() {
     document.getElementById("menu").style.width = "0%";
     document.getElementById("menu").style.height = "0%";
     hamburgerStatus = false;
+	document.getElementById("pink-line").style.width = "0px";
     closeTab()
   }
 
@@ -809,7 +818,7 @@
       }
       currentTab = document.getElementById(tab)
     }
-    currentTab.style.width = "550px";
+    currentTab.style.width = "100vw";
     currentTab.style.height = "90%";
   }
 
