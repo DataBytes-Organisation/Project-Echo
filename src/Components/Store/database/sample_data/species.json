@@ -185,70 +185,10 @@
   "status": "Least Concern",
   "diet": "Insectivore"
 },{
-  "_id": "Caligavis chrysops",
-  "commonName": "Yellow-faced Honeyeater",
-  "type": "Bird",
-  "status": "Least Concern",
-  "diet": "Nectarivore"
-},{
-  "_id": "Callocephalon fimbriatum",
-  "commonName": "Gang-gang Cockatoo",
-  "type": "Bird",
-  "status": "Least Concern",
-  "diet": "Omnivore"
-},{
-  "_id": "Calyptorhynchus banksii",
-  "commonName": "Red-tailed Black Cockatoo",
-  "type": "Bird",
-  "status": "Vulnerable",
-  "diet": "Herbivore"
-},{
-  "_id": "Calyptorhynchus lathami",
-  "commonName": "Glossy Black Cockatoo",
-  "type": "Bird",
-  "status": "Vulnerable",
-  "diet": "Herbivore"
-},{
-  "_id": "Carduelis carduelis",
-  "commonName": "European Goldfinch",
-  "type": "Bird",
-  "status": "Invasive",
-  "diet": "Herbivore"
-},{
-  "_id": "Carterornis leucotis",
-  "commonName": "White-eared Night Heron",
-  "type": "Bird",
-  "status": "Near Threatened",
-  "diet": "Carnivore"
-},{
-  "_id": "Ceyx azureus",
-  "commonName": "Azure Kingfisher",
-  "type": "Bird",
-  "status": "Least Concern",
-  "diet": "Carnivore"
-},{
-  "_id": "Chenonetta jubata",
-  "commonName": "Australian Wood Duck",
-  "type": "Bird",
-  "status": "Least Concern",
-  "diet": "Omnivore"
-},{
-  "_id": "Chlamydera guttata",
-  "commonName": "Western Bowerbird",
-  "type": "Bird",
-  "status": "Least Concern",
-  "diet": "Omnivore"
-},{
   "_id": "Chlamydera nuchalis",
   "commonName": "Great Bowerbird",
   "type": "Bird",
   "status": "Least Concern",
-  "diet": "Omnivore"
-},{
-  "_id": "Cincloramphus mathewsi",
-  "commonName": "Buff-rumped Thornbill",
-  "type": "Bird",
-  "status": "Endangered",
   "diet": "Omnivore"
 },{
   "_id": "Cinclosoma punctatum",
