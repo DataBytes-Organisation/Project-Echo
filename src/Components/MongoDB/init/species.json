@@ -59,17 +59,17 @@
   "status": "Least Concern",
   "diet": "Carnivore"
 },{
-  "_id": "Strepera Graculina",
-  "commonName": "Pied Currawong",
+  "_id": "Felis Catus",
+  "commonName": "Cat",
+  "type": "Mammal",
+  "status": "Invasive",
+  "diet": "Carnivore"
+},{
+  "_id": "Pachycephala Rufiventris",
+  "commonName": "Rufous Whistler",
   "type": "Bird",
   "status": "Least Concern",
   "diet": "Omnivore"
-},{
-  "_id": "Capra Hircus",
-  "commonName": "Feral Goat",
-  "type": "Mammal",
-  "status": "Invasive",
-  "diet": "Herbavore"
 },{
   "_id": "Ptilotula Penicillata",
   "commonName": "White-plumed Honeyeater",
