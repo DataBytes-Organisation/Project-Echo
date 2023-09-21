@@ -31,8 +31,12 @@ module.exports = function(app) {
   app.get(`/movement_time/:start/:end`, async (req, res, next) => {
     const start = req.params.start
     const end = req.params.end
-    const response = await res.send(axios.get(`${MESSAGE_API_URL}/movement_time?start=${start}&end=${end}`));
-    res.send(response.data);
+    const response = await axios.get(`${MESSAGE_API_URL}/movement_time?start=${start}&end=${end}`);
+    if (Object.keys(response.data).length === 0) {
+      res.send([])
+    } else {
+      res.send(response.data);
+    }
   })
 
   app.get(`/events_time/:start/:end`, async (req, res, next) => {
