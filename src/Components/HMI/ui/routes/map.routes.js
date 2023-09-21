@@ -72,7 +72,7 @@ module.exports = function(app) {
 
   app.post(`/sim_control/:control`, async (req, res, next) => {
     const control = req.params.control
-    const response = await axios.post(`${SERVER_URL}/sim_control?control=${control}`);
+    const response = await axios.post(`${MESSAGE_API_URL}/sim_control?control=${control}`);
     res.send(response.data);
     next()
   })

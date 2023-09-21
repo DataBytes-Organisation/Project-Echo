@@ -60,7 +60,7 @@ const validation = require('deep-email-validator')
 const storeItems = new Map([[
   1, { priceInCents: 100, name: "donation"}
 ]])
-app.use(express.json());
+app.use(express.json({limit: '10mb'}));
 // Use helmet middleware to set security headers
 
 // app.use(helmet());
@@ -202,8 +202,8 @@ app.use(cors(corsOptions))
 
 //bodyParser to make sure post form data is read
 const bodyParser = require("express");
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.json({ limit: '10mb' }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }))
 
 //const serveIndex = require('serve-index'); 
 //app.use('/images/bio', serveIndex(express.static(path.join(__dirname, '/images/bio'))));
