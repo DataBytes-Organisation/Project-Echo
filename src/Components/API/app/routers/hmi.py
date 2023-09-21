@@ -3,12 +3,12 @@ from fastapi import FastAPI, Body, HTTPException, status, APIRouter, Depends
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from typing import Optional, List
-
+import re
 from bson import ObjectId
 import datetime
 from app import serializers
 from app import schemas
-from app.database import Events, Movements, Microphones, User, Role, ROLES, Requests, ForgotPassword, LogoutToken
+from app.database import Events, Movements, Microphones, User, Role, ROLES, Requests, Guest, ForgotPassword, LogoutToken, Species
 import paho.mqtt.publish as publish
 import bcrypt
 from flask import jsonify
@@ -21,6 +21,7 @@ from app.middleware.auth import signJWT, decodeJWT
 from app.middleware.auth_bearer import JWTBearer
 from app.middleware.random import randompassword
 from bson.objectid import ObjectId
+import uuid
 
 jwtBearer = JWTBearer()
 
@@ -135,6 +136,17 @@ def latest_movememnt():
     return timestamp
 
 
+@router.post("/api/submit", dependencies=[Depends(jwtBearer)], status_code=status.HTTP_201_CREATED)
+def submit_request(request: schemas.RequestSchema):
+    try:
+        request_dict = request.dict()
+        Requests.insert_one(request_dict)
+        response = {"message": "Request submitted succesfully."}
+        return JSONResponse(content=response, status_code=201)
+    except Exception as e:
+        response = {"message": "Exception error", "exception": str(e)}
+        return JSONResponse(content=response, status_code=422)
+
 @router.post("/sim_control", status_code=status.HTTP_201_CREATED)
 def post_control(control: str):
 
@@ -191,7 +203,7 @@ def signup(user: schemas.UserSignupSchema):
     #Store user role as an id 
     user_role_id = []
     for role_name in user.roles:
-        role = Role.find_one({"name": role_name})
+        role = Role.find_one({"name": role_name["_id"]})
         user_role_id.append(role["_id"])
     user.roles = user_role_id
 
@@ -208,27 +220,52 @@ def signin(user: schemas.UserLoginSchema):
     #Find if the username exist in our database
     account = User.find_one({"$or": [{"username": user.username}, {"email": user.email}]})
     if(account is None):
-        response = {"message": "User Not Found."}
-        return JSONResponse(content=response, status_code=404)
-   
+        #User Not exist - Checking inside Guest Collections
+        guestAcc = Guest.find_one({"$or": [{"username": user.username}, {"email": user.email}]})
+        if(guestAcc is None):
+            response = {"message": "User Not Found in Database."}
+            return JSONResponse(content=response, status_code=404)
+        #Verify credentials in User Collections
+        passwordIsValid = bcrypt.checkpw(user.password.encode('utf-8'), guestAcc['password'].encode('utf-8'))
+        if (passwordIsValid == False):
+            response = {"message": "Invalid Password!"}
+            return JSONResponse(content=response, status_code=401)
+        authorities = []
+        for role_id in guestAcc['roles']:
+            role = Role.find_one({"_id": role_id["_id"]})
+            if role:
+                authorities.append("ROLE_" + role['name'].upper())
+        #Create JWT token using user info
+        jwtToken = signJWT(user=guestAcc, authorities=authorities)
+        
+        #Assign the session token with JWT
+        requests.session.token = jwtToken
+        result = {
+            "id": guestAcc["_id"],
+            "username": guestAcc["username"],
+            "email": guestAcc["email"],
+            "role" : authorities,
+        }
+
+        #Set up response (FOR TESTING ONLY)
+        response = {"message": "User Login Successfully!", "tkn" : jwtToken, "roles": authorities}
+
+        #Log result
+        print(result)
+        return JSONResponse(content=response, status_code=200)
+    
+    #User Exist
+    #Verify credentials in User Collections
     #Find if the password matches
     passwordIsValid = bcrypt.checkpw(user.password.encode('utf-8'), account['password'].encode('utf-8'))
     if (passwordIsValid == False):
         response = {"message": "Invalid Password!"}
         return JSONResponse(content=response, status_code=401)
-
     authorities = []
     for role_id in account['roles']:
-        role = Role.find_one({"_id": ObjectId(role_id)})
+        role = Role.find_one({"_id": str(role_id["_id"])})
         if role:
             authorities.append("ROLE_" + role['name'].upper())
-
-    #Create payload for our token
-    # payload = {
-    #     "id": account["userId"],
-    #     "roles": authorities,
-    #     "exp": datetime.datetime.utcnow() + datetime.timedelta(seconds=86400)
-    # }
     
     #Create JWT token using user info
     jwtToken = signJWT(user=account, authorities=authorities)
@@ -269,10 +306,87 @@ def signout(jwtToken: str):
     except Exception as err:
         return JSONResponse({"Error": str(err)})
 
+@router.post("/guestsignup", status_code=status.HTTP_200_OK)
+def guestsignup(guestSign: schemas.GuestSignupSchema):
+    try:
+        #Hash password using bcrypt
+        password_hashed = bcrypt.hashpw(guestSign.password.encode('utf-8'), bcrypt.gensalt(rounds=8))
+        recorded_password = password_hashed.decode('utf-8')
+
+        #Create a GuestShema dict and insert values accordingly
+        
+        role = Role.find_one({'name': 'guest'})
+        role.pop("name", None) 
+        guest = dict(
+            username= guestSign.username,
+            email= guestSign.email,
+            password= recorded_password,
+            userId= guestSign.username + str(uuid.uuid4()).replace("-", "")[:8],
+            roles= [role],
+            expiresAt= guestSign.timestamp
+        )
+
+        Guest.insert_one(guest)
+        response = {"message": "Guests was registered successfully!"}
+        return JSONResponse(content=response, status_code=201)
+
+    except Exception as e:
+        response = {"message": "Error creating a new Guest account", "error":  str(e)}
+        return JSONResponse(content=response, status_code=500)
+
+@router.patch('/api/requests', dependencies=[Depends(jwtBearer)], status_code=status.HTTP_200_OK)
+def update_request_status(request_dict : dict):
+    print("Admin Request Status Data: {}".format(request_dict))
+
+    if request_dict["newStatus"] is None:
+        response = {"message": "Invalid request status data"}
+        return JSONResponse(content=response, status_code=400)
+    if request_dict["requestId"] is None:
+        response = {"message": "Invalid requestId data"}
+        return JSONResponse(content=response, status_code=400)
+
+    updated_request = Requests.find_one_and_update(
+        {'_id': ObjectId(request_dict["requestId"])},
+        {'$set': {'status': request_dict["newStatus"]}},
+        return_document=True
+    )
+
+    if updated_request is None:
+        response = {"message": "Request data not found"}
+        return JSONResponse(content=response, status_code=404)
+
+    response = {"message": "Update request data successful"}
+    return JSONResponse(content=response, status_code=200)
+
+@router.patch('/api/updateConservationStatus', dependencies=[Depends(jwtBearer)], status_code=status.HTTP_200_OK)
+def update_request_status(request_dict : dict):
+    print("AnimalStatusUpdateData : {}".format(request_dict))
+    print("Animal requestAnimal value: {}".format(request_dict["requestAnimal"]))
+    print("Animal newStatus value: {}".format(request_dict["newStatus"]))
+    if request_dict["newStatus"] is None:
+        response = {"message": "Invalid request status data"}
+        return JSONResponse(content=response, status_code=400)
+    if request_dict["requestAnimal"] is None:
+        response = {"message": "Invalid Animal data"}
+        return JSONResponse(content=response, status_code=400)
+
+    updated_request = Species.find_one_and_update(
+        {'_id': {"$regex": re.compile(re.escape(request_dict["requestAnimal"]), re.IGNORECASE)}},
+        # {'_id': "Aegotheles Cristatus"},
+        {'$set': {'status': request_dict["newStatus"]}},
+        return_document=True
+    )
+
+    if updated_request is None:
+        response = {"message": "Animal data not found"}
+        return JSONResponse(content=response, status_code=404)
+
+    response = {"message": "Update species data successful"}
+    return JSONResponse(content=response, status_code=200)
 
 @router.post("/ChangePassword", status_code=status.HTTP_200_OK)
 def passwordchange(oldpw: str, newpw: str, cfm_newpw: str, jwtToken: str):
-    #Check if user has logged out
+    #Check if  has logged out
     if LogoutToken.find_one({'jwtToken' : jwtToken}):
         response = {"message": "Token does not exist"}
         return JSONResponse(content=response, status_code=403)   

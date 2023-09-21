@@ -7,11 +7,10 @@ const dbConfig = require('./config/db.config');
 //const helmet = require('helmet');
 //const mongoSanitize = require('express-mongo-sanitize');
 const jwt = require('jsonwebtoken');
-const { authJwt, client, checkUserSession } = require('./middleware');
+const { client, checkUserSession } = require('./middleware');
 const controller = require('./controller/auth.controller');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
-const mongoose = require('mongoose');
 client.connect()
 const cors = require('cors');
 require('dotenv').config()
@@ -20,57 +19,15 @@ const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY);
 const axios = require('axios')
 
 const {createCaptchaSync} = require("captcha-canvas");
-//Add mongoDB module inside config folder
-const db = require("./model");
-const Role = db.role;
-const User = db.user;
-const Guest = db.guest;
-const Request = db.request;
 
 
-//for connecting to ts-mongo-db
-const MongoClient = require('mongodb').MongoClient;
-const url = "mongodb://modelUser:EchoNetAccess2023@ts-mongodb-cont:27017/EchoNet";
+const port = 8080;
 
 //const rootDirectory = __dirname; // This assumes the root directory is the current directory
 
 
 //Security verification for email account and body content validation:
 const validation = require('deep-email-validator')
-const mongoSanitize = require('express-mongo-sanitize');
-db.mongoose
-  .connect(`mongodb://${dbConfig.USERNAME}:${dbConfig.PASSWORD}@${dbConfig.HOST}/${dbConfig.DB}?authSource=admin`, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-  })
-  .then(() => {
-    console.log("Successfully connect to MongoDB.");
-    initial();
-    initUsers();
-    initGuests();
-    initRequests();
-  })
-  .catch(err => {
-    console.log("ConnString: ", `mongodb://${dbConfig.USERNAME}:${dbConfig.PASSWORD}@${dbConfig.HOST}/${dbConfig.DB}?authSource=admin`)
-    console.error("Connection error", err);
-    // process.exit();
-  });
-
-
-
-//mongoose.connect("mongodb://modelUser:EchoNetAccess2023@localhost:27017/EchoNet")
-//Initalize the data if no user role existed
-function initial() {
-  Role.estimatedDocumentCount((err, count) => {
-    if (!err && count === 0) {
-      const roleData = require(path.join(__dirname, "user-sample/role-seed.json"));
-
-      Role.insertMany(roleData);
-    }
-  });
-}
-
-
 
 // async function getAllPayments() {
 
@@ -105,7 +62,7 @@ function initial() {
 const storeItems = new Map([[
   1, { priceInCents: 100, name: "donation"}
 ]])
-app.use(express.json());
+app.use(express.json({limit: '10mb'}));
 // Use helmet middleware to set security headers
 /*
 app.use(helmet());
@@ -115,9 +72,9 @@ function sanitizeFilePath(filePath) {
   // Use path.normalize to ensure the path is in normalized form
   const normalizedPath = path.normalize(filePath);
 
-  // Use path.join to join the normalized path with the root directory
-  const rootDirectory = __dirname; // This assumes the root directory is the current directory of the script
-  const absolutePath = path.join(rootDirectory, normalizedPath);
+//   // Use path.join to join the normalized path with the root directory
+//   const rootDirectory = __dirname; // This assumes the root directory is the current directory of the script
+//   const absolutePath = path.join(rootDirectory, normalizedPath);
 
   // Ensure that the resulting path is still within the root directory
   if (absolutePath.startsWith(rootDirectory)) {
@@ -228,78 +185,6 @@ app.get('/cumulativeDonations', async(req, res) => {
   } 
 })
 
-function initRequests(){
-  Request.estimatedDocumentCount((err, count) => {
-    if (!err && count === 0) {
-      const requestData = require(path.join(__dirname, "user-sample/request-seed.json"));
-      Request.insertMany(requestData);
-    }
-  });
-}
-//Add sample Users if none exists
-function initUsers() {
-  User.estimatedDocumentCount((err, count) => {
-    if (!err && count === 0) {
-      const userData = require(path.join(__dirname, "user-sample/user-seed.json"));
-      User.insertMany(userData);
-
-    }
-  });
-}
-
-//Add sample Guest users if none exists
-function initGuests() {
-  Guest.estimatedDocumentCount((err, count) => {
-    if (!err && count === 0) {
-      //Different from Roles and Users, 
-      // another approach is to manually seed mongoDB document
-      // Only feasible if there are only 1-2 sample documents
-      const newGuest1 = new Guest({
-        userId: "HMITest1",
-        username: "guest_tester1_0987654321",
-        email: "guest@echo.com",
-        password: bcrypt.hashSync("guest_password", 8),
-        roles: [
-          {
-            "_id": "64be1d0f05225843178d91d7"
-          }
-        ],
-        expiresAt: new Date(Date.now() + 1800000) // Set the expiration duration for 30 mins = 1800 s = 1800000 ms from now
-      });
-
-      // Save the new guest document to the collection
-      newGuest1.save((err, doc) => {
-        if (err) {
-          console.error(err);
-        } else {
-          console.log('Guest document inserted successfully:', doc);
-        }
-      });
-
-      const newGuest2 = new Guest({
-        userId: "HMITest2",
-        username: "guest_tester2_1234567890",
-        email: "guest@hmi.com",
-        password: bcrypt.hashSync("guest_password", 8),
-        roles: [
-          {
-            "_id": "64be1d0f05225843178d91d7"
-          }
-        ],
-        expiresAt: new Date(Date.now() + 300000) // Set the expiration duration for 5 mins = 300 s = 300000 ms from now
-      });
-
-      // Save the new guest document to the collection
-      newGuest2.save((err, doc) => {
-        if (err) {
-          console.error(err);
-        } else {
-          console.log('Guest document inserted successfully:', doc);
-        }
-      });
-    }
-  });
-}
 app.get('/data/captcha', (req, res) => {
   const {image, text} = createCaptchaSync(300,100); // Use the package's functionality
   fs.writeFileSync("./public/captchaImg.png", image);
@@ -307,21 +192,6 @@ app.get('/data/captcha', (req, res) => {
   console.log("Image: ", image);
   res.json({image, text});
 });
-
-//Background Process to automatically delete Guest role after exceeding expiration
-setInterval(() => {
-  const now = new Date();
-  console.log("Background monitor at ", now.toString())
-  Guest.deleteMany({ expiresAt: { $lte: now } }, (err) => {
-    if (err) {
-      console.error('Error deleting expired documents:', err);
-    } else {
-      console.log('Expired documents deleted successfully.');
-    }
-  });
-}, 360000); // Run every 6 mins = 360 s = 360000 ms (adjust as needed)
-
-const port = 8080;
 
 // serve static files from the public directory
 // app.use(express.static(path.join(__dirname, 'public')));
@@ -335,19 +205,8 @@ app.use(cors(corsOptions))
 
 //bodyParser to make sure post form data is read
 const bodyParser = require("express");
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }))
-
-//MongoDB query sanitization
-//Run in dryRun = testing mode; prevent server interruption because of this process
-app.use(
-  mongoSanitize({
-    dryRun: true,
-    onSanitize: ({ req, key }) => {
-      console.warn(`[DryRun] This request[${key}] will be sanitized`, req);
-    },
-  }),
-)
+app.use(bodyParser.json({ limit: '10mb' }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }))
 
 //const serveIndex = require('serve-index'); 
 //app.use('/images/bio', serveIndex(express.static(path.join(__dirname, '/images/bio'))));
@@ -450,7 +309,6 @@ app.post("/request_access", async (req, res) => {
     salt = crypto.getRandomValues(new Uint32Array(1)).toString();
   }
   let username = 'guest_' + email.split('@')[0] + "_" + salt;
-  console.log("username: ", username)
   let password = genPass(12);
   let timestamp = new Date(Date.now() + 1800000) //Set time to live of 1800000 ms = 1800 s = 30 mins
   let request = {
@@ -459,6 +317,7 @@ app.post("/request_access", async (req, res) => {
     "password": password,
     "timestamp": timestamp
   }
+  console.log("Guest details: ", request)
   try {
     //Sending that to Guest signup
     const response = await controller.guestsignup(request);
@@ -519,6 +378,7 @@ app.post("/request_access", async (req, res) => {
 // routes
 require('./routes/auth.routes')(app);
 require('./routes/user.routes')(app);
+require('./routes/map.routes')(app);
 app.get('*', checkUserSession);
 app.get("/", async (req, res) => {
   console.log("token: ", await client.get('JWT', (err, storedToken) => {
@@ -560,41 +420,33 @@ app.get("/login", (req, res) => {
 })
 
 app.post("/api/submit", async (req, res) => {
+  let token = await client.get('JWT', (err, storedToken) => {
+    if (err) {
+      console.error('Error retrieving token from Redis:', err);
+      return null
+    } else {
+      console.log('Stored Token:', storedToken);
+      return storedToken
+    }
+  })
+  let schema = req.body;
+  schema.status = "pending";
+  schema.date = new Date();
   try {
-    const newRequest = new Request(req.body);
-    newRequest.date = new Date();
-    newRequest.status = "pending";
-    await newRequest.save();
-    res.status(200).send("Request submitted successfully");
+    console.log("Request submission data: ", JSON.stringify(schema));
+    const axiosResponse = await axios.post('http://ts-api-cont:9000/hmi/api/submit', JSON.stringify(schema), { headers: {"Authorization" : `Bearer ${token}`, 'Content-Type': 'application/json'}})
+
+    if (axiosResponse.status === 201) {
+      console.log('Status Code: ' + axiosResponse.status + ' ' + axiosResponse.statusText)
+      res.status(201).send(`<script> window.location.href = "/login"; alert("Request Submitted successfully");</script>`);
+    } else {
+      res.status(400).send(`<script> window.location.href = "/login"; alert("Ooops! Something went wrong");</script>`);
+    }
   } catch (error) {
-    console.error(error);
+    console.error(error.data);
     res.status(500).send("An error occurred");
   }
 });
-
-
-async function testMongoDBConnection() {
-  try {
-    // Attempt to connect to MongoDB
-    const client = new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true });
-    await client.connect();
-
-    // If the connection is successful, print a success message
-    console.log('MongoDB connection test: Connection successful');
-    
-    // Perform additional database operations here if needed
-
-    // Close the connection when done
-    await client.close();
-  } catch (error) {
-    // If there's an error, print an error message
-    console.error('MongoDB connection test: Connection failed');
-    console.error(error);
-  }
-}
-
-// Call the function to test the MongoDB connection
-testMongoDBConnection();
 
 app.post("/api/approve", async (req,res) => {
 
@@ -608,74 +460,64 @@ app.get("/requestsOriginal", (req,res) => {
   res.sendFile(path.join(__dirname, 'public/requests.html'))
 })
 
+
+
 app.patch('/api/requests/:id', async (req, res) => {
   const requestId = req.params.id; // Get the request ID from the URL parameter
   const newStatus = req.body.status; // Get the new status from the request body
-
-  try {
-    // Find the request by ID and update the status
-    const updatedRequest = await Request.findByIdAndUpdate(
-      requestId,
-      { $set: { status: newStatus } },
-      { new: true } // Return the updated document
-    );
-
-    if (!updatedRequest) {
-      return res.status(404).json({ error: 'Request not found' });
+  let schema = {requestId:requestId, newStatus: newStatus};
+  let token = await client.get('JWT', (err, storedToken) => {
+    if (err) {
+      console.error('Error retrieving token from Redis:', err);
+      return null
+    } else {
+      console.log('Stored Token:', storedToken);
+      return storedToken
     }
-
-    res.json({ message: 'Request status updated successfully', updatedRequest });
+  })
+  try {
+    console.log("Admin Request update data: ", JSON.stringify(schema));
+    const axiosResponse = await axios.patch('http://ts-api-cont:9000/hmi/api/requests', JSON.stringify(schema), { headers: {"Authorization" : `Bearer ${token}`, 'Content-Type': 'application/json'}})
+    if (axiosResponse.status === 200) {
+      console.log('Status Code: ' + axiosResponse.status + ' ' + axiosResponse.statusText)
+      res.status(200).send(`<script> window.location.href = "/login"; alert("Request data updated successfully");</script>`);
+    } else {
+      res.status(400).send(`<script> window.location.href = "/login"; alert("Ooops! Something went wrong with updating request table");</script>`);
+    }
   } catch (error) {
-    console.error('Error updating request status:', error);
-    res.status(500).json({ error: 'Error updating request status' });
+    console.error(error.data);
+    res.status(500).send({ error: 'Error updating request status' });
   }
 });
 
-app.patch('/api/updateConservationStatus/:animal', async (req,res) => {
+app.patch('/api/updateConservationStatus/:animal', async (req, res) => {
   const requestAnimal = req.params.animal;
   const newStatus = req.body.status;
-  try{
-    const client = new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true });
-    await client.connect();
-    const EchoNet = client.db();
-    const collection = EchoNet.collection('species');
-    //const query = { _id : requestAnimal };
-    //const updateOperation = {status : newStatus};
-    const result = await collection.findOneAndUpdate(
-      {_id : requestAnimal},
-      {$set :{status: newStatus}},
-      {
-        collation: { locale: 'en', strength: 2 }, // Case-insensitive collation
-        returnOriginal: false // Set this to false to get the updated document
-      }
-    );
-    if (result.value) {
-      // If a matching document is found and updated, print it to the console
-      console.log('Updated animal:', result.value);
+  let schema = {requestAnimal:requestAnimal, newStatus: newStatus};
+  let token = await client.get('JWT', (err, storedToken) => {
+    if (err) {
+      console.error('Error retrieving token from Redis:', err);
+      return null
     } else {
-      // If no matching document is found, print a message
-      console.log('Animal not found.');
+      console.log('Stored Token:', storedToken);
+      return storedToken
     }
-    client.close();
-    res.status(200).json({message: `updated animal status successfully ${result.value}, ${requestAnimal}, ${newStatus}`});
+  })
+  try {
+    console.log("Admin update species data: ", JSON.stringify(schema));
+    const axiosResponse = await axios.patch('http://ts-api-cont:9000/hmi/api/updateConservationStatus', JSON.stringify(schema), { headers: {"Authorization" : `Bearer ${token}`, 'Content-Type': 'application/json'}})
+    if (axiosResponse.status === 200) {
+      console.log('Status Code: ' + axiosResponse.status + ' ' + axiosResponse.statusText)
+      res.status(200).send(`<script> window.location.href = "/login"; alert("Species Data updated successfully");</script>`);
+    } else {
+      res.status(400).send(`<script> window.location.href = "/login"; alert("Ooops! Something went wrong with updating species data");</script>`);
+    }
+  } catch (error) {
+    console.error(error.data);
+    res.status(500).send({ error: 'Error updating species status' });
   }
-  catch (error) {
-    console.error('MongoDB connection or update operation failed:', error);
-    res.status(500).json({error: 'Error updating animal'});
-  }
-})
+});
 
-// OLD METHOD - USING DIRECT CONNECTION
-// app.get('/api/requests', async (req, res) => {
-//   try {
-//     const requests = await Request.find();
-//     res.json(requests);
-//   } catch (error) {
-//     res.status(500).json({ error: 'Error fetching data' });
-//   }
-// });
-
-// NEW METHOD - CONNECT VIA API
 app.get('/api/requests', async (req, res) => {
   try {
 

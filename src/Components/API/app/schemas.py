@@ -104,7 +104,7 @@ class RequestSchema(BaseModel):
     initial: str
     modified: str
     source: str
-    date: str
+    date: datetime
     status: str
 
     class Config:
@@ -175,6 +175,35 @@ class UserLoginSchema(BaseModel):
     email: str
     password: str
     
+
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+        schema_extra = {
+           
+        } 
+class GuestSchema(BaseModel):
+    username: str
+    email: str
+    password: str
+    userId: str
+    roles: List[dict]
+    expiresAt: datetime
+
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+        schema_extra = {
+           
+        } 
+
+class GuestSignupSchema(BaseModel):
+    username: str
+    email: str
+    password: str
+    timestamp: datetime
 
     class Config:
         allow_population_by_field_name = True
