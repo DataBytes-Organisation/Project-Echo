@@ -353,42 +353,6 @@
   "status": "Least Concern",
   "diet": "Omnivore"
 },{
-  "_id": "Chlamydera guttata",
-  "commonName": "Western Bowerbird",
-  "type": "Bird",
-  "status": "Least Concern",
-  "diet": "Omnivore"
-},{
-  "_id": "Chlamydera nuchalis",
-  "commonName": "Great Bowerbird",
-  "type": "Bird",
-  "status": "Least Concern",
-  "diet": "Omnivore"
-},{
-  "_id": "Cincloramphus mathewsi",
-  "commonName": "Buff-rumped Thornbill",
-  "type": "Bird",
-  "status": "Endangered",
-  "diet": "Omnivore"
-},{
-  "_id": "Cinclosoma punctatum",
-  "commonName": "Spotted Quail-thrush",
-  "type": "Bird",
-  "status": "Least Concern",
-  "diet": "Omnivore"
-},{
-  "_id": "Cisticola exilis",
-  "commonName": "Golden-headed Cisticola",
-  "type": "Bird",
-  "status": "Least Concern",
-  "diet": "Insectivore"
-},{
-  "_id": "Climacteris picumnus",
-  "commonName": "Brown Treecreeper",
-  "type": "Bird",
-  "status": "Least Concern",
-  "diet": "Insectivore"
-},{
   "_id": "Sericornis frontalis",
   "commonName": "White-browed Scrubwren",
   "type": "Bird",
@@ -439,12 +403,6 @@
 },{
   "_id": "Stomiopera Unicolor",
   "commonName": "White-gaped Honeyeater",
-  "type": "Bird",
-  "status": "Least Concern",
-  "diet": "Omnivore"
-},{
-  "_id": "Strepera Graculina",
-  "commonName": "Pied Currawong",
   "type": "Bird",
   "status": "Least Concern",
   "diet": "Omnivore"
