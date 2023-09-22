@@ -66,7 +66,7 @@ Access this link to play and download the sample audios.
 
 ## Sample Spectograms
 
-![Tasmanian Devil](<Tasmanian Devil.png>) 
+![Tasmanian  Devil](<Tasmanian Devil.png>) 
 ![Gouldian Finch](<Gouldian Finch.png>) 
 ![Koala](Koala.png) 
 ![Southern Cassowary](<Southern Cassowary.png>)
