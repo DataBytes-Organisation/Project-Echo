@@ -1434,7 +1434,7 @@ i {
 #donate-menu-btn{
   background-image: url("../images/tabIcons/donate.png");
   background-size: cover;
-  background-size: 50%;
+  background-size: 75%;
   background-repeat: no-repeat;
   background-position: center;
 }
