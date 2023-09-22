@@ -2,7 +2,7 @@ from fastapi import Request, HTTPException
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 from .auth import decodeJWT
-
+from bson import ObjectId
 
 class JWTBearer(HTTPBearer):
     isVerified = False
@@ -55,3 +55,5 @@ class JWTBearer(HTTPBearer):
 
         except:
             return (False, "An Error occured when validate role")
+
+   

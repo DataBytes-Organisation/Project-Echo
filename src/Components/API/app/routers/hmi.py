@@ -286,6 +286,8 @@ def signin(user: schemas.UserLoginSchema):
     print(result)
     return JSONResponse(content=response, status_code=200)
 
+# Signout functionalities for API
+# However developing in the Frontend can clears the token better than storing it in a Database
 @router.post("/signout", status_code=status.HTTP_200_OK)
 def signout(jwtToken: str):
     try:
@@ -384,18 +386,19 @@ def update_request_status(request_dict : dict):
     response = {"message": "Update species data successful"}
     return JSONResponse(content=response, status_code=200)
 
-@router.post("/ChangePassword", status_code=status.HTTP_200_OK)
-def passwordchange(oldpw: str, newpw: str, cfm_newpw: str, jwtToken: str):
-    #Check if  has logged out
-    if LogoutToken.find_one({'jwtToken' : jwtToken}):
-        response = {"message": "Token does not exist"}
-        return JSONResponse(content=response, status_code=403)   
 
+@router.post("/ChangePassword", dependencies=[Depends(jwtBearer)], status_code=status.HTTP_200_OK)
+def passwordchange(oldpw: str, newpw: str, cfm_newpw: str):
+    #Check if user has logged out
+    # if LogoutToken.find_one({'jwtToken' : jwtToken}):
+    #     response = {"message": "Token does not exist"}
+    #     return JSONResponse(content=response, status_code=403)   
+    
     #Retrieve Token
-    isValid, payload = jwtBearer.verify_jwt(JWTToken = jwtToken)
+    JWTPayload = jwtBearer.decodedUser
 
     #Find if the username exist in our database
-    account = User.find_one({"_id": ObjectId(payload.get('id'))})
+    account = User.find_one({"_id": ObjectId(JWTPayload['id'])})
     if(account is None):
         response = {"message": "User Not Found."}
         return JSONResponse(content=response, status_code=404)
@@ -444,15 +447,15 @@ async def getRequests():
     except Exception as e:
         return {"error" : "Something unexpected occured - {}".format(e)}
 
-@router.post("/change-credential", status_code=status.HTTP_200_OK)
-def changeCredential(field:str, new: str, jwtToken: str):
+@router.post("/change-credential", dependencies=[Depends(jwtBearer)], status_code=status.HTTP_200_OK)
+def changeCredential(field:str, new: str):
     #Check if user has logged out
-    if LogoutToken.find_one({'jwtToken' : jwtToken}):
-        response = {"message": "Token does not exist"}
-        return JSONResponse(content=response, status_code=403)   
+    # if LogoutToken.find_one({'jwtToken' : jwtToken}):
+    #     response = {"message": "Token does not exist"}
+    #     return JSONResponse(content=response, status_code=403)   
         
-    #Retrieve Token
-    isValid, payload = jwtBearer.verify_jwt(JWTToken = jwtToken)
+    #Retrieve Payload from Token
+    JWTpayload = jwtBearer.decodedUser
 
     #Check if fields can be changed
     _field = ['gender', 'country', 'state', 'phonenumber']
@@ -462,30 +465,30 @@ def changeCredential(field:str, new: str, jwtToken: str):
     
     if field in ['country', "state"]:
         User.update_one(
-        {"_id": ObjectId(payload.get('id'))},
+        {"_id": ObjectId(JWTpayload['id'])},
         {"$set": {"address."+field: new}}
     )
     else:
         User.update_one(
-            {"_id": ObjectId(payload.get('id'))},
+            {"_id": ObjectId(JWTpayload['id'])},
             {"$set": {field: new}}
         )
 
     response = {"message": f"User {field} changed sucessfully!"}
     return JSONResponse(content=response)
 
-@router.delete("/delete-account", status_code=status.HTTP_200_OK)
-def deleteaccount(jwtToken: str):
+@router.delete("/delete-account", dependencies=[Depends(jwtBearer)], status_code=status.HTTP_200_OK)
+def deleteaccount():
     #Check if user has logged out
-    if LogoutToken.find_one({'jwtToken' : jwtToken}):
-        response = {"message": "Token does not exist"}
-        return JSONResponse(content=response, status_code=403)   
+    # if LogoutToken.find_one({'jwtToken' : jwtToken}):
+    #     response = {"message": "Token does not exist"}
+    #     return JSONResponse(content=response, status_code=403)   
         
     #Retrieve Token
-    isValid, payload = jwtBearer.verify_jwt(JWTToken = jwtToken)
+    JWTpayload = jwtBearer.decodedUser
 
     #Delete an account from User
-    User.delete_one({"_id": ObjectId(payload.get('id'))})
+    User.delete_one({"_id": ObjectId(JWTpayload['id'])})
 
     response = {"message": "User has been deleted!"}
     return JSONResponse(content=response)
