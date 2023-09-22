@@ -2,7 +2,7 @@
 This script contains a notebook that demonstrates the process of adding Class Activation Mapping (CAM) to spectrograms. The purpose of CAM is to provide visual explanations of which regions in the image were pivotal in making a prediction, making it an essential tool for model interpretability.
 
 ### Overview
-- Source: This notebook is a modified version of the code found on Kaggle. The original code can be accessed [here.]https://www.kaggle.com/code/guglielmocamporese/what-is-my-model-seeing-class-activation-mapping
+- Source: This notebook is a modified version of the code found on Kaggle. The original code can be accessed [here.](https://www.kaggle.com/code/guglielmocamporese/what-is-my-model-seeing-class-activation-mapping)
 
 - Data: The spectrograms are generated from audio files of three bird species:
 
@@ -29,6 +29,8 @@ Ensure you have the following libraries installed:
 ### Usage
 
 - Update the audio_folder_path and image_folder_path in the notebook to point to your directories.
+- An image folder is required to store the Spectogram files, created by the plot mel spec only.ipynb notebook shared in this folder developed by another person in Echonet.
+- Make sure there are at least 3 images in your image folder as the code is designed for a 1x3 grid of subplots (axes)
 - Run the notebook to visualize CAM on spectrograms.
 ### Code Explanations
 **Data Preprocessing:** Images are resized to 224x224, converted to tensors, and normalized using ImageNet statistics.
