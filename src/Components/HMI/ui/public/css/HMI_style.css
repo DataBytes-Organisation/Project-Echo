@@ -243,28 +243,7 @@ body{
     max-width: 100vw;
     overflow-y: hidden;
   }
-  #filter-menu{
-    overflow-y: hidden;
-  }
-  #animal-popup{
-    overflow-y: hidden;
-  }
-  #FAQ{
-    overflow-y: hidden;
-  }
-  #SIM{
-    overflow-y: hidden;
-  }
-  #donate{
-    overflow-y: hidden;
-  }
-  #statistics{
-    overflow-y: hidden;
-  }
-  #mic-popup{
-    overflow-y: hidden;
-  }
-  #mic-popup{
+  #filter-menu, #animal-popup, #FAQ, #SIM, #donate, #statistics, #mic-popup, #mic-popup {
     overflow-y: hidden;
   }
 }
@@ -272,6 +251,12 @@ body{
 @media only screen and (min-width: 600px) and (max-width: 1050px) and (orientation: portrait) { /* Tablet vers. (Portrait) */
   #filter-menu, #animal-popup, #FAQ, #SIM, #donate, #statistics, #mic-popup, #mic-popup {
     max-width: 100vw;
+  }
+}
+
+@media only screen and (max-width: 930px) and (orientation: landscape) { /* Mobile vers. (Landscape) */
+  #menu, #filter-menu, #animal-popup, #FAQ, #SIM, #donate, #statistics, #mic-popup, #mic-popup {
+    overflow-y: hidden;
   }
 }
 
@@ -784,6 +769,12 @@ input[type="checkbox"]{
   font-family: 'Roboto', sans-serif;
   overflow-y: scroll !important;
   overflow-x: hidden;*/
+}
+
+@media only screen and (max-width: 980px) and (orientation: portrait) { /* Mobile vers. (Portrait) */
+  #animal-popup #animal-popup-content{
+    width: 80vw;
+  }
 }
 
 #animal-default-content{
