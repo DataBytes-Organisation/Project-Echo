@@ -1272,7 +1272,7 @@ function submitRequest(){
   body: JSON.stringify(requestData)
   })
   .then(response => {
-    if (response.status===200){
+    if (response.status===201){
       console.log("Submission Success...");
       vrSuccessfulSubmission("Thank you. Your submission was succesfully received and is now awaiting review.");
     }
