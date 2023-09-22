@@ -11,7 +11,7 @@ This script allows users to download the audio stream from a specified YouTube v
 3.  Audio Conversion: Converts the downloaded audio to the WAV format using the moviepy library.
 4.  Custom Output Directory: Allows users to specify a desired directory for saving the WAV file.
 
-## Workflow:
+## Workflow of code:
 
 1. The script first checks if the specified output directory exists. If not, it creates the directory.
 2. It connects to the YouTube video using the provided URL.
