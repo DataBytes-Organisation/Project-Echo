@@ -1,9 +1,0 @@
-README.md
-setup.py
-echo_spectogram/__init__.py
-echo_spectogram/myfunctions.py
-echo_spectogram.egg-info/PKG-INFO
-echo_spectogram.egg-info/SOURCES.txt
-echo_spectogram.egg-info/dependency_links.txt
-echo_spectogram.egg-info/requires.txt
-echo_spectogram.egg-info/top_level.txt
