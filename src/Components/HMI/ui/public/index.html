@@ -997,50 +997,51 @@
                   </div>
                 </div>
               </div>
-            <div class="dropdown">
-              <button class="btn btn-secondary dropdown-toggle btn-no-background" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                Species Select
-              </button>
-              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                <div class="row">
-                  <div class="col">
-                    <div class="form-check">
-                      <div class="dropdown">
-                        <button class="btn btn-secondary dropdown-toggle btn-no-background" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                          Visible
-                        </button>
-                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                          <div class="row">
-                            <div class="col">
-                              <div class="form-check">
-                                <ul id="visibleList"></ul>
-                              </div>
+              <!---
+              <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle btn-no-background" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                    Species Select
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-check">
+                                <div class="dropdown">
+                                    <button class="btn btn-secondary dropdown-toggle btn-no-background" type="button" id="visibleDropdownButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Visible
+                                    </button>
+                                    <div class="dropdown-menu" aria-labelledby="visibleDropdownButton">
+                                        <div class="row">
+                                            <div class="col">
+                                                <div class="form-check">
+                                                    <ul id="visibleList" style="max-height: 200px; overflow-y: auto;"></ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="dropdown">
+                                    <button class="btn btn-secondary dropdown-toggle btn-no-background" type="button" id="hiddenDropdownButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Hidden
+                                    </button>
+                                    <div class="dropdown-menu" aria-labelledby="hiddenDropdownButton">
+                                        <div class="row">
+                                            <div class="col">
+                                                <div class="form-check">
+                                                    <ul id="hiddenList" style="max-height: 200px; overflow-y: auto;"></ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <input type="text" class="form-control" id="searchBar" placeholder="Search for species..." name="search" oninput="search_animal()">
+                                <ul id="resultsList" style="max-height: 200px; overflow-y: auto;"></ul>
                             </div>
-                          </div>
                         </div>
-                      </div>
-                      <div class="dropdown">
-                        <button class="btn btn-secondary dropdown-toggle btn-no-background" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                          Hidden
-                        </button>
-                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                          <div class="row">
-                            <div class="col">
-                              <div class="form-check">
-                                <ul id="hiddenList"></ul>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <input type="text" class="form-control" id="searchBar" placeholder="Search for species..." name="search" oninput="{search_animal()}">
-                      <ul id="resultsList"></ul>
-                      </div>
                     </div>
-                  </div>
-                  </div>
                 </div>
-              </div>
+            </div>
+          -->
 
             <div class="export-tab">
               <button id="export-csv" onclick="{downloadCSV()}">EXPORT AS CSV <i class="fa-solid fa-cloud-arrow-down"></i></button>
@@ -1361,7 +1362,7 @@
   stopAudioRecording, cancelAudioRecording, testFunct, convertCSV} from "./js/HMI.js";
   import {retrieveTruthEventsInTimeRange, retrieveVocalizationEventsInTimeRange, startSimulator, stopSimulator} from "./js/routes.js";
   window.updateMics = updateMics;
-  window.search_animal = search_animal;
+  //window.search_animal = search_animal;
   window.downloadCSV = downloadCSV;
   window.downloadXLSX = downloadXLSX;
   window.updateMicrophoneAnimation = updateMicrophoneAnimation;
@@ -1481,28 +1482,22 @@
   }
 
     //Species Select Filter
-    //So far hard-coded, need to retrieve all of the animals in sample_data.json
-    //let relative_path = 'js/sample_data.json'
-    //let jsonData = open(relative_path)
-    //let searchData = JSON.parse(jsonData)
-   let jsonData = `[
-    {"common": "Tawny Frogmouth"},
-    {"common": "Cane toad"},
-    {"common": "Wild Boar"},
-    {"common": "Redeye"},
-    {"common": "Brown Rat"},
-    {"common": "Australian Fairy Martin"},
-    {"common": "Red fox"}
-   ]`
-    let searchData = JSON.parse(jsonData)
-  function search_animal() {
+  /*function search_animal() {
     let searchTerm = document.getElementById("searchBar").value
     searchTerm = searchTerm.toLowerCase();
-          
+
     let resultsList = document.getElementById("resultsList");
     let visibleList = document.getElementById("visibleList");
     let hiddenList = document.getElementById("hiddenList");
-
+    let searchData;
+    // Fetch data from sample_data.json
+    // Store in variable searchData
+    // From here, can reference parts of animals (searchData.species, searchData.common)
+    fetch('./js/sample_data.json')
+    .then(response => response.json())
+    .then(data => {
+      searchData = data.data;
+      //let searchData = data;
     resultsList.innerHTML = ""
     hiddenList.innerHTML = ""
     visibleList.innerHTML = ""
@@ -1516,24 +1511,31 @@
         button.innerHTML = "Hide";
         button.style.color = "white";
         button.addEventListener("click", function() {
+          // In the case that animal is not in any list (aka when first created)
+          // Add to hiddenlist
             if (cloneElem.parentElement !== hiddenList || cloneElem.parentElement !== visibleList) {
               hiddenList.appendChild(cloneElem)
               cloneButton.innerHTML = "Show";
               originalButton.innerHTML = "Show";
+              //Code to filter animal on screen will go here
+          // In the case that animal is already hidden, this will make it visible
           }
             else if (cloneElem.parentElement == hiddenList) {
               visibleList.appendChild(cloneElem)
               cloneButton.innerHTML = "Hide";
-              originalButton.innerHTML = "Hide"
-            }
-
-            else if (cloneElem.parentElement == visibleList) {
-              hiddenList.appendChild(cloneELem)
-              cloneButton.innerHTML = "Show";
               originalButton.innerHTML = "Hide";
+              //Code to filter animal on screen will go here
+            }
+          // In the case that animal is visible, this will make it hidden
+            else if (cloneElem.parentElement == visibleList) {
+              hiddenList.appendChild(cloneElem)
+              cloneButton.innerHTML = "Show";
+              originalButton.innerHTML = "Show";
+              //Code to filter animal on screen will go here
             }
           
       });
+      // Clone buttons have the same functionality, but since they are cloned nodes, must have their own listener
       elem.innerHTML = obj.common
       elem.appendChild(button);
       resultsList.appendChild(elem);
@@ -1545,15 +1547,22 @@
               hiddenList.appendChild(cloneElem);
               cloneButton.innerHTML = "Show";
               originalButton.innerHTML = "Show";
+              //Code to filter animal on screen will go here
           } else if (cloneElem.parentElement === hiddenList) {
               visibleList.appendChild(cloneElem)
               cloneButton.innerHTML = "Hide";
               originalButton.innerHTML = "Hide";
+              //Code to filter animal on screen will go here
           }
          });
-      }
+        }
     }
-  }
+  })
+  // Ereror catching
+  .catch(error => {
+    console.error('Error:', error);
+  });
+}*/
 
   function updateMicrophoneAnimation(){
     let anim = document.getElementById("microphoneAnimations");
