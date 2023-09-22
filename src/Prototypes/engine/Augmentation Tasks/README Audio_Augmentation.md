@@ -91,6 +91,10 @@ Output directory structure: `/path/species_name/augmentation_name_audio_files.wa
 
 You can visualize the effects of these augmentations on your audio files by using the provided functions to plot waveforms and mel spectrograms. Additionally, you can listen to the augmented audio for qualitative assessment.
 
+## optimised_engine_pipeline_[AG]_[Audio_Augmentations].ipynb
+
+This file uses the augmented data to build and run the existing model.
+
 ## Conclusion
 
 These audio augmentations are valuable tools for enhancing your dataset and improving the performance of your animal noise classification model. Feel free to customize and extend the code to suit your specific requirements and explore further enhancements. Happy coding!
