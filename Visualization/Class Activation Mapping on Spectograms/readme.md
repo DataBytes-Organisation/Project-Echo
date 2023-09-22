@@ -1,5 +1,5 @@
 # Class Activation Mapping (CAM) for Spectrograms
-This repository contains a notebook that demonstrates the process of adding Class Activation Mapping (CAM) to spectrograms. The purpose of CAM is to provide visual explanations of which regions in the image were pivotal in making a prediction, making it an essential tool for model interpretability.
+This script contains a notebook that demonstrates the process of adding Class Activation Mapping (CAM) to spectrograms. The purpose of CAM is to provide visual explanations of which regions in the image were pivotal in making a prediction, making it an essential tool for model interpretability.
 
 ### Overview
 - Source: This notebook is a modified version of the code found on Kaggle. The original code can be accessed [here.]https://www.kaggle.com/code/guglielmocamporese/what-is-my-model-seeing-class-activation-mapping
