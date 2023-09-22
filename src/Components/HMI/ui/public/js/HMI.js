@@ -337,6 +337,15 @@ export function clearMicrophoneLayer(){
   layer.getSource().clear();
 }
 
+/*function commonNameFix(common){
+  if (common == "orange footed scrubfowl"){
+    return "orange-footed scrubfowl"
+  }
+  else{
+    return common;
+  }
+}*/
+
 export function convertJSONtoAnimalMovementEvent(hmiState, data){
   let movementEvent = {};
 
