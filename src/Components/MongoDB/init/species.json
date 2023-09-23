@@ -9,7 +9,7 @@
   "commonName": "Sambar Deer",
   "type": "Mammal",
   "status": "Invasive",
-  "diet": "herbivore"
+  "diet": "Herbivore"
 },{
   "_id": "Aegotheles Cristatus",
   "commonName": "Australian Owlet-nightjar",
