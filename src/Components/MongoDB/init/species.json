@@ -1415,12 +1415,6 @@
   "status": "Least Concern",
   "diet": "Carnivore"
 },{
-  "_id": "Eurostopodus argus",
-  "commonName": "Spotted Nightjar",
-  "type": "Bird",
-  "status": "Least Concern",
-  "diet": "Insectivore"
-},{
   "_id": "Phasianus colchicus",
   "commonName": "Common Pheasant",
   "type": "Bird",
@@ -1438,12 +1432,6 @@
   "type": "Bird",
   "status": "Least Concern",
   "diet": "Omnivore"
-},{
-  "_id": "Eudynamys orientalis",
-  "commonName": "Pacific Koel",
-  "type": "Bird",
-  "status": "Least Concern",
-  "diet": "Herbivore"
 },{
   "_id": "Anas gracilis",
   "commonName": "Grey Teal",

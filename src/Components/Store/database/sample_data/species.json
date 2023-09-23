@@ -9,7 +9,7 @@
   "commonName": "Sambar Deer",
   "type": "Mammal",
   "status": "Invasive",
-  "diet": "herbivore"
+  "diet": "Herbivore"
 },{
   "_id": "Aegotheles Cristatus",
   "commonName": "Australian Owlet-nightjar",
@@ -33,7 +33,7 @@
   "commonName": "Feral Goat",
   "type": "Mammal",
   "status": "Invasive",
-  "diet": "herbivore"
+  "diet": "Herbivore"
 },{
   "_id": "Colluricincla Harmonica",
   "commonName": "Grey Shrikethrush",
@@ -51,7 +51,7 @@
   "commonName": "Fallow Deer",
   "type": "Mammal",
   "status": "Invasive",
-  "diet": "herbivore"
+  "diet": "Herbivore"
 },{
   "_id": "Eopsaltria Australis",
   "commonName": "Eastern Yellow Robin",
@@ -1408,4 +1408,52 @@
   "type": "Bird",
   "status": "Least Concern",
   "diet": "Omnivore"
+},{
+  "_id": "Centropus phasianinus",
+  "commonName": "Pheasant Coucal",
+  "type": "Bird",
+  "status": "Least Concern",
+  "diet": "Carnivore"
+},{
+  "_id": "Phasianus colchicus",
+  "commonName": "Common Pheasant",
+  "type": "Bird",
+  "status": "Least Concern",
+  "diet": "Omnivore"
+},{
+  "_id": "Leipoa ocellata",
+  "commonName": "Malleefowl",
+  "type": "Bird",
+  "status": "Vulnerable",
+  "diet": "Omnivore"
+},{
+  "_id": "Alectura lathami",
+  "commonName": "Australian Brushturkey",
+  "type": "Bird",
+  "status": "Least Concern",
+  "diet": "Omnivore"
+},{
+  "_id": "Anas gracilis",
+  "commonName": "Grey Teal",
+  "type": "Bird",
+  "status": "Least Concern",
+  "diet": "Omnivore"
+},{
+  "_id": "Apus pacificus",
+  "commonName": "Pacific Swift",
+  "type": "Bird",
+  "status": "Least Concern",
+  "diet": "Insectivore"
+},{
+  "_id": "Caprimulgus macrurus",
+  "commonName": "Large-tailed Nightjar",
+  "type": "Bird",
+  "status": "Least Concern",
+  "diet": "Insectivore"
+},{
+  "_id": "Chrysococcyx minutillus",
+  "commonName": "Little Bronze Cuckoo",
+  "type": "Bird",
+  "status": "Least Concern",
+  "diet": "Insectivore"
 }]
