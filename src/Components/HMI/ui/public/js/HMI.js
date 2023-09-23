@@ -830,10 +830,11 @@ var animTimeout = null;
 
 function addmicrophones(hmiState) {
   
+  //Loop function to add all the frames that compose the microphone animation.
   for(let i=25; i>0;i--){
     addMicrophonesByLayer(hmiState,`mic_layer_${i}`, `./../images/${i}-01.png`);
   }
-  
+  //Add the single white dot as the microphone icon for when animation is disabled.
   addMicrophonesByHiddenLayer(hmiState, "mic_layer", "./../images/1-01.png");
 }
 
