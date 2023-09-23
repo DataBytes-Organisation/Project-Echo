@@ -210,7 +210,6 @@ updateTable();
 
     
     } else if (target.classList.contains('deny-btn')) {
-      //const requestId = target.getAttribute('data-request-id');
 
             console.log(`Denying request...`);  
             console.log("Request ID select:   ", requestId)
@@ -247,10 +246,6 @@ updateTable();
                 .catch(error => {
                     console.error('Error updating request status:', error);
          });
-      //console.log(requests[requestId-1].status);
-      //requests[requestId-1].status = "Denied"
-      //clearTable()
-      //updateTable()
     }
   })
 </script> 
