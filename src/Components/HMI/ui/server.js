@@ -87,6 +87,7 @@ app.post("/api/create-checkout-session", async (req, res) => {
     console.log(req.body.items);
     const session = await stripe.checkout.sessions.create({
       submit_type: 'donate',
+      customer_email: req.body.userEmail,
       payment_method_types: ["card"],
       mode: "payment",
       line_items: req.body.items.map(item => {

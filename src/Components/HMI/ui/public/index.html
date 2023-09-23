@@ -872,6 +872,7 @@
       },
       body: JSON.stringify({
         items: cart,
+        userEmail: email
       }),
     })
       .then(res => {
@@ -1247,7 +1248,7 @@ var animalNewStatus;
 var requestingToChange = "conservation status";
 var newConservationStatus; 
 // current user to get the current user who is logged in, this is just a temporary value for now
-var username = 'TN-HMI';
+//var username = 'TN-HMI';
 var source;
 var animal;
 var requestData;
@@ -1268,6 +1269,27 @@ function hideNotification() {
 }
 // Event listener for the close button
 notificationClose.addEventListener('click', hideNotification);
+
+let username;
+let email;
+
+function getUser(){
+  fetch("/user_profile")
+      .then(res => {
+        if (res.ok) return res.json()
+        return res.json().then(json => Promise.reject(json))
+      })
+      .then( userData => {
+        console.log("User profile data: ", userData)
+        username = String(userData.username);
+        email = `${userData.email}`
+      }) 
+      .catch(e => {
+        console.error(e.error)
+      })
+}
+
+getUser();
 
 function submitRequest(){
   animal = document.getElementById("desc_species").innerHTML;
@@ -1300,7 +1322,7 @@ function submitRequest(){
     generateVisualResponse("SUBMISSION CANCELLED. Source field cannot be empty.");
     return
   }
-
+  //console.log(user);
   requestData = {
     username,
     animal,
