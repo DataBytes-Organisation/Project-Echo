@@ -589,11 +589,11 @@ function addNewTruthFeatures(hmiState, events) {
   for (let entry of events) {
     //console.log("True location found!:  ")
     var iconPath = "";
-    if(entry.animalDiet === "herbavore" || entry.animalDiet === "frugivore"){
-      iconPath = './../images/sim/' + getIconName(entry.animalStatus, entry.animalType);
+    if(entry.animalDiet === "insectivore" || entry.animalDiet === "carnivore" || entry.animalDiet ==="omnivore"){
+      iconPath = './../images/Predator/sim/' + getIconName(entry.animalStatus, entry.animalType);
     }
     else{
-      iconPath ='./../images/Predator/sim/' + getIconName(entry.animalStatus, entry.animalType);
+      iconPath ='./../images/sim/' + getIconName(entry.animalStatus, entry.animalType);
     }
 
     var trueLocation = new ol.Feature({
