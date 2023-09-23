@@ -80,6 +80,13 @@ module.exports = function (app) {
             console.log("Set User roles successfully: ", res)
           }
         })
+        await client.set("Users", JSON.stringify(axiosResponse.data.user), (err, res)=> {
+          if (err) {
+            console.log("Set User Roles Token error: ", err)
+          } else {
+            console.log("Set User roles successfully: ", res)
+          }
+        })
         res.status(200).send(
         `<script> 
           alert("Login Successfully");
@@ -135,6 +142,8 @@ module.exports = function (app) {
   app.post("/api/auth/signout", controller.signout);
 
   app.post("/api/auth/guestsignup", controller.guestsignup);
+
+  // app.delete("/api/auth/delete-account", controller.deleteaccount);
 
   // app.post("/api/auth/guestsignin", controller.guestsignin);
 };

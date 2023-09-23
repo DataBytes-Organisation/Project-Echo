@@ -146,6 +146,8 @@
             <a id="mic-popup-menu-btn" class="tabs-button" onclick="openTab('mic-popup')"></a>
             <a id="FAQ-menu-btn" class="tabs-button" onclick="openTab('FAQ')"></a>
             <a id="donate-menu-btn" class="tabs-button" onclick="openTab('donate')"></a>
+            <a id="user-profile-button" class="tabs-button" onclick="openTab('userProfile'); fetchUser()"></a>
+            <!--<a id="stats-menu-btn" class="tabs-button" onclick="openTab('statistics')"></a>-->
             <span id="pink-line" class="sudden-line"></span>
           </div>
           <div id="FAQ">
@@ -183,6 +185,20 @@
                       </p>
                 </div>
               </div>
+
+              <div id="userProfile">
+                <div class="wrapper">
+                  <form action="/api/auth/signout" method="POST">
+                  <div id="userProfile-contents">
+                    <h2>User Profile</h2>
+                    <h3 id="display_name">Username: <span id="username"></span></h3>
+                    <h3 id="display_mail">Email: <span id="useremail"></span></h3>
+                    <center><button type="submit">Logout</button></center>
+                  </div>
+                </form>
+                </div>
+              </div>
+
               <div class="dropdown">
                 <button class="btn btn-secondary dropdown-toggle btn-no-background" id="data_src_toggle" data-bs-toggle="dropdown" aria-expanded="false">
                   Data Sourcing and Pooling
@@ -848,6 +864,7 @@
       },
       body: JSON.stringify({
         items: cart,
+        userEmail: email
       }),
     })
       .then(res => {
@@ -925,6 +942,21 @@
 	document.getElementById("pink-line").style.width = "0px";
     closeTab()
   }
+  function fetchUser() {
+    fetch("/user_profile")
+      .then(res => {
+        if (res.ok) return res.json()
+        return res.json().then(json => Promise.reject(json))
+      })
+      .then( userData => {
+        console.log("User profile data: ", userData)
+        document.getElementById("username").innerText = `${userData.username}`
+        document.getElementById("useremail").innerText = `${userData.email}`
+      }) 
+      .catch(e => {
+        console.error(e.error)
+      })
+  }
 
   function openTab(tab) {
     $(".tabs-button").removeClass("active");
@@ -946,6 +978,12 @@
         break;
       case "mic-popup":
         document.getElementById("mic-popup-menu-btn").classList.add("active");
+        break;
+      case "statistics":
+        document.getElementById("stats-menu-btn").classList.add("active");
+        break;
+      case "userProfile":
+        document.getElementById("user-profile-button").classList.add("active");
         break;
     }
     if (tab != null){
@@ -1201,7 +1239,7 @@ var animalNewStatus;
 var requestingToChange = "conservation status";
 var newConservationStatus; 
 // current user to get the current user who is logged in, this is just a temporary value for now
-var username = 'TN-HMI';
+//var username = 'TN-HMI';
 var source;
 var animal;
 var requestData;
@@ -1222,6 +1260,27 @@ function hideNotification() {
 }
 // Event listener for the close button
 notificationClose.addEventListener('click', hideNotification);
+
+let username;
+let email;
+
+function getUser(){
+  fetch("/user_profile")
+      .then(res => {
+        if (res.ok) return res.json()
+        return res.json().then(json => Promise.reject(json))
+      })
+      .then( userData => {
+        console.log("User profile data: ", userData)
+        username = String(userData.username);
+        email = `${userData.email}`
+      }) 
+      .catch(e => {
+        console.error(e.error)
+      })
+}
+
+getUser();
 
 function submitRequest(){
   animal = document.getElementById("desc_species").innerHTML;
@@ -1254,7 +1313,7 @@ function submitRequest(){
     generateVisualResponse("SUBMISSION CANCELLED. Source field cannot be empty.");
     return
   }
-
+  //console.log(user);
   requestData = {
     username,
     animal,

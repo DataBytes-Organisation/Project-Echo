@@ -209,6 +209,7 @@ def signup(user: schemas.UserSignupSchema):
 
     #Convert into dictionary and insert into the database
     user_dict = user.dict()
+    user_dict["_id"] = str(uuid.uuid4())
     user_dict["userId"] = user.username
     user_dict["__v"] = 0
     User.insert_one(user_dict)
@@ -270,17 +271,17 @@ def signin(user: schemas.UserLoginSchema):
     #Create JWT token using user info
     jwtToken = signJWT(user=account, authorities=authorities)
     
+    #Get info for users profile:
     #Assign the session token with JWT
     requests.session.token = jwtToken
     result = {
-        "id": account["_id"],
         "username": account["username"],
         "email": account["email"],
         "role" : authorities,
     }
 
     #Set up response (FOR TESTING ONLY)
-    response = {"message": "User Login Successfully!", "tkn" : jwtToken, "roles": authorities}
+    response = {"message": "User Login Successfully!", "tkn" : jwtToken, "roles": authorities, 'user': result}
 
     #Log result
     print(result)

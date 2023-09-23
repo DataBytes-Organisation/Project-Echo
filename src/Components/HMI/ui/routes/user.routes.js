@@ -1,4 +1,4 @@
-const { authJwt } = require("../middleware");
+const {client, authJwt } = require("../middleware");
 const controller = require("../controller/user.controller");
 
 module.exports = function(app) {
@@ -27,4 +27,16 @@ module.exports = function(app) {
     "/test",
     controller.publicHMI
   )
+  app.get(`/user_profile`, async (req, res, next) => {
+    let user = await client.get('Users', (err, storedUser) => {
+      if (err) {
+        return `Error retrieving user role from Redis: ${err}`
+      } else {
+        return storedUser
+      }
+    })
+    
+    res.send(user);
+    next()
+  })
 };
