@@ -1451,8 +1451,8 @@
   "status": "Least Concern",
   "diet": "Omnivore"
 },{
-  "_id": "Pacific Swift",
-  "commonName": "Apus pacificus",
+  "_id": "Apus pacificus",
+  "commonName": "Pacific Swift",
   "type": "Bird",
   "status": "Least Concern",
   "diet": "Insectivore"
