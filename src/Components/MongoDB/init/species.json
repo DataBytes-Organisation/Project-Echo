@@ -1420,4 +1420,10 @@
   "type": "Bird",
   "status": "Least Concern",
   "diet": "Insectivore"
+},{
+  "_id": "Phasianus colchicus",
+  "commonName": "Common Pheasant",
+  "type": "Bird",
+  "status": "Least Concern",
+  "diet": "Omnivore"
 }]
