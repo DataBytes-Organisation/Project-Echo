@@ -416,6 +416,7 @@ app.get("/login", (req, res) => {
   res.sendFile(path.join(__dirname, 'public/login.html'));
 })
 
+//API Endpoint for the submission requests
 app.post("/api/submit", async (req, res) => {
   let token = await client.get('JWT', (err, storedToken) => {
     if (err) {
@@ -427,12 +428,13 @@ app.post("/api/submit", async (req, res) => {
     }
   })
   let schema = req.body;
+  //Set the new submission to have a "pending" review status
   schema.status = "pending";
   schema.date = new Date();
   try {
     console.log("Request submission data: ", JSON.stringify(schema));
     const axiosResponse = await axios.post('http://ts-api-cont:9000/hmi/api/submit', JSON.stringify(schema), { headers: {"Authorization" : `Bearer ${token}`, 'Content-Type': 'application/json'}})
-
+    //If successful return a 201 status code
     if (axiosResponse.status === 201) {
       console.log('Status Code: ' + axiosResponse.status + ' ' + axiosResponse.statusText)
       res.status(201).send(`<script> window.location.href = "/login"; alert("Request Submitted successfully");</script>`);
@@ -458,7 +460,7 @@ app.get("/requestsOriginal", (req,res) => {
 })
 
 
-
+//API endpoint for patching the new review status to the newly reviewed edit request
 app.patch('/api/requests/:id', async (req, res) => {
   const requestId = req.params.id; // Get the request ID from the URL parameter
   const newStatus = req.body.status; // Get the new status from the request body
