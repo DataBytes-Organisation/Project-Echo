@@ -1426,4 +1426,10 @@
   "type": "Bird",
   "status": "Least Concern",
   "diet": "Omnivore"
+},{
+  "_id": "Leipoa ocellata",
+  "commonName": "Malleefowl",
+  "type": "Bird",
+  "status": "Vulnerable",
+  "diet": "Omnivore"
 }]
