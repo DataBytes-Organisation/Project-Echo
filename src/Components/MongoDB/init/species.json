@@ -1438,4 +1438,10 @@
   "type": "Bird",
   "status": "Least Concern",
   "diet": "Omnivore"
+},{
+  "_id": "Eudynamys orientalis",
+  "commonName": "Pacific Koel",
+  "type": "Bird",
+  "status": "Least Concern",
+  "diet": "Herbivore"
 }]
