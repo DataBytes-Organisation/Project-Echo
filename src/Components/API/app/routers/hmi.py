@@ -209,6 +209,7 @@ def signup(user: schemas.UserSignupSchema):
 
     #Convert into dictionary and insert into the database
     user_dict = user.dict()
+    user_dict["_id"] = str(uuid.uuid4())
     user_dict["userId"] = user.username
     user_dict["__v"] = 0
     User.insert_one(user_dict)
