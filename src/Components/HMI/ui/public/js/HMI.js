@@ -277,11 +277,16 @@ export function updateAnimalMovementLayerFromLiveData(hmiState, results){
   for(let evt of updatedMovementEvents){
     let layerName = deriveTruthLayerName(evt.animalStatus, evt.animalType);
     let layer = findMapLayerWithName(hmiState, layerName);
-    const featureToPurge = layer.getSource().getFeatureById(evt.animalId);
-    //console.log(featureToPurge);
-    if(featureToPurge){
-      //console.log("purge lat: " + evt.locationLat + " lon: " + evt.locationLon);
-      layer.getSource().removeFeature(featureToPurge);
+    if(layer){
+      const featureToPurge = layer.getSource().getFeatureById(evt.animalId);
+      //console.log(featureToPurge);
+      if(featureToPurge){
+        //console.log("purge lat: " + evt.locationLat + " lon: " + evt.locationLon);
+        layer.getSource().removeFeature(featureToPurge);
+      }
+      else{
+        console.log(layerName);
+      }
     }
   }
 
@@ -1223,9 +1228,14 @@ function purgeTruthEvents(hmiState){
     if(hmiState.liveEventCutoff > event.timestamp){
       let layerName = deriveTruthLayerName(event.animalStatus, event.animalType);
       let layer = findMapLayerWithName(hmiState, layerName);
-      const featureToPurge = layer.getSource().getFeatureById(event.animalId);
-      //console.log(featureToPurge);
-      layer.getSource().removeFeature(featureToPurge);
+      if(layer){
+        const featureToPurge = layer.getSource().getFeatureById(event.animalId);
+        //console.log(featureToPurge);
+        layer.getSource().removeFeature(featureToPurge);
+      }
+      else{
+        console.log(layerName);
+      }
     }
     else{
       persistEvents[event.animalId] = event;
@@ -1248,11 +1258,16 @@ function purgeVocalizationEvents(hmiState){
     if(hmiState.liveEventCutoff > event.timestamp){
       let layerName = deriveLayerName(event.animalStatus, event.animalType);
       let layer = findMapLayerWithName(hmiState, layerName);
-      //console.log(event.eventId);
-      const featureToPurge = layer.getSource().getFeatureById(event.eventId);
-      //console.log(featureToPurge);
-      if(featureToPurge !== null){
-        layer.getSource().removeFeature(featureToPurge);
+      if(layer){
+        //console.log(event.eventId);
+        const featureToPurge = layer.getSource().getFeatureById(event.eventId);
+        //console.log(featureToPurge);
+        if(featureToPurge !== null){
+          layer.getSource().removeFeature(featureToPurge);
+        }
+      }
+      else{
+        console.log(layerName);
       }
     }
     else{
