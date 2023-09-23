@@ -77,7 +77,7 @@ with open('yamnet_dir/label_encoder.pkl', 'rb') as f:
 yamnet = yamnet_model.yamnet_frames_model(params)
 yamnet.load_weights('yamnet_dir/yamnet.h5')
 yamnet_classes = yamnet_model.class_names('yamnet_dir/yamnet_class_map.csv')
-model = load_model('yamnet_dir/model_2_79.h5')
+model = load_model('yamnet_dir/model_3_82_16000.h5')
 
 # Load the YAMNet model
 yamnet_model_handle = 'https://tfhub.dev/google/yamnet/1'
