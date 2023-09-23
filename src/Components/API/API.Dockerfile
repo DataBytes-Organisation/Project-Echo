@@ -17,4 +17,4 @@ EXPOSE 9000
 EXPOSE 9080
 
 # Start the API using uvicorn
-CMD ["uvicorn", "app.main:app", "--host", "ts-api-cont", "--port", "9000"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "9000"]
