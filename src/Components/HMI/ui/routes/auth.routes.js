@@ -50,61 +50,58 @@ module.exports = function (app) {
 });
     
   app.post("/api/auth/signin", async (req, res) => {
-      let uname = req.body.username;
-      let pw = req.body.password;
+    let uname = req.body.username;
+    let pw = req.body.password;
 
-      let email = req.body.email;
+    let email = req.body.email;
       
-      let re = new RegExp("^guest\_.*\_[0-9]{8,10}$");
+    try {
+      const axiosResponse = await axios.post('http://ts-api-cont:9000/hmi/signin',{
+        username: uname,
+        email: email,
+        password: pw
+      });
       
-      //Check user login based on Regex Pattern:
-      if (uname.match(re) === null) {
-        console.log("username is not from Guest, proceed to User Signin")
-        try {
-          const axiosResponse = await axios.post('http://ts-api-cont:9000/hmi/signin', {
-            username: uname,
-            email: email,
-            password: pw
-          });
-          
-          if (axiosResponse.status === 200) {
-            console.log('Status Code: ' + axiosResponse.status + ' ' + axiosResponse.statusText)
-            console.log("Login response: ", axiosResponse.data);
-            
-            await client.set("JWT", axiosResponse.data.tkn, (err, res)=> {
-              if (err) {
-                console.log("Set JWT Token error: ", err)
-              } else {
-                console.log("Set JWT successfully: ", res)
-              }
-            })
-            await client.set("Roles", axiosResponse.data.roles.toString(), (err, res)=> {
-              if (err) {
-                console.log("Set User Roles Token error: ", err)
-              } else {
-                console.log("Set User roles successfully: ", res)
-              }
-            })
-            res.status(200).send(
-            `<script> 
-              alert("Login Successfully");
-              window.location.href = "/welcome"
-            </script>`);
-              
-            
+      if (axiosResponse.status === 200) {
+        console.log('Status Code: ' + axiosResponse.status + ' ' + axiosResponse.statusText)
+        console.log("Login response: ", axiosResponse.data);
+        
+        await client.set("JWT", axiosResponse.data.tkn, (err, res)=> {
+          if (err) {
+            console.log("Set JWT Token error: ", err)
           } else {
-            console.log("Login response: ", axiosResponse.data);
-            res.status(400).send('<script> window.location.href = "/login"; alert("Failed! Invalid credentials!");</script>');
+            console.log("Set JWT successfully: ", res)
           }
-        } catch (err) {
-          console.log('Login exception error: ' + err)
-          res.send(`<script> window.location.href = "/login"; alert("Login exception Error: ${err}!");</script>`);
-        }  
-      } 
-      else {
-        console.log("username is from Guest, proceed to Guest Signin")
-        controller.guestsignin(req, res)
+        })
+        await client.set("Roles", axiosResponse.data.roles.toString(), (err, res)=> {
+          if (err) {
+            console.log("Set User Roles Token error: ", err)
+          } else {
+            console.log("Set User roles successfully: ", res)
+          }
+        })
+        await client.set("Users", JSON.stringify(axiosResponse.data.user), (err, res)=> {
+          if (err) {
+            console.log("Set User Roles Token error: ", err)
+          } else {
+            console.log("Set User roles successfully: ", res)
+          }
+        })
+        res.status(200).send(
+        `<script> 
+          alert("Login Successfully");
+          window.location.href = "/welcome"
+        </script>`);
+          
+        
+      } else {
+        console.log("Login response: ", axiosResponse.data);
+        res.status(400).send('<script> window.location.href = "/login"; alert("Failed! Invalid credentials!");</script>');
       }
+    } catch (err) {
+      console.log('Login exception error: ' + err)
+      res.send(`<script> window.location.href = "/login"; alert("Login exception Error: ${err}!");</script>`);
+    }  
   });
 
   app.post("/api/auth/forgot", async (req, res) => {
@@ -146,5 +143,7 @@ module.exports = function (app) {
 
   app.post("/api/auth/guestsignup", controller.guestsignup);
 
-  app.post("/api/auth/guestsignin", controller.guestsignin);
+  // app.delete("/api/auth/delete-account", controller.deleteaccount);
+
+  // app.post("/api/auth/guestsignin", controller.guestsignin);
 };

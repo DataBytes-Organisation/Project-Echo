@@ -58,7 +58,7 @@
 
               <h1>Donations</h1>
               <!-- <i class="screen-icon fa-brands fa-codepen"></i> -->
-              
+              <!-- Create the empty table to display the donations in --->
               <div class="screen-user">
                   <table>
                       <thead>
@@ -95,7 +95,8 @@
     const dataBody = document.getElementById('data-body');
   
       
-  
+    //Update the table of donations
+    //This calls the donations API in server.js
     function updateTable() {
         fetch('/donations')
         .then(response => response.json())

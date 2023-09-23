@@ -2,7 +2,7 @@
   <head>
     <!-- Imports -->
     <meta charset="UTF-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+	<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1"> 
     <!-- Open Layers -->
     <link
       rel="stylesheet"
@@ -136,7 +136,7 @@
 
           <div id="menu" class="menu">
             <div class="menu-header"><div class="image-container">
-              <img src="./images/tabIcons/logo.png" alt="project echo logo">
+              <img src="./images/tabIcons/logo-removebg.png" alt="project echo logo">
             </div>
           </div>
           <div class="navbar">
@@ -146,15 +146,10 @@
             <a id="mic-popup-menu-btn" class="tabs-button" onclick="openTab('mic-popup')"></a>
             <a id="FAQ-menu-btn" class="tabs-button" onclick="openTab('FAQ')"></a>
             <a id="donate-menu-btn" class="tabs-button" onclick="openTab('donate')"></a>
-            <!--a id="stats-menu-btn" class="tabs-button" onclick="openTab('statistics')"></a--> <!-- New tab -->
-            <span style="position: fixed; border-top: 6px solid rgba(247, 186, 206, 0.8); height: 2px; width: 440; margin-top: 36px;"></span>
+            <a id="user-profile-button" class="tabs-button" onclick="openTab('userProfile'); fetchUser()"></a>
+            <!--<a id="stats-menu-btn" class="tabs-button" onclick="openTab('statistics')"></a>-->
+            <span id="pink-line" class="sudden-line"></span>
           </div>
-            <!--div id="statistics">
-              <div class="wrapper">
-                <div id="statistics-contents">
-                </div>
-              </div>
-            </div-->
           <div id="FAQ">
             <div class="wrapper">
               <div id="FAQ-contents">
@@ -190,6 +185,20 @@
                       </p>
                 </div>
               </div>
+
+              <div id="userProfile">
+                <div class="wrapper">
+                  <form action="/api/auth/signout" method="POST">
+                  <div id="userProfile-contents">
+                    <h2>User Profile</h2>
+                    <h3 id="display_name">Username: <span id="username"></span></h3>
+                    <h3 id="display_mail">Email: <span id="useremail"></span></h3>
+                    <center><button type="submit">Logout</button></center>
+                  </div>
+                </form>
+                </div>
+              </div>
+
               <div class="dropdown">
                 <button class="btn btn-secondary dropdown-toggle btn-no-background" id="data_src_toggle" data-bs-toggle="dropdown" aria-expanded="false">
                   Data Sourcing and Pooling
@@ -285,15 +294,15 @@
                   <div class="toggle-switch-container">
                     <div class="radio-group">
                       <input type="radio" id="option1" name="options" value="option1" onclick="{simModeSwitch('Animal_Mode')}">
-                      <span for="option1">Simulate Animals - CNN</span>
+                      <span for="option1">Simulate Movement</span>
                     </div>
                     <div class="radio-group">
                       <input type="radio" id="option2" name="options" value="option2" onclick="{simModeSwitch('Recording_Mode')}">
-                      <span for="option2">Live Recording - CNN</span>
+                      <span for="option2">Live Recording</span>
                     </div>
                     <div class="radio-group">
                       <input type="radio" id="option3" name="options" value="option3" onclick="{simModeSwitch('Recording_Mode_V2')}">
-                      <span for="option3">Live Recording - SNN + Event Detection</span>
+                      <span for="option3">Live Recording V2</span>
                     </div>
                     <div class="radio-group">
                       <input type="radio" id="option4" name="options" value="option4" onclick="{simModeSwitch('Stop')}" checked>
@@ -308,6 +317,7 @@
             </div>
             </div>
           </div> 
+          <!--DONATIONS TAB--->
           <div id="donate">
             <div class="wrapper">
             <div id="donate-contents">
@@ -338,12 +348,12 @@
                     <p class="image-amount">50</p>
                   </div>
                 </div>
-
                 <!-- Donation amount display -->
                 <div class="lightbulb-container" style="text-align: center;">
                   <img src="./images/Your Amount.png" alt="Light Bulb">
                   <p class="donation-amount">Your Amount:</p>
                 </div>
+                
                   <button class="donate-button" id="donation-button">DONATE NOW</button>
             </div>
             </div>
@@ -753,7 +763,6 @@
               <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                 <div class="row">
                   <div class="col">
-                    
                     <div class="form-check">
                       <input class="form-check-input" type="checkbox" value="" id="microphones" onchange="{microphoneDisplay()}" checked>
                       <label class="form-check-label" for="microphones">Microphones </label>
@@ -762,23 +771,19 @@
                       <input class="form-check-input" type="checkbox" value="" id="microphoneAnimations" onchange="{updateMicrophoneAnimation()}" checked>
                       <label class="form-check-label" for="microphones">Enable Animation </label>
                     </div>
-                   
                   </div>
                   </div>
                 </div>
               </div>
-
             <div class="export-tab">
               <button id="export-csv" onclick="{downloadCSV()}">EXPORT AS CSV <i class="fa-solid fa-cloud-arrow-down"></i></button>
               <button id="export-xlsx" onclick="{downloadXLSX()}">EXPORT AS XLSX <i class="fa-solid fa-cloud-arrow-down"></i></button>
-              
             </div>
             <div class="error-box" id="error-msg"></div>
             </div>
             </div> 
           </div>
           </div>      
-        
       </div>
     </div>
 
@@ -801,7 +806,6 @@
         var amount = description.querySelector('.image-amount');
         amount.textContent = donationData[index].amount;
         var imageFilename = donationData[index].image;
-
         image.src = './images/' + imageFilename;
 
       });
@@ -832,11 +836,11 @@
         });
       });
 
+  // Cart that is sent in the body of the API request
   let cart = [
     { id: 1, quantity: 0 }
   ];
   // Donation Button Functionality
-
   const donationButton = document.getElementById('donation-button');
   donationButton.addEventListener("click", () => {
     // Check to see if a donation amount has been selected
@@ -855,6 +859,7 @@
       },
       body: JSON.stringify({
         items: cart,
+        userEmail: email
       }),
     })
       .then(res => {
@@ -895,7 +900,14 @@
   }
 
   var hamburgerStatus = false;
-  var currentTab = document.getElementById('filter-menu'); 
+  var currentTab = document.getElementById('filter-menu');
+
+	if(hamburgerStatus == false){
+	  document.getElementById("pink-line").style.width = "0px";
+	}
+	else {
+	  document.getElementById("pink-line").style.width = "100vw";
+	}  
 
   function toggleNav() {
     var hamburger = document.querySelector('.hamburger-icon');
@@ -911,17 +923,34 @@
   }
   
   function openMenu() {
-    document.getElementById("menu").style.width = "550px";
+    document.getElementById("menu").style.width = "100vw";
     document.getElementById("menu").style.height = "100%";
     hamburgerStatus = true;
     openTab("filter-menu")
+	document.getElementById("pink-line").style.width = "100vw";
   }
 
   function closeMenu() {
     document.getElementById("menu").style.width = "0%";
     document.getElementById("menu").style.height = "0%";
     hamburgerStatus = false;
+	document.getElementById("pink-line").style.width = "0px";
     closeTab()
+  }
+  function fetchUser() {
+    fetch("/user_profile")
+      .then(res => {
+        if (res.ok) return res.json()
+        return res.json().then(json => Promise.reject(json))
+      })
+      .then( userData => {
+        console.log("User profile data: ", userData)
+        document.getElementById("username").innerText = `${userData.username}`
+        document.getElementById("useremail").innerText = `${userData.email}`
+      }) 
+      .catch(e => {
+        console.error(e.error)
+      })
   }
 
   function openTab(tab) {
@@ -948,6 +977,9 @@
       case "statistics":
         document.getElementById("stats-menu-btn").classList.add("active");
         break;
+      case "userProfile":
+        document.getElementById("user-profile-button").classList.add("active");
+        break;
     }
     if (tab != null){
       if (currentTab != document.getElementById(tab)){
@@ -955,12 +987,11 @@
       }
       currentTab = document.getElementById(tab)
     }
-    currentTab.style.width = "550px";
+    currentTab.style.width = "100vw";
     currentTab.style.height = "90%";
   }
 
   function closeTab() {
-    //console.log("Closing Current Tab")
     currentTab.style.width = "0%"
     currentTab.style.height = "0%"
   }
@@ -1144,17 +1175,19 @@ const markupDetails = document.getElementById("markup_details");
 const newStatus = document.getElementById("selectNCS");
 const conservationButtons = document.getElementById("dropdownContentNCS"); 
 const dropdownOptions = document.getElementById("dropdownContentNCS");
+
+//Load the request form for the user to fill out
 requestButton.addEventListener('click', () => {
 
   editFormWrapper.style.display = "";
   console.log("Request edit button clicked.");
   content = markupDetails.innerHTML;
-  // Split the content using the '|' delimiter
+  //Split the content using the '|' delimiter
   items = content.split('|');
 
-  // Trim whitespace from each item
+  //Trim whitespace from each item
   trimmedItems = items.map(item => item.trim());
-  // Access the third item (index 2) after trimming
+  //Access the third item (index 2) after trimming
   currentStatus = trimmedItems[2];
   console.log(currentStatus);
   //console.log("Third item:", thirdItem);
@@ -1203,7 +1236,7 @@ var animalNewStatus;
 var requestingToChange = "conservation status";
 var newConservationStatus; 
 // current user to get the current user who is logged in, this is just a temporary value for now
-var username = 'TN-HMI';
+//var username = 'TN-HMI';
 var source;
 var animal;
 var requestData;
@@ -1212,32 +1245,87 @@ const notification = document.getElementById('notification');
 const notificationText = document.getElementById('notification-text');
 const notificationClose = document.getElementById('notification-close');
 
-function vrSuccessfulSubmission(text){
+//This function receives text as a parameter and generates a visual response with it
+//It is responsible for generating a response once a user submits a edit request
+//The visual response appears in the bottom left of the screen like a notification
+function generateVisualResponse(text){
   
 // Function to show the notification
   notificationText.textContent = text;
   notification.style.display = 'block';
 }
 
+//The notification is hidden once the user clicks on the 'x'
 function hideNotification() {
     notification.style.display = 'none';
 }
 // Event listener for the close button
 notificationClose.addEventListener('click', hideNotification);
 
+let username;
+let email;
+
+function getUser(){
+  fetch("/user_profile")
+      .then(res => {
+        if (res.ok) return res.json()
+        return res.json().then(json => Promise.reject(json))
+      })
+      .then( userData => {
+        console.log("User profile data: ", userData)
+        username = String(userData.username);
+        email = `${userData.email}`
+      }) 
+      .catch(e => {
+        console.error(e.error)
+      })
+}
+
+getUser();
+
+
+
+//This is responsible for when the user submits their request
+//It gets the data from the fields and proceeds to generate the payload 
+//For the API endpoint
+//In the process of doing so checks are performed to ensure that the user
+//Hasn't missed a field, or hasn't entered redundant information
 function submitRequest(){
+  //Get the inner name of the animal 
   animal = document.getElementById("desc_species").innerHTML;
+  //Let Source equal to what is contained in the citation field
   source = document.getElementById("citationSneeded").value;
-  console.log(newConservationStatus);
-  //console.log(currentUser);
-  //console.log(thirdItem);
-  console.log(source);
-  console.log(animal);
-  checkFields();
-  
+  //get the initial and modified values, these will be used for checks too
   initial = currentStatus;
   modified = newConservationStatus;
+  console.log(newConservationStatus);
+  
+  // console.log(currentUser);
+  // console.log(thirdItem);
+  // console.log("Source:", source);
+  // console.log("Animal:", animal);
+  // console.log("New Status: ", modified);
+  // console.log("Initial: ", initial);
 
+  // Check the fields
+
+  checkFields();
+
+  if (initial === modified){
+    generateVisualResponse("SUBMISSION CANCELLED. New conservation status can't be the same as current status.");
+    return;
+  }
+
+  if (modified === undefined){
+    generateVisualResponse("SUBMISSION CANCELLED. No new conservation status selected.");
+    return;
+  }
+
+  if (source === ""){
+    generateVisualResponse("SUBMISSION CANCELLED. Source field cannot be empty.");
+    return
+  }
+  //console.log(user);
   requestData = {
     username,
     animal,
@@ -1255,12 +1343,13 @@ function submitRequest(){
   body: JSON.stringify(requestData)
   })
   .then(response => {
-    if (response.status===200){
+    if (response.status===201){
       console.log("Submission Success...");
-      vrSuccessfulSubmission("Thank you. Your submission was succesfully received and is now awaiting review.");
+      generateVisualResponse("Thank you. Your submission was succesfully received and is now awaiting review.");
     }
     else {
       console.log("Submission Unsuccessful...");
+      generateVisualResponse("There was an error in receiving your submission. Please try again.")
     }
   })
   .catch(error => {
@@ -1272,8 +1361,11 @@ function checkFields(){
   if(source === "" || animalNewStatus === "none"){
     return false
   }
+
 }
 
+//Once the submission exits, the form resets it's values so that the form 
+//can be empty if the user chooses to request an edit for another animal
 function exitSubmission(){
   currentStatus = "";
   source = "";
@@ -1518,7 +1610,6 @@ closeFormButton.addEventListener('click', (event) => {
     console.log("Website loaded!");
     initialiseHMI(hmiState);
     //sim is usually on by default, but this functionality is disabled during development
-    //startSimulator();
   };
 
   //Microphone show/hide
@@ -1580,16 +1671,6 @@ closeFormButton.addEventListener('click', (event) => {
     }
   });
 
-  /*
-  simulatorSwitch.addEventListener('change', function() {
-    if (this.checked) {
-      console.log("starting");
-      startSimulator();
-    } else {
-      console.log("stopping");
-      stopSimulator();
-    }
-  });*/
 
   $(function() {
     $('#datetime-range').daterangepicker({

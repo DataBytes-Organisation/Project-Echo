@@ -3,12 +3,12 @@ from fastapi import FastAPI, Body, HTTPException, status, APIRouter, Depends
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from typing import Optional, List
-
+import re
 from bson import ObjectId
 import datetime
 from app import serializers
 from app import schemas
-from app.database import Events, Movements, Microphones, User, Role, ROLES, Requests, ForgotPassword, LogoutToken
+from app.database import Events, Movements, Microphones, User, Role, ROLES, Requests, Guest, ForgotPassword, LogoutToken, Species
 import paho.mqtt.publish as publish
 import bcrypt
 from flask import jsonify
@@ -21,6 +21,7 @@ from app.middleware.auth import signJWT, decodeJWT
 from app.middleware.auth_bearer import JWTBearer
 from app.middleware.random import randompassword
 from bson.objectid import ObjectId
+import uuid
 
 jwtBearer = JWTBearer()
 
@@ -135,6 +136,17 @@ def latest_movememnt():
     return timestamp
 
 
+@router.post("/api/submit", dependencies=[Depends(jwtBearer)], status_code=status.HTTP_201_CREATED)
+def submit_request(request: schemas.RequestSchema):
+    try:
+        request_dict = request.dict()
+        Requests.insert_one(request_dict)
+        response = {"message": "Request submitted succesfully."}
+        return JSONResponse(content=response, status_code=201)
+    except Exception as e:
+        response = {"message": "Exception error", "exception": str(e)}
+        return JSONResponse(content=response, status_code=422)
+
 @router.post("/sim_control", status_code=status.HTTP_201_CREATED)
 def post_control(control: str):
 
@@ -192,11 +204,12 @@ def signup(user: schemas.UserSignupSchema):
     user_role_id = []
     for role_name in user.roles:
         role = Role.find_one({"name": role_name})
-        user_role_id.append(role["_id"])
+        user_role_id.append({"_id": role["_id"]})
     user.roles = user_role_id
 
     #Convert into dictionary and insert into the database
     user_dict = user.dict()
+    user_dict["_id"] = str(uuid.uuid4())
     user_dict["userId"] = user.username
     user_dict["__v"] = 0
     User.insert_one(user_dict)
@@ -208,47 +221,74 @@ def signin(user: schemas.UserLoginSchema):
     #Find if the username exist in our database
     account = User.find_one({"$or": [{"username": user.username}, {"email": user.email}]})
     if(account is None):
-        response = {"message": "User Not Found."}
-        return JSONResponse(content=response, status_code=404)
-   
+        #User Not exist - Checking inside Guest Collections
+        guestAcc = Guest.find_one({"$or": [{"username": user.username}, {"email": user.email}]})
+        if(guestAcc is None):
+            response = {"message": "User Not Found in Database."}
+            return JSONResponse(content=response, status_code=404)
+        #Verify credentials in User Collections
+        passwordIsValid = bcrypt.checkpw(user.password.encode('utf-8'), guestAcc['password'].encode('utf-8'))
+        if (passwordIsValid == False):
+            response = {"message": "Invalid Password!"}
+            return JSONResponse(content=response, status_code=401)
+        authorities = []
+        for role_id in guestAcc['roles']:
+            role = Role.find_one({"_id": role_id["_id"]})
+            if role:
+                authorities.append("ROLE_" + role['name'].upper())
+        #Create JWT token using user info
+        jwtToken = signJWT(user=guestAcc, authorities=authorities)
+        
+        #Assign the session token with JWT
+        requests.session.token = jwtToken
+        result = {
+            "id": guestAcc["_id"],
+            "username": guestAcc["username"],
+            "email": guestAcc["email"],
+            "role" : authorities,
+        }
+
+        #Set up response (FOR TESTING ONLY)
+        response = {"message": "User Login Successfully!", "tkn" : jwtToken, "roles": authorities}
+
+        #Log result
+        print(result)
+        return JSONResponse(content=response, status_code=200)
+    
+    #User Exist
+    #Verify credentials in User Collections
     #Find if the password matches
     passwordIsValid = bcrypt.checkpw(user.password.encode('utf-8'), account['password'].encode('utf-8'))
     if (passwordIsValid == False):
         response = {"message": "Invalid Password!"}
         return JSONResponse(content=response, status_code=401)
-
     authorities = []
     for role_id in account['roles']:
-        role = Role.find_one({"_id": ObjectId(role_id)})
+        role = Role.find_one({"_id": str(role_id["_id"])})
         if role:
             authorities.append("ROLE_" + role['name'].upper())
-
-    #Create payload for our token
-    # payload = {
-    #     "id": account["userId"],
-    #     "roles": authorities,
-    #     "exp": datetime.datetime.utcnow() + datetime.timedelta(seconds=86400)
-    # }
     
     #Create JWT token using user info
     jwtToken = signJWT(user=account, authorities=authorities)
     
+    #Get info for users profile:
     #Assign the session token with JWT
     requests.session.token = jwtToken
     result = {
-        "id": account["_id"],
         "username": account["username"],
         "email": account["email"],
         "role" : authorities,
     }
 
     #Set up response (FOR TESTING ONLY)
-    response = {"message": "User Login Successfully!", "tkn" : jwtToken, "roles": authorities}
+    response = {"message": "User Login Successfully!", "tkn" : jwtToken, "roles": authorities, 'user': result}
 
     #Log result
     print(result)
     return JSONResponse(content=response, status_code=200)
 
+# Signout functionalities for API
+# However developing in the Frontend can clears the token better than storing it in a Database
 @router.post("/signout", status_code=status.HTTP_200_OK)
 def signout(jwtToken: str):
     try:
@@ -269,19 +309,97 @@ def signout(jwtToken: str):
     except Exception as err:
         return JSONResponse({"Error": str(err)})
 
+@router.post("/guestsignup", status_code=status.HTTP_200_OK)
+def guestsignup(guestSign: schemas.GuestSignupSchema):
+    try:
+        #Hash password using bcrypt
+        password_hashed = bcrypt.hashpw(guestSign.password.encode('utf-8'), bcrypt.gensalt(rounds=8))
+        recorded_password = password_hashed.decode('utf-8')
 
-@router.post("/ChangePassword", status_code=status.HTTP_200_OK)
-def passwordchange(oldpw: str, newpw: str, cfm_newpw: str, jwtToken: str):
+        #Create a GuestShema dict and insert values accordingly
+        
+        role = Role.find_one({'name': 'guest'})
+        role.pop("name", None) 
+        guest = dict(
+            username= guestSign.username,
+            email= guestSign.email,
+            password= recorded_password,
+            userId= guestSign.username + str(uuid.uuid4()).replace("-", "")[:8],
+            roles= [role],
+            expiresAt= guestSign.timestamp
+        )
+
+        Guest.insert_one(guest)
+        response = {"message": "Guests was registered successfully!"}
+        return JSONResponse(content=response, status_code=201)
+
+    except Exception as e:
+        response = {"message": "Error creating a new Guest account", "error":  str(e)}
+        return JSONResponse(content=response, status_code=500)
+
+@router.patch('/api/requests', dependencies=[Depends(jwtBearer)], status_code=status.HTTP_200_OK)
+def update_request_status(request_dict : dict):
+    print("Admin Request Status Data: {}".format(request_dict))
+
+    if request_dict["newStatus"] is None:
+        response = {"message": "Invalid request status data"}
+        return JSONResponse(content=response, status_code=400)
+    if request_dict["requestId"] is None:
+        response = {"message": "Invalid requestId data"}
+        return JSONResponse(content=response, status_code=400)
+
+    updated_request = Requests.find_one_and_update(
+        {'_id': ObjectId(request_dict["requestId"])},
+        {'$set': {'status': request_dict["newStatus"]}},
+        return_document=True
+    )
+
+    if updated_request is None:
+        response = {"message": "Request data not found"}
+        return JSONResponse(content=response, status_code=404)
+
+    response = {"message": "Update request data successful"}
+    return JSONResponse(content=response, status_code=200)
+
+@router.patch('/api/updateConservationStatus', dependencies=[Depends(jwtBearer)], status_code=status.HTTP_200_OK)
+def update_request_status(request_dict : dict):
+    print("AnimalStatusUpdateData : {}".format(request_dict))
+    print("Animal requestAnimal value: {}".format(request_dict["requestAnimal"]))
+    print("Animal newStatus value: {}".format(request_dict["newStatus"]))
+    if request_dict["newStatus"] is None:
+        response = {"message": "Invalid request status data"}
+        return JSONResponse(content=response, status_code=400)
+    if request_dict["requestAnimal"] is None:
+        response = {"message": "Invalid Animal data"}
+        return JSONResponse(content=response, status_code=400)
+
+    updated_request = Species.find_one_and_update(
+        {'_id': {"$regex": re.compile(re.escape(request_dict["requestAnimal"]), re.IGNORECASE)}},
+        # {'_id': "Aegotheles Cristatus"},
+        {'$set': {'status': request_dict["newStatus"]}},
+        return_document=True
+    )
+
+    if updated_request is None:
+        response = {"message": "Animal data not found"}
+        return JSONResponse(content=response, status_code=404)
+
+    response = {"message": "Update species data successful"}
+    return JSONResponse(content=response, status_code=200)
+
+
+@router.post("/ChangePassword", dependencies=[Depends(jwtBearer)], status_code=status.HTTP_200_OK)
+def passwordchange(oldpw: str, newpw: str, cfm_newpw: str):
     #Check if user has logged out
-    if LogoutToken.find_one({'jwtToken' : jwtToken}):
-        response = {"message": "Token does not exist"}
-        return JSONResponse(content=response, status_code=403)   
-
+    # if LogoutToken.find_one({'jwtToken' : jwtToken}):
+    #     response = {"message": "Token does not exist"}
+    #     return JSONResponse(content=response, status_code=403)   
+    
     #Retrieve Token
-    isValid, payload = jwtBearer.verify_jwt(JWTToken = jwtToken)
+    JWTPayload = jwtBearer.decodedUser
 
     #Find if the username exist in our database
-    account = User.find_one({"_id": ObjectId(payload.get('id'))})
+    account = User.find_one({"_id": ObjectId(JWTPayload['id'])})
     if(account is None):
         response = {"message": "User Not Found."}
         return JSONResponse(content=response, status_code=404)
@@ -330,15 +448,15 @@ async def getRequests():
     except Exception as e:
         return {"error" : "Something unexpected occured - {}".format(e)}
 
-@router.post("/change-credential", status_code=status.HTTP_200_OK)
-def changeCredential(field:str, new: str, jwtToken: str):
+@router.post("/change-credential", dependencies=[Depends(jwtBearer)], status_code=status.HTTP_200_OK)
+def changeCredential(field:str, new: str):
     #Check if user has logged out
-    if LogoutToken.find_one({'jwtToken' : jwtToken}):
-        response = {"message": "Token does not exist"}
-        return JSONResponse(content=response, status_code=403)   
+    # if LogoutToken.find_one({'jwtToken' : jwtToken}):
+    #     response = {"message": "Token does not exist"}
+    #     return JSONResponse(content=response, status_code=403)   
         
-    #Retrieve Token
-    isValid, payload = jwtBearer.verify_jwt(JWTToken = jwtToken)
+    #Retrieve Payload from Token
+    JWTpayload = jwtBearer.decodedUser
 
     #Check if fields can be changed
     _field = ['gender', 'country', 'state', 'phonenumber']
@@ -348,30 +466,30 @@ def changeCredential(field:str, new: str, jwtToken: str):
     
     if field in ['country', "state"]:
         User.update_one(
-        {"_id": ObjectId(payload.get('id'))},
+        {"_id": ObjectId(JWTpayload['id'])},
         {"$set": {"address."+field: new}}
     )
     else:
         User.update_one(
-            {"_id": ObjectId(payload.get('id'))},
+            {"_id": ObjectId(JWTpayload['id'])},
             {"$set": {field: new}}
         )
 
     response = {"message": f"User {field} changed sucessfully!"}
     return JSONResponse(content=response)
 
-@router.delete("/delete-account", status_code=status.HTTP_200_OK)
-def deleteaccount(jwtToken: str):
+@router.delete("/delete-account", dependencies=[Depends(jwtBearer)], status_code=status.HTTP_200_OK)
+def deleteaccount():
     #Check if user has logged out
-    if LogoutToken.find_one({'jwtToken' : jwtToken}):
-        response = {"message": "Token does not exist"}
-        return JSONResponse(content=response, status_code=403)   
+    # if LogoutToken.find_one({'jwtToken' : jwtToken}):
+    #     response = {"message": "Token does not exist"}
+    #     return JSONResponse(content=response, status_code=403)   
         
     #Retrieve Token
-    isValid, payload = jwtBearer.verify_jwt(JWTToken = jwtToken)
+    JWTpayload = jwtBearer.decodedUser
 
     #Delete an account from User
-    User.delete_one({"_id": ObjectId(payload.get('id'))})
+    User.delete_one({"_id": ObjectId(JWTpayload['id'])})
 
     response = {"message": "User has been deleted!"}
     return JSONResponse(content=response)
@@ -400,3 +518,19 @@ def forgotpassword(user: schemas.ForgotPasswordSchema):
     
     response = {"message": "User not Found!"}
     return JSONResponse(content=response, status_code = 404)
+
+
+# Get request for filter algorithm phase 1
+
+@router.get("/filter_algorithm/{algorithm_type}", status_code=status.HTTP_200_OK, response_description="returns the running filter algorithm name")
+def filter_name(algorithm_type : str):
+    try:
+        algorithms_running = requests.get("http://ts-api-cont:9000/engine/algorithms_data")
+        algorithm_name = algorithms_running.json()[algorithm_type]
+        if(algorithm_name is not None):
+            response = {"message": algorithm_name}
+            return JSONResponse(content=response, status_code=200) 
+    except Exception as e:
+        return JSONResponse({"error" : "Algorithm not Found - {}".format(e)}, status_code=404)
+        
+    
