@@ -9,12 +9,11 @@ const { client, checkUserSession } = require('./middleware');
 const controller = require('./controller/auth.controller');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
-client.connect()
+client.connect();
 const cors = require('cors');
-require('dotenv').config()
-//const shop = require("./shop/shop")
+require('dotenv').config();
 const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY);
-const axios = require('axios')
+const axios = require('axios');
 
 const {createCaptchaSync} = require("captcha-canvas");
 
