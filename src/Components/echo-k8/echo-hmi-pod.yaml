@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --file docker-compose.yml --out ./k8s
+    kompose.version: 1.30.0 (9d8dcb518)
+  creationTimestamp: null
+  labels:
+    io.kompose.network/echo-net-echo-net: "true"
+    io.kompose.service: echo-hmi
+  name: echo-hmi
+  namespace: default
+spec:
+  containers:
+    - image: ts-echo-hmi
+      name: ts-echo-hmi-cont
+      ports:
+        - containerPort: 8080
+          hostPort: 8080
+          protocol: TCP
+      resources: {}
+      stdin: true
+      tty: true
+      volumeMounts:
+        - mountPath: /root/.config/gcloud
+          name: credentials-volume
+  restartPolicy: OnFailure
+  volumes:
+    - name: credentials-volume
+      persistentVolumeClaim:
+        claimName: credentials-volume
+status: {}

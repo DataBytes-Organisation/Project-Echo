@@ -195,6 +195,10 @@ body{
   animation-name: silence;
 }
 
+.boxmutedR {
+  animation-name: silence;
+}
+
 @media (min-width: 0px) {
   #menu {
     max-width: 550px;
@@ -214,7 +218,13 @@ body{
   #donate{
     max-width: 520px;
   }
-  #services{
+  #statistics{
+    max-width: 520px;
+  }
+  #mic-popup{
+    max-width: 520px;
+  }
+  #mic-popup{
     max-width: 520px;
   }
 }
@@ -496,7 +506,7 @@ input[type="checkbox"]{
   margin-top: 30px;
 }
 
-#services{
+#stats{
   padding: 0px 0px 0px 0px;
   height: 100%;
   width: 0%;
@@ -512,7 +522,7 @@ input[type="checkbox"]{
   margin-top: 30px;
 }
 
-#services-contents{
+#stats-contents{
   color: rgb(106, 246, 239);
   padding-top: 20px;
   margin-left: 10px;
@@ -525,13 +535,6 @@ input[type="checkbox"]{
   font-family: 'Roboto', sans-serif;
   /*overflow-y: scroll;
   overflow-x: hidden;*/
-}
-
-#services-contents ul {
-  color: white; /* Light green color */
-  list-style-type: disc; /* Use disc bullet points */
-  margin-left: 20px; /* Add some left margin for bullet points */
-  padding-left: 20px; /* Add left padding for the list items */
 }
 
 #SIM {  
@@ -962,6 +965,34 @@ input[type="checkbox"]{
     /*font-family: 'Roboto', sans-serif;*/
 }
 
+#mic-popup .audio_component {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+}
+
+#mic-popup .audio_component .audioContainer{
+  display: flex;
+  justify-content: space-between;
+  height: 64px;
+  --boxSize: 8px;
+  --gutter: 8px;
+  width: calc((var(--boxSize) + var(--gutter)) * 20);
+}
+
+#mic-popup .audioContainer .boxR{
+  transform: scaleY(.01);
+  height: 100%;
+  width: var(--boxSize);
+  background: rgba(247, 186, 206, 0.6) !important;
+  animation-duration: 1.5s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  border-radius: 8px;
+}
+
 #mic-popup img{
     /* padding: 8px 8px 8px 32px; */
     display: block;
@@ -1157,9 +1188,6 @@ i {
     pointer-events: auto;
   }
 
-  .toggle-switch-container{
-    margin-top: 20px;
-  }
   .toggle-label{
     color: rgb(141, 141, 141, 1.0);
     font-family: 'Roboto', sans-serif;
@@ -1275,6 +1303,14 @@ i {
   background-position: center;
 }
 
+#mic-popup-menu-btn{
+  background-image: url("../images/tabIcons/mic_icon.png");
+  background-size: cover;
+  background-size: 50%;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
 #filter-menu-btn::before {
   opacity: 0.5;
 }
@@ -1350,7 +1386,28 @@ i {
 #audio_recording_container {
   margin-top: 20px;
   width: 100%;
-  height: 100vh;
+  display: -webkit-flex;
+  display: -ms-flex;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+#audio_playback_container {
+  margin-top: 20px;
+  width: 100%;
+  display: -webkit-flex;
+  display: -ms-flex;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+#recording_simulation_master_container {
+  margin-top: 20px;
+  width: 100%;
   display: -webkit-flex;
   display: -ms-flex;
   display: flex;
@@ -1371,6 +1428,17 @@ i {
   width: 400px;
   margin-bottom: 30px;
 }
+#recording_export_container {
+  display: -webkit-flex;
+  display: -ms-flex;
+  display: inline-block;
+  justify-content: space-evenly;
+  align-items: center;
+  width: 400px;
+  margin-bottom: 30px;
+}
+#save_recording_button,
+#load_recording_button,
 #cancel_recording_button,
 #stop_recording_button,
 #record_audio_button {
@@ -1504,7 +1572,7 @@ i {
 .audio-element.hide {
   display: none;
 }
-#audio_playback_container {
+#audio_playback_div {
   height: 20px;
 }
 #audio_playback_indicator {
@@ -1598,3 +1666,139 @@ i {
 #audio_recording_container{
   width:440px;
 }
+
+#audio_playback_container{
+  width:440px;
+}
+#recording_simulation_master_container{
+  width:440px;
+}
+
+
+#request-edit-button {
+  color: white;
+}
+
+#editFormWrapper {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent background */
+  z-index: -1; /* Higher z-index to place it above the content */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#editForm {
+  display: none;
+      width: 80%; /* Adjust the width as needed */
+      max-width: 600px; /* Limit the maximum width */
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      font-weight: normal;
+  /* Add more styling as needed */
+}
+
+#ccs {
+  display: flex;  
+}
+
+#currentConservationStatus {
+  font-weight: normal;
+}
+
+label {
+  font-weight: bold;
+}
+
+#important {
+  color: red;
+}
+
+#dropdownNCS{
+  position: relative;
+  display: inline-block;
+}
+
+#dropdownContentNCS{
+  display: none;
+  position: absolute;
+  background-color: white;
+  border: 1px solid #ccc;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1001;
+}
+
+#dropdownNCS:hover .dropdownContentNCS {
+  display: block;
+}
+
+#dropdownContentNCS button {
+  width: 100%;
+  padding: 5px;
+  border: none;
+  background-color: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+#dropdownContentNCS button:hover {
+  background-color: rgb(189, 189, 189);
+}
+
+.toggle-switch-container{
+  margin-top: 20px;
+  display: block;
+}
+
+.radio-group {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.radio-group input[type="radio"] {
+  display: inline-block;
+  margin-top: 10px;
+  width: 20px;
+}
+
+input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+}
+
+input[type="radio"]+span:before {
+  content: '';
+  border: 1px solid rgba(247, 186, 206, 0.8);
+  border-radius: 50%;
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  margin-right: 0.5em;
+  margin-top: 0.5em;
+  vertical-align: -2px;
+}
+
+input[type="radio"]:checked+span:before {
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.6);
+  border: 6px solid rgba(247, 186, 206, 0.8);
+}
+
+input[type="radio"]:focus+span:before,
+input[type="radio"]:not(:disabled)+span:hover:before {
+  box-shadow:
+    0px 0px 0px 1px rgba(0, 0, 0, 0.6),
+    0px 0px 0px 2px rgba(247, 186, 206, 0.8);
+
+  outline-color: transparent;
+  outline-width: 2px;
+  outline-style: dotted;
+  }
+  

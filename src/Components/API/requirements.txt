@@ -24,5 +24,7 @@ python-dotenv==1.0.0
 paho-mqtt
 bcrypt
 flask
-pyjwt==1.5.3
+pyjwt==2.4.0
 requests
+python-decouple
+pandas
