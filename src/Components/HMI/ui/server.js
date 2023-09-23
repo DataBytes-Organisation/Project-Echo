@@ -27,33 +27,6 @@ const rootDirectory = __dirname; // This assumes the root directory is the curre
 //Security verification for email account and body content validation:
 const validation = require('deep-email-validator')
 
-// async function getAllPayments() {
-
-//   while (true) {
-//     nextPage = null;
-//     firstPage = false;
-//     let charges;
-//     if(firstPage == false){
-//       charges = await stripe.charges.list({
-//         limit: 100,
-//       });
-//       firstPage = true;
-//     }
-//     charges.data.forEach(charge => {
-//       cumulativeTotal += charge.amount;
-//     });
-//     if (!charges.has_more) {
-//       break; // Exit the loop when there are no more pages
-//     }
-//     nextPage = charges[charges.length() - 1]
-//     charges = await stripe.charges.list({
-//       limit: 100,
-//       starting_next: nextPage
-//     });
-//     firstPage = true;
-//   }
-//   console.log('Cumulative Total:', cumulativeTotal);
-// }
 
 // getAllPayments();
 
