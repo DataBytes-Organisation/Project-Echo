@@ -1193,7 +1193,7 @@ export function MapCloseNav() {
 function updateTruthEvents(hmiState){
   retrieveTruthEventsInTimeRange(hmiState.currentTime-5, hmiState.currentTime).then((res) => {
     updateAnimalMovementLayerFromLiveData(hmiState, res.data);
-    //TODO also update vocalisation layer h
+    //TODO also update vocalisation layer 
   })
 }
 
