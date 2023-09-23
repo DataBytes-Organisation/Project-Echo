@@ -51,3 +51,25 @@ exports.signout = async (req, res, next) => {
     next(err);
   }
 };
+
+//Delete Account functionality
+// exports.deleteaccount = async (req, res) => { 
+//     try {
+//         const jwtToken = req.session.jwtToken;
+        
+//         const axiosResponse = await axios.delete('http://ts-api-cont:9000/hmi/delete-account', {
+//             headers: {
+//                 Authorization: `Bearer ${jwtToken}`
+//             }
+//         });
+
+//         if (axiosResponse.status === 200) {
+//           return res.status(200).send('<script> alert("User account deleted successfully!"); window.location.href = "/login"</script>')
+//         } else {
+//           return res.status(500).send('<script> alert("Failed to delete user account!");');
+//         }
+//       } catch (err) {
+//         console.error("Delete Account Error:", err);
+//         return res.status(500).send('<script> alert("An error occured while deleting the user account!");');
+//     }
+// };
