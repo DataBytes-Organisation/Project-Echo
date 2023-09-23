@@ -1415,9 +1415,9 @@
   "status": "Least Concern",
   "diet": "Carnivore"
 },{
-  "_id": "",
+  "_id": "Eurostopodus argus",
   "commonName": "Spotted Nightjar",
-  "type": "",
-  "status": "",
-  "diet": ""
+  "type": "Bird",
+  "status": "Least Concern",
+  "diet": "Insectivore"
 }]
