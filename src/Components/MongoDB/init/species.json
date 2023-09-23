@@ -1468,4 +1468,10 @@
   "type": "Bird",
   "status": "Least Concern",
   "diet": "Omnivore"
+},{
+  "_id": "Menura novaehollandiae",
+  "commonName": "Australian Lyrebird",
+  "type": "Bird",
+  "status": "Least Concern",
+  "diet": "Insectivore"
 }]
