@@ -68,7 +68,7 @@ var audioRecorder = {
               var soundSource = offlineAudioCtx.createBufferSource();
               soundSource.buffer = buffer;
       
-              // // Create Compressor Node
+              // Create Compressor Node
               var compressor = offlineAudioCtx.createDynamicsCompressor();
       
               compressor.threshold.setValueAtTime(-20, offlineAudioCtx.currentTime);
