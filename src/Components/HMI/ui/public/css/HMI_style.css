@@ -1554,7 +1554,7 @@ i {
 #mic-popup-menu-btn{
   background-image: url("../images/tabIcons/mic_icon.png");
   background-size: cover;
-  background-size: 50%;
+  background-size: 40%;
   background-repeat: no-repeat;
   background-position: center;
 }
