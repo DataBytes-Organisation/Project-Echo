@@ -1220,12 +1220,18 @@ function generateVisualResponse(text){
   notification.style.display = 'block';
 }
 
+//The notification is hidden once the user clicks on the 'x'
 function hideNotification() {
     notification.style.display = 'none';
 }
 // Event listener for the close button
 notificationClose.addEventListener('click', hideNotification);
 
+//This is responsible for when the user submits their request
+//It gets the data from the fields and proceeds to generate the payload 
+//For the API endpoint
+//In the process of doing so checks are performed to ensure that the user
+//Hasn't missed a field, or hasn't entered redundant information
 function submitRequest(){
   //Get the inner name of the animal 
   animal = document.getElementById("desc_species").innerHTML;
