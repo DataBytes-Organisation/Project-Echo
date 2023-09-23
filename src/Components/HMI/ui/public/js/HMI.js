@@ -589,7 +589,7 @@ function addNewTruthFeatures(hmiState, events) {
   for (let entry of events) {
     //console.log("True location found!:  ")
     var iconPath = "";
-    if(entry.animalDiet === "insectivore" || entry.animalDiet === "carnivore" || entry.animalDiet ==="omnivore"){
+    if(entry.animalDiet ==="omnivore" || entry.animalDiet === "carnivore" || entry.animalDiet === "insectivore" ){
       iconPath = './../images/Predator/sim/' + getIconName(entry.animalStatus, entry.animalType);
     }
     else{
