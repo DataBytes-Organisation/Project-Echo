@@ -9,12 +9,11 @@ const { client, checkUserSession } = require('./middleware');
 const controller = require('./controller/auth.controller');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
-client.connect()
+client.connect();
 const cors = require('cors');
-require('dotenv').config()
-//const shop = require("./shop/shop")
+require('dotenv').config();
 const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY);
-const axios = require('axios')
+const axios = require('axios');
 
 const {createCaptchaSync} = require("captcha-canvas");
 
@@ -26,36 +25,6 @@ const rootDirectory = __dirname; // This assumes the root directory is the curre
 
 //Security verification for email account and body content validation:
 const validation = require('deep-email-validator')
-
-// async function getAllPayments() {
-
-//   while (true) {
-//     nextPage = null;
-//     firstPage = false;
-//     let charges;
-//     if(firstPage == false){
-//       charges = await stripe.charges.list({
-//         limit: 100,
-//       });
-//       firstPage = true;
-//     }
-//     charges.data.forEach(charge => {
-//       cumulativeTotal += charge.amount;
-//     });
-//     if (!charges.has_more) {
-//       break; // Exit the loop when there are no more pages
-//     }
-//     nextPage = charges[charges.length() - 1]
-//     charges = await stripe.charges.list({
-//       limit: 100,
-//       starting_next: nextPage
-//     });
-//     firstPage = true;
-//   }
-//   console.log('Cumulative Total:', cumulativeTotal);
-// }
-
-// getAllPayments();
 
 const storeItems = new Map([[
   1, { priceInCents: 100, name: "donation"}
@@ -82,6 +51,8 @@ app.use(express.json({limit: '10mb'}));
 //   }
 // }
 
+//This API endpoint is fetched when the user clicks the donate button.
+//This endpoint generates a new checkout session using Stripe.
 app.post("/api/create-checkout-session", async (req, res) => {
   try {
     console.log(req.body.items);
@@ -98,6 +69,7 @@ app.post("/api/create-checkout-session", async (req, res) => {
             product_data: {
               name: storeItem.name,
             },
+            //Conversion
             unit_amount: item.quantity * 100,
           },
           quantity: 1,
@@ -113,6 +85,8 @@ app.post("/api/create-checkout-session", async (req, res) => {
   }
 })
 
+//This API endpoint fetches the "charges", AKA donations, from the Stripe account.
+//It returns a json object of all the charges
 app.get('/donations', async(req,res) => {
   let charges;
   try{
@@ -143,7 +117,8 @@ app.get('/donations', async(req,res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 })
-
+//This endpoint retrieves the donation amounts from the associated stripe account
+//it adds up the amounts to return a cumulative total. Used on admin dashboard.
 app.get('/cumulativeDonations', async(req, res) => {
   let cumulativeTotal = 0;
   try{
@@ -397,7 +372,7 @@ app.get("/", async (req, res) => {
     res.redirect("/map")
   }
 })
-
+//Serve the admin dashboard
 app.get("/admin-dashboard", (req,res)=> {
   return res.sendFile(path.join(__dirname, 'public/admin/dashboard.html'));
 })
@@ -405,15 +380,16 @@ app.get("/admin-dashboard", (req,res)=> {
 app.get("/admin-template", (req,res)=> {
   return res.sendFile(path.join(__dirname, 'public/admin/template.html'));
 })
-
+//Serve the donations tab
 app.get("/admin-donations", (req, res) => {
   return res.sendFile(path.join(__dirname, 'public/admin/donations.html'));
 })
-
+//Serve the login page
 app.get("/login", (req, res) => {
   res.sendFile(path.join(__dirname, 'public/login.html'));
 })
 
+//API Endpoint for the submission requests
 app.post("/api/submit", async (req, res) => {
   let token = await client.get('JWT', (err, storedToken) => {
     if (err) {
@@ -425,12 +401,13 @@ app.post("/api/submit", async (req, res) => {
     }
   })
   let schema = req.body;
+  //Set the new submission to have a "pending" review status
   schema.status = "pending";
   schema.date = new Date();
   try {
     console.log("Request submission data: ", JSON.stringify(schema));
     const axiosResponse = await axios.post('http://ts-api-cont:9000/hmi/api/submit', JSON.stringify(schema), { headers: {"Authorization" : `Bearer ${token}`, 'Content-Type': 'application/json'}})
-
+    //If successful return a 201 status code
     if (axiosResponse.status === 201) {
       console.log('Status Code: ' + axiosResponse.status + ' ' + axiosResponse.statusText)
       res.status(201).send(`<script> window.location.href = "/login"; alert("Request Submitted successfully");</script>`);
@@ -446,17 +423,12 @@ app.post("/api/submit", async (req, res) => {
 app.post("/api/approve", async (req,res) => {
 
 })
-
+//Navigate to requests tab on admin dashboard
 app.get("/requests", (req,res) => {
   res.sendFile(path.join(__dirname, 'public/admin/admin-request.html'))
 })
 
-app.get("/requestsOriginal", (req,res) => {
-  res.sendFile(path.join(__dirname, 'public/requests.html'))
-})
-
-
-
+//API endpoint for patching the new review status to the newly reviewed edit request
 app.patch('/api/requests/:id', async (req, res) => {
   const requestId = req.params.id; // Get the request ID from the URL parameter
   const newStatus = req.body.status; // Get the new status from the request body
@@ -485,6 +457,9 @@ app.patch('/api/requests/:id', async (req, res) => {
   }
 });
 
+//API endpoint is responsible for patching the conservation status
+//Of the animal within a edit request submission with the new conservation status
+//that the request includes.
 app.patch('/api/updateConservationStatus/:animal', async (req, res) => {
   const requestAnimal = req.params.animal;
   const newStatus = req.body.status;
@@ -512,7 +487,7 @@ app.patch('/api/updateConservationStatus/:animal', async (req, res) => {
     res.status(500).send({ error: 'Error updating species status' });
   }
 });
-
+//Fetch the requests for the admin dashboard
 app.get('/api/requests', async (req, res) => {
   try {
 
@@ -538,7 +513,7 @@ app.get('/api/requests', async (req, res) => {
     res.status(401).redirect('/admin-dashboard')
   }
 });
-
+//Page Direction to Welcome page after logging in
 app.get("/welcome", async (req,res) => {
   try {
     console.log("token: ", await client.get('JWT', (err, storedToken) => {
@@ -555,7 +530,8 @@ app.get("/welcome", async (req,res) => {
         return storedToken
       }
     })
-
+    //If the user that has just logged in is an admin, direct them
+    //to the admin dashboard. Otherwise direct them to the map.
     if (role.toLowerCase().includes("admin")) {
       res.redirect("/admin-dashboard")
     } else {
@@ -566,7 +542,7 @@ app.get("/welcome", async (req,res) => {
     res.send(`<script> alert("No user info detected! Please login again"); window.location.href = "/login"; </script>`);
   }
 })
-
+//Page direction to the map
 app.get("/map", async(req,res) => {
   res.sendFile(path.join(__dirname, 'public/index.html'))
 })

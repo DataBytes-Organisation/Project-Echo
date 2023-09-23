@@ -136,7 +136,7 @@
 
           <div id="menu" class="menu">
             <div class="menu-header"><div class="image-container">
-              <img src="./images/tabIcons/logo.png" alt="project echo logo">
+              <img src="./images/tabIcons/logo-removebg.png" alt="project echo logo">
             </div>
           </div>
           <div class="navbar">
@@ -763,7 +763,6 @@
               <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                 <div class="row">
                   <div class="col">
-                    
                     <div class="form-check">
                       <input class="form-check-input" type="checkbox" value="" id="microphones" onchange="{microphoneDisplay()}" checked>
                       <label class="form-check-label" for="microphones">Microphones </label>
@@ -772,23 +771,19 @@
                       <input class="form-check-input" type="checkbox" value="" id="microphoneAnimations" onchange="{updateMicrophoneAnimation()}" checked>
                       <label class="form-check-label" for="microphones">Enable Animation </label>
                     </div>
-                   
                   </div>
                   </div>
                 </div>
               </div>
-
             <div class="export-tab">
               <button id="export-csv" onclick="{downloadCSV()}">EXPORT AS CSV <i class="fa-solid fa-cloud-arrow-down"></i></button>
               <button id="export-xlsx" onclick="{downloadXLSX()}">EXPORT AS XLSX <i class="fa-solid fa-cloud-arrow-down"></i></button>
-              
             </div>
             <div class="error-box" id="error-msg"></div>
             </div>
             </div> 
           </div>
           </div>      
-        
       </div>
     </div>
 
@@ -1180,6 +1175,8 @@ const markupDetails = document.getElementById("markup_details");
 const newStatus = document.getElementById("selectNCS");
 const conservationButtons = document.getElementById("dropdownContentNCS"); 
 const dropdownOptions = document.getElementById("dropdownContentNCS");
+
+//Load the request form for the user to fill out
 requestButton.addEventListener('click', () => {
 
   editFormWrapper.style.display = "";
@@ -1248,6 +1245,9 @@ const notification = document.getElementById('notification');
 const notificationText = document.getElementById('notification-text');
 const notificationClose = document.getElementById('notification-close');
 
+//This function receives text as a parameter and generates a visual response with it
+//It is responsible for generating a response once a user submits a edit request
+//The visual response appears in the bottom left of the screen like a notification
 function generateVisualResponse(text){
   
 // Function to show the notification
@@ -1255,6 +1255,7 @@ function generateVisualResponse(text){
   notification.style.display = 'block';
 }
 
+//The notification is hidden once the user clicks on the 'x'
 function hideNotification() {
     notification.style.display = 'none';
 }
@@ -1282,22 +1283,33 @@ function getUser(){
 
 getUser();
 
+
+
+//This is responsible for when the user submits their request
+//It gets the data from the fields and proceeds to generate the payload 
+//For the API endpoint
+//In the process of doing so checks are performed to ensure that the user
+//Hasn't missed a field, or hasn't entered redundant information
 function submitRequest(){
+  //Get the inner name of the animal 
   animal = document.getElementById("desc_species").innerHTML;
+  //Let Source equal to what is contained in the citation field
   source = document.getElementById("citationSneeded").value;
+  //get the initial and modified values, these will be used for checks too
   initial = currentStatus;
   modified = newConservationStatus;
   console.log(newConservationStatus);
-  //console.log(currentUser);
-  //console.log(thirdItem);
-  console.log("Source:", source);
-  console.log("Animal:", animal);
-  console.log("New Status: ", modified);
-  console.log("Initial: ", initial);
+  
+  // console.log(currentUser);
+  // console.log(thirdItem);
+  // console.log("Source:", source);
+  // console.log("Animal:", animal);
+  // console.log("New Status: ", modified);
+  // console.log("Initial: ", initial);
+
+  // Check the fields
 
   checkFields();
-  
-  
 
   if (initial === modified){
     generateVisualResponse("SUBMISSION CANCELLED. New conservation status can't be the same as current status.");
@@ -1349,8 +1361,11 @@ function checkFields(){
   if(source === "" || animalNewStatus === "none"){
     return false
   }
+
 }
 
+//Once the submission exits, the form resets it's values so that the form 
+//can be empty if the user chooses to request an edit for another animal
 function exitSubmission(){
   currentStatus = "";
   source = "";
@@ -1595,7 +1610,6 @@ closeFormButton.addEventListener('click', (event) => {
     console.log("Website loaded!");
     initialiseHMI(hmiState);
     //sim is usually on by default, but this functionality is disabled during development
-    //startSimulator();
   };
 
   //Microphone show/hide
@@ -1657,16 +1671,6 @@ closeFormButton.addEventListener('click', (event) => {
     }
   });
 
-  /*
-  simulatorSwitch.addEventListener('change', function() {
-    if (this.checked) {
-      console.log("starting");
-      startSimulator();
-    } else {
-      console.log("stopping");
-      stopSimulator();
-    }
-  });*/
 
   $(function() {
     $('#datetime-range').daterangepicker({

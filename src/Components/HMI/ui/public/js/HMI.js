@@ -589,11 +589,11 @@ function addNewTruthFeatures(hmiState, events) {
   for (let entry of events) {
     //console.log("True location found!:  ")
     var iconPath = "";
-    if(entry.animalDiet === "herbavore" || entry.animalDiet === "frugivore"){
-      iconPath = './../images/sim/' + getIconName(entry.animalStatus, entry.animalType);
+    if(entry.animalDiet ==="omnivore" || entry.animalDiet === "carnivore" || entry.animalDiet === "insectivore" ){
+      iconPath = './../images/Predator/sim/' + getIconName(entry.animalStatus, entry.animalType);
     }
     else{
-      iconPath ='./../images/Predator/sim/' + getIconName(entry.animalStatus, entry.animalType);
+      iconPath ='./../images/sim/' + getIconName(entry.animalStatus, entry.animalType);
     }
 
     var trueLocation = new ol.Feature({
@@ -809,7 +809,7 @@ function addMicrophonesByHiddenLayer(hmiState, layerName, iconPath){
       image: new ol.style.Icon({
         src: iconPath,
         anchor: [0.5, 1],
-        scale: 1,
+        scale: 0.175,
       }),
     });
     mic.setStyle(icon);
@@ -830,22 +830,12 @@ var animTimeout = null;
 
 function addmicrophones(hmiState) {
   
+  //Loop function to add all the frames that compose the microphone animation.
   for(let i=25; i>0;i--){
     addMicrophonesByLayer(hmiState,`mic_layer_${i}`, `./../images/${i}-01.png`);
   }
-  
-  /*
-  addMicrophonesByLayer(hmiState, "mic_layer_9", "./../images/Microphone - 3-ai-9.png");
-  addMicrophonesByLayer(hmiState, "mic_layer_8", "./../images/Microphone - 3-ai-8.png");
-  addMicrophonesByLayer(hmiState, "mic_layer_7", "./../images/Microphone - 3-ai-7.png");
-  addMicrophonesByLayer(hmiState, "mic_layer_6", "./../images/Microphone - 3-ai-6.png");
-  addMicrophonesByLayer(hmiState, "mic_layer_5", "./../images/Microphone - 3-ai-5.png");
-  addMicrophonesByLayer(hmiState, "mic_layer_4", "./../images/Microphone - 3-ai-4.png");
-  addMicrophonesByLayer(hmiState, "mic_layer_3", "./../images/Microphone - 3-ai-3.png");
-  addMicrophonesByLayer(hmiState, "mic_layer_2", "./../images/Microphone - 3-ai-2.png");
-  addMicrophonesByLayer(hmiState, "mic_layer_1", "./../images/Microphone - 3-ai-1.png");
-  */
-  addMicrophonesByHiddenLayer(hmiState, "mic_layer", "./../images/mic2.png");
+  //Add the single white dot as the microphone icon for when animation is disabled.
+  addMicrophonesByHiddenLayer(hmiState, "mic_layer", "./../images/1-01.png");
 }
 
 export function enableMicAnimation(hmiState){
@@ -1203,15 +1193,12 @@ export function MapCloseNav() {
 function updateTruthEvents(hmiState){
   retrieveTruthEventsInTimeRange(hmiState.currentTime-5, hmiState.currentTime).then((res) => {
     updateAnimalMovementLayerFromLiveData(hmiState, res.data);
-    //TODO also update vocalisation layer here.
   })
 }
 
-//TODO Implement this
 function updateVocalizationEvents(hmiState){
   retrieveVocalizationEventsInTimeRange(hmiState.currentTime-5, hmiState.currentTime).then((res) => {
     updateVocalizationLayerFromLiveData(hmiState, res.data);
-    //TODO also update vocalisation layer here.
   })
 }
 
