@@ -542,7 +542,7 @@ app.get('/api/requests', async (req, res) => {
     res.status(401).redirect('/admin-dashboard')
   }
 });
-
+//Page Direction to Welcome page after logging in
 app.get("/welcome", async (req,res) => {
   try {
     console.log("token: ", await client.get('JWT', (err, storedToken) => {
@@ -559,7 +559,8 @@ app.get("/welcome", async (req,res) => {
         return storedToken
       }
     })
-
+    //If the user that has just logged in is an admin, direct them
+    //to the admin dashboard. Otherwise direct them to the map.
     if (role.toLowerCase().includes("admin")) {
       res.redirect("/admin-dashboard")
     } else {
@@ -570,7 +571,7 @@ app.get("/welcome", async (req,res) => {
     res.send(`<script> alert("No user info detected! Please login again"); window.location.href = "/login"; </script>`);
   }
 })
-
+//Page direction to the map
 app.get("/map", async(req,res) => {
   res.sendFile(path.join(__dirname, 'public/index.html'))
 })
