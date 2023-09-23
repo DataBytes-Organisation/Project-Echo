@@ -1463,12 +1463,6 @@
   "status": "Least Concern",
   "diet": "Insectivore"
 },{
-  "_id": "Little Bronze Cuckoo",
-  "commonName": "Chrysococcyx minutillus",
-  "type": "Bird",
-  "status": "Least Concern",
-  "diet": "Omnivore"
-},{
   "_id": "Menura novaehollandiae",
   "commonName": "Australian Lyrebird",
   "type": "Bird",
