@@ -1408,4 +1408,10 @@
   "type": "Bird",
   "status": "Least Concern",
   "diet": "Omnivore"
+},{
+  "_id": "Centropus phasianinus",
+  "commonName": "Pheasant Coucal",
+  "type": "",
+  "status": "",
+  "diet": ""
 }]
