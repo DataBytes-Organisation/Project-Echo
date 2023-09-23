@@ -399,7 +399,7 @@ app.get("/", async (req, res) => {
     res.redirect("/map")
   }
 })
-
+//Serve the admin dashboard
 app.get("/admin-dashboard", (req,res)=> {
   return res.sendFile(path.join(__dirname, 'public/admin/dashboard.html'));
 })
@@ -407,11 +407,11 @@ app.get("/admin-dashboard", (req,res)=> {
 app.get("/admin-template", (req,res)=> {
   return res.sendFile(path.join(__dirname, 'public/admin/template.html'));
 })
-
+//Serve the donations tab
 app.get("/admin-donations", (req, res) => {
   return res.sendFile(path.join(__dirname, 'public/admin/donations.html'));
 })
-//Get login page
+//Serve the login page
 app.get("/login", (req, res) => {
   res.sendFile(path.join(__dirname, 'public/login.html'));
 })
