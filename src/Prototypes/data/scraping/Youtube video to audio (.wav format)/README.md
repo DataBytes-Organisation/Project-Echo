@@ -3,7 +3,7 @@
 ## Overview 
 The code provides a function, random_move_files, designed to reorganize files across directories. Given an input directory with species subfolders, the function checks the directory's validity, creates a matching structure in an output directory, and then, for each species folder, randomly selects and moves a default of three files to the corresponding folder in the output directory. Care should be taken when using this function as files are moved, not copied, potentially leading to data loss if not backed up.
 
-## Details:
+## Details :
 
 # Directory Verification: 
 It first checks if the given input directory exists. If the output directory doesn't exist, it creates one.
