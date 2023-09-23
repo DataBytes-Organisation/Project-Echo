@@ -809,7 +809,7 @@ function addMicrophonesByHiddenLayer(hmiState, layerName, iconPath){
       image: new ol.style.Icon({
         src: iconPath,
         anchor: [0.5, 1],
-        scale: 1,
+        scale: 0.1,
       }),
     });
     mic.setStyle(icon);
