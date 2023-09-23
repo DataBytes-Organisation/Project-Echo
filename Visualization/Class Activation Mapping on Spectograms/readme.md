@@ -29,6 +29,7 @@ Ensure you have the following libraries installed:
 ### Usage
 
 - Update the audio_folder_path and image_folder_path in the notebook to point to your directories.
+- You will need to use the create mel spec only.ipynb to create your spectogram files, the spectograms you create will be saved to your working directory, update this path to the class activation mapping code to the image_folder_path
 - An image folder is required to store the Spectogram files, created by the plot mel spec only.ipynb notebook shared in this folder developed by another person in Echonet.
 - Make sure there are at least 3 images in your image folder as the code is designed for a 1x3 grid of subplots (axes)
 - Run the notebook to visualize CAM on spectrograms.
