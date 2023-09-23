@@ -51,7 +51,7 @@
   "commonName": "Fallow Deer",
   "type": "Mammal",
   "status": "Invasive",
-  "diet": "herbivore"
+  "diet": "Herbivore"
 },{
   "_id": "Eopsaltria Australis",
   "commonName": "Eastern Yellow Robin",
