@@ -454,11 +454,11 @@ app.post("/api/approve", async (req,res) => {
 app.get("/requests", (req,res) => {
   res.sendFile(path.join(__dirname, 'public/admin/admin-request.html'))
 })
-
+/*
 app.get("/requestsOriginal", (req,res) => {
   res.sendFile(path.join(__dirname, 'public/requests.html'))
 })
-
+*/
 
 //API endpoint for patching the new review status to the newly reviewed edit request
 app.patch('/api/requests/:id', async (req, res) => {
