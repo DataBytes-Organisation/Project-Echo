@@ -3,6 +3,7 @@ const db = require("../model");
 const path = require('path');
 const User = db.user;
 const Role = db.role;
+const nodemailer = require("nodemailer");
 
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
@@ -129,6 +130,43 @@ exports.signout = async (req, res) => {
   }
 };
 
+exports.send_email = async(username,email,token) => {
+
+  try {
+    
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: "echodatabytes@gmail.com",
+        pass: "ltzoycrrkpeipngi",
+      }
+    });
+    const mailOptions = {
+      from:"echodatabytes@gmail.com",
+      to:email,
+      subject:"For resting you password",
+      html:'<p> Hi ' + username + ', please click here to <a href= "http://localhost:8080/newPass?token='+token+'"> Reset </a> your Password. </p>'  
+    }
+
+    transporter.sendMail(mailOptions,function(error,info){
+      if (error) {
+        console.log(error);
+      }
+      else{
+        console.log("email has been sent:- ", info.response)
+      }
+    });
+     
+    
+  } catch (error) {
+    console.log(error.message)
+  }
+
+
+}
+
+
+
 exports.loadForget = (req,res) => {
   try {
     console.log("Sending forgetPass.html from router");
@@ -139,14 +177,30 @@ exports.loadForget = (req,res) => {
   }
 }
 
+
+
 exports.verifyForget = (req,res)=>{
   try {
-    
+
+    // const token = jwt.sign({ id: user.id },
+    //   config.secret,
+    //   {
+    //     algorithm: 'HS256',
+    //     allowInsecureKeySizes: true,
+    //     expiresIn: 86400, // 24 hours
+    //   });
+    // req.session.token = token;
+
+
+
+
+
+    const { verifyToken } = require('./middleware/authJwt');
     const emailToCheck = req.body.email;
     const userData = User.findOne({email:emailToCheck});
     if (userData) {
       res.send("Success");
-      // res.getElementById("demo").innerHTML = "Success";
+      send_email(userData.username,userData.email,verifyToken)
     }
     else{
       const errorMessage = "User not found.";
@@ -158,3 +212,38 @@ exports.verifyForget = (req,res)=>{
     console.log(error.message);
   }
 }
+
+
+
+
+
+
+
+
+
+// exports.loadNewPass = (req,res)=>{
+
+//   try {
+//     const token = req.query.token;
+//     const tokenData = User.findOne({token:token});
+//     if (tokenData) {
+//       res.status(200).sendFile(path.join(__dirname, '../public/newPass.html'));
+//     }
+//   } catch (error) {
+//     console.log(error.message);
+//   }
+// }
+
+// exports.makeNewPass = async(req,res)=>{
+//   try {
+//     const password = req.body.password;
+//     const user_id = req.body.user_id;
+
+//     const passwordhash = await bcrypt.hashSync(password,8);
+//     db.user.findByIdAndUpdate()
+//     User.findByIdAndUpdate({});
+
+//   } catch (error) {
+//     console.log(error.message);
+//   }
+// }

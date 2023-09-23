@@ -26,4 +26,10 @@ module.exports = function(app) {
   app.post("/api/auth/verifyForget", controller.verifyForget);
 
   app.get("/forgetPass",controller.loadForget);
+
+  app.post("/forgetPass",controller.verifyForget);
+
+  app.get("/newPass", controller.loadNewPass);
+
+  app.post("/newPass", controller.makeNewPass);
 };
