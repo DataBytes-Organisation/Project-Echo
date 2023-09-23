@@ -3972,6 +3972,19 @@
       ],
       "img": ""
     },
+    {
+      "species": "Chrysococcyx minutillus",
+      "common": "Little Bronze Cuckoo",
+      "summary": "The Little Bronze Cuckoo, scientifically known as Chrysococcyx minutillus, is a petite and enchanting bird species found across parts of Southeast Asia and Northern Australia. Despite its small size, this cuckoo is known for its striking iridescent plumage and its unique reproductive strategy, which involves laying its eggs in the nests of other bird species.",
+      "description": [
+        "Little Bronze Cuckoos have a distinctive bronze-green iridescent sheen on their plumage, which can shimmer in the sunlight, making them a visually stunning bird to behold.",
+        "They are brood parasites, meaning that they do not build their own nests but lay their eggs in the nests of other bird species, often leaving their young to be raised by unwitting foster parents.",
+        "Their preferred hosts for egg-laying include various species of fairywrens and thornbills.",
+        "These cuckoos are migratory birds, spending their winters in northern Australia and their breeding season in parts of Southeast Asia, where they can be heard singing melodious, high-pitched calls.",
+        ""
+      ],
+      "img": ""
+    },  
         {
             "species": "Gerygone mouki",
             "common": "Brown Gerygone",
