@@ -143,7 +143,8 @@ app.get('/donations', async(req,res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 })
-
+//This endpoint retrieves the donation amounts from the associated stripe account
+//it adds up the amounts to return a cumulative total. Used on admin dashboard.
 app.get('/cumulativeDonations', async(req, res) => {
   let cumulativeTotal = 0;
   try{
