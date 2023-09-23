@@ -33,7 +33,7 @@
   "commonName": "Feral Goat",
   "type": "Mammal",
   "status": "Invasive",
-  "diet": "herbivore"
+  "diet": "Herbivore"
 },{
   "_id": "Colluricincla Harmonica",
   "commonName": "Grey Shrikethrush",
