@@ -30,17 +30,16 @@ exports.guestsignup = async (req) => {
 };
 
 
-exports.signout = async (req, res) => {
+exports.signout = async (req, res, next) => {
   try {
-    req.session = null;
-    await client.set("JWT", null, (err, res)=> {
+    await client.del("JWT", (err, res)=> {
       if (err) {
         console.log("Remove JWT Token error: ", err)
       } else {
         console.log("Remove JWT successfully: ")
       }
     })
-    await client.set("Roles", null, (err, res)=> {
+    await client.del("Roles", (err, res)=> {
       if (err) {
         console.log("Remove Roles Token error: ", err)
       } else {
@@ -49,6 +48,6 @@ exports.signout = async (req, res) => {
     })
     return res.status(200).send('<script> alert("User logout successfully!"); window.location.href = "/login"</script>')
   } catch (err) {
-    this.next(err);
+    next(err);
   }
 };
