@@ -3958,9 +3958,20 @@
         ""
       ],
       "img": ""
-    }
-  
-        
+    },
+    {
+      "species": "Caprimulgus macrurus",
+      "common": "Large-tailed Nightjar",
+      "summary": "The Large-tailed Nightjar, scientifically known as Caprimulgus macrurus, is a nocturnal bird species found in various parts of Asia, including India, Southeast Asia, and parts of China. This cryptic bird is well adapted to its nocturnal lifestyle, with intricate plumage that provides excellent camouflage during the day.",
+      "description": [
+        "Large-tailed Nightjars are masters of camouflage, relying on their cryptic appearance and sitting motionless during the day to avoid detection by predators.",
+        "They are primarily insectivorous, feeding on a diet of moths, beetles, and other flying insects captured in flight during their nightly forays.",
+        "During the breeding season, males engage in aerial displays, including wing-clapping and distinctive calls, to attract females.",
+        "These nightjars are named for their distinctive long, tapered tail feathers, which can be seen during flight and are a key identifying feature.",
+        ""
+      ],
+      "img": ""
+    },
         {
             "species": "Gerygone mouki",
             "common": "Brown Gerygone",
