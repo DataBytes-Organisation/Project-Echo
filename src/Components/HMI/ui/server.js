@@ -369,7 +369,9 @@ app.post("/request_access", async (req, res) => {
   }
 })
 
-
+app.post("/signout", (req, res) => {
+  controller.signout(req.session);
+})
 
 // routes
 require('./routes/auth.routes')(app);

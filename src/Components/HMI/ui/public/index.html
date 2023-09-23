@@ -146,6 +146,7 @@
             <a id="mic-popup-menu-btn" class="tabs-button" onclick="openTab('mic-popup')"></a>
             <a id="FAQ-menu-btn" class="tabs-button" onclick="openTab('FAQ')"></a>
             <a id="donate-menu-btn" class="tabs-button" onclick="openTab('donate')"></a>
+            <a id="user-profile-button" class="tabs-button" onclick="openTab('userProfile')"></a>
             <!--<a id="stats-menu-btn" class="tabs-button" onclick="openTab('statistics')"></a>-->
             <span id="pink-line" class="sudden-line"></span>
 			<!-- <span style="position: fixed; border-top: 6px solid rgba(247, 186, 206, 0.8); height: 2px; width: 440; margin-top: 36px;"></span> -->
@@ -191,6 +192,18 @@
                       </p>
                 </div>
               </div>
+
+              <div id="userProfile">
+                <div class="wrapper">
+                  <form action="/signout" method="POST">
+                  <div id="userProfile-contents">
+                    <h2>User Profile</h2>
+                    <center><button type="submit">Logout</button></center>
+                  </div>
+                </form>
+                </div>
+              </div>
+
               <div class="dropdown">
                 <button class="btn btn-secondary dropdown-toggle btn-no-background" id="data_src_toggle" data-bs-toggle="dropdown" aria-expanded="false">
                   Data Sourcing and Pooling
@@ -958,6 +971,9 @@
         break;
       case "statistics":
         document.getElementById("stats-menu-btn").classList.add("active");
+        break;
+      case "userProfile":
+        document.getElementById("user-profile-button").classList.add("active");
         break;
     }
     if (tab != null){
