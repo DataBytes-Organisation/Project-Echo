@@ -1411,9 +1411,9 @@
 },{
   "_id": "Centropus phasianinus",
   "commonName": "Pheasant Coucal",
-  "type": "",
-  "status": "",
-  "diet": ""
+  "type": "Bird",
+  "status": "Least Concern",
+  "diet": "Carnivore"
 },{
   "_id": "",
   "commonName": "Spotted Nightjar",
