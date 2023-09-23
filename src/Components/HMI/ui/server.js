@@ -82,6 +82,8 @@ app.use(express.json({limit: '10mb'}));
 //   }
 // }
 
+//This API endpoint is fetched when the user clicks the donate button.
+//This endpoint generates a new checkout session using Stripe.
 app.post("/api/create-checkout-session", async (req, res) => {
   try {
     console.log(req.body.items);
@@ -98,6 +100,7 @@ app.post("/api/create-checkout-session", async (req, res) => {
             product_data: {
               name: storeItem.name,
             },
+            //Conversion
             unit_amount: item.quantity * 100,
           },
           quantity: 1,
