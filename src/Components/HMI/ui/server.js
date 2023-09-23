@@ -113,6 +113,8 @@ app.post("/api/create-checkout-session", async (req, res) => {
   }
 })
 
+//This API endpoint fetches the "charges", AKA donations, from the Stripe account.
+//It returns a json object of all the charges
 app.get('/donations', async(req,res) => {
   let charges;
   try{
