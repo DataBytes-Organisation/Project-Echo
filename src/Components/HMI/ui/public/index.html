@@ -147,7 +147,6 @@
             <a id="FAQ-menu-btn" class="tabs-button" onclick="openTab('FAQ')"></a>
             <a id="donate-menu-btn" class="tabs-button" onclick="openTab('donate')"></a>
             <a id="user-profile-button" class="tabs-button" onclick="openTab('userProfile'); fetchUser()"></a>
-            <!--<a id="stats-menu-btn" class="tabs-button" onclick="openTab('statistics')"></a>-->
             <span id="pink-line" class="sudden-line"></span>
           </div>
           <div id="FAQ">
@@ -937,20 +936,11 @@
 	document.getElementById("pink-line").style.width = "0px";
     closeTab()
   }
+  
+  //Populate User profile based with username and email variable
   function fetchUser() {
-    fetch("/user_profile")
-      .then(res => {
-        if (res.ok) return res.json()
-        return res.json().then(json => Promise.reject(json))
-      })
-      .then( userData => {
-        console.log("User profile data: ", userData)
-        document.getElementById("username").innerText = `${userData.username}`
-        document.getElementById("useremail").innerText = `${userData.email}`
-      }) 
-      .catch(e => {
-        console.error(e.error)
-      })
+        document.getElementById("username").innerText = `${username}`
+        document.getElementById("useremail").innerText = `${email}`
   }
 
   function openTab(tab) {
@@ -973,9 +963,6 @@
         break;
       case "mic-popup":
         document.getElementById("mic-popup-menu-btn").classList.add("active");
-        break;
-      case "statistics":
-        document.getElementById("stats-menu-btn").classList.add("active");
         break;
       case "userProfile":
         document.getElementById("user-profile-button").classList.add("active");
@@ -1265,6 +1252,8 @@ notificationClose.addEventListener('click', hideNotification);
 let username;
 let email;
 
+//This function fetches the user email and username. It stores them as variables client side so that 
+// They can be used for forms, and the user profile
 function getUser(){
   fetch("/user_profile")
       .then(res => {
