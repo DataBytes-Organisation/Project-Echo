@@ -146,16 +146,8 @@
             <a id="mic-popup-menu-btn" class="tabs-button" onclick="openTab('mic-popup')"></a>
             <a id="FAQ-menu-btn" class="tabs-button" onclick="openTab('FAQ')"></a>
             <a id="donate-menu-btn" class="tabs-button" onclick="openTab('donate')"></a>
-            <!--<a id="stats-menu-btn" class="tabs-button" onclick="openTab('statistics')"></a>-->
             <span id="pink-line" class="sudden-line"></span>
-			<!-- <span style="position: fixed; border-top: 6px solid rgba(247, 186, 206, 0.8); height: 2px; width: 440; margin-top: 36px;"></span> -->
           </div>
-            <!--div id="statistics">
-              <div class="wrapper">
-                <div id="statistics-contents">
-                </div>
-              </div>
-            </div-->
           <div id="FAQ">
             <div class="wrapper">
               <div id="FAQ-contents">
@@ -340,7 +332,6 @@
                     <p class="image-amount">50</p>
                   </div>
                 </div>
-                <!-- TO ADD - ENTER CUSTOM DONATION AMOUNT HERE --->
                 <!-- Donation amount display -->
                 <div class="lightbulb-container" style="text-align: center;">
                   <img src="./images/Your Amount.png" alt="Light Bulb">
@@ -956,9 +947,6 @@
       case "mic-popup":
         document.getElementById("mic-popup-menu-btn").classList.add("active");
         break;
-      case "statistics":
-        document.getElementById("stats-menu-btn").classList.add("active");
-        break;
     }
     if (tab != null){
       if (currentTab != document.getElementById(tab)){
@@ -971,7 +959,6 @@
   }
 
   function closeTab() {
-    //console.log("Closing Current Tab")
     currentTab.style.width = "0%"
     currentTab.style.height = "0%"
   }
@@ -1160,12 +1147,12 @@ requestButton.addEventListener('click', () => {
   editFormWrapper.style.display = "";
   console.log("Request edit button clicked.");
   content = markupDetails.innerHTML;
-  // Split the content using the '|' delimiter
+  //Split the content using the '|' delimiter
   items = content.split('|');
 
-  // Trim whitespace from each item
+  //Trim whitespace from each item
   trimmedItems = items.map(item => item.trim());
-  // Access the third item (index 2) after trimming
+  //Access the third item (index 2) after trimming
   currentStatus = trimmedItems[2];
   console.log(currentStatus);
   //console.log("Third item:", thirdItem);

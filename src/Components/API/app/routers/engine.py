@@ -77,3 +77,10 @@ def list_species_data(species: str = "", event_start: str = "", event_end: str =
         headers={"Content-Disposition": f"attachment; filename=data.csv"})
 
 
+@router.get("/algorithms_data", response_description="returns the running list of algorithm data")
+def filter_name():
+    algorithm_name = {'Echo-Engine' : "Echo-Engine-Algorithm", 'Echo-Simulator' : "Echo-Simulator-Algorithm", 
+                      'Echo-search' : "Echo-Search-Algorithm", 'Echo-lookup' : "Echo-lookup-Algorithm" }
+    return algorithm_name
+
+
