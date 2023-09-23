@@ -121,7 +121,7 @@
       const dataBody = document.getElementById('data-body');
   
       
-  
+    //Update the table
     function updateTable(){
       fetch('/api/requests')
           .then(response => response.json())
@@ -159,6 +159,7 @@
     });
   }
   
+  //Clear Table
   function clearTable() {
     const dataBody = document.getElementById('data-body');
     dataBody.innerHTML = ''; // Remove all rows
@@ -204,8 +205,6 @@
               .then(data => {
                   // Handle the response data
                   console.log('Request status updated:', data);
-                  // clearTable();
-                  // updateTable();
               })
               .catch(error => {
                   console.error('Error updating request status:', error);
