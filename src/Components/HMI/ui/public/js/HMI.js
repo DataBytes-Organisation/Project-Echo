@@ -845,7 +845,7 @@ function addmicrophones(hmiState) {
   addMicrophonesByLayer(hmiState, "mic_layer_2", "./../images/Microphone - 3-ai-2.png");
   addMicrophonesByLayer(hmiState, "mic_layer_1", "./../images/Microphone - 3-ai-1.png");
   */
-  addMicrophonesByHiddenLayer(hmiState, "mic_layer", "./../images/mic2.png");
+  addMicrophonesByHiddenLayer(hmiState, "mic_layer", "./../images/1-01.png");
 }
 
 export function enableMicAnimation(hmiState){
