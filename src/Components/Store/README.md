@@ -1,13 +1,16 @@
 ## Project Otways Dataset
 
-There are currently 3 versions of this dataset up on Google Cloud Storage. They are as the following:
+There are currently 5 versions of this dataset up on Google Cloud Storage. They are as the following:
 
-|  	bucket name | description  |
-|---|---|
-| project_echo_bucket_1    | This is a raw dump of all scraped data. Currently containing ALA and mammals datasets    |
-| project_echo_bucket_2    | This is a bucket containing unedited training data for the 15 Otway species   |
-| project_echo_bucket_3    | This is a bucket containing audio clips of up to 10s each with sliences filtered out   |
-| project_echo_birdclef    | Birdclef 2022 dataset for testing purposes  |
+project_echo_bucket 1-: Sim data is uploaded here, number of species must match training species = 122, folder names are scientific species names. 
+
+project_echo birdclef / project_echo_bucket 2-: Training data is uploaded here = 122 DO NOT MIX WITH SIM DATA. 
+
+project_echo_bucket 3-: This bucket contains segmented data = 227.
+
+project_echo_bucket 4-: This bucket contains all the full length audio we have collected > 440 species 
+
+project_echo_bucket 5-: This bucket contains cleaned up audio legacy data clips of up to 10s each with silences filtered out (currently in bucket 3).  
 
 Google Cloud Project name: sit-23t1-project-echo-25288b9
 
