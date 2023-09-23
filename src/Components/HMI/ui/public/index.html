@@ -1142,6 +1142,8 @@ const markupDetails = document.getElementById("markup_details");
 const newStatus = document.getElementById("selectNCS");
 const conservationButtons = document.getElementById("dropdownContentNCS"); 
 const dropdownOptions = document.getElementById("dropdownContentNCS");
+
+//Load the request form for the user to fill out
 requestButton.addEventListener('click', () => {
 
   editFormWrapper.style.display = "";
@@ -1306,6 +1308,8 @@ function checkFields(){
 
 }
 
+//Once the submission exits, the form resets it's values so that the form 
+//can be empty if the user chooses to request an edit for another animal
 function exitSubmission(){
   currentStatus = "";
   source = "";
