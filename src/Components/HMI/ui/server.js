@@ -489,6 +489,9 @@ app.patch('/api/requests/:id', async (req, res) => {
   }
 });
 
+//API endpoint is responsible for patching the conservation status
+//Of the animal within a edit request submission with the new conservation status
+//that the request includes.
 app.patch('/api/updateConservationStatus/:animal', async (req, res) => {
   const requestAnimal = req.params.animal;
   const newStatus = req.body.status;
@@ -516,7 +519,7 @@ app.patch('/api/updateConservationStatus/:animal', async (req, res) => {
     res.status(500).send({ error: 'Error updating species status' });
   }
 });
-
+//Fetch the requests for the admin dashboard
 app.get('/api/requests', async (req, res) => {
   try {
 
