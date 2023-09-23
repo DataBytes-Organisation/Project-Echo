@@ -27,9 +27,6 @@ const rootDirectory = __dirname; // This assumes the root directory is the curre
 //Security verification for email account and body content validation:
 const validation = require('deep-email-validator')
 
-
-// getAllPayments();
-
 const storeItems = new Map([[
   1, { priceInCents: 100, name: "donation"}
 ]])
