@@ -146,7 +146,7 @@
             <a id="mic-popup-menu-btn" class="tabs-button" onclick="openTab('mic-popup')"></a>
             <a id="FAQ-menu-btn" class="tabs-button" onclick="openTab('FAQ')"></a>
             <a id="donate-menu-btn" class="tabs-button" onclick="openTab('donate')"></a>
-            <a id="user-profile-button" class="tabs-button" onclick="openTab('userProfile')"></a>
+            <a id="user-profile-button" class="tabs-button" onclick="openTab('userProfile'); fetchUser()"></a>
             <!--<a id="stats-menu-btn" class="tabs-button" onclick="openTab('statistics')"></a>-->
             <span id="pink-line" class="sudden-line"></span>
 			<!-- <span style="position: fixed; border-top: 6px solid rgba(247, 186, 206, 0.8); height: 2px; width: 440; margin-top: 36px;"></span> -->
@@ -198,8 +198,8 @@
                   <form action="/api/auth/signout" method="POST">
                   <div id="userProfile-contents">
                     <h2>User Profile</h2>
-                    <h3 id="display_name">Username: </h3>
-                    <h3 id="display_mail">Email: </h3>
+                    <h3 id="display_name">Username: <span id="username"></span></h3>
+                    <h3 id="display_mail">Email: <span id="useremail"></span></h3>
                     <center><button type="submit">Logout</button></center>
                   </div>
                 </form>
@@ -948,6 +948,21 @@
     hamburgerStatus = false;
 	document.getElementById("pink-line").style.width = "0px";
     closeTab()
+  }
+  function fetchUser() {
+    fetch("/user_profile")
+      .then(res => {
+        if (res.ok) return res.json()
+        return res.json().then(json => Promise.reject(json))
+      })
+      .then( userData => {
+        console.log("User profile data: ", userData)
+        document.getElementById("username").innerText = `${userData.username}`
+        document.getElementById("useremail").innerText = `${userData.email}`
+      }) 
+      .catch(e => {
+        console.error(e.error)
+      })
   }
 
   function openTab(tab) {

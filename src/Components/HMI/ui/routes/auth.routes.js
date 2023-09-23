@@ -80,6 +80,13 @@ module.exports = function (app) {
             console.log("Set User roles successfully: ", res)
           }
         })
+        await client.set("Users", JSON.stringify(axiosResponse.data.user), (err, res)=> {
+          if (err) {
+            console.log("Set User Roles Token error: ", err)
+          } else {
+            console.log("Set User roles successfully: ", res)
+          }
+        })
         res.status(200).send(
         `<script> 
           alert("Login Successfully");

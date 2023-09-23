@@ -270,6 +270,7 @@ def signin(user: schemas.UserLoginSchema):
     #Create JWT token using user info
     jwtToken = signJWT(user=account, authorities=authorities)
     
+    #Get info for users profile:
     #Assign the session token with JWT
     requests.session.token = jwtToken
     result = {
@@ -280,7 +281,7 @@ def signin(user: schemas.UserLoginSchema):
     }
 
     #Set up response (FOR TESTING ONLY)
-    response = {"message": "User Login Successfully!", "tkn" : jwtToken, "roles": authorities}
+    response = {"message": "User Login Successfully!", "tkn" : jwtToken, "roles": authorities, 'user': result}
 
     #Log result
     print(result)
