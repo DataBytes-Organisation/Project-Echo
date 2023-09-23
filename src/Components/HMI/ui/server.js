@@ -411,7 +411,7 @@ app.get("/admin-template", (req,res)=> {
 app.get("/admin-donations", (req, res) => {
   return res.sendFile(path.join(__dirname, 'public/admin/donations.html'));
 })
-
+//Get login page
 app.get("/login", (req, res) => {
   res.sendFile(path.join(__dirname, 'public/login.html'));
 })
