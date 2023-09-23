@@ -274,7 +274,6 @@ def signin(user: schemas.UserLoginSchema):
     #Assign the session token with JWT
     requests.session.token = jwtToken
     result = {
-        "id": account["_id"],
         "username": account["username"],
         "email": account["email"],
         "role" : authorities,
