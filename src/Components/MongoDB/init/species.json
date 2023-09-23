@@ -1456,4 +1456,10 @@
   "type": "Bird",
   "status": "Least Concern",
   "diet": "Insectivore"
+},{
+  "_id": "Large-tailed Nightjar",
+  "commonName": "Caprimulgus macrurus",
+  "type": "Bird",
+  "status": "Least Concern",
+  "diet": "Insectivore"
 }]
