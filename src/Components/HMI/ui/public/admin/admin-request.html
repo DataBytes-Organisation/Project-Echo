@@ -180,35 +180,7 @@
           console.log("Request ID select:   ", requestId)
           console.log("Changing status to:  ", modified)
       
-          //Perform API call to update the status
-          fetch(`/api/requests/${requestId}`, {
-              method: 'PATCH',
-              headers: {
-                  'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({
-                  status: 'approved'
-              })
-              })
-              .then(response => {
-                  if (!response.ok) {
-                  throw new Error('Network response was not ok');
-                  }
-                  // Return response text if the content type is not JSON
-                  const contentType = response.headers.get('content-type');
-                  if (contentType && contentType.indexOf('application/json') !== -1) {
-                  return response.json();
-                  } else {
-                  return response.text();
-                  }
-              })
-              .then(data => {
-                  // Handle the response data
-                  console.log('Request status updated:', data);
-              })
-              .catch(error => {
-                  console.error('Error updating request status:', error);
-           });
+          
   
            
            fetch(`/api/updateConservationStatus/${animal}`, {
@@ -240,6 +212,37 @@
               })
               .catch(error => {
                   console.error('Error updating request status:', error);
+           });
+
+           //Perform API call to update the status
+          fetch(`/api/requests/${requestId}`, {
+              method: 'PATCH',
+              headers: {
+                  'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                  status: 'approved'
+              })
+              })
+              .then(response => {
+                  if (!response.ok) {
+                  throw new Error('Network response was not ok');
+                  }
+                  // Return response text if the content type is not JSON
+                  const contentType = response.headers.get('content-type');
+                  if (contentType && contentType.indexOf('application/json') !== -1) {
+                  return response.json();
+                  } else {
+                  return response.text();
+                  }
+              })
+              .then(data => {
+                  // Handle the response data
+                  console.log('Request status updated:', data);
+              })
+              .catch(error => {
+                  console.error('Error updating request status:', error);
+                  return;
            });
   
       
@@ -277,6 +280,7 @@
                   })
                   .catch(error => {
                       console.error('Error updating request status:', error);
+                      return;
            });
         clearTable();
         updateTable();
