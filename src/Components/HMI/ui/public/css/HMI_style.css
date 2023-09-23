@@ -230,9 +230,7 @@ body{
   #mic-popup{
     max-width: 520px;
   }
-  #mic-popup{
-    max-width: 520px;
-  }
+
 }
 #notification {
   position: fixed;
