@@ -959,7 +959,6 @@
   }
 
   function closeTab() {
-    //console.log("Closing Current Tab")
     currentTab.style.width = "0%"
     currentTab.style.height = "0%"
   }
@@ -1148,12 +1147,12 @@ requestButton.addEventListener('click', () => {
   editFormWrapper.style.display = "";
   console.log("Request edit button clicked.");
   content = markupDetails.innerHTML;
-  // Split the content using the '|' delimiter
+  //Split the content using the '|' delimiter
   items = content.split('|');
 
-  // Trim whitespace from each item
+  //Trim whitespace from each item
   trimmedItems = items.map(item => item.trim());
-  // Access the third item (index 2) after trimming
+  //Access the third item (index 2) after trimming
   currentStatus = trimmedItems[2];
   console.log(currentStatus);
   //console.log("Third item:", thirdItem);
