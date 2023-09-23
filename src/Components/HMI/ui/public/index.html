@@ -2,7 +2,7 @@
   <head>
     <!-- Imports -->
     <meta charset="UTF-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+	<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1"> 
     <!-- Open Layers -->
     <link
       rel="stylesheet"
@@ -146,8 +146,9 @@
             <a id="mic-popup-menu-btn" class="tabs-button" onclick="openTab('mic-popup')"></a>
             <a id="FAQ-menu-btn" class="tabs-button" onclick="openTab('FAQ')"></a>
             <a id="donate-menu-btn" class="tabs-button" onclick="openTab('donate')"></a>
-            <!--a id="stats-menu-btn" class="tabs-button" onclick="openTab('statistics')"></a--> <!-- New tab -->
-            <span style="position: fixed; border-top: 6px solid rgba(247, 186, 206, 0.8); height: 2px; width: 440; margin-top: 36px;"></span>
+            <!--<a id="stats-menu-btn" class="tabs-button" onclick="openTab('statistics')"></a>-->
+            <span id="pink-line" class="sudden-line"></span>
+			<!-- <span style="position: fixed; border-top: 6px solid rgba(247, 186, 206, 0.8); height: 2px; width: 440; margin-top: 36px;"></span> -->
           </div>
             <!--div id="statistics">
               <div class="wrapper">
@@ -896,7 +897,14 @@
   }
 
   var hamburgerStatus = false;
-  var currentTab = document.getElementById('filter-menu'); 
+  var currentTab = document.getElementById('filter-menu');
+
+	if(hamburgerStatus == false){
+	  document.getElementById("pink-line").style.width = "0px";
+	}
+	else {
+	  document.getElementById("pink-line").style.width = "100vw";
+	}  
 
   function toggleNav() {
     var hamburger = document.querySelector('.hamburger-icon');
@@ -912,16 +920,18 @@
   }
   
   function openMenu() {
-    document.getElementById("menu").style.width = "550px";
+    document.getElementById("menu").style.width = "100vw";
     document.getElementById("menu").style.height = "100%";
     hamburgerStatus = true;
     openTab("filter-menu")
+	document.getElementById("pink-line").style.width = "100vw";
   }
 
   function closeMenu() {
     document.getElementById("menu").style.width = "0%";
     document.getElementById("menu").style.height = "0%";
     hamburgerStatus = false;
+	document.getElementById("pink-line").style.width = "0px";
     closeTab()
   }
 
@@ -956,7 +966,7 @@
       }
       currentTab = document.getElementById(tab)
     }
-    currentTab.style.width = "550px";
+    currentTab.style.width = "100vw";
     currentTab.style.height = "90%";
   }
 
