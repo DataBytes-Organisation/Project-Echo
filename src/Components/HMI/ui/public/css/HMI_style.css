@@ -249,19 +249,19 @@ body{
     max-width: 100vw;
     overflow-y: hidden;
   }
-  #filter-menu, #animal-popup, #FAQ, #SIM, #donate, #mic-popup, #mic-popup {
+  #filter-menu, #animal-popup, #FAQ, #SIM, #donate, #mic-popup {
     overflow-y: hidden;
   }
 }
 
 @media only screen and (min-width: 600px) and (max-width: 1050px) and (orientation: portrait) { /* Tablet vers. (Portrait) */
-  #filter-menu, #animal-popup, #FAQ, #SIM, #donate, #mic-popup, #mic-popup {
+  #filter-menu, #animal-popup, #FAQ, #SIM, #donate, #mic-popup {
     max-width: 100vw;
   }
 }
 
 @media only screen and (max-width: 930px) and (orientation: landscape) { /* Mobile vers. (Landscape) */
-  #menu, #filter-menu, #animal-popup, #FAQ, #SIM, #donate, #statistics, #mic-popup, #mic-popup {
+  #menu, #filter-menu, #animal-popup, #FAQ, #SIM, #donate, #mic-popup {
     overflow-y: hidden;
   }
 }
