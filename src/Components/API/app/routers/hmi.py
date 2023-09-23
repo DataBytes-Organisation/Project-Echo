@@ -514,3 +514,19 @@ def forgotpassword(user: schemas.ForgotPasswordSchema):
     
     response = {"message": "User not Found!"}
     return JSONResponse(content=response, status_code = 404)
+
+
+# Get request for filter algorithm phase 1
+
+@router.get("/filter_algorithm/{algorithm_type}", status_code=status.HTTP_200_OK, response_description="returns the running filter algorithm name")
+def filter_name(algorithm_type : str):
+    try:
+        algorithms_running = requests.get("http://ts-api-cont:9000/engine/algorithms_data")
+        algorithm_name = algorithms_running.json()[algorithm_type]
+        if(algorithm_name is not None):
+            response = {"message": algorithm_name}
+            return JSONResponse(content=response, status_code=200) 
+    except Exception as e:
+        return JSONResponse({"error" : "Algorithm not Found - {}".format(e)}, status_code=404)
+        
+    
