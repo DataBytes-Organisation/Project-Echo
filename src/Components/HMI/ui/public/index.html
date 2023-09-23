@@ -1224,21 +1224,25 @@ function hideNotification() {
 notificationClose.addEventListener('click', hideNotification);
 
 function submitRequest(){
+  //Get the inner name of the animal 
   animal = document.getElementById("desc_species").innerHTML;
+  //Let Source equal to what is contained in the citation field
   source = document.getElementById("citationSneeded").value;
+  //get the initial and modified values, these will be used for checks too
   initial = currentStatus;
   modified = newConservationStatus;
   console.log(newConservationStatus);
-  //console.log(currentUser);
-  //console.log(thirdItem);
-  console.log("Source:", source);
-  console.log("Animal:", animal);
-  console.log("New Status: ", modified);
-  console.log("Initial: ", initial);
+  
+  // console.log(currentUser);
+  // console.log(thirdItem);
+  // console.log("Source:", source);
+  // console.log("Animal:", animal);
+  // console.log("New Status: ", modified);
+  // console.log("Initial: ", initial);
+  
+  // Check the fields
 
   checkFields();
-  
-  
 
   if (initial === modified){
     generateVisualResponse("SUBMISSION CANCELLED. New conservation status can't be the same as current status.");
@@ -1290,6 +1294,7 @@ function checkFields(){
   if(source === "" || animalNewStatus === "none"){
     return false
   }
+
 }
 
 function exitSubmission(){
