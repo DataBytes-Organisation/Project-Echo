@@ -1444,4 +1444,10 @@
   "type": "Bird",
   "status": "Least Concern",
   "diet": "Herbivore"
+},{
+  "_id": "Grey Teal",
+  "commonName": "Anas gracilis",
+  "type": "Bird",
+  "status": "Least Concern",
+  "diet": "Omnivore"
 }]
