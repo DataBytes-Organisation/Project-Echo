@@ -1479,6 +1479,7 @@ closeFormButton.addEventListener('click', (event) => {
   hmiState.defaultZoom = 10;
   hmiState.requestInterval = 1000;
   hmiState.layers = {};
+  hmiState.layerPool = 1000;
 
   const microphoneLocations = [
     { lat: -38.808, lon: 143.554, id:1 },
