@@ -305,6 +305,9 @@
       if (totalDonationsElement) {
         totalDonationsElement.innerHTML = `Total Donations: $${data.cumulativeTotal}`;
       }
+      else{
+        totalDonationsElement.innerHTML = "Total Donations: Connect Stripe Account";
+      }
     })
     .catch(error => {
       console.error('Error:', error);
