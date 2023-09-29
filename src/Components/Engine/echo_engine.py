@@ -548,8 +548,8 @@ class EchoEngine():
             outputs = yamnet(frame_data)
             yamnet_prediction = np.mean(outputs[0], axis=0)
             top2_i = np.argsort(yamnet_prediction)[::-1][:2]
-
-            if any(cls in animal_related_classes for cls in [yamnet_classes[top2_i[0]], yamnet_classes[top2_i[1]]]):
+            threshold=0.2
+            if any(yamnet_prediction[np.where(yamnet_classes == cls)[0][0]] >= threshold for cls in animal_related_classes if cls in yamnet_classes):
                 if start_time is None:
                     start_time = cnt
                 buffer.append(frame_data)
@@ -597,7 +597,7 @@ class EchoEngine():
         data = data.astype(np.float32)
 
         return df, data
-
+    
     def generate_random_location(self, lat, lon, min_distance, max_distance):
         # Generate a random direction in radians (0 to 2*pi)
         random_direction = random.uniform(0, 2 * 3.14159265359)

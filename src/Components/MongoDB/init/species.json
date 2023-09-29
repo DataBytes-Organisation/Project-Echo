@@ -59,7 +59,7 @@
   "status": "Least Concern",
   "diet": "Carnivore"
 },{
-  "_id": "Felis Catus",
+  "_id": "Felis catus",
   "commonName": "Cat",
   "type": "Mammal",
   "status": "Invasive",
@@ -1450,4 +1450,11 @@
   "type": "Bird",
   "status": "Least Concern",
   "diet": "Insectivore"
-}]
+},{
+  "_id": "Canis lupus dingo",
+  "commonName": "Dingo",
+  "type": "Mammal",
+  "status": "Threatened",
+  "diet": "Carnivore"
+}
+]

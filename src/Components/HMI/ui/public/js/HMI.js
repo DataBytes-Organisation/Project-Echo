@@ -16,7 +16,7 @@ var markups = ["elephant.png", "monkey.png", "tiger.png"];
 
 const EARTH_RADIUS = 6371000;
 const MIC_DETECTION_RANGE = 300;
-const MAX_RECORDING_TIME_S = "15";
+const MAX_RECORDING_TIME_S = "20";
 const DEG_TO_RAD = (Math.PI / 180);
 const RAD_TO_DEG = (180 / Math.PI);
 
@@ -699,14 +699,20 @@ function addAllVocalizationFeatures(hmiState) {
 
     let layerName = deriveLayerName(entry.animalStatus,entry.animalType);
     let layer = findMapLayerWithName(hmiState, layerName);
-    let layerSource = layer.getSource();
+    if(layer){
+      let layerSource = layer.getSource();
 
-    //console.log(layerName);
-    //console.log("animal type: ", entry.speciesScientificName);
+      //console.log(layerName);
+      //console.log("animal type: ", entry.speciesScientificName);
+  
+      layerSource.addFeature(evtLocation);
+      layer.getSource().changed();
+      layer.changed();
+    }
+    else{
+      console.log(layerName);
+    }
 
-    layerSource.addFeature(evtLocation);
-    layer.getSource().changed();
-    layer.changed();
   }
 }
 
@@ -757,14 +763,19 @@ function addNewVocalizationFeatures(hmiState, events) {
 
     let layerName = deriveLayerName(entry.animalStatus,entry.animalType);
     let layer = findMapLayerWithName(hmiState, layerName);
-    let layerSource = layer.getSource();
+    if(layer){
+      let layerSource = layer.getSource();
 
-    //console.log(layerName);
-    //console.log("animal type: ", entry.speciesScientificName);
-
-    layerSource.addFeature(evtLocation);
-    layer.getSource().changed();
-    layer.changed();
+      //console.log(layerName);
+      //console.log("animal type: ", entry.speciesScientificName);
+  
+      layerSource.addFeature(evtLocation);
+      layer.getSource().changed();
+      layer.changed();
+    }
+    else{
+      console.log(layerName);
+    }
   }
 }
 
