@@ -302,11 +302,13 @@
     .then(data => {
       // Update the content of the "totalDonations" element
       const totalDonationsElement = document.getElementById('totalDonations');
-      if (totalDonationsElement) {
-        totalDonationsElement.innerHTML = `Total Donations: $${data.cumulativeTotal}`;
+      if (data === 0) {
+        totalDonationsElement.innerHTML = "Total Donations: Connect Stripe Account";
+        // totalDonationsElement.innerHTML = `Total Donations: $${data.cumulativeTotal}`;
       }
       else{
-        totalDonationsElement.innerHTML = "Total Donations: Connect Stripe Account";
+        totalDonationsElement.innerHTML = `Total Donations: $${data.cumulativeTotal}`;
+        // totalDonationsElement.innerHTML = `Total Donations: Connect Stripe Account`;
       }
     })
     .catch(error => {
