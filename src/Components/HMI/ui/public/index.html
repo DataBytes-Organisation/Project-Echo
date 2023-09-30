@@ -190,8 +190,29 @@
                   <form action="/api/auth/signout" method="POST">
                   <div id="userProfile-contents">
                     <h2>User Profile</h2>
-                    <h3 id="display_name">Username: <span id="username"></span></h3>
-                    <h3 id="display_mail">Email: <span id="useremail"></span></h3>
+                    <!-- <h3 id="display_name">Username: <span id="username"></span></h3>
+                    <h3 id="display_mail">Email: <span id="useremail"></span></h3> -->
+                    
+                    <div class="markup_form">
+                      <div class="markup_column">
+                        <div class="markup_row_left">
+                          <div>Username:</div>
+                        </div>
+                        <div class="markup_row_right">
+                          <div id="display_name"> <span id="username"></span></div>
+                        </div>
+                      </div>
+  
+                      <div class="markup_column">
+                        <div class="markup_row_left">
+                          <div>Email:</div>
+                        </div>
+                        <div class="markup_row_right">
+                          <div id="display_mail"> <span id="useremail"></span></div>
+                        </div>
+                      </div>
+                    </div>
+                    
                     <center><button type="submit">Logout</button></center>
                   </div>
                 </form>
