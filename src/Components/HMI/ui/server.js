@@ -132,24 +132,21 @@ app.get('/cumulativeDonations', async(req, res) => {
         });
         firstPage = true;
       }
-      if (firstPage === 1) {
-        charges.data.forEach(charge => {
-          cumulativeTotal += charge.amount;
-        });
-        if (!charges.has_more) {
-          break; // Exit the loop when there are no more pages
-        }
-        nextPage = charges[charges.length() - 1]
-        charges = await stripe.charges.list({
-          limit: 100,
-          starting_next: nextPage
-        });
-        firstPage = true;
-      }
-      else{
-        return 0;
-      }
+      
+    charges.data.forEach(charge => {
+        cumulativeTotal += charge.amount;
+    });
+    if (!charges.has_more) {
+      break; // Exit the loop when there are no more pages
     }
+    nextPage = charges[charges.length() - 1]
+    charges = await stripe.charges.list({
+      limit: 100,
+      starting_next: nextPage
+    });
+      firstPage = true;
+    }
+    
     cumulativeTotal = cumulativeTotal / 100;
     cumulativeTotal = cumulativeTotal.toFixed(2);
     
