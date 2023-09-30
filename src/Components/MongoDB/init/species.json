@@ -1,5 +1,5 @@
 [{ 
-  "_id": "Sus Scrofa",
+  "_id": "Sus scrofa",
   "commonName": "Wild Pig",
   "type": "Mammal",
   "status": "Invasive",
@@ -29,7 +29,7 @@
   "status": "Least Concern",
   "diet": "Omnivore"
 },{
-  "_id": "Capra Hircus",
+  "_id": "Capra hircus",
   "commonName": "Feral Goat",
   "type": "Mammal",
   "status": "Invasive",
@@ -254,7 +254,7 @@
   "_id": "Aphelocephala leucopsis",
   "commonName": "Southern Whiteface",
   "type": "Bird",
-  "status": "Near Threatened",
+  "status": "Near-Threatened",
   "diet": "Omnivore"
 },{
   "_id": "Aprosmictus erythropterus",
@@ -338,7 +338,7 @@
   "_id": "Carterornis leucotis",
   "commonName": "White-eared Night Heron",
   "type": "Bird",
-  "status": "Near Threatened",
+  "status": "Near-Threatened",
   "diet": "Carnivore"
 },{
   "_id": "Ceyx azureus",
@@ -1112,7 +1112,7 @@
   "_id": "Dasyurus maculatus",
   "commonName": "Tiger Quoll",
   "type": "Mammal",
-  "status": "Near Threatened",
+  "status": "Near-Threatened",
   "diet": "Carnivore"
 },{
   "_id": "Pachycephala pectoralis",
@@ -1454,7 +1454,13 @@
   "_id": "Canis lupus dingo",
   "commonName": "Dingo",
   "type": "Mammal",
-  "status": "Threatened",
+  "status": "Near-Threatened",
   "diet": "Carnivore"
+},{
+  "_id": "Uperoleia laevigata",
+  "commonName": "Smooth toadlet",
+  "type": "Amphibian",
+  "status": "Least Concern",
+  "diet": "Insectivore"
 }
 ]
