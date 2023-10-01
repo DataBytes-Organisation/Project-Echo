@@ -385,6 +385,7 @@ class EchoEngine():
                 sample_rate = 16000
                 audio_clip = self.string_to_audio(audio_event['audioClip'])
                 file = io.BytesIO(audio_clip)
+                #wav = 'yamnet_dir/cat-goat-dingo.wav'
                 data_frame, audio_clip = self.sound_event_detection(file, sample_rate)
                 iteration_count = 0
             
@@ -523,7 +524,7 @@ class EchoEngine():
             return [(class_names[top_two_prob_indices[1-i]], top_two_prob_values[1-i]) for i in range(2)]
 
     def sound_event_detection(self, filepath, sample_rate):
-        data, sr = librosa.load(filepath, sr=sample_rate)
+        data, sr = librosa.load(filepath, sr=16000)
         frame_len = int(sr * 1)
         num_chunks = len(data) // frame_len
         chunks = [data[i*frame_len:(i+1)*frame_len] for i in range(num_chunks)]
