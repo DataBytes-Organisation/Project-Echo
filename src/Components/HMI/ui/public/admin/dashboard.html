@@ -302,8 +302,26 @@
     .then(data => {
       // Update the content of the "totalDonations" element
       const totalDonationsElement = document.getElementById('totalDonations');
-      if (totalDonationsElement) {
-        totalDonationsElement.innerHTML = `Total Donations: $${data.cumulativeTotal}`;
+      if (data === 0) {
+        console.log("data does not exists");
+        totalDonationsElement.innerHTML = "Total Donations: Connect Stripe Account";
+        // totalDonationsElement.innerHTML = `Total Donations: $${data.cumulativeTotal}`;
+      }
+      else if(data === undefined){
+        console.log("data is undefined");
+        totalDonationsElement.innerHTML = "Total Donations: Connect Stripe Account";
+      }
+      else{
+        console.log("data exists");
+        console.log(data);
+        if (data.cumulativeTotal === undefined) {
+          console.log("cumulativeTotal is undefined");
+          totalDonationsElement.innerHTML = "Total Donations: Connect Stripe Account";
+        }
+        else{
+          totalDonationsElement.innerHTML = `Total Donations: $${data.cumulativeTotal}`;
+        }
+        // totalDonationsElement.innerHTML = `Total Donations: Connect Stripe Account`;
       }
     })
     .catch(error => {
