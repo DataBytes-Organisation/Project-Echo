@@ -112,8 +112,9 @@ export function initialiseHMI(hmiState) {
   console.log(`initialising`);
   createBasemap(hmiState);
   //console.log("Get sample element from document: ", document.getElementById("menuPanel"))
-  addTruthLayers(hmiState);
   addVocalisationLayers(hmiState);
+  addTruthLayers(hmiState);
+  
   
   for(let i=1; i<26; i++){
     addVectorLayerTopDown(hmiState, `mic_layer_${i}`);
