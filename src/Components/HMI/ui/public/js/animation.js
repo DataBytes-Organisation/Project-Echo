@@ -30,10 +30,8 @@ function fadeAnim(){
     const screen = document.querySelector('.screen');
     const blur = document.getElementById('blur');
     const hamburger = document.querySelector('.hamburger-icon');
-    //const nav = document.getElementById('nav-container');
     screen.classList.toggle('change');
     blur.classList.toggle('change');
-    //nav.style.display = "block";
     setTimeout(()=>{
         hamburger.style.display = "block";
         screen.style.display = "none";

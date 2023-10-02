@@ -6,6 +6,8 @@ RUN apt-get update && apt-get install -y build-essential
 # Copy the model to the container
 COPY models/ ./models/
 
+
+
 # make the container directory for credentials
 RUN mkdir -p ~/.config/gcloud/
 

@@ -4,7 +4,6 @@ click==7.1.2
 dnspython==2.0.0
 email-validator==1.1.2
 fastapi==0.62.0
-flake8==3.8.4
 h11==0.11.0
 idna==2.10
 mccabe==0.6.1
@@ -23,3 +22,9 @@ typing-extensions==3.7.4.3
 uvicorn==0.12.3
 python-dotenv==1.0.0
 paho-mqtt
+bcrypt
+flask
+pyjwt==2.4.0
+requests
+python-decouple
+pandas

@@ -90,7 +90,7 @@
   "timestamp": {
     "$date": "2023-05-13T01:30:49.095Z"
   },
-  "species": "Dama Dama",
+  "species": "Felis Catus",
   "animalId": "YXNKSPR3QU26BNSTRNRENG",
   "animalTrueLLA": [
     -38.7737010391841,

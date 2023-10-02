@@ -1,11 +1,26 @@
 "use strict";
 
 import { getAudioTestString } from "./HMI-utils.js";
+import { getAudioRecorder } from "./audio_recorder.js";
 import { retrieveTruthEventsInTimeRange, retrieveVocalizationEventsInTimeRange, 
-  retrieveMicrophones, retrieveAudio, retrieveSimTime } from "./routes.js";
-import data from "./sample_data.json" assert { type: 'json' };
+  retrieveMicrophones, retrieveAudio, retrieveSimTime, postRecording, 
+  setSimModeAnimal, setSimModeRecording, setSimModeRecordingV2, stopSimulator } from "./routes.js";
+
+  //import data from "./sample_data.json" assert { type: 'json' }; Browser assertions not yet supported in all browsers, alternative method used instead.
+
+
+// import { parse } from 'json2csv';
+
 
 var markups = ["elephant.png", "monkey.png", "tiger.png"];
+
+const EARTH_RADIUS = 6371000;
+const MIC_DETECTION_RANGE = 300;
+const MAX_RECORDING_TIME_S = "20";
+const DEG_TO_RAD = (Math.PI / 180);
+const RAD_TO_DEG = (180 / Math.PI);
+
+var audioRecorder = getAudioRecorder();
 
 var statuses = [
   "endangered",
@@ -22,6 +37,26 @@ function matchStatus(status){
   else{
     return status;
   }
+}
+
+export function convertCSV(json) {
+  if (json == null) return null
+  if (typeof json === undefined | json.length === 0){
+    return null
+  }
+  let data = json;
+  let fields = Object.keys(data[0]);
+  let replacer = function(key, value) { return value === null ? 'N/A' : value } ;
+
+  let csv = null;
+  csv = data.map(function(row){
+    return fields.map(function(fieldName){
+      return JSON.stringify(row[fieldName], replacer)
+    }).join(',')
+  })
+  csv.unshift(fields.join(',')) // add header column
+  csv = csv.join('\r\n');
+  return csv
 }
 
 var statusPrintLookup = {
@@ -58,8 +93,10 @@ function getIconName(status, type){
   return animalTypeIconLookup[type] + statusIconLookup[status] + "-01.png";
 }
 
-var sample_data = data.data;
-
+//var sample_data = data.data; For assertion method
+var sample_data = []; // For the universal method
+fetch("./js/sample_data.json").then(res => res.json()).then(data => sample_data = data.data);
+// Went from 4 lines to 1. This method works on all browsers according to previous tests.
 var animal_data = [];
 
 export var animal_toggled = false;
@@ -75,8 +112,17 @@ export function initialiseHMI(hmiState) {
   console.log(`initialising`);
   createBasemap(hmiState);
   //console.log("Get sample element from document: ", document.getElementById("menuPanel"))
-  addTruthLayers(hmiState);
   addVocalisationLayers(hmiState);
+  addTruthLayers(hmiState);
+  
+  
+  for(let i=1; i<26; i++){
+    addVectorLayerTopDown(hmiState, `mic_layer_${i}`);
+    console.log(`Adding microphone layer:${i}`);
+  }
+  
+  addVectorLayerTopDown(hmiState, "mic_layer");
+  /*
   addVectorLayerTopDown(hmiState, "mic_layer");
   addVectorLayerTopDown(hmiState, "mic_layer_1");
   addVectorLayerTopDown(hmiState, "mic_layer_2");
@@ -87,7 +133,7 @@ export function initialiseHMI(hmiState) {
   addVectorLayerTopDown(hmiState, "mic_layer_7");
   addVectorLayerTopDown(hmiState, "mic_layer_8");
   addVectorLayerTopDown(hmiState, "mic_layer_9");
-
+  */
   addAllTruthFeatures(hmiState);
   addAllVocalizationFeatures(hmiState);
 
@@ -98,12 +144,34 @@ export function initialiseHMI(hmiState) {
     updateMicrophoneLayer(hmiState, res.data);
     stepMicAnimation(hmiState);
   })
-  
+  addmicrophones(hmiState);
+  stepMicAnimation(hmiState);
   queueSimUpdate(hmiState);
   //simulateData(hmiState);
 }
 
 function updateFilters(){
+  
+}
+
+const validEmailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+export function emailValidation(inp){
+  let email_id = inp + "-email-inp";
+  let error_id = inp + "-email-error";
+  let btn_id = inp + "-button"
+  let input_ele = document.getElementById(email_id);
+  let error_ele = document.getElementById(error_id);
+  let btn_ele = document.getElementById(btn_id);
+  console.log("Toggle email: ", input_ele.value)
+  if (input_ele.value.match(validEmailRegex)){
+    error_ele.style.display = 'none';
+    error_ele.innerHTML = '';
+    btn_ele.disabled = false;
+  } else {
+    error_ele.style.display = 'block';
+    error_ele.innerHTML = 'Please insert a valid email address';
+    btn_ele.disabled = true;
+  }
   
 }
 
@@ -210,11 +278,16 @@ export function updateAnimalMovementLayerFromLiveData(hmiState, results){
   for(let evt of updatedMovementEvents){
     let layerName = deriveTruthLayerName(evt.animalStatus, evt.animalType);
     let layer = findMapLayerWithName(hmiState, layerName);
-    const featureToPurge = layer.getSource().getFeatureById(evt.animalId);
-    //console.log(featureToPurge);
-    if(featureToPurge){
-      //console.log("purge lat: " + evt.locationLat + " lon: " + evt.locationLon);
-      layer.getSource().removeFeature(featureToPurge);
+    if(layer){
+      const featureToPurge = layer.getSource().getFeatureById(evt.animalId);
+      //console.log(featureToPurge);
+      if(featureToPurge){
+        //console.log("purge lat: " + evt.locationLat + " lon: " + evt.locationLon);
+        layer.getSource().removeFeature(featureToPurge);
+      }
+      else{
+        console.log(layerName);
+      }
     }
   }
 
@@ -269,6 +342,15 @@ export function clearMicrophoneLayer(){
   let layer = findMapLayerWithName(hmiState, "mic_layer");
   layer.getSource().clear();
 }
+
+/*function commonNameFix(common){
+  if (common == "orange footed scrubfowl"){
+    return "orange-footed scrubfowl"
+  }
+  else{
+    return common;
+  }
+}*/
 
 export function convertJSONtoAnimalMovementEvent(hmiState, data){
   let movementEvent = {};
@@ -341,6 +423,16 @@ export function convertJSONtoMicrophone(hmiState, data){
 
 export function muteAudioAnimation(){
   const mute_audio = new CustomEvent('muteAnimation',{
+    detail: {
+      message: "mute animation"
+    }
+  })
+
+  document.dispatchEvent(mute_audio);
+}
+
+export function muteRecordingPlaybackAnimation(){
+  const mute_audio = new CustomEvent('muteRecordingAnimation',{
     detail: {
       message: "mute animation"
     }
@@ -455,11 +547,11 @@ function addAllTruthFeatures(hmiState) {
     let entry = hmiState.movementEvents[key];
 
     var iconPath = "";
-    if(entry.animalDiet === "herbavore" || entry.animalDiet === "frugivore"){
-      iconPath = './../images/sim/' + getIconName(entry.animalStatus, entry.animalType);
+    if(entry.animalDiet === "insectivore" || entry.animalDiet === "omnivore" || entry.animalDiet === "carnivore"){
+      iconPath = './../images/Predator/sim/' + getIconName(entry.animalStatus, entry.animalType);
     }
     else{
-      iconPath ='./../images/Predator/sim/' + getIconName(entry.animalStatus, entry.animalType);
+      iconPath ='./../images/sim/' + getIconName(entry.animalStatus, entry.animalType);
     }
     
     var trueLocation = new ol.Feature({
@@ -512,11 +604,11 @@ function addNewTruthFeatures(hmiState, events) {
   for (let entry of events) {
     //console.log("True location found!:  ")
     var iconPath = "";
-    if(entry.animalDiet === "herbavore" || entry.animalDiet === "frugivore"){
-      iconPath = './../images/sim/' + getIconName(entry.animalStatus, entry.animalType);
+    if(entry.animalDiet ==="omnivore" || entry.animalDiet === "carnivore" || entry.animalDiet === "insectivore" ){
+      iconPath = './../images/Predator/sim/' + getIconName(entry.animalStatus, entry.animalType);
     }
     else{
-      iconPath ='./../images/Predator/sim/' + getIconName(entry.animalStatus, entry.animalType);
+      iconPath ='./../images/sim/' + getIconName(entry.animalStatus, entry.animalType);
     }
 
     var trueLocation = new ol.Feature({
@@ -608,14 +700,20 @@ function addAllVocalizationFeatures(hmiState) {
 
     let layerName = deriveLayerName(entry.animalStatus,entry.animalType);
     let layer = findMapLayerWithName(hmiState, layerName);
-    let layerSource = layer.getSource();
+    if(layer){
+      let layerSource = layer.getSource();
 
-    //console.log(layerName);
-    //console.log("animal type: ", entry.speciesScientificName);
+      //console.log(layerName);
+      //console.log("animal type: ", entry.speciesScientificName);
+  
+      layerSource.addFeature(evtLocation);
+      layer.getSource().changed();
+      layer.changed();
+    }
+    else{
+      console.log(layerName);
+    }
 
-    layerSource.addFeature(evtLocation);
-    layer.getSource().changed();
-    layer.changed();
   }
 }
 
@@ -666,14 +764,19 @@ function addNewVocalizationFeatures(hmiState, events) {
 
     let layerName = deriveLayerName(entry.animalStatus,entry.animalType);
     let layer = findMapLayerWithName(hmiState, layerName);
-    let layerSource = layer.getSource();
+    if(layer){
+      let layerSource = layer.getSource();
 
-    //console.log(layerName);
-    //console.log("animal type: ", entry.speciesScientificName);
-
-    layerSource.addFeature(evtLocation);
-    layer.getSource().changed();
-    layer.changed();
+      //console.log(layerName);
+      //console.log("animal type: ", entry.speciesScientificName);
+  
+      layerSource.addFeature(evtLocation);
+      layer.getSource().changed();
+      layer.changed();
+    }
+    else{
+      console.log(layerName);
+    }
   }
 }
 
@@ -689,12 +792,17 @@ function addMicrophonesByLayer(hmiState, layerName, iconPath){
         ol.proj.fromLonLat([location.lon, location.lat])
       ),
       name: "mic",
+      micLat: location.lat,
+      micLon: location.lon,
+      micIcon: iconPath,
+      id: location.id,
+      isMic: 1,
     });
     var icon = new ol.style.Style({
       image: new ol.style.Icon({
         src: iconPath,
         anchor: [0.5, 1],
-        scale: 0.75,
+        scale: 0.175,
       }),
     });
     mic.setStyle(icon);
@@ -727,7 +835,7 @@ function addMicrophonesByHiddenLayer(hmiState, layerName, iconPath){
       image: new ol.style.Icon({
         src: iconPath,
         anchor: [0.5, 1],
-        scale: 1.0,
+        scale: 0.175,
       }),
     });
     mic.setStyle(icon);
@@ -747,25 +855,20 @@ var micAnimFrameIndex = 1;
 var animTimeout = null;
 
 function addmicrophones(hmiState) {
-
-  addMicrophonesByLayer(hmiState, "mic_layer_9", "./../images/Microphone - 3-ai-9.png");
-  addMicrophonesByLayer(hmiState, "mic_layer_8", "./../images/Microphone - 3-ai-8.png");
-  addMicrophonesByLayer(hmiState, "mic_layer_7", "./../images/Microphone - 3-ai-7.png");
-  addMicrophonesByLayer(hmiState, "mic_layer_6", "./../images/Microphone - 3-ai-6.png");
-  addMicrophonesByLayer(hmiState, "mic_layer_5", "./../images/Microphone - 3-ai-5.png");
-  addMicrophonesByLayer(hmiState, "mic_layer_4", "./../images/Microphone - 3-ai-4.png");
-  addMicrophonesByLayer(hmiState, "mic_layer_3", "./../images/Microphone - 3-ai-3.png");
-  addMicrophonesByLayer(hmiState, "mic_layer_2", "./../images/Microphone - 3-ai-2.png");
-  addMicrophonesByLayer(hmiState, "mic_layer_1", "./../images/Microphone - 3-ai-1.png");
-
-  addMicrophonesByHiddenLayer(hmiState, "mic_layer", "./../images/mic2.png");
+  
+  //Loop function to add all the frames that compose the microphone animation.
+  for(let i=25; i>0;i--){
+    addMicrophonesByLayer(hmiState,`mic_layer_${i}`, `./../images/${i}-01.png`);
+  }
+  //Add the single white dot as the microphone icon for when animation is disabled.
+  addMicrophonesByHiddenLayer(hmiState, "mic_layer", "./../images/1-01.png");
 }
 
 export function enableMicAnimation(hmiState){
   var staticLayer = findMapLayerWithName(hmiState, "mic_layer");
   staticLayer.setVisible(false);
 
-  for(var i = 1; i <= 9; i++){
+  for(var i = 1; i <= 25; i++){
     var nextLayer = findMapLayerWithName(hmiState, "mic_layer_" + i);
     nextLayer.setVisible(true);
   }
@@ -778,7 +881,7 @@ export function disableMicAnimation(hmiState){
     clearTimeout(animTimeout);
   }
 
-  for(var i = 1; i <= 9; i++){
+  for(var i = 1; i <= 25; i++){
     var nextLayer = findMapLayerWithName(hmiState, "mic_layer_" + i);
     nextLayer.setVisible(false);
   }
@@ -786,7 +889,7 @@ export function disableMicAnimation(hmiState){
 
 function stepMicAnimation(hmiState) {
   var currentIndex = micAnimFrameIndex;
-  micAnimFrameIndex = (micAnimFrameIndex % 9) + 1;
+  micAnimFrameIndex = (micAnimFrameIndex % 25) + 1;
 
   var nextLayer = findMapLayerWithName(hmiState, "mic_layer_" + micAnimFrameIndex);
   nextLayer.setVisible(true);
@@ -939,6 +1042,11 @@ function createBasemap(hmiState) {
   return basemap;
 }
 
+var current_mic_lat = 0.0;
+var current_mic_lon = 0.0;
+var current_mic_id = "";
+
+
 function createMapClickEvent(hmiState){
   hmiState.basemap.on("click", function (evt) {
     const feature = hmiState.basemap.forEachFeatureAtPixel(evt.pixel, function (feature) {
@@ -947,27 +1055,70 @@ function createMapClickEvent(hmiState){
 
     let active_content = $("#animal-popup-content");
     let default_content = $("#animal-default-content");
+    let active_mic_content = $("#mic-popup-content");
+    let default_mic_content = $("mic-default-content");
     if (feature){
-      // console.log('feature: ', feature);
-      stopAudioPlayback();
-
-      active_content.show();
-      default_content.hide();
 
       let values = feature.getProperties();
-      if (values.eventId){
-        //console.log("saving " + values.eventId);
-        selectedVocalizationEventId = values.eventId;
-      }
-      if(values.isAnimalMovement){
-        document.getElementById("audioHeader").style.display = "none"
-        document.getElementById("audioControl").style.display = "none"
+      if (values.isMic){
+        active_mic_content.show();
+        default_mic_content.hide();
+
+        const img = new Image();
+        let dice = Math.floor(Math.random() * 4) + 1;
+        img.onload = function() {
+          //console.log('Image exists!');
+          document.getElementById("mic_desc_img").src = "../../images/bio/mic_bio_" + dice + ".png";
+        }
+        img.onerror = function() {
+          console.log('Mic image does not exist!');
+        }
+        img.src = "../../images/bio/mic_bio_" + dice + ".png";
+        //document.getElementById("mic_desc_name").innerText = result.common;
+        document.getElementById("mic_desc_id").innerText = values.id;
+        //document.getElementById("desc_summary").innerText = result.summary;
+
+        //Markup details specific session
+        let dateFormat = new Date();
+        document.getElementById("mic_markup_img").src = values.micIcon;
+        document.getElementById("mic_markup_details").innerHTML = "Microphone";
+        document.getElementById("mic_markup_loc_lat").innerHTML = values.micLat;
+        document.getElementById("mic_markup_loc_lon").innerHTML = values.micLon;
+        document.getElementById("mic_markup_date").innerHTML = dateFormat.toUTCString()
+
+        current_mic_lat = values.micLat;
+        current_mic_lon = values.micLon;
+        current_mic_id = values.id;
+
+
+        animal_toggled = true;
+        const toggled_mic = new CustomEvent('micToggled',{
+        detail: {
+          message: "Mic toggled:",
+          }
+        })
+        
+        document.dispatchEvent(toggled_mic);
       }
       else{
-        document.getElementById("audioHeader").style.display = "flex"
-        document.getElementById("audioControl").style.display = "flex"
-      }
-      if (values.animalSpecies){
+        // console.log('feature: ', feature);
+        stopAudioPlayback();
+
+        active_content.show();
+        default_content.hide();
+        if (values.eventId){
+          //console.log("saving " + values.eventId);
+          selectedVocalizationEventId = values.eventId;
+        }
+        if(values.isAnimalMovement){
+          document.getElementById("audioHeader").style.display = "none"
+          document.getElementById("audioControl").style.display = "none"
+        }
+        else{
+          document.getElementById("audioHeader").style.display = "flex"
+          document.getElementById("audioControl").style.display = "flex"
+        }
+        if (values.animalSpecies){
           //console.log(values.animalSpecies)
           var result = sample_data.find(({ species }) => species.toLowerCase() === values.animalSpecies.toLowerCase())
           if (result) {
@@ -988,7 +1139,7 @@ function createMapClickEvent(hmiState){
             animal_data = result;
             document.getElementById("desc_name").innerText = result.common;
             //document.getElementById("markup_img_2").src = values.animalIcon;
-            document.getElementById("desc_confidence").innerText = values.animalLocConfidence + "%";
+            document.getElementById("desc_confidence").innerText = values.animalConfidence + "%";
             document.getElementById("desc_species").innerText = result.species;
             document.getElementById("desc_summary").innerText = result.summary;
 
@@ -1009,7 +1160,7 @@ function createMapClickEvent(hmiState){
 
             document.getElementById("desc_name").innerText = values.animalSpecies;
             //document.getElementById("markup_img_2").src = values.animalIcon;
-            document.getElementById("desc_confidence").innerText = values.animalLocConfidence + "%";
+            document.getElementById("desc_confidence").innerText = values.animalConfidence + "%";
             document.getElementById("desc_species").innerText = values.animalSpecies;
             document.getElementById("desc_summary").innerText = "Bio data coming soon.";
             let summary = document.getElementById("desc_details");
@@ -1023,7 +1174,7 @@ function createMapClickEvent(hmiState){
             document.getElementById("markup_details").innerHTML = values.animalType + " | " + values.animalDiet + " | " + statusPrintLookup[values.animalStatus];
             document.getElementById("markup_loc_lon").innerHTML = values.animalLon;
             document.getElementById("markup_loc_lat").innerHTML = values.animalLat;
-            document.getElementById("markup_confidence").innerHTML = values.animalConfidence + "%";
+            document.getElementById("markup_confidence").innerHTML = values.animalLocConfidence + "%";
             document.getElementById("markup_date").innerHTML = dateFormat.toUTCString()
 
             animal_toggled = true;
@@ -1036,13 +1187,16 @@ function createMapClickEvent(hmiState){
             document.dispatchEvent(toggled_animal);
           
 
-      }
-      else{
-        console.log(values);
+        }
+        else{
+          console.log(values);
+        }
       }
     } else {
       active_content.hide();
+      active_mic_content.hide();
       default_content.show();
+      default_mic_content.show();
     }
   });
 }
@@ -1065,15 +1219,12 @@ export function MapCloseNav() {
 function updateTruthEvents(hmiState){
   retrieveTruthEventsInTimeRange(hmiState.currentTime-5, hmiState.currentTime).then((res) => {
     updateAnimalMovementLayerFromLiveData(hmiState, res.data);
-    //TODO also update vocalisation layer here.
   })
 }
 
-//TODO Implement this
 function updateVocalizationEvents(hmiState){
   retrieveVocalizationEventsInTimeRange(hmiState.currentTime-5, hmiState.currentTime).then((res) => {
     updateVocalizationLayerFromLiveData(hmiState, res.data);
-    //TODO also update vocalisation layer here.
   })
 }
 
@@ -1089,9 +1240,14 @@ function purgeTruthEvents(hmiState){
     if(hmiState.liveEventCutoff > event.timestamp){
       let layerName = deriveTruthLayerName(event.animalStatus, event.animalType);
       let layer = findMapLayerWithName(hmiState, layerName);
-      const featureToPurge = layer.getSource().getFeatureById(event.animalId);
-      //console.log(featureToPurge);
-      layer.getSource().removeFeature(featureToPurge);
+      if(layer){
+        const featureToPurge = layer.getSource().getFeatureById(event.animalId);
+        //console.log(featureToPurge);
+        layer.getSource().removeFeature(featureToPurge);
+      }
+      else{
+        console.log(layerName);
+      }
     }
     else{
       persistEvents[event.animalId] = event;
@@ -1114,11 +1270,16 @@ function purgeVocalizationEvents(hmiState){
     if(hmiState.liveEventCutoff > event.timestamp){
       let layerName = deriveLayerName(event.animalStatus, event.animalType);
       let layer = findMapLayerWithName(hmiState, layerName);
-      //console.log(event.eventId);
-      const featureToPurge = layer.getSource().getFeatureById(event.eventId);
-      //console.log(featureToPurge);
-      if(featureToPurge !== null){
-        layer.getSource().removeFeature(featureToPurge);
+      if(layer){
+        //console.log(event.eventId);
+        const featureToPurge = layer.getSource().getFeatureById(event.eventId);
+        //console.log(featureToPurge);
+        if(featureToPurge !== null){
+          layer.getSource().removeFeature(featureToPurge);
+        }
+      }
+      else{
+        console.log(layerName);
       }
     }
     else{
@@ -1202,6 +1363,8 @@ function queueSimUpdate(hmiState) {
   );
 }
 
+
+
 document.addEventListener('playAudio', function(event){
   //console.log("play audio");
   playNextTrack = true;
@@ -1217,3 +1380,497 @@ document.addEventListener('stopAudio', function(event){
   playNextTrack = false;
   stopAudioPlayback();
 })
+
+var durationTag = document.getElementById("recording_duration");
+
+
+var audioElement = document.getElementsByClassName("audio-element")[0];
+var audioElementSource = document.getElementsByClassName("audio-element")[0]
+    .getElementsByTagName("source")[0];
+audioElement.onended = hidePlaybackIndicator;
+var textIndicatorOfAudiPlaying = document.getElementsByClassName("playback_indicator")[0];
+
+var recordButton = document.getElementById("record_audio_button");
+//recordButton.onclick = startAudioRecording;
+
+var recordingControls = document.getElementsByClassName("recording_controls")[0];
+
+export function showRecordingControls() {
+  console.log("showing controls")
+  recordButton.style.display = "none";
+  recordingControls.classList.remove("hide");
+  initializeRecordingDuration();
+}
+
+export function hideRecordingControls() {
+  console.log("hiding controls")
+  recordButton.style.display = "block";
+  recordingControls.classList.add("hide");
+  clearInterval(durationTimer);
+}
+
+//var overlay = document.getElementsByClassName("overlay")[0];
+//var acknowledgeButton = document.getElementById("acknowledge_button");
+//acknowledgeButton.onclick = hideRecordingNotSupportedOverlay;
+
+export function showRecordingNotSupportedOverlay() {
+    //overlay.classList.remove("hide");
+}
+
+function hideRecordingNotSupportedOverlay() {
+    //overlay.classList.add("hide");
+}
+
+export function createSourceForAudioElement() {
+    let sourceElement = document.createElement("source");
+    audioElement.appendChild(sourceElement);
+
+    audioElementSource = sourceElement;
+}
+
+export function showPlaybackIndicator() {
+    textIndicatorOfAudiPlaying.classList.remove("hide");
+}
+
+export function hidePlaybackIndicator() {
+    textIndicatorOfAudiPlaying.classList.add("hide");
+}
+
+var audioRecordStartTime = null;
+var durationTimer = null;
+
+export function testFunct(){
+  console.log("Recording started 1");
+}
+
+export function startAudioRecording() {
+  console.log("Recording started 2");
+
+  if (!audioElementSource){}
+  else if (!audioElement.paused) {
+    console.log("Paused playback");
+    audioElement.pause();
+    hidePlaybackIndicator();
+  }
+
+  audioRecorder.start()
+    .then(() => {
+      audioRecordStartTime = new Date();
+        showRecordingControls();
+      })
+    .catch(error => {
+      console.log(error.message);
+
+      if (error.message.includes("mediaDevices API or getUserMedia method is not supported in this browser.")) {
+        console.log("To record audio, use browsers like Chrome and Firefox.");
+        showRecordingNotSupportedOverlay();
+      }
+
+      switch (error.name) {
+        case 'AbortError': 
+          console.log("An AbortError has occured.");
+          break;
+        case 'NotAllowedError': 
+          console.log("A NotAllowedError has occured. User might have denied permission.");
+          break;
+        case 'NotFoundError': 
+          console.log("A NotFoundError has occured.");
+          break;
+        case 'NotReadableError': 
+          console.log("A NotReadableError has occured.");
+          break;
+        case 'SecurityError': 
+          console.log("A SecurityError has occured.");
+          break;
+        case 'TypeError': 
+          console.log("A TypeError has occured.");
+          break;
+        case 'InvalidStateError': 
+          console.log("An InvalidStateError has occured.");
+          break;
+        case 'UnknownError': 
+          console.log("An UnknownError has occured.");
+          break;
+        default:
+          console.log("An error occured with the error name " + error.name);
+        };
+      });
+}
+
+
+export function stopAudioRecording() {
+  console.log("Stopped recording...");
+
+  audioRecorder.stop()
+    .then(audioAsblob => {
+      playAudio();
+      hideRecordingControls();
+    })
+    .catch(error => {
+      switch (error.name) {
+        case 'InvalidStateError':
+          console.log("An InvalidStateError has occured.");
+          break;
+        default:
+          console.log("ERROR: " + error.name);
+      };
+    });
+}
+
+export function cancelAudioRecording() {
+  console.log("Cancelled recording");
+
+  audioRecorder.cancel();
+  hideRecordingControls();
+}
+
+document.addEventListener('saveRecording', function(event){
+  save();
+})
+
+document.addEventListener('loadRecording', function(event){
+  //console.log("stop audio");
+  //playNextTrack = false;
+  //stopAudioPlayback();
+})
+
+document.addEventListener('simulateRecording', function(event){
+  //simulateRecording(audioRecorder.audioBlobs, window.hmiState);
+  simulateRecording(window.hmiState);
+})
+
+function generateRandomCoordinate(latitude, longitude) {
+  const latRad = latitude * DEG_TO_RAD;
+  const lonRad = longitude * DEG_TO_RAD;
+
+  const dist = (Math.random() * MIC_DETECTION_RANGE) + 50;
+
+  const theta = Math.random() * 2 * Math.PI;
+
+  const newLatRad = latRad + (dist / EARTH_RADIUS) * Math.cos(theta);
+  const newLonRad = lonRad + (dist / EARTH_RADIUS) * Math.sin(theta);
+
+  const newLat = newLatRad * RAD_TO_DEG;
+  const newLon = newLonRad * RAD_TO_DEG;
+
+  return { lat: newLat, lon: newLon };
+}
+
+function arrayBufferToBase64(buffer) {
+  let binary = '';
+  const bytes = new Uint8Array(buffer);
+  const len = bytes.byteLength;
+  for (let i = 0; i < len; i++) {
+      binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}
+
+function simulateRecording(hmiState){
+  if (decodedAudioStore.length === 0) {
+    console.log("No recording available.");
+    return;
+  }else{
+
+    const base64String = arrayBufferToBase64(fileContent);
+    
+    let coords = generateRandomCoordinate(current_mic_lat, current_mic_lon);
+
+    const recordingData = {
+      timestamp: Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000),
+      sensorId: current_mic_id,
+      microphoneLLA: [current_mic_lat, current_mic_lon, 0.0],
+      animalEstLLA: [coords.lat, coords.lon, 0.0],
+      animalTrueLLA: [coords.lat, coords.lon, 0.0],
+      animalLLAUncertainty: 50.0,
+      audioClip: base64String,
+      mode: hmiState.simMode,
+      audioFile: hmiState.simMode
+    }
+  
+    postRecording(recordingData);
+      
+    //let decodedAudio = stringToAudio(base64String);
+
+    //playAudioFromUint8Array(decodedAudio);
+    //testEncoding(base64String);
+  }
+}
+
+function testEncoding(base64String){
+  audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  const binaryData = atob(base64String);
+
+  const float32Array = new Float32Array(binaryData.length / Float32Array.BYTES_PER_ELEMENT);
+  const view = new DataView(float32Array.buffer);
+  for (let i = 0; i < binaryData.length; i++) {
+    view.setUint8(i, binaryData.charCodeAt(i));
+  }
+
+  const newBuffer = audioContext.createBuffer(1, float32Array.length, audioContext.sampleRate);
+  newBuffer.copyToChannel(float32Array, 0);
+
+  const audioSource = audioContext.createBufferSource();
+  audioSource.buffer = newBuffer;
+  audioSource.connect(audioContext.destination);
+  audioSource.start();
+}
+
+function stringToAudio(base64String) {
+  const binaryString = atob(base64String);
+
+  const uint8Array = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) {
+    uint8Array[i] = binaryString.charCodeAt(i);
+  }
+
+  return uint8Array;
+}
+
+function playAudioFromUint8Array(uint8Array) {
+  const blob = new Blob([uint8Array], { type: 'audio/wav' }); // Change the MIME type if needed
+
+  const audioUrl = URL.createObjectURL(blob);
+
+  const audioElement = new Audio(audioUrl);
+
+  audioElement.play();
+}
+
+
+function save() {
+  if(audioRecorder.audioBlobs.length != 0){
+    let exportData = {};
+    exportData.audioBlobs = [];
+
+    audioRecorder.audioBlobs.forEach(item => {
+      exportData.audioBlobs.push(btoa(item));
+    });
+
+    const base64AudioDataArray = audioRecorder.audioBlobs.map(blob => {
+      const reader = new FileReader();
+      return new Promise((resolve, reject) => {
+          reader.onloadend = () => {
+              resolve(reader.result.split(',')[1]); // Extract Base64 data
+          };
+          reader.readAsDataURL(blob);
+      });
+    });
+
+    var jsonDataStr = "";
+
+    Promise.all(base64AudioDataArray)
+      .then(audioDataArray => {
+          const jsonData = {
+              audioBlobs: audioDataArray,
+          };
+
+          jsonDataStr = JSON.stringify(jsonData);
+          
+
+          const filename = prompt("Enter a filename for the JSON file:", "data.json");
+
+          if (filename) {
+      
+            const jsonDataString = jsonDataStr;
+            const blob = new Blob([jsonDataString], { type: 'application/json' });
+      
+            const blobURL = URL.createObjectURL(blob);
+      
+            const downloadLink = document.createElement('a');
+            downloadLink.href = blobURL;
+            downloadLink.download = filename;
+            downloadLink.textContent = 'Download JSON';
+      
+            document.getElementById("downloadLink").innerHTML = "";
+            document.getElementById("downloadLink").appendChild(downloadLink);
+            console.log(jsonDataString);
+            downloadLink.click();
+          }
+      })
+      .catch(err => console.error("Error processing audio blobs: ", err));
+  }
+}
+
+var fileInput = document.getElementById("fileInput");
+
+var playNextRecordedTrack = false;
+var audioAnimTimeout = null;
+
+document.addEventListener('playRecordedAudio', function(event){
+  //console.log("play audio");
+  playNextRecordedTrack = true;
+  playAudio()
+})
+
+document.addEventListener('stopRecordedAudio', function(event){
+  //console.log("stop audio");
+  playNextRecordedTrack = false;
+  stopRecordingPlayback();
+})
+
+var audioRecordingElement = null;
+var recordingPlaybackAnimTimeout = null;
+
+function playRecording(recordedChunks) {
+    if (recordedChunks.length === 0) {
+        console.log("No recording available.");
+        return;
+    }else{
+
+      const blob = new Blob(recordedChunks, { type: 'audio/wav; codecs=MS_PCM' });
+
+      if(blob.size > 0){
+        const url = URL.createObjectURL(blob);
+        audioRecordingElement = document.getElementById("audioElem");
+  
+        audioRecordingElement.src = url;
+        audioRecordingElement.load();
+        if(playNextRecordedTrack){
+          recordingPlaybackAnimTimeout = setTimeout(
+            muteRecordingPlaybackAnimation,
+            10000,
+            hmiState
+          );
+          audioRecordingElement.play();
+        }
+      }
+      else{
+        console.log("Recording failed check microphone configuration settings.");
+      }
+    }
+}
+
+
+var audioContext = null;
+var a_source = null;
+var decodedAudioStore = null;
+var fileContent = null;
+
+fileInput.addEventListener("change", function(event) {
+  const selectedFile = event.target.files[0];
+  audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+  if (selectedFile) {
+    const reader = new FileReader();
+
+    reader.onload = function(event) {
+      fileContent = event.target.result;
+      audioContext.decodeAudioData(fileContent.slice(0), function(decodedAudio) {
+
+          decodedAudioStore = decodedAudio;
+          a_source = audioContext.createBufferSource();
+          a_source.buffer = decodedAudioStore;
+
+          a_source.connect(audioContext.destination);
+
+          audioElement.src = URL.createObjectURL(selectedFile);
+      });
+    };
+
+    reader.readAsArrayBuffer(selectedFile);
+  }
+});
+
+function stopRecordingPlayback(){
+  muteRecordingPlaybackAnimation();
+
+  if(recordingPlaybackAnimTimeout){
+    clearTimeout(recordingPlaybackAnimTimeout);
+  }
+
+  if(a_source == null){
+    if(audioRecordingElement != null){
+      audioRecordingElement.pause();
+      audioRecordingElement.currentTime = 0; 
+    }
+  }
+  else{
+    a_source.stop();
+  }
+}
+
+export function playAudio() {
+  console.log("play");
+  if(a_source == null){
+    playRecording(audioRecorder.audioBlobs);
+  }
+  else{
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    if(playNextRecordedTrack){
+      recordingPlaybackAnimTimeout = setTimeout(
+        muteRecordingPlaybackAnimation,
+        10000,
+        hmiState
+      );
+      a_source = audioContext.createBufferSource();
+      a_source.buffer = decodedAudioStore;
+
+      a_source.connect(audioContext.destination);
+      a_source.start();
+    }
+  }
+}
+
+export function initializeRecordingDuration() {
+    showRecordingDuration("00:00:00");
+
+    durationTimer = setInterval(() => {
+        let duration = computeRecordingDuration(audioRecordStartTime);
+        console.log("Start time" + audioRecordStartTime);
+        console.log("Recording " + duration);
+        showRecordingDuration(duration);
+    }, 1000); 
+}
+
+export function showRecordingDuration(duration) {
+    durationTag.innerHTML = duration;
+
+    if (checkAudioDurationThreshold(duration)) {
+        stopAudioRecording();
+    }
+}
+
+export function checkAudioDurationThreshold(duration) {
+    let timers = duration.split(":");
+
+    if (timers[2] === MAX_RECORDING_TIME_S)
+        return true;
+    else 
+        return false;
+}
+
+export function computeRecordingDuration(startTime) {
+    let currentTime = new Date();
+
+    let timeDelta = currentTime - startTime;
+
+    let timeDeltaS = timeDelta / 1000;
+
+    let seconds = Math.floor(timeDeltaS % 60);
+
+    seconds = seconds < 10 ? "0" + seconds : seconds;
+
+    let timeDeltaM = Math.floor(timeDeltaS / 60);
+
+    let minutes = timeDeltaM % 60; 
+    minutes = minutes < 10 ? "0" + minutes : minutes;
+
+    return  "00:" + minutes + ":" + seconds;
+}
+
+document.addEventListener('modeSwitch', function(event){
+  window.hmiState.simMode = event.detail.message;
+  if(window.hmiState.simMode == "Animal_Mode"){
+    setSimModeAnimal();
+  }
+  else if(window.hmiState.simMode == "Recording_Mode"){
+    setSimModeRecording();
+  }
+  else if(window.hmiState.simMode == "Recording_Mode_V2"){
+    setSimModeRecordingV2();
+  }
+  else if(window.hmiState.simMode == "Stop"){
+    stopSimulator();
+  }
+});
