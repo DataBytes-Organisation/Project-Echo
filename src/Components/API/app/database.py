@@ -4,8 +4,8 @@ import time
 # import mongoose
 
 # please use echonet credentials here, this connection string is just a placeholder
-connection_string="mongodb://modelUser:EchoNetAccess2023@ts-mongodb-cont:27017/EchoNet"
-# connection_string = "mongodb://root:root_password@localhost:27017/?authMechanism=DEFAULT"
+connection_string ="mongodb+srv://bndct:2zZwTx4E1Rd8dKsJ@cluster0.ntu9thj.mongodb.net"
+#connection_string = "mongodb://root:root_password@localhost:27017/?authMechanism=DEFAULT"
 #connection_string="mongodb+srv://projectechodeakin:uKRBgDwBmimUuV2Q@cluster0.gu2idc8.mongodb.net/test"
 client = pymongo.MongoClient(connection_string)
 db = client['EchoNet']
@@ -16,7 +16,7 @@ Species = db.species
 Microphones = db.microphones
 
 User_connection_string = "mongodb://root:root_password@ts-mongodb-cont/UserSample?authSource=admin"
-Userclient = pymongo.MongoClient(User_connection_string)
+Userclient = pymongo.MongoClient(connection_string)
 Userdb = Userclient['UserSample']
 User = Userdb.users
 Role = Userdb.roles
