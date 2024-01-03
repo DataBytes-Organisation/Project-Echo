@@ -1,17 +1,12 @@
 version: "3"
 
 services:
-  frontend:
-    build:
-      context: ./frontend
-    image: rb-echo-hmi
 
   api:
     build:
-      context: ./api
-    image: rb-echo-api
+      context: ./api-new
+    image: echo-api
 
-  db:
-    build:
-      context: ./MongoDb
-    image: rb-echo-db
+
+
+  
