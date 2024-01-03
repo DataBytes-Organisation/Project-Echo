@@ -1,0 +1,35 @@
+# echo-hmi.yaml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hmi-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hmi
+  template:
+    metadata:
+      labels:
+        app: hmi
+    spec:
+      containers:
+      - name: hmi-container
+        image: nichollsb/echo-hmi:v0.1 #REPLACE WITH REFERENCE TO YOUR DOCKERHUB IMAGE: <USERNAME>/<REPOSITORY>:<TAG>
+        ports:
+        - containerPort: 8080
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hmi-service
+spec:
+  selector:
+    app: hmi
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: NodePort

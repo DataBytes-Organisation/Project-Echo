@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ts-mqtt-server-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ts-mqtt-server
+  template:
+    metadata:
+      labels:
+        app: ts-mqtt-server
+    spec:
+      containers:
+      - name: ts-mqtt-server
+        image: nichollsb/ts-mqtt-server:v0.1 #REPLACE WITH REFERENCE TO YOUR DOCKERHUB IMAGE: <USERNAME>/<REPOSITORY>:<TAG>
+        ports:
+        - containerPort: 1883
+        - containerPort: 7001
+        - containerPort: 7070
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ts-mqtt-server-cont
+spec:
+  selector:
+    app: ts-mqtt-server
+  ports:
+    - name: mqtt
+      protocol: TCP
+      port: 1883
+      targetPort: 1883
+    - name: custom-port-1
+      protocol: TCP
+      port: 7001
+      targetPort: 7001
+    - name: custom-port-2
+      protocol: TCP
+      port: 7070
+      targetPort: 7070

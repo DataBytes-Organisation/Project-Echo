@@ -1,0 +1,40 @@
+# api-and-frontend-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: echo-api
+  template:
+    metadata:
+      labels:
+        app: echo-api
+    spec:
+      containers:
+      - name: echo-api
+        image: nichollsb/echo-api:v0.3 #REPLACE WITH REFERENCE TO YOUR DOCKERHUB IMAGE: <USERNAME>/<REPOSITORY>:<TAG>
+        ports:
+        - containerPort: 9000
+        env: 
+          - name: ATLAS_CONNECTION_STRING
+            valueFrom:
+              secretKeyRef:
+                name: mongodb-secret
+                key: password
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ts-api-cont
+spec:
+  selector:
+    app: echo-api
+  ports:
+    - protocol: TCP
+      port: 9000
+      targetPort: 9000
+

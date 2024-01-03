@@ -1,0 +1,8 @@
+1) 01_Filter
+https://www.flaticon.com/free-icon/filter-filled-tool-symbol_57164
+2) 02_About
+https://www.flaticon.com/free-icon/information-button_1176
+3) 03_Simulator
+https://www.flaticon.com/free-icon/roundabout_714482
+4) 04 Detection
+https://www.flaticon.com/free-icon/sensor_2540201?term=sensor&page=1&position=12&origin=search&related_id=2540201

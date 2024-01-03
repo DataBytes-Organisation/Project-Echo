@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ts-echo-engine-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ts-echo-engine
+  template:
+    metadata:
+      labels:
+        app: ts-echo-engine
+    spec:
+      containers:
+      - name: ts-echo-engine
+        image: nichollsb/ts-echo-engine:v0.6 #REPLACE WITH REFERENCE TO YOUR DOCKERHUB IMAGE: <USERNAME>/<REPOSITORY>:<TAG>
+        command: ["/app/echo_engine.sh"]
+        workingDir: /app
+        env:
+        - name: DEBIAN_FRONTEND
+          value: noninteractive
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /app/echo_credentials.json
+        - name: ATLAS_CONNECTION_STRING
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: password
+        volumeMounts:
+        - name: credentials-volume
+          mountPath: "/root/.config/gcloud/"
+      volumes:
+      - name: credentials-volume
+        emptyDir: {}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ts-echo-engine-service
+spec:
+  selector:
+    app: ts-echo-engine
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: ClusterIP

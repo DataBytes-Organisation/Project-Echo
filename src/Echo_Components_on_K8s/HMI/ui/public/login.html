@@ -1,0 +1,449 @@
+<html>
+
+<head>
+    <!-- Imports -->
+    <meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+    <!-- Open Layers -->
+    <link rel="stylesheet" type="text/css" href="./css/ol.css" />
+
+    <script type="text/javascript" src="./js/ol.js"></script>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <script src="https://kit.fontawesome.com/8aa980d912.js" crossorigin="anonymous"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous" />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+
+    <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
+
+    <!-- SplashScreen Styling -->
+    <link rel="stylesheet" type="text/css" href="./css/splash_screen_style.css">
+
+    <!--jQuery-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+
+    <!--Axios-->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <!-- HMI -->
+    <link rel="stylesheet" href="./css/HMI_style.css" type="text/css">
+    <script type="text/javascript" src="./js/audio.js"></script>
+    <!-- <script type="module" src='./js/HMI.js'></script> -->
+    <script type="text/javascript" src="./js/animation.js"></script>
+    <!-- <script type="module" src='./js/HMI-utils.js'></script> -->
+    <link rel="stylesheet" href="./css/auth-form.css" type="text/css">
+    <!-- End Imports -->
+    <title>Echo | Login</title>
+</head>
+
+<body>
+
+    <div class="screen" id="screen">
+        <div class="screen-image"></div>
+        <div class="screen-overlay"></div>
+        <div class="screen-content">
+            <!-- <i class="screen-icon fa-brands fa-codepen"></i> -->
+            <img src="./images/logo-splashscreen.png" style="width: 101px; height: 81px">
+            <div class="screen-user">
+                <ul>
+                    <li><span onclick="{openForm('login-form')}">Login</span></li>
+                    <li><span onclick="{openForm('signup-form')}">Register</span></li>
+                    <li><span onclick="{openForm('request-access-form')}">Guest Request</span></li>
+                </ul>
+
+                <span class="name animate" id="name" data-value="PROJECT ECHO" onmouseenter="{textFlex()}">PROJECT ECHO</span>
+            </div>
+        </div>
+
+        <div id="login-form" class="user-auth-form modal">
+
+            <form class="modal-content animate" id="login-form" action="/api/auth/signin" method="POST">
+                <div class="imgcontainer">
+                    <span onclick="{closeForm('login-form')}" class="close" title="Close Modal">&times;</span>
+                    <!-- <img src="img_avatar2.png" alt="Avatar" class="avatar"> -->
+                </div>
+
+                <div class="container">
+                    
+                    <div id="usernameInput">
+                        <label for="username"><b>Username</b></label>
+                        <input type="text" placeholder="Username" name="username">
+                    </div>
+
+                    <div id="emailInput" style="display:none;">
+                        <label for="email"><b>Email</b></label>
+                        <input type="Email" placeholder="Enter Email" name="email">
+                    </div>
+
+                    <label for="password"><b>Password</b></label>
+                    <input type="password" placeholder="Enter Password" name="password" required>
+
+                    <input type="checkbox" id="switchInput" onclick="toggleLoginType()" name="switchInput">
+                    <label for="switchInput" id="switchText">Use Email instead</label>
+                    <input type="checkbox" id="login-form-checkbox" checked='false' onclick="openCaptcha('login-form')" required> <span id="login-form-checkbox-txt"> Verify captcha</span>
+                    <div id="login-form-captcha" class="captcha-block animate">
+                        <img id="login-form-img" class="captcha-img"/>
+                        <input type="text" id="login-form-txt" placeholder="Enter highlighted text" required>
+                        <span id="login-form-captcha-error" class="error-text"></span>
+                        <button type="button" onclick="VerifyCaptcha('login-form')"> Verify</button>
+                    </div>
+
+                    <button id="login-form-submit" type="submit" class="btn10 animate disabled" disabled><span>Login</span></button>
+                    <label>
+                        <input type="checkbox" checked="checked" name="remember"> Remember me
+                    </label>
+                </div>
+
+                <div class="container" style="background-color:#f1f1f1">
+                    <button type="button" onclick="{closeForm('login-form')}" class="cancelbtn">Cancel</button>
+                    <span class="psw" onclick="{closeForm('login-form')} {openForm('forgotpassword-form')}"><a href="#">Forgot password?</a></span>
+                </div>
+            </form>
+        </div>
+
+        <div id="signup-form" class="user-auth-form modal">
+
+            <form class="modal-content animate" action="/api/auth/signup" method="POST" id="form-sign-up" style="margin-top: -75px;">
+                <div class="imgcontainer">
+                    <span onclick="{closeForm('signup-form')}" class="close" title="Close Modal">&times;</span>
+                </div>
+        
+                <div class="container">
+                    <div class="page" data-page="1">
+                        <label for="username"><b>Username</b></label>
+                        <input type="text" placeholder="Enter Username" name="username" required>
+        
+                        <label for="email"><b>Email</b></label>
+                        <input type="email" placeholder="Enter Email" name="email" required>
+        
+                        <label for="password"><b>Password</b></label>
+                        <input type="password" placeholder="Enter Password" name="password" required>
+        
+                        <label for="confirmpassword"><b>Confirm Password</b></label>
+                        <input type="password" placeholder="Enter Password Again" name="confirmpassword" required>
+                    </div>
+        
+                    <div class="page" data-page="2">
+                        <label for="roles"><b>Roles</b></label><br>
+                        <select name="roles" id="roles">
+                            <option value="" disabled selected>Roles</option>
+                            <option value="admin">Admin</option>
+                            <option value="user">User</option>
+                            <option value="guest">Guest</option>
+                        </select>
+        
+                        <label for="gender"><b>Gender</b></label><br>
+                        <select name="gender" id="gender">
+                            <option value="" disabled selected>Gender</option>
+                            <option value="MALE">Male</option>
+                            <option value="FEMALE">Female</option>
+                        </select>
+        
+                        <label for="DoB"><b>Date of Birth</b></label>
+                        <input type="text" placeholder="DD/MM/YYYY" name="DoB" required>
+                    </div>
+        
+                    <div class="page" data-page="3">
+                        <label for="country"><b>Country</b></label>
+                        <input type="text" placeholder="Enter your Country" name="country" required>
+        
+                        <label for="state"><b>State</b></label>
+                        <input type="text" placeholder="Required if Australia" name="state">
+        
+                        <label for="organization"><b>Organization</b></label>
+                        <input type="text" placeholder="Enter your Organization" name="organization" required>
+        
+                        <label for="phonenumber"><b>Phone Number</b></label>
+                        <input type="text" placeholder="Enter your Number" name="phonenumber">
+                    </div>
+        
+                    <div class="container" style="background-color:#f1f1f1">
+                        <button type="button" id="prev-button" onclick="prevPage()">Previous</button>
+                        <button type="button" id="next-button" onclick="nextPage()">Next</button>
+                        <button type="submit" class="btn10" id="submit-button">Sign Up</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        
+        <script>
+            const pages = document.querySelectorAll('.page');
+            let currentPage = 1;
+            const submitButton = document.getElementById('submit-button');
+            const prevButton = document.getElementById('prev-button');
+            const nextButton = document.getElementById('next-button');
+        
+            function showPage(pageNum) {
+                pages.forEach((page, index) => {
+                    if (index + 1 === pageNum) {
+                        page.style.display = 'block';
+                    } else {
+                        page.style.display = 'none';
+                    }
+                });
+                if (pageNum === 1) {
+                prevButton.style.display = 'none';
+                nextButton.style.display = 'block';
+                submitButton.style.display = 'none';
+            } else if (pageNum === pages.length) {
+                prevButton.style.display = 'block';
+                nextButton.style.display = 'none';
+                submitButton.style.display = 'block';
+            } else {
+                prevButton.style.display = 'block';
+                nextButton.style.display = 'block';
+                submitButton.style.display = 'none';
+            }
+            }
+        
+            function prevPage() {
+                if (currentPage > 1) {
+                    currentPage--;
+                    showPage(currentPage);
+                }
+            }
+        
+            function nextPage() {
+                if (currentPage < pages.length) {
+                    currentPage++;
+                    showPage(currentPage);
+                }
+            }
+        
+            showPage(currentPage);
+        </script>
+        
+        
+        <div id="request-access-form" class="user-auth-form modal">
+
+            <form class="modal-content animate" action="/request_access" method="POST">
+                <div class="imgcontainer">
+                    <span onclick="{closeForm('request-access-form')}" class="close" title="Close Modal">&times;</span>
+                </div>
+
+                <div class="container">
+                    <label for="email"><b>Email</b></label>
+                    <input id="request-access-email-inp" type="email" placeholder="Enter Email" name="email"
+                        oninput="{emailFormValidation('request-access')}" required>
+                    <span id="request-access-email-error" class="error-text"></span>
+                    <button type="submit" class="btn10" id="request-access-button"><span>Send Request</span></button>
+                </div>
+
+                <div class="container" style="background-color:#f1f1f1">
+                    <button type="button" onclick="{closeForm('request-access-form')}" class="cancelbtn">Cancel</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="forgotpassword-form" class="user-auth-form modal">
+
+            <form class="modal-content animate" id="forgotpassword-form" action="/api/auth/forgot" method="POST">
+                <div class="imgcontainer">
+                    <span onclick="{closeForm('forgotpassword-form')}" class="close" title="Close Modal">&times;</span>
+                    <!-- <img src="img_avatar2.png" alt="Avatar" class="avatar"> -->
+                </div>
+
+                <div class="container">
+   
+                    <label for="account"><b>Account</b></label>
+                    <input type="text" placeholder="Email or Username" name="account">
+
+                    <button type="submit"><span>Reset Password</span></button>
+        
+                </div>
+
+                <div class="container" style="background-color:#f1f1f1">
+                    <button type="button" onclick="{closeForm('forgotpassword-form')}" class="cancelbtn">Cancel</button>
+ 
+                </div>
+            </form>
+        </div>
+
+        <div id="error-box" class="error_box"></div>
+
+    </div>
+
+
+
+    <div id="blur"></div>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+</body>
+
+<script>
+    function toggleLoginType() {
+        const emailInput = document.getElementById('emailInput');
+        const usernameInput = document.getElementById('usernameInput');
+        const switchInput = document.getElementById('switchInput');
+
+        if (switchInput.checked) {
+            emailInput.style.display = 'block';
+            usernameInput.style.display = 'none';
+            
+            document.getElementById('email').setAttribute('required', 'required');
+            document.getElementById('username').removeAttribute('required');
+        } else {
+            emailInput.style.display = 'none';
+            usernameInput.style.display = 'block';
+    
+            document.getElementById('username').setAttribute('required', 'required');
+            document.getElementById('email').removeAttribute('required');
+        }
+    }
+
+
+    var captchaTxt = "";
+    // Get the modal
+    var modal = document.getElementById('id01');
+
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function (event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+    
+    async function openForm(id) {
+        console.log("Open form: ", id);
+        let ele = id;
+        document.getElementById(ele).style.display = 'block';
+        const eleCheckbox = id + "-checkbox"
+        document.getElementById(eleCheckbox).checked = false    
+        document.getElementById(ele).style.display='block';
+        console.log("Fetched data start!")
+        await fetch('/data/captcha')
+            .then((response) => response.json())
+            .then((data) => {
+                console.log("Captcha data: ", data)
+                captchaTxt = data.text;
+            })
+            .catch((error) => {
+                console.error('Error fetching data:', error);
+            });
+        // document.getElementById(project-title).style.display='none';
+    }
+
+    function openCaptcha(id){
+        const eleImg = id + "-img"
+        const eleDiv = id + "-captcha"
+        const eleCheckbox = id + "-checkbox"
+        //If already verified, no more
+        if (document.getElementById(eleCheckbox).checked && document.getElementById(eleCheckbox +"-txt").innerText == " Verified") {
+            return
+        } else {
+            //Set image source
+            document.getElementById(eleDiv).style.display = "block"
+            document.getElementById(eleImg).src = "./captchaImg.png"
+            document.getElementById(eleCheckbox).checked = false 
+        }
+    }
+    function closeCaptcha(id){
+        const eleImg = id + "-img"
+        const eleDiv = id + "-captcha"
+        //Set image source
+        document.getElementById(eleDiv).style.display = "none"
+        document.getElementById(eleImg).src = null
+    }
+
+    function VerifyCaptcha(id) {
+        const eletxt = id + "-txt"
+        const eleCheckbox = id + "-checkbox"
+        const err = id + "-captcha-error"
+        const input = document.getElementById(eletxt).value;
+        let error_ele = document.getElementById(err); 
+        const eleBtn = id + "-submit"
+        if (input == captchaTxt) {
+            closeCaptcha(id)
+            document.getElementById(eleCheckbox).checked = true
+            document.getElementById(eleCheckbox+"-txt").innerText = " Verified"
+            document.getElementById(eleBtn).disabled = false;
+            document.getElementById(eleBtn).classList.remove("disabled");
+            error_ele.style.display = 'none';
+            error_ele.innerHTML = '';
+        } else {
+            console.log("Wrong captcha: ", eletxt);
+            error_ele.style.display = 'block';
+            error_ele.innerHTML = 'Wrong captcha! please try again';
+        }
+    }
+
+    function closeForm(id) {
+        let ele = id;
+        document.getElementById(ele).style.display = 'none';
+    }
+    const validEmailRegex = /^[\w\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+    function emailFormValidation(inp) {
+        let email_id = inp + "-email-inp";
+        let error_id = inp + "-email-error";
+        let btn_id = inp + "-button"
+        let input_ele = document.getElementById(email_id);
+        let error_ele = document.getElementById(error_id);
+        let btn_ele = document.getElementById(btn_id);
+        if (input_ele.value.match(validEmailRegex)) {
+            error_ele.style.display = 'none';
+            error_ele.innerHTML = '';
+            btn_ele.disabled = false;
+        } else {
+            error_ele.style.display = 'block';
+            error_ele.innerHTML = 'Please insert a valid email address';
+            btn_ele.disabled = true;
+        }
+    }
+
+        // const form = document.getElementById('form-sign-up');
+        // const password = document.getElementById('passwordSignUp');
+        // const confirmSignup = document.getElementById('confirmSignup');
+
+        // form.addEventListener('buttonSignUp', function (event) {
+        //     if (password.value !== confirmSignup.value) {
+        //         event.preventDefault();
+        //         alert('Passwords do not match');
+        //     }
+        // });
+
+
+//For Authentication, matching credentials from client side with those of database
+
+// document.getElementById('login-form').addEventListener('submit', async (e) => {
+//   e.preventDefault();
+
+//   const username = document.getElementById('usernameLogin').value;
+//   const password = document.getElementById('passwordLogin').value;
+//   const response = await fetch('/login', {
+//     method: 'POST',
+//     headers: {
+//       'Content-Type': 'application/json'
+//     },
+//     body: JSON.stringify({ username, password })
+//   });
+
+//   //For redirecting user to welcome page, if the credentials are correct and a response.ok is received
+
+//   try {
+//     const data = await response.json();
+//     if (response.ok) {
+//       if (data.redirectTo) {
+//         window.open(data.redirectTo, "_blank");
+//       } else {
+//         alert(data.message);
+//       }
+//     } else {
+//       alert(data.error);
+//     }
+//   } catch (error) {
+//     console.error(error);
+//     alert('An error occurred.');
+//   }
+// });
+
+</script>
+
+</html>

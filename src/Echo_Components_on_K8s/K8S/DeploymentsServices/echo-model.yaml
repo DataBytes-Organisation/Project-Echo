@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ts-echo-model-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ts-echo-model
+  template:
+    metadata:
+      labels:
+        app: ts-echo-model
+    spec:
+      containers:
+      - name: ts-echo-model
+        image: nichollsb/ts-echo-model:v0.1 #REPLACE WITH REFERENCE TO YOUR DOCKERHUB IMAGE: <USERNAME>/<REPOSITORY>:<TAG>
+        ports:
+        - containerPort: 8501
+        volumeMounts:
+        - name: credentials-volume
+          mountPath: "/root/.config/gcloud/"
+      volumes:
+      - name: credentials-volume
+        emptyDir: {}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ts-echo-model-cont
+spec:
+  selector:
+    app: ts-echo-model
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8501
+  type: LoadBalancer
