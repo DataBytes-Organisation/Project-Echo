@@ -23,6 +23,13 @@ echo push engine
 docker push %DOCKER_USER%/ts-engine:%DOCKER_VERSION%
 cd ..
 
+cd Engine
+echo build model
+docker build -t %DOCKER_USER%/ts-model:%DOCKER_VERSION% -f %~dp0\Engine/Model.Dockerfile .
+echo push engine
+docker push %DOCKER_USER%/ts-model:%DOCKER_VERSION%
+cd ..
+
 cd API
 echo build API
 docker build -t %DOCKER_USER%/ts-api:%DOCKER_VERSION% -f %~dp0\API/API.Dockerfile .

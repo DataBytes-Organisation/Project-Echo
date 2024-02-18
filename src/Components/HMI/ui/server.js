@@ -15,10 +15,12 @@ require('dotenv').config();
 const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY);
 const axios = require('axios');
 
+const config = require('./config');
+
 const {createCaptchaSync} = require("captcha-canvas");
 
 
-const port = 8080;
+const port = config.port;
 
 const rootDirectory = __dirname; // This assumes the root directory is the current directory
 
