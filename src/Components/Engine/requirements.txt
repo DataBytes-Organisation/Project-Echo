@@ -7,7 +7,7 @@ ipykernel
 librosa
 matplotlib
 numpy
-paho-mqtt
+paho-mqtt<2.0.0
 pandas
 pymongo[srv]
 soundfile

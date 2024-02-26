@@ -19,6 +19,6 @@ geopy
 folium
 shapely
 ipympl
-paho-mqtt
+paho-mqtt<2.0.0
 asyncio-mqtt
 networkx

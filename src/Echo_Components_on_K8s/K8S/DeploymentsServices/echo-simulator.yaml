@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: ts-simulator-echo
-        image: nichollsb/ts-simulator:v0.3 #REPLACE WITH REFERENCE TO YOUR DOCKERHUB IMAGE: <USERNAME>/<REPOSITORY>:<TAG>
+        image: nichollsb/ts-simulator:v0.5 #REPLACE WITH REFERENCE TO YOUR DOCKERHUB IMAGE: <USERNAME>/<REPOSITORY>:<TAG>
         workingDir: /app
         env:
         - name: ATLAS_CONNECTION_STRING

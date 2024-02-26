@@ -34,7 +34,8 @@ class CommsManager():
         
         self.mqtt_client = paho.Client()
         self.mqtt_client.connect(os.environ['MQTT_CLIENT_URL'], int(os.environ['MQTT_CLIENT_PORT']))
-       
+        print(os.environ['MQTT_CLIENT_URL'], flush = True)
+        print(os.environ['MQTT_CLIENT_PORT'], flush = True)
         # Load the project echo credentials into a dictionary
         try:
             file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'echo_credentials.json')
@@ -47,7 +48,9 @@ class CommsManager():
         # Setup database client and connect
         try:
             # database connection string
+            #Local Deployment
             # self.connection_string=f"mongodb://{self.credentials['DB_USERNAME']}:{self.credentials['DB_PASSWORD']}@{os.environ['MONGODB_HOSTNAME']}/EchoNet"
+            
             #KUBERNETES 
             self.connection_string=f"{os.getenv('ATLAS_CONNECTION_STRING')}"
             myclient = pymongo.MongoClient(self.connection_string)

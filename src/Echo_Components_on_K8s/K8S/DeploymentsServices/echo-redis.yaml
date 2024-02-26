@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: redis-container
-        image: nichollsb/echo-redis:v0.1 #REPLACE WITH REFERENCE TO YOUR DOCKERHUB IMAGE: <USERNAME>/<REPOSITORY>:<TAG>
+        image: redis:latest #REPLACE WITH REFERENCE TO YOUR DOCKERHUB IMAGE: <USERNAME>/<REPOSITORY>:<TAG>
         ports:
         - containerPort: 6379
 
