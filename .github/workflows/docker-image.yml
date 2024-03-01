@@ -27,4 +27,6 @@ jobs:
         cd src/Components
         docker-compose ps
     - name: Stop and remove containers
-      run: docker-compose down
+      run: |
+        cd src/Components
+        docker-compose down
