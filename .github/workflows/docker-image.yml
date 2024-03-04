@@ -13,19 +13,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Delete huge unnecessary tools folder
+      run: rm -rf /opt/hostedtoolcache
+      
     - uses: actions/checkout@v3
+    
     - name: Build containers
       run: |
         cd src/Components
         docker-compose build
+        
     - name: Start containers
       run: |
         cd src/Components
         docker-compose up
+        
     - name: Check running containers
       run: |
         cd src/Components
         docker-compose ps
+        
     - name: Stop and remove containers
       run: |
         cd src/Components
