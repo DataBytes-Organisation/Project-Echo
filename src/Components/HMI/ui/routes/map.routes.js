@@ -63,15 +63,15 @@ module.exports = function(app) {
 
   app.post(`/post_recording`, async (req, res, next) => {
     let data = req.body
-    axios.post(`${MESSAGE_API_URL}/post_recording`, data)
-    .then(response => {
+    try {
+      const response = await axios.post(`${MESSAGE_API_URL}/post_recording`, data);
       console.log('Record response:', response.data);
-    })
-    .catch(error => {
+      res.send(response.data);
+      next()
+    } catch (error) {
       console.error('Error:', error);
-    });
+    }
     //axios.post(`${MESSAGE_API_URL}/post_recording?data=${recordingData}`);
-    next()
   })
 
   app.post(`/sim_control/:control`, async (req, res, next) => {
