@@ -12,7 +12,7 @@ Project Echo is dedicated to providing conservationists with the best possible t
 
 # Our Git File Structure 📂:
 
-![50569d6deb946c7cb21b42d4d00138b](https://github.com/DataBytes-Organisation/Project-Echo/assets/95070150/e8aaf728-c80f-42c1-af07-40651438c002)
+![MicrosoftTeams-image (1)](https://user-images.githubusercontent.com/3150898/225461178-079563ee-0f3b-4364-8350-753f4047e82b.png)
 
 Throughout this project we want to try and maintain the above file structure so that we have a clear understanding of where prototype like files live, and developement / component type files.
 
