@@ -20,6 +20,14 @@ const MAX_RECORDING_TIME_S = "20";
 const DEG_TO_RAD = (Math.PI / 180);
 const RAD_TO_DEG = (180 / Math.PI);
 
+// Create a vector source for the polygons
+var polygonSource = new ol.source.Vector();
+
+// Create a vector layer using the polygon source
+var polygonLayer = new ol.layer.Vector({
+  source: polygonSource
+});
+
 var audioRecorder = getAudioRecorder();
 
 var statuses = [
@@ -111,6 +119,7 @@ document.addEventListener('click', function() {
 export function initialiseHMI(hmiState) {
   console.log(`initialising`);
   createBasemap(hmiState);
+  
   //console.log("Get sample element from document: ", document.getElementById("menuPanel"))
   addVocalisationLayers(hmiState);
   addTruthLayers(hmiState);
@@ -120,7 +129,7 @@ export function initialiseHMI(hmiState) {
     addVectorLayerTopDown(hmiState, `mic_layer_${i}`);
     console.log(`Adding microphone layer:${i}`);
   }
-  
+  hmiState.basemap.addLayer(polygonLayer);
   addVectorLayerTopDown(hmiState, "mic_layer");
   /*
   addVectorLayerTopDown(hmiState, "mic_layer");
@@ -660,12 +669,87 @@ function addAllVocalizationFeatures(hmiState) {
   for (let entry of hmiState.vocalizationEvents) {
     //console.log("True location found!:  ")
     var iconPath = "";
+    
     if(entry.animalDiet === "herbavore" || entry.animalDiet === "frugivore"){
       iconPath = './../images/vocalization/' + getIconName(entry.animalStatus, entry.animalType);
     }
     else{
       iconPath ='./../images/Predator/vocalization/' + getIconName(entry.animalStatus, entry.animalType);
     }
+
+    // function calculateEvenlySpacedPoints(centerLon, centerLat, radius, numberOfPoints) {
+    //   const points = [];
+    //   //earths radius in meters
+    //   const earthRadius = 6371000; 
+    //    //angle in radians between each point
+    //   const deltaAngle = 2 * Math.PI / numberOfPoints;
+  
+    //   for (let i = 0; i < numberOfPoints; i++) {
+    //       const theta = deltaAngle * i;
+    //       const deltaLatitude = (radius / earthRadius) * (180 / Math.PI);
+    //       const deltaLongitude = (radius / earthRadius) * (180 / Math.PI) / Math.cos(centerLat * (Math.PI / 180));
+  
+    //       //calculate new latitude and longitude
+    //       const lat = centerLat + deltaLatitude * Math.cos(theta);
+    //       const lon = centerLon + deltaLongitude * Math.sin(theta);
+  
+    //       points.push([lon, lat]);
+    //   }
+
+    //   points.push(points[0])
+  
+    //   return points;
+    // }
+
+    // const centerLongitude = entry.locationLon;
+    // const centerLatitude = entry.locationLat;
+
+    // //location bubble radius in meters
+    // const radius = 100;
+    // //number of points to create the polygon
+    // const numberOfPoints = 64;
+    // const points = calculateEvenlySpacedPoints(centerLongitude, centerLatitude, radius, numberOfPoints);
+    // console.log(points);
+    // var polygon = new ol.geom.Polygon([points]).transform('EPSG:4326', 'EPSG:3857')
+    // var polygonFeature = new ol.Feature({
+    //   geometry: polygon
+    // })
+
+    // //polygonFeature.setVisible(false)
+
+    // let strokeColor = "#ffffff"
+
+    // if (entry.animalStatus == "normal"){
+    //   strokeColor = "#00c90d"
+    // }
+      
+    // else if (entry.animalStatus == "invasive"){
+    //   strokeColor = "#0059f2"
+    // }
+
+    // else if (entry.animalStatus == "endangered"){
+    //   strokeColor = "#ff0303"
+    // }
+
+    // else if (entry.animalStatus == "vulnerable"){
+    //   strokeColor = "#f2aa00"
+    // }
+
+    // else if (entry.animalStatus == "near-threatened"){
+    //   strokeColor = "#f2f200"
+    // }
+
+    // var polygonStyle = new ol.style.Style({
+    //   fill: new ol.style.Fill({
+    //       color: 'rgba(255, 255, 255, 0.3)' // This will fill the polygon
+    //   }),
+    //   stroke: new ol.style.Stroke({
+    //       color: strokeColor,
+    //       width: 3
+    //   })
+    // });
+  
+    // polygonFeature.setStyle(polygonStyle);
 
     var evtLocation = new ol.Feature({
       geometry: new ol.geom.Point(
@@ -684,6 +768,7 @@ function addAllVocalizationFeatures(hmiState) {
         animalRecordDate: entry.timestamp,
         eventId: entry.eventId,
         isAnimalMovement: 0,
+        animalLocation: null
     });
       //console.log(entry.locationLon, " ", entry.locationLat)
     
@@ -692,9 +777,31 @@ function addAllVocalizationFeatures(hmiState) {
         src: iconPath,
         anchor: [0.5, 1],
         scale: 0.75,
-        className: 'vocalization-icon'
+        className: 'vocalization-icon',
+        opacity : 0.8
       }),
     })
+
+   
+    
+    let coords = []
+
+    
+    console.log(entry.animalStatus)
+
+    //convert the coordinates for a Polygon and ensure the projection is correct
+    
+    
+    // var polygonFeature = new ol.Feature({
+    //     geometry: polygon
+    // });
+    
+    // Note: The fill style now applies to the Polygon geometry
+
+    console.log("Pushed Polygon")
+    
+    // Add the polygon to the map in the same way as before
+
     evtLocation.setStyle(icon);
     evtLocation.setId(entry.animalId);
 
@@ -707,6 +814,8 @@ function addAllVocalizationFeatures(hmiState) {
       //console.log("animal type: ", entry.speciesScientificName);
   
       layerSource.addFeature(evtLocation);
+      //layerSource.addFeature(polygonFeature);
+      //layerSource.addFeature(circleFeature);
       layer.getSource().changed();
       layer.changed();
     }
@@ -1045,7 +1154,9 @@ function createBasemap(hmiState) {
 var current_mic_lat = 0.0;
 var current_mic_lon = 0.0;
 var current_mic_id = "";
-
+let currentIcon = null
+let currentPolygon = null;
+let currentFeature = null;
 
 function createMapClickEvent(hmiState){
   hmiState.basemap.on("click", function (evt) {
@@ -1058,8 +1169,172 @@ function createMapClickEvent(hmiState){
     let active_mic_content = $("#mic-popup-content");
     let default_mic_content = $("mic-default-content");
     if (feature){
+      
+      if (currentIcon == null){
+        console.log("Current Icon is none")
+      }
+
+      // try{
+      //   feature.setStyle(clickedOn)
+      //   console.log("Set style on feature")
+      // }
+      // catch{
+      //   console.log("Couldn't set new values to feature")
+      // }
+
+      // function calculateEvenlySpacedPoints(centerLon, centerLat, radius, numberOfPoints) {
+      //   const points = [];
+      //   //earths radius in meters
+      //   const earthRadius = 6371000; 
+      //    //angle in radians between each point
+      //   const deltaAngle = 2 * Math.PI / numberOfPoints;
+    
+      //   for (let i = 0; i < numberOfPoints; i++) {
+      //       const theta = deltaAngle * i;
+      //       const deltaLatitude = (radius / earthRadius) * (180 / Math.PI);
+      //       const deltaLongitude = (radius / earthRadius) * (180 / Math.PI) / Math.cos(centerLat * (Math.PI / 180));
+    
+      //       //calculate new latitude and longitude
+      //       const lat = centerLat + deltaLatitude * Math.cos(theta);
+      //       const lon = centerLon + deltaLongitude * Math.sin(theta);
+    
+      //       points.push([lon, lat]);
+      //       console.log(lon, lat);
+      //   }
+  
+      //   points.push(points[0])
+    
+      //   return points;
+      // }
+
+      function calculateEvenlySpacedPoints(centerLon, centerLat, radius, numberOfPoints) {
+        const points = [];
+        //earths radius in meters
+        const earthRadius = 6371000; 
+         //angle in radians between each point
+        const deltaAngle = 2 * Math.PI / numberOfPoints;
+    
+        for (let i = 0; i < numberOfPoints; i++) {
+            const theta = deltaAngle * i;
+            const deltaLatitude = (radius / earthRadius) * (180 / Math.PI);
+            const deltaLongitude = (radius / earthRadius) * (180 / Math.PI) / Math.cos(centerLat * (Math.PI / 180));
+    
+            //calculate new latitude and longitude
+            const lat = centerLat + deltaLatitude * Math.cos(theta);
+            const lon = centerLon + deltaLongitude * Math.sin(theta);
+    
+            points.push([lon, lat]);
+        }
+  
+        points.push(points[0])
+    
+        return points;
+      }
+      
+      
 
       let values = feature.getProperties();
+
+      const centerLongitude = values.animalLon;
+      const centerLatitude = values.animalLat;
+  
+      //location bubble radius in meters
+      const radius = 100;
+      //number of points to create the polygon
+      const numberOfPoints = 64;
+      const points = calculateEvenlySpacedPoints(centerLongitude, centerLatitude, radius, numberOfPoints);
+      console.log(points);
+      var polygon = new ol.geom.Polygon([points]).transform('EPSG:4326', 'EPSG:3857')
+      var polygonFeature = new ol.Feature({
+        geometry: polygon
+      })
+      
+      
+
+
+      let strokeColor = "#ffffff"
+  
+      if (values.animalStatus == "normal"){
+        strokeColor = "#00c90d"
+      }
+        
+      else if (values.animalStatus == "invasive"){
+        strokeColor = "#0059f2"
+      }
+  
+      else if (values.animalStatus == "endangered"){
+        strokeColor = "#ff0303"
+      }
+  
+      else if (values.animalStatus == "vulnerable"){
+        strokeColor = "#f2aa00"
+      }
+  
+      else if (values.animalStatus == "near-threatened"){
+        strokeColor = "#f2f200"
+      }
+  
+      var polygonStyle = new ol.style.Style({
+        fill: new ol.style.Fill({
+            color: 'rgba(255, 255, 255, 0.3)' // This will fill the polygon
+        }),
+        stroke: new ol.style.Stroke({
+            color: strokeColor,
+            width: 3
+        })
+      });
+    
+      polygonFeature.setStyle(polygonStyle);
+
+      values.animalLocation = polygonFeature
+
+      var clickedOn = new ol.style.Style({
+        image: new ol.style.Icon({
+          src: values.animalIcon,
+          anchor: [0.5, 1],
+          scale: 0.75,
+          className: 'vocalization-icon',
+          opacity: 1
+        }),
+      })
+
+      
+      
+      try{
+
+        if (currentPolygon != null){
+          polygonSource.removeFeature(currentPolygon)
+
+          var clickedOff = new ol.style.Style({
+            image: new ol.style.Icon({
+              src: currentFeature.getProperties().animalIcon,
+              anchor: [0.5, 1],
+              scale: 0.75,
+              className: 'vocalization-icon',
+              opacity: 0.8
+            }),
+          })
+
+          currentFeature.setStyle(clickedOff)
+        }
+        feature.setStyle(clickedOn)
+        console.log("Setting style on values")
+        console.log("Attempting to apply animal location area:  ", values.animalLocation)
+        polygonSource.addFeature(polygonFeature);
+
+
+        currentFeature = feature
+        currentPolygon = polygonFeature;
+        //Iterate through to find the layer which contains the icon feature
+
+
+      }
+      catch{
+        console.log("Couldn't set new values to values")
+      }
+
+      console.log("New Feature clicked: ",values);
+      console.log("Printing animal icon path: ",values.animalIcon)
       if (values.isMic){
         active_mic_content.show();
         default_mic_content.hide();
