@@ -5,7 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="10041674-e6c8-4c79-bb50-316e826bf443" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/src/Prototypes/engine/Integration_Demo/IntegrationModel.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/Prototypes/engine/Integration_Demo/IntegrationModel.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/Engine/models/echo_model/1/keras_metadata.pb" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/Engine/models/echo_model/1/keras_metadata.pb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/Engine/models/echo_model/1/saved_model.pb" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/Engine/models/echo_model/1/saved_model.pb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/Engine/models/echo_model/1/variables/variables.data-00000-of-00001" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/Engine/models/echo_model/1/variables/variables.data-00000-of-00001" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/Engine/models/echo_model/1/variables/variables.index" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/Engine/models/echo_model/1/variables/variables.index" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -14,6 +17,20 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "AndyWanng"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings">
+    <option name="selectedUrlAndAccountId">
+      <UrlAndAccount>
+        <option name="accountId" value="268a7cd4-4a7c-4dfd-a07e-6c345fc64086" />
+        <option name="url" value="https://github.com/DataBytes-Organisation/Project-Echo.git" />
+      </UrlAndAccount>
+    </option>
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -32,7 +49,7 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "EE/SW/Updated-Model-Integration",
+    "git-widget-placeholder": "main",
     "last_opened_file_path": "C:/Users/22396/PycharmProjects/temporaryEcho/yamnet/IntegrationModel.py",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
