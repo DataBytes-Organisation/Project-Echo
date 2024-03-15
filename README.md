@@ -12,7 +12,7 @@ We have achieved significant milestones in our journey:
 
 - **Audio Pipeline Development:** We've successfully engineered a sophisticated audio pipeline capable of processing audio files of any type, size, or format. It converts them into tensor Mel spectrogram files, which are essential for training.
   
-- **Model Training:** Our efforts have led to the training of an efficient net_v2 pre-trained model, boasting 7.1 million parameters for 224x224 images. This model has achieved an impressive accuracy of 90%.
+- **Model Training:** Our efforts have led to the training of an EfficientNetV2 pre-trained model, boasting 7.1 million parameters for 224x224 images. This model has achieved an impressive accuracy of 90%.
 
 - **Accessibility Improvements:** To enhance accessibility, we've developed a publicly available pip package. This package allows developers to load our pre-trained model and analyze raw audio files in real-time. Additionally, we've prototyped an API for a website, enabling users to upload audio samples and receive animal classification predictions.
 
@@ -35,7 +35,7 @@ By maintaining this structured file hierarchy, we aim to enhance our productivit
 - Install our pip package:
 
 ```python
-%pip install git+https://github.com/Deakin-Capstone-Echo/Project-Echo --quiet
+%pip install git+https://github.com/DataBytes-Organisation/Project-Echo --quiet
 ```
 
 - Use the package to analyze your raw audio files:
