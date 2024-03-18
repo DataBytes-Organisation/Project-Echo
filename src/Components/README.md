@@ -36,7 +36,7 @@ cd Project-Echo\src\Components
 6. Build and run all the components using the command below. This can take up to 20 mins the first time it is run. Subsequent builds will run much quicker.
 
 ```
-docker-compose up --build
+docker compose up --build
 ```
 
 7. All components should start and you should see something like the following running in the Docker Containers:
