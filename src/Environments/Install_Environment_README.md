@@ -18,7 +18,7 @@ Project-Echo\src\Environments> environment.bat
 
 ## Mac
 
-> _Instructions for Trimester 2 2023_
+> _Instructions for Trimester 1 2024_
 
 _Once a virtual environment is set up, always launch Jupyter Notebook from this environment._
 
