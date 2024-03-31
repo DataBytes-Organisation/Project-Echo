@@ -1427,14 +1427,14 @@
     },
     {
       "species": "Pteropus sp.",
-      "common": "Torresian flying-fox",
-      "summary": "The Pteropus genus is a group of megabats, commonly known as Torresian flying-fox, that are found throughout Asia, Australia, and the Pacific. They are known for their large size and their important role in pollination and seed dispersal.",
+      "common": "Flying Foxes",
+      "summary": "The Pteropus genus is a group of megabats, commonly known as flying foxes, that are found throughout Asia, Australia, and the Pacific. They are known for their large size and their important role in pollination and seed dispersal.",
       "description": [
-        "The Pteropus genus includes over 60 species of Torresian flying-fox, ranging in size from the small Little Red Flying-fox to the large Black Flying-fox, which can have a wingspan of up to 1.5 meters.",
-        "Torresian flying-fox are herbivores and feed mainly on nectar, pollen, and fruit.",
+        "The Pteropus genus includes over 60 species of flying foxes, ranging in size from the small Little Red Flying-fox to the large Black Flying-fox, which can have a wingspan of up to 1.5 meters.",
+        "Flying foxes are herbivores and feed mainly on nectar, pollen, and fruit.",
         "They are important pollinators and seed dispersers, helping to maintain the health of many ecosystems.",
-        "Some species of Torresian flying-fox are considered to be pests, as they can cause damage to crops and orchards.",
-        "Many species of Torresian flying-fox are threatened by habitat destruction and fragmentation, hunting, and persecution by humans."
+        "Some species of flying foxes are considered to be pests, as they can cause damage to crops and orchards.",
+        "Many species of flying foxes are threatened by habitat destruction and fragmentation, hunting, and persecution by humans."
       ],
       "img": ""
     },
@@ -1670,7 +1670,7 @@
         "These birds feed on nectar and insects, and can often be seen hovering in front of flowers to feed.",
         "The female builds the nest using grass, bark, and spiderwebs, and the male helps to defend the territory.",
         "It has been listed as a species of Least Concern in the IUCN Red List.",
-        "Yellow-tinted Honeyeaters typically breed during the warmer months of the year."
+        ""
       ],
       "img": ""
     },
@@ -1683,7 +1683,7 @@
         "These birds feed on nectar and insects, and are known to feed on the sugary excretions of certain insects.",
         "The female builds the nest using twigs and grass, and the male helps to defend the territory.",
         "The Fuscous Honeyeater has been listed as a species of Least Concern in the IUCN Red List.",
-        "Fuscous Honeyeaters typically breed during the breeding season, which varies depending on the region"
+        ""
       ],
       "img": ""
     },
@@ -1735,7 +1735,7 @@
         "Red-capped Parrots are social birds that often gather in flocks to feed and roost together.",
         "They have a varied diet that includes seeds, fruit, flowers, and insects.",
         "These parrots are found in a variety of habitats, including woodlands, forests, and grasslands, and are widely distributed throughout most of Australia.",
-        "Red-capped Parrots typically breed during the warmer months of the year. They nest in tree hollows, often choosing eucalyptus trees as nesting sites."
+        ""
       ],
       "img": ""
     },
