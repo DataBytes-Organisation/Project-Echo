@@ -2,6 +2,8 @@ const express = require('express');
 const app = express();
 const path = require('path');
 const fs = require('fs');
+const { exec } = require('child_process');
+const bodyParser = require("body-parser");
 const cookieSession = require('cookie-session');
 const helmet = require('helmet');
 const jwt = require('jsonwebtoken');
@@ -19,6 +21,30 @@ const {createCaptchaSync} = require("captcha-canvas");
 
 
 const port = 8080;
+
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
+// Route for vulnerability scan
+app.get('/vulnerability-scan', (req, res) => {
+    exec('npm audit --json', (err, stdout, stderr) => {
+        if (err) {
+            console.error(err);
+            res.status(500).json({ error: 'Error occurred during vulnerability scan.' });
+        } else {
+            const auditReport = JSON.parse(stdout);
+            res.json({ auditReport });
+        }
+    });
+});
+
+// Start the server
+const server = app.listen(port, () => {
+  console.log(`Server listening on port ${port}`);
+});
+
+// Export the server for testing purposes or other modules
+module.exports = server;
 
 const rootDirectory = __dirname; // This assumes the root directory is the current directory
 
