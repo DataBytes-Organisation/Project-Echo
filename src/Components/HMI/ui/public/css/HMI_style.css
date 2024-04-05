@@ -1503,6 +1503,14 @@ i {
   background-position: center;
 }
 
+#statistics-menu-btn{
+  background-image: url("../images/tabIcons/statistics.png");
+  background-size: cover;
+  background-size: 40%;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
 #filter-menu-btn::before {
   opacity: 0.5;
 }
