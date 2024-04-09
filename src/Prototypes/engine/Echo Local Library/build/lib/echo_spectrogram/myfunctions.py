@@ -279,6 +279,7 @@ class myFunctions:
         elif augmentation == Shift or augmentation == 'Shift':
             #Apply only Shift
             output_path= output_path + "Shift."+fileExtension
+            audio, sr = librosa.load(input_path)
             augment= Compose([
                 Shift(min_fraction=min_value, max_fraction=max_value, p=1),
                 ])
