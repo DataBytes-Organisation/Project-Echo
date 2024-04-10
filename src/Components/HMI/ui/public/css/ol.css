@@ -347,3 +347,23 @@ input:checked + .slider:before {
   margin-top: 10px;
 }
 /*# sourceMappingURL=ol.css.map */
+
+#searchInput {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+}
+
+#animalList {
+  list-style-type: none;
+  padding: 0;
+}
+
+#animalList li {
+  padding: 8px;
+  border-bottom: 1px solid #ccc;
+}
+
+#animalList li:last-child {
+  border-bottom: none;
+}

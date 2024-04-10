@@ -638,6 +638,14 @@
                 <input type="text" id="datetime-range" name="datetime-range" style="width:100%" value="" />
               </div>
             </div>
+            <div class="container">
+              <input type="text" id="searchInput" placeholder="Search for an animal">
+                <ul id="animalList">
+                </ul>
+            </div>
+
+            
+
             <div class="dropdown">
               <button class="btn btn-secondary dropdown-toggle btn-no-background" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
                 Animal Vocalizations
@@ -795,6 +803,7 @@
                   </div>
                 </div>
               </div>
+            </div>
             <div class="export-tab">
               <button id="export-csv" onclick="{downloadCSV()}">EXPORT AS CSV <i class="fa-solid fa-cloud-arrow-down"></i></button>
               <button id="export-xlsx" onclick="{downloadXLSX()}">EXPORT AS XLSX <i class="fa-solid fa-cloud-arrow-down"></i></button>
@@ -808,6 +817,47 @@
     </div>
 
 <script>
+
+  
+  //Search functionality for filter  
+
+  document.addEventListener("DOMContentLoaded", function() {
+    const jsonUrl = './js/sample_data.json';
+    const animalListElement = document.getElementById('animalList');
+    const searchInput = document.getElementById('searchInput');
+    let animalNames = []; // To store animal names for filtering
+
+    // Fetch and process the JSON data
+    fetch(jsonUrl)
+        .then(response => response.json())
+        .then(data => {
+            animalNames = data.data.map(animal => animal.common); // Extract animal names
+        })
+        .catch(error => console.error('Error loading JSON:', error));
+
+    // Function to display animal names in the list
+    function displayAnimalList(list) {
+        animalListElement.innerHTML = ''; // Clear existing list items
+        list.forEach(animal => {
+            const li = document.createElement('li');
+            li.textContent = animal;
+            animalListElement.appendChild(li);
+        });
+    }
+
+    // Event listener for search input
+    searchInput.addEventListener('keyup', function() {
+        const searchTerm = searchInput.value.toLowerCase();
+        // Filter animal names based on search term, then limit to top 5 results
+        const filteredAnimals = animalNames.filter(animal => 
+            animal.toLowerCase().includes(searchTerm)
+        ).slice(0, 5); // limit to 5 results
+
+        displayAnimalList(filteredAnimals); // Display filtered list
+    });
+});
+
+
   // Variable to keep track of which donation amount has been selected
   let donorAmount;
   // Donation amounts
