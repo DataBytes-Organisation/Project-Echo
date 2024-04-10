@@ -820,42 +820,110 @@
 
   
   //Search functionality for filter  
-
   document.addEventListener("DOMContentLoaded", function() {
     const jsonUrl = './js/sample_data.json';
     const animalListElement = document.getElementById('animalList');
     const searchInput = document.getElementById('searchInput');
-    let animalNames = []; // To store animal names for filtering
+    let animalData = [];
 
-    // Fetch and process the JSON data
+  
     fetch(jsonUrl)
         .then(response => response.json())
         .then(data => {
-            animalNames = data.data.map(animal => animal.common); // Extract animal names
+            animalData = data.data; 
         })
         .catch(error => console.error('Error loading JSON:', error));
 
     // Function to display animal names in the list
-    function displayAnimalList(list) {
-        animalListElement.innerHTML = ''; // Clear existing list items
-        list.forEach(animal => {
+    function displayAnimalList(filteredData) {
+        animalListElement.innerHTML = ''; 
+        filteredData.forEach(animal => {
             const li = document.createElement('li');
-            li.textContent = animal;
+            li.textContent = animal.common;
+            li.onclick = () => displayPopup(animal);
             animalListElement.appendChild(li);
         });
     }
 
+    // Function to display a popup with animal details
+    function displayPopup(animal) {
+    
+      const popup = document.createElement('div');
+      popup.style.position = 'fixed';
+      popup.style.top = '50%';
+      popup.style.left = '75%';
+      popup.style.transform = 'translate(-50%, -50%)';
+      popup.style.backgroundColor = '#ffffff';
+      popup.style.padding = '20px';
+      popup.style.width = '300px';
+      popup.style.zIndex = '1000';
+      popup.style.border = '1px solid #ddd';
+      popup.style.borderRadius = '8px';
+      popup.style.boxShadow = '0 5px 15px rgba(0,0,0,0.2)';
+      popup.style.fontSize = '16px';
+      popup.style.color = '#333'; 
+      popup.style.fontFamily = '"Helvetica Neue", Helvetica, Arial, sans-serif'; 
+
+      // Apply animation
+      popup.style.opacity = '0';
+      popup.style.transition = 'opacity 0.4s ease-in-out';
+      setTimeout(() => popup.style.opacity = '1', 10); 
+
+      const title = document.createElement('h4');
+      title.textContent = animal.common;
+      title.style.color = '#007bff'; 
+      title.style.marginTop = '0';
+
+      const summary = document.createElement('p');
+      summary.textContent = animal.summary;
+      summary.style.textAlign = 'justify'; 
+
+      const descriptionList = document.createElement('ul')
+      
+      animal.description.forEach(desc => {
+          const description = document.createElement('li')
+          description.textContent = desc
+          descriptionList.appendChild(description)
+      })
+
+      
+      const closeButton = document.createElement('button');
+      closeButton.textContent = 'Close';
+      closeButton.style.padding = '8px 15px';
+      closeButton.style.fontSize = '14px';
+      closeButton.style.backgroundColor = '#007bff'; 
+      closeButton.style.color = 'white'; 
+      closeButton.style.border = 'none';
+      closeButton.style.borderRadius = '5px';
+      closeButton.style.cursor = 'pointer';
+      closeButton.style.marginTop = '20px';
+      closeButton.onclick = function() {
+          popup.style.opacity = '0';
+          setTimeout(() => document.body.removeChild(popup), 390);
+      };
+
+     
+      popup.appendChild(title);
+      popup.appendChild(summary);
+      popup.appendChild(descriptionList);
+      popup.appendChild(closeButton);
+      document.body.appendChild(popup);
+  }
+
+
+
     // Event listener for search input
     searchInput.addEventListener('keyup', function() {
         const searchTerm = searchInput.value.toLowerCase();
-        // Filter animal names based on search term, then limit to top 5 results
-        const filteredAnimals = animalNames.filter(animal => 
-            animal.toLowerCase().includes(searchTerm)
-        ).slice(0, 5); // limit to 5 results
+        // Filter full animal data based on search term, then limit to top 5 results
+        const filteredData = animalData.filter(animal => 
+            animal.common.toLowerCase().includes(searchTerm)
+        ).slice(0, 5);
 
-        displayAnimalList(filteredAnimals); // Display filtered list
+        displayAnimalList(filteredData); 
     });
 });
+
 
 
   // Variable to keep track of which donation amount has been selected
