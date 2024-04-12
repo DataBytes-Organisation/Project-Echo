@@ -969,7 +969,7 @@
                 const animalName = feature.get('animalSpecies').toLowerCase();
                 //console.log(animalName,animal)
                 if (animalName.includes(animal.species.toLowerCase())) {
-                    iconDicts[animalName] = feature.get('animalIcon');
+                    iconDicts[feature.get('eventId')] = feature.get('animalIcon');
                     feature.setStyle(new ol.style.Style({ display: 'none' })); // Hide animal
                     console.log("Hiding ", animalName)
                 }else {
@@ -1001,7 +1001,7 @@ function showAnimal(animal) {
                 const animalName = feature.get('animalSpecies').toLowerCase();
                 //console.log(animalName,animal)
                 if (animalName.includes(animal.species.toLowerCase())) {
-                    url = iconDicts[animalName]
+                    url =  iconDicts[feature.get('eventId')]
                     feature.setStyle(visibleStyle(url)); //Show animal
                     console.log("Showing ", animalName)
                 }else {
