@@ -818,7 +818,7 @@
 
 <script>
 
-  
+  const iconDicts = {}
   //Search functionality for filter  
   document.addEventListener("DOMContentLoaded", function() {
     const jsonUrl = './js/sample_data.json';
@@ -839,23 +839,53 @@
         animalListElement.innerHTML = ''; 
         filteredData.forEach(animal => {
             const li = document.createElement('li');
-            li.textContent = animal.common;
-            li.onclick = () => displayPopup(animal);
+            const textSpan = document.createElement('span');
+            textSpan.textContent = animal.common;
+            //li.textContent = animal.common;
+            textSpan.onclick = (event) => displayPopup(animal,event);
+            li.appendChild(textSpan)
+
+            // Create "Show" button
+            const showButton = document.createElement('button');
+            showButton.textContent = 'Show';
+            showButton.className = 'btn btn-show'; 
+            showButton.style.color='green'
+            
+            showButton.onclick = () => {
+                console.log("Show button clicked for", animal.common);
+                showAnimal(animal)
+            };
+
+            // Create "Hide" button
+            const hideButton = document.createElement('button');
+            hideButton.textContent = 'Hide';
+            hideButton.className = 'btn btn-hide';
+            hideButton.style.color='red'
+
+            hideButton.onclick = () => {
+                console.log("Hide button clicked for", animal.common);
+                hideAnimal(animal)
+            };
+
+            li.appendChild(showButton);
+            li.appendChild(hideButton);
             animalListElement.appendChild(li);
         });
     }
 
     // Function to display a popup with animal details
-    function displayPopup(animal) {
+    function displayPopup(animal,event) {
     
       const popup = document.createElement('div');
-      popup.style.position = 'fixed';
-      popup.style.top = '50%';
-      popup.style.left = '75%';
-      popup.style.transform = 'translate(-50%, -50%)';
+      popup.style.position = 'absolute';
+      //popup.style.top = '50%';
+      //popup.style.left = '75%';
+      //popup.style.transform = 'translate(-50%, -50%)';
       popup.style.backgroundColor = '#ffffff';
       popup.style.padding = '20px';
       popup.style.width = '300px';
+      popup.style.maxHeight = '500px';
+      popup.style.overflowY= 'auto';
       popup.style.zIndex = '1000';
       popup.style.border = '1px solid #ddd';
       popup.style.borderRadius = '8px';
@@ -863,6 +893,7 @@
       popup.style.fontSize = '16px';
       popup.style.color = '#333'; 
       popup.style.fontFamily = '"Helvetica Neue", Helvetica, Arial, sans-serif'; 
+      
 
       // Apply animation
       popup.style.opacity = '0';
@@ -876,7 +907,7 @@
 
       const summary = document.createElement('p');
       summary.textContent = animal.summary;
-      summary.style.textAlign = 'justify'; 
+      //summary.style.textAlign = 'left'; 
 
       const descriptionList = document.createElement('ul')
       
@@ -908,9 +939,13 @@
       popup.appendChild(descriptionList);
       popup.appendChild(closeButton);
       document.body.appendChild(popup);
+
+      const rect = event.target.getBoundingClientRect();
+      const popupWidth=300;
+      popup.style.top = `${rect.top + window.scrollY}px`;
+      popup.style.left = `${rect.left - popupWidth - 10}px`; 
+
   }
-
-
 
     // Event listener for search input
     searchInput.addEventListener('keyup', function() {
@@ -922,7 +957,60 @@
 
         displayAnimalList(filteredData); 
     });
-});
+  });
+
+  function hideAnimal(animal) {
+    const layers = window.hmiState.basemap.getLayers().getArray();
+
+    layers.forEach(layer => {
+        if (layer instanceof ol.layer.Vector) {
+            layer.getSource().getFeatures().forEach(feature => {
+                
+                const animalName = feature.get('animalSpecies').toLowerCase();
+                //console.log(animalName,animal)
+                if (animalName.includes(animal.species.toLowerCase())) {
+                    iconDicts[animalName] = feature.get('animalIcon');
+                    feature.setStyle(new ol.style.Style({ display: 'none' })); // Hide animal
+                    console.log("Hiding ", animalName)
+                }else {
+                    console.log("Not changing anything else", animalName)
+                }
+            });
+        }
+    });
+}
+
+const visibleStyle = (url) => new ol.style.Style({
+      image: new ol.style.Icon({
+        src: url,
+        anchor: [0.5, 1],
+        scale: 0.75,
+        className: 'true-icon'
+      }),
+    })
+
+// 
+
+function showAnimal(animal) {
+    const layers = window.hmiState.basemap.getLayers().getArray();
+
+    layers.forEach(layer => {
+        if (layer instanceof ol.layer.Vector) {
+            layer.getSource().getFeatures().forEach(feature => {
+                
+                const animalName = feature.get('animalSpecies').toLowerCase();
+                //console.log(animalName,animal)
+                if (animalName.includes(animal.species.toLowerCase())) {
+                    url = iconDicts[animalName]
+                    feature.setStyle(visibleStyle(url)); //Show animal
+                    console.log("Showing ", animalName)
+                }else {
+                    console.log("Not changing anything else", animalName)
+                }
+            });
+        }
+    });
+}
 
 
 
@@ -1540,8 +1628,8 @@ closeFormButton.addEventListener('click', (event) => {
   //init variable is set to true before the user has selected any filter options
   //before a user has checked any filter options, all layers will appear on screen
   let filterState = [...checkboxIDs];
-  //console.log(filterState, "FilterState:  ")
-  //console.log(checkboxIDs)
+  console.log(filterState, "FilterState:  ")
+  console.log(checkboxIDs)
 
   function updateFilter(checkbox){ 
 
