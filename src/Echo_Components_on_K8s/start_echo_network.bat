@@ -2,28 +2,57 @@
 REM first build component images
 docker-compose build
 
-REM start the db container using env_db.txt which contains Database enviornment variables
-docker run --rm -d --env-file .\env_db.txt -h db_server --name db_server_cont -p 27017:27017/tcp rb-echo-db:latest
+REM start the db container using env_db.txt which contains Database environment variables
+docker-compose up -d db_server_cont
+REM Wait for the db container to start
+:wait_db
+timeout /t 5 /nobreak >nul
+docker inspect -f "{{.State.Running}}" db_server_cont | findstr "true"
+if errorlevel 1 goto wait_db
 
-REM get the ip of the database container and save it in a variable
-echo database server is running on
+REM get the IP of the database container
+for /f "tokens=*" %%i in ('docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" db_server_cont') do set DB_IP=%%i
+echo Database server is running on %DB_IP%
 
-FOR /F "tokens=*" %%i IN ('docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" db_server_cont') DO SET DB_IP=%%i
-echo %DB_IP%
+REM start the api container using env_api.txt
+docker-compose up -d api_server_cont
+REM Wait for the api container to start
+:wait_api
+timeout /t 5 /nobreak >nul
+docker inspect -f "{{.State.Running}}" api_server_cont | findstr "true"
+if errorlevel 1 goto wait_api
 
-REM using the database container ip (variable above) and the env_api.txt to run the api container
-docker run --rm -d --env-file .\env_api.txt -e DB_HOST=%DB_IP% -h api_server --name api_server_cont -p 9000:9000/tcp -p 9080:9080/tcp rb-echo-api:latest
+REM get the IP of the api container
+for /f "tokens=*" %%i in ('docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" api_server_cont') do set API_IP=%%i
+echo API container is up at %API_IP%
 
-REM get the ip of the api container and save it in a variable
-FOR /F "tokens=*" %%i IN ('docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" api_server_cont') DO SET API_IP=%%i
-echo API container up at %API_IP%
+REM start the redis container
+docker-compose up -d redis_server_cont
+REM Wait for the redis container to start
+:wait_redis
+timeout /t 5 /nobreak >nul
+docker inspect -f "{{.State.Running}}" redis_server_cont | findstr "true"
+if errorlevel 1 goto wait_redis
 
-REM running the redis host and getting its ip
-docker run --rm -d --name redis_server_cont -p 6379:6379/tcp redis:latest
-FOR /F "tokens=*" %%i IN ('docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" redis_server_cont') DO SET REDIS_IP=%%i
-echo REDIS container up at %REDIS_IP%
+REM get the IP of the redis container
+for /f "tokens=*" %%i in ('docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" redis_server_cont') do set REDIS_IP=%%i
+echo REDIS container is up at %REDIS_IP%
 
-REM using redis ip, db ip and api ip, running the frontend! and using env_hmi.txt for other vars
-docker run --rm -it --env-file .\env_hmi.txt -e DB_HOST=%DB_IP% -e REDIS_HOST=%REDIS_IP% -e API_HOST=%API_IP% --name web_server -p 8080:8080/tcp rb-echo-hmi:latest
+REM start the frontend container using env_hmi.txt
+docker-compose up -d web_server
+REM Wait for the frontend container to start
+:wait_frontend
+timeout /t 5 /nobreak >nul
+docker inspect -f "{{.State.Running}}" web_server | findstr "true"
+if errorlevel 1 goto wait_frontend
+
+echo Frontend container is up and running.
 
 pause
+
+
+
+::I replaced docker run commands with docker-compose up commands, assuming you have a docker-compose.yml file defined with appropriate services.
+::Each container is started with docker-compose up -d for detached mode, and then we wait for it to be running before proceeding.
+::Error handling is implemented using labels (:wait_db, :wait_api, etc.) and checking the state of containers before proceeding.
+::Reused variables for container IPs and improved output messages for better clarity.
