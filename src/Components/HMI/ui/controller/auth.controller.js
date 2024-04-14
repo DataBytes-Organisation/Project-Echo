@@ -46,7 +46,7 @@ exports.signout = async (req, res, next) => {
         console.log("Remove Roles successfully: ")
       }
     })
-    return res.status(200).send('<script> alert("User logout successfully!"); window.location.href = "/login"</script>')
+    return res.status(200).send('<script> alert("User logout successful!"); window.location.href = "/login"</script>')
   } catch (err) {
     next(err);
   }

@@ -291,6 +291,7 @@ def signin(user: schemas.UserLoginSchema):
 # However developing in the Frontend can clears the token better than storing it in a Database
 @router.post("/signout", status_code=status.HTTP_200_OK)
 def signout(jwtToken: str):
+    # Signs out of an Account by invalid
     try:
         if jwtToken is None:
             return jsonify({'message': 'Token is missing'}), 400
@@ -302,6 +303,8 @@ def signout(jwtToken: str):
         # Add the token to the revoked tokens list
         token = {}
         token['jwtToken'] = jwtToken
+        # A function that adds the existing token to the logout token list
+        # This list also checks if the token has already been revoked.
         LogoutToken.insert_one(token)
         response = {"message": "You've been signed out!"}
         return JSONResponse(content=response)
@@ -410,6 +413,7 @@ def passwordchange(oldpw: str, newpw: str, cfm_newpw: str):
         response = {"message": "Invalid Password!"}
         return JSONResponse(content=response, status_code=401)
 
+    #Verifying the code new password with the second field
     if (newpw != cfm_newpw):
         response = {"message": "New Password Must Match Each Other"}
         return JSONResponse(content=response, status_code=401)
