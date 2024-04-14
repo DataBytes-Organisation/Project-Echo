@@ -19,6 +19,29 @@ const axios = require('axios');
 
 const {createCaptchaSync} = require("captcha-canvas");
 
+function checkPasswordStrength(password) {
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  const commonPasswordRegex = /^(password|123456|12345678|qwerty|abc123|admin|welcome|654321|password1|123123|123456789|123123123|000000|1234567|1234567890|qwertyuiop|myspace1|password123|password12|password1234|welcome1|654321|1q2w3e4r5t|123qwe|123qwe!@#|1q2w3e4r5t6y|abc123!@#|qwerty123|qwerty123!@#|password!@#$%^&*|password!@#$%^&*()_+|password!@#$%^&*()_+{}|password!@#$%^&*()_+{}[]|password!@#$%^&*()_+{}[]\|)$/i;
+
+  if (!password) {
+    return 'Password is required';
+  }
+
+  if (password.length < 8) {
+    return 'Password must be at least 8 characters long';
+  }
+
+  if (!passwordRegex.test(password)) {
+    return 'Password must contain at least one lowercase letter, one uppercase letter, one digit, and one special character';
+  }
+
+  if (commonPasswordRegex.test(password)) {
+    return 'Password is too common and easy to guess';
+  }
+
+  return 'Password is strong';
+}
+
 
 const port = 8080;
 
