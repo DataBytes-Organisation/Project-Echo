@@ -867,8 +867,33 @@
                 hideAnimal(animal)
             };
 
+            // Create "Show only" button
+            const showOnlyButton = document.createElement('button');
+            showOnlyButton.textContent = 'Show only';
+            showOnlyButton.className = 'btn btn-hide';
+            showOnlyButton.style.color='pink'
+
+            showOnlyButton.onclick = () => {
+                console.log("Show only button clicked for", animal.common);
+                showOnly(animal)
+            };
+            
+            // Create "Unhide all" button
+            const unHideAllButton = document.createElement('button');
+            unHideAllButton.textContent = 'Unhide all';
+            unHideAllButton.className = 'btn btn-hide';
+            unHideAllButton.style.color='cyan'
+
+            unHideAllButton.onclick = () => {
+                console.log("Unhide all button clicked for", animal.common);
+                unHideAll(animal)
+            };
+            li.appendChild(showOnlyButton);
+            li.appendChild(unHideAllButton);
             li.appendChild(showButton);
             li.appendChild(hideButton);
+
+            
             animalListElement.appendChild(li);
         });
     }
@@ -969,7 +994,8 @@
                 const animalName = feature.get('animalSpecies').toLowerCase();
                 //console.log(animalName,animal)
                 if (animalName.includes(animal.species.toLowerCase())) {
-                    iconDicts[feature.get('eventId')] = feature.get('animalIcon');
+                    key = feature.get('eventId') + feature.get('animalSpecies').toLowerCase();
+                    iconDicts[key] = feature.get('animalIcon');
                     feature.setStyle(new ol.style.Style({ display: 'none' })); // Hide animal
                     console.log("Hiding ", animalName)
                 }else {
@@ -1001,9 +1027,11 @@ function showAnimal(animal) {
                 const animalName = feature.get('animalSpecies').toLowerCase();
                 //console.log(animalName,animal)
                 if (animalName.includes(animal.species.toLowerCase())) {
-                    url =  iconDicts[feature.get('eventId')]
+                    key = feature.get('eventId') + feature.get('animalSpecies').toLowerCase();
+                    url =  iconDicts[key];
+                    console.log(iconDicts);
                     feature.setStyle(visibleStyle(url)); //Show animal
-                    console.log("Showing ", animalName)
+                    console.log("Showing ", animalName);
                 }else {
                     console.log("Not changing anything else", animalName)
                 }
@@ -1012,6 +1040,53 @@ function showAnimal(animal) {
     });
 }
 
+function showOnly(animal) {
+    const layers = window.hmiState.basemap.getLayers().getArray();
+
+    layers.forEach(layer => {
+        if (layer instanceof ol.layer.Vector) {
+            layer.getSource().getFeatures().forEach(feature => {
+                
+                const animalName = feature.get('animalSpecies').toLowerCase();
+                //console.log(animalName,animal)
+                if (animalName.includes(animal.species.toLowerCase())) {
+                    console.log("Not hiding ", animalName);
+                }else {
+                    key = feature.get('eventId') + feature.get('animalSpecies').toLowerCase();
+                    iconDicts[key] = feature.get('animalIcon');
+                    feature.setStyle(new ol.style.Style({ display: 'none' })); // Hide animal
+                    console.log("Hiding ", animalName)
+                    console.log(iconDicts)
+                }
+            });
+        }
+    });
+    
+  
+}
+
+function unHideAll(animal) {
+    const layers = window.hmiState.basemap.getLayers().getArray();
+
+    layers.forEach(layer => {
+        if (layer instanceof ol.layer.Vector) {
+            layer.getSource().getFeatures().forEach(feature => {
+                
+                const animalName = feature.get('animalSpecies').toLowerCase();
+                //console.log(animalName,animal)
+                if (animalName.includes(animal.species.toLowerCase())) {
+                    console.log("Not Unhiding ", animalName)
+                }else {
+                    key = feature.get('eventId') + feature.get('animalSpecies').toLowerCase();
+                    url =  iconDicts[key];
+                    console.log(iconDicts);
+                    feature.setStyle(visibleStyle(url)); //Show animal
+                    console.log("Showing ", animalName)
+                }
+            });
+        }
+    });
+}
 
 
   // Variable to keep track of which donation amount has been selected
