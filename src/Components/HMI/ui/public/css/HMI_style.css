@@ -172,6 +172,10 @@ body{
   border-radius: 8px;
 }
 
+.reset-style {
+  all: unset;
+}
+
 .box1 , .box6 {
   animation-name: quiet ;
 }
@@ -1530,7 +1534,7 @@ i {
 }
 .wrapper{
   position: relative;
-  /*width: 500px;*/ 
+  width: 100%;
   height: 100%; 
   padding: 0; 
   overflow-y: scroll; 
@@ -1872,29 +1876,33 @@ i {
 }
 
 #editFormWrapper {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent background */
+  display: none; 
+  position: absolute;
+  top: 0px;
+ 
+  /* width: 1400px !important; */
+  /*width: 500px;*/ 
+  height: 100%; 
+  padding: 0; 
+  overflow-y: scroll; 
+  overflow-x: hidden;
   z-index: -1; /* Higher z-index to place it above the content */
-  display: flex;
-  justify-content: center;
-  align-items: center;
+ 
 }
 
+#editFormWrapper::-webkit-scrollbar {
+  display: none ;
+ 
+}
+
+
 #editForm {
-  display: none;
-      width: 80%; /* Adjust the width as needed */
-      max-width: 600px; /* Limit the maximum width */
-      padding: 20px;
-      background-color: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      font-weight: normal;
-  /* Add more styling as needed */
+     display: none; 
+     display: flex;
+     justify-content: center;
+     align-items: center;
+     
+     
 }
 
 #ccs {
@@ -1905,9 +1913,11 @@ i {
   font-weight: normal;
 }
 
+
 label {
   font-weight: bold;
 }
+
 
 #important {
   color: red;
@@ -1975,6 +1985,14 @@ input[type="radio"]+span:before {
   margin-right: 0.5em;
   margin-top: 0.5em;
   vertical-align: -2px;
+}
+
+.close-btn {
+  position: absolute;
+  top: 1px;
+  right: 15px;
+  cursor: pointer;
+  font-size: 30px;
 }
 
 input[type="radio"]:checked+span:before {
