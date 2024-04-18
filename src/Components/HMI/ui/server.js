@@ -15,7 +15,8 @@ require('dotenv').config();
 const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY);
 const axios = require('axios');
 
-const {createCaptchaSync} = require("captcha-canvas");
+// Temporarily removed the variables that need the captcha-canvas package
+//const {createCaptchaSync} = require("captcha-canvas");
 
 
 const port = 8080;
@@ -159,13 +160,15 @@ app.get('/cumulativeDonations', async(req, res) => {
   } 
 })
 
-app.get('/data/captcha', (req, res) => {
-  const {image, text} = createCaptchaSync(300,100); // Use the package's functionality
-  fs.writeFileSync("./public/captchaImg.png", image);
-  console.log("text: ", text);
-  console.log("Image: ", image);
-  res.json({image, text});
-});
+// Temporarily removed the route for the captcha function
+
+// app.get('/data/captcha', (req, res) => {
+//   const {image, text} = createCaptchaSync(300,100); // Use the package's functionality
+//   fs.writeFileSync("./public/captchaImg.png", image);
+//   console.log("text: ", text);
+//   console.log("Image: ", image);
+//   res.json({image, text});
+// });
 
 // serve static files from the public directory
 // app.use(express.static(path.join(__dirname, 'public')));
