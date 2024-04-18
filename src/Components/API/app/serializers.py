@@ -15,10 +15,10 @@ def eventEntity(event) -> dict:
 def eventSpeciesEntity(event) -> dict:
     return {
         "_id": str(event["_id"]),
-        "commonName": event["commonName"],
-        "type": event["type"],
-        "status": event["status"],
-        "diet": event["diet"],
+        "commonName": event.get("commonName", "Unknown"),
+        "type": event.get("type", "Unknown"),
+        "status": event.get("status", "Unknown"),
+        "diet": event.get("diet", "Unknown"),
         "timestamp": event["timestamp"],
         "sensorId": event["sensorId"],
         "species": event["species"],
@@ -41,10 +41,10 @@ def movementEntity(event) -> dict:
 def movementSpeciesEntity(event) -> dict:
     return {
         "_id": str(event["_id"]),
-        "commonName": event["commonName"],
-        "type": event["type"],
-        "status": event["status"],
-        "diet": event["diet"],
+        "commonName": event.get("commonName", "Unknown"),
+        "type": event.get("type", "Unknown"),
+        "status": event.get("status", "Unknown"),
+        "diet": event.get("diet", "Unknown"),
         "timestamp": event["timestamp"],
         "species": event["species"],
         "animalId": event["animalId"],
