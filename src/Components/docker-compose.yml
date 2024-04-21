@@ -25,9 +25,11 @@ services:
     networks:
       - echo-net
     volumes:
+      - ./Engine/echo_engine.py:/app/echo_engine.py # Mount the echo_engine.py file
       - credentials_volume:/root/.config/gcloud/
     stdin_open: true
     tty: true
+
 
   echo_hmi:
     build:
