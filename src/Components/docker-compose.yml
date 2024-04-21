@@ -25,7 +25,6 @@ services:
     networks:
       - echo-net
     volumes:
-      - ./Engine/echo_engine.py:/app/echo_engine.py # Mount the HMI/ui directory to /usr/src/app/ui in the container
       - credentials_volume:/root/.config/gcloud/
     stdin_open: true
     tty: true
