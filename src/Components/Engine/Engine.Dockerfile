@@ -18,6 +18,7 @@ RUN apt-get update
 RUN apt-get install -y libopenexr-dev dos2unix
 RUN python3 -m pip install --upgrade pip
 
+RUN pip install watchdog
 RUN pip download -r requirements.txt
 RUN pip install -r requirements.txt
 
@@ -37,4 +38,4 @@ COPY ./echo_credentials.json ./
 RUN chmod +x ./echo_engine.sh
 RUN dos2unix ./echo_engine.sh
 
-CMD ["/app/echo_engine.sh"]
+CMD ["watchmedo", "auto-restart", "--patterns=*.py", "--recursive", "--", "python", "/app/echo_engine.py"]
