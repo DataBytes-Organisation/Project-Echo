@@ -1,0 +1,16 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: hmi-ingress
+spec:
+  rules:
+  - host: project-echo-gecko.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: hmi-service 
+            port:
+              number: 8080       

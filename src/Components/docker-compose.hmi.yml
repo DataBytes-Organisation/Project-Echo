@@ -1,0 +1,26 @@
+version: "3.8"
+
+services:
+  echo_hmi:
+    build:
+      context: HMI/
+      dockerfile: HMI.Dockerfile
+    image: ts-echo-hmi
+    container_name: ts-echo-hmi-cont
+    networks:
+      - echo-net_echo-net
+    volumes:
+      - echo-net_credentials_volume:/root/.config/gcloud/
+    stdin_open: true
+    tty: true
+    ports:
+      - "8080:8080"
+    restart: on-failure
+
+networks:
+  echo-net_echo-net:
+    external: true
+
+volumes:
+  echo-net_credentials_volume:
+    external: true

@@ -1,0 +1,26 @@
+version: "3.8"
+
+services:
+  echo_api:
+      build:
+        context: API/
+        dockerfile: API.Dockerfile
+      image: ts-api
+      container_name: ts-api-cont
+      networks:
+        - echo-net_echo-net
+      ports:
+        - "9000:9000"
+        - "9080:9080"      
+      volumes:
+        - echo-net_credentials_volume:/root/.config/gcloud/
+      stdin_open: false
+      tty: true
+
+networks:
+  echo-net_echo-net:
+    external: true
+
+volumes:
+  echo-net_credentials_volume:
+    external: true   

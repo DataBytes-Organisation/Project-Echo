@@ -31,6 +31,8 @@ class SystemManager:
                     print("Connected... waiting for start command", flush=True)
                     await mqtt_client.subscribe("Simulator_Controls")
                     await mqtt_client.subscribe("Simulate_Recording")
+                    print(os.environ['MQTT_CLIENT_URL'], flush = True)
+                    print(os.environ['MQTT_CLIENT_PORT'], flush = True)
                     await asyncio.gather(self.handle_messages(mqtt_client), self.run_loop())                   
             except Exception as e:
                 print(f"Exception {e} Retrying...", flush=True)
