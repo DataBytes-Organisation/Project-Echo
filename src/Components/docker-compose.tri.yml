@@ -1,0 +1,23 @@
+version: "3.8"
+
+services:
+  echo_triangulation:
+    build:
+      context: ClusteringTriangulation/
+      dockerfile: Triangulation.Dockerfile
+    image: ts-echo-triangulation
+    container_name: ts-triangulation-cont
+    networks:
+      - echo-net_echo-net
+    volumes:
+      - echo-net_credentials_volume:/root/.config/gcloud/
+    stdin_open: true
+    tty: true
+
+networks:
+  echo-net_echo-net:
+    external: true
+
+volumes:
+  echo-net_credentials_volume:
+    external: true

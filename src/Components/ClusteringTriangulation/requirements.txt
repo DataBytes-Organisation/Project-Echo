@@ -1,0 +1,6 @@
+pymongo
+geopy
+matplotlib
+sympy
+numpy
+scipy

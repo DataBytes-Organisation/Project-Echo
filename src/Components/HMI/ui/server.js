@@ -391,6 +391,7 @@ app.get("/login", (req, res) => {
   res.sendFile(path.join(__dirname, 'public/login.html'));
 })
 
+
 //API Endpoint for the submission requests
 app.post("/api/submit", async (req, res) => {
   let token = await client.get('JWT', (err, storedToken) => {

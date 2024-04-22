@@ -405,8 +405,8 @@ export function convertJSONtoAnimalVocalizationEvent(hmiState, data){
   vocalizationEvent.locationConfidence = 100 - data.animalLLAUncertainty;
   vocalizationEvent.estLat = data.animalEstLLA[0];
   vocalizationEvent.estLon = data.animalEstLLA[1];
-  vocalizationEvent.locationLat = data.animalTrueLLA[0];
-  vocalizationEvent.locationLon = data.animalTrueLLA[1];
+  vocalizationEvent.locationLat = data.animalTrueLLA[0][0];
+  vocalizationEvent.locationLon = data.animalTrueLLA[0][1];
 
   vocalizationEvent.sensorId = data.sensorId;
   vocalizationEvent.sensorLat = data.microphoneLLA[0];
@@ -768,7 +768,8 @@ function addAllVocalizationFeatures(hmiState) {
         animalRecordDate: entry.timestamp,
         eventId: entry.eventId,
         isAnimalMovement: 0,
-        animalLocation: null
+        animalLocation: null,
+        type: "vocalization"
     });
       //console.log(entry.locationLon, " ", entry.locationLat)
     
@@ -1170,42 +1171,11 @@ function createMapClickEvent(hmiState){
     let default_mic_content = $("mic-default-content");
     if (feature){
       
+      
       if (currentIcon == null){
         console.log("Current Icon is none")
       }
 
-      // try{
-      //   feature.setStyle(clickedOn)
-      //   console.log("Set style on feature")
-      // }
-      // catch{
-      //   console.log("Couldn't set new values to feature")
-      // }
-
-      // function calculateEvenlySpacedPoints(centerLon, centerLat, radius, numberOfPoints) {
-      //   const points = [];
-      //   //earths radius in meters
-      //   const earthRadius = 6371000; 
-      //    //angle in radians between each point
-      //   const deltaAngle = 2 * Math.PI / numberOfPoints;
-    
-      //   for (let i = 0; i < numberOfPoints; i++) {
-      //       const theta = deltaAngle * i;
-      //       const deltaLatitude = (radius / earthRadius) * (180 / Math.PI);
-      //       const deltaLongitude = (radius / earthRadius) * (180 / Math.PI) / Math.cos(centerLat * (Math.PI / 180));
-    
-      //       //calculate new latitude and longitude
-      //       const lat = centerLat + deltaLatitude * Math.cos(theta);
-      //       const lon = centerLon + deltaLongitude * Math.sin(theta);
-    
-      //       points.push([lon, lat]);
-      //       console.log(lon, lat);
-      //   }
-  
-      //   points.push(points[0])
-    
-      //   return points;
-      // }
 
       function calculateEvenlySpacedPoints(centerLon, centerLat, radius, numberOfPoints) {
         const points = [];
@@ -1234,12 +1204,12 @@ function createMapClickEvent(hmiState){
       
 
       let values = feature.getProperties();
-
-      const centerLongitude = values.animalLon;
+      if(values.type == "vocalization"){
+        const centerLongitude = values.animalLon;
       const centerLatitude = values.animalLat;
   
       //location bubble radius in meters
-      const radius = 100;
+      const radius = 10;
       //number of points to create the polygon
       const numberOfPoints = 64;
       const points = calculateEvenlySpacedPoints(centerLongitude, centerLatitude, radius, numberOfPoints);
@@ -1311,7 +1281,7 @@ function createMapClickEvent(hmiState){
               anchor: [0.5, 1],
               scale: 0.75,
               className: 'vocalization-icon',
-              opacity: 0.8
+              opacity: 0.6
             }),
           })
 
@@ -1335,10 +1305,15 @@ function createMapClickEvent(hmiState){
 
       console.log("New Feature clicked: ",values);
       console.log("Printing animal icon path: ",values.animalIcon)
+      }
+
+
+
+      
       if (values.isMic){
         active_mic_content.show();
         default_mic_content.hide();
-
+        console.log("Microphone clicked, fetching image...")
         const img = new Image();
         let dice = Math.floor(Math.random() * 4) + 1;
         img.onload = function() {
