@@ -15,6 +15,7 @@ Movements = db.movements
 Species = db.species
 Microphones = db.microphones
 
+
 User_connection_string = "mongodb://root:root_password@ts-mongodb-cont/UserSample?authSource=admin"
 Userclient = pymongo.MongoClient(connection_string)
 Userdb = Userclient['UserSample']
