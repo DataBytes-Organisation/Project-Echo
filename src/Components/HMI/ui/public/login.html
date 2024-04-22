@@ -130,6 +130,18 @@
         
                         <label for="confirmpassword"><b>Confirm Password</b></label>
                         <input type="password" placeholder="Enter Password Again" name="confirmpassword" required>
+
+                        <div id="emailVerificationInput" style="display:none;">
+                            <label for="emailVerificationCode"><b>Email Verification Code</b></label>
+                            <input type="text" placeholder="Enter Verification Code" name="emailVerificationCode" required>
+                        </div>
+                    
+                        <button type="button" id="sendEmailVerificationCode" onclick="sendEmailVerificationCode()">Send Verification Code</button>
+
+                        <button type="button" id="toggleEmailVerification" onclick="toggleEmailVerification()">Use Email Verification Code</button>
+
+                    </div>
+
                     </div>
         
                     <div class="page" data-page="2">
@@ -216,6 +228,36 @@
                 if (currentPage < pages.length) {
                     currentPage++;
                     showPage(currentPage);
+                }
+            }
+
+            function sendEmailVerificationCode() {
+                const email = document.getElementsByName('email')[0].value;
+                // Send a request to your server to send the verification code
+                fetch('/api/auth/sendVerificationCode', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email: email }),
+                })
+                .then(response => response.text())
+                .then(data => alert(data))
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+            }
+
+            function toggleEmailVerification() {
+                const emailVerificationInput = document.getElementById('emailVerificationInput');
+                const sendEmailVerificationCode = document.getElementById('sendEmailVerificationCode');
+
+                if (emailVerificationInput.style.display === 'none') {
+                    emailVerificationInput.style.display = 'block';
+                    sendEmailVerificationCode.style.display = 'block';
+                } else {
+                    emailVerificationInput.style.display = 'none';
+                    sendEmailVerificationCode.style.display = 'none';
                 }
             }
         
@@ -325,6 +367,7 @@
         document.getElementById(eleCheckbox).checked = false    
         document.getElementById(ele).style.display='block';
 
+        
 
 
         // console.log("Fetched data start!")

@@ -47,5 +47,26 @@ exports.send_enquiry = async (email, subject, message) => {
     
   }
 
+exports.send_verification_code = async (email) => {
+    // Generate a random verification code
+    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
 
+    // Store the verification code in your database
+    storeVerificationCodeForUser(email, verificationCode);
 
+    // Send the verification code to the user's email
+    let mailOptions = {
+        from: 'echodatabytes@gmail.com',
+        to: email,
+        subject: 'Your Verification Code',
+        text: 'Your verification code is: ' + verificationCode
+    };
+
+    transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+            console.log(error);
+        } else {
+            console.log('Email sent: ' + info.response);
+        }
+    });
+}
