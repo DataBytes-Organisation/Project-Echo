@@ -646,7 +646,7 @@
                 </ul>
             </div>
             <div class="container">
-                <span>Show Only Animal List</span>
+                <span>Exclusive View Animal List</span>
                 <ul id="displayOnlyAnimalList">
                 </ul>
             </div>
@@ -833,6 +833,18 @@
   const iconDicts = {};
   var displayedAnimals = new Set();
   var hiddenAnimals = new Set();
+  var animalSpeciesToCommon = {};
+
+  //Sanitizing to prevent Cross-Site Scripting attacks through the search bar
+  function sanitizeInput(str) {
+    var temp = document.createElement('div');
+    temp.textContent = str;
+    return temp.innerHTML;
+  }
+
+  document.getElementById('searchInput').addEventListener('input', function(e) {
+    this.value = sanitizeInput(this.value); // Sanitize every input
+  });
   //Search functionality for filter  
   document.addEventListener("DOMContentLoaded", function() {
     const jsonUrl = './js/sample_data.json';
@@ -846,7 +858,14 @@
         .then(data => {
             animalData = data.data; 
         })
+        .then(()=>{
+          animalData.forEach(animal=>{
+          animalSpeciesToCommon[animal.species.toLowerCase()] = animal.common;
+        });
+        })
         .catch(error => console.error('Error loading JSON:', error));
+
+    
 
     // Function to display animal names in the list
     function displayAnimalList(filteredData) {
@@ -883,7 +902,7 @@
 
             // Create "Show only" button
             const showOnlyButton = document.createElement('button');
-            showOnlyButton.textContent = 'Add to Show only';
+            showOnlyButton.textContent = 'Add to Exclusive View';
             showOnlyButton.className = 'btn btn-hide';
             showOnlyButton.style.color='green'
 
@@ -916,33 +935,12 @@
     function displayPopup(animal,event) {
     
       const popup = document.createElement('div');
-      popup.style.position = 'absolute';
-      //popup.style.top = '50%';
-      //popup.style.left = '75%';
-      //popup.style.transform = 'translate(-50%, -50%)';
-      popup.style.backgroundColor = '#ffffff';
-      popup.style.padding = '20px';
-      popup.style.width = '300px';
-      popup.style.maxHeight = '500px';
-      popup.style.overflowY= 'auto';
-      popup.style.zIndex = '1000';
-      popup.style.border = '1px solid #ddd';
-      popup.style.borderRadius = '8px';
-      popup.style.boxShadow = '0 5px 15px rgba(0,0,0,0.2)';
-      popup.style.fontSize = '16px';
-      popup.style.color = '#333'; 
-      popup.style.fontFamily = '"Helvetica Neue", Helvetica, Arial, sans-serif'; 
-      
-
-      // Apply animation
-      popup.style.opacity = '0';
-      popup.style.transition = 'opacity 0.4s ease-in-out';
+      popup.className = 'popup'
       setTimeout(() => popup.style.opacity = '1', 10); 
 
       const title = document.createElement('h4');
+      title.className = 'popup-title'
       title.textContent = animal.common;
-      title.style.color = '#007bff'; 
-      title.style.marginTop = '0';
 
       const summary = document.createElement('p');
       summary.textContent = animal.summary;
@@ -958,15 +956,8 @@
 
       
       const closeButton = document.createElement('button');
+      closeButton.className ='popup-close-button';
       closeButton.textContent = 'Close';
-      closeButton.style.padding = '8px 15px';
-      closeButton.style.fontSize = '14px';
-      closeButton.style.backgroundColor = '#007bff'; 
-      closeButton.style.color = 'white'; 
-      closeButton.style.border = 'none';
-      closeButton.style.borderRadius = '5px';
-      closeButton.style.cursor = 'pointer';
-      closeButton.style.marginTop = '20px';
       closeButton.onclick = function() {
           popup.style.opacity = '0';
           setTimeout(() => document.body.removeChild(popup), 390);
@@ -1109,7 +1100,7 @@ function updateDisplayedAnimalsList(displayedAnimals){
   displayedAnimals.forEach(function(animal){
     const listItem = document.createElement('li');
     const textSpan = document.createElement('span');
-    textSpan.textContent = animal;
+    textSpan.textContent = convertSpeciesToCommon(animal);
     const hideButton = document.createElement('button');
     hideButton.textContent = 'Hide';
     hideButton.className = 'btn btn-hide';
@@ -1135,7 +1126,7 @@ function updateHiddenAnimalsList(){
   hiddenAnimals.forEach(function(animal){
     const listItem = document.createElement('li');
     const textSpan = document.createElement('span');
-    textSpan.textContent = animal;
+    textSpan.textContent = convertSpeciesToCommon(animal);
     const showButton = document.createElement('button');
     showButton.textContent = 'Show';
     showButton.className = 'btn btn-hide';
@@ -1143,7 +1134,7 @@ function updateHiddenAnimalsList(){
 
     showButton.onclick = () => {
         console.log("Show button clicked for", animal);
-        showAnimal(animal)
+        showAnimal(animal);
     };
     listItem.appendChild(textSpan);
     listItem.appendChild(showButton);
@@ -1183,6 +1174,9 @@ function resetSearchFilter() {
     updateDisplayedAnimalsList();
 }
 
+function convertSpeciesToCommon(species){
+    return animalSpeciesToCommon[species.toLowerCase()];
+}
 
   // Variable to keep track of which donation amount has been selected
   let donorAmount;
