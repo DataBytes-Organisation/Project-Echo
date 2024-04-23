@@ -636,17 +636,25 @@
               <div class="past-data-header">View Past Data:</div>
               <div class="time-range-picker">
                 <input type="text" id="datetime-range" name="datetime-range" style="width:100%" value="" />
+               
               </div>
             </div>
             <div class="container">
-              <input type="text" id="searchInput" placeholder="Search for an animal">
+                <input type="text" id="searchInput" placeholder="Search for an animal">
+                <button onclick="{resetSearchFilter()}" class="toggle-button btn btn-secondary btn-no-background select-all-btn">Reset Filter</button>
                 <ul id="animalList">
                 </ul>
             </div>
             <div class="container">
+                <span>Show Only Animal List</span>
                 <ul id="displayOnlyAnimalList">
                 </ul>
             </div>
+            <div class="container">
+              <span>Hidden Animal List</span>
+              <ul id="hideAnimalList">
+              </ul>
+          </div>
 
             
 
@@ -824,6 +832,7 @@
 
   const iconDicts = {};
   var displayedAnimals = new Set();
+  var hiddenAnimals = new Set();
   //Search functionality for filter  
   document.addEventListener("DOMContentLoaded", function() {
     const jsonUrl = './js/sample_data.json';
@@ -869,12 +878,12 @@
 
             hideButton.onclick = () => {
                 console.log("Hide button clicked for", animal.common);
-                hideAnimal(animal)
+                hideAnimal(animal.species.toLowerCase());
             };
 
             // Create "Show only" button
             const showOnlyButton = document.createElement('button');
-            showOnlyButton.textContent = 'Show';
+            showOnlyButton.textContent = 'Add to Show only';
             showOnlyButton.className = 'btn btn-hide';
             showOnlyButton.style.color='green'
 
@@ -896,7 +905,7 @@
             li.appendChild(showOnlyButton);
             //li.appendChild(unHideAllButton);
             //li.appendChild(showButton);
-            //li.appendChild(hideButton);
+            li.appendChild(hideButton);
 
             
             animalListElement.appendChild(li);
@@ -983,7 +992,7 @@
         // Filter full animal data based on search term, then limit to top 5 results
         const filteredData = animalData.filter(animal => 
             animal.common.toLowerCase().includes(searchTerm)
-        ).slice(0, 5);
+        ).slice(0, 3);
 
         displayAnimalList(filteredData); 
     });
@@ -1007,10 +1016,10 @@ function showAnimal(animal) {
     layers.forEach(layer => {
         if (layer instanceof ol.layer.Vector) {
             layer.getSource().getFeatures().forEach(feature => {
-                
+                if(feature.get('animalSpecies')!=undefined){
                 const animalName = feature.get('animalSpecies').toLowerCase();
                 //console.log(animalName,animal)
-                if (animalName.includes(animal.species.toLowerCase())) {
+                if (animalName.includes(animal)) {
                     key = feature.get('eventId') + feature.get('animalSpecies').toLowerCase();
                     url =  iconDicts[key];
                     console.log(iconDicts);
@@ -1019,21 +1028,26 @@ function showAnimal(animal) {
                 }else {
                     console.log("Not changing anything else", animalName)
                 }
-            });
-        }
+            };
+        })
+      }
     });
+    hiddenAnimals.delete(animal);
+    displayedAnimals.add(animal);
+    updateDisplayedAnimalsList(displayedAnimals);
+    updateHiddenAnimalsList();
 }
 
 function hideAnimal(animal) {
     const layers = window.hmiState.basemap.getLayers().getArray();
-
+    hiddenAnimals.add(animal);
     layers.forEach(layer => {
         if (layer instanceof ol.layer.Vector) {
             layer.getSource().getFeatures().forEach(feature => {
                 if(feature.get('animalSpecies')!=undefined){
                 const animalName = feature.get('animalSpecies').toLowerCase();
                 //console.log(animalName,animal)
-                if (displayedAnimals.has(animal) && feature.get('animalSpecies').toLowerCase() == animal) {
+                if (feature.get('animalSpecies').toLowerCase() == animal) {
                     key = feature.get('eventId') + feature.get('animalSpecies').toLowerCase();
                     iconDicts[key] = feature.get('animalIcon');
                     
@@ -1048,13 +1062,14 @@ function hideAnimal(animal) {
     });
     displayedAnimals.delete(animal);
     updateDisplayedAnimalsList(displayedAnimals);
+    updateHiddenAnimalsList();
 }
 
 
 
 function showOnly(animal) {
     const layers = window.hmiState.basemap.getLayers().getArray();
-    
+    hiddenAnimals.delete(animal.species.toLowerCase());
     layers.forEach(layer => {
         if (layer instanceof ol.layer.Vector) {
             layer.getSource().getFeatures().forEach(feature => {
@@ -1077,12 +1092,13 @@ function showOnly(animal) {
                     feature.setStyle(new ol.style.Style({ display: 'none' })); // Hide animal
                     console.log("Hiding ", animalName)
                     console.log(iconDicts)
+                    hiddenAnimals.add(animalName);
                 }
             };
           });
         }
     });
-
+    updateHiddenAnimalsList();
    
 }
 
@@ -1101,7 +1117,7 @@ function updateDisplayedAnimalsList(displayedAnimals){
 
     hideButton.onclick = () => {
         console.log("Hide button clicked for", animal);
-        hideAnimal(animal)
+        hideAnimal(animal);
     };
     listItem.appendChild(textSpan);
     listItem.appendChild(hideButton);
@@ -1112,17 +1128,43 @@ function updateDisplayedAnimalsList(displayedAnimals){
 
 }
 
-function unHideAll(animal) {
+function updateHiddenAnimalsList(){
+
+  const listContainer = document.getElementById('hideAnimalList');
+  listContainer.innerHTML = '';
+  hiddenAnimals.forEach(function(animal){
+    const listItem = document.createElement('li');
+    const textSpan = document.createElement('span');
+    textSpan.textContent = animal;
+    const showButton = document.createElement('button');
+    showButton.textContent = 'Show';
+    showButton.className = 'btn btn-hide';
+    showButton.style.color='green';
+
+    showButton.onclick = () => {
+        console.log("Show button clicked for", animal);
+        showAnimal(animal)
+    };
+    listItem.appendChild(textSpan);
+    listItem.appendChild(showButton);
+    //listItem.textContent = animal;
+    listContainer.appendChild(listItem);
+  })
+
+}
+
+
+function resetSearchFilter() {
     const layers = window.hmiState.basemap.getLayers().getArray();
 
     layers.forEach(layer => {
         if (layer instanceof ol.layer.Vector) {
             layer.getSource().getFeatures().forEach(feature => {
                 
-              
+                if(feature.get('animalSpecies')!=undefined){
                 const animalName = feature.get('animalSpecies').toLowerCase();
                 //console.log(animalName,animal)
-                if (animalName.includes(animal.species.toLowerCase())) {
+                if (displayedAnimals.has(animalName)) {
                     console.log("Not Unhiding ", animalName)
                 }else {
                     key = feature.get('eventId') + feature.get('animalSpecies').toLowerCase();
@@ -1131,9 +1173,14 @@ function unHideAll(animal) {
                     feature.setStyle(visibleStyle(url)); //Show animal
                     console.log("Showing ", animalName)
                 }
-            });
-        }
+            };
+        });
+      }
     });
+    hiddenAnimals.clear();
+    displayedAnimals.clear();
+    updateHiddenAnimalsList();
+    updateDisplayedAnimalsList();
 }
 
 
