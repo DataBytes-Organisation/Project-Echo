@@ -20,6 +20,7 @@ import paho.mqtt.client as paho
 from app.middleware.auth import signJWT, decodeJWT
 from app.middleware.auth_bearer import JWTBearer
 from app.middleware.random import randompassword
+from app.middleware.random import genotp
 from bson.objectid import ObjectId
 import uuid
 
@@ -496,28 +497,54 @@ def deleteaccount():
 
 @router.post("/forgot-password", status_code=status.HTTP_201_CREATED)
 def forgotpassword(user: schemas.ForgotPasswordSchema):
+    # existing_user = User.find_one({"$or": [{"username": user.user}, {"email": user.user}]})
+    # if existing_user:
+    #     newpassword = randompassword()
+    #     print(newpassword)
+    #     password_hashed = bcrypt.hashpw(newpassword.encode('utf-8'), bcrypt.gensalt(rounds=8))
+
+    #     user_dict = {}
+    #     user_dict["userId"] = str(existing_user['_id'])
+    #     user_dict["newPassword"] = password_hashed.decode('utf-8')
+    #     user_dict["modified_date"] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+    #     ForgotPassword.insert_one(user_dict)
+
+    #     User.update_one(
+    #        {"$or": [{"username": user.user}, {"email": user.user}]},
+    #        {"$set": {"password": password_hashed.decode('utf-8')}}
+    #     )
+        
+    #     response = {"message": "Password has been reset. Please check your email", "email": existing_user["email"], "password": newpassword}
+    #     return JSONResponse(content=response, status_code = 201)
+    
+    # response = {"message": "User not Found!"}
+    # return JSONResponse(content=response, status_code = 404)
+
     existing_user = User.find_one({"$or": [{"username": user.user}, {"email": user.user}]})
     if existing_user:
-        newpassword = randompassword()
-        print(newpassword)
-        password_hashed = bcrypt.hashpw(newpassword.encode('utf-8'), bcrypt.gensalt(rounds=8))
+        otp = genotp()
+        print(otp)
+        password_hashed = bcrypt.hashpw(otp.encode('utf-8'), bcrypt.gensalt(rounds=8))
 
         user_dict = {}
         user_dict["userId"] = str(existing_user['_id'])
-        user_dict["newPassword"] = password_hashed.decode('utf-8')
+        user_dict["otp"] = password_hashed.decode('utf-8')
         user_dict["modified_date"] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
         ForgotPassword.insert_one(user_dict)
 
         User.update_one(
            {"$or": [{"username": user.user}, {"email": user.user}]},
-           {"$set": {"password": password_hashed.decode('utf-8')}}
+           {"$set": {"otp": password_hashed.decode('utf-8')}}
         )
         
-        response = {"message": "Password has been reset. Please check your email", "email": existing_user["email"], "password": newpassword}
+        response = {"message": "New Otp geerated. Please check your email", "email": existing_user["email"], "otp": otp}
         return JSONResponse(content=response, status_code = 201)
     
     response = {"message": "User not Found!"}
     return JSONResponse(content=response, status_code = 404)
+
+
+
 
 
 # Get request for filter algorithm phase 1
