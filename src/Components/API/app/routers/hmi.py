@@ -534,7 +534,7 @@ def forgotpassword(user: schemas.ForgotPasswordSchema):
 
         User.update_one(
            {"$or": [{"username": user.user}, {"email": user.user}]},
-           {"$set": {"otp": password_hashed.decode('utf-8')}}
+           {"$set": {"otp": otp}}
         )
         
         response = {"message": "New Otp geerated. Please check your email", "email": existing_user["email"], "otp": otp}
@@ -545,16 +545,21 @@ def forgotpassword(user: schemas.ForgotPasswordSchema):
 
 
 @router.post("/reset-password", status_code=status.HTTP_201_CREATED)
-def forgotpassword(user: schemas.ForgotPasswordSchema):
+def forgotpassword(user: schemas.ResetPasswordSchema):
     existing_user = User.find_one({"$or": [{"username": user.user}]})
     if existing_user:
-        password_hashed = bcrypt.hashpw(existing_user['password'].encode('utf-8'), bcrypt.gensalt(rounds=8))
+        # if user.otp == existing_user["otp"]:
+        password_hashed = bcrypt.hashpw(user.password.encode('utf-8'), bcrypt.gensalt(rounds=8))
         User.update_one(
-           {"$or": [{"username": user.user}, {"email": user.user}]},
-           {"$set": {"password": password_hashed.decode('utf-8')}}
+        {"$or": [{"username": user.user}]},
+        {"$set": {"password": password_hashed.decode('utf-8')}}
         )
+        
         response = {"message": "New Password Generated.", "email": existing_user["email"], "Password": existing_user['password']}
         return JSONResponse(content=response, status_code = 201)
+        # else:
+        #     response = {"message": "invalid OTP"}
+        #     return JSONResponse(content=response, status_code = 401)
     response = {"message": "User not Found!"}
     return JSONResponse(content=response, status_code = 404)
 
