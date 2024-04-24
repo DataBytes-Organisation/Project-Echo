@@ -126,8 +126,6 @@ class UserSignupSchema(BaseModel):
     address: AddressSchema
     organization: str
     phonenumber: Optional[str]
-    emailVerificationCode: str
-
 
 
     @validator('DoB', pre=True)

@@ -182,12 +182,7 @@ def post_recording(data: schemas.RecordingData):
     
 @router.post("/signup", status_code=status.HTTP_201_CREATED)
 def signup(user: schemas.UserSignupSchema):  
-    # Check the verification code
-    stored_verification_code = get_verification_code_for_user(user.email)
-    if user.emailVerificationCode != stored_verification_code:
-        response = {"message": "Invalid verification code"}
-        return JSONResponse(content=response, status_code=400)
-
+    # Check to see if the request body has conflict with the database
     existing_user = User.find_one({"$or": [{"username": user.username}, {"email": user.email}]})
     if existing_user:
         if existing_user['username'] == user.username:
@@ -220,16 +215,6 @@ def signup(user: schemas.UserSignupSchema):
     User.insert_one(user_dict)
     response = {"message": "User was registered successfully!"}
     return JSONResponse(content=response, status_code=201)
-
-@router.post("/sendVerificationCode", status_code=status.HTTP_200_OK)
-def send_verification_code(email: str):
-    # Generate a random verification code
-    verification_code = str(random.randint(100000, 999999))
-    # Store the verification code for the user
-    store_verification_code_for_user(email, verification_code) 
-    # Send the verification code to the user's email
-    send_email(email, verification_code) 
-    return JSONResponse(content={"message": "Verification code sent"}, status_code=200)
 
 @router.post("/signin", status_code=status.HTTP_200_OK)
 def signin(user: schemas.UserLoginSchema):

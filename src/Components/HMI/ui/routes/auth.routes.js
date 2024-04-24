@@ -14,22 +14,8 @@ module.exports = function (app) {
     next();
   });
 
-  app.post("/api/auth/sendVerificationCode", async (req, res) => {
-    const email = req.body.email;
-    // Generate a random verification code
-    const verificationCode = Math.floor(100000 + Math.random() * 900000);
-    // Store the verification code in the user's session or in your database
-    req.session.verificationCode = verificationCode;
-    // Send the verification code to the user's email
-    await sendEmail(email, verificationCode);
-    res.status(200).send("Verification code sent");
-});
-
-app.post("/api/auth/signup", verifySignUp.confirmPassword, async (req, res) => {
-    // Check the verification code
-    if (req.body.verificationCode !== req.session.verificationCode) {
-        return res.status(400).send("Invalid verification code");
-    }
+  app.post("/api/auth/signup", verifySignUp.confirmPassword, async (req, res) => {
+    
     const rolesList = [req.body.roles]
     // After signup page are completed and merged
     // Use this schema instead of the bottom one 
@@ -45,21 +31,22 @@ app.post("/api/auth/signup", verifySignUp.confirmPassword, async (req, res) => {
       
       address : {"country": req.body.country, "state": req.body.state} 
     }
-    
-    try {
-      const axiosResponse = await axios.post('http://ts-api-cont:9000/hmi/signup',schema)
-    
-      if (axiosResponse.status === 201) {
-        console.log('Status Code: ' + axiosResponse.status + ' ' + axiosResponse.statusText)
-        res.status(201).send(`<script> window.location.href = "/login"; alert("User registered successfully");</script>`);
-      } else {
-        res.status(400).send(`<script> window.location.href = "/login"; alert("Ooops! Something went wrong");</script>`);
+
+  
+      try {
+        const axiosResponse = await axios.post('http://ts-api-cont:9000/hmi/signup',schema)
+      
+        if (axiosResponse.status === 201) {
+          console.log('Status Code: ' + axiosResponse.status + ' ' + axiosResponse.statusText)
+          res.status(201).send(`<script> window.location.href = "/login"; alert("User registered successfully");</script>`);
+        } else {
+          res.status(400).send(`<script> window.location.href = "/login"; alert("Ooops! Something went wrong");</script>`);
+        }
+      } catch (err) {
+        console.log('Status Code: ' + err.response.status + ' ' + err.response.statusText)
+        console.log(err.response.data)
+        res.status(404).send(`<script> window.location.href = "/login"; alert("Register exception error occured!");</script>`);
       }
-    } catch (err) {
-      console.log('Status Code: ' + err.response.status + ' ' + err.response.statusText)
-      console.log(err.response.data)
-      res.status(404).send(`<script> window.location.href = "/login"; alert("Register exception error occured!");</script>`);
-    }
 });
     
   app.post("/api/auth/signin", async (req, res) => {
