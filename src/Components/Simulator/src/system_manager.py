@@ -13,6 +13,11 @@ class SystemManager:
         self.command_queue = asyncio.Queue()
         self.sim_mode = "Animal Mode"
 
+        self.topic_handlers = {
+            str("Simulator_Controls"): self.on_message,
+            str("Simulate_Recording"): self.on_recording_message
+        }
+
     def read_configuration(self):
         config_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config', '.config')
         with open(config_file_path) as f:
@@ -22,37 +27,50 @@ class SystemManager:
             key, value = line.strip().split('=')
             os.environ[key] = value
 
+
+
     async def initialise_communications(self):
-        # sleep and wait for MQTT server to initialise
         print("Initialising communications with MQTT", flush=True)
         while True:
+            tasks = []
             try:
                 async with MqttClient(os.environ['MQTT_CLIENT_URL'], int(os.environ['MQTT_CLIENT_PORT']), clean_session=True) as mqtt_client:
                     print("Connected... waiting for start command", flush=True)
                     await mqtt_client.subscribe("Simulator_Controls")
                     await mqtt_client.subscribe("Simulate_Recording")
-                    await asyncio.gather(self.handle_messages(mqtt_client), self.run_loop())                   
+                    tasks = [
+                        asyncio.create_task(self.handle_messages(mqtt_client)),
+                        asyncio.create_task(self.run_loop())
+                    ]
+                    await asyncio.gather(*tasks)
             except Exception as e:
-                print(f"Exception {e} Retrying...", flush=True)
-            await asyncio.sleep(1)    
+                print(f"Exception in communications: {e}", flush=True)
+                for task in tasks:
+                    task.cancel()
+                try:
+                    await asyncio.gather(*tasks)
+                except asyncio.CancelledError:
+                    print("All tasks cancelled after an error.", flush=True)
+            finally:
+                await asyncio.sleep(1)
 
     async def handle_messages(self, mqtt_client):
-        topic_filter = "Simulator_Controls"
-        topic_filter2 = "Simulate_Recording"
         async with mqtt_client.messages() as messages:
             async for msg in messages:
-                if str(topic_filter) == str(msg.topic):
-                    await self.on_message(mqtt_client, None, msg)
-                if str(topic_filter2) == str(msg.topic):
-                    await self.on_recording_message(mqtt_client, None, msg)
-                
+                topic = str(msg.topic)
+                handler = self.topic_handlers.get(topic)
+                if handler:
+                    await handler(mqtt_client, None, msg)
+                else:
+                    print(f"Unhandled topic: {topic} - Available handlers: {list(self.topic_handlers.keys())}")
 
     async def on_message(self, client, userdata, msg):
         message = msg.payload.decode('utf-8')
         await self.command_queue.put(message)
+        print(f"Received command: {message}")
 
     async def on_recording_message(self, client, userdata, msg):
-        print("calling handle recording")
+        print("Handling recording message")
         await self.simulator.handle_recording_message(msg)
 
     async def start_sim(self, mode):
@@ -69,7 +87,14 @@ class SystemManager:
             print("Simulator is not running", flush=True)
         else:
             print("Stopping Simulator", flush=True)
-            self.sim_task.cancel()
+            if self.sim_task:
+                self.sim_task.cancel()
+                try:
+                    await self.sim_task
+                except asyncio.CancelledError:
+                    print("Simulator task cancelled.", flush=True)
+                except Exception as e:
+                    print(f"Error while stopping the simulator: {e}", flush=True)
             self.sim_running = False
             print("Simulator has stopped.", flush=True)
 
