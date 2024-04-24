@@ -544,6 +544,19 @@ def forgotpassword(user: schemas.ForgotPasswordSchema):
     return JSONResponse(content=response, status_code = 404)
 
 
+@router.post("/reset-password", status_code=status.HTTP_201_CREATED)
+def forgotpassword(user: schemas.ForgotPasswordSchema):
+    existing_user = User.find_one({"$or": [{"username": user.user}]})
+    if existing_user:
+        password_hashed = bcrypt.hashpw(existing_user['password'].encode('utf-8'), bcrypt.gensalt(rounds=8))
+        User.update_one(
+           {"$or": [{"username": user.user}, {"email": user.user}]},
+           {"$set": {"password": password_hashed.decode('utf-8')}}
+        )
+        response = {"message": "New Password Generated.", "email": existing_user["email"], "Password": existing_user['password']}
+        return JSONResponse(content=response, status_code = 201)
+    response = {"message": "User not Found!"}
+    return JSONResponse(content=response, status_code = 404)
 
 
 
