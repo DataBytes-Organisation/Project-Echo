@@ -191,14 +191,6 @@ for file_name in os.listdir(directory_path):
         # Convert Sxx to dB
         Sxx_dB = 10 * np.log10(Sxx + 1e-10)
 
-        # Find indices of frequencies over 2 kHz
-        frequencyBenchmark = 2000
-        freq_indices = np.where(frequencies > frequencyBenchmark)[0]
-
-        # Initialize an array to mark time slices where the condition is met
-        time_slices_exceeding_threshold = []
-        dbThreshold = 20  # dB threshold
-
         #plotting the spectrogram
         plt.figure(figsize=(10, 4))
         plt.pcolormesh(times, frequencies, Sxx_dB, shading='gouraud')
