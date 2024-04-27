@@ -120,16 +120,25 @@
                 <div class="container">
                     <div class="page" data-page="1">
                         <label for="username"><b>Username</b></label>
-                        <input type="text" placeholder="Enter Username" name="username" required>
+                        <input type="text" placeholder="Enter Username" name="username" required id="username">
         
                         <label for="email"><b>Email</b></label>
-                        <input type="email" placeholder="Enter Email" name="email" required>
-        
+                        <input type="email" placeholder="Enter Email" name="email" required id="email">
+
+                        <label for="inputOTP"><b>OTP</b></label>
+                        <input type="text" placeholder="Enter OTP" name="inputOTP" required id="inputOTP">
+
+                        <!-- Create a dynamic button -->
+                        <button type="button" id="send-otp-button" onclick="sendOTP()">Send OTP</button>
+                        <button type="button" id="verify-otp-button" onclick="verifyOTP()" style="display: none;" disabled>Verify OTP</button>
+                
                         <label for="password"><b>Password</b></label>
-                        <input type="password" placeholder="Enter Password" name="password" required>
-        
+                        <!-- Password input disabled by default -->
+                        <input type="password" placeholder="Enter Password" name="password" required disabled id="password">
+                
                         <label for="confirmpassword"><b>Confirm Password</b></label>
-                        <input type="password" placeholder="Enter Password Again" name="confirmpassword" required>
+                        <!-- Confirm Password input disabled by default -->
+                        <input type="password" placeholder="Enter Password Again" name="confirmpassword" required disabled id="confirmpassword">
                     </div>
         
                     <div class="page" data-page="2">
@@ -168,7 +177,7 @@
         
                     <div class="container" style="background-color:#f1f1f1">
                         <button type="button" id="prev-button" onclick="prevPage()">Previous</button>
-                        <button type="button" id="next-button" onclick="nextPage()">Next</button>
+                        <button type="button" id="next-button" onclick="nextPage()" disabled>Next</button>
                         <button type="submit" class="btn10" id="submit-button">Sign Up</button>
                     </div>
                 </div>
@@ -191,18 +200,58 @@
                     }
                 });
                 if (pageNum === 1) {
-                prevButton.style.display = 'none';
-                nextButton.style.display = 'block';
-                submitButton.style.display = 'none';
-            } else if (pageNum === pages.length) {
-                prevButton.style.display = 'block';
-                nextButton.style.display = 'none';
-                submitButton.style.display = 'block';
-            } else {
-                prevButton.style.display = 'block';
-                nextButton.style.display = 'block';
-                submitButton.style.display = 'none';
+                    prevButton.style.display = 'none';
+                    nextButton.style.display = 'block';
+                    submitButton.style.display = 'none';
+                } else if (pageNum === pages.length) {
+                    prevButton.style.display = 'block';
+                    nextButton.style.display = 'none';
+                    submitButton.style.display = 'block';
+                } else {
+                    prevButton.style.display = 'block';
+                    nextButton.style.display = 'block';
+                    submitButton.style.display = 'none';
+                }
             }
+
+            function sendOTP() {
+                var verify_otp_sent = true;
+                document.getElementById('send-otp-button').style.display = 'none';
+                document.getElementById('verify-otp-button').style.display = '';
+                document.getElementById('verify-otp-button').disabled = false;
+            }
+
+            function verifyOTP() {
+                const inputOTP = document.getElementById('inputOTP').value;
+                const userEmail = document.getElementById('email').value;
+
+                // Verify OTP with backend
+                fetch('/verify-otp', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email: userEmail, otp: inputOTP })
+                })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    throw new Error('Failed to verify OTP');
+                })
+                .then(data => {
+                    console.log(data.message); // Output success message from backend
+                    document.getElementById('next-button').disabled = false;
+                    document.getElementById('password').disabled = false;
+                    document.getElementById('confirmpassword').disabled = false;
+                    document.getElementById('email').disabled = true;
+                    document.getElementById('username').disabled = true;
+                    document.getElementById('inputOTP').disabled = true;
+                    document.getElementById('otp-button').disabled = false;
+                })
+                .catch(error => {
+                    console.error('Error verifying OTP:', error);
+                });
             }
         
             function prevPage() {
