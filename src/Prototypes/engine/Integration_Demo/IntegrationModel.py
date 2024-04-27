@@ -38,22 +38,29 @@ yamnet_model.load_weights('yamnet.h5')
 yamnet_classes = yamnet.class_names('yamnet_class_map.csv')
 
 #Load specialized engine
-model = tf.keras.models.load_model('C:/Users/22396/PycharmProjects/temporaryEcho/models/Inception0/') # Replace this with your own model path.
+model = tf.keras.models.load_model('C:\\Users\\22396\\Documents\\GitHub\\Project-Echo2024\\Project-Echo\\src\\Components\\Engine\\models\\echo_model\\1') # Replace this with your own model path.
 df = pd.read_csv('Classes.csv')
 class_names = df["Class Name"].tolist()
 
 # Using YamNet to recognize audio for further classification
 def recognize_audio(waveform, expected_class_names, top_n=10):
     prediction = np.mean(yamnet_model.predict(np.reshape(waveform, [1, -1]), steps=1)[0], axis=0)
+    if len(prediction) < top_n:
+        top_n = len(prediction)  # Adjust top_n to avoid out-of-range errors
+
     sorted_indices = np.argsort(prediction)[-top_n:][::-1]
+    if not sorted_indices.size:
+        return False  # Early exit if no predictions
 
     matching_classes = set(yamnet_classes[sorted_indices]).intersection(set(expected_class_names))
+    if not matching_classes:
+        return False  # Early exit if no matching classes
+
     is_condition_met = any(
         [prediction[idx] > 0.2 for idx in sorted_indices if yamnet_classes[idx] in matching_classes])
 
-    if is_condition_met:
-        return True
-    return False
+    return is_condition_met
+
 
 # Function to preprocess audio sample
 def process_audio(waveform):
@@ -174,11 +181,19 @@ def process_audio_file(audio_filepath, threshold=0.05):
             audio_image = process_audio(segment)
             audio_image = np.expand_dims(audio_image, axis=0)
             predictions = model.predict(audio_image)
-            predicted_index = np.argmax(predictions[0])
-            predicted_class = class_names[predicted_index]
-            start_time = round(start_sample / SC['AUDIO_SAMPLE_RATE'], 1)
-            end_time = round(end_sample / SC['AUDIO_SAMPLE_RATE'], 1)
-            print(f"Specialized model prediction between {start_time}s to {end_time}s: {predicted_class}")
+            print(f"Predictions: {predictions}")
+            if predictions.size > 0 and len(predictions[0]) > 0:
+                predicted_index = np.argmax(predictions[0])
+                print(f"Predicted index: {predicted_index}, Total classes: {len(class_names)}")
+                if predicted_index < len(class_names):
+                    predicted_class = class_names[predicted_index]
+                    start_time = round(start_sample / SC['AUDIO_SAMPLE_RATE'], 1)
+                    end_time = round(end_sample / SC['AUDIO_SAMPLE_RATE'], 1)
+                    print(f"Specialized model prediction between {start_time}s to {end_time}s: {predicted_class}")
+                else:
+                    print("Predicted index is out of range for class names.")
+            else:
+                print("No valid predictions were returned.")
         else:
             start_time = round(start_sample / SC['AUDIO_SAMPLE_RATE'], 1)
             end_time = round(end_sample / SC['AUDIO_SAMPLE_RATE'], 1)

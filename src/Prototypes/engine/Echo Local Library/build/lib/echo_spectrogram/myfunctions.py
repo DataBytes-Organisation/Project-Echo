@@ -14,27 +14,48 @@ import soundfile as sf
 import random
 import audiomentations
 from audiomentations import Compose, AddGaussianNoise, TimeStretch, PitchShift, Shift
-AUDIO_CLIP_DURATION = 5 # seconds 
-AUDIO_NFFT =  2048
-AUDIO_WINDOW = None
-AUDIO_STRIDE = 200
-AUDIO_SAMPLE_RATE = 48000
-AUDIO_MELS = 260
-AUDIO_FMIN = 20
-AUDIO_FMAX =13000
-AUDIO_TOP_DB = 80
+
 
 class myFunctions:
     # these are global constants in the engine pipeline and throughout echonet. Stick to these for all spectrogram generations
     #Initialise variables
-    n_mels=256
-    hop_length=128
-    fmax=8000
+    AUDIO_CLIP_DURATION = 5 # seconds 
+    AUDIO_NFFT =  2048
+    AUDIO_WINDOW = None
+    AUDIO_STRIDE = 200
+    AUDIO_SAMPLE_RATE = 48000
+    AUDIO_MELS = 260
+    AUDIO_FMIN = 20
+    AUDIO_FMAX =13000
+    AUDIO_TOP_DB = 80
+    n_mels= int
+    hop_length = int
+    fmax = int
 
-    def __init__(self):
-        self.n_mels=256
-        self.hop_length=128
-        self.fmax=8000
+    # initialise mtfunctions class with defualt prarmeters 
+    def __init__(self, _n_mels=256,_hop_length=128,_fmax=8000):
+        self.n_mels=_n_mels
+        self.hop_length= _hop_length
+        self.fmax = _fmax
+
+    
+    # prints instance variable and constants 
+    def PrintSettings(self):
+        print(
+    f"AUDIO_CLIP_DURATION   {self.AUDIO_CLIP_DURATION} \n" +  
+    f"AUDIO_NFFT            {self.AUDIO_NFFT}\n"+
+    f"AUDIO_WINDOW          {self.AUDIO_WINDOW}\n"+ 
+    f"AUDIO_STRIDE          {self.AUDIO_STRIDE}\n"+
+    f"AUDIO_SAMPLE_RATE     {self.AUDIO_SAMPLE_RATE}\n"+
+    f"AUDIO_MELS            {self.AUDIO_MELS}\n"+
+    f"AUDIO_FMIN            {self.AUDIO_FMIN}\n"+
+    f"AUDIO_FMAX            {self.AUDIO_FMAX}\n"+
+    f"AUDIO_TOP_DB          {self.AUDIO_TOP_DB}\n"+
+    f"n_mels                {self.n_mels}\n"+
+    f"hop_length            {self.hop_length}\n"+
+    f"fmax                  {self.fmax}")
+
+        
 
 
     
@@ -95,7 +116,7 @@ class myFunctions:
             y_axis_label =None   
         
         audio, sr = librosa.load(filepath)                     
-        mel_spectrogram = librosa.feature.melspectrogram(y=audio, sr=sr,n_mels=AUDIO_MELS, hop_length=AUDIO_STRIDE, fmax=AUDIO_FMAX)
+        mel_spectrogram = librosa.feature.melspectrogram(y=audio, sr=sr,n_mels=self.AUDIO_MELS, hop_length=self.AUDIO_STRIDE, fmax=self.AUDIO_FMAX)
         fig = plt.figure(figsize = (image_width,image_height))
         ax = fig.add_subplot(111)
 
@@ -193,7 +214,7 @@ class myFunctions:
         #Apply only Shift
         output_path= output_path + "Shift."+fileExtension
         augment= Compose([
-            Shift(min_fraction=-0.5, max_fraction=0.5, p=1),
+            Shift(min_shift=-0.5, max_shift=0.5, p=1),
             ])
         augmented_audio = augment(samples=audio, sample_rate=sr)
         sf.write(output_path,augmented_audio,sr)
@@ -218,7 +239,7 @@ class myFunctions:
 
             # Shift the audio in time by a random fraction
             # This can help the model become invariant to the position of important features in the audio
-            Shift(min_fraction=-0.5, max_fraction=0.5, p=1),
+            Shift(min_shift=-0.5, max_shift=0.5, p=1),
         ])
         augmented_audio = augment(samples=audio, sample_rate=sr)
         sf.write(output_path,augmented_audio,sr)

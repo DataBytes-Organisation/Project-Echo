@@ -14,9 +14,10 @@ WORKDIR /usr/src/app/ui
 
 # Install your application's dependencies
 RUN npm install
+RUN npm install -g nodemon
 
 # The application runs on port 8080, so let Docker know about this
 EXPOSE 8080
 
 # The command to run your application
-CMD [ "node", "server.js" ]
+CMD [ "nodemon", "server.js" ]
