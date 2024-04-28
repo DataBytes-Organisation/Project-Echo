@@ -13,3 +13,6 @@ src\Prototypes\api\__pycache__
 
 src/Prototypes/hmi/ui/node_modules/*
 src/Components/HMI/ui/node_modules/*
+
+# Temporary files from Cloud Storage (added by ptanmay143)
+.tmp.driveupload
