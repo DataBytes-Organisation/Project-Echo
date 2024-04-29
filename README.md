@@ -1,4 +1,4 @@
-# Project Echo - Bioacoustics Classification Tool 🤖
+
 
 We are thrilled to share the progress of Project Echo, where we aim to develop an AI/ML solution for discerning the density and classification of noise-producing animals in rainforests. Our ultimate goal is to furnish conservationists with an efficient and non-invasive tool for monitoring threatened animal species populations over time.
 
