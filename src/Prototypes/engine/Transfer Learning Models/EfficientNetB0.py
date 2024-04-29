@@ -30,7 +30,7 @@ print("Audiomentations Version  : ", audiomentations.__version__)
 warnings.filterwarnings("ignore")
 os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION"] = "python"
 SC = {
-    "AUDIO_DATA_DIRECTORY": "C:\\Users\\ptanmay143\\Data\\Projects\\project-echo-data",
+    "AUDIO_DATA_DIRECTORY": "C:\\Users\\ptanmay143\\Data\\Projects\\project-echo-data-bucket-3",
     "CACHE_DIRETORY": "C:\\Users\\ptanmay143\\Data\\Projects\\project-echo-data-cache",
     "AUDIO_CLIP_DURATION": 1,  # seconds
     "AUDIO_NFFT": 2048,
@@ -509,8 +509,8 @@ def build_model(trainable):
 
 
 def train_model():
-    if not os.path.exists(f"models/tp/{MODEL_NAME}/"):
-        os.makedirs(f"models/tp/{MODEL_NAME}/", exist_ok=True)
+    if not os.path.exists(f"models/{MODEL_NAME}/"):
+        os.makedirs(f"models/{MODEL_NAME}/", exist_ok=True)
 
     model = build_model(trainable=False)
     start_time = time.time()
@@ -545,7 +545,7 @@ def train_model():
 
     # save the best model as it trains..
     mcp_save = tf.keras.callbacks.ModelCheckpoint(
-        "models/checkpoint_generic_model.hdf5",
+        f"models/checkpoint_{MODEL_NAME}.hdf5",
         save_best_only=True,
         monitor="val_loss",
         mode="min",
@@ -563,7 +563,4 @@ def train_model():
     print(f"Model Training Time: {elapsed_time} seconds")
     print(f"Model Training Time: {round(elapsed_time / 60, 2)} minutes")
 
-    model.save(f"models/tp/{MODEL_NAME}/", overwrite=True)
-
-
-train_model()
+    model.save(f"models/{MODEL_NAME}/", overwrite=True)
