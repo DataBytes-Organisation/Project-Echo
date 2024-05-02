@@ -14,10 +14,11 @@ import pandas as pd
 from audiomentations import Compose, AddGaussianNoise, TimeStretch, PitchShift, Shift
 import params
 import yamnet
+from sklearn.preprocessing import LabelEncoder
 
 # Set constants for audio processing
 SC = {
-    'AUDIO_CLIP_DURATION': 5,  # seconds
+    'AUDIO_CLIP_DURATION': 2,  # seconds
     'AUDIO_NFFT': 2048,
     'AUDIO_WINDOW': None,
     'AUDIO_STRIDE': 200,
@@ -42,24 +43,21 @@ model = tf.keras.models.load_model('C:\\Users\\22396\\Documents\\GitHub\\Project
 df = pd.read_csv('Classes.csv')
 class_names = df["Class Name"].tolist()
 
+#Load weather engine
+weather_model = tf.keras.models.load_model('WeatherAudioDetectionModel.h5')
+
 # Using YamNet to recognize audio for further classification
 def recognize_audio(waveform, expected_class_names, top_n=10):
     prediction = np.mean(yamnet_model.predict(np.reshape(waveform, [1, -1]), steps=1)[0], axis=0)
-    if len(prediction) < top_n:
-        top_n = len(prediction)  # Adjust top_n to avoid out-of-range errors
-
     sorted_indices = np.argsort(prediction)[-top_n:][::-1]
-    if not sorted_indices.size:
-        return False  # Early exit if no predictions
+    matching_classes = {yamnet_classes[i]: prediction[i] for i in sorted_indices if yamnet_classes[i] in expected_class_names}
 
-    matching_classes = set(yamnet_classes[sorted_indices]).intersection(set(expected_class_names))
-    if not matching_classes:
-        return False  # Early exit if no matching classes
+    # Check for bird and weather-related sounds
+    bird_related = {'Animal', 'Bird', 'Bird vocalization, bird call, bird song'}
+    is_bird_call = any(cls in bird_related for cls in matching_classes)
 
-    is_condition_met = any(
-        [prediction[idx] > 0.2 for idx in sorted_indices if yamnet_classes[idx] in matching_classes])
+    return is_bird_call
 
-    return is_condition_met
 
 
 # Function to preprocess audio sample
@@ -158,10 +156,30 @@ def enhanced_event_detection(waveform, sample_rate, threshold=0.5, min_event_dur
     print(f"Detected {len(events)} events.")
 
     return events
+def pad_audio(audio, duration=2, sr=16000):
+    required_samples = sr * duration
+    if len(audio) < required_samples:
+        audio = np.pad(audio, (0, required_samples - len(audio)), 'constant')
+    else:
+        audio = audio[:required_samples]
+    return audio
 
+def prepare_audio_segment(audio_segment):
+    audio_padded = pad_audio(audio_segment, duration=SC['AUDIO_CLIP_DURATION'], sr=SC['AUDIO_SAMPLE_RATE'])
+    mel_spectrogram = librosa.feature.melspectrogram(
+        y=audio_padded, sr=SC['AUDIO_SAMPLE_RATE'],
+        n_fft=SC['AUDIO_NFFT'],
+        hop_length=SC['AUDIO_STRIDE'],
+        n_mels=SC['AUDIO_MELS'],
+        fmin=SC['AUDIO_FMIN'],
+        fmax=SC['AUDIO_FMAX']
+    )
+    log_mel_spectrogram = librosa.power_to_db(mel_spectrogram, top_db=SC['AUDIO_TOP_DB'])
+    spectrogram_resized = tf.image.resize(log_mel_spectrogram[np.newaxis, :, :, np.newaxis], [SC['MODEL_INPUT_IMAGE_HEIGHT'], SC['MODEL_INPUT_IMAGE_WIDTH']])
+    spectrogram_resized = np.repeat(spectrogram_resized, SC['MODEL_INPUT_IMAGE_CHANNELS'], axis=-1)
+    return spectrogram_resized
 
-
-def process_audio_file(audio_filepath, threshold=0.05):
+def process_audio_file(audio_filepath, threshold=0.05, weather_threshold=0.5):
     print("Processing audio file:", audio_filepath)
     # Load the audio file
     waveform, _ = librosa.load(audio_filepath, sr=SC['AUDIO_SAMPLE_RATE'])
@@ -173,18 +191,22 @@ def process_audio_file(audio_filepath, threshold=0.05):
     for start_sample, end_sample in events:
         segment = waveform[start_sample:end_sample]
 
-        # Classify with YAMNet
-        is_bird_call = recognize_audio(segment, ['Animal', 'Bird', 'Bird vocalization, bird call, bird song'])
-        print(f"YAMNet prediction for segment: {is_bird_call}")
+        audio_image = prepare_audio_segment(segment)
+
+        weather_predictions = weather_model.predict(audio_image)
+        handle_weather_predictions(weather_predictions, weather_threshold)
+
+        audio_image = process_audio(segment)
+
+        is_bird_call = recognize_audio(segment,['Animal', 'Bird', 'Bird vocalization, bird call, bird song'])
+        print(f"YAMNet prediction for segment: Bird call: {is_bird_call}")
 
         if is_bird_call:
-            audio_image = process_audio(segment)
-            audio_image = np.expand_dims(audio_image, axis=0)
-            predictions = model.predict(audio_image)
-            print(f"Predictions: {predictions}")
+            # Prepare input for bird call model
+            bird_audio_image = np.expand_dims(audio_image, axis=0)
+            predictions = model.predict(bird_audio_image)
             if predictions.size > 0 and len(predictions[0]) > 0:
                 predicted_index = np.argmax(predictions[0])
-                print(f"Predicted index: {predicted_index}, Total classes: {len(class_names)}")
                 if predicted_index < len(class_names):
                     predicted_class = class_names[predicted_index]
                     start_time = round(start_sample / SC['AUDIO_SAMPLE_RATE'], 1)
@@ -194,15 +216,24 @@ def process_audio_file(audio_filepath, threshold=0.05):
                     print("Predicted index is out of range for class names.")
             else:
                 print("No valid predictions were returned.")
-        else:
-            start_time = round(start_sample / SC['AUDIO_SAMPLE_RATE'], 1)
-            end_time = round(end_sample / SC['AUDIO_SAMPLE_RATE'], 1)
-            print(f"Detected sound between {start_time}s to {end_time}s is not an animal sound.")
 
+
+def handle_weather_predictions(weather_predictions, weather_threshold=0.5):
+    encoder = LabelEncoder()
+    encoder.fit(['Earthquake', 'Rain', 'Thunder', 'Tornado'])
+    predicted_class = np.argmax(weather_predictions, axis=1)
+    if predicted_class.size == 1:
+        predicted_class = predicted_class.item()
+    predicted_label = encoder.inverse_transform([predicted_class])
+    weather_probability = max(weather_predictions.flatten())
+    if weather_probability < weather_threshold:
+        print("No particular weather events detected with high confidence.")
+    else:
+        print(f"Current weather events: {predicted_label[0]}")
 
 
 if __name__ == "__main__":
-    audio_filepath = "C:/Users/22396/Downloads/test.wav"
+    audio_filepath = r"C:\Users\22396\Downloads\audio sample.wav"
     try:
         process_audio_file(audio_filepath)
     except Exception as e:
