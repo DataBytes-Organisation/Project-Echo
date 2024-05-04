@@ -40,10 +40,91 @@
   <script src="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.min.js"></script>
   <script type="text/javascript" src="./admin/js/dashboard.js"></script>
   <script type="text/javascript" src="./admin/js/app.min.js"></script>
-  
+  <style>
+    #update-form {
+      display: none;
+      position: fixed;
+      /* or 'absolute' if you prefer */
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      /* Semi-transparent background */
+
+      justify-content: center;
+      align-items: center;
+      z-index: -1;
+    }
+  </style>
 </head>
 
 <body>
+
+  <div id="update-form">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-md-5 mt-5 bg-body-tertiary rounded">
+          <form>
+            <div class="pt-3">
+              <h3 class="text-center font-weight-bold fw-bolder"> Updated Details</h3>
+            </div>
+            <hr class="bg-light">
+
+            <!-- <label class = "fw-bolder"> User Name: </label> -->
+            <div class="input-group">
+              <p class="fw-bolder" style="white-space: pre;">User Name: </p>
+              <p id="update_usernm"></p>
+            </div>
+            <div class="input-group">
+              <p class="fw-bolder" style="white-space: pre;">Animal: </p>
+              <p id="update_animal"></p>
+            </div>
+
+            <div class="input-group">
+              <p class="fw-bolder" style="white-space: pre;">Conservation: </p>
+              <p id="old_conser"></p>
+            </div>
+
+            <div class="input-group">
+              <p class="fw-bolder" style="white-space: pre;">New Conservation: </p>
+              <p id="udate_conser"></p>
+            </div>
+
+            <div class=" input-group">
+              <p class="fw-bolder" style="white-space: pre;">Link: </p>
+              <a href="" id="link_up" target="_blank">click for link</a>
+            </div>
+
+            <div class="row mb-3">
+              <label class="col-sm-2 col-form-label fw-bolder">Summary:</label>
+              <div class="col-sm-9 ">
+                <div class="bg-light rounded border border-black mb-4 bg-white"
+                  style="height: 120px; overflow-y: scroll;  overflow-x: hidden;">
+                  <p id="summ_para"></p>
+                </div>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <label class="col-sm-2 col-form-label fw-bolder">Description:</label>
+              <div class="col-sm-9 ">
+                <div class="bg-light rounded border border-black mb-4 bg-white"
+                  style="height: 120px; overflow-y: scroll; overflow-x: hidden;">
+                  <p id="desc_para"></p>
+                </div>
+              </div>
+            </div>
+            <div class="pb-4">
+              <button id="close-btn" type="button" class="btn btn-secondary d-grid gap-2 col-4 mx-auto ">close</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
   <!--  Body Wrapper -->
   <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
     data-sidebar-position="fixed" data-header-position="fixed">
@@ -60,31 +141,34 @@
 
               <h1>REQUESTS</h1>
               <!-- <i class="screen-icon fa-brands fa-codepen"></i> -->
-              
+
               <div class="screen-user">
-                  <table>
-                      <thead>
-                        <tr>
-                          <th>Request ID</th>
-                          <th>Username</th>
-                          <th>Animal</th>
-                          <th>Requesting To Change</th>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Request ID</th>
+                      <th>Username</th>
+                      <th>Animal</th>
+                      <!-- <th>Requesting To Change</th>
                           <th>From</th>
                           <th>To</th>
-                          <th>Reason</th>
-                          <th>Date</th>
-                          <th>Status</th>
-                        </tr>
-                      </thead>
-                      <tbody id="data-body">
-                      </tbody>
-                    </table>               
+                          <th>Reason</th> -->
+                      <th>More Details</th>
+                      <th>Date</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="data-body">
+                  </tbody>
+                </table>
               </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
+  
 
 
   <script type="text/javascript">
