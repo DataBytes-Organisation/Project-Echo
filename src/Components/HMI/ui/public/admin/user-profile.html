@@ -87,17 +87,17 @@
                     class="rounded-circle"
                     width="150"
                   />
-                  <div class="mt-3">
-                    <h4 id="user_name">Admin</h4>
-                    <p class="text-secondary mb-1">Full Stack Developer</p>
-                    <p class="text-muted font-size-sm">Email</p>
-                    <button class="btn btn-primary" id="signOutButton">
-                      Sign Out
-                    </button>
-                    <button class="btn btn-outline-primary">
-                      Delete Account
-                    </button>
-                  </div>
+                    <div class="mt-3">
+                      <h4 id="user_name">Admin</h4>
+                      <p class="text-secondary mb-1">Full Stack Developer</p>
+                      <p class="text-muted font-size-sm">Email</p>
+                      <button class="btn btn-primary" id="signOutButton">
+                        Sign Out
+                      </button>
+                      <button class="btn btn-outline-primary" id="deleteAccButton">
+                        Delete Account
+                      </button>
+                    </div>
                 </div>
               </div>
             </div>
@@ -135,10 +135,27 @@
                 </div>
                 <hr />
                 <div class="row">
-                  <div class="col-sm-3">Password</div>
-                  <div class="col-sm-5 text-secondary">112233</div>
-                  <div class="col-sm-1">
-                    <a class="btn btn-info" href="">Update Password</a>
+                  <div class="col-sm-3">
+                    <h6 class="mb-0">Reset Password</h6>
+                  </div>
+                  <div class="col-sm-9">
+                    <div class="row">
+                      <div class="col-sm-4">
+                        <b>Old Password</b>
+                      </div>
+                      <input id="oldPassword" class="col-sm-5 text-secondary" type="text">
+                      <div class="col-sm-4">
+                        <b>New Password</b>
+                      </div>
+                      <input id="newPassword" class="col-sm-5 text-secondary" type="text">
+                      <div class="col-sm-4">
+                        <b>Confirm Password</b>
+                      </div>
+                      <input id="confirmPassword" class="col-sm-5 text-secondary" type="text">
+                    </div>
+                  </div>
+                  <div class="col-md-auto">
+                    <button class="btn btn-info" id="updatePassword">Update Password</button>
                   </div>
                 </div>
               </div>
@@ -220,6 +237,7 @@
     ></script>
     <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.bundle.min.js"></script>
+    <!--
     <script type="text/javascript">
       function watchAction(options) {
         const { id, api, onSuccess, onError } = options;
@@ -249,8 +267,21 @@
 
       watchAction({
         id: "#signOutButton",
-        api: "/Back-end Api",
+        api: "/hmi/signout",
         onSuccess: () => {
+          alert("logout successfully")
+          console.log("Success");
+        },
+        onError: (error) => {
+          console.error(error);
+        },
+      });
+
+      watchAction({
+        id: "#deleteAccButton",
+        api: "/hmi/delete-account",
+        onSuccess: () => {
+          alert("delete successfully")
           console.log("Success");
         },
         onError: (error) => {
@@ -258,5 +289,89 @@
         },
       });
     </script>
+    -->
+
+    <script>
+      $(document).ready(function() {
+          $('#signOutButton').click(function() {
+              // Make an AJAX request to logout endpoint
+              $.ajax({
+                  url: '/hmi/signout',
+                  type: 'POST',
+                  dataType: 'json',
+                  success: function(response) {
+                      // Check if logout was successful
+                      if (response.success) {
+                          // Redirect user to login page or perform any other action
+                          window.location.href = 'welcome.html';
+                      } else {
+                          // Handle error, if any
+                          alert('Logout failed. Please try again.');
+                      }
+                  },
+                  error: function(xhr, status, error) {
+                      // Handle AJAX error
+                      console.error('AJAX Error:', status, error);
+                  }
+              });
+          });
+
+          $('#deleteAccButton').click(function() {
+              // Make an AJAX request to logout endpoint
+              $.ajax({
+                  url: '/hmi/delete-account',
+                  type: 'DELETE',
+                  dataType: 'json',
+                  success: function(response) {
+                      // Check if logout was successful
+                      if (response.success) {
+                          // Redirect user to login page or perform any other action
+                          window.location.href = 'welcome.html';
+                      } else {
+                          // Handle error, if any
+                          alert('Delete Account\ failed. Please try again.');
+                      }
+                  },
+                  error: function(xhr, status, error) {
+                      // Handle AJAX error
+                      console.error('AJAX Error:', status, error);
+                  }
+              });
+          });
+
+          $('#updatePassword').click(function() {
+
+            var oldPassword = $('#oldPassword').val();
+            var newPassword = $('#newPassword').val();
+            var confirmPassword = $('#confirmPassword').val();
+
+              // Make an AJAX request to update Password endpoint
+              $.ajax({
+                  url: '/hmi/ChangePassword',
+                  type: 'POST',
+                  dataType: 'json',
+                  contentType: 'application/json',
+                  data: JSON.stringify({
+                      oldPassword: oldPassword,
+                      newPassword: newPassword,
+                      confirmPassword: confirmPassword
+                  }),
+                  success: function(response) {
+                      if (response.success) {
+                          alert("Password changed successfully")
+                          window.location.href = 'welcome.html';
+                      } else {
+                          // Handle error, if any
+                          alert('Update the password failed. Please try again.');
+                      }
+                  },
+                  error: function(xhr, status, error) {
+                      // Handle AJAX error
+                      console.error('AJAX Error:', status, error);
+                  }
+              });
+          });
+      });
+      </script>
   </body>
 </html>
