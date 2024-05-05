@@ -37,6 +37,41 @@ app.get('/api-endpoint-disclosure', (req, res) => {
     });
 });
 
+// Route for Clickjacking Vulnerability Testing
+app.get('/clickjacking-test', (req, res) => {
+  // Execute a command to check for clickjacking vulnerability
+  // Example command: curl -X GET -H "X-Frame-Options: deny" <target-URL>
+  exec('curl -X GET -H "X-Frame-Options: deny" <target-URL>', (err, stdout, stderr) => {
+      if (err) {
+          console.error(err);
+          res.status(500).json({ error: 'Error occurred during vulnerability test.' });
+      } else {
+          // Parse the output and send it as response
+          const testResult = stdout; // Example: "Clickjacking protection enabled: No framing allowed"
+          res.json({ testResult });
+      }
+  });
+});
+// Route for Directory Traversal Vulnerability Testing
+app.get('/directory-traversal-test', (req, res) => {
+  // Execute a command to check for directory traversal vulnerability
+  // Example command: curl -X GET <target-URL>/../../../etc/passwd
+  exec('curl -X GET <target-URL>/../../../etc/passwd', (err, stdout, stderr) => {
+      if (err) {
+          console.error(err);
+          res.status(500).json({ error: 'Error occurred during vulnerability test.' });
+      } else {
+          // Parse the output and send it as response
+          const testResult = stdout; // Example: "Directory traversal vulnerability detected: /etc/passwd accessed"
+          res.json({ testResult });
+      }
+  });
+});
+// Start the server
+const port = 8080;
+app.listen(port, () => {
+    console.log(`Server listening on port ${port}`);
+});
 const {createCaptchaSync} = require("captcha-canvas");
 
 function checkPasswordStrength(password) {
