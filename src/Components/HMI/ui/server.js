@@ -16,6 +16,26 @@ const cors = require('cors');
 require('dotenv').config();
 const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY);
 const axios = require('axios');
+// Import necessary modules
+const express = require('express');
+const app = express();
+const { exec } = require('child_process');
+
+// Route for API Endpoint Disclosure Vulnerability Testing
+app.get('/api-endpoint-disclosure', (req, res) => {
+    // Execute a command to check for API endpoint disclosure vulnerability
+    // Example command: nmap --script http-enum <target-IP>
+    exec('nmap --script http-enum <target-IP>', (err, stdout, stderr) => {
+        if (err) {
+            console.error(err);
+            res.status(500).json({ error: 'Error occurred during vulnerability scan.' });
+        } else {
+            // Parse the output and send it as response
+            const scanResult = stdout; // Example: "Found exposed API endpoints: /api/user, /api/admin"
+            res.json({ vulnerability: 'API Endpoint Disclosure', description: 'This vulnerability arises when an API unintentionally exposes information about its endpoints or inner workings to unauthorized users. It can lead to information leakage, making it easier for attackers to understand the API\'s structure and potentially identify vulnerabilities.', prevention: 'To prevent this, organizations should implement proper access controls, authentication, and authorization mechanisms to ensure that sensitive endpoint information is not exposed.', scanResult });
+        }
+    });
+});
 
 const {createCaptchaSync} = require("captcha-canvas");
 
