@@ -636,8 +636,28 @@
               <div class="past-data-header">View Past Data:</div>
               <div class="time-range-picker">
                 <input type="text" id="datetime-range" name="datetime-range" style="width:100%" value="" />
+               
               </div>
             </div>
+            <div class="container">
+                <input type="text" id="searchInput" placeholder="Search for an animal">
+                <button onclick="{resetSearchFilter()}" class="toggle-button btn btn-secondary btn-no-background select-all-btn">Reset Filter</button>
+                <ul id="animalList">
+                </ul>
+            </div>
+            <div class="container">
+                <span>Exclusive View Animal List</span>
+                <ul id="displayOnlyAnimalList">
+                </ul>
+            </div>
+            <div class="container">
+              <span>Hidden Animal List</span>
+              <ul id="hideAnimalList">
+              </ul>
+          </div>
+
+            
+
             <div class="dropdown">
               <button class="btn btn-secondary dropdown-toggle btn-no-background" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
                 Animal Vocalizations
@@ -795,6 +815,7 @@
                   </div>
                 </div>
               </div>
+            </div>
             <div class="export-tab">
               <button id="export-csv" onclick="{downloadCSV()}">EXPORT AS CSV <i class="fa-solid fa-cloud-arrow-down"></i></button>
               <button id="export-xlsx" onclick="{downloadXLSX()}">EXPORT AS XLSX <i class="fa-solid fa-cloud-arrow-down"></i></button>
@@ -808,6 +829,355 @@
     </div>
 
 <script>
+
+  const iconDicts = {};
+  var displayedAnimals = new Set();
+  var hiddenAnimals = new Set();
+  var animalSpeciesToCommon = {};
+
+  //Sanitizing to prevent Cross-Site Scripting attacks through the search bar
+  function sanitizeInput(str) {
+    var temp = document.createElement('div');
+    temp.textContent = str;
+    return temp.innerHTML;
+  }
+
+  document.getElementById('searchInput').addEventListener('input', function(e) {
+    this.value = sanitizeInput(this.value); // Sanitize every input
+  });
+  //Search functionality for filter  
+  document.addEventListener("DOMContentLoaded", function() {
+    const jsonUrl = './js/sample_data.json';
+    const animalListElement = document.getElementById('animalList');
+    const searchInput = document.getElementById('searchInput');
+    let animalData = [];
+
+  
+    fetch(jsonUrl)
+        .then(response => response.json())
+        .then(data => {
+            animalData = data.data; 
+        })
+        .then(()=>{
+          animalData.forEach(animal=>{
+          animalSpeciesToCommon[animal.species.toLowerCase()] = animal.common;
+        });
+        })
+        .catch(error => console.error('Error loading JSON:', error));
+
+    
+
+    // Function to display animal names in the list
+    function displayAnimalList(filteredData) {
+        animalListElement.innerHTML = ''; 
+        filteredData.forEach(animal => {
+            const li = document.createElement('li');
+            const textSpan = document.createElement('span');
+            textSpan.textContent = animal.common;
+            //li.textContent = animal.common;
+            textSpan.onclick = (event) => displayPopup(animal,event);
+            li.appendChild(textSpan)
+
+            // Create "Show" button
+            const showButton = document.createElement('button');
+            showButton.textContent = 'Show';
+            showButton.className = 'btn btn-show'; 
+            showButton.style.color='green'
+            
+            showButton.onclick = () => {
+                console.log("Show button clicked for", animal.common);
+                showAnimal(animal)
+            };
+
+            // Create "Hide" button
+            const hideButton = document.createElement('button');
+            hideButton.textContent = 'Hide';
+            hideButton.className = 'btn btn-hide';
+            hideButton.style.color='red'
+
+            hideButton.onclick = () => {
+                console.log("Hide button clicked for", animal.common);
+                hideAnimal(animal.species.toLowerCase());
+            };
+
+            // Create "Show only" button
+            const showOnlyButton = document.createElement('button');
+            showOnlyButton.textContent = 'Add to Exclusive View';
+            showOnlyButton.className = 'btn btn-hide';
+            showOnlyButton.style.color='green'
+
+            showOnlyButton.onclick = () => {
+                console.log("Show only button clicked for", animal.common);
+                showOnly(animal)
+            };
+            
+            // Create "Unhide all" button
+            const unHideAllButton = document.createElement('button');
+            unHideAllButton.textContent = 'Hide';
+            unHideAllButton.className = 'btn btn-hide';
+            unHideAllButton.style.color='red'
+
+            unHideAllButton.onclick = () => {
+                console.log("Unhide all button clicked for", animal.common);
+                unHideAll(animal)
+            };
+            li.appendChild(showOnlyButton);
+            //li.appendChild(unHideAllButton);
+            //li.appendChild(showButton);
+            li.appendChild(hideButton);
+
+            
+            animalListElement.appendChild(li);
+        });
+    }
+
+    // Function to display a popup with animal details
+    function displayPopup(animal,event) {
+    
+      const popup = document.createElement('div');
+      popup.className = 'popup'
+      setTimeout(() => popup.style.opacity = '1', 10); 
+
+      const title = document.createElement('h4');
+      title.className = 'popup-title'
+      title.textContent = animal.common;
+
+      const summary = document.createElement('p');
+      summary.textContent = animal.summary;
+      //summary.style.textAlign = 'left'; 
+
+      const descriptionList = document.createElement('ul')
+      
+      animal.description.forEach(desc => {
+          const description = document.createElement('li')
+          description.textContent = desc
+          descriptionList.appendChild(description)
+      })
+
+      
+      const closeButton = document.createElement('button');
+      closeButton.className ='popup-close-button';
+      closeButton.textContent = 'Close';
+      closeButton.onclick = function() {
+          popup.style.opacity = '0';
+          setTimeout(() => document.body.removeChild(popup), 390);
+      };
+
+     
+      popup.appendChild(title);
+      popup.appendChild(summary);
+      popup.appendChild(descriptionList);
+      popup.appendChild(closeButton);
+      document.body.appendChild(popup);
+
+      const rect = event.target.getBoundingClientRect();
+      const popupWidth=300;
+      popup.style.top = `${rect.top + window.scrollY}px`;
+      popup.style.left = `${rect.left - popupWidth - 10}px`; 
+
+  }
+
+    // Event listener for search input
+    searchInput.addEventListener('keyup', function() {
+        const searchTerm = searchInput.value.toLowerCase();
+        // Filter full animal data based on search term, then limit to top 5 results
+        const filteredData = animalData.filter(animal => 
+            animal.common.toLowerCase().includes(searchTerm)
+        ).slice(0, 3);
+
+        displayAnimalList(filteredData); 
+    });
+  });
+
+ 
+const visibleStyle = (url) => new ol.style.Style({
+      image: new ol.style.Icon({
+        src: url,
+        anchor: [0.5, 1],
+        scale: 0.75,
+        className: 'true-icon'
+      }),
+    })
+
+// 
+
+function showAnimal(animal) {
+    const layers = window.hmiState.basemap.getLayers().getArray();
+    
+    layers.forEach(layer => {
+        if (layer instanceof ol.layer.Vector) {
+            layer.getSource().getFeatures().forEach(feature => {
+                if(feature.get('animalSpecies')!=undefined){
+                const animalName = feature.get('animalSpecies').toLowerCase();
+                //console.log(animalName,animal)
+                if (animalName.includes(animal)) {
+                    key = feature.get('eventId') + feature.get('animalSpecies').toLowerCase();
+                    url =  iconDicts[key];
+                    console.log(iconDicts);
+                    feature.setStyle(visibleStyle(url)); //Show animal
+                    console.log("Showing ", animalName);
+                }else {
+                    console.log("Not changing anything else", animalName)
+                }
+            };
+        })
+      }
+    });
+    hiddenAnimals.delete(animal);
+    displayedAnimals.add(animal);
+    updateDisplayedAnimalsList(displayedAnimals);
+    updateHiddenAnimalsList();
+}
+
+function hideAnimal(animal) {
+    const layers = window.hmiState.basemap.getLayers().getArray();
+    hiddenAnimals.add(animal);
+    layers.forEach(layer => {
+        if (layer instanceof ol.layer.Vector) {
+            layer.getSource().getFeatures().forEach(feature => {
+                if(feature.get('animalSpecies')!=undefined){
+                const animalName = feature.get('animalSpecies').toLowerCase();
+                //console.log(animalName,animal)
+                if (feature.get('animalSpecies').toLowerCase() == animal) {
+                    key = feature.get('eventId') + feature.get('animalSpecies').toLowerCase();
+                    iconDicts[key] = feature.get('animalIcon');
+                    
+                    feature.setStyle(new ol.style.Style({ display: 'none' })); // Hide animal
+                    console.log("Hiding ", animalName)
+                }else {
+                    console.log("Not changing anything else", animalName)
+                }
+            }
+        });
+      }
+    });
+    displayedAnimals.delete(animal);
+    updateDisplayedAnimalsList(displayedAnimals);
+    updateHiddenAnimalsList();
+}
+
+
+
+function showOnly(animal) {
+    const layers = window.hmiState.basemap.getLayers().getArray();
+    hiddenAnimals.delete(animal.species.toLowerCase());
+    layers.forEach(layer => {
+        if (layer instanceof ol.layer.Vector) {
+            layer.getSource().getFeatures().forEach(feature => {
+                
+                if(feature.get('animalSpecies')!=undefined){
+                const animalName = feature.get('animalSpecies').toLowerCase();
+                //console.log(animalName,animal)
+                displayedAnimals.add(animal.species.toLowerCase());
+                if (displayedAnimals.has(animalName)){
+                    key = feature.get('eventId') + feature.get('animalSpecies').toLowerCase();
+                    //const listItem = document.createElement('li');
+                    //listItem.textContent = feature.get('animalSpecies');
+                    feature.setStyle(visibleStyle(feature.get('animalIcon')));
+                    updateDisplayedAnimalsList(displayedAnimals);
+                    //listContainer.appendChild(listItem);
+                    console.log("Not hiding ", animalName);
+                }else {
+                    key = feature.get('eventId') + feature.get('animalSpecies').toLowerCase();
+                    iconDicts[key] = feature.get('animalIcon');
+                    feature.setStyle(new ol.style.Style({ display: 'none' })); // Hide animal
+                    console.log("Hiding ", animalName)
+                    console.log(iconDicts)
+                    hiddenAnimals.add(animalName);
+                }
+            };
+          });
+        }
+    });
+    updateHiddenAnimalsList();
+   
+}
+
+function updateDisplayedAnimalsList(displayedAnimals){
+  
+  const listContainer = document.getElementById('displayOnlyAnimalList');
+  listContainer.innerHTML = '';
+  displayedAnimals.forEach(function(animal){
+    const listItem = document.createElement('li');
+    const textSpan = document.createElement('span');
+    textSpan.textContent = convertSpeciesToCommon(animal);
+    const hideButton = document.createElement('button');
+    hideButton.textContent = 'Hide';
+    hideButton.className = 'btn btn-hide';
+    hideButton.style.color='red';
+
+    hideButton.onclick = () => {
+        console.log("Hide button clicked for", animal);
+        hideAnimal(animal);
+    };
+    listItem.appendChild(textSpan);
+    listItem.appendChild(hideButton);
+    //listItem.textContent = animal;
+    listContainer.appendChild(listItem);
+  })
+  
+
+}
+
+function updateHiddenAnimalsList(){
+
+  const listContainer = document.getElementById('hideAnimalList');
+  listContainer.innerHTML = '';
+  hiddenAnimals.forEach(function(animal){
+    const listItem = document.createElement('li');
+    const textSpan = document.createElement('span');
+    textSpan.textContent = convertSpeciesToCommon(animal);
+    const showButton = document.createElement('button');
+    showButton.textContent = 'Show';
+    showButton.className = 'btn btn-hide';
+    showButton.style.color='green';
+
+    showButton.onclick = () => {
+        console.log("Show button clicked for", animal);
+        showAnimal(animal);
+    };
+    listItem.appendChild(textSpan);
+    listItem.appendChild(showButton);
+    //listItem.textContent = animal;
+    listContainer.appendChild(listItem);
+  })
+
+}
+
+
+function resetSearchFilter() {
+    const layers = window.hmiState.basemap.getLayers().getArray();
+
+    layers.forEach(layer => {
+        if (layer instanceof ol.layer.Vector) {
+            layer.getSource().getFeatures().forEach(feature => {
+                
+                if(feature.get('animalSpecies')!=undefined){
+                const animalName = feature.get('animalSpecies').toLowerCase();
+                //console.log(animalName,animal)
+                if (displayedAnimals.has(animalName)) {
+                    console.log("Not Unhiding ", animalName)
+                }else {
+                    key = feature.get('eventId') + feature.get('animalSpecies').toLowerCase();
+                    url =  iconDicts[key];
+                    console.log(iconDicts);
+                    feature.setStyle(visibleStyle(url)); //Show animal
+                    console.log("Showing ", animalName)
+                }
+            };
+        });
+      }
+    });
+    hiddenAnimals.clear();
+    displayedAnimals.clear();
+    updateHiddenAnimalsList();
+    updateDisplayedAnimalsList();
+}
+
+function convertSpeciesToCommon(species){
+    return animalSpeciesToCommon[species.toLowerCase()];
+}
+
   // Variable to keep track of which donation amount has been selected
   let donorAmount;
   // Donation amounts
@@ -1422,8 +1792,8 @@ closeFormButton.addEventListener('click', (event) => {
   //init variable is set to true before the user has selected any filter options
   //before a user has checked any filter options, all layers will appear on screen
   let filterState = [...checkboxIDs];
-  //console.log(filterState, "FilterState:  ")
-  //console.log(checkboxIDs)
+  console.log(filterState, "FilterState:  ")
+  console.log(checkboxIDs)
 
   function updateFilter(checkbox){ 
 
