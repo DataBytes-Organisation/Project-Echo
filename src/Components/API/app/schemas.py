@@ -228,7 +228,7 @@ class ForgotPasswordSchema(BaseModel):
 class ResetPasswordSchema(BaseModel):
     user: str
     password: str
-    # otp: int
+    otp: int
     
 
     class Config:

@@ -537,7 +537,7 @@ def forgotpassword(user: schemas.ForgotPasswordSchema):
            {"$set": {"otp": otp}}
         )
         
-        response = {"message": "New Otp geerated. Please check your email", "email": existing_user["email"], "otp": otp}
+        response = {"message": "New Otp generated. Please check your email", "email": existing_user["email"], "otp": otp}
         return JSONResponse(content=response, status_code = 201)
     
     response = {"message": "User not Found!"}
@@ -548,18 +548,19 @@ def forgotpassword(user: schemas.ForgotPasswordSchema):
 def forgotpassword(user: schemas.ResetPasswordSchema):
     existing_user = User.find_one({"$or": [{"username": user.user}]})
     if existing_user:
-        # if user.otp == existing_user["otp"]:
-        password_hashed = bcrypt.hashpw(user.password.encode('utf-8'), bcrypt.gensalt(rounds=8))
-        User.update_one(
-        {"$or": [{"username": user.user}]},
-        {"$set": {"password": password_hashed.decode('utf-8')}}
-        )
-        
-        response = {"message": "New Password Generated.", "email": existing_user["email"], "Password": existing_user['password']}
-        return JSONResponse(content=response, status_code = 201)
-        # else:
-        #     response = {"message": "invalid OTP"}
-        #     return JSONResponse(content=response, status_code = 401)
+        if user.otp == int(existing_user["otp"]):
+
+            password_hashed = bcrypt.hashpw(user.password.encode('utf-8'), bcrypt.gensalt(rounds=8))
+            User.update_one(
+            {"$or": [{"username": user.user}]},
+            {"$set": {"password": password_hashed.decode('utf-8')}}
+            )
+            
+            response = {"message": "New Password Generated.", "email": existing_user["email"], "Password": existing_user['password'],"otp_saved_mongo": int(existing_user["otp"]), "otp_entered": user.otp}
+            return JSONResponse(content=response, status_code = 201)
+        else:
+            response = {"message": "invalid OTP"}
+            return JSONResponse(content=response, status_code = 401)
     response = {"message": "User not Found!"}
     return JSONResponse(content=response, status_code = 404)
 
