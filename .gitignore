@@ -1,4 +1,3 @@
-
 *.DS_Store
 *.pyc
 *.hdf5
@@ -13,3 +12,5 @@ src\Prototypes\api\__pycache__
 
 src/Prototypes/hmi/ui/node_modules/*
 src/Components/HMI/ui/node_modules/*
+
+.idea/
