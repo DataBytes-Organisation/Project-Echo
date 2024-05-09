@@ -216,10 +216,7 @@
                   <td>${item._id}</td>
                   <td>${item.username}</td>
                   <td>${item.animal}</td>
-                  <td>${item.requestingToChange}</td>
-                  <td>${item.initial}</td>
-                  <td>${item.modified}</td>
-                  <td>${item.source}</td>
+                  <td><button class ="show-detail" style = "border-radius: 3px;" data-detail_id="${item._id}" >show details</button></td>
                   <td>${item.date}</td>
   
                   <td></td> <!-- Placeholder for status cell -->
@@ -256,6 +253,8 @@
       const requestId = target.getAttribute('data-request-id');
       const animal = target.getAttribute('data-animal');
       const modified = target.getAttribute('data-to');
+      const desc = target.getAttribute('data-desc');
+      const summary = target.getAttribute('data-summ');
   
       if (target.classList.contains('approve-btn')) {
           console.log(`Approving request...`);
@@ -263,9 +262,6 @@
           console.log("Request ID select:   ", requestId)
           console.log("Changing status to:  ", modified)
       
-          
-  
-           
            fetch(`/api/updateConservationStatus/${animal}`, {
               method: 'PATCH',
               headers: {
@@ -307,7 +303,8 @@
                   status: 'approved'
               })
               })
-              .then(response => {
+              .then(response => 
+              {
                   if (!response.ok) {
                   throw new Error('Network response was not ok');
                   }
@@ -318,7 +315,7 @@
                   } else {
                   return response.text();
                   }
-              })
+                })
               .then(data => {
                   // Handle the response data
                   console.log('Request status updated:', data);
@@ -369,6 +366,44 @@
         updateTable();
       }
     })
+
+    const form = document.getElementById('update-form');
+    const closes = document.getElementById('close-btn');
+
+
+    dataBody.addEventListener('click', event => {
+
+      if (event.target.classList.contains('show-detail')) {
+        const detailId = event.target.dataset.detail_id;
+        console.log(`logging details for ID: ${detailId}`);
+
+        fetch('/api/requests').then(response => response.json()).then(data => {
+          data.forEach(item => {
+
+            if (item._id == detailId) {
+              document.getElementById('update_usernm').innerHTML = item.username;
+              document.getElementById('update_animal').innerHTML = item.animal;
+              document.getElementById('desc_para').innerHTML = item.desc;
+              document.getElementById('summ_para').innerHTML = item.summary;
+              document.getElementById('link_up').href = item.source;
+              document.getElementById('udate_conser').innerHTML = item.modified;
+              document.getElementById('old_conser').innerHTML = item.initial;
+            }
+
+          });
+        })
+
+        form.style.display = "block";
+        form.style.zIndex = "1000";
+      }
+
+    })
+
+    closes.addEventListener('click', event => {
+      form.style.display = "none";
+      form.style.zIndex = "-1";
+    })
+    
   </script> 
 
 </body>
