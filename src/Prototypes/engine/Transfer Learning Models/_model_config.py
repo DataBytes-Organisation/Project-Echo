@@ -21,4 +21,4 @@ SC = {
 }
 
 ### Set the Model Name
-MODEL_NAME = "MobileNetV2"
+MODEL_NAME = "MobileNetV3Large"
