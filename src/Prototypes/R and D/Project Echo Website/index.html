@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Echo</title>
+    <link href="styles.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Bundle with Popper (Includes JavaScript) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"> </script>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container-fluid">
+              <a class="navbar-brand" href="#">
+                <img src="images/logo.jpg" alt="Project Echo Logo" class="logo">
+                Project Echo
+              </a>
+              <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+              </button>
+              <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                  <li class="nav-item">
+                    <a class="nav-link" href="#index.html">Solution</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="impact.html">Impact</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="#vision.html">Vision</a>
+                  </li>
+                </ul>
+                <button class="btn btn-success ms-3">Explore Echo</button>
+              </div>
+            </div>
+          </nav>
+          
+        <div class="hero">
+            <h1>Power of AI</h1>
+            <p>Unleashing the Power of AI to Protect Rainforest Wildlife Through Sound Analysis</p>
+            <button class="btn btn-primary btn-lg" onclick="scrollToMission()">Discover More</button>
+        </div>
+    </header>
+
+    <div id="mission" class="mission-container">
+        <div class="mission-text">
+            <h2>Our Mission</h2>
+            <p>Embark on a journey with Project Echo as we pioneer AI/ML solutions to detect and classify noise-producing animals in rainforests.</p>
+            <p>We are dedicated to providing conservationists with a cutting-edge, non-invasive tool for monitoring threatened animal species populations over time.</p>
+            <p>Join us in revolutionizing animal population monitoring through the magic of sound analysis and machine learning technologies.</p>
+        </div>
+        <div class="mission-graphic">
+            <img src="images/our-mission.jpg" alt="Interactive Graphic">
+        </div>
+    </div>
+
+    <div class="stats-container">
+        <div class="stat">
+            <h2>1000+</h2>
+            <p>Animal Species Classified</p>
+        </div>
+        <div class="stat">
+            <h2>95%</h2>
+            <p>Accuracy in Density Detection</p>
+        </div>
+        <div class="stat">
+            <h2>24/7</h2>
+            <p>Real-time Monitoring Support</p>
+        </div>
+    </div>
+
+    <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+        </div>
+        <div class="carousel-inner">
+            <div class="carousel-item active" data-bs-interval="3000">
+                <img src="images/slide1.jpg" class="d-block w-100" alt="Slide 1">
+            </div>
+            <div class="carousel-item" data-bs-interval="3000">
+                <img src="images/slide2.jpg" class="d-block w-100" alt="Slide 2">
+            </div>
+            <div class="carousel-item" data-bs-interval="3000">
+                <img src="images/slide3.jpg" class="d-block w-100" alt="Slide 3">
+            </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+
+    <div class="container my-5">
+        <h2 class="text-center mb-4">Curious Minds Ask! </h2>
+        <div class="accordion" id="faqAccordion">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingOne">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                        How does Project Echo classify animals accurately?
+                    </button>
+                </h2>
+                <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        Our AI utilizes advanced machine learning algorithms trained on extensive sound datasets to accurately classify animals based on their unique acoustic signatures.
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingTwo">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                        What sets Project Echo apart in wildlife monitoring?
+                    </button>
+                </h2>
+                <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        Our Product stands out by offering a non-invasive, efficient solution that enables conservationists to monitor threatened animal species populations over time without disturbing their natural habitats.                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingThree">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                        How can it help safeguard endangered wildlife?
+                    </button>
+                </h2>
+                <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        By providing cutting-edge tools based on sound analysis, this empowers conservationists to protect endangered wildlife and mitigate the impact of predatory and destructive fauna effectively.
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingFour">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                        Is real-time monitoring possible with Project Echo?
+                    </button>
+                </h2>
+                <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        Yes, it offers 24/7 real-time monitoring support, allowing conservationists to track animal populations continuously and respond promptly to any changes in the environment.
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingFive">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                        What drives its vision for the future?
+                    </button>
+                </h2>
+                <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        Project Echo is committed to unlocking new insights into animal populations through sound analysis, advancing conservation efforts, and ensuring a sustainable future for wildlife.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
+    
+     
+    <script src="script.js"></script>
+</body>
+</html>
