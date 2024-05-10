@@ -1,8 +1,8 @@
 ### Set the Data Directories
 SC = {
-    "AUDIO_DATA_DIRECTORY": "/content/drive/Othercomputers/My Laptop/project-echo-data-bucket-3",
-    "CACHE_DIRETORY": "/content/drive/Othercomputers/My Laptop/project-echo-data-cache",
-    "AUDIO_CLIP_DURATION": 1,  # seconds
+    "AUDIO_DATA_DIRECTORY": "C:\\Users\\ptanmay143\\Data\\Projects\\project-echo-data-bucket-3",
+    "CACHE_DIRETORY": "C:\\Users\\ptanmay143\\Data\\Projects\\project-echo-data-cache",
+    "AUDIO_CLIP_DURATION": 5,  # seconds
     "AUDIO_NFFT": 2048,
     "AUDIO_WINDOW": None,
     "AUDIO_STRIDE": 200,
@@ -21,4 +21,4 @@ SC = {
 }
 
 ### Set the Model Name
-MODEL_NAME = "MobileNetV2"
+MODEL_NAME = "MobileNetV3Large"
