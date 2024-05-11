@@ -49,8 +49,8 @@ def enforce_memory_limit(mem_mb):
             print(e)
 
 
-# enforce max 5GB memory on GPU for this notebook if you have a small GPU
-# enforce_memory_limit(5120)
+# enforce max 4GB memory on GPU for this notebook if you have a small GPU
+enforce_memory_limit(4096)
 
 if SC["USE_DISK_CACHE"]:
     cache = dc.Cache(SC["CACHE_DIRETORY"], cull_limit=0, size_limit=10**9)
@@ -457,10 +457,11 @@ def build_model(trainable):
             SC["MODEL_INPUT_IMAGE_CHANNELS"],
         ),
         include_top=False,
+        include_preprocessing=False,
     )
 
     # Freeze the base_model
-    base_model.trainable = False
+    base_model.trainable = trainable
 
     # Create new model on top
     inputs = keras.Input(
@@ -472,10 +473,10 @@ def build_model(trainable):
     )
 
     # Pre-trained weights requires that input be scaled
-    # from (0, 255) to a range of (-1., +1.), the rescaling layer
+    # from (0, 1) to a range of (-1., +1.), the rescaling layer
     # outputs: `(inputs * scale) + offset`
-    # scale_layer = keras.layers.Rescaling(scale=1 / 127.5, offset=-1)
-    # x = scale_layer(inputs)
+    scale_layer = keras.layers.Rescaling(scale=2, offset=-1)
+    x = scale_layer(inputs)
 
     # The base model contains batchnorm layers. We want to keep them in inference mode
     # when we unfreeze the base model for fine-tuning, so we make sure that the
@@ -489,11 +490,11 @@ def build_model(trainable):
     return model
 
 
-def train_model():
+def train_model(trainable):
     if not os.path.exists(f"models/{MODEL_NAME}/"):
         os.makedirs(f"models/{MODEL_NAME}/", exist_ok=True)
 
-    model = build_model(trainable=False)
+    model = build_model(trainable)
     start_time = time.time()
 
     model.compile(
