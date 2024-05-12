@@ -22,6 +22,9 @@ from app.middleware.auth_bearer import JWTBearer
 from app.middleware.random import randompassword
 from bson.objectid import ObjectId
 import uuid
+import pyotp
+from fastapi_mail import FastMail, MessageSchema, ConnectionConfig
+from typing import List
 
 jwtBearer = JWTBearer()
 
@@ -179,6 +182,62 @@ def post_recording(data: schemas.RecordingData):
     print("sent")
 
     return data
+
+#config for the 2fa
+conf = ConnectionConfig(
+    MAIL_USERNAME="your-email@gmail.com",  # Your email address
+    MAIL_PASSWORD="your-email-password",  # Your email password
+    MAIL_FROM="your-email@gmail.com",      # The email from which to send messages
+    MAIL_PORT=587,                         # Commonly 587 for SMTP
+    MAIL_SERVER="smtp.gmail.com",          # SMTP server address
+    MAIL_TLS=True,                         # Use TLS (Transport Layer Security)
+    MAIL_SSL=False                         # Use SSL (Secure Sockets Layer), typically false if TLS is true
+)
+
+@router.post("/setup-2fa", status_code=status.HTTP_200_OK)
+async def setup_2fa(user: schemas.UserLoginSchema):
+    account = User.find_one({"$or": [{"username": user.username}, {"email": user.email}]})
+    if not account:
+        return JSONResponse(content={"message": "User Not Found."}, status_code=404)
+
+    if bcrypt.checkpw(user.password.encode('utf-8'), account['password'].encode('utf-8')):
+        secret = pyotp.random_base32()
+        User.update_one({"_id": account['_id']}, {"$set": {"secret": secret}})
+        
+        totp = pyotp.TOTP(secret)
+        url = totp.provisioning_uri(name=user.email, issuer_name="Your App")
+        
+        message = MessageSchema(
+            subject="Your 2FA Setup",
+            recipients=[user.email],
+            body=f"Scan this QR code with your 2FA app: {url}",
+            subtype="html"
+        )
+        fm = FastMail(conf)
+        await fm.send_message(message)
+        return {"message": "2FA setup instructions sent to your email."}
+    else:
+        return JSONResponse(content={"message": "Invalid credentials."}, status_code=401)
+
+
+#two factor auth
+@router.post("/verify-2fa", status_code=status.HTTP_200_OK)
+def verify_2fa(user: schemas.UserLoginSchema, token: int):
+    account = User.find_one({"$or": [{"username": user.username}, {"email": user.email}]})
+    if not account:
+        return JSONResponse(content={"message": "User Not Found."}, status_code=404)
+    
+    if bcrypt.checkpw(user.password.encode('utf-8'), account['password'].encode('utf-8')):
+        totp = pyotp.TOTP(account['secret'])
+        if totp.verify(token):
+            jwtToken = signJWT(user=account)
+            requests.session.token = jwtToken
+            return {"message": "2FA verification successful", "jwt": jwtToken}
+        else:
+            return JSONResponse(content={"message": "Invalid 2FA token."}, status_code=401)
+    else:
+        return JSONResponse(content={"message": "Invalid credentials."}, status_code=401)
+
     
 @router.post("/signup", status_code=status.HTTP_201_CREATED)
 def signup(user: schemas.UserSignupSchema):  
