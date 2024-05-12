@@ -67,12 +67,30 @@ app.get('/directory-traversal-test', (req, res) => {
       }
   });
 });
+function network_monitor(interval=1) {
+  setInterval(() => {
+      exec('nmap --script http-enum <target-IP>', (err, stdout, stderr) => {
+          if (err) {
+              console.error(err);
+              // Handle error
+          } else {
+              const scanResult = stdout.trim(); // Trim any whitespace from the output
+              console.log("Network Scan Result:", scanResult);
+              // Process scan result or send it to any logging system
+          }
+      });
+  }, interval * 1000); // Convert seconds to milliseconds
+}
+
+// Start the server
 // Start the server
 const port = 8080;
 app.listen(port, () => {
     console.log(`Server listening on port ${port}`);
-});
-const {createCaptchaSync} = require("captcha-canvas");
+    
+    // Start network monitoring after server starts
+    network_monitor(); 
+});const {createCaptchaSync} = require("captcha-canvas");
 
 function checkPasswordStrength(password) {
   const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
