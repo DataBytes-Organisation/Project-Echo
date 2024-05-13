@@ -1,5 +1,5 @@
 /* General Body and HTML Styles */
-body, html {
+* {
     padding-top: 70px;
     margin: 0;
     padding: 0;
@@ -63,7 +63,7 @@ body .navbar .logo-text {
     height: 100vh;
     background-image: url('images/forest-background.jpg');
     background-size: cover;
-    color: yellow;
+    color: #fff;
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -71,9 +71,17 @@ body .navbar .logo-text {
     align-items: center;
 }
 
+.centre-text{
+    padding: 100px;
+    backdrop-filter: blur(3px);
+    border: 1px solid #212529;
+    border-radius: 5px;;
+}
+
 h1 {
     font-size: 48px;
     margin: 0 0 20px 0; /* Space below the header */
+    padding: 20px;
 }
 
 /* Logo Styles */
