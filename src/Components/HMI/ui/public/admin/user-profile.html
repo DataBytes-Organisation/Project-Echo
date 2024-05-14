@@ -44,7 +44,6 @@
         margin-top: 20px;
         color: #1a202c;
         text-align: left;
-        background-color: #e2e8f0;
       }
       .main-body {
         padding: 15px;
@@ -54,6 +53,7 @@
           0 1px 2px 0 rgba(0, 0, 0, 0.06);
       }
       .card {
+        width: 100%;
         position: relative;
         display: flex;
         flex-direction: column;
@@ -63,6 +63,10 @@
         background-clip: border-box;
         border: 0 solid rgba(0, 0, 0, 0.125);
         border-radius: 0.25rem;
+      }
+
+      #card-charges {
+        max-width: 90%;
       }
       .card-body {
         flex: 1 1 auto;
@@ -130,21 +134,26 @@
                           <div class="card-body">
                             <div class="d-flex flex-column align-items-center text-center">
                               <img
-                                src="./images/profile/user-1.jpg"
+                                src="./admin/images/profile/user-1.jpg"
                                 alt="Admin"
                                 class="rounded-circle"
                                 width="150"
                               />
                                 <div class="mt-3">
-                                  <h4 id="user_name">Admin</h4>
+                                  <h4 id="username"></h4>
                                   <p class="text-secondary mb-1">Full Stack Developer</p>
-                                  <p class="text-muted font-size-sm">Email</p>
-                                  <button class="btn btn-primary" id="signOutButton">
-                                    Sign Out
-                                  </button>
-                                  <button class="btn btn-outline-primary" id="deleteAccButton">
-                                    Delete Account
-                                  </button>
+                                  <p id="useremail" class="text-muted font-size-sm"></p>
+                                  <form action="/api/auth/signout" method="POST">
+                                    <button class="btn btn-primary" id="signOutButton">
+                                      Sign Out
+                                    </button>
+                                  </form>
+                                  </form>
+                                  <form action="/api/auth/deleteaccount" method="DELETE">
+                                    <button class="btn btn-outline-primary" type="submit" id="deleteAccButton">
+                                      Delete Account
+                                    </button>
+                                  </form>
                                 </div>
                             </div>
                           </div>
@@ -156,16 +165,16 @@
                             <div class="row"></div>
                             <div class="row">
                               <div class="col-sm-3">
-                                <h6 class="mb-0">Full Name</h6>
+                                <h6 class="mb-0">User Name</h6>
                               </div>
-                              <div class="col-sm-9 text-secondary">Admin Admin</div>
+                              <div id="username_1" class="col-sm-9 text-secondary">Admin Admin</div>
                             </div>
                             <hr />
                             <div class="row">
                               <div class="col-sm-3">
                                 <h6 class="mb-0">Email</h6>
                               </div>
-                              <div class="col-sm-9 text-secondary">Admin@deakin.cou.au</div>
+                              <div id="useremail_1" class="col-sm-9 text-secondary">Admin@deakin.cou.au</div>
                             </div>
                             <hr />
                             <div class="row">
@@ -187,7 +196,7 @@
                                 <h6 class="mb-0">Reset Password</h6>
                               </div>
                               <div class="col-sm-9">
-                                <div class="row">
+                                <!-- <div class="row">
                                   <div class="col-sm-4">
                                     <b>Old Password</b>
                                   </div>
@@ -200,10 +209,25 @@
                                     <b>Confirm Password</b>
                                   </div>
                                   <input id="confirmPassword" class="col-sm-5 text-secondary" type="text">
-                                </div>
+                                </div> -->
+                                <form id="resetPasswordForm" action="/api/auth/ChangePassword" method="POST">
+                                  <div>
+                                    <label for="oldPassword">Old Password:</label>
+                                    <input type="password" id="oldPassword" name="newPassword" required>
+                                  </div>
+                                  <div>
+                                      <label for="newPassword">New Password:</label>
+                                      <input type="password" id="newPassword" name="newPassword" required>
+                                  </div>
+                                  <div>
+                                      <label for="confirmPassword">Confirm Password:</label>
+                                      <input type="password" id="confirmPassword" name="confirmPassword" required>
+                                  </div>
+                                  <button class="btn btn-info" type="submit" id="updatePassword">Update Password</button>
+                                </form>
                               </div>
                               <div class="col-md-auto">
-                                <button class="btn btn-info" id="updatePassword">Update Password</button>
+                                <!-- <button class="btn btn-info" id="updatePassword">Update Password</button> -->
                               </div>
                             </div>
                           </div>
@@ -279,20 +303,44 @@
                     </div>
                   </div>
                 </div>
-                
               </div>
+            </div>  
           </div>
         </div>
       </div>
     </div>
   </div>
    
-    <script type="text/javascript">
+    <script type="text/javascript"> 
+      function getUser(){
+        fetch("/user_profile")
+            .then(res => {
+              if (res.ok) return res.json()
+              return res.json().then(json => Promise.reject(json))
+            })
+            .then( userData => {
+              console.log("User profile data: ", userData)
+              username = String(userData.username);
+              email = `${userData.email}`
+              document.getElementById("username").innerText = username;
+              document.getElementById("useremail").innerText = email;
+              document.getElementById("username_1").innerText = username;
+              document.getElementById("useremail_1").innerText = email;
+            }) 
+            .catch(e => {
+              console.error(e.error)
+            })
+      }
+
       $(document).ready(function() {
+                var username;
+                var useremail;
                 // Use jQuery's load() method to load component contents
                 console.log("Start!")
                 $("#sidebar").load("./admin/component/sidebar-component.html");
                 $("#header").load("./admin/component/header-component.html");
+
+                getUser();
             });
     </script>
     
@@ -303,141 +351,52 @@
     ></script>
     <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.bundle.min.js"></script>
-    <!--
-    <script type="text/javascript">
-      function watchAction(options) {
-        const { id, api, onSuccess, onError } = options;
-
-        const el = document.querySelector(id);
-
-        if (!el) {
-          return;
-        }
-
-        el.addEventListener("click", async () => {
-          try {
-            const res = await fetch(api);
-
-            if (!res.ok) {
-              onError(new Error(res.statusText));
-            }
-
-            const data = await res.json();
-
-            onSuccess(data);
-          } catch (error) {
-            onError(error);
-          }
-        });
-      }
-
-      watchAction({
-        id: "#signOutButton",
-        api: "/hmi/signout",
-        onSuccess: () => {
-          alert("logout successfully")
-          console.log("Success");
-        },
-        onError: (error) => {
-          console.error(error);
-        },
-      });
-
-      watchAction({
-        id: "#deleteAccButton",
-        api: "/hmi/delete-account",
-        onSuccess: () => {
-          alert("delete successfully")
-          console.log("Success");
-        },
-        onError: (error) => {
-          console.error(error);
-        },
-      });
-    </script>
-    -->
+   
     
-    <script>
-      $(document).ready(function() {
-          $('#signOutButton').click(function() {
-              // Make an AJAX request to logout endpoint
-              $.ajax({
-                  url: '/hmi/signout',
-                  type: 'POST',
-                  dataType: 'json',
-                  success: function(response) {
-                      // Check if logout was successful
-                      if (response.success) {
-                          // Redirect user to login page or perform any other action
-                          window.location.href = 'welcome.html';
-                      } else {
-                          // Handle error, if any
-                          alert('Logout failed. Please try again.');
-                      }
-                  },
-                  error: function(xhr, status, error) {
-                      // Handle AJAX error
-                      console.error('AJAX Error:', status, error);
-                  }
-              });
-          });
+    <!-- <script>
 
-          $('#deleteAccButton').click(function() {
-              // Make an AJAX request to logout endpoint
-              $.ajax({
-                  url: '/hmi/delete-account',
-                  type: 'DELETE',
-                  dataType: 'json',
-                  success: function(response) {
-                      // Check if logout was successful
-                      if (response.success) {
-                          // Redirect user to login page or perform any other action
-                          window.location.href = 'welcome.html';
-                      } else {
-                          // Handle error, if any
-                          alert('Delete Account\ failed. Please try again.');
-                      }
-                  },
-                  error: function(xhr, status, error) {
-                      // Handle AJAX error
-                      console.error('AJAX Error:', status, error);
-                  }
-              });
-          });
+    document.getElementById('resetPasswordForm').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent default form submission
 
-          $('#updatePassword').click(function() {
+    // Validate password and confirm password
+    var oldPassword = document.getElementById('oldPassword').value;
+    var newPassword = document.getElementById('newPassword').value;
+    var confirmPassword = document.getElementById('confirmPassword').value;
 
-            var oldPassword = $('#oldPassword').val();
-            var newPassword = $('#newPassword').val();
-            var confirmPassword = $('#confirmPassword').val();
+    if (newPassword !== confirmPassword) {
+        alert("Passwords do not match.");
+        return;
+    }
 
-              // Make an AJAX request to update Password endpoint
-              $.ajax({
-                  url: '/hmi/ChangePassword',
-                  type: 'POST',
-                  dataType: 'json',
-                  contentType: 'application/json',
-                  data: JSON.stringify({
-                      oldPassword: oldPassword,
-                      newPassword: newPassword,
-                      confirmPassword: confirmPassword
-                  }),
-                  success: function(response) {
-                      if (response.success) {
-                          alert("Password changed successfully")
-                          window.location.href = 'welcome.html';
-                      } else {
-                          // Handle error, if any
-                          alert('Update the password failed. Please try again.');
-                      }
-                  },
-                  error: function(xhr, status, error) {
-                      // Handle AJAX error
-                      console.error('AJAX Error:', status, error);
-                  }
-              });
-          });
-      });
-      </script>
+    // Prepare data to send to the API
+    var formData = new FormData();
+    formData.append('oldpw', oldPassword);
+    formData.append('newpw', newPassword);
+    formData.append('cfm_newpw', confirmPassword);
+
+    // Make an AJAX request to the API
+    fetch('/api/auth/ChangePassword', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to reset password');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Handle success response from the API
+            alert('Password reset successfully.');
+            // Optionally, redirect the user to a new page
+            // window.location.href = '/login'; // Redirect to login page
+        })
+        .catch(error => {
+            // Handle error
+            console.error('Error:', error);
+            alert('Failed to reset password. Please try again later.');
+        });
+    });
+      </script> -->
   </body>
 </html>
