@@ -14,6 +14,8 @@ const cors = require('cors');
 require('dotenv').config();
 const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY);
 const axios = require('axios');
+const json_path = './public/js/sample_data.json';
+
 
 // Temporarily removed the variables that need the captcha-canvas package
 //const {createCaptchaSync} = require("captcha-canvas");
@@ -547,6 +549,15 @@ app.get("/welcome", async (req,res) => {
     res.send(`<script> alert("No user info detected! Please login again"); window.location.href = "/login"; </script>`);
   }
 })
+
+app.patch('/api/update_json/:animal', (req, res) => {
+  const animal = req.params.animal;
+  const desc = req.body.description;
+  const newsummary = req.body.summary;
+
+updateSpeciesData(animal, desc, newsummary,res);
+});
+
 //Page direction to the map
 app.get("/map", async(req,res) => {
   res.sendFile(path.join(__dirname, 'public/index.html'))
@@ -556,3 +567,48 @@ app.get("/map", async(req,res) => {
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
+
+
+// Function to update species data
+function updateSpeciesData(speciesToUpdate, newDescriptions, newSummary, res) {
+  fs.readFile(json_path, 'utf8', (err, data) => {
+      if (err) {
+          console.error("Error reading file:", err);
+          return;
+      }
+
+      let jsonData = JSON.parse(data);
+      let speciesData = jsonData.data.find(item => item.species === speciesToUpdate);
+      
+      if (!speciesData) {
+          console.log("Species not found");
+          return;
+      }
+
+      // Append new descriptions
+      if (newDescriptions != "unchanged") {
+          if (typeof newDescriptions === 'string') {
+              speciesData.description.push(newDescriptions);
+          } else if (Array.isArray(newDescriptions)) {
+              speciesData.description = speciesData.description.concat(newDescriptions);
+          }
+      }
+
+      // Update the summary if provided
+      if (newSummary !== "unchanged") {
+          speciesData.summary = newSummary;
+      }
+      
+      fs.writeFile(json_path, JSON.stringify(jsonData, null, 2), 'utf8', (err) => {
+          if (err) {
+              console.error("Error writing JSON to file:", err);
+              return res.status(500).json({ error: "Failed to write to the file" });
+          }
+          else{
+          console.log("JSON file has been updated successfully.");
+          res.json({ message: "Update successful" });
+          }
+      });
+  });
+}
+

@@ -7,56 +7,48 @@
   <title>Echo Admin</title>
   <link rel="shortcut icon" type="image/png" href="./admin/images/logos/favicon.png" />
   <link type="text/css" rel="stylesheet" href="./admin/css/styles.min.css" />
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
-  <scrip type="text/javascript" src="https://kit.fontawesome.com/8aa980d912.js" crossorigin="anonymous"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+  <scrip type="text/javascript" src="https://kit.fontawesome.com/8aa980d912.js" crossorigin="anonymous">
+    </script>
 
-  <link
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
-    rel="stylesheet"
-    integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD"
-    crossorigin="anonymous"
-  />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+      integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous" />
 
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
-  />
-  <!--- Requests Page Styling -->
-  <link type="text/css" rel="stylesheet" href="./css/requests.css" >
-  <!-- jQuery -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script> 
-  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
-  <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+    <!--- Requests Page Styling -->
+    <link type="text/css" rel="stylesheet" href="./css/requests.css">
+    <!-- jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 
-  <script type="text/javascript" src="./admin/js/sidebarmenu.js"></script>
-  <script type="text/javascript" src="./admin/js/app.min.js"></script>
-  <!-- <script type="text/javascript" src="../../node_modules/apexcharts/dist/apexcharts.min.js"></script> -->
-  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-  <link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.css"
-  />
-  <script src="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.min.js"></script>
-  <script type="text/javascript" src="./admin/js/dashboard.js"></script>
-  <script type="text/javascript" src="./admin/js/app.min.js"></script>
-  <style>
-    #update-form {
-      display: none;
-      position: fixed;
-      /* or 'absolute' if you prefer */
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      /* Semi-transparent background */
+    <script type="text/javascript" src="./admin/js/sidebarmenu.js"></script>
+    <script type="text/javascript" src="./admin/js/app.min.js"></script>
+    <!-- <script type="text/javascript" src="../../node_modules/apexcharts/dist/apexcharts.min.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.css" />
+    <script src="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.min.js"></script>
+    <script type="text/javascript" src="./admin/js/dashboard.js"></script>
+    <script type="text/javascript" src="./admin/js/app.min.js"></script>
+    <style>
+      #update-form {
+        display: none;
+        position: fixed;
+        /* or 'absolute' if you prefer */
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        /* Semi-transparent background */
 
-      justify-content: center;
-      align-items: center;
-      z-index: -1;
-    }
-  </style>
+        justify-content: center;
+        align-items: center;
+        z-index: -1;
+      }
+    </style>
 </head>
 
 <body>
@@ -168,51 +160,52 @@
       </div>
     </div>
   </div>
-  
+
 
 
   <script type="text/javascript">
-    $(document).ready(function() {
-              // Use jQuery's load() method to load component contents
-              console.log("Start!")
-              $("#sidebar").load("./admin/component/sidebar-component.html");
-              $("#header").load("./admin/component/header-component.html");
-          });
+    $(document).ready(function () {
+      // Use jQuery's load() method to load component contents
+      console.log("Start!")
+      $("#sidebar").load("./admin/component/sidebar-component.html");
+      $("#header").load("./admin/component/header-component.html");
+    });
   </script>
 
 
-<script>
+  <script>
 
-  function createDropdown(requestId, animal, modified) {
+function createDropdown(requestId, animal, modified, desc, summary) {
       const dropdown = document.createElement('div');
       dropdown.classList.add('dropdown');
-  
+
       const button = document.createElement('button');
       button.textContent = 'Pending';
       dropdown.appendChild(button);
-  
+
       const options = document.createElement('div');
       options.classList.add('dropdown-options');
       options.innerHTML = `
-        <button class="approve-btn" data-request-id="${requestId}" data-animal="${animal}" data-to="${modified}">Approve</button>
-        <button class="deny-btn" data-request-id="${requestId}">Deny</button>
+        <button class="approve-btn" style = "z-index: 1000;"" data-request-id="${requestId}" data-animal="${animal}" 
+        data-to="${modified}" data-desc = "${desc}" data-summ = "${summary}">Approve</button>
+        <button class="deny-btn" style = "z-index: 1000;""  data-request-id="${requestId}">Deny</button>
       `;
       dropdown.appendChild(options);
-  
+
       return dropdown;
     }
-  
-      const dataBody = document.getElementById('data-body');
-  
-      
+
+    const dataBody = document.getElementById('data-body');
+
+
     //Update the table
-    function updateTable(){
+    function updateTable() {
       fetch('/api/requests')
-          .then(response => response.json())
-          .then(data => {
-              data.forEach(item => {
-              const row = document.createElement('tr');
-              row.innerHTML = `
+        .then(response => response.json())
+        .then(data => {
+          data.forEach(item => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
                   <td>${item._id}</td>
                   <td>${item.username}</td>
                   <td>${item.animal}</td>
@@ -222,146 +215,179 @@
                   <td></td> <!-- Placeholder for status cell -->
   
                `;
-               dataBody.appendChild(row);
-  
-        // Get the newly created row's status cell
-          const statusCell = row.querySelector('td:last-child');
-  
-          if (item.status === 'pending') {
-              const dropdown = createDropdown(item._id, item.animal, item.modified);
+            dataBody.appendChild(row);
+
+            // Get the newly created row's status cell
+            const statusCell = row.querySelector('td:last-child');
+
+            if (item.status === 'pending') {
+              const dropdown = createDropdown(item._id, item.animal, item.modified, item.desc, item.summary);
               statusCell.appendChild(dropdown);
-          } else {
+            } else {
               statusCell.textContent = item.status;
-          }
-      });
-    })
-    .catch(error => {
-      console.error('Error fetching data:', error);
-    });
-  }
-  
-  //Clear Table
-  function clearTable() {
-    const dataBody = document.getElementById('data-body');
-    dataBody.innerHTML = ''; // Remove all rows
-  }
-  
-  updateTable();
-  
-    dataBody.addEventListener('click',event =>{
+            }
+          });
+        })
+        .catch(error => {
+          console.error('Error fetching data:', error);
+        });
+    }
+
+    //Clear Table
+    function clearTable() {
+      const dataBody = document.getElementById('data-body');
+      dataBody.innerHTML = ''; // Remove all rows
+    }
+
+    updateTable();
+
+    dataBody.addEventListener('click', event => {
       const target = event.target;
       const requestId = target.getAttribute('data-request-id');
       const animal = target.getAttribute('data-animal');
       const modified = target.getAttribute('data-to');
       const desc = target.getAttribute('data-desc');
       const summary = target.getAttribute('data-summ');
-  
-      if (target.classList.contains('approve-btn')) {
-          console.log(`Approving request...`);
-          
-          console.log("Request ID select:   ", requestId)
-          console.log("Changing status to:  ", modified)
-      
-           fetch(`/api/updateConservationStatus/${animal}`, {
-              method: 'PATCH',
-              headers: {
-                  'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({
-                  status: modified
-              })
-              })
-              .then(response => {
-                  if (!response.ok) {
-                  throw new Error('Network response was not ok');
-                  }
-                  // Return response text if the content type is not JSON
-                  const contentType = response.headers.get('content-type');
-                  if (contentType && contentType.indexOf('application/json') !== -1) {
-                  return response.json();
-                  } else {
-                  return response.text();
-                  }
-              })
-              .then(data => {
-                  // Handle the response data
-                  console.log('Request status updated:', data);
-                  clearTable();
-                  updateTable();
-              })
-              .catch(error => {
-                  console.error('Error updating request status:', error);
-           });
 
-           //Perform API call to update the status
-          fetch(`/api/requests/${requestId}`, {
-              method: 'PATCH',
-              headers: {
-                  'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({
-                  status: 'approved'
-              })
-              })
-              .then(response => 
-              {
-                  if (!response.ok) {
-                  throw new Error('Network response was not ok');
-                  }
-                  // Return response text if the content type is not JSON
-                  const contentType = response.headers.get('content-type');
-                  if (contentType && contentType.indexOf('application/json') !== -1) {
-                  return response.json();
-                  } else {
-                  return response.text();
-                  }
-                })
-              .then(data => {
-                  // Handle the response data
-                  console.log('Request status updated:', data);
-              })
-              .catch(error => {
-                  console.error('Error updating request status:', error);
-                  return;
-           });
-  
-      
-      } else if (target.classList.contains('deny-btn')) {
-  
-              console.log(`Denying request...`);  
-              console.log("Request ID select:   ", requestId)
-  
-      
-          //Perform API call to update the status
-              fetch(`/api/requests/${requestId}`, {
-                  method: 'PATCH',
-                  headers: {
-                      'Content-Type': 'application/json'
-                  },
-                  body: JSON.stringify({
-                      status: 'denied'
-                  })
-                  })
-                  .then(response => {
-                      if (!response.ok) {
-                      throw new Error('Network response was not ok');
-                      }
-                      // Return response text if the content type is not JSON
-                      const contentType = response.headers.get('content-type');
-                      if (contentType && contentType.indexOf('application/json') !== -1) {
-                      return response.json();
-                      } else {
-                      return response.text();
-                      }
-                  })
-                  .then(data => {
-                      // Handle the response data
-                      console.log('Request status updated:', data);
-                  })
-                  .catch(error => {
-                      console.error('Error updating request status:', error);
-                      return;
-           });
+      if (target.classList.contains('approve-btn')) {
+        console.log(`Approving request...`);
+        console.log("Request ID select:   ", requestId);
+
+        if (desc != "unchanged" || summary != "unchanged") {
+          
+          fetch(`/api/update_json/${animal}`, {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              description: desc,
+              summary: summary,
+            })
+          })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Network response was not ok');
+              }
+              return response.json();
+            })
+            .then(data => {
+              // Handle the response data
+              console.log('Request status updated:', data);
+              clearTable();
+              updateTable();
+            })
+            .catch(error => {
+              console.error('Error updating request status:', error);
+              return;
+            });
+
+        }
+
+        if (modified != "unchanged") {
+
+          console.log('changing conservation');
+
+          fetch(`/api/updateConservationStatus/${animal}`, {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              status: modified
+            })
+          })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Network response was not ok');
+              }
+              // Return response text if the content type is not JSON
+              const contentType = response.headers.get('content-type');
+              if (contentType && contentType.indexOf('application/json') !== -1) {
+                return response.json();
+              } else {
+                return response.text();
+              }
+            })
+            .then(data => {
+              // Handle the response data
+              console.log('Request status updated:', data);
+              clearTable();
+              updateTable();
+            })
+            .catch(error => {
+              console.error('Error updating request status:', error);
+            });
+        }
+        //Perform API call to update the status
+        fetch(`/api/requests/${requestId}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            status: 'approved'
+          })
+        })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+            // Return response text if the content type is not JSON
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.indexOf('application/json') !== -1) {
+              return response.json();
+            } else {
+              return response.text();
+            }
+          })
+          .then(data => {
+            // Handle the response data
+            console.log('Request status updated:', data);
+          })
+          .catch(error => {
+            console.error('Error updating request status:', error);
+            return;
+          });
+
+
+      }  
+      else if (target.classList.contains('deny-btn')) {
+
+        console.log(`Denying request...`);
+        console.log("Request ID select:   ", requestId)
+
+
+        //Perform API call to update the status
+        fetch(`/api/requests/${requestId}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            status: 'denied'
+          })
+        })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+            // Return response text if the content type is not JSON
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.indexOf('application/json') !== -1) {
+              return response.json();
+            } else {
+              return response.text();
+            }
+          })
+          .then(data => {
+            // Handle the response data
+            console.log('Request status updated:', data);
+          })
+          .catch(error => {
+            console.error('Error updating request status:', error);
+            return;
+          });
         clearTable();
         updateTable();
       }
@@ -403,8 +429,8 @@
       form.style.display = "none";
       form.style.zIndex = "-1";
     })
-    
-  </script> 
+
+  </script>
 
 </body>
 
