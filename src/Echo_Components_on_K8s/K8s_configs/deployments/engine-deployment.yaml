@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: engine-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: engine
+  template:
+    metadata:
+      labels:
+        app: engine
+    spec:
+      containers:
+        - name: engine
+          image: gcr.io/sit-23t1-project-echo-25288b9/rb-echo-engine
+          ports:
+            - containerPort: 8501
+              hostPort: 8501
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: engine-env

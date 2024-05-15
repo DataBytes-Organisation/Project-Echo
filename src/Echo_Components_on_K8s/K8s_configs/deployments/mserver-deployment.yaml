@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mserver-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mserver
+  template:
+    metadata:
+      labels:
+        app: mserver
+    spec:
+      containers:
+        - name: mserver
+          image: 
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: mserver-env
