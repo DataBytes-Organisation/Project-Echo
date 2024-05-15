@@ -150,7 +150,6 @@
             <a id="statistics-menu-btn" class="tabs-button" onclick="openTab('statistics')"></a>
             <span id="pink-line" class="sudden-line"></span>
           </div>
-          <!-- New section for statistics -->
         
           <div id="FAQ">
             <div class="wrapper">
@@ -189,7 +188,10 @@
               </div>
 
               <div id="statistics">
-                
+                <div class="wrapper">
+                  
+                  </div>
+                </div>
               </div>
 
               <div id="userProfile">
@@ -1364,6 +1366,9 @@ function convertSpeciesToCommon(species){
         break;
       case "userProfile":
         document.getElementById("user-profile-button").classList.add("active");
+        break;
+      case "statistics":
+        document.getElementById("statistics-menu-btn").classList.add("active");
         break;
     }
     if (tab != null){
