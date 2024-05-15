@@ -76,6 +76,7 @@ exports.deleteaccount = async (req, res) => {
 
 //Change the Password
 exports.changepassword = async (req, res) => {
+  console.log("change password req", req)
   let oldpw = req.body.oldPassword;
   let newpd = req.body.newPassword;
   let cfm_newpw = req.body.confirmPassword
@@ -109,6 +110,6 @@ exports.changepassword = async (req, res) => {
     }
   } catch (err) {
     console.log('Login exception error: ' + err)
-    res.send(`<script> alert("Change Password exception Error: ${err}!");</script>`);
+    //res.send(`<script> alert("Change Password exception Error: ${err}!");</script>`);
   }  
 };
