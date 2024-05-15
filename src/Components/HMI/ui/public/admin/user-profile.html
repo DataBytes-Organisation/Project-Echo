@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>User Profile</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>User Profile</title>
+    <link rel="shortcut icon" type="image/png" href="./admin/images/logos/favicon.png" />
+    <link type="text/css" rel="stylesheet" href="./admin/css/styles.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <scrip type="text/javascript" src="https://kit.fontawesome.com/8aa980d912.js" crossorigin="anonymous"></script>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD"
+      crossorigin="anonymous"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+    />
+    <!-- jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script> 
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+
+    <script type="text/javascript" src="./admin/js/sidebarmenu.js"></script>
+    <script type="text/javascript" src="./admin/js/app.min.js"></script>
+    <!-- <script type="text/javascript" src="../../node_modules/apexcharts/dist/apexcharts.min.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.min.js"></script>
+    <script type="text/javascript" src="./admin/js/dashboard.js"></script>
+  
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <style type="text/css">
+      body {
+        margin-top: 20px;
+        color: #1a202c;
+        text-align: left;
+      }
+      .main-body {
+        padding: 15px;
+      }
+      .card {
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1),
+          0 1px 2px 0 rgba(0, 0, 0, 0.06);
+      }
+      .card {
+        width: 100%;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        word-wrap: break-word;
+        background-color: #fff;
+        background-clip: border-box;
+        border: 0 solid rgba(0, 0, 0, 0.125);
+        border-radius: 0.25rem;
+      }
+
+      #card-charges {
+        max-width: 90%;
+      }
+      .card-body {
+        flex: 1 1 auto;
+        min-height: 1px;
+        padding: 1rem;
+      }
+      .gutters-sm {
+        margin-right: -8px;
+        margin-left: -8px;
+      }
+      .gutters-sm > .col,
+      .gutters-sm > [class*="col-"] {
+        padding-right: 8px;
+        padding-left: 8px;
+      }
+      .mb-3,
+      .my-3 {
+        margin-bottom: 1rem !important;
+      }
+      .bg-gray-300 {
+        background-color: #e2e8f0;
+      }
+      .h-100 {
+        height: 100% !important;
+      }
+      .shadow-none {
+        box-shadow: none !important;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- <div id="user-info">
+    <h1>User Account Information</h1>
+    <p><strong>Username:</strong> <span id="username">JohnDoe</span></p>
+    <p><strong>Email:</strong> <span id="email">johndoe@example.com</span></p></div>
+    <div id="options">
+    <h2>Options</h2>
+    <button onclick="updatePassword()">Update Password</button>
+    <button onclick="signOut()">Sign Out</button>
+    <button onclick="deleteAccount()">Delete Account</button></div>
+    -->
+    <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
+    data-sidebar-position="fixed" data-header-position="fixed">
+    <!-- Sidebar Start -->
+    <div id="sidebar"></div>
+    <!--  Sidebar End -->
+    <!--  Main wrapper -->
+    <div class="body-wrapper">
+      <div id="header"></div>
+      <div class="container-fluid">
+        <div class="card" id="card-charges">
+          <div class="card-body">
+            <div class="screen-content">
+
+              <h1>Profile</h1>
+              <!-- <i class="screen-icon fa-brands fa-codepen"></i> -->
+              <!-- Create the empty table to display the donations in --->
+              <div class="screen-user">
+                <div class="container">
+                  <div class="main-body">
+                    <div class="row gutters-sm">
+                      <div class="col-md-4 mb-3">
+                        <div class="card">
+                          <div class="card-body">
+                            <div class="d-flex flex-column align-items-center text-center">
+                              <img
+                                src="./admin/images/profile/user-1.jpg"
+                                alt="Admin"
+                                class="rounded-circle"
+                                width="150"
+                              />
+                                <div class="mt-3">
+                                  <h4 id="username"></h4>
+                                  <p class="text-secondary mb-1">Full Stack Developer</p>
+                                  <p id="useremail" class="text-muted font-size-sm"></p>
+                                  <form action="/api/auth/signout" method="POST">
+                                    <button class="btn btn-primary" id="signOutButton">
+                                      Sign Out
+                                    </button>
+                                  </form>
+                                  </form>
+                                  <form action="/api/auth/deleteaccount" method="DELETE">
+                                    <button class="btn btn-outline-primary" type="submit" id="deleteAccButton">
+                                      Delete Account
+                                    </button>
+                                  </form>
+                                </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-8">
+                        <div class="card mb-3">
+                          <div class="card-body">
+                            <div class="row"></div>
+                            <div class="row">
+                              <div class="col-sm-3">
+                                <h6 class="mb-0">User Name</h6>
+                              </div>
+                              <div id="username_1" class="col-sm-9 text-secondary">Admin Admin</div>
+                            </div>
+                            <hr />
+                            <div class="row">
+                              <div class="col-sm-3">
+                                <h6 class="mb-0">Email</h6>
+                              </div>
+                              <div id="useremail_1" class="col-sm-9 text-secondary">Admin@deakin.cou.au</div>
+                            </div>
+                            <hr />
+                            <div class="row">
+                              <div class="col-sm-3">
+                                <h6 class="mb-0">Phone</h6>
+                              </div>
+                              <div class="col-sm-9 text-secondary">(03) 9244 6333</div>
+                            </div>
+                            <hr />
+                            <div class="row">
+                              <div class="col-sm-3">
+                                <h6 class="mb-0">Mobile</h6>
+                              </div>
+                              <div class="col-sm-9 text-secondary">(03) 9244 6333</div>
+                            </div>
+                            <hr />
+                            <div class="row">
+                              <div class="col-sm-3">
+                                <h6 class="mb-0">Reset Password</h6>
+                              </div>
+                              <div class="col-sm-9">
+                                <!-- <div class="row">
+                                  <div class="col-sm-4">
+                                    <b>Old Password</b>
+                                  </div>
+                                  <input id="oldPassword" class="col-sm-5 text-secondary" type="text">
+                                  <div class="col-sm-4">
+                                    <b>New Password</b>
+                                  </div>
+                                  <input id="newPassword" class="col-sm-5 text-secondary" type="text">
+                                  <div class="col-sm-4">
+                                    <b>Confirm Password</b>
+                                  </div>
+                                  <input id="confirmPassword" class="col-sm-5 text-secondary" type="text">
+                                </div> -->
+                                <form id="resetPasswordForm" action="/api/auth/ChangePassword" method="POST">
+                                  <div>
+                                    <label for="oldPassword">Old Password:</label>
+                                    <input type="password" id="oldPassword" name="newPassword" required>
+                                  </div>
+                                  <div>
+                                      <label for="newPassword">New Password:</label>
+                                      <input type="password" id="newPassword" name="newPassword" required>
+                                  </div>
+                                  <div>
+                                      <label for="confirmPassword">Confirm Password:</label>
+                                      <input type="password" id="confirmPassword" name="confirmPassword" required>
+                                  </div>
+                                  <button class="btn btn-info" type="submit" id="updatePassword">Update Password</button>
+                                </form>
+                              </div>
+                              <div class="col-md-auto">
+                                <!-- <button class="btn btn-info" id="updatePassword">Update Password</button> -->
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row gutters-sm">
+                          <div class="col-sm-12 mb-3">
+                            <div class="card h-100">
+                              <div class="card-body">
+                                <h6 class="d-flex align-items-center mb-3">
+                                  <i class="material-icons text-info mr-2">Echo</i>Project
+                                  Status
+                                </h6>
+                                <small>Web Design</small>
+                                <div class="progress mb-3" style="height: 5px">
+                                  <div
+                                    class="progress-bar bg-primary"
+                                    role="progressbar"
+                                    style="width: 80%"
+                                    aria-valuenow="80"
+                                    aria-valuemin="0"
+                                    aria-valuemax="100"
+                                  ></div>
+                                </div>
+                                <small>Website Markup</small>
+                                <div class="progress mb-3" style="height: 5px">
+                                  <div
+                                    class="progress-bar bg-primary"
+                                    role="progressbar"
+                                    style="width: 72%"
+                                    aria-valuenow="72"
+                                    aria-valuemin="0"
+                                    aria-valuemax="100"
+                                  ></div>
+                                </div>
+                                <small>Engine Team</small>
+                                <div class="progress mb-3" style="height: 5px">
+                                  <div
+                                    class="progress-bar bg-primary"
+                                    role="progressbar"
+                                    style="width: 89%"
+                                    aria-valuenow="89"
+                                    aria-valuemin="0"
+                                    aria-valuemax="100"
+                                  ></div>
+                                </div>
+                                <small>Server Setup</small>
+                                <div class="progress mb-3" style="height: 5px">
+                                  <div
+                                    class="progress-bar bg-primary"
+                                    role="progressbar"
+                                    style="width: 55%"
+                                    aria-valuenow="55"
+                                    aria-valuemin="0"
+                                    aria-valuemax="100"
+                                  ></div>
+                                </div>
+                                <small>Backend API</small>
+                                <div class="progress mb-3" style="height: 5px">
+                                  <div
+                                    class="progress-bar bg-primary"
+                                    role="progressbar"
+                                    style="width: 66%"
+                                    aria-valuenow="66"
+                                    aria-valuemin="0"
+                                    aria-valuemax="100"
+                                  ></div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>  
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+   
+    <script type="text/javascript"> 
+      function getUser(){
+        fetch("/user_profile")
+            .then(res => {
+              if (res.ok) return res.json()
+              return res.json().then(json => Promise.reject(json))
+            })
+            .then( userData => {
+              console.log("User profile data: ", userData)
+              username = String(userData.username);
+              email = `${userData.email}`
+              document.getElementById("username").innerText = username;
+              document.getElementById("useremail").innerText = email;
+              document.getElementById("username_1").innerText = username;
+              document.getElementById("useremail_1").innerText = email;
+            }) 
+            .catch(e => {
+              console.error(e.error)
+            })
+      }
+
+      $(document).ready(function() {
+                var username;
+                var useremail;
+                // Use jQuery's load() method to load component contents
+                console.log("Start!")
+                $("#sidebar").load("./admin/component/sidebar-component.html");
+                $("#header").load("./admin/component/header-component.html");
+
+                getUser();
+            });
+    </script>
+    
+
+    <script
+      data-cfasync="false"
+      src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"
+    ></script>
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.bundle.min.js"></script>
+   
+    
+    <!-- <script>
+
+    document.getElementById('resetPasswordForm').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent default form submission
+
+    // Validate password and confirm password
+    var oldPassword = document.getElementById('oldPassword').value;
+    var newPassword = document.getElementById('newPassword').value;
+    var confirmPassword = document.getElementById('confirmPassword').value;
+
+    if (newPassword !== confirmPassword) {
+        alert("Passwords do not match.");
+        return;
+    }
+
+    // Prepare data to send to the API
+    var formData = new FormData();
+    formData.append('oldpw', oldPassword);
+    formData.append('newpw', newPassword);
+    formData.append('cfm_newpw', confirmPassword);
+
+    // Make an AJAX request to the API
+    fetch('/api/auth/ChangePassword', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to reset password');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Handle success response from the API
+            alert('Password reset successfully.');
+            // Optionally, redirect the user to a new page
+            // window.location.href = '/login'; // Redirect to login page
+        })
+        .catch(error => {
+            // Handle error
+            console.error('Error:', error);
+            alert('Failed to reset password. Please try again later.');
+        });
+    });
+      </script> -->
+  </body>
+</html>

@@ -143,7 +143,10 @@ module.exports = function (app) {
 
   app.post("/api/auth/guestsignup", controller.guestsignup);
 
-  // app.delete("/api/auth/delete-account", controller.deleteaccount);
+  //app.delete("/api/auth/deleteaccount",controller.deleteaccount);
+
+  app.post("/api/auth/ChangePassword", controller.changepassword);
+
 
   // app.post("/api/auth/guestsignin", controller.guestsignin);
 };
