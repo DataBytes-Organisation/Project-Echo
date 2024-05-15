@@ -22,6 +22,11 @@ from app.middleware.auth_bearer import JWTBearer
 from app.middleware.random import randompassword
 from bson.objectid import ObjectId
 import uuid
+import pyotp
+from fastapi_mail import FastMail, MessageSchema, ConnectionConfig
+from typing import List
+import secrets
+import urllib.parse
 
 jwtBearer = JWTBearer()
 
@@ -179,6 +184,62 @@ def post_recording(data: schemas.RecordingData):
     print("sent")
 
     return data
+
+#config for the 2fa
+conf = ConnectionConfig(
+    MAIL_USERNAME="your-email@gmail.com",  # Your email address
+    MAIL_PASSWORD="your-email-password",  # Your email password
+    MAIL_FROM="your-email@gmail.com",      # The email from which to send messages
+    MAIL_PORT=587,                         # Commonly 587 for SMTP
+    MAIL_SERVER="smtp.gmail.com",          # SMTP server address
+    MAIL_TLS=True,                         # Use TLS (Transport Layer Security)
+    MAIL_SSL=False                         # Use SSL (Secure Sockets Layer), typically false if TLS is true
+)
+
+@router.post("/setup-2fa", status_code=status.HTTP_200_OK)
+async def setup_2fa(user: schemas.UserLoginSchema):
+    account = User.find_one({"$or": [{"username": user.username}, {"email": user.email}]})
+    if not account:
+        return JSONResponse(content={"message": "User Not Found."}, status_code=404)
+
+    if bcrypt.checkpw(user.password.encode('utf-8'), account['password'].encode('utf-8')):
+        secret = pyotp.random_base32()
+        User.update_one({"_id": account['_id']}, {"$set": {"secret": secret}})
+        
+        totp = pyotp.TOTP(secret)
+        url = totp.provisioning_uri(name=user.email, issuer_name="Your App")
+        
+        message = MessageSchema(
+            subject="Your 2FA Setup",
+            recipients=[user.email],
+            body=f"Scan this QR code with your 2FA app: {url}",
+            subtype="html"
+        )
+        fm = FastMail(conf)
+        await fm.send_message(message)
+        return {"message": "2FA setup instructions sent to your email."}
+    else:
+        return JSONResponse(content={"message": "Invalid credentials."}, status_code=401)
+
+
+#two factor auth
+@router.post("/verify-2fa", status_code=status.HTTP_200_OK)
+def verify_2fa(user: schemas.UserLoginSchema, token: int):
+    account = User.find_one({"$or": [{"username": user.username}, {"email": user.email}]})
+    if not account:
+        return JSONResponse(content={"message": "User Not Found."}, status_code=404)
+    
+    if bcrypt.checkpw(user.password.encode('utf-8'), account['password'].encode('utf-8')):
+        totp = pyotp.TOTP(account['secret'])
+        if totp.verify(token):
+            jwtToken = signJWT(user=account)
+            requests.session.token = jwtToken
+            return {"message": "2FA verification successful", "jwt": jwtToken}
+        else:
+            return JSONResponse(content={"message": "Invalid 2FA token."}, status_code=401)
+    else:
+        return JSONResponse(content={"message": "Invalid credentials."}, status_code=401)
+
     
 @router.post("/signup", status_code=status.HTTP_201_CREATED)
 def signup(user: schemas.UserSignupSchema):  
@@ -216,76 +277,127 @@ def signup(user: schemas.UserSignupSchema):
     response = {"message": "User was registered successfully!"}
     return JSONResponse(content=response, status_code=201)
 
-@router.post("/signin", status_code=status.HTTP_200_OK)
-def signin(user: schemas.UserLoginSchema):
-    #Find if the username exist in our database
-    account = User.find_one({"$or": [{"username": user.username}, {"email": user.email}]})
-    if(account is None):
-        #User Not exist - Checking inside Guest Collections
-        guestAcc = Guest.find_one({"$or": [{"username": user.username}, {"email": user.email}]})
-        if(guestAcc is None):
-            response = {"message": "User Not Found in Database."}
-            return JSONResponse(content=response, status_code=404)
-        #Verify credentials in User Collections
-        passwordIsValid = bcrypt.checkpw(user.password.encode('utf-8'), guestAcc['password'].encode('utf-8'))
-        if (passwordIsValid == False):
-            response = {"message": "Invalid Password!"}
-            return JSONResponse(content=response, status_code=401)
-        authorities = []
-        for role_id in guestAcc['roles']:
-            role = Role.find_one({"_id": role_id["_id"]})
-            if role:
-                authorities.append("ROLE_" + role['name'].upper())
-        #Create JWT token using user info
-        jwtToken = signJWT(user=guestAcc, authorities=authorities)
+# @router.post("/signin", status_code=status.HTTP_200_OK)
+# def signin(user: schemas.UserLoginSchema):
+#     #Find if the username exist in our database
+#     account = User.find_one({"$or": [{"username": user.username}, {"email": user.email}]})
+#     if(account is None):
+#         #User Not exist - Checking inside Guest Collections
+#         guestAcc = Guest.find_one({"$or": [{"username": user.username}, {"email": user.email}]})
+#         if(guestAcc is None):
+#             response = {"message": "User Not Found in Database."}
+#             return JSONResponse(content=response, status_code=404)
+#         #Verify credentials in User Collections
+#         passwordIsValid = bcrypt.checkpw(user.password.encode('utf-8'), guestAcc['password'].encode('utf-8'))
+#         if (passwordIsValid == False):
+#             response = {"message": "Invalid Password!"}
+#             return JSONResponse(content=response, status_code=401)
+#         authorities = []
+#         for role_id in guestAcc['roles']:
+#             role = Role.find_one({"_id": role_id["_id"]})
+#             if role:
+#                 authorities.append("ROLE_" + role['name'].upper())
+#         #Create JWT token using user info
+#         jwtToken = signJWT(user=guestAcc, authorities=authorities)
         
-        #Assign the session token with JWT
-        requests.session.token = jwtToken
-        result = {
-            "id": guestAcc["_id"],
-            "username": guestAcc["username"],
-            "email": guestAcc["email"],
-            "role" : authorities,
-        }
+#         #Assign the session token with JWT
+#         requests.session.token = jwtToken
+#         result = {
+#             "id": guestAcc["_id"],
+#             "username": guestAcc["username"],
+#             "email": guestAcc["email"],
+#             "role" : authorities,
+#         }
 
-        #Set up response (FOR TESTING ONLY)
-        response = {"message": "User Login Successfully!", "tkn" : jwtToken, "roles": authorities}
+#         #Set up response (FOR TESTING ONLY)
+#         response = {"message": "User Login Successfully!", "tkn" : jwtToken, "roles": authorities}
 
-        #Log result
-        print(result)
-        return JSONResponse(content=response, status_code=200)
+#         #Log result
+#         print(result)
+#         return JSONResponse(content=response, status_code=200)
     
-    #User Exist
-    #Verify credentials in User Collections
-    #Find if the password matches
+#     #User Exist
+#     #Verify credentials in User Collections
+#     #Find if the password matches
+#     passwordIsValid = bcrypt.checkpw(user.password.encode('utf-8'), account['password'].encode('utf-8'))
+#     if (passwordIsValid == False):
+#         response = {"message": "Invalid Password!"}
+#         return JSONResponse(content=response, status_code=401)
+#     authorities = []
+#     for role_id in account['roles']:
+#         role = Role.find_one({"_id": str(role_id["_id"])})
+#         if role:
+#             authorities.append("ROLE_" + role['name'].upper())
+    
+#     #Create JWT token using user info
+#     jwtToken = signJWT(user=account, authorities=authorities)
+    
+#     #Get info for users profile:
+#     #Assign the session token with JWT
+#     requests.session.token = jwtToken
+#     result = {
+#         "username": account["username"],
+#         "email": account["email"],
+#         "role" : authorities,
+#     }
+
+#     #Set up response (FOR TESTING ONLY)
+#     response = {"message": "User Login Successfully!", "tkn" : jwtToken, "roles": authorities, 'user': result}
+
+#     #Log result
+#     print(result)
+#     return JSONResponse(content=response, status_code=200)
+
+router = APIRouter()
+
+# Configure nodemailer transporter
+transporter = nodemailer.createTransport({
+    "host": "smtp.your-mailserver.com",
+    "port": 587,
+    "secure": False,  # True for 465, false for other ports
+    "auth": {
+        "user": "your-email@example.com",
+        "pass": "your-password"
+    }
+})
+
+# Function to send emails (make it async to use await)
+async def send_email(recipient, subject, body):
+    mail_options = {
+        "from": "your-email@example.com",
+        "to": recipient,
+        "subject": subject,
+        "html": body
+    }
+    result = await transporter.sendMail(mail_options)
+    return result
+
+@router.post("/signin", status_code=status.HTTP_200_OK)
+async def signin(user: schemas.UserLoginSchema):  # Make this function async
+    account = User.find_one({"$or": [{"username": user.username}, {"email": user.email}]})
+    if account is None:
+        response = {"message": "User Not Found in Database."}
+        return JSONResponse(content=response, status_code=404)
+
     passwordIsValid = bcrypt.checkpw(user.password.encode('utf-8'), account['password'].encode('utf-8'))
-    if (passwordIsValid == False):
+    if not passwordIsValid:
         response = {"message": "Invalid Password!"}
         return JSONResponse(content=response, status_code=401)
-    authorities = []
-    for role_id in account['roles']:
-        role = Role.find_one({"_id": str(role_id["_id"])})
-        if role:
-            authorities.append("ROLE_" + role['name'].upper())
-    
-    #Create JWT token using user info
-    jwtToken = signJWT(user=account, authorities=authorities)
-    
-    #Get info for users profile:
-    #Assign the session token with JWT
-    requests.session.token = jwtToken
-    result = {
-        "username": account["username"],
-        "email": account["email"],
-        "role" : authorities,
-    }
 
-    #Set up response (FOR TESTING ONLY)
-    response = {"message": "User Login Successfully!", "tkn" : jwtToken, "roles": authorities, 'user': result}
+    verification_code = secrets.token_hex(3)  # Generates a short hex token
+    current_time = datetime.now()
+    User.update_one(
+        {"_id": account["_id"]},
+        {"$set": {"verification_code": verification_code, "code_timestamp": current_time}}
+    )
 
-    #Log result
-    print(result)
+    email_body = f"Your verification code is: {verification_code}. Please enter this code in the application to complete your verification."
+    await send_email(account['email'], "Your Verification Code", email_body)  # Correct use of await inside async function
+
+    jwtToken = signJWT(user=account)
+    response = {"message": "User logged in successfully! Please verify your account with the code sent to your email.", "jwt": jwtToken}
     return JSONResponse(content=response, status_code=200)
+
 
 # Signout functionalities for API
 # However developing in the Frontend can clears the token better than storing it in a Database

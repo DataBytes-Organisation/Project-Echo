@@ -29,3 +29,7 @@ requests
 python-decouple
 pandas
 Werkzeug==2.3.7
+pyotp==2.6.0
+fastapi-mail==0.4.1
+
+
