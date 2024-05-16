@@ -6,6 +6,7 @@
     "path": "^0.12.7"
   },
   "scripts": {
+    "prestart": "npm install",
     "start": "nodemon server.js",
     "dev": "nodemon server.js"
   }

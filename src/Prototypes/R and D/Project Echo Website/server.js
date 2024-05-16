@@ -16,6 +16,10 @@ app.get('/vision', (req, res) => {
     res.sendFile(path.join(__dirname, "/src/vision.html"))
 })
 
+app.get('/contactus', (req, res) => {
+    res.sendFile(path.join(__dirname, "/src/contact.html"))
+})
+
 app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);
 });
