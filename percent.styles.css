@@ -1,0 +1,114 @@
+body,
+html {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  color: #fff;
+  background: url("images/bg.jpg") no-repeat center center fixed; /* Background image fixed */
+  background-size: cover; /* Ensure background covers the entire viewport */
+}
+
+.main-container,
+.container {
+  display: flex;
+}
+
+.left-container {
+  width: 25%; /* Reduced width for sidebar */
+  background: rgba(
+    0,
+    0,
+    0,
+    0.7
+  ); /* Semi-transparent background for better readability */
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  overflow-y: auto; /* Enables scrolling if the content is taller than the viewport */
+}
+
+.navbar {
+  height: 50px;
+  background: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 0 20px;
+}
+
+.navbar a {
+  color: white;
+  text-decoration: none;
+  padding: 10px 20px;
+  transition: color 0.3s ease, transform 0.2s ease;
+}
+
+.navbar a:hover {
+  color: #ffd700;
+  transform: scale(1.1);
+}
+
+.selection-box {
+  margin-top: 20px; /* Space between navbar and selection box */
+}
+
+#animal-list {
+  display: grid;
+  grid-template-columns: repeat(
+    3,
+    1fr
+  ); /* Creates a grid layout with 3 columns */
+  gap: 10px; /* Space between grid items */
+  list-style-type: none; /* Remove default list styling */
+  padding: 0;
+}
+
+#animal-list li {
+  background: rgba(255, 255, 255, 0.1); /* Light background for list items */
+  padding: 15px; /* Padding inside list items */
+  border-radius: 5px; /* Rounded corners for list items */
+  transition: background-color 0.3s; /* Transition for hover effect */
+}
+
+#animal-list li:hover {
+  background: rgba(255, 255, 255, 0.2); /* Change background on hover */
+}
+
+#animal-list label {
+  cursor: pointer; /* Indicates that label is clickable */
+  display: flex; /* Flexbox for aligning checkbox and label */
+  align-items: center; /* Center align items vertically */
+}
+
+input[type="checkbox"] {
+  margin-right: 10px; /* Space between checkbox and label */
+}
+
+.container {
+  flex: 1;
+  display: flex;
+}
+
+.text-box,
+.chart-box {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.text-box {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #eee; /* Light grey color for text for better readability */
+}
+
+.chart-box {
+  width: 50%; /* Half of its container */
+  height: 50%; /* Half of its container */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: auto; /* Centers the chart box within its flex container */
+}

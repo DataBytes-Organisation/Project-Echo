@@ -1,0 +1,135 @@
+body,
+html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: url("images/bg.jpg") no-repeat center center fixed; /* Background image fixed */
+  font-family: Arial, sans-serif;
+  color: white; /* Text color */
+}
+.pageTitle {
+  display: flex;
+  justify-content: center;
+}
+.main-container {
+  display: flex;
+
+  height: 100vh;
+  width: 100vw;
+}
+
+.left-container {
+  width: 50%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  padding: 10px 0;
+}
+
+.navbar {
+  margin-top: 25px;
+  height: 50px;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 0 20px;
+}
+
+.navbar a {
+  color: white;
+  text-align: center;
+  padding: 10px 20px; /* Adequate padding for clickable area */
+  text-decoration: none;
+  transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+}
+
+.navbar a:hover {
+  background-color: #ddd;
+  color: black;
+}
+
+.container {
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-start;
+  padding: 20px;
+}
+
+.column {
+  width: 45%;
+  padding: 20px;
+  border-radius: 10px;
+  background-color: rgba(
+    0,
+    0,
+    0,
+    0.5
+  ); /* Semi-transparent background for columns */
+}
+
+h2 {
+  text-align: center;
+  color: white; /* Heading color */
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  position: relative;
+}
+
+ul::after {
+  content: "";
+  position: absolute;
+  width: 2px;
+  background-color: #32cd32; /* Green color for the vertical line */
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  z-index: 1;
+}
+
+li {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.icon {
+  flex-basis: 50%;
+  width: 250px;
+  display: flex;
+  justify-content: flex-end;
+  overflow: hidden;
+}
+
+.icon img {
+  height: 250px;
+  width: 250px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for transform and box-shadow */
+}
+
+.icon img:hover {
+  transform: scale(1.05); /* Slightly increase size on hover */
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.8); /* White glow effect */
+  cursor: pointer; /* Changes the cursor to indicate that it's clickable */
+}
+
+.name {
+  position: absolute;
+  left: 60%;
+}
+
+li::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(0, -50%);
+  width: 30px; /* Correct length of the horizontal dash */
+  height: 2px; /* Thickness of the dash */
+  background-color: #32cd32; /* Green color for the dash */
+  z-index: 2;
+}

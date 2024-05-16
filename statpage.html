@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Animal Clock</title>
+    <link rel="stylesheet" href="StatPageStyles.css" />
+    <script src="animalsData.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const clockContainer = document.querySelector(".clock");
+        animals.slice(0, 12).forEach((animal, index) => {
+          const animalImage = document.createElement("img");
+          animalImage.src = animal.src;
+          animalImage.className = `animal animal-${index + 1}`;
+          animalImage.onclick = () =>
+            redirectToConservation(
+              animal.name,
+              animal.count,
+              animal.description
+            );
+          clockContainer.appendChild(animalImage);
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <div class="main-container">
+      <div class="left-container">
+        <div class="navbar">
+          <a href="statpage.html">Home</a>
+          <a href="about.html">About</a>
+          <a href="animalsPage.html">Animal Species</a>
+        </div>
+      </div>
+      <div class="right-container">
+        <div class="clock-container">
+          <div class="clock">
+            <!-- Images will be dynamically inserted here -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

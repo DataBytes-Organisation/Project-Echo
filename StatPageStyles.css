@@ -1,0 +1,189 @@
+body,
+html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: url("images/bg.jpg") no-repeat center center fixed;
+  background-size: cover;
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-container {
+  display: flex;
+
+  height: 100vh;
+  width: 100vw;
+}
+
+.left-container {
+  width: 50%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  padding: 10px 0;
+}
+
+.navbar {
+  margin-top: 250px;
+  height: 50px;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 0 20px;
+}
+
+.navbar a {
+  color: white;
+  text-align: center;
+  padding: 10px 20px; /* Adequate padding for clickable area */
+  text-decoration: none;
+  transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+}
+
+.navbar a:hover {
+  background-color: #ddd;
+  color: black;
+}
+
+.right-container {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+}
+
+.clock-container {
+  width: 500px; /* Set to 50% of the main container */
+  height: 500px; /* Define a fixed height for the clock container */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  margin: auto;
+  border-radius: 50%; /* Makes the container circular */
+  border: 1px solid black;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.3) 55%,
+    rgba(0, 0, 0, 0.5) 50% 100%
+  );
+}
+
+.animal {
+  position: absolute;
+  width: 350px;
+  height: 350px;
+  font-size: 24px;
+  text-align: center;
+  transform-origin: center;
+  top: 50%;
+  left: 50%;
+}
+
+.clock img {
+  width: 100px;
+  height: 100px;
+}
+.animal:hover {
+  cursor: pointer;
+  transform: scale(1.1); /* Scales up the image by 10% */
+  opacity: 0.8; /* Reduces the opacity to 80% */
+  transition: transform 0.3s ease, opacity 0.3s ease; /* Smooth transitions for transform and opacity */
+}
+
+/* Correcting the transformation logic to better handle the centering */
+.animal-1 {
+  transform: translate(-50%, -50%) rotate(30deg) translate(200px) rotate(-30deg);
+}
+.animal-1:hover {
+  transform: translate(-50%, -50%) rotate(30deg) translate(calc(200px - 10px))
+    rotate(-30deg);
+}
+.animal-2 {
+  transform: translate(-50%, -50%) rotate(60deg) translate(200px) rotate(-60deg);
+}
+.animal-2:hover {
+  transform: translate(-50%, -50%) rotate(60deg) translate(calc(200px - 10px))
+    rotate(-60deg);
+}
+.animal-3 {
+  transform: translate(-50%, -50%) rotate(90deg) translate(200px) rotate(-90deg);
+}
+.animal-3:hover {
+  transform: translate(-50%, -50%) rotate(90deg) translate(calc(200px - 10px))
+    rotate(-90deg);
+}
+.animal-4 {
+  transform: translate(-50%, -50%) rotate(120deg) translate(200px)
+    rotate(-120deg);
+}
+.animal-4:hover {
+  transform: translate(-50%, -50%) rotate(120deg) translate(calc(200px - 10px))
+    rotate(-120deg);
+}
+.animal-5 {
+  transform: translate(-50%, -50%) rotate(150deg) translate(200px)
+    rotate(-150deg);
+}
+.animal-5:hover {
+  transform: translate(-50%, -50%) rotate(150deg) translate(calc(200px - 10px))
+    rotate(-150deg);
+}
+.animal-6 {
+  transform: translate(-50%, -50%) rotate(180deg) translate(200px)
+    rotate(-180deg);
+}
+.animal-6:hover {
+  transform: translate(-50%, -50%) rotate(180deg) translate(calc(200px - 10px))
+    rotate(-180deg);
+}
+.animal-7 {
+  transform: translate(-50%, -50%) rotate(210deg) translate(200px)
+    rotate(-210deg);
+}
+.animal-7:hover {
+  transform: translate(-50%, -50%) rotate(210deg) translate(calc(200px - 10px))
+    rotate(-210deg);
+}
+.animal-8 {
+  transform: translate(-50%, -50%) rotate(240deg) translate(200px)
+    rotate(-240deg);
+}
+.animal-8:hover {
+  transform: translate(-50%, -50%) rotate(240deg) translate(calc(200px - 10px))
+    rotate(-240deg);
+}
+.animal-9 {
+  transform: translate(-50%, -50%) rotate(270deg) translate(200px)
+    rotate(-270deg);
+}
+.animal-9:hover {
+  transform: translate(-50%, -50%) rotate(270deg) translate(calc(200px - 10px))
+    rotate(-270deg);
+}
+.animal-10 {
+  transform: translate(-50%, -50%) rotate(300deg) translate(200px)
+    rotate(-300deg);
+}
+.animal-10:hover {
+  transform: translate(-50%, -50%) rotate(300deg) translate(calc(200px - 10px))
+    rotate(-300deg);
+}
+.animal-11 {
+  transform: translate(-50%, -50%) rotate(330deg) translate(200px)
+    rotate(-330deg);
+}
+.animal-11:hover {
+  transform: translate(-50%, -50%) rotate(330deg) translate(calc(200px - 10px))
+    rotate(-330deg);
+}
+.animal-12 {
+  transform: translate(-50%, -50%) rotate(360deg) translate(200px)
+    rotate(-360deg);
+}
+.animal-12:hover {
+  transform: translate(-50%, -50%) rotate(360deg) translate(calc(200px - 10px))
+    rotate(-360deg);
+}

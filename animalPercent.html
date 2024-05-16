@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Australian Wildlife Conservation</title>
+    <link rel="stylesheet" href="percent.styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <script src="animalsData.js"></script>
+    <script src="script.js"></script>
+  </head>
+  <body>
+    <div class="left-container">
+      <div class="navbar">
+        <a href="statpage.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="animalsPage.html">Animal Species</a>
+      </div>
+      <div class="selection-box">
+        <h3>Select Animals for Chart:</h3>
+        <ul id="animal-list">
+          <!-- Checkboxes for selecting animals will be inserted here -->
+        </ul>
+      </div>
+    </div>
+    <div class="container">
+      <div class="text-box">
+        <p></p>
+      </div>
+      <div class="chart-box">
+        <canvas id="myChart" width="400" height="400"></canvas>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Classification of Animals</title>
+    <link rel="stylesheet" href="animals.styles.css" />
+    <script src="animalsData.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const vertebratesContainer = document.querySelector(".vertebrates");
+        const invertebratesContainer = document.querySelector(".invertebrates");
+
+        animals.slice(0, 6).forEach((animal, index) => {
+          const li = document.createElement("li");
+          li.onclick = () =>
+            redirectToConservation(
+              animal.name,
+              animal.count,
+              animal.description
+            );
+          li.innerHTML = `<div class="icon"><img src="${animal.src}" alt="${animal.name}" /></div><div class="name">${animal.name}</div>`;
+          vertebratesContainer.appendChild(li);
+        });
+
+        animals.slice(6).forEach((animal, index) => {
+          const li = document.createElement("li");
+          li.onclick = () =>
+            redirectToConservation(
+              animal.name,
+              animal.count,
+              animal.description
+            );
+          li.innerHTML = `<div class="icon"><img src="${animal.src}" alt="${animal.name}" /></div><div class="name">${animal.name}</div>`;
+          invertebratesContainer.appendChild(li);
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <div class="pageTitle"><h1>Classification of Animals</h1></div>
+    <div class="left-container">
+      <div class="navbar">
+        <a href="statpage.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="animalsPage.html">Animal Species</a>
+      </div>
+    </div>
+    <div class="container">
+      <div class="column">
+        <h2>Vertebrates</h2>
+        <ul class="vertebrates">
+          <!-- Vertebrate animals will be dynamically inserted here -->
+        </ul>
+      </div>
+      <div class="column">
+        <h2>Invertebrates</h2>
+        <ul class="invertebrates">
+          <!-- Invertebrate animals will be dynamically inserted here -->
+        </ul>
+      </div>
+    </div>
+  </body>
+</html>
