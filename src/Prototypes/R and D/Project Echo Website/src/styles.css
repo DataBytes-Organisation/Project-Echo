@@ -20,6 +20,8 @@ body .navbar {
     top: 0;
     left: 0;
     background: rgba(0,0,0,0.6) !important;
+    backdrop-filter: blur(10px); 
+    border-radius: 20px0px; /* Rounds the edges */
 }
 
 body .navbar ul {
@@ -32,24 +34,22 @@ body .navbar ul li {
     padding: 0 20px;
 }
 
-body .navbar a {
+body .navbar a,
+body .navbar .logo-text {
     color: white; /* Link color */
     text-decoration: none;
-}
-
-body .navbar .logo-text {
-    color: white; /* Logo text color */
-    font-size: 24px;
-    margin-left: 10px;
-    font-weight: bold;
 }
 
 .navbar-brand {
     display: flex;
     align-items: center;
+    padding: 10px; /* Adjust padding for space around the logo */
 }
 
-
+.navbar-brand img {
+    width: auto; /* adjust according to the container */
+    max-height: 40px;
+    }
 
 /* Buttons Styles */
 .btn-explore, .btn-discover, .btn-lg {
@@ -89,6 +89,42 @@ body .navbar .logo-text {
     justify-content: center;
     align-items: center;
 }
+/* Form Styles */
+form {
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+button[type="submit"] {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button[type="submit"]:hover {
+    background-color: #218838;
+}
+
 
 .centre-text{
     padding: 100px;
@@ -102,6 +138,7 @@ h1 {
     margin: 0 0 20px 0; /* Space below the header */
     padding: 20px;
 }
+
 
 /* Logo Styles */
 .logo-container {
