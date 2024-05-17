@@ -4,6 +4,8 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from typing import Optional, List
 import re
+
+from fastapi_mail import ConnectionConfig, FastMail, MessageSchema
 from bson import ObjectId
 import datetime
 from app import serializers
@@ -23,6 +25,8 @@ from app.middleware.random import randompassword
 from app.middleware.random import genotp
 from bson.objectid import ObjectId
 import uuid
+import random
+import string
 
 jwtBearer = JWTBearer()
 
@@ -237,6 +241,8 @@ def signin(user: schemas.UserLoginSchema):
             role = Role.find_one({"_id": role_id["_id"]})
             if role:
                 authorities.append("ROLE_" + role['name'].upper())
+
+
         #Create JWT token using user info
         jwtToken = signJWT(user=guestAcc, authorities=authorities)
         
@@ -263,30 +269,73 @@ def signin(user: schemas.UserLoginSchema):
     if (passwordIsValid == False):
         response = {"message": "Invalid Password!"}
         return JSONResponse(content=response, status_code=401)
-    authorities = []
-    for role_id in account['roles']:
-        role = Role.find_one({"_id": str(role_id["_id"])})
-        if role:
-            authorities.append("ROLE_" + role['name'].upper())
     
-    #Create JWT token using user info
-    jwtToken = signJWT(user=account, authorities=authorities)
+     #send secure verification email
+    # Generate a random verification code
+    verification_code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+    verification_code[user.email] = verification_code
+
+    # Send verification email
+    message = MessageSchema(
+        subject="Your Verification Code",
+        recipients=[user.email],  # List of recipients
+        body=f"Your verification code is {verification_code}", 
+        subtype="plain"
+    )
+    #Sending email
+    #I have utilized FastAPI fastmail. You may choose to use a different mailing system.
+    #As I used my personal email to test this I have commented out the email section#
+    #Configuration for fastmail
+    # conf = ConnectionConfig(
+    #     MAIL_USERNAME="databytestest@gmail.com",  # Your email address
+    #     MAIL_PASSWORD="projectecho1",  # Your email password
+    #     MAIL_FROM="databytestest@gmail.com",      # The email from which to send messages
+    #     MAIL_PORT=465,                         # Commonly 587 for SMTP
+    #     MAIL_SERVER="smtp.gmail.com",          # SMTP server address
+    #     MAIL_STARTTLS=True,                         # Use TLS (Transport Layer Security)
+    #     MAIL_SSL_TLS=True, # Use SSL (Secure Sockets Layer), typically false if TLS is true
+    #     USE_CREDENTIALS=True, 
+    #     VALIDATE_CERTS=True                        
+    # )
+    # fm = FastMail(conf)
+    # fm.send_message(message)
+
+    #For testing purposes verification_code is set to 000000
+    #Remove the below line when frontend is ready
+    verification_code = "000000"
+
+    #Frontend Prompts user to enter verification code
+    #User Enters Verification code and code is recieved
+    #Verification code is saved into variable code_recieved
+    code_recieved = "000000" #Modify this line to save the code recieved from user rather than 000000
+    if (code_recieved==verification_code):
+        authorities = []
+        for role_id in account['roles']:
+            role = Role.find_one({"_id": str(role_id["_id"])})
+            if role:
+                authorities.append("ROLE_" + role['name'].upper())
     
-    #Get info for users profile:
-    #Assign the session token with JWT
-    requests.session.token = jwtToken
-    result = {
-        "username": account["username"],
-        "email": account["email"],
-        "role" : authorities,
-    }
+        #Create JWT token using user info
+        jwtToken = signJWT(user=account, authorities=authorities)
+    
+        #Get info for users profile:
+        #Assign the session token with JWT
+        requests.session.token = jwtToken
+        result = {
+            "username": account["username"],
+            "email": account["email"],
+            "role" : authorities,
+        }
 
-    #Set up response (FOR TESTING ONLY)
-    response = {"message": "User Login Successfully!", "tkn" : jwtToken, "roles": authorities, 'user': result}
+        #Set up response (FOR TESTING ONLY)
+        response = {"message": "User Login Successfully, Codes Verified!", "tkn" : jwtToken, "roles": authorities, 'user': result}
 
-    #Log result
-    print(result)
-    return JSONResponse(content=response, status_code=200)
+        #Log result
+        print(result)
+        return JSONResponse(content=response, status_code=200)        
+    
+    response = {"message": "Invalid Password!"}
+    return JSONResponse(content=response, status_code=401)
 
 # Signout functionalities for API
 # However developing in the Frontend can clears the token better than storing it in a Database
