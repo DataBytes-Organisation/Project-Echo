@@ -6,6 +6,7 @@ from typing import Optional, List
 import re
 
 from fastapi_mail import ConnectionConfig, FastMail, MessageSchema
+import pyotp
 from bson import ObjectId
 import datetime
 from app import serializers
@@ -219,6 +220,64 @@ def signup(user: schemas.UserSignupSchema):
     User.insert_one(user_dict)
     response = {"message": "User was registered successfully!"}
     return JSONResponse(content=response, status_code=201)
+
+
+@router.post("/setup-2fa", status_code=status.HTTP_200_OK)
+async def setup_2fa(user: schemas.UserLoginSchema):
+    account = User.find_one({"$or": [{"username": user.username}, {"email": user.email}]})
+    if not account:
+        return JSONResponse(content={"message": "User Not Found."}, status_code=404)
+
+    if bcrypt.checkpw(user.password.encode('utf-8'), account['password'].encode('utf-8')):
+        secret = pyotp.random_base32()
+        User.update_one({"_id": account['_id']}, {"$set": {"secret": secret}})
+        
+        totp = pyotp.TOTP(secret)
+        url = totp.provisioning_uri(name=user.email, issuer_name="Your App")
+        
+        message = MessageSchema(
+            subject="Your 2FA Setup",
+            recipients=[user.email],
+            body=f"Scan this QR code with your 2FA app: {url}",
+            subtype="html"
+        )
+
+        conf = ConnectionConfig(
+            MAIL_USERNAME="databytestest@gmail.com",  # Your email address
+            MAIL_PASSWORD="projectecho1",  # Your email password
+            MAIL_FROM="databytestest@gmail.com",      # The email from which to send messages
+            MAIL_PORT=465,                         # Commonly 587 for SMTP
+            MAIL_SERVER="smtp.gmail.com",          # SMTP server address
+            MAIL_STARTTLS=True,                         # Use TLS (Transport Layer Security)
+            MAIL_SSL_TLS=True, # Use SSL (Secure Sockets Layer), typically false if TLS is true
+            USE_CREDENTIALS=True, 
+            VALIDATE_CERTS=True                        
+        )
+
+        fm = FastMail(conf)
+        await fm.send_message(message)
+        return {"message": "2FA setup instructions sent to your email."}
+    else:
+        return JSONResponse(content={"message": "Invalid credentials."}, status_code=401)
+
+
+#two factor auth
+@router.post("/verify-2fa", status_code=status.HTTP_200_OK)
+def verify_2fa(user: schemas.UserLoginSchema, token: int):
+    account = User.find_one({"$or": [{"username": user.username}, {"email": user.email}]})
+    if not account:
+        return JSONResponse(content={"message": "User Not Found."}, status_code=404)
+    
+    if bcrypt.checkpw(user.password.encode('utf-8'), account['password'].encode('utf-8')):
+        totp = pyotp.TOTP(account['secret'])
+        if totp.verify(token):
+            jwtToken = signJWT(user=account)
+            requests.session.token = jwtToken
+            return {"message": "2FA verification successful", "jwt": jwtToken}
+        else:
+            return JSONResponse(content={"message": "Invalid 2FA token."}, status_code=401)
+    else:
+        return JSONResponse(content={"message": "Invalid credentials."}, status_code=401)
 
 @router.post("/signin", status_code=status.HTTP_200_OK)
 def signin(user: schemas.UserLoginSchema):
