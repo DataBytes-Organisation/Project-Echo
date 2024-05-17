@@ -425,6 +425,10 @@ app.post("/api/submit", async (req, res) => {
   }
 });
 
+app.get("/forgotPassword",async (req,res) => {
+  res.sendFile(path.join(__dirname, 'public/resetPassword.html'))
+})
+
 app.post("/api/approve", async (req,res) => {
 
 })
@@ -551,6 +555,7 @@ app.get("/welcome", async (req,res) => {
 app.get("/map", async(req,res) => {
   res.sendFile(path.join(__dirname, 'public/index.html'))
 })
+
 
 // start the server
 app.listen(port, () => {

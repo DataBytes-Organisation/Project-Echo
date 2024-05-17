@@ -75,3 +75,12 @@ table {
   .deny-btn:hover {
     background-color: #f0f0f0;
   }
+
+  .dropdown-menu {
+    background: rgb(0, 0, 0);
+    border: 1px solid #000000;
+    border-radius: 5px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1000;
+}
