@@ -1,0 +1,137 @@
+Classification Report for MobileNetV3Small:
+                              precision    recall  f1-score   support
+
+       Acanthiza chrysorrhoa       0.00      0.00      0.00         2
+           Acanthiza lineata       0.00      0.00      0.00         2
+              Acanthiza nana       0.00      0.00      0.00         0
+           Acanthiza pusilla       0.00      0.00      0.00         2
+        Acanthiza reguloides       0.00      0.00      0.00         8
+       Acanthiza uropygialis       0.00      0.00      0.00         2
+Acanthorhynchus tenuirostris       0.00      0.00      0.00         1
+     Accipiter cirrocephalus       0.00      0.00      0.00         2
+          Aidemosyne modesta       0.05      1.00      0.10         4
+             Alauda arvensis       0.00      0.00      0.00         3
+     Anhinga novaehollandiae       0.00      0.00      0.00         8
+         Anthochaera phrygia       0.00      0.00      0.00         0
+          Antigone rubicunda       0.00      0.00      0.00         9
+            Artamus cinereus       0.00      0.00      0.00         3
+         Artamus cyanopterus       0.00      0.00      0.00         1
+               Artamus minor       0.00      0.00      0.00         1
+       Artamus superciliosus       0.00      0.00      0.00         2
+         Barnardius zonarius       0.05      1.00      0.10         4
+    Callocephalon fimbriatum       0.00      0.00      0.00         2
+     Calyptorhynchus banksii       0.00      0.00      0.00         1
+     Calyptorhynchus lathami       0.00      0.00      0.00         2
+                Capra Hircus       0.00      0.00      0.00         0
+         Carduelis carduelis       0.00      0.00      0.00         1
+        Carterornis leucotis       0.00      0.00      0.00         0
+            Cervus Unicolour       0.00      0.00      0.00         0
+                Ceyx azureus       0.00      0.00      0.00         8
+           Chenonetta jubata       0.00      0.00      0.00         3
+         Chlamydera nuchalis       0.00      0.00      0.00         0
+      Cincloramphus mathewsi       0.00      0.00      0.00         0
+        Cinclosoma punctatum       0.00      0.00      0.00         0
+            Cisticola exilis       0.00      0.00      0.00         3
+        Climacteris picumnus       0.05      1.00      0.10         4
+     Colluricincla harmonica       0.05      1.00      0.10         4
+     Conopophila albogularis       0.05      1.00      0.10         4
+          Cophixalus exiguus       0.00      0.00      0.00         9
+        Cophixalus infacetus       0.00      0.00      0.00         9
+          Cophixalus ornatus       0.00      0.00      0.00         0
+    Coracina novaehollandiae       0.00      0.00      0.00         9
+          Coracina papuensis       0.00      0.00      0.00         0
+     Corcorax melanorhamphos       0.00      0.00      0.00         0
+       Cormobates leucophaea       0.05      1.00      0.10         4
+              Corvus mellori       0.00      0.00      0.00         1
+         Coturnix pectoralis       0.00      0.00      0.00         2
+              Cygnus atratus       0.00      0.00      0.00         0
+                   Dama Dama       0.00      0.00      0.00         2
+   Daphoenositta chrysoptera       0.00      0.00      0.00         0
+          Dasyurus maculatus       0.00      0.00      0.00         1
+       Dicaeum hirundinaceum       0.00      0.00      0.00         2
+     Egretta novaehollandiae       0.00      0.00      0.00         1
+         Elseyornis melanops       0.00      0.00      0.00         1
+          Entomyzon cyanotis       0.00      0.00      0.00         3
+          Eurostopodus argus       0.00      0.00      0.00         0
+     Eurostopodus mystacalis       0.00      0.00      0.00         0
+       Eurystomus orientalis       0.00      0.00      0.00         0
+              Falco berigora       0.00      0.00      0.00         9
+           Falco cenchroides       0.05      1.00      0.10         4
+            Falco peregrinus       0.00      0.00      0.00         0
+       Falcunculus frontatus       0.00      0.00      0.00         2
+                 Felis Catus       0.00      0.00      0.00         3
+                 Fulica atra       0.00      0.00      0.00         9
+         Gallinula tenebrosa       0.00      0.00      0.00         0
+            Geopelia cuneata       0.00      0.00      0.00         1
+              Gerygone mouki       0.00      0.00      0.00         8
+         Haliastur sphenurus       0.00      0.00      0.00         1
+       Irediparra gallinacea       0.00      0.00      0.00         3
+            Lalage leucomela       0.00      0.00      0.00         0
+             Litoria inermis       0.00      0.00      0.00         0
+        Manorina melanophrys       0.00      0.00      0.00         1
+        Megapodius reinwardt       0.00      0.00      0.00         1
+   Melithreptus brevirostris       0.00      0.00      0.00         0
+        Melithreptus gularis       0.00      0.00      0.00         9
+        Melithreptus lunatus       0.00      0.00      0.00         0
+        Microeca flavigaster       0.00      0.00      0.00         0
+          Neophema pulchella       0.00      0.00      0.00         3
+       Nesoptilotis leucotis       0.00      0.00      0.00         2
+        Pachycephala simplex       0.00      0.00      0.00         1
+       Pardalotus rubricatus       0.00      0.00      0.00         3
+         Parvipsitta pusilla       0.00      0.00      0.00         0
+    Pelecanus conspicillatus       0.00      0.00      0.00         3
+         Petrochelidon ariel       0.00      0.00      0.00         1
+     Petrochelidon nigricans       0.00      0.00      0.00         3
+            Petroica boodang       0.00      0.00      0.00         2
+         Petroica goodenovii       0.00      0.00      0.00         2
+          Petroica phoenicea       0.00      0.00      0.00         8
+              Petroica rosea       0.05      1.00      0.10         4
+          Pezoporus wallicus       0.00      0.00      0.00         1
+               Phaps elegans       0.05      1.00      0.10         4
+      Philemon citreogularis       0.05      1.00      0.10         4
+       Philemon corniculatus       0.00      0.00      0.00         2
+          Phylidonyris niger       0.00      0.00      0.00         0
+                  Pitta iris       0.00      0.00      0.00         2
+            Pitta versicolor       0.00      0.00      0.00         0
+         Platycercus elegans       0.00      0.00      0.00         3
+    Plectorhyncha lanceolata       0.00      0.00      0.00         9
+         Psophodes cristatus       0.00      0.00      0.00         1
+           Ptilinopus regina       0.00      0.00      0.00         0
+       Pycnoptilus floccosus       0.00      0.00      0.00         1
+       Ramsayornis fasciatus       0.00      0.00      0.00         8
+           Ranoidea caerulea       0.00      0.00      0.00         0
+           Rattus Norvegicus       0.00      0.00      0.00         8
+             Rhinella marina       0.00      0.00      0.00         2
+         Rhipidura albiscapa       0.00      0.00      0.00         8
+        Rhipidura leucophrys       0.00      0.00      0.00         0
+         Rhipidura rufifrons       0.00      0.00      0.00         1
+       Rhipidura rufiventris       0.00      0.00      0.00         0
+   Scythrops novaehollandiae       0.00      0.00      0.00         3
+        Spilopelia chinensis       0.00      0.00      0.00         0
+       Stizoptera bichenovii       0.00      0.00      0.00         0
+         Stomiopera unicolor       0.00      0.00      0.00         3
+         Strepera versicolor       0.00      0.00      0.00         2
+                  Sus Scrofa       0.00      0.00      0.00         9
+   Symposiachrus trivirgatus       0.00      0.00      0.00         2
+          Tregellasia capito       0.00      0.00      0.00         3
+       Trichosurus vulpecula       0.00      0.00      0.00         3
+         Uperoleia altissima       0.00      0.00      0.00         3
+            Uperoleia mimula       0.00      0.00      0.00         3
+              Vanellus miles       0.00      0.00      0.00         1
+               Vulpes vulpes       0.00      0.00      0.00         2
+
+                   micro avg       0.05      0.13      0.08     19412
+                   macro avg       0.00      0.09      0.01     19412
+                weighted avg       0.01      0.13      0.01     19412
+
+Confusion Matrix for {model_name}:
+[[0 0 0 ... 0 0 0]
+ [0 0 0 ... 0 0 0]
+ [0 0 0 ... 0 0 0]
+ ...
+ [0 0 0 ... 0 0 0]
+ [0 0 0 ... 0 0 0]
+ [0 0 0 ... 0 0 0]]
+Accuracy for {model_name}:
+0.05263157894736842
+
