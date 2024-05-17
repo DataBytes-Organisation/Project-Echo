@@ -147,8 +147,10 @@
             <a id="FAQ-menu-btn" class="tabs-button" onclick="openTab('FAQ')"></a>
             <a id="donate-menu-btn" class="tabs-button" onclick="openTab('donate')"></a>
             <a id="user-profile-button" class="tabs-button" onclick="openTab('userProfile'); fetchUser()"></a>
+            <a id="statistics-menu-btn" class="tabs-button" onclick="openTab('statistics')"></a>
             <span id="pink-line" class="sudden-line"></span>
           </div>
+        
           <div id="FAQ">
             <div class="wrapper">
               <div id="FAQ-contents">
@@ -182,6 +184,13 @@
                         Project Echo leverages machine learning to understand the density and classifications of animals in a survey area, using our curated sound datasets. 
                         Our team is making solid and comprehensive progress in the analysis of labeled data and its predictive ability using Artificial Intelligence and Machine Learning.
                       </p>
+                </div>
+              </div>
+
+              <div id="statistics">
+                <div class="wrapper">
+                  
+                  </div>
                 </div>
               </div>
 
@@ -1357,6 +1366,9 @@ function convertSpeciesToCommon(species){
         break;
       case "userProfile":
         document.getElementById("user-profile-button").classList.add("active");
+        break;
+      case "statistics":
+        document.getElementById("statistics-menu-btn").classList.add("active");
         break;
     }
     if (tab != null){

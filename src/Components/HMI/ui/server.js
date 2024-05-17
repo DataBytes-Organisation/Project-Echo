@@ -394,6 +394,11 @@ app.get("/login", (req, res) => {
   res.sendFile(path.join(__dirname, 'public/login.html'));
 })
 
+//Serve the user profile page
+app.get("/user-profile", (req,res)=> {
+  return res.sendFile(path.join(__dirname, 'public/admin/user-profile.html'));
+})
+
 //API Endpoint for the submission requests
 app.post("/api/submit", async (req, res) => {
   let token = await client.get('JWT', (err, storedToken) => {
@@ -424,6 +429,10 @@ app.post("/api/submit", async (req, res) => {
     res.status(500).send("An error occurred");
   }
 });
+
+app.get("/forgotPassword",async (req,res) => {
+  res.sendFile(path.join(__dirname, 'public/resetPassword.html'))
+})
 
 app.post("/api/approve", async (req,res) => {
 
@@ -551,6 +560,7 @@ app.get("/welcome", async (req,res) => {
 app.get("/map", async(req,res) => {
   res.sendFile(path.join(__dirname, 'public/index.html'))
 })
+
 
 // start the server
 app.listen(port, () => {
