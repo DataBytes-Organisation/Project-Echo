@@ -1,0 +1,488 @@
+/* General Body and HTML Styles */
+* {
+    padding-top: 70px;
+    margin: 0;
+    padding: 0;
+    font-family: 'Montserrat', sans-serif;
+}
+
+/* Navbar Styles */
+/* Ensuring that the navbar styles have higher specificity */
+
+body .navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white; 
+    z-index: 1000;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: rgba(0,0,0,0.6) !important;
+}
+
+body .navbar ul {
+    list-style-type: none;
+    display: flex;
+    margin: 0;
+}
+
+body .navbar ul li {
+    padding: 0 20px;
+}
+
+body .navbar a {
+    color: white; /* Link color */
+    text-decoration: none;
+}
+
+body .navbar .logo-text {
+    color: white; /* Logo text color */
+    font-size: 24px;
+    margin-left: 10px;
+    font-weight: bold;
+}
+
+.navbar-brand {
+    display: flex;
+    align-items: center;
+}
+
+
+
+/* Buttons Styles */
+.btn-explore, .btn-discover, .btn-lg {
+    color: white;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 1.2rem; /* Larger text for buttons */
+    border-radius: 5px; /* Rounded corners */
+}
+
+.hero .btn {
+    background-color: green;
+    border: 2px solid green;
+}
+
+.hero .btn:hover {
+    background-color: white;
+    color: green;
+    border: 2px solid green;
+}
+
+.hero .btn:active {
+    background-color: white !important;
+    color: green !important;
+    border: 2px solid green !important;
+}
+
+/* Hero Section Styles */
+.hero {
+    height: 100vh;
+    background-image: url('images/forest-background.jpg');
+    background-size: cover;
+    color: #fff;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.centre-text{
+    padding: 100px;
+    backdrop-filter: blur(3px);
+    border: 1px solid #212529;
+    border-radius: 5px;;
+}
+
+h1 {
+    font-size: 48px;
+    margin: 0 0 20px 0; /* Space below the header */
+    padding: 20px;
+}
+
+/* Logo Styles */
+.logo-container {
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    width: 80px;
+    height: auto;
+    display: block;
+    margin-right: 10px;
+}
+
+.logo-text {
+    font-size: 24px;
+    margin-left: 10px;
+    color: white;
+    font-weight: bold;
+}
+
+/* Mission Section Styles */
+.mission-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 50px;
+    background-color: #f4f4f4; /* Light grey background */
+}
+
+.mission-text {
+    flex: 1;
+    padding-right: 20px;
+}
+
+.mission-graphic {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.mission-graphic img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Responsive Design Adjustments */
+@media (max-width: 768px) {
+    .navbar ul {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .mission-container {
+        flex-direction: column;
+    }
+
+    .mission-text, .mission-graphic {
+        padding: 20px;
+        flex: none;
+    }
+
+    .mission-text {
+        padding-bottom: 20px;
+    }
+
+    .btn-explore, .btn-discover, .btn-lg {
+        font-size: 16px; /* Smaller button text on mobile */
+        padding: 8px 16px; /* Smaller padding */
+    }
+
+    h1 {
+        font-size: 32px; /* Smaller font size on mobile */
+    }
+}
+
+.mission-text p {
+    font-size: 20px; /* Increase font size for better readability */
+    margin-bottom: 10px; /* Add some space between paragraphs */
+}
+
+.mission-container {
+    display: flex;
+    align-items: stretch; /* Ensures children of .mission-container fill the container */
+    justify-content: space-between;
+    padding: 50px;
+    background-color: #f4f4f4; /* Light grey background */
+}
+
+.mission-text, .mission-graphic {
+    flex: 1; /* Both children share available space equally */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Centers content vertically */
+}
+
+.mission-text {
+    padding-right: 20px; /* Ensures there is space between text and image */
+}
+
+.mission-graphic img {
+    width: 100%; /* Full width of the container */
+    height: auto; /* Maintain aspect ratio */
+    object-fit: cover; /* Ensures the image covers the area without being stretched */
+}
+
+@media (max-width: 768px) {
+    .mission-container {
+        flex-direction: column;
+        padding: 20px;
+    }
+
+    .mission-text, .mission-graphic {
+        flex: none; /* Removes flex grow/shrink properties */
+        width: 100%; /* Full width on small screens */
+    }
+
+    .mission-text {
+        padding-bottom: 20px; /* Space between text and image on small screens */
+    }
+
+    .mission-graphic img {
+        width: 100%; /* Ensures image adjusts to the width of the container */
+        height: auto; /* Maintain aspect ratio */
+    }
+
+    .mission-text p {
+        font-size: 18px; /* Slightly smaller font size on mobile */
+    }
+}
+
+.stats-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 50px 10%;
+    background-color: #f4f4f4; 
+    color: #333; 
+}
+
+.stat h2 {
+    font-size: 48px; /* Large font size for numbers */
+    color: #008000; /* Green color similar to your design */
+    margin: 0; /* Remove default margins */
+}
+
+.stat p {
+    font-size: 24px; /* Suitable font size for descriptions */
+    color: #333; /* Dark text color */
+    margin: 5px 0 0; /* Spacing above the description */
+    text-align: center; /* Center-align the text */
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 768px) {
+    .stats-container {
+        flex-direction: column; /* Stack stats vertically on small screens */
+        padding: 20px;
+    }
+
+    .stat {
+        margin-bottom: 20px; /* Add bottom margin for spacing between stats */
+    }
+}
+
+.carousel {
+    max-width: 60%; /* Adjust this value to control the width of the carousel */
+    margin: 20px auto; /* Center the carousel horizontally */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Optional: adds shadow for visual separation */
+}
+
+.carousel-inner {
+    position: relative;
+    width: 100%;
+    overflow: hidden; /* Ensures no overflow of content outside the carousel */
+}
+
+.carousel-item {
+    height: 500px; /* Set a fixed height for each carousel item */
+    display: flex;
+    justify-content: center;
+    align-items: center; /* This centers the content vertically */
+}
+
+.carousel-item img {
+    width: auto; /* Maintain aspect ratio */
+    max-height: 100%; /* Ensure the image does not exceed the carousel item's height */
+    margin: auto; /* Center the image within the item */
+}
+
+@media (max-width: 768px) {
+    .carousel-item {
+        height: 300px; /* Smaller height on smaller screens */
+    }
+
+    .carousel {
+        max-width: 90%; /* Allow carousel to take more width on smaller screens */
+    }
+}
+
+/* Styling for cards to ensure they look good and have space around them */
+.card {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Subtle shadow for depth */
+    transition: transform 0.3s ease-in-out; /* Smooth transform effect on hover */
+}
+
+.card:hover {
+    transform: scale(1.05); /* Slight scale up on hover for interactive feedback */
+}
+
+.card-img-top {
+    width: 100%; /* Full width of the card */
+    height: 180px; /* Fixed height for consistency */
+    object-fit: cover; /* Ensures images are covered nicely without distortion */
+}
+
+.col-md-4 {
+    margin-bottom: 30px; /* Increased bottom margin to separate rows of cards */
+}
+
+@media (max-width: 768px) {
+    .col-md-4 {
+        margin-bottom: 20px; /* Smaller margin for mobile devices */
+    }
+}
+
+.container {
+    padding-top: 150px; /* Adds additional top padding to the container holding the cards */
+}
+
+.header-container {
+    padding: 20px 0; /* Top and bottom padding */
+    background-color: #f4f4f4; /* Light grey background, adjust color as needed */
+    margin-bottom: 20px; /* Space between the header and the carousel */
+}
+
+h1.text-center {
+    font-size: 48px; /* Large font size for the header */
+    color: #333; /* Dark grey text color, adjust as needed */
+    font-weight: bold; /* Bold text for better visibility */
+    margin: 0; /* Remove default margins */
+    padding: 20px; /* Padding to add space inside the header */
+}
+
+@media (max-width: 768px) {
+    h1.text-center {
+        font-size: 32px; /* Smaller font size on mobile devices */
+    }
+}
+
+.card {
+    margin: 20px auto; /* Center cards in the column with some margin */
+    width: 100%; /* Use the full width of the column */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Add subtle shadow for depth */
+}
+
+.card-img-top {
+    width: 80px; /* Fixed width for the avatar */
+    height: 80px; /* Fixed height for the avatar */
+    border-radius: 50%; /* Make the avatar image circular */
+    margin-top: -40px; /* Pull the avatar slightly up out of the card */
+    border: 3px solid white; /* Add white border around the avatar */
+    background-color: white; /* Ensure background behind image is white */
+}
+
+.card-body {
+    padding: 20px; /* Padding inside the card */
+}
+
+.card-text {
+    font-size: 16px; /* Slightly larger text for readability */
+    color: #333; /* Dark grey text for better visibility */
+}
+
+.blockquote-footer {
+    font-size: 14px; /* Smaller font size for the name */
+    color: #666; /* Light grey text for the name */
+}
+
+.vision-header {
+    background-color: #f4f4f4; /* Light grey background */
+    padding: 200px 100px; /* Sufficient padding */
+    text-align: center; /* Center the text */
+    margin-top: 56px; /* Adjust based on your navbar's height */
+}
+
+.vision-header h1 {
+    color: #006400; /* Ensure this is a visible color */
+    font-size: 36px; /* Visible font size */
+    font-weight: bold; /* Bold for emphasis */
+    margin: auto; /* Center the heading */
+    padding: 20px; /* Padding inside the header */
+    display: block; /* Ensures it is visible */
+}
+
+
+@media (max-width: 768px) {
+    .vision-header h1 {
+        font-size: 24px; /* Smaller font size for smaller devices */
+        padding: 10px; /* Adjust padding */
+    }
+}
+
+.video-container {
+    position: relative;
+    width: 60%; /* Adjust this percentage to control the video width */
+    max-width: 1200px; /* Limits the maximum width */
+    margin: 50px auto; /* Centers the video and adds vertical spacing */
+    padding-bottom: 45%; /* Adjust this to maintain aspect ratio */
+    height: 0;
+    overflow: hidden;
+}
+
+.video-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.join-movement {
+    background-color: #004D40; /* Deep green background */
+    color: white; /* White text color */
+    text-align: center; /* Centering the text */
+    padding: 50px 20px; /* Top and bottom padding */
+    margin-top: 20px; /* Space above the section */
+}
+
+.join-movement h2 {
+    font-size: 32px; 
+    margin-bottom: 20px; 
+}
+
+.join-movement p {
+    font-size: 20px; 
+    margin-bottom: 30px; 
+}
+
+.join-movement .btn {
+    font-size: 18px; /* Button font size */
+    padding: 10px 30px; /* Padding inside the button */
+    margin: 10px; /* Space around buttons */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+}
+
+.join-movement .btn-primary {
+    background-color: #00796B; /* Green background for the primary button */
+    color: white; /* White text color */
+}
+
+.join-movement .btn-warning {
+    background-color: #FFB300; /* Yellow background for the warning button */
+    color: white; /* White text color */
+}
+
+.social-media-section {
+    background-color: white; /* Adjust the background color if needed */
+    text-align: center;
+    padding: 20px;
+    font-size: 24px;
+}
+
+.social-media-section h2 {
+    color: black; /* Color for the heading */
+    margin-bottom: 20px; /* Space between heading and icons */
+}
+
+.social-icons a {
+    margin: 0 10px; /* Space between icons */
+}
+
+.social-icons img {
+    width: 40px; /* Size of icons */
+    height: 40px; /* Maintain aspect ratio */
+    transition: transform 0.3s ease; /* Smooth transform effect on hover */
+}
+
+.social-icons a:hover img {
+    transform: scale(1.2); /* Slightly enlarge icons on hover */
+}
+
+
