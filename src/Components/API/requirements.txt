@@ -29,3 +29,4 @@ requests
 python-decouple
 pandas
 Werkzeug==2.3.7
+fastapi_mail
