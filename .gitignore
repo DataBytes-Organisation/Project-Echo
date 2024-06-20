@@ -11,3 +11,9 @@ src\Prototypes\api\__pycache__
 
 src/Prototypes/hmi/ui/node_modules/*
 src/Components/HMI/ui/node_modules/*
+src/Components/RecordingProcessor/RecordingImports/*
+src/Components/RecordingProcessor/Experiments/EuclideanComparisons
+src/Components/RecordingProcessor/Experiments/NoiseReductionTests
+src/Components/RecordingProcessor/Experiments/OnsetDetection
+src/Components/RecordingProcessor/Experiments/TimingOld
+src/Components/RecordingProcessor/Experiments/0_InitialProcessing/combined/*

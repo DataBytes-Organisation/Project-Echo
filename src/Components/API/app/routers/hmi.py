@@ -42,7 +42,8 @@ def show_event_from_time(start: str, end: str):
     # print(datetime_end)
     aggregate = [
         {
-            '$match':{'timestamp': { '$gte' : datetime_start, '$lt' : datetime_end}}
+            '$match':{'timestamp': { '$gte' : datetime_start, '$lt' : datetime_end},
+                      'animalTrueLLA': {'$ne': None}}
             
         },
         {
@@ -51,6 +52,11 @@ def show_event_from_time(start: str, end: str):
                 'localField': 'species',
                 'foreignField': '_id',
                 'as': 'info'
+            }
+        },
+        {
+            '$match': {
+                'info': {'$ne': []}
             }
         },
         {

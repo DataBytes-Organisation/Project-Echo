@@ -11,7 +11,7 @@ paho-mqtt<2.0.0
 pandas
 pymongo[srv]
 soundfile
-tensorflow
+tensorflow==2.15.0
 tensorflow-addons
 tensorflow_hub
 tensorflow_io

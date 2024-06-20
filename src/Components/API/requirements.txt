@@ -29,3 +29,4 @@ requests
 python-decouple
 pandas
 Werkzeug==2.2.2
+python-multipart

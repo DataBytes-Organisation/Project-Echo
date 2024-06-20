@@ -23,6 +23,8 @@ class EventSchema(BaseModel):
     timestamp: datetime
     sensorId: str
     species: str 
+    clusterID: str
+    events: List[str]
     microphoneLLA: List[float] 
     animalEstLLA: List[float]
     animalTrueLLA: List[float]
@@ -49,6 +51,29 @@ class EventSchema(BaseModel):
                 "sampleRate": 48000
             }
         }
+
+class TestEventSchema(BaseModel):
+
+     
+    clusterID: str
+    species: str 
+    audioClip: str
+    confidence: float
+    sampleRate: int
+
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+        schema_extra = {
+            "example": {                          
+                "species": "Sus Scrofa",
+                "audioClip": "some audio_base64 data",
+                "confidence": 99.4,
+                "sampleRate": 48000
+            }
+        }
+
 class MovementSchema(BaseModel):
     timestamp: datetime
     species: str
@@ -242,4 +267,58 @@ class RecordingData(BaseModel):
         json_encoders = {ObjectId: str}
         schema_extra = {
            
-        } 
+        }
+
+class RecordingDataClustering(BaseModel):
+
+    #timestamp: datetime
+    type: str
+    clusterID: str
+    audioClip: str
+    #mode: str 
+    audioFile: str
+    
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+        schema_extra = {
+           
+        }
+
+class Triangulation(BaseModel):
+
+    #timestamp: datetime
+    clusterID:  str
+    times: List[str]
+    
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+        schema_extra = {
+           "example": {
+                "times": ["3_23482384923521", "2_3258235828359"]
+            }
+        }
+
+class Location(BaseModel):
+
+    #timestamp: datetime
+    clusterID:  str
+    sourceLLA: List[List[float]]
+    
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+        schema_extra = {
+           "example": {
+                "sourceLLA": [[-38.19842926291313, -144.2927937789876, 10.0]]
+            }
+        }
+        
+class UpdateResponse(BaseModel):
+    matched_count: int
+    modified_count: int
+    acknowledged: bool

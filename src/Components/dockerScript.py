@@ -2,12 +2,10 @@ import docker
 import subprocess
 import argparse
 
-
-
 # List of container names to delete
 containers_to_delete = ["ts-echo-model-cont","ts-echo-hmi-cont","ts-api-cont", "ts-simulator-cont", "ts-echo-engine-cont", "ts-mongodb-cont", "mongo-express", "ts-mqtt-server-cont","echo-redis","ts-triangulation-cont"]
 images = ["ts-simulator","ts-api","ts-mongodb","ts-echo-hmi","ts-echo-engine","ts-mqtt-server","ts-echo-model","mongo-express", "redis","ts-echo-triangulation"]
-preserved_volumes = ["echo-net_credentials_volume", "echo-net_db-data"]
+preserved_volumes = ["echo-net_credentials_volume", "echo-net_db-data", "echo-net_recordings"]
 
 containers_to_deleteV2 = []
 imagesV2 = []
@@ -39,6 +37,17 @@ def deletionList(containers):
         elif container == "tri":
             containers_to_deleteV2.append("ts-triangulation-cont")
             imagesV2.append("ts-echo-triangulation")
+        
+        elif container == "onset":
+            containers_to_deleteV2.append('ts-onset-cont')
+            imagesV2.append("ts-echo-onset")
+
+        elif container == "clustering":
+            containers_to_deleteV2.append('ts-clustering-cont')
+            imagesV2.append("ts-echo-clustering")
+        
+
+
 
 def delete_containers(container_names):
     client = docker.from_env()
@@ -86,6 +95,7 @@ def run_docker_compose_up():
 
 def compose(containers):
     command = ["docker-compose"]
+    print("Composing containers:    ", containers)
     
     # Dynamically add all compose files to the command
     for container in containers:
@@ -94,6 +104,9 @@ def compose(containers):
     
     # Add the 'up' and '--build' commands at the end
     command.extend(["up", "--build"])
+    
+    # Print the constructed command for debugging
+    print("Constructed command: ", " ".join(command))
     
     try:
         subprocess.run(command, check=True)
@@ -125,6 +138,7 @@ if __name__ == "__main__":
         deletionList(containers.container)
         delete_containers(containers_to_deleteV2)
         delete_images(imagesV2)
+        print(containers.container)
         compose(containers.container)
         
 

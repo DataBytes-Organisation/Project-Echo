@@ -10,10 +10,12 @@ connection_string ="mongodb+srv://bndct:2zZwTx4E1Rd8dKsJ@cluster0.ntu9thj.mongod
 client = pymongo.MongoClient(connection_string)
 db = client['EchoNet']
 #db = client['mydatabase']
-Events = db.triangulatedEvents2
-Movements = db.movements
-Species = db.species
+Events = db['test-events']
+Movements = db['movements']
+Species = db['species']
 Microphones = db['microphones-new']
+Test_Events = db['test-events']
+
 
 User_connection_string = "mongodb://root:root_password@ts-mongodb-cont/UserSample?authSource=admin"
 Userclient = pymongo.MongoClient(connection_string)

@@ -407,11 +407,13 @@ export function convertJSONtoAnimalVocalizationEvent(hmiState, data){
   vocalizationEvent.estLon = data.animalEstLLA[1];
   vocalizationEvent.locationLat = data.animalTrueLLA[0][0];
   vocalizationEvent.locationLon = data.animalTrueLLA[0][1];
-
+  console.log("Data:  ", data)
+  vocalizationEvent.numberDetections = data.events.length
+  vocalizationEvent.polygonPoints = data.animalTrueLLA
+  console.log("Length:  ", data.events.length)
   vocalizationEvent.sensorId = data.sensorId;
   vocalizationEvent.sensorLat = data.microphoneLLA[0];
   vocalizationEvent.sensorLon = data.microphoneLLA[1];
-
   return vocalizationEvent;
 }
 
@@ -668,6 +670,7 @@ function addAllVocalizationFeatures(hmiState) {
   //console.log("Truth locs", hmiState.movementEvents);
   for (let entry of hmiState.vocalizationEvents) {
     //console.log("True location found!:  ")
+    console.log("Number of detections:  ", entry.numberDetections)
     var iconPath = "";
     
     if(entry.animalDiet === "herbavore" || entry.animalDiet === "frugivore"){
@@ -767,6 +770,8 @@ function addAllVocalizationFeatures(hmiState) {
         animalIcon: iconPath,
         animalRecordDate: entry.timestamp,
         eventId: entry.eventId,
+        numberDetections: entry.numberDetections,
+        polygonPoints: entry.polygonPoints,
         isAnimalMovement: 0,
         animalLocation: null,
         type: "vocalization"
@@ -856,6 +861,8 @@ function addNewVocalizationFeatures(hmiState, events) {
         animalIcon: iconPath,
         animalRecordDate: entry.timestamp,
         eventId: entry.eventId,
+        numberDetections: entry.numberDetections,
+        polygonPoints: entry.polygonPoints,
         isAnimalMovement: 0,
     });
       //console.log(entry.locationLon, " ", entry.locationLat)
@@ -1200,111 +1207,155 @@ function createMapClickEvent(hmiState){
     
         return points;
       }
+
+      function calculatePointsForPolygon(coordinates) {
+       const points = []
+
+      }
       
       
 
       let values = feature.getProperties();
       if(values.type == "vocalization"){
-        const centerLongitude = values.animalLon;
-      const centerLatitude = values.animalLat;
-  
-      //location bubble radius in meters
-      const radius = 10;
-      //number of points to create the polygon
-      const numberOfPoints = 64;
-      const points = calculateEvenlySpacedPoints(centerLongitude, centerLatitude, radius, numberOfPoints);
-      console.log(points);
-      var polygon = new ol.geom.Polygon([points]).transform('EPSG:4326', 'EPSG:3857')
-      var polygonFeature = new ol.Feature({
-        geometry: polygon
-      })
-      
-      
 
-
-      let strokeColor = "#ffffff"
-  
-      if (values.animalStatus == "normal"){
-        strokeColor = "#00c90d"
-      }
         
-      else if (values.animalStatus == "invasive"){
-        strokeColor = "#0059f2"
-      }
-  
-      else if (values.animalStatus == "endangered"){
-        strokeColor = "#ff0303"
-      }
-  
-      else if (values.animalStatus == "vulnerable"){
-        strokeColor = "#f2aa00"
-      }
-  
-      else if (values.animalStatus == "near-threatened"){
-        strokeColor = "#f2f200"
-      }
-  
-      var polygonStyle = new ol.style.Style({
-        fill: new ol.style.Fill({
-            color: 'rgba(255, 255, 255, 0.3)' // This will fill the polygon
-        }),
-        stroke: new ol.style.Stroke({
-            color: strokeColor,
-            width: 3
-        })
-      });
-    
-      polygonFeature.setStyle(polygonStyle);
-
-      values.animalLocation = polygonFeature
-
-      var clickedOn = new ol.style.Style({
-        image: new ol.style.Icon({
-          src: values.animalIcon,
-          anchor: [0.5, 1],
-          scale: 0.75,
-          className: 'vocalization-icon',
-          opacity: 1
-        }),
-      })
-
-      
-      
-      try{
-
-        if (currentPolygon != null){
-          polygonSource.removeFeature(currentPolygon)
-
-          var clickedOff = new ol.style.Style({
-            image: new ol.style.Icon({
-              src: currentFeature.getProperties().animalIcon,
-              anchor: [0.5, 1],
-              scale: 0.75,
-              className: 'vocalization-icon',
-              opacity: 0.6
-            }),
-          })
-
-          currentFeature.setStyle(clickedOff)
+        let centerLatitude;
+        let centerLongitude;
+        let points;
+        //location bubble radius in meters
+        const radius = 10;
+        //number of points to create the polygon
+        const numberOfPoints = 64;
+        console.log("Vocalization event clicked!")
+        // FOR 1 MIC DETECTIONS
+        if (values.numberDetections == 1){
+          randomCoords = generateRandomCoordinate(values.animalLat, values.animalLon)
+          console.log("1 mic detection event")
+          centerLongitude = randomCoords.lon;
+          centerLatitude = randomCoords.lat;
+          points = calculateEvenlySpacedPoints(randomCoords.lon, randomCoords.lat, radius, numberOfPoints);
+          console.log("Points:  ", points)
         }
-        feature.setStyle(clickedOn)
-        console.log("Setting style on values")
-        console.log("Attempting to apply animal location area:  ", values.animalLocation)
-        polygonSource.addFeature(polygonFeature);
+
+        // FOR 2 MIC DETECTIONS 
+        else if(values.numberDetections == 2){
+
+          centerLongitude = values.polygonPoints[5][0];
+          centerLatitude = values.polygonPoints[5][1];
+          console.log("Two mic detection")
+          points = values.polygonPoints
+          points.forEach(innerArray => {
+            innerArray.pop();
+          });
+          points.forEach(innerArray => {
+            innerArray.reverse();
+          });
+          console.log("Points:  ", points)
+        }
+
+        // FOR 3+ MIC DETECTIONS
+        else{
+          console.log("3 Mic detection event")
+          centerLongitude = values.animalLon;
+          centerLatitude = values.animalLat;
+          points = calculateEvenlySpacedPoints(centerLongitude, centerLatitude, radius, numberOfPoints);
+          console.log("Points:  ", points)
+        }
+          
+        
+        console.log(points);
+
+        var polygon = new ol.geom.Polygon([points]).transform('EPSG:4326', 'EPSG:3857')
+        var polygonFeature = new ol.Feature({
+          geometry: polygon
+        })
+        
+        
 
 
-        currentFeature = feature
-        currentPolygon = polygonFeature;
-        //Iterate through to find the layer which contains the icon feature
+        let strokeColor = "#ffffff"
+    
+        if (values.animalStatus == "normal"){
+          strokeColor = "#00c90d"
+        }
+          
+        else if (values.animalStatus == "invasive"){
+          strokeColor = "#0059f2"
+        }
+    
+        else if (values.animalStatus == "endangered"){
+          strokeColor = "#ff0303"
+        }
+    
+        else if (values.animalStatus == "vulnerable"){
+          strokeColor = "#f2aa00"
+        }
+    
+        else if (values.animalStatus == "near-threatened"){
+          strokeColor = "#f2f200"
+        }
+    
+        var polygonStyle = new ol.style.Style({
+          fill: new ol.style.Fill({
+              color: 'rgba(255, 255, 255, 0.3)' // This will fill the polygon
+          }),
+          stroke: new ol.style.Stroke({
+              color: strokeColor,
+              width: 3
+          })
+        });
+      
+        polygonFeature.setStyle(polygonStyle);
+
+        values.animalLocation = polygonFeature
+
+        var clickedOn = new ol.style.Style({
+          image: new ol.style.Icon({
+            src: values.animalIcon,
+            anchor: [0.5, 1],
+            scale: 0.75,
+            className: 'vocalization-icon',
+            opacity: 1
+          }),
+        })
+
+        
+        
+        try{
+
+          if (currentPolygon != null){
+            polygonSource.removeFeature(currentPolygon)
+
+            var clickedOff = new ol.style.Style({
+              image: new ol.style.Icon({
+                src: currentFeature.getProperties().animalIcon,
+                anchor: [0.5, 1],
+                scale: 0.75,
+                className: 'vocalization-icon',
+                opacity: 0.6
+              }),
+            })
+
+            currentFeature.setStyle(clickedOff)
+          }
+          feature.setStyle(clickedOn)
+          console.log("Setting style on values")
+          console.log("Attempting to apply animal location area:  ", values.animalLocation)
+          polygonSource.addFeature(polygonFeature);
 
 
-      }
-      catch{
-        console.log("Couldn't set new values to values")
-      }
+          currentFeature = feature
+          currentPolygon = polygonFeature;
+          //Iterate through to find the layer which contains the icon feature
 
-      console.log("New Feature clicked: ",values);
-      console.log("Printing animal icon path: ",values.animalIcon)
+
+        }
+        catch{
+          console.log("Couldn't set new values to values")
+        }
+
+        console.log("New Feature clicked: ",values);
+        console.log("Printing animal icon path: ",values.animalIcon)
       }
 
 
@@ -1467,13 +1518,13 @@ export function MapCloseNav() {
 }
 
 function updateTruthEvents(hmiState){
-  retrieveTruthEventsInTimeRange(hmiState.currentTime-5, hmiState.currentTime).then((res) => {
+  retrieveTruthEventsInTimeRange(hmiState.currentTime-10, hmiState.currentTime).then((res) => {
     updateAnimalMovementLayerFromLiveData(hmiState, res.data);
   })
 }
 
 function updateVocalizationEvents(hmiState){
-  retrieveVocalizationEventsInTimeRange(hmiState.currentTime-5, hmiState.currentTime).then((res) => {
+  retrieveVocalizationEventsInTimeRange(hmiState.currentTime-10, hmiState.currentTime).then((res) => {
     updateVocalizationLayerFromLiveData(hmiState, res.data);
   })
 }
@@ -1582,8 +1633,10 @@ function queueSimUpdate(hmiState) {
   if(hmiState.liveMode){
     updateTimeOffset(hmiState);
 
-    hmiState.currentTime = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
-    hmiState.liveEventCutoff = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay - hmiState.liveWindow) / 1000);
+    //hmiState.currentTime = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
+    hmiState.currentTime = Math.floor((getUTC()) / 1000);
+    //hmiState.liveEventCutoff = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay - hmiState.liveWindow) / 1000);
+    hmiState.liveEventCutoff = Math.floor((getUTC() - hmiState.liveWindow) / 1000);
                 
     purgeTruthEvents(hmiState);
     purgeVocalizationEvents(hmiState);
