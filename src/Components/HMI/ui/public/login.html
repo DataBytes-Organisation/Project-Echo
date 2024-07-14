@@ -435,7 +435,7 @@
         if (input_ele.value.match(validEmailRegex)) {
             error_ele.style.display = 'none';
             error_ele.innerHTML = '';
-            btn_ele. = false;
+            btn_ele.disabled = false;
         } else {
             error_ele.style.display = 'block';
             error_ele.innerHTML = 'Please insert a valid email address';
