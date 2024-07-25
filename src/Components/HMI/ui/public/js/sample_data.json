@@ -2232,12 +2232,12 @@
     {
       "species": "Uperoleia lithomoda",
       "common": "Stonemason Toadlet",
-      "summary": "Uperoleia lithomoda, commonly known as the stonemason toadlet, is a small species of frog that belongs to the family of frogs known as Myobatrachidae. The species is endemic to Australia, and is found in the rainforests and wet sclerophyll forests of the Wet Tropics region of northeastern Queensland.",
+      "summary": "Uperoleia lithomoda, commonly known as the stonemason toadlet, is a small frog species belonging to the family Myobatrachidae. The species is endemic to Australia and is found in the rainforests and wet sclerophyll forests of the Wet Tropics region of northeastern Queensland.",
       "description": [
-        "The species is small, with males typically reaching a maximum length of around 2.5 centimetres. The species is brown or grey in colour, with dark brown or black spots on its back and legs.",
-        "The stonemason toadlet is primarily active during the wet season, when it emerges from its burrow to mate and feed, though the breeding biology is little known. The species is insectivorous, and feeds on a variety of small invertebrates.",
-        "The stonemason toadlet is an important indicator species for the health of the Wet Tropics region, as it is sensitive to changes in its environment. The species' presence in an area is a sign of a healthy and intact ecosystem.",
-        "The species is not considered to be threatened, and is classified as of 'Least Concern' by the International Union for Conservation of Nature (IUCN). However, like many other amphibian species around the world, it is vulnerable to habitat loss and degradation caused by human activities such as land clearing and climate change."
+        "The stonemason toadlet is small, with males typically reaching a maximum length of around 2.5 centimeters. The species is brown or grey in color, with dark brown or black spots on its back and legs.",
+        "The stonemason toadlet is primarily active during the wet season, emerging from its burrow to mate and feed, though its breeding biology is little known. The species is insectivorous and feeds on a variety of small invertebrates.",
+        "The stonemason toadlet is an important indicator species for the health of the Wet Tropics region, as it is sensitive to environmental changes. Its presence indicates a healthy and intact ecosystem.",
+        "The species is classified as 'Least Concern' by the International Union for Conservation of Nature (IUCN). However, it is vulnerable to habitat loss and degradation caused by human activities such as land clearing and climate change."
       ],
       "img": ""
     },
@@ -2247,20 +2247,19 @@
       "summary": "Uperoleia littlejohni, also known as Littlejohn's Toadlet, is a small frog found in the coastal regions of eastern Australia. It is known for its bright, yellow-orange coloration and black markings.",
       "description": [
         "Littlejohn's Toadlet is an arboreal species, spending much of its time in the branches of trees and shrubs.",
-        "During breeding season, males will call from high in the trees to attract females.",
+        "During the breeding season, males will call from high in the trees to attract females.",
         "This species is primarily active at night and feeds on small invertebrates such as ants and spiders.",
-        "Habitat loss and degradation are threats to Littlejohn's Toadlet, which is currently listed as 'near threatened' on the IUCN Red List.",
-        ""
+        "Habitat loss and degradation are threats to Littlejohn's Toadlet, which is currently listed as 'Near Threatened' on the IUCN Red List."
       ],
       "img": ""
     },
     {
       "species": "Uperoleia mimula",
       "common": "Mimicking gungan",
-      "summary": "Uperoleia mimula, commonly known as the Mimicking gungan, is a species of frog found in eastern Australia. These small toadlets grow to a length of about 2.5 cm and are typically found in subtropical or tropical swamps, dry savanna, moist savanna, subtropical or tropical seasonally wet lands",
+      "summary": "Uperoleia mimula, commonly known as the Mimicking gungan, is a species of frog found in eastern Australia. These small toadlets grow to a length of about 2.5 cm and are typically found in subtropical or tropical swamps, dry savanna, moist savanna, and subtropical or tropical seasonally wet lands.",
       "description": [
         "They are mostly active during the day and are known for their distinctive call, which sounds like a short trill.",
-        "Tawny Toadlets feed on a variety of small invertebrates, such as ants and spiders, and are preyed upon by a range of animals, including birds, snakes, and larger frogs.",
+        "Mimicking gungans feed on a variety of small invertebrates, such as ants and spiders, and are preyed upon by a range of animals, including birds, snakes, and larger frogs.",
         "They have a unique adaptation where their skin is able to secrete a mild toxin to deter predators."
       ],
       "img": ""
@@ -2304,7 +2303,6 @@
       ],
       "img": ""
     },
-
     {
       "species": "Yoyetta tristrigata",
       "common": "Tropical ambertail",
@@ -2317,11 +2315,10 @@
       ],
       "img": ""
     },
-
     {
-      "species": "Zanda funereal",
+      "species": "Zanda funerea",
       "common": "Yellow-tailed Black Cockatoo",
-      "summary": "Zanda funereal, commonly known as the yellow-tailed black cockatoo, is a large bird species found in the forests of southeastern Australia. It is known for its striking appearance and unique vocalizations, as well as its important role in the ecology of its native habitat.",
+      "summary": "Zanda funerea, commonly known as the yellow-tailed black cockatoo, is a large bird species found in the forests of southeastern Australia. It is known for its striking appearance and unique vocalizations, as well as its important role in the ecology of its native habitat.",
       "description": [
         "The species is one of the largest cockatoo species, with adults measuring up to 65 cm in length and weighing up to 900 g. It has a distinctive appearance, with black feathers covering most of its body, a bright yellow patch on its tail feathers, and a large, strong beak that it uses to crack open seeds and nuts.",
         "Yellow-tailed black cockatoos are social birds and are often seen in pairs or small groups. They communicate with each other using a range of vocalizations, including a loud, distinctive call that is often heard in the early morning and late afternoon.",
@@ -2330,7 +2327,7 @@
         "The species is considered to be vulnerable to habitat loss and fragmentation caused by human activities such as logging and land clearing. It is also threatened by the loss of mature trees, which provide important nesting sites and food sources."
       ],
       "img": ""
-    },
+    },   
     {
       "species": "Zoothera heinei",
       "common": "Russet-tailed Thrush",
@@ -2356,7 +2353,7 @@
         "The Bassian Thrush is an important indicator species for the health of southeastern Australia's wet forests and woodlands. Its presence or absence can indicate the health of these ecosystems and the effectiveness of conservation efforts to protect them."
       ],
       "img": ""
-    },
+    },    
     {
       "species": "Zanda sp.",
       "common": "Black Cockatoos",
@@ -2921,7 +2918,6 @@
       ],
       "img": ""
     },
-
     {
       "species": "Cacatua galerita",
       "common": "Sulphur-crested cockatoo",
@@ -2933,8 +2929,7 @@
         "They are also known for their ability to imitate human speech and sounds."
       ],
       "img": ""
-    },
-
+    }
     {
       "species": "Cacatua sanguinea",
       "common": "Little corella",
@@ -4006,13 +4001,12 @@
       ],
       "img": ""
     },
-
     {
       "species": "Chalcites basalis",
       "common": "Horsfield's bronze cuckoo",
       "summary": "Horsfield's bronze cuckoo (Chalcites basalis) is a small bird found in Australia, Indonesia, and Papua New Guinea. It is a brood parasite, laying its eggs in the nests of other bird species.",
       "description": [
-        "The Horsfield's bronze cuckoo is a small bird, measuring about 14cm in length, with a brownish-black plumage on its back and wings, and a bronze-green sheen on its head and breast. The belly is white with dark streaks.",
+        "The Horsfield's bronze cuckoo is a small bird, measuring about 14 cm in length, with brownish-black plumage on its back and wings, and a bronze-green sheen on its head and breast. The belly is white with dark streaks.",
         "This species is a brood parasite, laying its eggs in the nests of other bird species such as thornbills, scrubwrens, and gerygones. The host birds raise the cuckoo chicks, often at the expense of their own offspring.",
         "The Horsfield's bronze cuckoo sustains itself by consuming insects and various small invertebrates, either seizing them mid-flight or collecting them from plants.",
         "The call of Horsfield's bronze cuckoo is a series of high-pitched, descending notes, repeated at intervals.",
@@ -4025,10 +4019,10 @@
       "common": "Shining bronze cuckoo",
       "summary": "The Shining bronze cuckoo (Chalcites lucidus) is a small bird found in Australia, New Zealand, and some Pacific islands. It is a brood parasite, laying its eggs in the nests of other bird species.",
       "description": [
-        "The shining bronze cuckoo is a petite bird, approximately 12cm long, featuring metallic greenish-bronze feathers on its upper body and a white underside. The male of the species is characterized by a noticeable purple patch on its crown.",
+        "The shining bronze cuckoo is a petite bird, approximately 12 cm long, featuring metallic greenish-bronze feathers on its upper body and a white underside. The male of the species is characterized by a noticeable purple patch on its crown.",
         "The shining bronze cuckoo is a brood parasite, depositing its eggs in the nests of various bird species like gerygones, silvereyes, and thornbills. The host birds then nurture the cuckoo chicks, frequently at the cost of their own offspring.",
         "The shining bronze cuckoo sustains itself by capturing insects and various small invertebrates either in flight or by foraging through vegetation.",
-        "The call of Shining bronze cuckoo is a distinctive descending whistle, often heard in the forest during the breeding season.",
+        "The call of the Shining bronze cuckoo is a distinctive descending whistle, often heard in the forest during the breeding season.",
         "This species is widespread and relatively common, and is not currently considered to be threatened. However, its reliance on other bird species for reproduction means that it may be affected by habitat loss and other factors that impact its host species."
       ],
       "img": ""
@@ -4083,7 +4077,7 @@
         "The species is able to tolerate a wide range of environmental conditions, and can survive in low oxygen environments by burrowing into the mud. It is also known to aestivate during periods of drought."
       ],
       "img": ""
-    },
+    },    
     {
       "species": "Chlamydera guttata",
       "common": "Western bowerbird",
