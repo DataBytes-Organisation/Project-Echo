@@ -1281,16 +1281,16 @@
     {
       "species": "Rhinella marina",
       "common": "Cane Toad",
-      "summary": "Rhinella marina, commonly known as the Cane toad, is a large, terrestrial toad native to Central and South America. It has been introduced to various countries around the world as a biological control agent for pests, but it has become an invasive species in many of these areas.",
+      "summary": "Rhinella marina, commonly known as the Cane Toad, is a large, terrestrial toad native to Central and South America. Introduced to various countries as a biological control agent, it has become an invasive species in many regions, significantly impacting local ecosystems.",
       "description": [
-        "Cane toads secrete a toxic venom from glands on their skin, which can be lethal to predators and other animals that ingest them.",
-        "The Cane toad is a prolific breeder and can lay up to 30,000 eggs at a time.",
-        "Despite their toxic skin secretions, Cane toads have been known to be preyed upon by certain snake species that have evolved resistance to their venom.",
-        "",
-        ""
+        "Cane Toads secrete a potent toxic venom from glands located behind their eyes, which can be lethal to predators, pets, and humans if ingested or handled improperly.",
+        "They are prolific breeders, capable of laying up to 30,000 eggs at a time, which contributes to their rapid population growth.",
+        "Despite their toxic secretions, Cane Toads are preyed upon by certain snake species that have evolved resistance to their venom.",
+        "Cane Toads are highly adaptable and can thrive in various environments, including urban areas, forests, and open fields.",
+        "Their introduction to non-native regions has had significant ecological impacts, often outcompeting local species and altering ecosystems."
       ],
       "img": ""
-    },
+    },    
     {
       "species": "Strepera graculina",
       "common": "Pied Currawong",
@@ -1422,32 +1422,32 @@
       "img": ""
     },
     {
-      "species": "Pteropus sp.",
-      "common": "Torresian flying-fox",
-      "summary": "The Pteropus genus is a group of megabats, commonly known as Torresian flying-fox, that are found throughout Asia, Australia, and the Pacific. They are known for their large size and their important role in pollination and seed dispersal.",
+      "species": "Pteropus poliocephalus",
+      "common": "Grey-headed Flying-fox",
+      "summary": "Pteropus poliocephalus, commonly known as the Grey-headed Flying-fox, is a species of megabat native to Australia. They are known for their large size and their important role in pollination and seed dispersal.",
       "description": [
-        "The Pteropus genus includes over 60 species of Torresian flying-fox, ranging in size from the small Little Red Flying-fox to the large Black Flying-fox, which can have a wingspan of up to 1.5 meters.",
-        "Torresian flying-fox are herbivores and feed mainly on nectar, pollen, and fruit.",
-        "They are important pollinators and seed dispersers, helping to maintain the health of many ecosystems.",
-        "Some species of Torresian flying-fox are considered to be pests, as they can cause damage to crops and orchards.",
-        "Many species of Torresian flying-fox are threatened by habitat destruction and fragmentation, hunting, and persecution by humans."
+        "Grey-headed Flying-foxes are large bats, with a wingspan of up to 1 meter.",
+        "They are herbivores and feed mainly on nectar, pollen, and fruit.",
+        "Grey-headed Flying-foxes are important pollinators and seed dispersers, helping to maintain the health of many ecosystems.",
+        "They often roost in large colonies, sometimes numbering in the thousands.",
+        "Many populations of Grey-headed Flying-foxes are threatened by habitat destruction and fragmentation, hunting, and persecution by humans.",
+        "The Grey-headed Flying-fox is listed as Vulnerable on the IUCN Red List."
       ],
       "img": ""
     },
     {
       "species": "Pycnoptilus floccosus",
       "common": "Pilotbird",
-      "summary": "Pycnoptilus floccosus, commonly known as the pilotbird, is a small, ground-dwelling bird species found in the woodlands of southeastern Australia. Despite its unassuming appearance, the pilotbird is a unique and fascinating species that has captured the attention of birdwatchers and scientists alike.",
+      "summary": "Pycnoptilus floccosus, commonly known as the Pilotbird, is a small, ground-dwelling bird species found in the woodlands of southeastern Australia. Despite its unassuming appearance, the Pilotbird is a unique and fascinating species that has captured the attention of birdwatchers and scientists alike.",
       "description": [
-        "The pilotbird is a skilled mimic and can imitate the calls of other bird species as well as various non-bird sounds such as chainsaws and car alarms.",
-        "Unlike many other bird species, the pilotbird is not territorial and will often form small flocks with other individuals.",
+        "The Pilotbird is a skilled mimic and can imitate the calls of other bird species.",
+        "Unlike many other bird species, the Pilotbird is not territorial and will often form small flocks with other individuals.",
         "Pilotbirds have a unique method of foraging, using their strong legs and sharp claws to scratch in the leaf litter for insects and other small prey.",
         "The species has a distinctive mating ritual, where the male will perform a complex song-and-dance routine to attract a mate. The female will then select a male based on the quality of his performance.",
         "Pilotbirds are monogamous and form strong pair bonds that can last for several years."
       ],
       "img": ""
-    },
-
+    },    
     {
       "species": "Vanellus miles",
       "common": "Masked Lapwing",
@@ -1594,17 +1594,17 @@
     },
     {
       "species": "Psophodes nigrogularis",
-      "common": "Black-throated whipbird",
-      "summary": "Psophodes nigrogularis, commonly known as the black-throated whipbird, is a bird species found in the forests and woodlands of eastern Australia. These elusive and cryptic birds are known for their distinctive calls and striking appearance.",
+      "common": "Black-throated Whipbird",
+      "summary": "Psophodes nigrogularis, commonly known as the black-throated whipbird, is a bird species found in the forests and woodlands of southwestern Australia. These elusive and cryptic birds are known for their distinctive calls and striking appearance.",
       "description": [
-        "Black-throated whipbirds are named for their whip-like calls, which are often heard in pairs or family groups. The male makes the initial 'whip' sound, followed by the female's 'crack' response.",
+        "Black-throated whipbirds are named for their whip-like calls, which are often heard in pairs. The male makes the initial 'whip' sound, followed by the female's 'crack' response.",
         "These birds have a striking appearance, with black and white stripes on their heads and distinctive black throat feathers.",
-        "Black-throated whipbirds are territorial and have been known to defend their territories against other birds and even humans.",
-        "The species is known for its unusual breeding behavior, with females laying eggs in the nests of other birds, often the superb fairywren or the grey shrike-thrush. The foster parents then raise the chick as their own.",
+        "Black-throated whipbirds are territorial and have been known to defend their territories against other birds.",
+        "The species is known for its unusual breeding behavior, with females laying eggs in their own nests. They do not practice brood parasitism (laying eggs in the nests of other birds).",
         "Black-throated whipbirds are notoriously difficult to spot, often remaining hidden in the undergrowth. Birdwatchers and naturalists may need to rely on their calls to detect their presence."
       ],
       "img": ""
-    },
+    },    
     {
       "species": "Psophodes occidentalis",
       "common": "Chiming Wedgebill",
@@ -1634,16 +1634,14 @@
     {
       "species": "Ptilinopus regina",
       "common": "Rose-crowned Fruit Dove",
-      "summary": "Ptilinopus regina, also known as the Rose-crowned Fruit Dove, is a species of bird in the family Columbidae, native to New Guinea and nearby islands. The species is characterized by its distinctive pink head and green body.",
+      "summary": "Ptilinopus regina, also known as the Rose-crowned Fruit Dove, is a species of bird in the family Columbidae, native to Australia and nearby islands. The species is characterized by its distinctive pink head and green body.",
       "description": [
         "The Rose-crowned Fruit Dove feeds on a variety of fruits, including figs, guavas, and papayas.",
         "Males of the species perform courtship displays where they bow their heads and fan their tails to attract a mate.",
-        "Ptilinopus regina is considered to be a species of least concern by the IUCN, due to its large range and stable population.",
-        "",
-        ""
+        "Ptilinopus regina is considered to be a species of least concern by the IUCN, due to its large range and stable population."
       ],
       "img": ""
-    },
+    },    
     {
       "species": "Ptilonorhynchus violaceus",
       "common": "Satin Bowerbird",
@@ -1686,16 +1684,16 @@
     {
       "species": "Ptilotula keartlandi",
       "common": "Grey-headed Honeyeater",
-      "summary": "Ptilotula keartlandi, commonly known as the grey-headed honeyeater, is a bird species found in the woodlands and forests of eastern Australia. These small and active birds are known for their distinctive calls and their important role in pollinating plants.",
+      "summary": "Ptilotula keartlandi, commonly known as the Grey-headed Honeyeater, is a bird species found in the woodlands and forests of central Australia. These small and active birds are known for their distinctive calls and their important role in pollinating plants.",
       "description": [
-        "Grey-headed honeyeaters have a distinctive appearance, with grey feathers on their head and upper body and a yellow belly.",
+        "Grey-headed Honeyeaters have a distinctive appearance, with grey feathers on their head and upper body and a yellow belly.",
         "These birds are highly vocal and are known for their complex songs and calls, which can vary between individuals and populations.",
-        "Grey-headed honeyeaters primarily feed on nectar from flowering plants and are important pollinators for many plant species in their native habitats.",
+        "Grey-headed Honeyeaters primarily feed on nectar from flowering plants and are important pollinators for many plant species in their native habitats.",
         "The species has a unique foraging behavior, often hovering in front of flowers to feed on nectar or using their sharp beaks to pry open the bases of flowers to access the nectar inside.",
-        "Grey-headed honeyeaters are monogamous and form strong pair bonds that can last for several years."
+        "Grey-headed Honeyeaters are monogamous and form strong pair bonds that can last for several years."
       ],
       "img": ""
-    },
+    },    
     {
       "species": "Ptilotula penicillata",
       "common": "White-plumed Honeyeater",
@@ -1710,9 +1708,9 @@
       "img": ""
     },
     {
-      "species": "Purnella albifrons",
+      "species": "Ptilotula albifrons",
       "common": "White-fronted Honeyeater",
-      "summary": "Purnella albifrons, commonly known as the White-fronted Honeyeater, is a small bird species found in eastern Australia.",
+      "summary": "Ptilotula albifrons, commonly known as the White-fronted Honeyeater, is a small bird species found in eastern Australia.",
       "description": [
         "They have distinctive white feathers on their forehead and throat that contrast with their grey-brown body plumage.",
         "White-fronted Honeyeaters are social birds that often gather in large flocks to feed and roost together.",
@@ -1721,7 +1719,7 @@
         "They have been listed as a species of Least Concern in the IUCN Red List."
       ],
       "img": ""
-    },
+    },    
     {
       "species": "Purpureicephalus spurius",
       "common": "Red-capped Parrot",
@@ -1738,68 +1736,66 @@
     {
       "species": "Pyrrholaemus brunneus",
       "common": "Redthroat",
-      "summary": "Pyrrholaemus brunneus, commonly known as the Redthroat, is a small bird found in Australia and New Guinea.",
+      "summary": "Pyrrholaemus brunneus, commonly known as the Redthroat, is a small bird species found in Australia. They are notable for their distinctive red throat patch and are typically found in dense vegetation such as shrubs and mangroves.",
       "description": [
-        "They have a distinctive red throat patch, and are often found in dense vegetation such as shrubs and mangroves.",
-        "Redthroats are territorial birds, and males defend their breeding territories with aggressive displays and vocalizations.",
-        "They are known to hybridize with the Golden-headed Cisticola in some areas of their range.",
-        "",
-        ""
+        "Redthroats have a distinctive red throat patch, and are often found in dense vegetation such as shrubs and mangroves.",
+        "They are territorial birds, and males defend their breeding territories with aggressive displays and vocalizations.",
+        "They primarily feed on insects and other small invertebrates found in their habitat.",
+        "The Redthroat is known for its subtle and melodious song, which is used in both communication and territorial defense."
       ],
       "img": ""
-    },
+    },    
     {
       "species": "Pyrrholaemus sagittata",
       "common": "Speckled Warbler",
-      "summary": "Pyrrholaemus sagittata, also known as the Speckled Warbler, is a small passerine bird found in Australia.",
+      "summary": "Pyrrholaemus sagittata, commonly known as the Speckled Warbler, is a small passerine bird found in Australia. It is known for its distinctive speckled plumage and is typically found in dry woodlands and scrublands.",
       "description": [
-        "They are typically found in dry woodlands and scrublands, and are known for their distinctive speckled plumage.",
-        "Speckled Warblers are territorial and form breeding pairs, but will sometimes nest in loose groups.",
-        "They have a unique feeding strategy where they move through the canopy of trees and use their bills to extract insects from under bark and leaves.",
-        "",
-        ""
+        "Speckled Warblers are typically found in dry woodlands and scrublands, and are known for their distinctive speckled plumage.",
+        "They are territorial and form breeding pairs. Outside the breeding season, they are usually solitary or found in small, loose groups.",
+        "Their feeding strategy involves moving through the undergrowth and low vegetation, where they use their bills to extract insects from under bark and leaves, as well as foraging on the ground.",
+        "The species has a melodious call and is often heard in its habitat before being seen."
       ],
       "img": ""
-    },
+    },    
     {
       "species": "Radjah rajah",
       "common": "Raja Shelduck",
-      "summary": "Radjah rajah, also known as the raja shelduck, is a large waterbird found in freshwater habitats across Southeast Asia. These ducks are notable for their striking black and white plumage, with males having a distinctive green head.",
+      "summary": "Radjah rajah, commonly known as the Raja Shelduck, is a large waterbird found in brackish and freshwater wetlands across Southeast Asia. These ducks are notable for their striking black and white plumage, with males having a distinctive green head.",
       "description": [
-        "These ducks are monogamous, with pairs staying together for multiple breeding seasons.",
+        "Raja Shelducks are monogamous, with pairs staying together for multiple breeding seasons.",
         "They are often found in pairs or small groups, rarely congregating in large flocks.",
-        "Radjah rajah are primarily herbivorous, feeding on aquatic plants and insects.",
-        "",
-        ""
+        "Radjah rajah are primarily herbivorous, feeding on aquatic plants, insects, and small invertebrates.",
+        "These ducks are known for their distinctive calls and can often be heard in their wetland habitats.",
+        "Their striking plumage makes them a notable species in their native range."
       ],
       "img": ""
-    },
+    },    
     {
       "species": "Ramsayornis fasciatus",
       "common": "Bar-breasted Honeyeater",
-      "summary": "Ramsayornis fasciatus, commonly known as the bar-breasted honeyeater, is a bird species found in the forests and woodlands of Australia and Papua New Guinea. These small and active birds are known for their distinctive appearance, vocalizations, and important role in pollinating plants.",
+      "summary": "Ramsayornis fasciatus, commonly known as the Bar-breasted Honeyeater, is a bird species found in the rainforests and woodlands of northern Australia and Papua New Guinea. These small and active birds are known for their distinctive appearance, vocalizations, and important role in pollinating plants.",
       "description": [
-        "Bar-breasted honeyeaters have a distinctive appearance, with a bar-shaped pattern on their breast.",
+        "Bar-breasted Honeyeaters have a distinctive appearance, with a bar-shaped pattern on their breast.",
         "These birds are highly vocal and have a range of calls and songs that are used to communicate with each other and establish territories.",
-        "Bar-breasted honeyeaters are primarily nectarivorous, feeding on the nectar of flowering plants. They are important pollinators for many plant species in their native habitats.",
-        "The species is highly adaptable and can thrive in a range of habitats, from rainforests to savannas and woodlands.",
-        "Bar-breasted honeyeaters have been known to exhibit cooperative breeding behavior, with non-breeding individuals helping to raise the offspring of breeding pairs."
+        "Bar-breasted Honeyeaters are primarily nectarivorous, feeding on the nectar of flowering plants, but they also consume insects and other small invertebrates. They are important pollinators for many plant species in their native habitats.",
+        "The species is highly adaptable and thrives in a range of habitats, from rainforests to adjacent woodlands.",
+        "Bar-breasted Honeyeaters are known to exhibit cooperative breeding behavior, with non-breeding individuals helping to raise the offspring of breeding pairs."
       ],
       "img": ""
-    },
+    },    
     {
       "species": "Rattus norvegicus",
       "common": "Brown Rat",
-      "summary": "Rattus norvegicus, also known as the brown rat, is a common rodent found worldwide. These rats are known for their brown fur and long, scaly tails.",
+      "summary": "Rattus norvegicus, commonly known as the Brown Rat, is a widespread rodent found globally. Recognizable by their brown fur and long, scaly tails, these rats are highly adaptable and thrive in a variety of environments.",
       "description": [
-        "They are highly adaptable and can survive in a variety of habitats, including urban areas and sewers.",
-        "Brown rats are known to carry a number of diseases, including leptospirosis and hantavirus.",
-        "They are omnivores, and will eat almost anything they can find, including insects, fruits, and even human food.",
-        "",
-        ""
+        "Brown Rats are highly adaptable and can survive in diverse habitats, including urban areas, sewers, rural environments, and natural settings.",
+        "They are known to carry several diseases, including leptospirosis, hantavirus, salmonella, and tularemia, which can pose health risks to humans and other animals.",
+        "Brown Rats are omnivorous and will consume a wide range of food items, including insects, fruits, garbage, and human food.",
+        "They are social animals that often live in colonies, which can sometimes become quite large.",
+        "Brown Rats are known for their impressive climbing abilities and can often be seen scaling walls or running along ledges."
       ],
       "img": ""
-    },
+    },    
     {
       "species": "Rhipidura albiscapa",
       "common": "Grey Fantail",
