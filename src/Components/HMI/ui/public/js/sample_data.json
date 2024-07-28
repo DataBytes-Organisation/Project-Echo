@@ -1169,11 +1169,11 @@
     {
       "species": "Phylidonyris niger",
       "common": "White-cheeked Honeyeater",
-      "summary": "Phylidonyris niger, commonly known as the White-cheeked honeyeater, is a small bird species native to southeastern Australia. It is found in a variety of habitats including forests, woodlands, and heathlands, and is known for its distinctive black and white plumage.",
+      "summary": "Phylidonyris niger, commonly known as the White-cheeked honeyeater, is a small bird species native to south-west corner of Australia. It is found in a variety of habitats including forests, woodlands, and heathlands, and is known for its distinctive black and white plumage.",
       "description": [
         "White-cheeked honeyeaters feed mainly on nectar from a range of flowers, but also eat insects and other small invertebrates.",
         "They are highly territorial and will defend their feeding and nesting areas aggressively against other birds.",
-        "Breeding season for this species is from August to January, and they typically build their nests in shrubs or trees using twigs, bark, and grass.",
+        "Breeding season for this species is from August to November and March to May, and they typically build their nests in shrubs or trees using twigs, bark, and grass.",
         "Females lay 2-3 eggs, which are incubated for around 14 days before hatching.",
         "The White-cheeked honeyeater is a common and widespread species, and is not currently considered to be threatened. It is a popular bird for birdwatchers and is often seen in suburban gardens and parks."
       ],
@@ -1221,7 +1221,7 @@
     {
       "species": "Platycercus adscitus",
       "common": "Pale-headed Rosella",
-      "summary": "Platycercus adscitus, commonly known as the Pale-headed Rosella, is a medium-sized parrot species found in eastern and southeastern Australia. This bird species is known for its colorful plumage and distinctive yellow and green colors.",
+      "summary": "Platycercus adscitus, commonly known as the Pale-headed Rosella, is a medium-sized parrot species found in northeastern Australia. This bird species is known for its colorful plumage and distinctive yellow and green colors.",
       "description": [
         "The Pale-headed Rosella feeds mainly on seeds, fruit, flowers, and insects.",
         "This species is highly social and often seen in flocks of up to 50 birds.",
@@ -1273,7 +1273,7 @@
     {
       "species": "Pomatostomus superciliosus",
       "common": "White-browed Babbler",
-      "summary": "Pomatostomus superciliosus, commonly known as the White-browed Babbler, is a small bird species found in Australia. This bird species is known for its social behavior and unique vocalizations.",
+      "summary": "Pomatostomus superciliosus, commonly known as the White-browed Babbler, is a small bird species found in open woodlands and shrubby areas of central and southern Australia. This bird species is known for its social behavior and unique vocalizations.",
       "description": [
         "The White-browed Babbler feeds mainly on insects, seeds, spiders, amphibians, crustaceans, reptiles and fruits.",
         "This species is highly social and often seen in family groups of up to 10 birds.",
@@ -1490,7 +1490,7 @@
         "The white-browed robin is known for its beautiful song, which is a complex series of whistles and trills.",
         "While some populations of White-browed Robins are sedentary, others undertake seasonal migrations in response to changes in food availability or environmental conditions. "
       ],
-      "img": "The White-browed Robin is distributed across various regions of Australia and New Guinea"
+      "img": ""
     },
     {
       "species": "Poodytes gramineus",
@@ -1521,7 +1521,7 @@
     {
       "species": "Psaltoda moerens",
       "common": "Redeye Cicada",
-      "summary": "The Psaltoda moerens, also known as the Redeye cicada, is a large and colorful cicada that is native to eastern Australia. These cicadas are known for their distinctive calls, which are often heard during the summer months.",
+      "summary": "The Psaltoda moerens, also known as the Redeye cicada, is a large and colorful cicada that is native to south-east of Australia. These cicadas are known for their distinctive calls, which are often heard during the summer months.",
       "description": [
         "The Redeye cicada is a large and colorful insect that can grow up to 4.5 centimeters in length. They have a black body with bright red eyes and wings that are mottled with brown and black.",
         "These cicadas are known for their loud and distinctive calls, which are created by vibrating their tymbals, a specialized structure in their abdomen. The calls are used to attract mates and defend their territory.",
@@ -1534,7 +1534,7 @@
     {
       "species": "Psephotellus varius",
       "common": "Varied Lorikeet",
-      "summary": "The Varied Lorikeet (Psephotellus varius) is a colorful species of parrot native to the eastern and southeastern parts of Australia. These parrots are known for their striking plumage, which is predominantly green with blue and yellow markings on the wings and tail.",
+      "summary": "The Varied Lorikeet (Psephotellus varius) is a colorful species of parrot native to the arid scrublands and lightly timbered grasslands in the interior of southern Australia. These parrots are known for their striking plumage, which is predominantly green with blue and yellow markings on the wings and tail.",
       "description": [
         "Varied Lorikeets can grow up to 28cm in length and weigh between 70 and 90g.",
         "These parrots are highly social and usually travel in flocks of up to 20 individuals.",
