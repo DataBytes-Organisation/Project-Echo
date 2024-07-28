@@ -1803,16 +1803,16 @@
     {
       "species": "Rhipidura albiscapa",
       "common": "Grey Fantail",
-      "summary": "The Rhipidura albiscapa, also known as the grey fantail, is a small passerine bird found throughout Australia and New Zealand.",
+      "summary": "The Rhipidura albiscapa, also known as the Grey Fantail, is a small passerine bird found in Australia.",
       "description": [
-        "The grey fantail is a common and widespread species, often seen in parks and gardens.",
-        "They are known for their acrobatic flight, and can twist and turn mid-flight to catch insects.",
-        "Grey fantails build a cup-shaped nest using bark, spider webs, and other materials, and typically lay 3-4 eggs at a time.",
-        "",
-        ""
+          "The Grey Fantail is a common and widespread species, often seen in parks and gardens.",
+          "They are known for their acrobatic flight, and can twist and turn mid-flight to catch insects.",
+          "Grey Fantails build a cup-shaped nest using bark, spider webs, and other materials, and typically lay 2-4 eggs at a time.",
+          "",
+          ""
       ],
       "img": ""
-    },
+  },
     {
       "species": "Rhipidura leucophrys",
       "common": "Willie Wagtail",
