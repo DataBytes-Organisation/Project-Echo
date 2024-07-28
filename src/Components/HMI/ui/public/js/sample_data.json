@@ -2711,7 +2711,7 @@
         "They have a distinctive red head and neck, with blue-gray wings and body.",
         "Sarus cranes are highly territorial and form strong bonds with their mates.",
         "They feed mainly on plant material and insects found in wetland habitats.",
-        "The loss of wetlands due to human activities is a major threat to Sarus crane populations and as such they are considered a vulnerable species."
+        "Sarus cranes are regarded as a vulnerable species because of the significant threat posed to their populations by human-caused wetlands loss."
       ],
       "img": ""
     },
@@ -2786,7 +2786,7 @@
       "common": "Dusky woodswallow",
       "summary": "Artamus cyanopterus or Dusky woodswallow is a small Australian bird known for its distinctive black and silver plumage.",
       "description": [
-        "They have a unique foraging strategy where they catch insects in mid-air with their beaks while flying.",
+        "They use a special foraging strategy whereby they fly and use their beaks to grab insects in midair.",
         "These birds are known to be highly social and often form large flocks during the breeding season.",
         "The Dusky woodswallow is monogamous and pairs are known to mate for life.",
         "They are often found in open areas like fields, savannas, and grasslands."
@@ -2813,7 +2813,7 @@
       "summary": "Artamus superciliosus or White-browed woodswallow is a species of bird native to Australia and New Guinea.",
       "description": [
         "They are known for their distinctive black and white plumage, with a white eyebrow stripe above the eye.",
-        "These birds are highly adaptable and can be found in a variety of habitats, including woodlands, savannas, and semi-arid areas.",
+        "These birds can be found in wide range of habitats because of their greater adaptability, including as semi-arid regions, savannas, and woodlands.",
         "White-browed woodswallows are social birds and often feed in flocks of several hundred individuals.",
         "They are known to be long-distance migrators and can travel hundreds of kilometers during the non-breeding season."
       ],
@@ -4856,6 +4856,32 @@
         "They are known for their nomadic behavior, traveling long distances in search of flowering trees.",
         "Breeding success is closely linked to the availability of their floral food sources.",
         "Conservation efforts are vital for the survival of this species, focusing on habitat restoration and protection."
+      ],
+      "img": ""
+    },
+    {
+      "species": "ApocritaÂ sp.",
+      "common": "Wasps/Bees/Ants",
+      "summary": "Apocrita, a broad category of insects that includes bees, ants, and wasps, are important pollinators, predators, and decomposers in ecosystems.",
+      "description": [
+        "Apocrita are characterized by a unique narrow waist that divides their thorax and abdomen.",
+        "This category includes a wide range of sizes, colors, and social organizations, ranging from individual hunters to intricate colony-building species.",
+        "Pollination, pest control, and nutrient recycling are all important functions they perform.",
+        "While many species are helpful, some can be harmful, such as fire ants and hornets.",
+        "Conservation efforts for these insects focus on protecting their habitats and reducing the negative impact of pesticides, which can harm their populations."
+      ],
+      "img": ""
+    },
+    {
+      "species": "AvesÂ sp.",
+      "common": "Birds",
+      "summary": "Birds (Aves) are a diverse group of vertebrates distinguished by feathers, wings, and the ability to fly, though not all species share these characteristics. They can be found all over the world, inhabiting a variety of habitats and displaying a wide range of behaviors and adaptations.",
+      "description": [
+        "Birds are warm-blooded animals with a high metabolism, which helps them regulate a stable internal body temperature.",
+        "Their forelimbs have developed into wings, granting most species the ability to fly, although some have adapted for swimming or running.",
+        "Their feathers serve various purposes such as insulation, flight, and attracting mates.",
+        "Many bird species are migratory, undertaking long journeys between their breeding and wintering grounds.",
+        "The conservation of bird species requires the protection of their habitats, addressing the impacts of climate change, and mitigating threats such as habitat destruction and pollution."
       ],
       "img": ""
     }
