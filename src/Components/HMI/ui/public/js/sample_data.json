@@ -1164,11 +1164,11 @@
     {
       "species": "Phylidonyris niger",
       "common": "White-cheeked Honeyeater",
-      "summary": "Phylidonyris niger, commonly known as the White-cheeked honeyeater, is a small bird species native to southeastern Australia. It is found in a variety of habitats including forests, woodlands, and heathlands, and is known for its distinctive black and white plumage.",
+      "summary": "Phylidonyris niger, commonly known as the White-cheeked honeyeater, is a small bird species native to south-west Australia. It is found in a variety of habitats including forests, woodlands, and heathlands, and is known for its distinctive black and white plumage.",
       "description": [
         "White-cheeked honeyeaters feed mainly on nectar from a range of flowers, but also eat insects and other small invertebrates.",
         "They are highly territorial and will defend their feeding and nesting areas aggressively against other birds.",
-        "Breeding season for this species is from August to January, and they typically build their nests in shrubs or trees using twigs, bark, and grass.",
+        "Breeding season for this species is from August to November and March to May, and they typically build their nests in shrubs or trees using twigs, bark, and grass.",
         "Females lay 2-3 eggs, which are incubated for around 14 days before hatching.",
         "The White-cheeked honeyeater is a common and widespread species, and is not currently considered to be threatened. It is a popular bird for birdwatchers and is often seen in suburban gardens and parks."
       ],
@@ -1177,12 +1177,12 @@
     {
       "species": "Pitta iris",
       "common": "Rainbow Pitta",
-      "summary": "Pitta iris, commonly known as the rainbow pitta, is a bird species found in eastern Australia and nearby islands. This colorful bird is known for its distinctive bright green, blue, and yellow plumage.",
+      "summary": "Pitta iris, commonly known as the rainbow pitta, is a bird species found in northern Australia and nearby islands. This colorful bird is known for its velvet black head with chestnut stripes above the eyes, olive green upper parts, black underparts, a bright red belly and an olive green tail.",
       "description": [
         "Rainbow pittas are known for their unique vocalizations and can produce a variety of calls, including a high-pitched whistle and a low trill.",
         "They are also known for their secretive behavior, often hiding in dense vegetation and remaining quiet for long periods of time.",
         "These birds are omnivorous and feed on a variety of insects, small mammals, and fruits.",
-        "Rainbow Pittas inhabit dense tropical rainforests, wet sclerophyll forests, and mangrove forests in eastern Australia and nearby islands",
+        "Rainbow Pittas inhabit dense tropical rainforests, wet sclerophyll forests, and mangrove forests.",
         "The Rainbow Pitta faces threats from habitat loss due to deforestation, land development, and climate change"
       ],
       "img": ""
@@ -1190,7 +1190,7 @@
     {
       "species": "Pitta versicolor",
       "common": "Noisy Pitta",
-      "summary": "Pitta versicolor, commonly known as the noisy pitta, is a bird species found in eastern Australia and nearby islands. This bird is known for its distinctive green and black plumage, with a white patch on its throat and a red patch above its beak.",
+      "summary": "Pitta versicolor, commonly known as the noisy pitta, is a bird species found in eastern Australia and southern New Guinea. This bird is known for its distinctive green and black plumage, with a white patch on its throat and a red patch above its beak.",
       "description": [
         "Noisy pittas are known for their loud vocalizations, which include a range of whistles, trills, and calls.",
         "They are also known for their distinctive nesting habits, often building nests on the ground under dense vegetation.",
@@ -1206,7 +1206,7 @@
       "summary": "Platycercus elegans, also known as the Crimson Rosella, is a medium-sized parrot species found in eastern and southeastern Australia. This bird species is known for its colorful plumage and distinctive red and blue colors.",
       "description": [
         "The Crimson Rosella feeds mainly on seeds, fruit, flowers, and insects.",
-        "This species is highly social and often seen in flocks of up to 100 birds.",
+        "Outside of the breeding season, crimson rosellas tend to congregate in pairs or small groups and feeding parties.",
         "Males and females look similar, but males have a larger beak and are slightly larger in size.",
         "The Crimson Rosella is a popular bird in aviculture, and many captive bred birds are now available in the pet trade.",
         "The Crimson Rosella has been featured on several Australian postage stamps and is a popular symbol of Australian wildlife."
@@ -1529,7 +1529,7 @@
     {
       "species": "Psephotellus varius",
       "common": "Varied Lorikeet",
-      "summary": "The Varied Lorikeet (Psephotellus varius) is a colorful species of parrot native to the eastern and southeastern parts of Australia. These parrots are known for their striking plumage, which is predominantly green with blue and yellow markings on the wings and tail.",
+      "summary": "The Varied Lorikeet (Psephotellus varius) is a colorful species of parrot native to the northern coastal regions of Australia. These parrots are known for their striking plumage, which is predominantly green with blue and yellow markings on the wings and tail.",
       "description": [
         "Varied Lorikeets can grow up to 28cm in length and weigh between 70 and 90g.",
         "These parrots are highly social and usually travel in flocks of up to 20 individuals.",
@@ -1582,7 +1582,7 @@
     {
       "species": "Psophodes cristatus",
       "common": "Chirruping Wedgebill",
-      "summary": "Psophodes cristatus, commonly known as the chirruping wedgebill, is a bird species found in the arid and semi-arid regions of Australia. These small and active birds are known for their distinctive appearance, vocalizations, and unique feeding behavior.",
+      "summary": "Psophodes cristatus, commonly known as the chirruping wedgebill, is a bird species found in low shrublands in south-eastern inland Australia. These small and active birds are known for their distinctive appearance, vocalizations, and unique feeding behavior.",
       "description": [
         "Chirruping wedgebills have a distinctive appearance, with a large head, short neck, and a distinctive black and white striped pattern on their back and wings.",
         "These birds are highly vocal and have a distinctive, repetitive chirping call that gives them their name.",
