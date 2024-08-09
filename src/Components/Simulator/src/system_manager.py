@@ -63,7 +63,12 @@ class SystemManager:
                     await handler(mqtt_client, None, msg)
                 else:
                     print(f"Unhandled topic: {topic} - Available handlers: {list(self.topic_handlers.keys())}")
-
+            ###THE MERGED CODE IDK IF ITS RIGHT
+                if str(topic_filter) == str(msg.topic):
+                    await self.on_message(mqtt_client, None, msg)
+                if str(topic_filter2) == str(msg.topic):
+                    await self.on_recording_message(mqtt_client, None, msg)
+                
     async def on_message(self, client, userdata, msg):
         message = msg.payload.decode('utf-8')
         await self.command_queue.put(message)

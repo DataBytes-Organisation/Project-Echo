@@ -1933,15 +1933,19 @@ closeFormButton.addEventListener('click', (event) => {
 
   hmiState.timeOffset = 0;
   hmiState.simTime = getUTC();
-  hmiState.currentTime = Math.floor((utcTime - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
-  hmiState.previousUpdateTime = Math.floor((utcTime - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
+  // hmiState.currentTime = Math.floor((utcTime - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
+  // hmiState.previousUpdateTime = Math.floor((utcTime - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
+  // hmiState.currentTime = Math.floor((utcTime - hmiState.timeOffset) / 1000);
+  hmiState.currentTime = getUTC();
+  hmiState.previousUpdateTime = getUTC();
+  //hmiState.previousUpdateTime = Math.floor((utcTime - hmiState.timeOffset) / 1000);
   hmiState.liveEventCutoff = Math.floor((utcTime - hmiState.timeOffset - hmiState.simUpdateDelay - hmiState.liveWindow) / 1000);
 
   //Basemap config
   //pls do not change origin lat long, these are set to target wild otways region
-  hmiState.originLat = -38.8078;
-  hmiState.originLon = 143.54741;
-  hmiState.defaultZoom = 10;
+  hmiState.originLat = -38.19912;
+  hmiState.originLon = 144.29354;
+  hmiState.defaultZoom = 17;
   hmiState.requestInterval = 1000;
   hmiState.layers = {};
   hmiState.layerPool = 1000;
@@ -2048,8 +2052,12 @@ closeFormButton.addEventListener('click', (event) => {
   toggleSwitch.addEventListener('change', function() {
     if (this.checked) {
       resetWildlifeLayers(hmiState);
-      hmiState.currentTime = Math.floor((getUTC()- hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
-      hmiState.previousUpdate = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
+      // hmiState.currentTime = Math.floor((getUTC()- hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
+      // hmiState.previousUpdate = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
+      // hmiState.currentTime = Math.floor((getUTC()- hmiState.timeOffset) / 1000);
+      // hmiState.previousUpdate = Math.floor((getUTC() - hmiState.timeOffset) / 1000);
+      hmiState.currentTime = getUTC();
+      hmiState.previousUpdate = getUTC();
       datepickerStart = Math.floor((getUTC()- hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
       datepickerEnd = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
       hmiState.liveMode = true;

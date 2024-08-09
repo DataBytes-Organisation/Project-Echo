@@ -16,3 +16,9 @@ src/Components/HMI/ui/node_modules/*
 
 # Temporary files from Cloud Storage (added by ptanmay143)
 .tmp.driveupload
+src/Components/RecordingProcessor/RecordingImports/*
+src/Components/RecordingProcessor/Experiments/EuclideanComparisons
+src/Components/RecordingProcessor/Experiments/NoiseReductionTests
+src/Components/RecordingProcessor/Experiments/OnsetDetection
+src/Components/RecordingProcessor/Experiments/TimingOld
+src/Components/RecordingProcessor/Experiments/0_InitialProcessing/combined/*

@@ -5,3 +5,4 @@ services:
     volumes:
       - ./src:/app/src
     command: python src/system_manager.py
+  

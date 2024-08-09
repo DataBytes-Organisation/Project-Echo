@@ -1,0 +1,8 @@
+pymongo
+geopy
+matplotlib
+sympy
+numpy
+scipy
+paho-mqtt<2.0.0
+requests

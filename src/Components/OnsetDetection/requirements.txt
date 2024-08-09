@@ -1,0 +1,8 @@
+numpy<2
+noisereduce
+scipy
+pydub
+mutagen
+matplotlib
+pytaglib
+watchdog
