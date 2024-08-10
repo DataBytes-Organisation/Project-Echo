@@ -1,0 +1,17 @@
+version: "3.8"
+
+services:
+  nodejs_app:
+    build:
+      context: . # The context is set to the current directory containing the Dockerfile
+      dockerfile: Dockerfile
+    image: nodejs_app_image
+    container_name: nodejs_app_container
+    ports:
+      - "3123:3123" # Maps port 3123 on the container to port 3123 on the host
+    environment:
+      NODE_ENV: "development" # Set any environment variables you need here
+    volumes:
+      - .:/app # Mounts the current directory to /app inside the container
+    stdin_open: true
+    tty: true

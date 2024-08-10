@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "50999:50999"
+    volumes:
+      - .:/app
+    environment:
+      - FLASK_ENV=development

@@ -497,7 +497,7 @@ routes.forEach((route) => {
     }
   }
 
-  startHttpRedirect() {
+ /* startHttpRedirect() {
     http
       .createServer((req, res) => {
         res.writeHead(301, {
@@ -508,7 +508,7 @@ routes.forEach((route) => {
       .listen(80, () => {
         console.log("HTTP server listening on port 80, redirecting to HTTPS");
       });
-  }
+  }*/
 }
 
 module.exports = ObjServer;

@@ -9,14 +9,33 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@chakra-ui/icons": "^2.1.1",
     "@chakra-ui/react": "^2.8.2",
     "@emotion/react": "^11.13.0",
     "@emotion/styled": "^11.13.0",
+    "@ffmpeg/ffmpeg": "^0.12.10",
+    "@ffmpeg/util": "^0.12.1",
+    "@tensorflow/tfjs": "^4.20.0",
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "chart.js": "^4.4.3",
+    "colormap": "^2.3.2",
+    "fft.js": "^4.0.4",
     "framer-motion": "^11.3.24",
+    "md5": "^2.3.0",
     "next": "14.2.5",
     "node-fetch": "^3.3.2",
     "react": "^18",
+    "react-chartjs-2": "^5.2.0",
     "react-dom": "^18",
-    "react-icons": "^5.2.1"
+    "react-icons": "^5.2.1",
+    "react-router-dom": "^6.25.1",
+    "react-scripts": "5.0.1",
+    "react-toastify": "^10.0.5",
+    "spectrogram": "^0.0.7",
+    "wav-spectrogram": "^0.0.4",
+    "wavesurfer-react": "^3.0.3",
+    "wavesurfer.js": "^7.8.2"
   }
 }

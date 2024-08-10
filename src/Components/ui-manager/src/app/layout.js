@@ -72,6 +72,11 @@ export default async function RootLayout({ children }) {
                       Map
                     </Button>
                   </Link>
+                  <Link href="/sound">
+                    <Button colorScheme="teal" variant="outline" mr="4">
+                      Train sound
+                    </Button>
+                  </Link>
                 </Flex>
 
                 <Spacer />

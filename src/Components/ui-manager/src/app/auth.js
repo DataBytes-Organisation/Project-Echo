@@ -5,11 +5,8 @@ import { cookies } from "next/headers";
 export async function checkAuth(token) {
   if (!token) return null;
 
-  // Construct the absolute URL if running server-side
-  const baseUrl =
-    process.env.NODE_ENV === "production"
-      ? "http://your-production-domain.com"
-      : "http://localhost:3123"; // Adjust the localhost port as needed
+  // Use environment variable to determine the base URL
+  const baseUrl = process.env.API_BASE_URL || "http://localhost:3123"; // Defaults to localhost if not set
 
   const url = `${baseUrl}/api/check-auth`;
 
@@ -49,10 +46,7 @@ export async function getAuthStatus() {
   const loggedInUser = token ? await checkAuth(token) : null;
 
   if (loggedInUser) {
-    const baseUrl =
-      process.env.NODE_ENV === "production"
-        ? "http://your-production-domain.com"
-        : "http://localhost:3123"; // Adjust the localhost port as needed
+    const baseUrl = process.env.API_BASE_URL || "http://localhost:3123"; // Defaults to localhost if not set
 
     const url = `${baseUrl}/api/check-auth`;
     const agent = new http.Agent({ rejectUnauthorized: false });

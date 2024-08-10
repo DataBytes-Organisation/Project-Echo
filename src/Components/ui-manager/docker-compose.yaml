@@ -1,0 +1,16 @@
+version: "3.8"
+
+services:
+  nextjs_app:
+    build:
+      context: . # The context is set to the current directory containing the Dockerfile
+      dockerfile: Dockerfile
+    image: nextjs_app_image
+    container_name: nextjs_app_container
+    ports:
+      - "3000:3000" # Maps port 3000 on the container to port 3000 on the host
+    environment:
+      NODE_ENV: "production" # Set the environment to production
+      API_BASE_URL: "http://192.168.0.228:3123" # Use Docker internal host
+    stdin_open: true
+    tty: true
