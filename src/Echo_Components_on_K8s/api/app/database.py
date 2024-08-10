@@ -23,3 +23,5 @@ ROLES = ["user", "admin", "guest"]
 STATES_CODE = ["vic", "nsw", "ts", "ql", "sa", "wa"]
 GENDER = ["male", "female", "m", "f" "prefer not to say"]
 AUS_STATES = ["victoria", "newsouthwales", "tasmania", "queensland", "southaustralia", "westernaustralia"]
+
+print("WTF")
