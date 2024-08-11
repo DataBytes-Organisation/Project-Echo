@@ -31,6 +31,69 @@ const storeItems = new Map([[
   1, { priceInCents: 100, name: "donation"}
 ]])
 app.use(express.json({limit: '10mb'}));
+
+// Import the User model
+const { User } = require('./models/user.model'); // Add this line
+
+// Middleware to check if the user is an admin
+function isAdmin(req, res, next) {
+  const token = req.headers.authorization.split(' ')[1];
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  
+  if (decoded.role !== 'admin') {
+    return res.status(403).json({ message: 'Access denied: Admins only' });
+  }
+  
+  next();
+}
+
+// API to suspend a user
+app.patch('/api/users/:id/suspend', isAdmin, async (req, res) => {
+  const userId = req.params.id;
+  
+  try {
+    const user = await User.findByIdAndUpdate(userId, { status: 'suspended' }, { new: true });
+    res.json({ message: `User ${user.email} suspended`, user });
+  } catch (error) {
+    res.status(500).json({ error: 'Error suspending user' });
+  }
+});
+
+// API to ban a user
+app.patch('/api/users/:id/ban', isAdmin, async (req, res) => {
+  const userId = req.params.id;
+  
+  try {
+    const user = await User.findByIdAndUpdate(userId, { status: 'banned' }, { new: true });
+    res.json({ message: `User ${user.email} banned`, user });
+  } catch (error) {
+    res.status(500).json({ error: 'Error banning user' });
+  }
+});
+
+// API to reinstate a user
+app.patch('/api/users/:id/reinstate', isAdmin, async (req, res) => {
+  const userId = req.params.id;
+  
+  try {
+    const user = await User.findByIdAndUpdate(userId, { status: 'active' }, { new: true });
+    res.json({ message: `User ${user.email} reinstated`, user });
+  } catch (error) {
+    res.status(500).json({ error: 'Error reinstating user' });
+  }
+});
+
+// API to retrieve user status
+app.get('/api/users/:id/status', isAdmin, async (req, res) => {
+  const userId = req.params.id;
+  
+  try {
+    const user = await User.findById(userId, 'email status');
+    res.json({ user });
+  } catch (error) {
+    res.status(500).json({ error: 'Error retrieving user status' });
+  }
+});
 // Use helmet middleware to set security headers
 
 // app.use(helmet());
