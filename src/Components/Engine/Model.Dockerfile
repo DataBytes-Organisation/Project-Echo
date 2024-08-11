@@ -17,3 +17,5 @@ ENV MODEL_VERSION=1
 
 # Expose the port for TensorFlow serving
 EXPOSE 8501
+
+ENTRYPOINT ["tensorflow_model_server", "--port=8501", "--model_config_file=/models.config"]
