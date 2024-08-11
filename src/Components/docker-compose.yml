@@ -181,16 +181,18 @@ services:
 
   
   app:
-      build:
-        context: APISessionManager/
-        dockerfile: Dockerfile
-      ports:
-        - "3123:3123"
-      volumes:
-        - ./APISessionManager:/app
-      environment:
-        - NODE_ENV=development
-      restart: always
+    build:
+      context: APISessionManager/
+      dockerfile: Dockerfile
+    ports:
+      - "3123:3123"
+    volumes:
+      - ./APISessionManager/src:/app/src
+      - ./APISessionManager/package.json:/app/package.json
+      - ./APISessionManager/package-lock.json:/app/package-lock.json
+      - ./APISessionManager/.env:/app/.env
+    environment:
+      - NODE_ENV=development
 
  
 
