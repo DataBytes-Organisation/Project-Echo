@@ -150,7 +150,47 @@ services:
       retries: 5
     restart: on-failure
 
+
+
+  api:
+    build:
+      context: AIData/
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "50999:50999"
+    volumes:
+      - ./AIData:/app
+    environment:
+      - FLASK_ENV=development
+    networks:
+      - echo-net
+
+  nextjs_app:
+    build:
+      context: ui-manager/ # The context is set to the current directory containing the Dockerfile
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000" # Maps port 3000 on the container to port 3000 on the host
+    environment:
+      NODE_ENV: "production" # Set the environment to production
+      API_BASE_URL: ${API_BASE_URL}
+    stdin_open: true
+    tty: true
+    restart: always
+
   
+  app:
+      build:
+        context: APISessionManager/
+        dockerfile: Dockerfile
+      ports:
+        - "3123:3123"
+      volumes:
+        - ./APISessionManager:/app
+      environment:
+        - NODE_ENV=development
+      restart: always
 
  
 
