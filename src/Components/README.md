@@ -1,3 +1,9 @@
+# Before setup on this branch need to create .env in this folder
+```
+API_BASE_URL=http://192.168.0.228:3123 or website domain or localhost or host.docker.internal (IP and DOMAIN work from tests)
+```
+
+
 # EchoNet Components Setup
 
 The echo _Components_ directory contains all the core production components of the echo system. These components can be instantiated locally on your developer machine using docker. When the echo components are instantiated in this way, the project echo team call this the **'EchoNet'** environment. Within Docker, a private network is setup called EchoNet and all the component containers join this network.
@@ -149,3 +155,5 @@ Cannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docke
 
 Ensure all containers have been deleted. If not, follow steps 10 and 11 above.  
 Follow step 12 to Quit and Restart Docker Desktop.
+
+

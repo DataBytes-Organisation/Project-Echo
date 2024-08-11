@@ -34,3 +34,21 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+
+
+
+.ENV Example
+
+```
+SSL_KEY_PATH=path/to/your/ssl/key
+SSL_CERT_PATH=path/to/your/ssl/cert
+MONGO_URI=pathtomongodb
+MONGODB=ModernUI
+JWT_SECRET=your_jwt_secret
+SESSION_SECRET=your_session_secret
+NODE_ENV=development
+PROXY_TARGET=localhost or website domain or ip
+NEXTJS_PORT=3000
+USE_HTTPS=false
+PROXYDOCKS=host.docker.internal
+```
