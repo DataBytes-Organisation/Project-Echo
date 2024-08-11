@@ -8,6 +8,8 @@ services:
     ports:
       - "3123:3123"
     volumes:
-      - .:/app
+      - ./src:/app/src
+      - ./package.json:/app/package.json
+      - ./package-lock.json:/app/package-lock.json
     environment:
       - NODE_ENV=development

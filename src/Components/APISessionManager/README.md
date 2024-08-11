@@ -1,5 +1,22 @@
 # End-to-End Audio Labeling and AI Training Pipeline
 
+.ENV Example
+
+```
+SSL_KEY_PATH=path/to/your/ssl/key
+SSL_CERT_PATH=path/to/your/ssl/cert
+MONGO_URI=pathtomongodb
+MONGODB=ModernUI
+JWT_SECRET=your_jwt_secret
+SESSION_SECRET=your_session_secret
+NODE_ENV=development
+PROXY_TARGET=localhost or website domain or ip
+NEXTJS_PORT=3000
+USE_HTTPS=false
+PROXYDOCKS=host.docker.internal
+```
+
+
 ## Overview
 
 This project is an end-to-end solution for labeling audio data, converting audio chunks to spectrograms, and training AI models using the labeled data. The pipeline is designed to handle large amounts of audio data, process it efficiently, and utilize AI for model training and deployment. The solution includes components for data labeling, chunk conversion, AI training, and model management.

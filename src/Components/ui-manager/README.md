@@ -37,18 +37,3 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/deploym
 
 
 
-.ENV Example
-
-```
-SSL_KEY_PATH=path/to/your/ssl/key
-SSL_CERT_PATH=path/to/your/ssl/cert
-MONGO_URI=pathtomongodb
-MONGODB=ModernUI
-JWT_SECRET=your_jwt_secret
-SESSION_SECRET=your_session_secret
-NODE_ENV=development
-PROXY_TARGET=localhost or website domain or ip
-NEXTJS_PORT=3000
-USE_HTTPS=false
-PROXYDOCKS=host.docker.internal
-```
