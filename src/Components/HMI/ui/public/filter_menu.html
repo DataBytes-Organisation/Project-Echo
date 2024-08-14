@@ -358,5 +358,42 @@
         </div>
       </div>
     </div>
+    <div class="dropdown">
+      <button
+        class="btn btn-secondary dropdown-toggle btn-no-background"
+        type="button"
+        id="algorithmDropdown"
+        data-bs-toggle="dropdown"
+        aria-expanded="false"
+      >
+        Select Detection Algorithm
+      </button>
+      <div class="dropdown-menu" aria-labelledby="algorithmDropdown">
+        <div class="row">
+          <div class="col">
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                value="AlgorithmA"
+                id="algorithmA"
+                onchange="updateAlgorithm('AlgorithmA')"
+              />
+              <label class="form-check-label" for="algorithmA">Algorithm A</label>
+            </div>
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                value="AlgorithmB"
+                id="algorithmB"
+                onchange="updateAlgorithm('AlgorithmB')"
+              />
+              <label class="form-check-label" for="algorithmB">Algorithm B</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
