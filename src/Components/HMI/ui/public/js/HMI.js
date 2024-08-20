@@ -2,11 +2,13 @@
 
 import { getAudioTestString } from "./HMI-utils.js";
 import { getAudioRecorder } from "./audio_recorder.js";
-import { retrieveTruthEventsInTimeRange, retrieveVocalizationEventsInTimeRange, 
-  retrieveMicrophones, retrieveAudio, retrieveSimTime, postRecording, 
-  setSimModeAnimal, setSimModeRecording, setSimModeRecordingV2, stopSimulator } from "./routes.js";
+import {
+  retrieveTruthEventsInTimeRange, retrieveVocalizationEventsInTimeRange,
+  retrieveMicrophones, retrieveAudio, retrieveSimTime, postRecording,
+  setSimModeAnimal, setSimModeRecording, setSimModeRecordingV2, stopSimulator
+} from "./routes.js";
 
-  //import data from "./sample_data.json" assert { type: 'json' }; Browser assertions not yet supported in all browsers, alternative method used instead.
+//import data from "./sample_data.json" assert { type: 'json' }; Browser assertions not yet supported in all browsers, alternative method used instead.
 
 
 // import { parse } from 'json2csv';
@@ -15,7 +17,7 @@ import { retrieveTruthEventsInTimeRange, retrieveVocalizationEventsInTimeRange,
 var markups = ["elephant.png", "monkey.png", "tiger.png"];
 
 const EARTH_RADIUS = 6371000;
-const MIC_DETECTION_RANGE = 300;
+const MIC_DETECTION_RANGE = 300; //TODO: change 300
 const MAX_RECORDING_TIME_S = "20";
 const DEG_TO_RAD = (Math.PI / 180);
 const RAD_TO_DEG = (180 / Math.PI);
@@ -38,27 +40,27 @@ var statuses = [
   "invasive",
 ];
 
-function matchStatus(status){
-  if (status == "least concern"){
+function matchStatus(status) {
+  if (status == "least concern") {
     return "normal";
   }
-  else{
+  else {
     return status;
   }
 }
 
 export function convertCSV(json) {
   if (json == null) return null
-  if (typeof json === undefined | json.length === 0){
+  if (typeof json === undefined | json.length === 0) {
     return null
   }
   let data = json;
   let fields = Object.keys(data[0]);
-  let replacer = function(key, value) { return value === null ? 'N/A' : value } ;
+  let replacer = function (key, value) { return value === null ? 'N/A' : value };
 
   let csv = null;
-  csv = data.map(function(row){
-    return fields.map(function(fieldName){
+  csv = data.map(function (row) {
+    return fields.map(function (fieldName) {
       return JSON.stringify(row[fieldName], replacer)
     }).join(',')
   })
@@ -68,11 +70,11 @@ export function convertCSV(json) {
 }
 
 var statusPrintLookup = {
-  "endangered" : "endangered",
+  "endangered": "endangered",
   "vulnerable": "vulnerable",
-  "near-threatened" : "near-threatened",
-  "normal" : "least concern",
-  "invasive" : "invasive"
+  "near-threatened": "near-threatened",
+  "normal": "least concern",
+  "invasive": "invasive"
 };
 
 var vocalizedLayers = []
@@ -80,24 +82,24 @@ var vocalizedLayers = []
 var animalTypes = ["mammal", "bird", "amphibian", "reptile", "insect"];
 
 var statusIconLookup = {
-  "endangered" : "1",
+  "endangered": "1",
   "vulnerable": "2",
-  "near-threatened" : "3",
-  "normal" : "4",
-  "invasive" : "5"
+  "near-threatened": "3",
+  "normal": "4",
+  "invasive": "5"
 };
 
 var animalTypeIconLookup = {
-  "mammal" : "Mammals",
-  "bird" : "Bird",
-  "amphibian" : "Amphibians",
-  "insect" : "Insects",
-  "reptile" : "Reptiles"
+  "mammal": "Mammals",
+  "bird": "Bird",
+  "amphibian": "Amphibians",
+  "insect": "Insects",
+  "reptile": "Reptiles"
 };
 
 var selectedVocalizationEventId = null;
 
-function getIconName(status, type){
+function getIconName(status, type) {
   return animalTypeIconLookup[type] + statusIconLookup[status] + "-01.png";
 }
 
@@ -111,7 +113,7 @@ export var animal_toggled = false;
 
 //For Demo purposes only
 //This plays an awful quailty audio test string
-document.addEventListener('click', function() {
+document.addEventListener('click', function () {
   //playAudioString(getAudioTestString());  
 });
 
@@ -119,13 +121,13 @@ document.addEventListener('click', function() {
 export function initialiseHMI(hmiState) {
   console.log(`initialising`);
   createBasemap(hmiState);
-  
+
   //console.log("Get sample element from document: ", document.getElementById("menuPanel"))
   addVocalisationLayers(hmiState);
   addTruthLayers(hmiState);
-  
-  
-  for(let i=1; i<26; i++){
+
+
+  for (let i = 1; i < 26; i++) {
     addVectorLayerTopDown(hmiState, `mic_layer_${i}`);
     console.log(`Adding microphone layer:${i}`);
   }
@@ -149,7 +151,7 @@ export function initialiseHMI(hmiState) {
   createMapClickEvent(hmiState);
 
   retrieveMicrophones().then((res) => {
-    
+
     updateMicrophoneLayer(hmiState, res.data);
     stepMicAnimation(hmiState);
   })
@@ -159,12 +161,12 @@ export function initialiseHMI(hmiState) {
   //simulateData(hmiState);
 }
 
-function updateFilters(){
-  
+function updateFilters() {
+
 }
 
 const validEmailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
-export function emailValidation(inp){
+export function emailValidation(inp) {
   let email_id = inp + "-email-inp";
   let error_id = inp + "-email-error";
   let btn_id = inp + "-button"
@@ -172,7 +174,7 @@ export function emailValidation(inp){
   let error_ele = document.getElementById(error_id);
   let btn_ele = document.getElementById(btn_id);
   console.log("Toggle email: ", input_ele.value)
-  if (input_ele.value.match(validEmailRegex)){
+  if (input_ele.value.match(validEmailRegex)) {
     error_ele.style.display = 'none';
     error_ele.innerHTML = '';
     btn_ele.disabled = false;
@@ -181,12 +183,12 @@ export function emailValidation(inp){
     error_ele.innerHTML = 'Please insert a valid email address';
     btn_ele.disabled = true;
   }
-  
+
 }
 
 let latestSimAnimals = {};
 
-export function updateAnimalMovementLayerFromPastData(hmiState, results){
+export function updateAnimalMovementLayerFromPastData(hmiState, results) {
 
   clearAllTruthLayers();
 
@@ -197,21 +199,21 @@ export function updateAnimalMovementLayerFromPastData(hmiState, results){
 
   //ensure events are unique per id
   for (let data of results) {
-    if(latestSimAnimals.hasOwnProperty(data.animalId)){
+    if (latestSimAnimals.hasOwnProperty(data.animalId)) {
       let entry = latestSimAnimals[data.animalId];
-      if(entry.timestamp < data.timestamp){
+      if (entry.timestamp < data.timestamp) {
         latestSimAnimals[data.animalId] = data;
         updateDict[data.animalId] = true;
       }
     }
-    else{
+    else {
       latestSimAnimals[data.animalId] = data;
       let event = convertJSONtoAnimalMovementEvent(hmiState, data);
       hmiState.movementEvents[event.animalId] = event;
     }
   }
 
-  for(const key in updateDict){
+  for (const key in updateDict) {
     let event = convertJSONtoAnimalMovementEvent(hmiState, latestSimAnimals[key]);
     hmiState.movementEvents[event.animalId] = event;
   }
@@ -219,7 +221,7 @@ export function updateAnimalMovementLayerFromPastData(hmiState, results){
   addAllTruthFeatures(hmiState);
 }
 
-export function updateVocalizationLayerFromPastData(hmiState, results){
+export function updateVocalizationLayerFromPastData(hmiState, results) {
 
   clearAllVocalizationLayers();
 
@@ -234,7 +236,7 @@ export function updateVocalizationLayerFromPastData(hmiState, results){
   addAllVocalizationFeatures(hmiState);
 }
 
-export function updateMicrophoneLayer(hmiState, results){
+export function updateMicrophoneLayer(hmiState, results) {
 
   clearMicrophoneLayer();
 
@@ -243,7 +245,7 @@ export function updateMicrophoneLayer(hmiState, results){
 
   for (let data of results) {
     let location = convertJSONtoMicrophone(hmiState, data);
-    if(location !== null){
+    if (location !== null) {
       hmiState.microphoneLocations.push(location);
     }
   }
@@ -252,49 +254,49 @@ export function updateMicrophoneLayer(hmiState, results){
 }
 
 
-export function updateAnimalMovementLayerFromLiveData(hmiState, results){
+export function updateAnimalMovementLayerFromLiveData(hmiState, results) {
   let newMovementEvents = [];
   let updatedMovementEvents = [];
   let updateDict = {};
 
   //ensure events are unique per id
   for (let data of results) {
-    
+
     //console.log(data);
 
-    if(latestSimAnimals.hasOwnProperty(data.animalId)){
+    if (latestSimAnimals.hasOwnProperty(data.animalId)) {
       let entry = latestSimAnimals[data.animalId];
-      if(entry.timestamp < data.timestamp){
+      if (entry.timestamp < data.timestamp) {
         latestSimAnimals[data.animalId] = data;
         updateDict[data.animalId] = true;
       }
     }
-    else{
+    else {
       latestSimAnimals[data.animalId] = data;
       let event = convertJSONtoAnimalMovementEvent(hmiState, data);
       hmiState.movementEvents[event.animalId] = event;
-      newMovementEvents.push(event); 
+      newMovementEvents.push(event);
     }
   }
 
-  for(const key in updateDict){
+  for (const key in updateDict) {
     let event = convertJSONtoAnimalMovementEvent(hmiState, latestSimAnimals[key]);
     hmiState.movementEvents[event.animalId] = event;
-    updatedMovementEvents.push(event); 
+    updatedMovementEvents.push(event);
   }
 
   //purge old events per id
-  for(let evt of updatedMovementEvents){
+  for (let evt of updatedMovementEvents) {
     let layerName = deriveTruthLayerName(evt.animalStatus, evt.animalType);
     let layer = findMapLayerWithName(hmiState, layerName);
-    if(layer){
+    if (layer) {
       const featureToPurge = layer.getSource().getFeatureById(evt.animalId);
       //console.log(featureToPurge);
-      if(featureToPurge){
+      if (featureToPurge) {
         //console.log("purge lat: " + evt.locationLat + " lon: " + evt.locationLon);
         layer.getSource().removeFeature(featureToPurge);
       }
-      else{
+      else {
         console.log(layerName);
       }
     }
@@ -304,7 +306,7 @@ export function updateAnimalMovementLayerFromLiveData(hmiState, results){
   addNewTruthFeatures(hmiState, newMovementEvents);
 }
 
-export function updateVocalizationLayerFromLiveData(hmiState, results){
+export function updateVocalizationLayerFromLiveData(hmiState, results) {
 
   let newVocalizationEvents = [];
 
@@ -320,14 +322,14 @@ export function updateVocalizationLayerFromLiveData(hmiState, results){
   addNewVocalizationFeatures(hmiState, newVocalizationEvents);
 }
 
-export function resetWildlifeLayers(hmiState){
+export function resetWildlifeLayers(hmiState) {
   hmiState.vocalizationEvents = [];
   hmiState.movementEvents = {};
   clearAllVocalizationLayers();
   clearAllTruthLayers();
 }
 
-export function clearAllVocalizationLayers(){
+export function clearAllVocalizationLayers() {
   for (let stat of statuses) {
     for (let animalType of animalTypes) {
       let nextName = stat + "_" + animalType;
@@ -337,7 +339,7 @@ export function clearAllVocalizationLayers(){
   }
 }
 
-export function clearAllTruthLayers(){
+export function clearAllTruthLayers() {
   for (let stat of statuses) {
     for (let animalType of animalTypes) {
       let nextName = stat + "_" + animalType + "_truth";
@@ -347,7 +349,7 @@ export function clearAllTruthLayers(){
   }
 }
 
-export function clearMicrophoneLayer(){
+export function clearMicrophoneLayer() {
   let layer = findMapLayerWithName(hmiState, "mic_layer");
   layer.getSource().clear();
 }
@@ -361,7 +363,7 @@ export function clearMicrophoneLayer(){
   }
 }*/
 
-export function convertJSONtoAnimalMovementEvent(hmiState, data){
+export function convertJSONtoAnimalMovementEvent(hmiState, data) {
   let movementEvent = {};
 
   //console.log(data);
@@ -384,7 +386,7 @@ export function convertJSONtoAnimalMovementEvent(hmiState, data){
 }
 
 //TODO update external data properties
-export function convertJSONtoAnimalVocalizationEvent(hmiState, data){
+export function convertJSONtoAnimalVocalizationEvent(hmiState, data) {
   let vocalizationEvent = {};
 
   //console.log(data);
@@ -394,7 +396,7 @@ export function convertJSONtoAnimalVocalizationEvent(hmiState, data){
   vocalizationEvent.eventId = data._id;
 
   //console.log(vocalizationEvent.eventId);
-  
+
   vocalizationEvent.speciesIdentificationConfidence = data.confidence;
   vocalizationEvent.speciesScientificName = data.species.toLowerCase();
   vocalizationEvent.commonName = data.commonName.toLowerCase();
@@ -417,23 +419,23 @@ export function convertJSONtoAnimalVocalizationEvent(hmiState, data){
   return vocalizationEvent;
 }
 
-export function convertJSONtoMicrophone(hmiState, data){
+export function convertJSONtoMicrophone(hmiState, data) {
   let mic = {};
 
-  if(data.microphoneLLA !== null){
+  if (data.microphoneLLA !== null) {
     //console.log(data);
     mic.id = data._id;
     mic.lat = data.microphoneLLA[0];
     mic.lon = data.microphoneLLA[1];
     return mic;
   }
-  else{
+  else {
     return null;
   }
 }
 
-export function muteAudioAnimation(){
-  const mute_audio = new CustomEvent('muteAnimation',{
+export function muteAudioAnimation() {
+  const mute_audio = new CustomEvent('muteAnimation', {
     detail: {
       message: "mute animation"
     }
@@ -442,8 +444,8 @@ export function muteAudioAnimation(){
   document.dispatchEvent(mute_audio);
 }
 
-export function muteRecordingPlaybackAnimation(){
-  const mute_audio = new CustomEvent('muteRecordingAnimation',{
+export function muteRecordingPlaybackAnimation() {
+  const mute_audio = new CustomEvent('muteRecordingAnimation', {
     detail: {
       message: "mute animation"
     }
@@ -456,13 +458,13 @@ var activeAudioNode = null;
 var audioAnimTimeout = null;
 var playNextTrack = false;
 
-export function stopAudioPlayback(){
+export function stopAudioPlayback() {
   muteAudioAnimation();
 
-  if(audioAnimTimeout){
+  if (audioAnimTimeout) {
     clearTimeout(audioAnimTimeout);
   }
-  if(activeAudioNode != null){
+  if (activeAudioNode != null) {
     console.log("calling stop");
     activeAudioNode.stop();
   }
@@ -477,10 +479,10 @@ function playAudioString(audioDataString, sampleRate) {
       .split("")
       .map((char) => char.charCodeAt(0))
   );
-         
+
   // Create an audio context
   const audioContext = new AudioContext();
-  
+
   const el = document.getElementById("player");
   // Create a new audio buffer
   const numChannels = 1;
@@ -505,30 +507,29 @@ function playAudioString(audioDataString, sampleRate) {
   // Connect the source node to the destination node of the audio context
   activeAudioNode.connect(audioContext.destination);
 
-  if(playNextTrack){
+  if (playNextTrack) {
     // Start playing the audio
     activeAudioNode.start();
 
     audioAnimTimeout = setTimeout(
       muteAudioAnimation,
-      duration*1000,
+      duration * 1000,
       hmiState
     );
   }
 }
 
-export function updateLayers(filterState)  {
+export function updateLayers(filterState) {
 
   for (let stat of statuses) {
     for (let animalType of animalTypes) {
       let layerName = deriveLayerName(stat, animalType);
       let layer = findMapLayerWithName(hmiState, layerName);
-      
-      if (filterState.includes("_" + stat) && filterState.includes("_" + animalType))
-      {
+
+      if (filterState.includes("_" + stat) && filterState.includes("_" + animalType)) {
         layer.setVisible(true);
       }
-      else{
+      else {
         layer.setVisible(false);
       }
     }
@@ -538,11 +539,10 @@ export function updateLayers(filterState)  {
     for (let animalType of animalTypes) {
       let layerName = deriveTruthLayerName(stat, animalType);
       let layer = findMapLayerWithName(hmiState, layerName);
-      if (filterState.includes(stat) && filterState.includes(animalType))
-      {
+      if (filterState.includes(stat) && filterState.includes(animalType)) {
         layer.setVisible(true);
       }
-      else{
+      else {
         layer.setVisible(false);
       }
     }
@@ -558,32 +558,32 @@ function addAllTruthFeatures(hmiState) {
     let entry = hmiState.movementEvents[key];
 
     var iconPath = "";
-    if(entry.animalDiet === "insectivore" || entry.animalDiet === "omnivore" || entry.animalDiet === "carnivore"){
+    if (entry.animalDiet === "insectivore" || entry.animalDiet === "omnivore" || entry.animalDiet === "carnivore") {
       iconPath = './../images/Predator/sim/' + getIconName(entry.animalStatus, entry.animalType);
     }
-    else{
-      iconPath ='./../images/sim/' + getIconName(entry.animalStatus, entry.animalType);
+    else {
+      iconPath = './../images/sim/' + getIconName(entry.animalStatus, entry.animalType);
     }
-    
+
     var trueLocation = new ol.Feature({
       geometry: new ol.geom.Point(
-        ol.proj.fromLonLat([entry.locationLon,entry.locationLat])
+        ol.proj.fromLonLat([entry.locationLon, entry.locationLat])
       ),
-        name: 'trueLocation_' + entry.speciesScientificName,
-        animalType: entry.animalType,
-        animalStatus: entry.animalStatus,
-        animalSpecies: entry.speciesScientificName,
-        animalLon: entry.locationLon,
-        animalLat: entry.locationLat,
-        animalDiet: entry.animalDiet,
-        animalConfidence: entry.speciesIdentificationConfidence,
-        animalLocConfidence: entry.locationConfidence,
-        animalIcon: iconPath,
-        animalRecordDate: entry.timestamp,
-        isAnimalMovement: 1,
+      name: 'trueLocation_' + entry.speciesScientificName,
+      animalType: entry.animalType,
+      animalStatus: entry.animalStatus,
+      animalSpecies: entry.speciesScientificName,
+      animalLon: entry.locationLon,
+      animalLat: entry.locationLat,
+      animalDiet: entry.animalDiet,
+      animalConfidence: entry.speciesIdentificationConfidence,
+      animalLocConfidence: entry.locationConfidence,
+      animalIcon: iconPath,
+      animalRecordDate: entry.timestamp,
+      isAnimalMovement: 1,
     });
-      //console.log(entry.locationLon, " ", entry.locationLat)
-    
+    //console.log(entry.locationLon, " ", entry.locationLat)
+
     var trueIcon = new ol.style.Style({
       image: new ol.style.Icon({
         src: iconPath,
@@ -592,11 +592,11 @@ function addAllTruthFeatures(hmiState) {
         className: 'true-icon'
       }),
     })
-  
+
     trueLocation.setStyle(trueIcon);
     trueLocation.setId(entry.animalId);
 
-    let layerName = deriveTruthLayerName(entry.animalStatus,entry.animalType);
+    let layerName = deriveTruthLayerName(entry.animalStatus, entry.animalType);
     let layer = findMapLayerWithName(hmiState, layerName);
     let layerSource = layer.getSource();
 
@@ -615,31 +615,31 @@ function addNewTruthFeatures(hmiState, events) {
   for (let entry of events) {
     //console.log("True location found!:  ")
     var iconPath = "";
-    if(entry.animalDiet ==="omnivore" || entry.animalDiet === "carnivore" || entry.animalDiet === "insectivore" ){
+    if (entry.animalDiet === "omnivore" || entry.animalDiet === "carnivore" || entry.animalDiet === "insectivore") {
       iconPath = './../images/Predator/sim/' + getIconName(entry.animalStatus, entry.animalType);
     }
-    else{
-      iconPath ='./../images/sim/' + getIconName(entry.animalStatus, entry.animalType);
+    else {
+      iconPath = './../images/sim/' + getIconName(entry.animalStatus, entry.animalType);
     }
 
     var trueLocation = new ol.Feature({
       geometry: new ol.geom.Point(
         ol.proj.fromLonLat([entry.locationLon, entry.locationLat])
       ),
-        name: 'trueLocation_' + entry.speciesScientificName,
-        animalType: entry.animalType,
-        animalStatus: entry.animalStatus,
-        animalSpecies: entry.speciesScientificName,
-        animalLon: entry.locationLon,
-        animalLat: entry.locationLat,
-        animalDiet: entry.animalDiet,
-        animalConfidence: entry.speciesIdentificationConfidence,
-        animalLocConfidence: entry.locationConfidence,
-        animalIcon: iconPath,
-        animalRecordDate: entry.timestamp,
-        isAnimalMovement: 1,
+      name: 'trueLocation_' + entry.speciesScientificName,
+      animalType: entry.animalType,
+      animalStatus: entry.animalStatus,
+      animalSpecies: entry.speciesScientificName,
+      animalLon: entry.locationLon,
+      animalLat: entry.locationLat,
+      animalDiet: entry.animalDiet,
+      animalConfidence: entry.speciesIdentificationConfidence,
+      animalLocConfidence: entry.locationConfidence,
+      animalIcon: iconPath,
+      animalRecordDate: entry.timestamp,
+      isAnimalMovement: 1,
     });
-      //console.log(entry.locationLon, " ", entry.locationLat)
+    //console.log(entry.locationLon, " ", entry.locationLat)
 
     var trueIcon = new ol.style.Style({
       image: new ol.style.Icon({
@@ -653,7 +653,7 @@ function addNewTruthFeatures(hmiState, events) {
     trueLocation.setStyle(trueIcon);
     trueLocation.setId(entry.animalId);
 
-    let layerName = deriveTruthLayerName(entry.animalStatus,entry.animalType);
+    let layerName = deriveTruthLayerName(entry.animalStatus, entry.animalType);
     let layer = findMapLayerWithName(hmiState, layerName);
     let layerSource = layer.getSource();
 
@@ -672,12 +672,12 @@ function addAllVocalizationFeatures(hmiState) {
     //console.log("True location found!:  ")
     console.log("Number of detections:  ", entry.numberDetections)
     var iconPath = "";
-    
-    if(entry.animalDiet === "herbavore" || entry.animalDiet === "frugivore"){
+
+    if (entry.animalDiet === "herbavore" || entry.animalDiet === "frugivore") {
       iconPath = './../images/vocalization/' + getIconName(entry.animalStatus, entry.animalType);
     }
-    else{
-      iconPath ='./../images/Predator/vocalization/' + getIconName(entry.animalStatus, entry.animalType);
+    else {
+      iconPath = './../images/Predator/vocalization/' + getIconName(entry.animalStatus, entry.animalType);
     }
 
     // function calculateEvenlySpacedPoints(centerLon, centerLat, radius, numberOfPoints) {
@@ -686,21 +686,21 @@ function addAllVocalizationFeatures(hmiState) {
     //   const earthRadius = 6371000; 
     //    //angle in radians between each point
     //   const deltaAngle = 2 * Math.PI / numberOfPoints;
-  
+
     //   for (let i = 0; i < numberOfPoints; i++) {
     //       const theta = deltaAngle * i;
     //       const deltaLatitude = (radius / earthRadius) * (180 / Math.PI);
     //       const deltaLongitude = (radius / earthRadius) * (180 / Math.PI) / Math.cos(centerLat * (Math.PI / 180));
-  
+
     //       //calculate new latitude and longitude
     //       const lat = centerLat + deltaLatitude * Math.cos(theta);
     //       const lon = centerLon + deltaLongitude * Math.sin(theta);
-  
+
     //       points.push([lon, lat]);
     //   }
 
     //   points.push(points[0])
-  
+
     //   return points;
     // }
 
@@ -725,7 +725,7 @@ function addAllVocalizationFeatures(hmiState) {
     // if (entry.animalStatus == "normal"){
     //   strokeColor = "#00c90d"
     // }
-      
+
     // else if (entry.animalStatus == "invasive"){
     //   strokeColor = "#0059f2"
     // }
@@ -751,81 +751,81 @@ function addAllVocalizationFeatures(hmiState) {
     //       width: 3
     //   })
     // });
-  
+
     // polygonFeature.setStyle(polygonStyle);
 
     var evtLocation = new ol.Feature({
       geometry: new ol.geom.Point(
-        ol.proj.fromLonLat([entry.locationLon,entry.locationLat])
+        ol.proj.fromLonLat([entry.locationLon, entry.locationLat])
       ),
-        name: 'vocalisation_' + entry.speciesScientificName,
-        animalType: entry.animalType,
-        animalStatus: entry.animalStatus,
-        animalSpecies: entry.speciesScientificName,
-        animalLon: entry.locationLon,
-        animalLat: entry.locationLat,
-        animalConfidence: entry.speciesIdentificationConfidence,
-        animalLocConfidence: entry.locationConfidence,
-        animalDiet: entry.animalDiet,
-        animalIcon: iconPath,
-        animalRecordDate: entry.timestamp,
-        eventId: entry.eventId,
-        numberDetections: entry.numberDetections,
-        polygonPoints: entry.polygonPoints,
-        isAnimalMovement: 0,
-        animalLocation: null,
-        type: "vocalization"
+      name: 'vocalisation_' + entry.speciesScientificName,
+      animalType: entry.animalType,
+      animalStatus: entry.animalStatus,
+      animalSpecies: entry.speciesScientificName,
+      animalLon: entry.locationLon,
+      animalLat: entry.locationLat,
+      animalConfidence: entry.speciesIdentificationConfidence,
+      animalLocConfidence: entry.locationConfidence,
+      animalDiet: entry.animalDiet,
+      animalIcon: iconPath,
+      animalRecordDate: entry.timestamp,
+      eventId: entry.eventId,
+      numberDetections: entry.numberDetections,
+      polygonPoints: entry.polygonPoints,
+      isAnimalMovement: 0,
+      animalLocation: null,
+      type: "vocalization"
     });
-      //console.log(entry.locationLon, " ", entry.locationLat)
-    
+    //console.log(entry.locationLon, " ", entry.locationLat)
+
     var icon = new ol.style.Style({
       image: new ol.style.Icon({
         src: iconPath,
         anchor: [0.5, 1],
         scale: 0.75,
         className: 'vocalization-icon',
-        opacity : 0.8
+        opacity: 0.8
       }),
     })
 
-   
-    
+
+
     let coords = []
 
-    
+
     console.log(entry.animalStatus)
 
     //convert the coordinates for a Polygon and ensure the projection is correct
-    
-    
+
+
     // var polygonFeature = new ol.Feature({
     //     geometry: polygon
     // });
-    
+
     // Note: The fill style now applies to the Polygon geometry
 
     console.log("Pushed Polygon")
-    
+
     // Add the polygon to the map in the same way as before
 
     evtLocation.setStyle(icon);
     evtLocation.setId(entry.animalId);
 
-    let layerName = deriveLayerName(entry.animalStatus,entry.animalType);
+    let layerName = deriveLayerName(entry.animalStatus, entry.animalType);
     let layer = findMapLayerWithName(hmiState, layerName);
-    if(layer){
+    if (layer) {
       let layerSource = layer.getSource();
 
       //console.log(layerName);
       //console.log("animal type: ", entry.speciesScientificName);
-  
+
       layerSource.addFeature(evtLocation);
       //layerSource.addFeature(polygonFeature);
       //layerSource.addFeature(circleFeature);
       layer.getSource().changed();
       layer.changed();
     }
-    else{
+    else {
       console.log(layerName);
     }
 
@@ -838,34 +838,34 @@ function addNewVocalizationFeatures(hmiState, events) {
   for (let entry of events) {
     //console.log("True location found!:  ")
     var iconPath = "";
-    if(entry.animalDiet === "herbavore" || entry.animalDiet === "frugivore"){
+    if (entry.animalDiet === "herbavore" || entry.animalDiet === "frugivore") {
       iconPath = './../images/vocalization/' + getIconName(entry.animalStatus, entry.animalType);
     }
-    else{
-      iconPath ='./../images/Predator/vocalization/' + getIconName(entry.animalStatus, entry.animalType);
+    else {
+      iconPath = './../images/Predator/vocalization/' + getIconName(entry.animalStatus, entry.animalType);
     }
 
     var evtLocation = new ol.Feature({
       geometry: new ol.geom.Point(
-        ol.proj.fromLonLat([entry.locationLon,entry.locationLat])
+        ol.proj.fromLonLat([entry.locationLon, entry.locationLat])
       ),
-        name: 'vocalisation_' + entry.speciesScientificName,
-        animalType: entry.animalType,
-        animalStatus: entry.animalStatus,
-        animalSpecies: entry.speciesScientificName,
-        animalLon: entry.locationLon,
-        animalLat: entry.locationLat,
-        animalConfidence: entry.speciesIdentificationConfidence,
-        animalLocConfidence: entry.locationConfidence,
-        animalDiet: entry.animalDiet,
-        animalIcon: iconPath,
-        animalRecordDate: entry.timestamp,
-        eventId: entry.eventId,
-        numberDetections: entry.numberDetections,
-        polygonPoints: entry.polygonPoints,
-        isAnimalMovement: 0,
+      name: 'vocalisation_' + entry.speciesScientificName,
+      animalType: entry.animalType,
+      animalStatus: entry.animalStatus,
+      animalSpecies: entry.speciesScientificName,
+      animalLon: entry.locationLon,
+      animalLat: entry.locationLat,
+      animalConfidence: entry.speciesIdentificationConfidence,
+      animalLocConfidence: entry.locationConfidence,
+      animalDiet: entry.animalDiet,
+      animalIcon: iconPath,
+      animalRecordDate: entry.timestamp,
+      eventId: entry.eventId,
+      numberDetections: entry.numberDetections,
+      polygonPoints: entry.polygonPoints,
+      isAnimalMovement: 0,
     });
-      //console.log(entry.locationLon, " ", entry.locationLat)
+    //console.log(entry.locationLon, " ", entry.locationLat)
 
     var icon = new ol.style.Style({
       image: new ol.style.Icon({
@@ -875,29 +875,29 @@ function addNewVocalizationFeatures(hmiState, events) {
         className: 'vocalization-icon'
       }),
     })
-    
+
     evtLocation.setStyle(icon);
     evtLocation.setId(entry.eventId);
 
-    let layerName = deriveLayerName(entry.animalStatus,entry.animalType);
+    let layerName = deriveLayerName(entry.animalStatus, entry.animalType);
     let layer = findMapLayerWithName(hmiState, layerName);
-    if(layer){
+    if (layer) {
       let layerSource = layer.getSource();
 
       //console.log(layerName);
       //console.log("animal type: ", entry.speciesScientificName);
-  
+
       layerSource.addFeature(evtLocation);
       layer.getSource().changed();
       layer.changed();
     }
-    else{
+    else {
       console.log(layerName);
     }
   }
 }
 
-function addMicrophonesByLayer(hmiState, layerName, iconPath){
+function addMicrophonesByLayer(hmiState, layerName, iconPath) {
   var mics = [];
 
   //console.log("locs", hmiState.microphoneLocations);
@@ -935,7 +935,7 @@ function addMicrophonesByLayer(hmiState, layerName, iconPath){
 }
 
 
-function addMicrophonesByHiddenLayer(hmiState, layerName, iconPath){
+function addMicrophonesByHiddenLayer(hmiState, layerName, iconPath) {
   var mics = [];
 
   //console.log("locs", hmiState.microphoneLocations);
@@ -972,20 +972,20 @@ var micAnimFrameIndex = 1;
 var animTimeout = null;
 
 function addmicrophones(hmiState) {
-  
+
   //Loop function to add all the frames that compose the microphone animation.
-  for(let i=25; i>0;i--){
-    addMicrophonesByLayer(hmiState,`mic_layer_${i}`, `./../images/${i}-01.png`);
+  for (let i = 25; i > 0; i--) {
+    addMicrophonesByLayer(hmiState, `mic_layer_${i}`, `./../images/${i}-01.png`);
   }
   //Add the single white dot as the microphone icon for when animation is disabled.
   addMicrophonesByHiddenLayer(hmiState, "mic_layer", "./../images/1-01.png");
 }
 
-export function enableMicAnimation(hmiState){
+export function enableMicAnimation(hmiState) {
   var staticLayer = findMapLayerWithName(hmiState, "mic_layer");
   staticLayer.setVisible(false);
 
-  for(var i = 1; i <= 25; i++){
+  for (var i = 1; i <= 25; i++) {
     var nextLayer = findMapLayerWithName(hmiState, "mic_layer_" + i);
     nextLayer.setVisible(true);
   }
@@ -993,12 +993,12 @@ export function enableMicAnimation(hmiState){
   stepMicAnimation(hmiState);
 }
 
-export function disableMicAnimation(hmiState){
-  if(animTimeout){
+export function disableMicAnimation(hmiState) {
+  if (animTimeout) {
     clearTimeout(animTimeout);
   }
 
-  for(var i = 1; i <= 25; i++){
+  for (var i = 1; i <= 25; i++) {
     var nextLayer = findMapLayerWithName(hmiState, "mic_layer_" + i);
     nextLayer.setVisible(false);
   }
@@ -1014,7 +1014,7 @@ function stepMicAnimation(hmiState) {
   var currentLayer = findMapLayerWithName(hmiState, "mic_layer_" + currentIndex);
   currentLayer.setVisible(false);
 
-  if(animTimeout){
+  if (animTimeout) {
     clearTimeout(animTimeout);
   }
 
@@ -1025,13 +1025,13 @@ function stepMicAnimation(hmiState) {
   );
 }
 
-export function showMics(hmiState){
+export function showMics(hmiState) {
   let layer = findMapLayerWithName(hmiState, "mic_layer");
   let layerSource = layer.getSource();
   layer.setVisible(true);
 }
 
-export function hideMics(hmiState){
+export function hideMics(hmiState) {
   let layer = findMapLayerWithName(hmiState, "mic_layer");
   let layerSource = layer.getSource();
   layer.setVisible(false);
@@ -1042,7 +1042,7 @@ function findMapLayerWithName(hmiState, name) {
     console.log(`findMapLayerWithName: invalid basemap`);
     return null;
   } else {
-    if(hmiState.layers.hasOwnProperty(name)){
+    if (hmiState.layers.hasOwnProperty(name)) {
       return hmiState.layers[name];
     }
   }
@@ -1166,7 +1166,7 @@ let currentIcon = null
 let currentPolygon = null;
 let currentFeature = null;
 
-function createMapClickEvent(hmiState){
+function createMapClickEvent(hmiState) {
   hmiState.basemap.on("click", function (evt) {
     const feature = hmiState.basemap.forEachFeatureAtPixel(evt.pixel, function (feature) {
       return feature;
@@ -1176,10 +1176,10 @@ function createMapClickEvent(hmiState){
     let default_content = $("#animal-default-content");
     let active_mic_content = $("#mic-popup-content");
     let default_mic_content = $("mic-default-content");
-    if (feature){
-      
-      
-      if (currentIcon == null){
+    if (feature) {
+
+
+      if (currentIcon == null) {
         console.log("Current Icon is none")
       }
 
@@ -1187,38 +1187,80 @@ function createMapClickEvent(hmiState){
       function calculateEvenlySpacedPoints(centerLon, centerLat, radius, numberOfPoints) {
         const points = [];
         //earths radius in meters
-        const earthRadius = 6371000; 
-         //angle in radians between each point
+        const earthRadius = 6371000;
+        //angle in radians between each point
         const deltaAngle = 2 * Math.PI / numberOfPoints;
-    
+
         for (let i = 0; i < numberOfPoints; i++) {
-            const theta = deltaAngle * i;
-            const deltaLatitude = (radius / earthRadius) * (180 / Math.PI);
-            const deltaLongitude = (radius / earthRadius) * (180 / Math.PI) / Math.cos(centerLat * (Math.PI / 180));
-    
-            //calculate new latitude and longitude
-            const lat = centerLat + deltaLatitude * Math.cos(theta);
-            const lon = centerLon + deltaLongitude * Math.sin(theta);
-    
-            points.push([lon, lat]);
+          const theta = deltaAngle * i;
+          const deltaLatitude = (radius / earthRadius) * (180 / Math.PI);
+          const deltaLongitude = (radius / earthRadius) * (180 / Math.PI) / Math.cos(centerLat * (Math.PI / 180));
+
+          //calculate new latitude and longitude
+          const lat = centerLat + deltaLatitude * Math.cos(theta);
+          const lon = centerLon + deltaLongitude * Math.sin(theta);
+
+          points.push([lon, lat]);
         }
-  
+
         points.push(points[0])
-    
+
         return points;
       }
 
       function calculatePointsForPolygon(coordinates) {
-       const points = []
+        const points = []
 
       }
-      
-      
+
+      function calculateIntersection(mic1, mic2, distance1, distance2) {
+        const d = Math.sqrt(Math.pow(mic2.lon - mic1.lon, 2) + Math.pow(mic2.lat - mic1.lat, 2));
+
+        // Check if circles intersect
+        if (d > (distance1 + distance2) || d < Math.abs(distance1 - distance2) || (d === 0 && distance1 === distance2)) {
+          console.error("Circles do not intersect");
+          return null;
+        }
+
+        const a = (Math.pow(distance1, 2) - Math.pow(distance2, 2) + Math.pow(d, 2)) / (2 * d);
+        const h = Math.sqrt(Math.pow(distance1, 2) - Math.pow(a, 2));
+
+        const x2 = mic1.lon + a * (mic2.lon - mic1.lon) / d;
+        const y2 = mic1.lat + a * (mic2.lat - mic1.lat) / d;
+
+        const x3 = x2 + h * (mic2.lat - mic1.lat) / d;
+        const y3 = y2 - h * (mic2.lon - mic1.lon) / d;
+
+        const x4 = x2 - h * (mic2.lat - mic1.lat) / d;
+        const y4 = y2 + h * (mic2.lon - mic1.lon) / d;
+        console.log(x4,y4)
+        return [
+          { lon: x3, lat: y3 }, // First intersection point
+          { lon: x4, lat: y4 }  // Second intersection point
+        ];
+      }
+
+      function calculateArcPoints(center, start, end, radius, numPoints) {
+        const points = [];
+        const startAngle = Math.atan2(start.lat - center.lat, start.lon - center.lon);
+        const endAngle = Math.atan2(end.lat - center.lat, end.lon - center.lon);
+        const deltaAngle = (endAngle - startAngle) / numPoints;
+    
+        for (let i = 0; i <= numPoints; i++) {
+            const angle = startAngle + i * deltaAngle;
+            const lat = center.lat + (radius / EARTH_RADIUS) * (180 / Math.PI) * Math.sin(angle);
+            const lon = center.lon + (radius / EARTH_RADIUS) * (180 / Math.PI) / Math.cos(center.lat * (Math.PI / 180)) * Math.cos(angle);
+            points.push([lon, lat]);
+        }
+    
+        return points;
+    }
+
 
       let values = feature.getProperties();
-      if(values.type == "vocalization"){
+      if (values.type == "vocalization") {
 
-        
+
         let centerLatitude;
         let centerLongitude;
         let points;
@@ -1227,9 +1269,13 @@ function createMapClickEvent(hmiState){
         //number of points to create the polygon
         const numberOfPoints = 64;
         console.log("Vocalization event clicked!")
+        //TODO: numberDetections is undefined and 1 and 2 polygons dont generate coz of errors. How to triangulate stuff?
+        values.numberDetections =  Math.floor(Math.random() * 3) + 1;
+        //numberMicsElement = document.getElementById("number_of_mics")
+        //numberMicsElement.textContent = values.numberDetections
         // FOR 1 MIC DETECTIONS
-        if (values.numberDetections == 1){
-          randomCoords = generateRandomCoordinate(values.animalLat, values.animalLon)
+        if (values.numberDetections == 1) {
+          let randomCoords = generateRandomCoordinate(values.animalLat, values.animalLon)
           console.log("1 mic detection event")
           centerLongitude = randomCoords.lon;
           centerLatitude = randomCoords.lat;
@@ -1238,8 +1284,8 @@ function createMapClickEvent(hmiState){
         }
 
         // FOR 2 MIC DETECTIONS 
-        else if(values.numberDetections == 2){
-
+        else if (values.numberDetections == 2) {
+          /*
           centerLongitude = values.polygonPoints[5][0];
           centerLatitude = values.polygonPoints[5][1];
           console.log("Two mic detection")
@@ -1251,60 +1297,93 @@ function createMapClickEvent(hmiState){
             innerArray.reverse();
           });
           console.log("Points:  ", points)
+          */
+
+          const mic1 = generateRandomCoordinate(values.animalLat, values.animalLon); // Replace with actual mic 1 coordinates
+          const mic2 = generateRandomCoordinate(values.animalLat, values.animalLon); // Replace with actual mic 2 coordinates
+          const distance1 = 0.005; // Replace with actual distance to mic 1
+          const distance2 = 0.005; // Replace with actual distance to mic 2
+
+          const intersections = calculateIntersection(mic1, mic2, distance1, distance2);
+          console.log(mic1,mic2)
+          if (intersections) {
+            // Choose one of the intersection points (or average them)
+            console.log(intersections)
+            //const chosenPoint = intersections[0];
+            
+            //centerLongitude = chosenPoint.lon;
+            //centerLatitude = chosenPoint.lat;
+            //console.log(centerLatitude,centerLongitude)
+
+            const [int1, int2] = intersections;
+
+            // Create arc points for the first circle from int1 to int2
+            const arc1 = calculateArcPoints(mic1, int1, int2, distance1, numberOfPoints / 2);
+            // Create arc points for the second circle from int2 to int1
+            const arc2 = calculateArcPoints(mic2, int2, int1, distance2, numberOfPoints / 2);
+
+            // Combine the arcs and intersection points to form the polygon
+            points = [...arc1, ...arc2, arc1[0]]; // Ensure the polygon is closed
+
+            // Center on the first intersection point
+            centerLongitude = int1.lon;
+            centerLatitude = int1.lat;
+
+            //points = calculateEvenlySpacedPoints(centerLongitude, centerLatitude, radius, numberOfPoints);
+          } else {
+            console.error("Could not determine the sound source with two mics");
+          }
         }
 
         // FOR 3+ MIC DETECTIONS
-        else{
+        else {
           console.log("3 Mic detection event")
           centerLongitude = values.animalLon;
           centerLatitude = values.animalLat;
           points = calculateEvenlySpacedPoints(centerLongitude, centerLatitude, radius, numberOfPoints);
           console.log("Points:  ", points)
         }
-          
-        
+
+
         console.log(points);
 
         var polygon = new ol.geom.Polygon([points]).transform('EPSG:4326', 'EPSG:3857')
         var polygonFeature = new ol.Feature({
           geometry: polygon
         })
-        
-        
-
 
         let strokeColor = "#ffffff"
-    
-        if (values.animalStatus == "normal"){
+
+        if (values.animalStatus == "normal") {
           strokeColor = "#00c90d"
         }
-          
-        else if (values.animalStatus == "invasive"){
+
+        else if (values.animalStatus == "invasive") {
           strokeColor = "#0059f2"
         }
-    
-        else if (values.animalStatus == "endangered"){
+
+        else if (values.animalStatus == "endangered") {
           strokeColor = "#ff0303"
         }
-    
-        else if (values.animalStatus == "vulnerable"){
+
+        else if (values.animalStatus == "vulnerable") {
           strokeColor = "#f2aa00"
         }
-    
-        else if (values.animalStatus == "near-threatened"){
+
+        else if (values.animalStatus == "near-threatened") {
           strokeColor = "#f2f200"
         }
-    
+
         var polygonStyle = new ol.style.Style({
           fill: new ol.style.Fill({
-              color: 'rgba(255, 255, 255, 0.3)' // This will fill the polygon
+            color: 'rgba(255, 255, 255, 0.3)' // This will fill the polygon
           }),
           stroke: new ol.style.Stroke({
-              color: strokeColor,
-              width: 3
+            color: strokeColor,
+            width: 3
           })
         });
-      
+
         polygonFeature.setStyle(polygonStyle);
 
         values.animalLocation = polygonFeature
@@ -1319,11 +1398,23 @@ function createMapClickEvent(hmiState){
           }),
         })
 
-        
-        
-        try{
+        //hmiState.defaultZoom = 17;
 
-          if (currentPolygon != null){
+        const view = hmiState.basemap.getView();
+        const center = ol.proj.fromLonLat([centerLongitude, centerLatitude]);
+        const zoom = 17
+        //view.setZoom(17);
+
+        view.animate({
+          center: center,
+          zoom: zoom,
+          duration: 500, // Duration of the animation in milliseconds
+          easing: ol.easing.easeOut // Easing function for smooth animation
+        });
+
+        try {
+
+          if (currentPolygon != null) {
             polygonSource.removeFeature(currentPolygon)
 
             var clickedOff = new ol.style.Style({
@@ -1349,29 +1440,30 @@ function createMapClickEvent(hmiState){
           //Iterate through to find the layer which contains the icon feature
 
 
+
         }
-        catch{
+        catch {
           console.log("Couldn't set new values to values")
         }
 
-        console.log("New Feature clicked: ",values);
-        console.log("Printing animal icon path: ",values.animalIcon)
+        console.log("New Feature clicked: ", values);
+        console.log("Printing animal icon path: ", values.animalIcon)
       }
 
 
 
-      
-      if (values.isMic){
+
+      if (values.isMic) {
         active_mic_content.show();
         default_mic_content.hide();
         console.log("Microphone clicked, fetching image...")
         const img = new Image();
         let dice = Math.floor(Math.random() * 4) + 1;
-        img.onload = function() {
+        img.onload = function () {
           //console.log('Image exists!');
           document.getElementById("mic_desc_img").src = "../../images/bio/mic_bio_" + dice + ".png";
         }
-        img.onerror = function() {
+        img.onerror = function () {
           console.log('Mic image does not exist!');
         }
         img.src = "../../images/bio/mic_bio_" + dice + ".png";
@@ -1393,53 +1485,54 @@ function createMapClickEvent(hmiState){
 
 
         animal_toggled = true;
-        const toggled_mic = new CustomEvent('micToggled',{
-        detail: {
-          message: "Mic toggled:",
+        const toggled_mic = new CustomEvent('micToggled', {
+          detail: {
+            message: "Mic toggled:",
           }
         })
-        
+
         document.dispatchEvent(toggled_mic);
       }
-      else{
+      else {
         // console.log('feature: ', feature);
         stopAudioPlayback();
 
         active_content.show();
         default_content.hide();
-        if (values.eventId){
+        if (values.eventId) {
           //console.log("saving " + values.eventId);
           selectedVocalizationEventId = values.eventId;
         }
-        if(values.isAnimalMovement){
+        if (values.isAnimalMovement) {
           document.getElementById("audioHeader").style.display = "none"
           document.getElementById("audioControl").style.display = "none"
         }
-        else{
+        else {
           document.getElementById("audioHeader").style.display = "flex"
           document.getElementById("audioControl").style.display = "flex"
         }
-        if (values.animalSpecies){
+        if (values.animalSpecies) {
           //console.log(values.animalSpecies)
           var result = sample_data.find(({ species }) => species.toLowerCase() === values.animalSpecies.toLowerCase())
           if (result) {
             const img = new Image();
-            img.onload = function() {
+            img.onload = function () {
               //console.log('Image exists!');
               // Set the source of the img tag
               document.getElementById("desc_img").src = "../../images/bio/" + result.common.toLowerCase() + "-bio.png";
             }
-            img.onerror = function() {
+            img.onerror = function () {
               let dice = Math.floor(Math.random() * 5) + 1;
               document.getElementById("desc_img").src = "../../images/bio/not_available_" + dice + "-bio.png";
             }
             img.src = "../../images/bio/" + result.common.toLowerCase() + "-bio.png";
-          
+
             //console.log("found")
             //Animal Bio specific session
             animal_data = result;
             document.getElementById("desc_name").innerText = result.common;
             //document.getElementById("markup_img_2").src = values.animalIcon;
+            document.getElementById("number_of_mics").innerText = "Number of microphones : " + values.numberDetections
             document.getElementById("desc_confidence").innerText = values.animalConfidence + "%";
             document.getElementById("desc_species").innerText = result.species;
             document.getElementById("desc_summary").innerText = result.summary;
@@ -1447,7 +1540,7 @@ function createMapClickEvent(hmiState){
             let summary = document.getElementById("desc_details");
             summary.innerHTML = '';
             result.description.forEach(content => {
-              if (content){
+              if (content) {
                 var p = document.createElement('p');
                 p.className = "desc_ul";
                 p.innerText = content;
@@ -1455,7 +1548,7 @@ function createMapClickEvent(hmiState){
               }
             })
           }
-          else{
+          else {
             let dice = Math.floor(Math.random() * 5) + 1;
             document.getElementById("desc_img").src = "../../images/bio/not_available_" + dice + "-bio.png";
 
@@ -1469,27 +1562,27 @@ function createMapClickEvent(hmiState){
           }
 
 
-            //Markup details specific session
-            let dateFormat = new Date(values.animalRecordDate);
-            document.getElementById("markup_img").src = values.animalIcon;
-            document.getElementById("markup_details").innerHTML = values.animalType + " | " + values.animalDiet + " | " + statusPrintLookup[values.animalStatus];
-            document.getElementById("markup_loc_lon").innerHTML = values.animalLon;
-            document.getElementById("markup_loc_lat").innerHTML = values.animalLat;
-            document.getElementById("markup_confidence").innerHTML = values.animalLocConfidence + "%";
-            document.getElementById("markup_date").innerHTML = dateFormat.toUTCString()
+          //Markup details specific session
+          let dateFormat = new Date(values.animalRecordDate);
+          document.getElementById("markup_img").src = values.animalIcon;
+          document.getElementById("markup_details").innerHTML = values.animalType + " | " + values.animalDiet + " | " + statusPrintLookup[values.animalStatus];
+          document.getElementById("markup_loc_lon").innerHTML = values.animalLon;
+          document.getElementById("markup_loc_lat").innerHTML = values.animalLat;
+          document.getElementById("markup_confidence").innerHTML = values.animalLocConfidence + "%";
+          document.getElementById("markup_date").innerHTML = dateFormat.toUTCString()
 
-            animal_toggled = true;
-            const toggled_animal = new CustomEvent('animalToggled',{
-              detail: {
-                message: "Animal toggled:",
-              }
-            })
+          animal_toggled = true;
+          const toggled_animal = new CustomEvent('animalToggled', {
+            detail: {
+              message: "Animal toggled:",
+            }
+          })
 
-            document.dispatchEvent(toggled_animal);
-          
+          document.dispatchEvent(toggled_animal);
+
 
         }
-        else{
+        else {
           console.log(values);
         }
       }
@@ -1503,12 +1596,12 @@ function createMapClickEvent(hmiState){
 }
 
 export function MapOpenNav() {
-  if (animal_toggled){
+  if (animal_toggled) {
     document.getElementById("menuPanel").style.width = "30%";
   }
 }
 
-export function getAnimalToggled(){
+export function getAnimalToggled() {
   return animal_toggled;
 }
 
@@ -1517,40 +1610,40 @@ export function MapCloseNav() {
   animal_toggled = false;
 }
 
-function updateTruthEvents(hmiState){
-  retrieveTruthEventsInTimeRange(hmiState.currentTime-10, hmiState.currentTime).then((res) => {
+function updateTruthEvents(hmiState) {
+  retrieveTruthEventsInTimeRange(hmiState.currentTime - 10, hmiState.currentTime).then((res) => {
     updateAnimalMovementLayerFromLiveData(hmiState, res.data);
   })
 }
 
-function updateVocalizationEvents(hmiState){
-  retrieveVocalizationEventsInTimeRange(hmiState.currentTime-10, hmiState.currentTime).then((res) => {
+function updateVocalizationEvents(hmiState) {
+  retrieveVocalizationEventsInTimeRange(hmiState.currentTime - 10, hmiState.currentTime).then((res) => {
     updateVocalizationLayerFromLiveData(hmiState, res.data);
   })
 }
 
-function purgeTruthEvents(hmiState){
+function purgeTruthEvents(hmiState) {
   let persistEvents = {};
   //console.log("purging");
 
   //console.log(hmiState.liveEventCutoff);
-  for(const key in hmiState.movementEvents){
+  for (const key in hmiState.movementEvents) {
     let event = hmiState.movementEvents[key];
     //console.log(event);
 
-    if(hmiState.liveEventCutoff > event.timestamp){
+    if (hmiState.liveEventCutoff > event.timestamp) {
       let layerName = deriveTruthLayerName(event.animalStatus, event.animalType);
       let layer = findMapLayerWithName(hmiState, layerName);
-      if(layer){
+      if (layer) {
         const featureToPurge = layer.getSource().getFeatureById(event.animalId);
         //console.log(featureToPurge);
         layer.getSource().removeFeature(featureToPurge);
       }
-      else{
+      else {
         console.log(layerName);
       }
     }
-    else{
+    else {
       persistEvents[event.animalId] = event;
     }
   }
@@ -1558,32 +1651,32 @@ function purgeTruthEvents(hmiState){
   hmiState.movementEvents = persistEvents;
 }
 
-function purgeVocalizationEvents(hmiState){
+function purgeVocalizationEvents(hmiState) {
   let persistEvents = [];
   //console.log("purging");
 
   //console.log(hmiState.liveEventCutoff);
-  for(let event of hmiState.vocalizationEvents){
+  for (let event of hmiState.vocalizationEvents) {
     //console.log(event);
     //console.log(hmiState.liveEventCutoff);
     //console.log(event.timestamp); 
 
-    if(hmiState.liveEventCutoff > event.timestamp){
+    if (hmiState.liveEventCutoff > event.timestamp) {
       let layerName = deriveLayerName(event.animalStatus, event.animalType);
       let layer = findMapLayerWithName(hmiState, layerName);
-      if(layer){
+      if (layer) {
         //console.log(event.eventId);
         const featureToPurge = layer.getSource().getFeatureById(event.eventId);
         //console.log(featureToPurge);
-        if(featureToPurge !== null){
+        if (featureToPurge !== null) {
           layer.getSource().removeFeature(featureToPurge);
         }
       }
-      else{
+      else {
         console.log(layerName);
       }
     }
-    else{
+    else {
       persistEvents.push(event);
     }
   }
@@ -1596,32 +1689,32 @@ function simulateData(hmiState) {
   queueSimUpdate(hmiState);
 }
 
-export function getUTC(){
+export function getUTC() {
   const now = new Date();
   const utcTimestamp = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(),
     now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds(), now.getUTCMilliseconds());
   return utcTimestamp;
 }
 
-export function updateTimeOffset(hmiState){
-  try{
-  retrieveSimTime().then((res) => {
-    //console.log(res.data);
-    let unix = Date.parse(res.data.timestamp) / 1000;
-    let newDelay = (getUTC() - new Date((unix + (10*60*60)) * 1000)) + 1000;
-    if(isNaN(newDelay)){
-      hmiState.simUpdateDelay = 10000;
-    }
-    else{
-      hmiState.simUpdateDelay = newDelay;
-    }
-    // Multiply by 1000 to convert to milliseconds
-    /*const utcDate = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
-      date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
-    hmiState.simTime = utcDate;*/
-    //console.log(hmiState.simUpdateDelay);
-  });
-  }catch(error){
+export function updateTimeOffset(hmiState) {
+  try {
+    retrieveSimTime().then((res) => {
+      //console.log(res.data);
+      let unix = Date.parse(res.data.timestamp) / 1000;
+      let newDelay = (getUTC() - new Date((unix + (10 * 60 * 60)) * 1000)) + 1000;
+      if (isNaN(newDelay)) {
+        hmiState.simUpdateDelay = 10000;
+      }
+      else {
+        hmiState.simUpdateDelay = newDelay;
+      }
+      // Multiply by 1000 to convert to milliseconds
+      /*const utcDate = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
+        date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
+      hmiState.simTime = utcDate;*/
+      //console.log(hmiState.simUpdateDelay);
+    });
+  } catch (error) {
     console.log(failed);
     hmiState.simUpdateDelay = 10000;
   }
@@ -1630,14 +1723,14 @@ export function updateTimeOffset(hmiState){
 let simUpdateTimeout = null;
 
 function queueSimUpdate(hmiState) {
-  if(hmiState.liveMode){
+  if (hmiState.liveMode) {
     updateTimeOffset(hmiState);
 
     //hmiState.currentTime = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
     hmiState.currentTime = Math.floor((getUTC()) / 1000);
     //hmiState.liveEventCutoff = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay - hmiState.liveWindow) / 1000);
     hmiState.liveEventCutoff = Math.floor((getUTC() - hmiState.liveWindow) / 1000);
-                
+
     purgeTruthEvents(hmiState);
     purgeVocalizationEvents(hmiState);
     updateTruthEvents(hmiState);
@@ -1668,17 +1761,17 @@ function queueSimUpdate(hmiState) {
 
 
 
-document.addEventListener('playAudio', function(event){
+document.addEventListener('playAudio', function (event) {
   //console.log("play audio");
   playNextTrack = true;
-  if(selectedVocalizationEventId != null){
+  if (selectedVocalizationEventId != null) {
     retrieveAudio(selectedVocalizationEventId).then((res) => {
       playAudioString(res.data.audioClip, res.data.sampleRate);
     })
   }
 })
 
-document.addEventListener('stopAudio', function(event){
+document.addEventListener('stopAudio', function (event) {
   //console.log("stop audio");
   playNextTrack = false;
   stopAudioPlayback();
@@ -1689,7 +1782,7 @@ var durationTag = document.getElementById("recording_duration");
 
 var audioElement = document.getElementsByClassName("audio-element")[0];
 var audioElementSource = document.getElementsByClassName("audio-element")[0]
-    .getElementsByTagName("source")[0];
+  .getElementsByTagName("source")[0];
 audioElement.onended = hidePlaybackIndicator;
 var textIndicatorOfAudiPlaying = document.getElementsByClassName("playback_indicator")[0];
 
@@ -1717,39 +1810,39 @@ export function hideRecordingControls() {
 //acknowledgeButton.onclick = hideRecordingNotSupportedOverlay;
 
 export function showRecordingNotSupportedOverlay() {
-    //overlay.classList.remove("hide");
+  //overlay.classList.remove("hide");
 }
 
 function hideRecordingNotSupportedOverlay() {
-    //overlay.classList.add("hide");
+  //overlay.classList.add("hide");
 }
 
 export function createSourceForAudioElement() {
-    let sourceElement = document.createElement("source");
-    audioElement.appendChild(sourceElement);
+  let sourceElement = document.createElement("source");
+  audioElement.appendChild(sourceElement);
 
-    audioElementSource = sourceElement;
+  audioElementSource = sourceElement;
 }
 
 export function showPlaybackIndicator() {
-    textIndicatorOfAudiPlaying.classList.remove("hide");
+  textIndicatorOfAudiPlaying.classList.remove("hide");
 }
 
 export function hidePlaybackIndicator() {
-    textIndicatorOfAudiPlaying.classList.add("hide");
+  textIndicatorOfAudiPlaying.classList.add("hide");
 }
 
 var audioRecordStartTime = null;
 var durationTimer = null;
 
-export function testFunct(){
+export function testFunct() {
   console.log("Recording started 1");
 }
 
 export function startAudioRecording() {
   console.log("Recording started 2");
 
-  if (!audioElementSource){}
+  if (!audioElementSource) { }
   else if (!audioElement.paused) {
     console.log("Paused playback");
     audioElement.pause();
@@ -1759,8 +1852,8 @@ export function startAudioRecording() {
   audioRecorder.start()
     .then(() => {
       audioRecordStartTime = new Date();
-        showRecordingControls();
-      })
+      showRecordingControls();
+    })
     .catch(error => {
       console.log(error.message);
 
@@ -1770,34 +1863,34 @@ export function startAudioRecording() {
       }
 
       switch (error.name) {
-        case 'AbortError': 
+        case 'AbortError':
           console.log("An AbortError has occured.");
           break;
-        case 'NotAllowedError': 
+        case 'NotAllowedError':
           console.log("A NotAllowedError has occured. User might have denied permission.");
           break;
-        case 'NotFoundError': 
+        case 'NotFoundError':
           console.log("A NotFoundError has occured.");
           break;
-        case 'NotReadableError': 
+        case 'NotReadableError':
           console.log("A NotReadableError has occured.");
           break;
-        case 'SecurityError': 
+        case 'SecurityError':
           console.log("A SecurityError has occured.");
           break;
-        case 'TypeError': 
+        case 'TypeError':
           console.log("A TypeError has occured.");
           break;
-        case 'InvalidStateError': 
+        case 'InvalidStateError':
           console.log("An InvalidStateError has occured.");
           break;
-        case 'UnknownError': 
+        case 'UnknownError':
           console.log("An UnknownError has occured.");
           break;
         default:
           console.log("An error occured with the error name " + error.name);
-        };
-      });
+      };
+    });
 }
 
 
@@ -1827,17 +1920,17 @@ export function cancelAudioRecording() {
   hideRecordingControls();
 }
 
-document.addEventListener('saveRecording', function(event){
+document.addEventListener('saveRecording', function (event) {
   save();
 })
 
-document.addEventListener('loadRecording', function(event){
+document.addEventListener('loadRecording', function (event) {
   //console.log("stop audio");
   //playNextTrack = false;
   //stopAudioPlayback();
 })
 
-document.addEventListener('simulateRecording', function(event){
+document.addEventListener('simulateRecording', function (event) {
   //simulateRecording(audioRecorder.audioBlobs, window.hmiState);
   simulateRecording(window.hmiState);
 })
@@ -1864,19 +1957,19 @@ function arrayBufferToBase64(buffer) {
   const bytes = new Uint8Array(buffer);
   const len = bytes.byteLength;
   for (let i = 0; i < len; i++) {
-      binary += String.fromCharCode(bytes[i]);
+    binary += String.fromCharCode(bytes[i]);
   }
   return btoa(binary);
 }
 
-function simulateRecording(hmiState){
+function simulateRecording(hmiState) {
   if (decodedAudioStore.length === 0) {
     console.log("No recording available.");
     return;
-  }else{
+  } else {
 
     const base64String = arrayBufferToBase64(fileContent);
-    
+
     let coords = generateRandomCoordinate(current_mic_lat, current_mic_lon);
 
     const recordingData = {
@@ -1890,9 +1983,9 @@ function simulateRecording(hmiState){
       mode: hmiState.simMode,
       audioFile: hmiState.simMode
     }
-  
+
     postRecording(recordingData);
-      
+
     //let decodedAudio = stringToAudio(base64String);
 
     //playAudioFromUint8Array(decodedAudio);
@@ -1900,7 +1993,7 @@ function simulateRecording(hmiState){
   }
 }
 
-function testEncoding(base64String){
+function testEncoding(base64String) {
   audioContext = new (window.AudioContext || window.webkitAudioContext)();
   const binaryData = atob(base64String);
 
@@ -1942,7 +2035,7 @@ function playAudioFromUint8Array(uint8Array) {
 
 
 function save() {
-  if(audioRecorder.audioBlobs.length != 0){
+  if (audioRecorder.audioBlobs.length != 0) {
     let exportData = {};
     exportData.audioBlobs = [];
 
@@ -1953,10 +2046,10 @@ function save() {
     const base64AudioDataArray = audioRecorder.audioBlobs.map(blob => {
       const reader = new FileReader();
       return new Promise((resolve, reject) => {
-          reader.onloadend = () => {
-              resolve(reader.result.split(',')[1]); // Extract Base64 data
-          };
-          reader.readAsDataURL(blob);
+        reader.onloadend = () => {
+          resolve(reader.result.split(',')[1]); // Extract Base64 data
+        };
+        reader.readAsDataURL(blob);
       });
     });
 
@@ -1964,32 +2057,32 @@ function save() {
 
     Promise.all(base64AudioDataArray)
       .then(audioDataArray => {
-          const jsonData = {
-              audioBlobs: audioDataArray,
-          };
+        const jsonData = {
+          audioBlobs: audioDataArray,
+        };
 
-          jsonDataStr = JSON.stringify(jsonData);
-          
+        jsonDataStr = JSON.stringify(jsonData);
 
-          const filename = prompt("Enter a filename for the JSON file:", "data.json");
 
-          if (filename) {
-      
-            const jsonDataString = jsonDataStr;
-            const blob = new Blob([jsonDataString], { type: 'application/json' });
-      
-            const blobURL = URL.createObjectURL(blob);
-      
-            const downloadLink = document.createElement('a');
-            downloadLink.href = blobURL;
-            downloadLink.download = filename;
-            downloadLink.textContent = 'Download JSON';
-      
-            document.getElementById("downloadLink").innerHTML = "";
-            document.getElementById("downloadLink").appendChild(downloadLink);
-            console.log(jsonDataString);
-            downloadLink.click();
-          }
+        const filename = prompt("Enter a filename for the JSON file:", "data.json");
+
+        if (filename) {
+
+          const jsonDataString = jsonDataStr;
+          const blob = new Blob([jsonDataString], { type: 'application/json' });
+
+          const blobURL = URL.createObjectURL(blob);
+
+          const downloadLink = document.createElement('a');
+          downloadLink.href = blobURL;
+          downloadLink.download = filename;
+          downloadLink.textContent = 'Download JSON';
+
+          document.getElementById("downloadLink").innerHTML = "";
+          document.getElementById("downloadLink").appendChild(downloadLink);
+          console.log(jsonDataString);
+          downloadLink.click();
+        }
       })
       .catch(err => console.error("Error processing audio blobs: ", err));
   }
@@ -2000,13 +2093,13 @@ var fileInput = document.getElementById("fileInput");
 var playNextRecordedTrack = false;
 var audioAnimTimeout = null;
 
-document.addEventListener('playRecordedAudio', function(event){
+document.addEventListener('playRecordedAudio', function (event) {
   //console.log("play audio");
   playNextRecordedTrack = true;
   playAudio()
 })
 
-document.addEventListener('stopRecordedAudio', function(event){
+document.addEventListener('stopRecordedAudio', function (event) {
   //console.log("stop audio");
   playNextRecordedTrack = false;
   stopRecordingPlayback();
@@ -2016,32 +2109,32 @@ var audioRecordingElement = null;
 var recordingPlaybackAnimTimeout = null;
 
 function playRecording(recordedChunks) {
-    if (recordedChunks.length === 0) {
-        console.log("No recording available.");
-        return;
-    }else{
+  if (recordedChunks.length === 0) {
+    console.log("No recording available.");
+    return;
+  } else {
 
-      const blob = new Blob(recordedChunks, { type: 'audio/wav; codecs=MS_PCM' });
+    const blob = new Blob(recordedChunks, { type: 'audio/wav; codecs=MS_PCM' });
 
-      if(blob.size > 0){
-        const url = URL.createObjectURL(blob);
-        audioRecordingElement = document.getElementById("audioElem");
-  
-        audioRecordingElement.src = url;
-        audioRecordingElement.load();
-        if(playNextRecordedTrack){
-          recordingPlaybackAnimTimeout = setTimeout(
-            muteRecordingPlaybackAnimation,
-            10000,
-            hmiState
-          );
-          audioRecordingElement.play();
-        }
-      }
-      else{
-        console.log("Recording failed check microphone configuration settings.");
+    if (blob.size > 0) {
+      const url = URL.createObjectURL(blob);
+      audioRecordingElement = document.getElementById("audioElem");
+
+      audioRecordingElement.src = url;
+      audioRecordingElement.load();
+      if (playNextRecordedTrack) {
+        recordingPlaybackAnimTimeout = setTimeout(
+          muteRecordingPlaybackAnimation,
+          10000,
+          hmiState
+        );
+        audioRecordingElement.play();
       }
     }
+    else {
+      console.log("Recording failed check microphone configuration settings.");
+    }
+  }
 }
 
 
@@ -2050,24 +2143,24 @@ var a_source = null;
 var decodedAudioStore = null;
 var fileContent = null;
 
-fileInput.addEventListener("change", function(event) {
+fileInput.addEventListener("change", function (event) {
   const selectedFile = event.target.files[0];
   audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
   if (selectedFile) {
     const reader = new FileReader();
 
-    reader.onload = function(event) {
+    reader.onload = function (event) {
       fileContent = event.target.result;
-      audioContext.decodeAudioData(fileContent.slice(0), function(decodedAudio) {
+      audioContext.decodeAudioData(fileContent.slice(0), function (decodedAudio) {
 
-          decodedAudioStore = decodedAudio;
-          a_source = audioContext.createBufferSource();
-          a_source.buffer = decodedAudioStore;
+        decodedAudioStore = decodedAudio;
+        a_source = audioContext.createBufferSource();
+        a_source.buffer = decodedAudioStore;
 
-          a_source.connect(audioContext.destination);
+        a_source.connect(audioContext.destination);
 
-          audioElement.src = URL.createObjectURL(selectedFile);
+        audioElement.src = URL.createObjectURL(selectedFile);
       });
     };
 
@@ -2075,32 +2168,32 @@ fileInput.addEventListener("change", function(event) {
   }
 });
 
-function stopRecordingPlayback(){
+function stopRecordingPlayback() {
   muteRecordingPlaybackAnimation();
 
-  if(recordingPlaybackAnimTimeout){
+  if (recordingPlaybackAnimTimeout) {
     clearTimeout(recordingPlaybackAnimTimeout);
   }
 
-  if(a_source == null){
-    if(audioRecordingElement != null){
+  if (a_source == null) {
+    if (audioRecordingElement != null) {
       audioRecordingElement.pause();
-      audioRecordingElement.currentTime = 0; 
+      audioRecordingElement.currentTime = 0;
     }
   }
-  else{
+  else {
     a_source.stop();
   }
 }
 
 export function playAudio() {
   console.log("play");
-  if(a_source == null){
+  if (a_source == null) {
     playRecording(audioRecorder.audioBlobs);
   }
-  else{
+  else {
     audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    if(playNextRecordedTrack){
+    if (playNextRecordedTrack) {
       recordingPlaybackAnimTimeout = setTimeout(
         muteRecordingPlaybackAnimation,
         10000,
@@ -2116,64 +2209,64 @@ export function playAudio() {
 }
 
 export function initializeRecordingDuration() {
-    showRecordingDuration("00:00:00");
+  showRecordingDuration("00:00:00");
 
-    durationTimer = setInterval(() => {
-        let duration = computeRecordingDuration(audioRecordStartTime);
-        console.log("Start time" + audioRecordStartTime);
-        console.log("Recording " + duration);
-        showRecordingDuration(duration);
-    }, 1000); 
+  durationTimer = setInterval(() => {
+    let duration = computeRecordingDuration(audioRecordStartTime);
+    console.log("Start time" + audioRecordStartTime);
+    console.log("Recording " + duration);
+    showRecordingDuration(duration);
+  }, 1000);
 }
 
 export function showRecordingDuration(duration) {
-    durationTag.innerHTML = duration;
+  durationTag.innerHTML = duration;
 
-    if (checkAudioDurationThreshold(duration)) {
-        stopAudioRecording();
-    }
+  if (checkAudioDurationThreshold(duration)) {
+    stopAudioRecording();
+  }
 }
 
 export function checkAudioDurationThreshold(duration) {
-    let timers = duration.split(":");
+  let timers = duration.split(":");
 
-    if (timers[2] === MAX_RECORDING_TIME_S)
-        return true;
-    else 
-        return false;
+  if (timers[2] === MAX_RECORDING_TIME_S)
+    return true;
+  else
+    return false;
 }
 
 export function computeRecordingDuration(startTime) {
-    let currentTime = new Date();
+  let currentTime = new Date();
 
-    let timeDelta = currentTime - startTime;
+  let timeDelta = currentTime - startTime;
 
-    let timeDeltaS = timeDelta / 1000;
+  let timeDeltaS = timeDelta / 1000;
 
-    let seconds = Math.floor(timeDeltaS % 60);
+  let seconds = Math.floor(timeDeltaS % 60);
 
-    seconds = seconds < 10 ? "0" + seconds : seconds;
+  seconds = seconds < 10 ? "0" + seconds : seconds;
 
-    let timeDeltaM = Math.floor(timeDeltaS / 60);
+  let timeDeltaM = Math.floor(timeDeltaS / 60);
 
-    let minutes = timeDeltaM % 60; 
-    minutes = minutes < 10 ? "0" + minutes : minutes;
+  let minutes = timeDeltaM % 60;
+  minutes = minutes < 10 ? "0" + minutes : minutes;
 
-    return  "00:" + minutes + ":" + seconds;
+  return "00:" + minutes + ":" + seconds;
 }
 
-document.addEventListener('modeSwitch', function(event){
+document.addEventListener('modeSwitch', function (event) {
   window.hmiState.simMode = event.detail.message;
-  if(window.hmiState.simMode == "Animal_Mode"){
+  if (window.hmiState.simMode == "Animal_Mode") {
     setSimModeAnimal();
   }
-  else if(window.hmiState.simMode == "Recording_Mode"){
+  else if (window.hmiState.simMode == "Recording_Mode") {
     setSimModeRecording();
   }
-  else if(window.hmiState.simMode == "Recording_Mode_V2"){
+  else if (window.hmiState.simMode == "Recording_Mode_V2") {
     setSimModeRecordingV2();
   }
-  else if(window.hmiState.simMode == "Stop"){
+  else if (window.hmiState.simMode == "Stop") {
     stopSimulator();
   }
 });
