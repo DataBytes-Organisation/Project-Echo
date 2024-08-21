@@ -59,6 +59,8 @@
     <title>Echo | Welcome</title>
   </head>
   <body>
+
+
     
     <div class="screen" id="screen" onclick="fadeAnim(); openSIMULATOR()">  
 			<div class="screen-image"></div>  
@@ -83,6 +85,10 @@
 
 
     <div class="container" style="width:100% !important; margin-left: 0px !important; padding: 12px !important;">
+      <div id="zoom-controls" class="hidden">
+        <button id="zoom-in">+</button>
+        <button id="zoom-out">-</button>
+      </div>
       <!-- Row 1 with nav spanning the entire width and a fixed top-->
       
       <div class="hamburger-icon" onclick="toggleNav()">
@@ -99,11 +105,12 @@
       </div>
 
       <!-- Row 2 with main contents spanning the entire width-->
-      
+        
       <div class="row main bg-black" style="padding: 0px !important;">
         <div class="col-md-12 col-main" style="padding: 0px !important;"> 
           
           <div id="basemap"></div>
+          
           <div id="editFormWrapper">
             <form id="editForm">
               <!-- Add your form fields here -->
@@ -135,6 +142,7 @@
           </div>
 
           <div id="menu" class="menu">
+            
             <div class="menu-header"><div class="image-container">
               <img src="./images/tabIcons/logo-removebg.png" alt="project echo logo">
             </div>
@@ -840,6 +848,18 @@
 
 <script>
 
+  //Zoom Functionality
+
+  document.getElementById("zoom-in").addEventListener("click", function() {
+    const view = hmiState.basemap.getView();
+    view.setZoom(view.getZoom() + 1); // Zoom in by 1 level
+  });
+
+  document.getElementById("zoom-out").addEventListener("click", function() {
+      const view = hmiState.basemap.getView();
+      view.setZoom(view.getZoom() - 1); // Zoom out by 1 level
+  });
+
   const iconDicts = {};
   var displayedAnimals = new Set();
   var hiddenAnimals = new Set();
@@ -1323,14 +1343,24 @@ function convertSpeciesToCommon(species){
   }
   
   function openMenu() {
+    const body = document.body; // or use another container if needed
+    if (!body.classList.contains('menu-expanded')) {
+        body.classList.remove('menu-collapsed');
+        body.classList.add('menu-expanded');
+    }
     document.getElementById("menu").style.width = "100vw";
     document.getElementById("menu").style.height = "100%";
     hamburgerStatus = true;
     openTab("filter-menu")
-	document.getElementById("pink-line").style.width = "100vw";
+	  document.getElementById("pink-line").style.width = "100vw";
   }
 
   function closeMenu() {
+    const body = document.body; // or use another container if needed
+    if (!body.classList.contains('menu-collapsed')) {
+        body.classList.remove('menu-expanded');
+        body.classList.add('menu-collapsed');
+    }
     document.getElementById("menu").style.width = "0%";
     document.getElementById("menu").style.height = "0%";
     hamburgerStatus = false;
@@ -1392,7 +1422,9 @@ function convertSpeciesToCommon(species){
   function openSIMULATOR(){
     if(overlay){
       closeOverlay(overlay)
+      
     }
+    document.getElementById("zoom-controls").classList.remove("hidden");
     //console.log("Opening Simulator...")
   }
 

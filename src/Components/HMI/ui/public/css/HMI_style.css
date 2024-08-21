@@ -2035,3 +2035,61 @@ input[type="radio"]:not(:disabled)+span:hover:before {
     cursor: pointer;
     margin-top: 20px;
 }
+
+
+.hidden {
+  display: none;
+}
+
+
+#zoom-controls {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+  display: flex;
+  gap: 5px;
+  transition: right 0.3s ease-in-out;
+}
+
+
+#zoom-controls button {
+  width: 40px;
+  height: 40px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  outline: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+
+#zoom-controls button:hover {
+  background-color: rgba(255, 255, 255, 1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+
+#zoom-controls button:active {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+
+#zoom-controls button i {
+  font-size: 16px;
+  color: #333;
+}
+
+
+.menu-expanded #zoom-controls {
+  right: 600px;
+}
+
+.menu-collapsed #zoom-controls{
+  right: 30px;
+}
