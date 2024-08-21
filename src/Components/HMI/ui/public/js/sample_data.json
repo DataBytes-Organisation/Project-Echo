@@ -1169,11 +1169,11 @@
     {
       "species": "Phylidonyris niger",
       "common": "White-cheeked Honeyeater",
-      "summary": "Phylidonyris niger, commonly known as the White-cheeked honeyeater, is a small bird species native to southeastern Australia. It is found in a variety of habitats including forests, woodlands, and heathlands, and is known for its distinctive black and white plumage.",
+      "summary": "Phylidonyris niger, commonly known as the White-cheeked honeyeater, is a small bird species native to south-west corner of Australia. It is found in a variety of habitats including forests, woodlands, and heathlands, and is known for its distinctive black and white plumage.",
       "description": [
         "White-cheeked honeyeaters feed mainly on nectar from a range of flowers, but also eat insects and other small invertebrates.",
         "They are highly territorial and will defend their feeding and nesting areas aggressively against other birds.",
-        "Breeding season for this species is from August to January, and they typically build their nests in shrubs or trees using twigs, bark, and grass.",
+        "Breeding season for this species is from August to November and March to May, and they typically build their nests in shrubs or trees using twigs, bark, and grass.",
         "Females lay 2-3 eggs, which are incubated for around 14 days before hatching.",
         "The White-cheeked honeyeater is a common and widespread species, and is not currently considered to be threatened. It is a popular bird for birdwatchers and is often seen in suburban gardens and parks."
       ],
@@ -1221,7 +1221,7 @@
     {
       "species": "Platycercus adscitus",
       "common": "Pale-headed Rosella",
-      "summary": "Platycercus adscitus, commonly known as the Pale-headed Rosella, is a medium-sized parrot species found in eastern and southeastern Australia. This bird species is known for its colorful plumage and distinctive yellow and green colors.",
+      "summary": "Platycercus adscitus, commonly known as the Pale-headed Rosella, is a medium-sized parrot species found in northeastern Australia. This bird species is known for its colorful plumage and distinctive yellow and green colors.",
       "description": [
         "The Pale-headed Rosella feeds mainly on seeds, fruit, flowers, and insects.",
         "This species is highly social and often seen in flocks of up to 50 birds.",
@@ -1273,7 +1273,7 @@
     {
       "species": "Pomatostomus superciliosus",
       "common": "White-browed Babbler",
-      "summary": "Pomatostomus superciliosus, commonly known as the White-browed Babbler, is a small bird species found in Australia. This bird species is known for its social behavior and unique vocalizations.",
+      "summary": "Pomatostomus superciliosus, commonly known as the White-browed Babbler, is a small bird species found in open woodlands and shrubby areas of central and southern Australia. This bird species is known for its social behavior and unique vocalizations.",
       "description": [
         "The White-browed Babbler feeds mainly on insects, seeds, spiders, amphibians, crustaceans, reptiles and fruits.",
         "This species is highly social and often seen in family groups of up to 10 birds.",
@@ -1490,7 +1490,7 @@
         "The white-browed robin is known for its beautiful song, which is a complex series of whistles and trills.",
         "While some populations of White-browed Robins are sedentary, others undertake seasonal migrations in response to changes in food availability or environmental conditions. "
       ],
-      "img": "The White-browed Robin is distributed across various regions of Australia and New Guinea"
+      "img": ""
     },
     {
       "species": "Poodytes gramineus",
@@ -1507,21 +1507,21 @@
     },
     {
       "species": "Porphyrio porphyrio",
-      "common": "Purple Swamphen",
-      "summary": "The Porphyrio porphyrio, also known as the Purple Swamphen, is a large and colorful bird that is native to the wetlands of Africa, southern Europe, and Asia. These birds are known for their distinctive plumage and loud calls, and they are often seen wading through the shallow waters of their habitats.",
+      "common": "Western Swamphen",
+      "summary": "The Porphyrio porphyrio, also known as the Western Swamphen, is a large and colorful bird that is native to the wetlands of Africa, southern Europe, and Asia. These birds are known for their distinctive plumage and loud calls, and they are often seen wading through the shallow waters of their habitats.",
       "description": [
-        "The Purple Swamphen is a large bird that can grow up to 50 centimeters in length and weigh up to 1 kilogram. They have a distinctive blue-purple plumage, red bill, and a red and yellow shield on their forehead.",
+        "The Western Swamphen is a large bird that can grow up to 50 centimeters in length and weigh up to 1 kilogram. They have a distinctive blue-purple plumage, red bill, and a red and yellow shield on their forehead.",
         "These birds are known for their loud and distinctive calls, which they use to communicate with each other and defend their territory. Their calls are often heard at dawn and dusk.",
-        "The Purple Swamphen is an omnivore that feeds on a variety of foods, including plants, insects, fish, and small vertebrates. They are often seen wading in the shallow waters of their habitat, using their long toes to grasp and catch their prey.",
+        "The Western Swamphen is an omnivore that feeds on a variety of foods, including plants, insects, fish, and small vertebrates. They are often seen wading in the shallow waters of their habitat, using their long toes to grasp and catch their prey.",
         "These birds are known to be strong and agile fliers, and they are able to fly short distances to escape predators or reach new habitats.",
-        "Purple Swamphens are often observed living in small groups or pairs, particularly during the breeding season."
+        "Western Swamphen are often observed living in small groups or pairs, particularly during the breeding season."
       ],
       "img": ""
     },
     {
       "species": "Psaltoda moerens",
       "common": "Redeye Cicada",
-      "summary": "The Psaltoda moerens, also known as the Redeye cicada, is a large and colorful cicada that is native to eastern Australia. These cicadas are known for their distinctive calls, which are often heard during the summer months.",
+      "summary": "The Psaltoda moerens, also known as the Redeye cicada, is a large and colorful cicada that is native to south-east of Australia. These cicadas are known for their distinctive calls, which are often heard during the summer months.",
       "description": [
         "The Redeye cicada is a large and colorful insect that can grow up to 4.5 centimeters in length. They have a black body with bright red eyes and wings that are mottled with brown and black.",
         "These cicadas are known for their loud and distinctive calls, which are created by vibrating their tymbals, a specialized structure in their abdomen. The calls are used to attract mates and defend their territory.",
@@ -1534,7 +1534,7 @@
     {
       "species": "Psephotellus varius",
       "common": "Varied Lorikeet",
-      "summary": "The Varied Lorikeet (Psephotellus varius) is a colorful species of parrot native to the eastern and southeastern parts of Australia. These parrots are known for their striking plumage, which is predominantly green with blue and yellow markings on the wings and tail.",
+      "summary": "The Varied Lorikeet (Psephotellus varius) is a colorful species of parrot native to the arid scrublands and lightly timbered grasslands in the interior of southern Australia. These parrots are known for their striking plumage, which is predominantly green with blue and yellow markings on the wings and tail.",
       "description": [
         "Varied Lorikeets can grow up to 28cm in length and weigh between 70 and 90g.",
         "These parrots are highly social and usually travel in flocks of up to 20 individuals.",
@@ -1804,37 +1804,36 @@
     {
       "species": "Rhipidura albiscapa",
       "common": "Grey Fantail",
-      "summary": "The Rhipidura albiscapa, also known as the grey fantail, is a small passerine bird found throughout Australia and New Zealand.",
+      "summary": "The Grey Fantail, scientifically known as Rhipidura albiscapa, is a small passerine bird found throughout Australia.",
       "description": [
-        "The grey fantail is a common and widespread species, often seen in parks and gardens.",
-        "They are known for their acrobatic flight, and can twist and turn mid-flight to catch insects.",
-        "Grey fantails build a cup-shaped nest using bark, spider webs, and other materials, and typically lay 3-4 eggs at a time.",
-        "",
-        ""
+          "The Grey Fantail is a common and widespread species, often spotted in parks, gardens, and woodlands. It has adapted well to urban environments and is frequently seen in suburban areas.",
+          "It is known for its acrobatic flight capabilities. The Grey Fantail uses its agile, twisting flight patterns to catch insects in mid-air, often performing a distinctive flicking motion with its tail.",
+          "The Grey Fantail builds a cup-shaped nest using materials such as bark, spider webs, and plant fibers. They typically lay 3 to 4 eggs per clutch. The eggs are usually pale with speckled markings, and the incubation period lasts approximately 12 to 14 days.",
+          "This species exhibits a range of calls and songs that are used for communication, especially during the breeding season."
       ],
       "img": ""
     },
+  
     {
       "species": "Rhipidura leucophrys",
       "common": "Willie Wagtail",
-      "summary": "The Rhipidura leucophrys, or willie wagtail, is a small bird found in Australia, New Guinea, and the Solomon Islands.",
+      "summary": "The Rhipidura leucophrys, or Willie Wagtail, is a small bird found in Australia, New Guinea, and the Solomon Islands.",
       "description": [
-        "The willie wagtail is a common and well-known bird in Australia, often seen in urban areas and open woodlands.",
-        "They are known for their distinctive tail wagging, which they use to communicate with each other and to intimidate potential predators.",
-        "Willie wagtails build a small, cup-shaped nest made of grass and other materials, and typically lay 2-4 eggs at a time.",
-        "",
-        ""
+          "The Willie Wagtail is a common and well-known bird in Australia, often seen in urban areas and open woodlands.",
+          "They are known for their distinctive tail wagging, which they use to communicate with each other and to intimidate potential predators.",
+          "Willie Wagtails build a small, cup-shaped nest made of grass and other materials, and typically lay 2 to 3 eggs at a time.",
+          "The eggs are usually pale with speckled markings, and the incubation period lasts approximately 12 to 14 days."
       ],
       "img": ""
     },
     {
       "species": "Rhipidura rufifrons",
       "common": "Rufous Fantail",
-      "summary": "The Rhipidura rufifrons, or rufous fantail, is a small passerine bird found throughout Australia and parts of Indonesia.",
+      "summary": "The Rhipidura rufifrons, or Rufous Fantail, is a small passerine bird found in northern Australia and parts of New Guinea.",
       "description": [
-        "The rufous fantail is known for its striking reddish-brown coloration on its head and upper body.",
+        "The Rufous Fantail is known for its striking reddish-brown coloration on its head and upper body.",
         "They are often found in dense forests and woodlands, and use their long, narrow beaks to catch insects and other small prey.",
-        "Rufous fantails build a small, cup-shaped nest using grass and other materials, and typically lay 2-3 eggs at a time.",
+        "Rufous Fantails build a small, cup-shaped nest using grass and other materials, and typically lay 3-4 eggs at a time.",
         "",
         ""
       ],
@@ -1869,130 +1868,125 @@
     {
       "species": "Sericornis frontalis",
       "common": "White-browed Scrubwren",
-      "summary": "Sericornis frontalis, also known as the White-browed Scrubwren, is a small passerine bird found in Australia and New Guinea. The species is known for its distinctive white eyebrow stripe and its habit of foraging on the ground.",
+      "summary": "Sericornis frontalis, also known as the White-browed Scrubwren, is a small passerine bird found in Australia. The species is known for its distinctive white eyebrow stripe and its habit of foraging on the ground.",
       "description": [
         "The species is often found in dense vegetation, such as rainforests and shrublands.",
         "Sericornis frontalis has a diet that consists mainly of insects, spiders, and other small invertebrates.",
-        "The species is known to form monogamous pairs and build dome-shaped nests made of grass and other vegetation.",
-        "",
-        ""
+        "They form monogamous pairs or cooperative breeding groups, building dome-shaped nests made of grass and other vegetation.",
+        "They typically lay 2-3 eggs per clutch, which are incubated by the female for 17-22 days.",
+        "White-browed Scrubwrens are not globally threatened but are locally vulnerable to habitat loss."
       ],
       "img": ""
     },
     {
       "species": "Sericornis magnirostra",
       "common": "Large-billed Scrubwren",
-      "summary": "Sericornis magnirostra, commonly known as the Large-billed scrubwren, is a small passerine bird that belongs to the family of birds known as the Maluridae. The species is endemic to Australia, and can be found throughout the eastern and southern parts of the country, including Tasmania.",
+      "summary": "Sericornis magnirostra, commonly known as the Large-billed Scrubwren, is a small passerine bird found throughout the eastern and southern parts of Australia, including Tasmania.",
       "description": [
-        "As its name suggests, the Large-billed scrubwren has a particularly large bill, which it uses to forage for insects and other invertebrates amongst the undergrowth and leaf litter.",
-        "Despite its small size, the Large-billed scrubwren has a loud and distinctive call, which is often described as a musical trill.",
-        "The species is known for its remarkable agility, and is capable of hopping and climbing through dense vegetation with ease.",
-        "The Large-billed scrubwren is a monogamous species, with pairs staying together for multiple breeding seasons.",
-        "The species is not considered to be threatened, and is classified as of 'Least Concern' by the International Union for Conservation of Nature (IUCN). However, its range has contracted in some areas due to habitat loss and degradation caused by human activities, such as land clearing and urbanisation."
+        "The Large-billed Scrubwren has a particularly large bill, which it uses to forage for insects and other invertebrates.",
+        "Despite its small size, it has a loud and distinctive call, often described as a musical trill.",
+        "The species is agile, capable of hopping and climbing through dense vegetation with ease.",
+        "They form monogamous pairs that stay together for multiple breeding seasons.",
+        "The species is classified as 'Least Concern' but faces habitat loss in some areas."
       ],
       "img": ""
     },
     {
       "species": "Sericulus chrysocephalus",
       "common": "Regent Bowerbird",
-      "summary": "Sericulus chrysocephalus, commonly known as the Regent Bowerbird, is a bird species belonging to the family Ptilonorhynchidae. They are found in the rainforests of eastern Australia.",
+      "summary": "Sericulus chrysocephalus, commonly known as the Regent Bowerbird, is found in the rainforests of eastern Australia.",
       "description": [
-        "They have a striking plumage with black and bright yellow feathers.",
-        "They are known for their elaborate bower-building behavior, where males construct intricate structures made of sticks and decorate them with colorful objects like berries and flowers to attract females.",
-        "They are omnivorous and feed on fruits, insects, and small animals.",
-        "They have a loud, whistling call that is often heard in the early morning.",
-        ""
+        "They have striking black and bright yellow plumage.",
+        "Males build elaborate bowers decorated with colorful objects to attract females.",
+        "They are omnivorous, feeding on fruits, insects, and small animals.",
+        "Their loud, whistling call is often heard in the early morning."
       ],
       "img": ""
     },
     {
       "species": "Smicrornis brevirostris",
       "common": "Weebill",
-      "summary": "Smicrornis brevirostris, also known as Weebill, is a small bird species belonging to the family Acanthizidae. They are found in Australia and are one of the smallest birds in the world.",
+      "summary": "Smicrornis brevirostris, also known as Weebill, is a small bird species found in Australia and is one of the smallest birds in the world.",
       "description": [
-        "They have a short, pointed bill and a greenish-brown plumage.",
-        "They are insectivorous and feed on insects, spiders, and other small invertebrates.",
-        "They build compact, dome-shaped nests made of bark and grass, which are usually suspended from the branches of a tree.",
-        "They have a high-pitched, trilling call that is often heard in flocks.",
-        ""
+        "They have a short, pointed bill and greenish-brown plumage.",
+        "They feed on insects, spiders, and other small invertebrates.",
+        "They build compact, dome-shaped nests made of bark and grass.",
+        "They have a high-pitched, trilling call often heard in flocks."
       ],
       "img": ""
     },
     {
       "species": "Sphecotheres vieilloti",
-      "common": "Australasian figbird",
-      "summary": "Sphecotheres vieilloti, commonly known as the Australasian figbird, is a medium-sized bird that belongs to the family of birds known as the Oriolidae. The species is native to Australia, where it is found primarily in the coastal regions of eastern and northern parts of the country, as well as in some areas of Papua New Guinea.",
+      "common": "Australasian Figbird",
+      "summary": "Sphecotheres vieilloti, commonly known as the Australasian Figbird, is found in the coastal regions of eastern and northern Australia, as well as in Papua New Guinea.",
       "description": [
-        "The Australasian figbird is named after the French ornithologist, Louis Jean Pierre Vieillot, who was a prolific describer of bird species in the late 18th and early 19th centuries.",
-        "The species is known for its distinctive plumage, which is predominantly green with a yellowish-brown throat and chest, and a red eye-ring.",
-        "The Australasian figbird is so named because it feeds primarily on figs, although it will also consume other fruits, nectar, and insects.",
-        "The species is highly vocal, with a range of calls that include a variety of whistles, trills, and chattering sounds.",
-        "The Australasian figbird is a common species throughout much of its range and is not considered to be threatened. However, like many other bird species in Australia, it is vulnerable to habitat loss and degradation caused by land clearing and urbanisation."
+        "Named after ornithologist Louis Jean Pierre Vieillot.",
+        "The species has green plumage with a yellowish-brown throat and chest, and a red eye-ring.",
+        "Primarily feeds on figs but also consumes other fruits, nectar, and insects.",
+        "Highly vocal with a range of calls including whistles, trills, and chatters."
       ],
       "img": ""
     },
     {
       "species": "Spilopelia chinensis",
       "common": "Spotted Dove",
-      "summary": "Spilopelia chinensis, also known as the spotted dove, is a species of dove found throughout Asia and parts of Australia.",
+      "summary": "Spilopelia chinensis, also known as the Spotted Dove, is found throughout Asia and parts of Australia.",
       "description": [
-        "The spotted dove is a popular cage bird due to its gentle nature and pleasant cooing calls.",
-        "They are small in size, with a speckled brown plumage and a distinctive black spot on the lower neck.",
-        "Spotted doves are considered a pest species in some areas due to their habit of feeding on crops and seeds.",
-        "",
-        ""
+        "The Spotted Dove is a popular cage bird due to its gentle nature and pleasant cooing calls.",
+        "They have speckled brown plumage with a distinctive black spot on the lower neck.",
+        "Considered a pest in some areas due to feeding on crops and seeds."
       ],
       "img": ""
     },
     {
       "species": "Stagonopleura guttata",
       "common": "Diamond Firetail",
-      "summary": "Stagonopleura guttata, also known as the diamond firetail, is a small species of bird found in Australia",
+      "summary": "Stagonopleura guttata, also known as the Diamond Firetail, is a small species of bird found in Australia.",
       "description": [
-        "Diamond firetails have a striking appearance with a mix of black, white, and red feathers on their bodies and a distinctive red eye-ring.",
-        "They are known for their acrobatic flying displays during courtship and territorial disputes.",
-        "Diamond firetails are primarily seed-eaters and can be found in a variety of habitats, including grasslands and forests.",
-        "",
-        ""
+          "Diamond Firetails have a striking appearance with a mix of black, white, and red feathers on their bodies and a distinctive red eye-ring.",
+          "They are known for their acrobatic flying displays during courtship and territorial disputes.",
+          "Diamond Firetails are primarily seed-eaters and can be found in a variety of habitats, including grasslands and forests.",
+          "They build nests in shrubs or trees and typically lay 4-6 eggs per clutch.",
+          "The species is listed as Near Threatened due to habitat loss and fragmentation."
       ],
       "img": ""
     },
     {
       "species": "Stipiturus ruficeps",
       "common": "Rufous-crowned Emuwren",
-      "summary": "Stipiturus ruficeps, commonly known as the Rufous-crowned Emuwren, is a small bird found in Australia. The bird is known for its distinctive vocalizations and its beautiful appearance.",
+      "summary": "Stipiturus ruficeps, commonly known as the Rufous-crowned Emuwren, is a small bird found in Australia known for its distinctive vocalizations and beautiful appearance.",
       "description": [
-        "Rufous-crowned Emuwrens are tiny birds, measuring only around 8 cm in length and weighing just a few grams.",
-        "The male birds have beautiful rufous crowns and black faces, while the females have a greyish-brown crown and a brown face.",
-        "Stipiturus ruficeps is found in southern Australia, where it inhabits shrublands and heathlands.",
-        "These birds are insectivorous, and feed on a variety of small insects and spiders.",
-        "During the breeding season, the male Rufous-crowned Emuwren builds a spherical nest from grass and other plant materials. The nest is usually built close to the ground and is lined with feathers."
+          "Rufous-crowned Emuwrens are tiny birds, measuring only around 8 cm in length and weighing just a few grams.",
+          "Male birds have beautiful rufous crowns and black faces, while females have a greyish-brown crown and a brown face.",
+          "Stipiturus ruficeps is found in southern Australia, inhabiting shrublands and heathlands.",
+          "These birds are insectivorous, feeding on a variety of small insects and spiders.",
+          "During the breeding season, males build spherical nests from grass and other plant materials, usually close to the ground."
       ],
       "img": ""
     },
     {
       "species": "Stizoptera bichenovii",
       "common": "Double-barred Finch",
-      "summary": "Stizoptera bichenovii, commonly known as the Double-barred finch, is a small passerine bird that belongs to the family of birds known as the Estrildidae. The species is endemic to Australia, and is found in the eastern and southern parts of the country, including Tasmania.",
+      "summary": "Stizoptera bichenovii, commonly known as the Double-barred Finch, is a small passerine bird endemic to Australia.",
       "description": [
-        "The Double-barred finch is named after the distinctive double bars that run across its wings, which are black and white in colour.",
-        "The species is sexually dimorphic, with the males having a brighter and more vibrant plumage than the females.",
-        "The Double-barred finch is a social bird, and is often found in small flocks, especially during the breeding season.",
-        "The species feeds primarily on grass seeds, but will also consume insects and other invertebrates when they are available.",
-        "The Double-barred finch is a popular aviary bird, and is kept as a pet by many bird enthusiasts around the world."
+          "The Double-barred Finch is named for the distinctive double bars that run across its wings, which are black and white.",
+          "The species is sexually monomorphic, meaning males and females look alike, with subtle differences in intensity of coloration.",
+          "Double-barred Finches are social birds, often found in small flocks, especially during the breeding season.",
+          "They feed primarily on grass seeds but also consume insects and other invertebrates.",
+          "Popular as aviary birds, they are kept as pets by many bird enthusiasts."
       ],
       "img": ""
     },
     {
       "species": "Stomiopera unicolor",
       "common": "White-gaped Honeyeater",
-      "summary": "Stomiopera unicolor, commonly known as the White-gaped honeyeater, is a small bird that belongs to the family of birds known as the Meliphagidae. The species is endemic to Australia, and can be found throughout much of the eastern and southern parts of the country, including Tasmania.",
+      "summary": "Stomiopera unicolor, commonly known as the White-gaped Honeyeater, is a small bird endemic to Australia.",
       "description": [
-        "The White-gaped honeyeater is named after its distinctive white gape, which is the area around its bill.",
-        "The species has a fairly plain plumage, with greyish-brown feathers on its upper body and wings, and paler feathers on its underbelly.",
-        "The White-gaped honeyeater is primarily a nectar-feeder, and plays an important role in pollinating many of Australia's native plants.",
-        "The species is known for its musical and melodious song, which can often be heard in the forests and woodlands where it lives.",
-        "The White-gaped honeyeater is not considered to be threatened, and is classified as of 'Least Concern' by the International Union for Conservation of Nature (IUCN). However, like many other bird species in Australia, it is vulnerable to habitat loss and degradation caused by land clearing and urbanisation."
+          "The White-gaped Honeyeater is named for its distinctive white gape around its bill.",
+          "The species has a fairly plain plumage with greyish-brown feathers on its upper body and wings, and paler feathers on its underbelly.",
+          "Primarily a nectar-feeder, it plays an important role in pollinating many of Australia's native plants.",
+          "Known for its musical and melodious song, often heard in forests and woodlands.",
+          "Classified as 'Least Concern' by the IUCN but vulnerable to habitat loss and degradation."
       ],
       "img": ""
     },
@@ -2001,37 +1995,37 @@
       "common": "Grey Currawong",
       "summary": "Strepera versicolor, commonly known as the Grey Currawong, is a large passerine bird native to southern Australia.",
       "description": [
-        "Grey currawongs are opportunistic feeders and consume a wide variety of food, including insects, fruits, small vertebrates, and even carrion.",
-        "They are known for their distinctive, melodious calls, which can often be heard echoing through mountain ranges and valleys.",
-        "Grey Currawongs conservation efforts are vital for its survival amid habitat threats",
-        "They tend to exhibit bold and curious behavior, with individuals often approaching humans and investigating their surroundings.",
-        "They are known to form tight family groups and can be quite aggressive towards other birds and animals that encroach on their territory."
+          "Grey Currawongs are opportunistic feeders, consuming a wide variety of food including insects, fruits, small vertebrates, and carrion.",
+          "They are known for their distinctive, melodious calls, often heard echoing through mountain ranges and valleys.",
+          "Conservation efforts are vital for its survival amid habitat threats.",
+          "They exhibit bold and curious behavior, often approaching humans and investigating their surroundings.",
+          "Form tight family groups and can be aggressive towards other birds and animals encroaching on their territory."
       ],
       "img": ""
     },
     {
       "species": "Sugomel nigrum",
       "common": "Black Honeyeater",
-      "summary": "Sugomel nigrum, commonly known as the black honeyeater, is a small bird that belongs to the family of birds known as the Meliphagidae. The species is native to Australia, and is found in the arid and semi-arid regions of the country, including the central and western parts of Australia.",
+      "summary": "Sugomel nigrum, commonly known as the Black Honeyeater, is a small bird native to the arid and semi-arid regions of Australia.",
       "description": [
-        "The black honeyeater is named after its black plumage, which is iridescent and has a bluish-green sheen in certain lighting conditions.",
-        "The species has a unique bill shape, which is long, slender, and curved downwards. This allows it to feed on the nectar of flowers that have long corollas, such as those of Grevillea and Eremophila species.",
-        "The black honeyeater is highly mobile, and will often follow the flowering patterns of its preferred plants across the landscape. This means that it is able to move large distances in search of food.",
-        "The species is known for its high-pitched and musical song, which is often heard during the breeding season.",
-        "The black honeyeater is not considered to be threatened, and is classified as of 'Least Concern' by the International Union for Conservation of Nature (IUCN). However, like many other bird species in Australia, it is vulnerable to habitat loss and degradation caused by land clearing and changes in fire regimes."
+          "The Black Honeyeater is named for its black plumage, which has a bluish-green sheen in certain lighting conditions.",
+          "It has a unique bill shape, long, slender, and curved downwards, allowing it to feed on the nectar of flowers with long corollas.",
+          "Highly mobile, it follows the flowering patterns of its preferred plants across the landscape.",
+          "Known for its high-pitched and musical song, often heard during the breeding season.",
+          "Classified as 'Least Concern' by the IUCN but vulnerable to habitat loss and changes in fire regimes."
       ],
       "img": ""
     },
     {
       "species": "Sus scrofa",
       "common": "Wild Boar",
-      "summary": "Sus scrofa , commonly known as the wild pig/wild boar, is a large, omnivorous mammal found in forests and grasslands across Eurasia, North Africa, America and Oceania.",
+      "summary": "Sus scrofa, commonly known as the Wild Pig or Wild Boar, is a large, omnivorous mammal found in forests and grasslands across Eurasia, North Africa, America, and Oceania.",
       "description": [
-        "They have a distinctive appearance with a muscular body, long snout, and prominent tusks.",
-        "Wild boars are known for their intelligence and adaptability, able to survive in a range of habitats from forests to suburban areas.",
-        "They are considered a pest in many areas due to their habit of rooting up crops and damaging property.",
-        "They form close-knit family groups called sounders, comprising adult females and their offspring.",
-        ""
+          "They have a distinctive appearance with a muscular body, long snout, and prominent tusks.",
+          "Wild Boars are known for their intelligence and adaptability, able to survive in a range of habitats from forests to suburban areas.",
+          "Considered a pest in many areas due to their habit of rooting up crops and damaging property.",
+          "Form close-knit family groups called sounders, comprising adult females and their offspring.",
+          "Wild Boars have a significant ecological impact, influencing the composition and structure of their habitats."
       ],
       "img": ""
     },
