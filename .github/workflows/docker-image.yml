@@ -21,6 +21,11 @@ jobs:
       run: rm -rf /opt/hostedtoolcache
       
     - uses: actions/checkout@v3
+
+    - name: Check out Docker files from main
+      run: |
+        git fetch origin main
+        git checkout origin/main -- src/Components/docker-image.yml
     
     - name: Build containers
       run: |
