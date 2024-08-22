@@ -852,12 +852,22 @@
 
   document.getElementById("zoom-in").addEventListener("click", function() {
     const view = hmiState.basemap.getView();
-    view.setZoom(view.getZoom() + 1); // Zoom in by 1 level
+    const currentZoom = view.getZoom();
+    view.animate({
+        zoom: currentZoom + 1,  // Zoom in by 1 level
+        duration: 500,           // Animation duration in milliseconds
+        easing: ol.easing.inAndOut
+    });
   });
 
   document.getElementById("zoom-out").addEventListener("click", function() {
       const view = hmiState.basemap.getView();
-      view.setZoom(view.getZoom() - 1); // Zoom out by 1 level
+      const currentZoom = view.getZoom();
+      view.animate({
+          zoom: currentZoom -1,  // Zoom in by 1 level
+          duration: 500,         // Animation duration in milliseconds
+          easing: ol.easing.inAndOut
+      });
   });
 
   const iconDicts = {};
