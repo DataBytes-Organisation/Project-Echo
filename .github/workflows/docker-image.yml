@@ -21,16 +21,11 @@ jobs:
       run: rm -rf /opt/hostedtoolcache
       
     - uses: actions/checkout@v3
-    
-    - name: Install Docker Compose
-     run: |
-      sudo apt-get update
-      sudo apt-get install docker-compose -y
       
     - name: Build containers
       run: |
         cd src/Components
-        docker-compose build
+        docker compose build
         
     - name: Start containers
       run: |
