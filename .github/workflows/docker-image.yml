@@ -26,7 +26,6 @@ jobs:
       run: |
         git fetch origin main
         git checkout origin/main -- .github/workflows/docker-image.yml
-        git checkout origin/main -- src/Components/docker-compose.yml
     src
     - name: Build containers
       run: |
