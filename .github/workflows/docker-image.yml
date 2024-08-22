@@ -30,7 +30,7 @@ jobs:
     - name: Start containers
       run: |
         cd src/Components
-        docker-compose up -d
+        docker compose up -d
     
     - name: Wait for containers to be ready
       run: sleep 180
@@ -38,7 +38,7 @@ jobs:
     - name: Check running containers
       run: |
         cd src/Components
-        RUNNING_CONTAINERS=$(docker-compose ps | grep 'Up' | wc -l)
+        RUNNING_CONTAINERS=$(docker compose ps | grep 'Up' | wc -l)
         if [ "$RUNNING_CONTAINERS" -eq 9 ]; then
           echo "All containers are up and running."
         else
@@ -49,4 +49,4 @@ jobs:
     - name: Stop and remove containers
       run: |
         cd src/Components
-        docker-compose down
+        docker compose down
