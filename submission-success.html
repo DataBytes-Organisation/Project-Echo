@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Spice Requests</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap');
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: #1a1a1a;
+            color: rgba(247, 186, 206, 1);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: rgba(13, 12, 23, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(247, 186, 206, 0.3);
+            margin: 20px;
+        }
+
+        h2 {
+            color: rgba(247, 186, 206, 1);
+            margin-top: 0;
+            font-size: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid rgba(247, 186, 206, 0.5);
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+        }
+
+        th {
+            background-color: rgba(247, 186, 206, 0.1);
+        }
+
+        tr:nth-child(even) {
+            background-color: rgba(13, 12, 23, 0.5);
+        }
+
+        button {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 15px;
+            color: #1a1a1a;
+        }
+
+        .approve {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .reject {
+            background-color: #f44336;
+            color: white;
+        }
+
+        button:hover {
+            opacity: 0.8;
+        }
+
+        .status-message {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Manage Spice Requests</h2>
+        <table id="requestsTable">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Species Name</th>
+                    <th>Change Type</th>
+                    <th>Request Details</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Rows will be dynamically inserted here -->
+            </tbody>
+        </table>
+        <p id="statusMessage" class="status-message"></p>
+    </div>
+
+    <script>
+        async function fetchRequests() {
+            try {
+                const response = await fetch('http://localhost:8080/requests');
+                if (response.ok) {
+                    const requests = await response.json();
+                    renderTable(requests);
+                } else {
+                    document.getElementById('statusMessage').textContent = 'Failed to fetch requests.';
+                    document.getElementById('statusMessage').style.color = 'red';
+                }
+            } catch (error) {
+                console.error('Error fetching requests:', error);
+                document.getElementById('statusMessage').textContent = `An error occurred. Please try again later. Error: ${error.message}`;
+                document.getElementById('statusMessage').style.color = 'red';
+            }
+        }
+    
+        function renderTable(requests) {
+            const tableBody = document.getElementById('requestsTable').getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = ''; // Clear existing rows
+    
+            requests.forEach(request => {
+                const row = document.createElement('tr');
+    
+                row.innerHTML = `
+                    <td>${request.username}</td>
+                    <td>${request.speciesName}</td>
+                    <td>${request.changeType}</td>
+                    <td>${request.requestedChange}</td>
+                    <td>
+                        <button class="approve" onclick="handleApproval(${request.id})">Approve</button>
+                        <button class="reject" onclick="handleRejection(${request.id})">Reject</button>
+                    </td>
+                `;
+    
+                tableBody.appendChild(row);
+            });
+        }
+    
+        // Functions to handle approval and rejection
+        function handleApproval(requestId) {
+            document.getElementById('statusMessage').textContent = `Request ${requestId} approved.`;
+            document.getElementById('statusMessage').style.color = 'green';
+            // Implement actual logic to handle request approval
+        }
+    
+        function handleRejection(requestId) {
+            document.getElementById('statusMessage').textContent = `Request ${requestId} rejected.`;
+            document.getElementById('statusMessage').style.color = 'red';
+            // Implement actual logic to handle request rejection
+        }
+    
+        // Initial fetch
+        fetchRequests();
+    </script>
+    
+</body>
+</html>
