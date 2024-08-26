@@ -26,24 +26,37 @@ jobs:
       run: |
         git fetch origin main
         git checkout origin/main -- .github/workflows/docker-image.yml
-  
+
+    # New step: Install Docker Compose
+    # This step ensures Docker Compose is installed on the runner since it's not available by default.
+    - name: Install Docker Compose
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y docker-compose
+    
+    # Modified: Using docker-compose instead of docker compose
+    # Replaced `docker compose` with `docker-compose` to match the installation method.
     - name: Build containers
       run: |
         cd src/Components
-        docker compose build
+        docker-compose build
         
+    # Modified: Using docker-compose instead of docker compose
+    # Replaced `docker compose` with `docker-compose` to match the installation method.
     - name: Start containers
       run: |
         cd src/Components
-        docker compose up -d
+        docker-compose up -d
     
     - name: Wait for containers to be ready
       run: sleep 180
       
+    # Modified: Using docker-compose instead of docker compose
+    # Replaced `docker compose` with `docker-compose` to match the installation method.
     - name: Check running containers
       run: |
         cd src/Components
-        RUNNING_CONTAINERS=$(docker compose ps | grep 'Up' | wc -l)
+        RUNNING_CONTAINERS=$(docker-compose ps | grep 'Up' | wc -l)
         if [ "$RUNNING_CONTAINERS" -eq 9 ]; then
           echo "All containers are up and running."
         else
@@ -51,7 +64,9 @@ jobs:
           exit 1
         fi
   
+    # Modified: Using docker-compose instead of docker compose
+    # Replaced `docker compose` with `docker-compose` to match the installation method.
     - name: Stop and remove containers
       run: |
         cd src/Components
-        docker compose down
+        docker-compose down
