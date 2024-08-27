@@ -44,7 +44,8 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
-    
+    <script src = "paymentgateway.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <!-- Axios -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
@@ -1249,6 +1250,17 @@ function convertSpeciesToCommon(species){
     }
     // Update the quantity with the chosen donation amount
     cart[0].quantity=donorAmount;
+    var options = payment(username, donorAmount*100, email);
+      var rzp1 = new Razorpay(options);
+
+      rzp1.open();
+
+      rzp1.on('payment.failed', function (response) {
+        rzp1.close();
+        //payment failed
+      }
+      );
+
     fetch("/api/create-checkout-session", {
       method: "POST",
       headers: {
