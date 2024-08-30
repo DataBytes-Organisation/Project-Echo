@@ -1,87 +1,90 @@
-const express = require('express');
-const router = express.Router();
+const { verifySignUp, client } = require("../middleware");
 const axios = require('axios');
 
+
+// const MESSAGE_API_URL = 'http://localhost:9000/hmi';
 const MESSAGE_API_URL = 'http://ts-api-cont:9000/hmi';
+let token;
+// client.get('JWT', (err, storedToken) => {
+//   if (err) {
+//     console.error('Error retrieving token from Redis:', err);
+//     return null
+//   } else {
+//     console.log('Stored Token:', storedToken);
+//     return storedToken
+//   }
+// }).then(response => token = response)
 
-// Middleware to set headers
-router.use((req, res, next) => {
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, Content-Type, Accept"
-  );
-  next();
-});
+module.exports = function(app) {
+  
 
-// Define routes
-router.get(`/movement_time/:start/:end`, async (req, res) => {
-  const start = req.params.start;
-  const end = req.params.end;
-  try {
+  app.use(function(req, res, next) {
+    // req.headers['Authorization'] = `Bearer ${token}`;
+    res.header(
+      "Access-Control-Allow-Headers",
+      "Origin, Content-Type, Accept"
+    );
+    // console.log("Token inside map requests: ", token);
+    next();
+  });
+
+  app.get(`/movement_time/:start/:end`, async (req, res, next) => {
+    const start = req.params.start
+    const end = req.params.end
     const response = await axios.get(`${MESSAGE_API_URL}/movement_time?start=${start}&end=${end}`);
-    res.send(response.data.length ? response.data : []);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+    if (Object.keys(response.data).length === 0) {
+      res.send([])
+    } else {
+      res.send(response.data);
+    }
+  })
 
-router.get(`/events_time/:start/:end`, async (req, res) => {
-  const start = req.params.start;
-  const end = req.params.end;
-  try {
+  app.get(`/events_time/:start/:end`, async (req, res, next) => {
+    const start = req.params.start
+    const end = req.params.end
     const response = await axios.get(`${MESSAGE_API_URL}/events_time?start=${start}&end=${end}`);
     res.send(response.data);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+    next()
+  })
 
-router.get(`/microphones`, async (req, res) => {
-  try {
+  app.get(`/microphones`, async (req, res, next) => {
     const response = await axios.get(`${MESSAGE_API_URL}/microphones`);
     res.send(response.data);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+    next()
+  })
 
-router.get(`/audio/:id`, async (req, res) => {
-  const id = req.params.id;
-  try {
+  app.get(`/audio/:id`, async (req, res, next) => {
+    const id = req.params.id;
+    //console.log(`${MESSAGE_API_URL}/audio?id=${id}`);
     const response = await axios.get(`${MESSAGE_API_URL}/audio?id=${id}`);
     res.send(response.data);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+    next()
+  })
 
-router.post(`/post_recording`, async (req, res) => {
-  try {
-    const response = await axios.post(`${MESSAGE_API_URL}/post_recording`, req.body);
-    res.send(response.data);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+  app.post(`/post_recording`, async (req, res, next) => {
+    let data = req.body
+    try {
+      const response = await axios.post(`${MESSAGE_API_URL}/post_recording`, data);
+      console.log('Record response:', response.data);
+      res.send(response.data);
+      next()
+    } catch (error) {
+      console.error('Error:', error);
+    }
+    //axios.post(`${MESSAGE_API_URL}/post_recording?data=${recordingData}`);
+  })
 
-router.post(`/sim_control/:control`, async (req, res) => {
-  const control = req.params.control;
-  try {
+  app.post(`/sim_control/:control`, async (req, res, next) => {
+    const control = req.params.control
     const response = await axios.post(`${MESSAGE_API_URL}/sim_control?control=${control}`);
     res.send(response.data);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+    next()
+  })
 
-router.get(`/latest_movement`, async (req, res) => {
-  try {
+  
+  app.get(`/latest_movement`, async (req, res, next) => {
     const response = await axios.get(`${MESSAGE_API_URL}/latest_movement`);
     res.send(response.data);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Export the router
-module.exports = router;
+    next()
+  })
+}
