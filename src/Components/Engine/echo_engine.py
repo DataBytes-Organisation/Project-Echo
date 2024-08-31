@@ -60,7 +60,6 @@ from geopy.distance import geodesic
 
 # database libraries
 import pymongo
-from helpers import melspectrogram_to_cam
 
 # print system information
 print('Python Version           : ', python_version())
@@ -352,7 +351,7 @@ class EchoEngine():
                 audio_event["audioClip"] = self.audio_to_string(audio_clip)
 
                 image = tf.expand_dims(image, 0) 
-                cam = melspectrogram_to_cam.convert(image)
+            
                 image_list = image.numpy().tolist()
             
                 # Run the model via tensorflow serve
@@ -374,8 +373,7 @@ class EchoEngine():
                     audio_event,
                     sample_rate,
                     predicted_class,
-                    predicted_probability,
-                    cam)
+                    predicted_probability)
             
                 image = tf.expand_dims(image, 0) 
             
@@ -438,12 +436,12 @@ class EchoEngine():
                 audio_clip = self.string_to_audio(audio_event['audioClip'])
             
                 image, audio_clip, sample_rate = self.combined_pipeline(audio_clip, "Animal_Mode")
-                cam = melspectrogram_to_cam.convert(image)
+            
                 # update the audio event with the re-sampled audio
                 audio_event["audioClip"] = self.audio_to_string(audio_clip)
                 
                 image = tf.expand_dims(image, 0) 
-
+            
                 image_list = image.numpy().tolist()
             
                 # Run the model via tensorflow serve
@@ -465,8 +463,7 @@ class EchoEngine():
                     audio_event,
                     sample_rate,
                     predicted_class,
-                    predicted_probability,
-                    cam)
+                    predicted_probability)
             
                 image = tf.expand_dims(image, 0) 
             
@@ -480,7 +477,7 @@ class EchoEngine():
     ########################################################################################
     # this function populates the database with the prediction results
     ########################################################################################
-    def echo_api_send_detection_event(self, audio_event, sample_rate, predicted_class, predicted_probability, cam=None):
+    def echo_api_send_detection_event(self, audio_event, sample_rate, predicted_class, predicted_probability):
         
         detection_event = {
             "timestamp": audio_event["timestamp"],
@@ -492,9 +489,8 @@ class EchoEngine():
             "animalTrueLLA": audio_event["animalTrueLLA"], 
             "animalLLAUncertainty": audio_event["animalLLAUncertainty"],
             "audioClip": audio_event["audioClip"],
-            "sampleRate": sample_rate,
-            "cam": cam        
-        },
+            "sampleRate": sample_rate        
+        }
         
         url = 'http://ts-api-cont:9000/engine/event'
         x = requests.post(url, json = detection_event)
