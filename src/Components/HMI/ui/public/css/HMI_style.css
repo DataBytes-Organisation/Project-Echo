@@ -2035,3 +2035,156 @@ input[type="radio"]:not(:disabled)+span:hover:before {
     cursor: pointer;
     margin-top: 20px;
 }
+
+/* Light Theme */
+
+.light-theme {
+  background: #f5f5f5;
+}
+
+.light-theme .title,
+.light-theme h2,
+.light-theme h3 {
+  color: #298405 !important; /* Green color for headings */
+}
+
+.light-theme body {
+  background: #f5f5f5;
+  color: #000; /* Black color for main text */
+  font-size: 17px;
+  font-weight: bold;
+}
+
+.light-theme #blur {
+  background-color: #f5f5f5;
+}
+
+.light-theme .menu-header {
+  background-color: rgb(13, 12, 23, 0.8);
+}
+
+.light-theme #menu {
+  background-color: rgba(245, 245, 245, 0.8);
+}
+
+.light-theme .tabs-button {
+  background-color: rgba(9, 86, 16, 0.463); /* Light green background */
+  color: #000; /* Black text */
+}
+
+.light-theme .tabs-button.active {
+  background-color: rgba(0, 168, 107, 0.8); /* Darker green for active state */
+}
+
+.light-theme #filter-menu-btn,
+.light-theme #popup-menu-btn,
+.light-theme #FAQ-menu-btn,
+.light-theme #SIM-menu-btn,
+.light-theme #donate-menu-btn,
+.light-theme #user-profile-button,
+.light-theme #mic-popup-menu-btn,
+.light-theme #statistics-menu-btn {
+  filter: invert(1) hue-rotate(180deg); /* Invert colors for icon images */
+}
+
+
+.light-theme * {
+  color: #000 !important; /* Black color for all text */
+}
+
+.light-theme #userProfile-contents button:hover {
+  transition: .5s;
+  background-color: rgba(0, 168, 107, 0.8) !important; /* Background color for hover state */
+  color: #fff; /* Text color for hover state */
+}
+
+
+.light-theme .donate-button {
+  width: fit-content;
+  height: 30%;
+  min-width: 50px;
+  max-height: 40px;
+  background-color: rgba(0, 168, 107, 0.8) !important; /* green color for background */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+  font-size: 16px;
+  font-family: 'Roboto', sans-serif;
+}
+
+.light-theme .export-tab button {
+  width: 40%;
+  height: 30%;
+  min-width: 50px;
+  max-height: 40px;
+  background-color: rgba(0, 168, 107, 0.8) !important;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+  font-size: 16px;
+  font-family: 'Roboto', sans-serif;
+}
+
+
+/* Light Theme specific rule for checkboxes */
+.light-theme input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  background-color: rgba(0, 168, 107, 0.8); /* Green background */
+  border-color: white;
+  outline: none;
+}
+
+.light-theme input[type="checkbox"]:checked {
+  background-color: rgba(0, 168, 107, 0.8) !important; /* Green background when checked */
+  border: solid 2px white;
+}
+
+
+/* Scrollbar for .wrapper in light theme */
+.light-theme .wrapper::-webkit-scrollbar-thumb {
+  background: rgba(0, 168, 107, 0.6); /* Light green background */
+  border: 3px solid transparent;
+  border-radius: 9px;
+  background-clip: content-box;
+}
+
+/* On hover, highlight the scrollbar thumb in light theme */
+.light-theme .wrapper::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 168, 107, 0.8); /* Darker green background */
+  border: 3px solid transparent;
+  border-radius: 9px;
+  background-clip: content-box;
+}
+
+/* Radio button styling in light theme */
+.light-theme input[type="radio"]+span:before {
+  content: '';
+  border: 1px solid rgba(0, 168, 107, 0.8); /* Light green border */
+  border-radius: 50%;
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  margin-right: 0.5em;
+  margin-top: 0.5em;
+  vertical-align: -2px;
+}
+
+.light-theme input[type="radio"]:checked+span:before {
+  border-radius: 50%;
+  background-color: rgba(0, 168, 107, 0.6); /* Light green background when checked */
+  border: 6px solid rgba(0, 168, 107, 0.8); /* Darker green border when checked */
+}
+
+.light-theme input[type="radio"]:focus+span:before,
+.light-theme input[type="radio"]:not(:disabled)+span:hover:before {
+  box-shadow:
+    0px 0px 0px 1px rgba(0, 168, 107, 0.6), /* Green shadow */
+    0px 0px 0px 2px rgba(0, 168, 107, 0.8); /* Darker green shadow */
+  
+  outline-color: transparent;
+  outline-width: 2px;
+  outline-style: dotted;
+}
