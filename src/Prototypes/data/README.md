@@ -4,11 +4,9 @@ There are currently 3 versions of this dataset up on Google Cloud Storage. They 
 
 |  	bucket name | description  |
 |---|---|
-| project_echo_bucket_1    | This is a raw dump of all scraped data. Currently containing ALA and mammals datasets    |
-| project_echo_bucket_2    | This is a bucket containing unedited training data for the 15 Otway species   |
-| project_echo_bucket_3    | This is a bucket containing audio clips of up to 10s each with sliences filtered out   |
-| project_echo_bucket_4    | This is a bucket containing audio clips of up to 5s each with sliences filtered out   |
-| project_echo_birdclef    | Birdclef 2022 dataset for testing purposes  |
+| project_echo_bucket_1    | This is a bucket containing 3 audio files for each 118 label. Total files 353.Total size: 73 Mbs     |
+| project_echo_bucket_2    | This is a bucket containing training data for the 118 species. This has 88% files overlap with project_echo_bucket_3. Total files 7161. Total size: 168 Mbs     |
+| project_echo_bucket_3    | This is a bucket containing training clips of 118 species. Total files: 7536. Total Size: 349 Mbs    |
 
 Google Cloud Project name: sit-23t1-project-echo-25288b9
 
