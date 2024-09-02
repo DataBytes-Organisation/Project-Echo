@@ -14,6 +14,9 @@ const cors = require('cors');
 require('dotenv').config();
 const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY);
 const axios = require('axios');
+const { MongoClient, ObjectId } = require('mongodb');
+
+
 
 // Temporarily removed the variables that need the captcha-canvas package
 //const {createCaptchaSync} = require("captcha-canvas");
@@ -31,6 +34,69 @@ const storeItems = new Map([[
   1, { priceInCents: 100, name: "donation"}
 ]])
 app.use(express.json({limit: '10mb'}));
+
+// Import the User model
+const { User } = require('./models/user.model'); // Add this line
+
+// Middleware to check if the user is an admin
+function isAdmin(req, res, next) {
+  const token = req.headers.authorization.split(' ')[1];
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  
+  if (decoded.role !== 'admin') {
+    return res.status(403).json({ message: 'Access denied: Admins only' });
+  }
+  
+  next();
+}
+
+// API to suspend a user
+app.patch('/api/users/:id/suspend', isAdmin, async (req, res) => {
+  const userId = req.params.id;
+  
+  try {
+    const user = await User.findByIdAndUpdate(userId, { status: 'suspended' }, { new: true });
+    res.json({ message: `User ${user.email} suspended`, user });
+  } catch (error) {
+    res.status(500).json({ error: 'Error suspending user' });
+  }
+});
+
+// API to ban a user
+app.patch('/api/users/:id/ban', isAdmin, async (req, res) => {
+  const userId = req.params.id;
+  
+  try {
+    const user = await User.findByIdAndUpdate(userId, { status: 'banned' }, { new: true });
+    res.json({ message: `User ${user.email} banned`, user });
+  } catch (error) {
+    res.status(500).json({ error: 'Error banning user' });
+  }
+});
+
+// API to reinstate a user
+app.patch('/api/users/:id/reinstate', isAdmin, async (req, res) => {
+  const userId = req.params.id;
+  
+  try {
+    const user = await User.findByIdAndUpdate(userId, { status: 'active' }, { new: true });
+    res.json({ message: `User ${user.email} reinstated`, user });
+  } catch (error) {
+    res.status(500).json({ error: 'Error reinstating user' });
+  }
+});
+
+// API to retrieve user status
+app.get('/api/users/:id/status', isAdmin, async (req, res) => {
+  const userId = req.params.id;
+  
+  try {
+    const user = await User.findById(userId, 'email status');
+    res.json({ user });
+  } catch (error) {
+    res.status(500).json({ error: 'Error retrieving user status' });
+  }
+});
 // Use helmet middleware to set security headers
 
 // app.use(helmet());
@@ -551,6 +617,64 @@ app.get("/welcome", async (req,res) => {
     res.send(`<script> alert("No user info detected! Please login again"); window.location.href = "/login"; </script>`);
   }
 })
+
+// MongoDB connection URI
+const uri = process.env.MONGO_URI || "mongodb://localhost:27017";
+
+// Function to suspend or block a user by email or user ID
+const suspendOrBlockUser = async (identifier, action) => {
+    const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+
+    try {
+        // Connect to MongoDB
+        await client.connect();
+        const userdb = client.db('UserSample');
+        const usersCollection = userdb.collection('users');
+
+        // Determine the search criteria based on whether the identifier is an email or user ID
+        const query = ObjectId.isValid(identifier) 
+            ? { _id: new ObjectId(identifier) } 
+            : { email: identifier };
+
+        // Determine the status and message based on the action
+        const status = action === "suspend" ? "suspended" : action === "block" ? "banned" : null;
+        if (!status) {
+            throw new Error("Invalid action. Use 'suspend' or 'block'.");
+        }
+        const message = "Your account has been " + status + ". Please contact support to unblock your account.";
+
+        // Update the user's status and set the block message
+        const result = await usersCollection.updateOne(
+            query,
+            { $set: { status: status, blockMessage: message } }
+        );
+
+        if (result.matchedCount === 0) {
+            console.log("User not found.");
+            return { success: false, message: "User not found." };
+        }
+
+        console.log(`User with ${ObjectId.isValid(identifier) ? 'ID' : 'email'} ${identifier} has been ${status}.`);
+        return { success: true, message: `User has been ${status}.` };
+    } catch (error) {
+        console.error("Error suspending or blocking user:", error);
+        return { success: false, message: "Internal server error." };
+    } finally {
+        // Close the MongoDB connection
+        await client.close();
+    }
+};
+
+app.use(express.json());
+
+app.post('/suspendUser', async (req, res) => {
+    const { identifier, action } = req.body;
+    const result = await suspendOrBlockUser(identifier, action);
+    res.status(result.success ? 200 : 500).json(result);
+});
+
+
+
 //Page direction to the map
 app.get("/map", async(req,res) => {
   res.sendFile(path.join(__dirname, 'public/index.html'))
@@ -561,3 +685,4 @@ app.get("/map", async(req,res) => {
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
+
