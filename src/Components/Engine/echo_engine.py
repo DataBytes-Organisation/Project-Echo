@@ -57,6 +57,7 @@ from geopy.distance import geodesic
 
 # database libraries
 import pymongo
+from helpers import melspectrogram_to_cam
 
 # for weather label
 from sklearn.preprocessing import LabelEncoder
@@ -355,6 +356,7 @@ class EchoEngine():
 
                 image = tf.expand_dims(image, 0) 
             
+                cam = melspectrogram_to_cam.convert(image)
                 image_list = image.numpy().tolist()
             
                 # Run the model via tensorflow serve
@@ -376,7 +378,9 @@ class EchoEngine():
                     audio_event,
                     sample_rate,
                     predicted_class,
-                    predicted_probability)
+                    predicted_probability,
+                    cam)
+                    
             
                 image = tf.expand_dims(image, 0) 
             
@@ -440,6 +444,7 @@ class EchoEngine():
             
                 image, audio_clip, sample_rate = self.combined_pipeline(audio_clip, "Animal_Mode")
             
+                cam = melspectrogram_to_cam.convert(image)
                 # update the audio event with the re-sampled audio
                 audio_event["audioClip"] = self.audio_to_string(audio_clip)
                 
@@ -466,7 +471,8 @@ class EchoEngine():
                     audio_event,
                     sample_rate,
                     predicted_class,
-                    predicted_probability)
+                    predicted_probability,
+                    cam)
             
                 image = tf.expand_dims(image, 0) 
             
@@ -480,7 +486,7 @@ class EchoEngine():
     ########################################################################################
     # this function populates the database with the prediction results
     ########################################################################################
-    def echo_api_send_detection_event(self, audio_event, sample_rate, predicted_class, predicted_probability):
+    def echo_api_send_detection_event(self, audio_event, sample_rate, predicted_class, predicted_probability,cam=None):
         
         detection_event = {
             "timestamp": audio_event["timestamp"],
@@ -492,7 +498,8 @@ class EchoEngine():
             "animalTrueLLA": audio_event["animalTrueLLA"], 
             "animalLLAUncertainty": audio_event["animalLLAUncertainty"],
             "audioClip": audio_event["audioClip"],
-            "sampleRate": sample_rate        
+            "sampleRate": sample_rate,
+            "cam" : cam       
         }
         
         url = 'http://ts-api-cont:9000/engine/event'
