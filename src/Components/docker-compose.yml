@@ -97,6 +97,8 @@ services:
     volumes:
       - ./API:/app # Mount the API's src directory to /app in the container
       - credentials_volume:/root/.config/gcloud/
+      - weather_data:/app/weather_data  # Add a volume for weather data
+
     stdin_open: false
     tty: true
     command: uvicorn app.main:app --host 0.0.0.0 --port 9000 --reload
@@ -159,3 +161,4 @@ networks:
 volumes:
   credentials_volume:
   db-data:
+  weather_data:

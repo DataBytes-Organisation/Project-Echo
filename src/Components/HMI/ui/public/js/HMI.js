@@ -1046,6 +1046,19 @@ var current_mic_lat = 0.0;
 var current_mic_lon = 0.0;
 var current_mic_id = "";
 
+async function fetchWeatherData(timestamp,lat,lon) {
+  try {
+      const response = await fetch(`http://localhost:9000/hmi/weather?timestamp=${timestamp}&lat=${lat}&lon=${lon}`);
+      if (!response.ok) {
+          throw new Error('Failed to fetch weather data');
+      }
+      const weatherData = await response.json();
+      console.log(weatherData);
+      // Display the weather data on the frontend
+  } catch (error) {
+      console.error('Error fetching weather data:', error);
+  }
+}
 
 function createMapClickEvent(hmiState){
   hmiState.basemap.on("click", function (evt) {
@@ -1060,6 +1073,17 @@ function createMapClickEvent(hmiState){
     if (feature){
 
       let values = feature.getProperties();
+
+
+      if (values.hasOwnProperty('animalRecordDate')) {
+        
+        fetchWeatherData(values.animalRecordDate,values.animalLat,values.animalLon)
+      
+      }
+
+
+
+
       if (values.isMic){
         active_mic_content.show();
         default_mic_content.hide();

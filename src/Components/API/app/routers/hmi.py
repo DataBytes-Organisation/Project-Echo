@@ -23,6 +23,10 @@ from app.middleware.random import randompassword
 from app.middleware.random import genotp
 from bson.objectid import ObjectId
 import uuid
+from .weather_data import download_file_from_ftp,read_file
+import tempfile
+import os 
+import pandas as pd
 
 jwtBearer = JWTBearer()
 
@@ -34,6 +38,50 @@ MQTT_BROKER_PORT = 1883
 #mqtt_client = paho.Client()
 #mqtt_client.connect(MQTT_BROKER_URL, MQTT_BROKER_PORT)
 
+# Define FTP server details
+ftp_server = "ftp.bom.gov.au"
+ftp_directory = "/anon/gen/clim_data/IDCKWCDEA0/tables/vic/cape_otway_lighthouse"
+
+# Define local directory to save files
+local_directory = "C:/Users/vishn/Documents/Project-Echo/Weather"
+
+@router.get('/weather', response_description="Get weather data for the day and location provided")
+def get_weather(timestamp: int,
+                lat: float,
+                lon: float):
+
+    try:
+        dt_object = datetime.datetime.fromtimestamp(timestamp)
+        year_month = dt_object.strftime('%Y%m')
+        day_month_year = dt_object.strftime('%d/%m/%Y')
+
+        # Manually handle the file, using a persistent directory within the container
+        weather_data_dir  = "/app/weather_data"  # Change to a directory within the container
+        os.makedirs(weather_data_dir , exist_ok=True)
+        
+        local_filepath = os.path.join(weather_data_dir , f"cape_otway_lighthouse-{year_month}.csv")
+        print(f"Attempting to download to: {local_filepath}")
+
+        #Try to download the file
+        try:
+            download_file_from_ftp(ftp_server, ftp_directory, weather_data_dir , year_month)
+            print(f"Download complete: {local_filepath}")
+        except Exception as e:
+            print(f"Error during file download: {e}")
+            raise HTTPException(status_code=500, detail=f"Failed to download file: {str(e)}")
+        
+        # Try to read the file
+        try:
+            weather_data = read_file(local_filepath,day_month_year)
+            return weather_data
+        except Exception as e:
+            print(f"Error during file read: {e}")
+            raise HTTPException(status_code=500, detail=f"Failed to read file: {str(e)}")
+
+    except Exception as e:
+        print(f"An error occurred: {e.__class__.__name__}: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {e.__class__.__name__}: {str(e)}")
+    
 
 @router.get("/events_time", response_description="Get detection events within certain duration")
 def show_event_from_time(start: str, end: str):
