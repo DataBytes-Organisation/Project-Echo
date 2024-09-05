@@ -38,6 +38,7 @@ import ObjLabelManager from "./ObjLabelManager";
 import ObjSelectLabel from "./ObjSelectLabel";
 import ObjChunkConverter from "./ObjChunkConverter";
 import ObjAiTrainer from "./ObjAiTrainer";
+import ObjUpload from "./ObjUpload";
 
 class ObjProject extends React.Component {
   constructor(props) {
@@ -287,12 +288,16 @@ class ObjProject extends React.Component {
         
         >
           <TabList>
+          <Tab>Upload Manager</Tab>
             <Tab>Label Manager</Tab>
             <Tab>Audio Labeling</Tab>
             <Tab>Chunk Converter</Tab>
             <Tab>AI Trainer</Tab>
           </TabList>
           <TabPanels h="95%">
+          <TabPanel>
+              <ObjUpload/>
+            </TabPanel>
             <TabPanel>
               <ObjLabelManager
                 sendDataToParent={this.handleDataFromChildObjLabels}
