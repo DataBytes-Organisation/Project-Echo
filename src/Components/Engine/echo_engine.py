@@ -43,7 +43,6 @@ import librosa
 import paho.mqtt.client as paho
 # tensor flow / keras related libraries
 import tensorflow as tf
-import tensorflow_hub as hub
 import tensorflow_io as tfio
 from tensorflow.keras.models import load_model
 
@@ -79,8 +78,11 @@ yamnet_classes = yamnet_model.class_names('yamnet_dir/yamnet_class_map.csv')
 model = load_model('yamnet_dir/model_3_82_16000.h5')
 
 # Load the YAMNet model
-yamnet_model_handle = 'https://tfhub.dev/google/yamnet/1'
-yamnet_model = hub.load(yamnet_model_handle)
+# yamnet_model_handle = 'https://tfhub.dev/google/yamnet/1'
+# yamnet_model = hub.load(yamnet_model_handle)
+#TODO: Fix for above macOS, as installing tensorflow hub causes issue
+yamnet_model =tf.saved_model.load('yamnet_dir/model')
+
 
 class EchoEngine():
 
