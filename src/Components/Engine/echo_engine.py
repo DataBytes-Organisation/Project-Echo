@@ -43,7 +43,6 @@ import librosa
 import paho.mqtt.client as paho
 # tensor flow / keras related libraries
 import tensorflow as tf
-import tensorflow_addons as tfa
 import tensorflow_hub as hub
 import tensorflow_io as tfio
 from tensorflow.keras.models import load_model
