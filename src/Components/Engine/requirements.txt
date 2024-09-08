@@ -12,7 +12,4 @@ pandas
 pymongo[srv]
 soundfile
 tensorflow==2.15.0
-tensorflow-addons
-# tensorflow_hub
-tensorflow_io
 xgboost

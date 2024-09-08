@@ -43,7 +43,6 @@ import librosa
 import paho.mqtt.client as paho
 # tensor flow / keras related libraries
 import tensorflow as tf
-import tensorflow_io as tfio
 from tensorflow.keras.models import load_model
 
 from google.cloud import storage
@@ -62,7 +61,6 @@ import pymongo
 # print system information
 print('Python Version           : ', python_version())
 print('TensorFlow Version       : ', tf.__version__)
-print('TensorFlow IO Version    : ', tfio.__version__)
 print('Librosa Version          : ', librosa.__version__)
 
 # Load the necessary data and models
