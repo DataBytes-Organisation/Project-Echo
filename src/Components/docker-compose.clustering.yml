@@ -1,0 +1,26 @@
+version: "3.8"
+
+services:
+  echo_clustering:
+      build:
+        context: Clustering/
+        dockerfile: Clustering.Dockerfile
+      image: ts-echo-clustering
+      container_name: ts-clustering-cont
+      networks:
+        - echo-net_echo-net
+      volumes:
+        - echo-net_credentials_volume:/root/.config/gcloud/
+        - echo-net_recordings:/mnt/recordings
+      stdin_open: true
+      tty: true
+
+networks:
+  echo-net_echo-net:
+    external: true
+
+volumes:
+  echo-net_credentials_volume:
+    external: true
+  echo-net_recordings:
+    external: true   

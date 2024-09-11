@@ -1,0 +1,24 @@
+version: "3.8"
+
+services:
+
+  echo_simulator:
+    build:
+      context: Simulator/
+      dockerfile: Simulator.Dockerfile
+    image: ts-simulator
+    container_name: ts-simulator-cont
+    networks:
+      - echo-net_echo-net
+    volumes:
+      - echo-net_credentials_volume:/root/.config/gcloud/
+    stdin_open: false
+    tty: true
+
+networks:
+  echo-net_echo-net:
+    external: true
+
+volumes:
+  echo-net_credentials_volume:
+    external: true

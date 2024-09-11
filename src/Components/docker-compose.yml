@@ -16,6 +16,21 @@ services:
     stdin_open: false
     tty: true
 
+  echo_triangulation:
+    build:
+      context: ClusteringTriangulation/
+      dockerfile: Triangulation.Dockerfile
+    image: ts-echo-triangulation
+    container_name: ts-triangulation-cont
+    networks:
+      - echo-net
+    volumes:
+      - credentials_volume:/root/.config/gcloud/
+      - recordings:/mnt/recordings
+
+    stdin_open: true
+    tty: true  
+
   echo_engine:
     build:
       context: ./Engine
@@ -65,8 +80,11 @@ services:
     tty: true
     ports:
       - "1883:1883"
+      - "1884:1884"
       - "7001:7001"
       - "7070:7070"
+    volumes:
+      - ./MQTT-Server/config.xml:/opt/hivemq/conf/config.xml
 
   echo_simulator:
     build:
@@ -97,6 +115,7 @@ services:
     volumes:
       - ./API:/app # Mount the API's src directory to /app in the container
       - credentials_volume:/root/.config/gcloud/
+      - recordings:/mnt/recordings
     stdin_open: false
     tty: true
     command: uvicorn app.main:app --host 0.0.0.0 --port 9000 --reload
@@ -150,6 +169,43 @@ services:
       retries: 5
     restart: on-failure
 
+  echo_onset:
+    build:
+        context: OnsetDetection/
+        dockerfile: OnsetDetection.Dockerfile
+    image: ts-echo-onset
+    container_name: ts-onset-cont
+    networks:
+      - echo-net
+    volumes:
+      - credentials_volume:/root/.config/gcloud/
+      - recordings:/mnt/recordings
+    stdin_open: true
+    tty: true
+
+  echo_clustering:
+    build:
+        context: Clustering/
+        dockerfile: Clustering.Dockerfile
+    image: ts-echo-clustering
+    container_name: ts-clustering-cont
+    networks:
+      - echo-net
+    volumes:
+      - credentials_volume:/root/.config/gcloud/
+      - recordings:/mnt/recordings
+    stdin_open: true
+    tty: true
+
+  initializer:
+    image: busybox
+    volumes:
+      - recordings:/mnt/recordings
+    command: ["sh", "-c", "mkdir -p /mnt/recordings/pre-processed /mnt/recordings/onset /mnt/recordings/onset/spectrograms /mnt/recordings/onset/audio /mnt/recordings/clusters /mnt/recordings/clusters/1 /mnt/recordings/clusters/2 /mnt/recordings/clusters/3 "]
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
  
 
 networks:
@@ -159,3 +215,5 @@ networks:
 volumes:
   credentials_volume:
   db-data:
+  recordings:
+

@@ -1,0 +1,5 @@
+{
+    "MQTT_CLIENT_URL": "ts-mqtt-server-cont",
+    "MQTT_CLIENT_PORT": 1884,
+    "MQTT_PUBLISH_URL": "projectecho/engine/2"
+}

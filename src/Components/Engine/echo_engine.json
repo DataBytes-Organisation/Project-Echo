@@ -14,7 +14,7 @@
     "MODEL_INPUT_IMAGE_HEIGHT": 260,
     "MODEL_INPUT_IMAGE_CHANNELS": 3,
     "MQTT_CLIENT_URL": "ts-mqtt-server-cont",
-    "MQTT_CLIENT_PORT": 1883,
+    "MQTT_CLIENT_PORT": 1884,
     "MQTT_PUBLISH_URL": "projectecho/engine/2",
     "GCLOUD_PROJECT": "sit-23t1-project-echo-25288b9",
     "BUCKET_NAME": "project_echo_bucket_1",
