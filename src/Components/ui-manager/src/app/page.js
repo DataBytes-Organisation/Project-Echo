@@ -70,12 +70,6 @@ export default function Home() {
           </Text>
           <Flex justify="space-around" width="100%">
             <Box textAlign="center">
-              <Image
-                src="/imgs/feature1.png"
-                alt="Echo Engine"
-                boxSize="100px"
-                mb="10px"
-              />
               <Heading as="h3" size="md">
                 Echo Engine
               </Heading>
@@ -85,12 +79,6 @@ export default function Home() {
               </Text>
             </Box>
             <Box textAlign="center">
-              <Image
-                src="/imgs/feature2.png"
-                alt="Echo API"
-                boxSize="100px"
-                mb="10px"
-              />
               <Heading as="h3" size="md">
                 Echo API
               </Heading>
@@ -100,12 +88,6 @@ export default function Home() {
               </Text>
             </Box>
             <Box textAlign="center">
-              <Image
-                src="/imgs/feature3.png"
-                alt="Echo Simulator"
-                boxSize="100px"
-                mb="10px"
-              />
               <Heading as="h3" size="md">
                 Echo Simulator
               </Heading>

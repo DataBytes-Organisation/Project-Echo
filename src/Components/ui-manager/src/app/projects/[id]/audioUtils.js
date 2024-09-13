@@ -115,4 +115,56 @@ const convertToWavWithSpectrogram = async (file, start, end, onProgress) => {
   return { chunkUrl, spectrogramData };
 };
 
-export { convertToWav, convertToWavChunk, convertToWavWithSpectrogram };
+const convertWholeWavToSpectrogram = async (file, onProgress) => {
+  // Load and convert the whole WAV file
+  try {
+    // Check if ffmpeg is loaded
+    if (!ffmpeg.loaded) {
+      await ffmpeg.load();
+    }
+
+    const fileType = file.name.split(".").pop().toLowerCase();
+    const inputFileName = `input.${fileType}`;
+    const outputFileName = "output_full.wav";
+
+    // Write the file to FFmpeg's file system
+    await ffmpeg.writeFile(inputFileName, await fetchFile(file));
+
+    // Run FFmpeg to ensure it's in the correct wav format
+    await ffmpeg.exec(["-i", inputFileName, outputFileName]);
+
+    // Read the output WAV file
+    const data = await ffmpeg.readFile(outputFileName);
+    const blob = new Blob([data.buffer], { type: "audio/wav" });
+    const url = URL.createObjectURL(blob);
+
+    // Load the full WAV file into AudioContext for spectrogram generation
+    const response = await fetch(url);
+    const arrayBuffer = await response.arrayBuffer();
+    const audioContext = new (window.AudioContext ||
+      window.webkitAudioContext)();
+    const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+
+    // Convert audio data to Float32Array for FFT processing
+    const channelData = audioBuffer.getChannelData(0); // Use the first audio channel
+    const spectrogramData = generateSpectrogram(channelData.buffer);
+
+    if (onProgress) {
+      onProgress(100); // Update progress if needed
+    }
+
+    console.log("Generated Spectrogram Data:", spectrogramData); // Log spectrogram data
+
+    return { url, spectrogramData }; // Return the WAV URL and spectrogram data
+  } catch (error) {
+    console.error("Error converting WAV file to spectrogram:", error);
+    throw error;
+  }
+};
+
+export {
+  convertToWav,
+  convertToWavChunk,
+  convertToWavWithSpectrogram,
+  convertWholeWavToSpectrogram,
+};

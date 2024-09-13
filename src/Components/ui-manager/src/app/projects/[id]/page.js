@@ -1,6 +1,5 @@
 "use client";
 
-
 import React from "react";
 import {
   Box,
@@ -32,7 +31,6 @@ import WaveSurfer from "wavesurfer.js";
 import TimelinePlugin from "wavesurfer.js/dist/plugins/timeline";
 import RegionsPlugin from "wavesurfer.js/dist/plugins/regions";
 import { convertToWav } from "./audioUtils";
-
 
 import ObjLabelManager from "./ObjLabelManager";
 import ObjSelectLabel from "./ObjSelectLabel";
@@ -285,18 +283,17 @@ class ObjProject extends React.Component {
           colorScheme="green"
           minH="100%"
           width="100%"
-        
         >
           <TabList>
-          <Tab>Upload Manager</Tab>
+            <Tab>Upload Manager</Tab>
             <Tab>Label Manager</Tab>
             <Tab>Audio Labeling</Tab>
             <Tab>Chunk Converter</Tab>
             <Tab>AI Trainer</Tab>
           </TabList>
           <TabPanels h="95%">
-          <TabPanel>
-              <ObjUpload/>
+            <TabPanel>
+              <ObjUpload projectId={projectId} />
             </TabPanel>
             <TabPanel>
               <ObjLabelManager
