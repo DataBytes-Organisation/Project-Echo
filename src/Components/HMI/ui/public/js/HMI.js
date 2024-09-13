@@ -1053,12 +1053,14 @@ async function fetchWeatherData(timestamp,lat,lon) {
           throw new Error('Failed to fetch weather data');
       }
       const weatherData = await response.json();
-      console.log(weatherData);
-      // Display the weather data on the frontend
+      //console.log(weatherData);
+      return weatherData
   } catch (error) {
       console.error('Error fetching weather data:', error);
   }
 }
+
+
 
 function createMapClickEvent(hmiState){
   hmiState.basemap.on("click", function (evt) {
@@ -1077,11 +1079,36 @@ function createMapClickEvent(hmiState){
 
       if (values.hasOwnProperty('animalRecordDate')) {
         
-        fetchWeatherData(values.animalRecordDate,values.animalLat,values.animalLon)
-      
+        fetchWeatherData(values.animalRecordDate,values.animalLat,values.animalLon).then((weatherData)=>{
+
+          const key = Object.keys(weatherData.Date)[0]
+          //console.log(key)
+          const date_ele = document.getElementById("weather_date")
+          date_ele.innerHTML = weatherData["Date"][key]
+
+          const mintemp_ele = document.getElementById("weather_mintemp")
+          mintemp_ele.innerHTML = weatherData["Min Temperature (°C)"][key] + " (°C)"
+
+          const maxtemp_ele = document.getElementById("weather_maxtemp")
+          maxtemp_ele.innerHTML = weatherData["Max Temperature (°C)"][key] + " (°C)"
+
+          const rainfall_ele = document.getElementById("weather_rainfall")
+          rainfall_ele.innerHTML = weatherData["Rainfall (mm)"][key] + " (mm)"
+
+          const windspeed_ele = document.getElementById("weather_windspeed")
+          windspeed_ele.innerHTML = weatherData["Wind Speed (m/sec)"][key] + " (m/sec)"
+
+          const maxhumidity_ele = document.getElementById("weather_maxhumidity")
+          maxhumidity_ele.innerHTML = weatherData["Max Humidity (%)"][key] + " (%)"
+
+          const minhumidity_ele = document.getElementById("weather_minhumidity")
+          minhumidity_ele.innerHTML = weatherData["Min Humidity (%)"][key] + " (%)"
+        }).catch(error => {
+          console.error('Error fetching weather data:', error);
+        });
+
+       
       }
-
-
 
 
       if (values.isMic){

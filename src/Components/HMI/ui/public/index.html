@@ -82,7 +82,6 @@
         marked.parse('# Marked in the browser\n\nRendered by **marked**.');
     </script-->
 
-
     <div class="container" style="width:100% !important; margin-left: 0px !important; padding: 12px !important;">
       <!-- Row 1 with nav spanning the entire width and a fixed top-->
       
@@ -409,6 +408,68 @@
               <div id="desc_summary" class="desc"></div>
               <div id="desc_details" class="desc"></div>
               
+              <h2 style="margin-top: 20px !important;">Weather</h2>
+              <div class="markup_form">
+                <div class="markup_column">
+                  <div class="markup_row_left">
+                    <div>Date</div>
+                  </div>
+                  <div class="markup_row_right">
+                    <div id="weather_date"></div>
+                  </div>
+                </div>
+                <div class="markup_column">
+                  <div class="markup_row_left">
+                    <div>Max Temperature</div>
+                  </div>
+                  <div class="markup_row_right">
+                    <div id="weather_maxtemp"></div>
+                  </div>
+                </div>
+                <div class="markup_column">
+                  <div class="markup_row_left">
+                    <div>Minimum Temperature</div>
+                  </div>
+                  <div class="markup_row_right">
+                    <div id="weather_mintemp"></div>
+                  </div>
+                </div>
+                <div class="markup_column">
+                  <div class="markup_row_left">
+                    <div>Rainfall</div>
+                  </div>
+                  <div class="markup_row_right">
+                    <div id="weather_rainfall"></div>
+                  </div>
+                </div>
+                <div class="markup_column">
+                  <div class="markup_row_left">
+                    <div>Wind speed</div>
+                  </div>
+                  <div class="markup_row_right">
+                    <div id="weather_windspeed"></div>
+                  </div>
+                </div>
+                <div class="markup_column">
+                  <div class="markup_row_left">
+                    <div>Maximum Humiditiy</div>
+                  </div>
+                  <div class="markup_row_right">
+                    <div id="weather_maxhumidity"></div>
+                  </div>
+                </div>
+                <div class="markup_column">
+                  <div class="markup_row_left">
+                    <div>Minimum Humiditiy</div>
+                  </div>
+                  <div class="markup_row_right">
+                    <div id="weather_minhumidity"></div>
+                  </div>
+                </div>
+
+
+              </div>
+
               <h2 style="margin-top: 20px !important;">Event Details</h2>
               <div class="markup_form">
                 <!-- markup_icon -->
@@ -1970,10 +2031,11 @@ closeFormButton.addEventListener('click', (event) => {
   
   const vocalizationEvents = [
     {eventId: "6457a315e03129cb130fa270", timestamp: 1709463927, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Tawny Frogmouth", speciesScientificName: "Podargus strigoides", speciesIdentificationConfidence: 90.98, locationLat:-38.80266562762370,locationLon:143.563 , locationConfidence:90.98 , animalType:"bird", animalStatus:"normal" ,animalDiet: "herbavore" },
-    {eventId: "6457a315e03129cb130fa271", timestamp: 1709464927, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Cane toad", speciesScientificName: "Rhinella marina", speciesIdentificationConfidence: 90.98, locationLat:-38.81905478815443 ,locationLon:143.529, locationConfidence:90.98 , animalType:"amphibian", animalStatus:"invasive" ,animalDiet: "herbavore" },
-    {eventId: "6457a315e03129cb130fa272", timestamp: 1709460927, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Wild Boar", speciesScientificName: "Sus scrofa", speciesIdentificationConfidence: 90.98, locationLat:-38.80166562762364 ,locationLon:143.545  , locationConfidence:90.98 , animalType:"mammal", animalStatus:"endangered" ,animalDiet: "omnivore" },
-    {eventId: "6457a315e03129cb130fa273", timestamp: 1709462927, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Redeye", speciesScientificName: "Psaltoda moerens", speciesIdentificationConfidence: 90.98, locationLat:-38.82166562762360 ,locationLon:143.545 , locationConfidence:90.98 , animalType:"insect", animalStatus:"near-threatened" ,animalDiet: "carnivore" },
-    {eventId: "6457a315e03129cb130fa274", timestamp: 1709461967, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Brown Rat", speciesScientificName: "Rattus norvegicus", speciesIdentificationConfidence: 90.98, locationLat:-38.80266562762380 ,locationLon:143.565 , locationConfidence:90.98 , animalType:"reptile", animalStatus:"vulnerable" ,animalDiet: "herbavore" },
+    {eventId: "6457a315e03129cb130fa271", timestamp: 1708464927, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Cane toad", speciesScientificName: "Rhinella marina", speciesIdentificationConfidence: 90.98, locationLat:-38.81905478815443 ,locationLon:143.529, locationConfidence:90.98 , animalType:"amphibian", animalStatus:"invasive" ,animalDiet: "herbavore" },
+    {eventId: "6457a315e03129cb130fa272", timestamp: 1707460927, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Wild Boar", speciesScientificName: "Sus scrofa", speciesIdentificationConfidence: 90.98, locationLat:-38.80166562762364 ,locationLon:143.545  , locationConfidence:90.98 , animalType:"mammal", animalStatus:"endangered" ,animalDiet: "omnivore" },
+    {eventId: "6457a315e03129cb130fa273", timestamp: 1706462927, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Redeye", speciesScientificName: "Psaltoda moerens", speciesIdentificationConfidence: 90.98, locationLat:-38.82166562762360 ,locationLon:143.545 , locationConfidence:90.98 , animalType:"insect", animalStatus:"near-threatened" ,animalDiet: "carnivore" },
+    {eventId: "6457a315e03129cb130fa274", timestamp: 1705461967, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Brown Rat", speciesScientificName: "Rattus norvegicus", speciesIdentificationConfidence: 90.98, locationLat:-38.80266562762380 ,locationLon:143.565 , locationConfidence:90.98 , animalType:"reptile", animalStatus:"vulnerable" ,animalDiet: "herbavore" },
+    {eventId: "6457a315e03129cb130fa275", timestamp: 1705459967, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Brown Rat", speciesScientificName: "Rattus norvegicus", speciesIdentificationConfidence: 90.98, locationLat:-38.08 ,locationLon:144.21 , locationConfidence:90.98 , animalType:"reptile", animalStatus:"vulnerable" ,animalDiet: "herbavore" }
   ];
   
 

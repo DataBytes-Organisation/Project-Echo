@@ -23,7 +23,7 @@ from app.middleware.random import randompassword
 from app.middleware.random import genotp
 from bson.objectid import ObjectId
 import uuid
-from .weather_data import download_file_from_ftp,read_file
+from .weather_data import download_file_from_ftp,read_file,download_weather_stations_from_ftp,find_closest_station
 import tempfile
 import os 
 import pandas as pd
@@ -40,15 +40,25 @@ MQTT_BROKER_PORT = 1883
 
 # Define FTP server details
 ftp_server = "ftp.bom.gov.au"
-ftp_directory = "/anon/gen/clim_data/IDCKWCDEA0/tables/vic/cape_otway_lighthouse"
+ftp_directory = "/anon/gen/clim_data/IDCKWCDEA0/tables/vic"
+weather_station_list_directory = "/anon/gen/clim_data/IDCKWCDEA0/tables"
 
-# Define local directory to save files
-local_directory = "C:/Users/vishn/Documents/Project-Echo/Weather"
 
 @router.get('/weather', response_description="Get weather data for the day and location provided")
 def get_weather(timestamp: int,
                 lat: float,
                 lon: float):
+    
+    #Using a persistent directory within the container
+    weather_data_dir  = "/app/weather_data"  # Change to a directory within the container
+    os.makedirs(weather_data_dir , exist_ok=True)
+
+    weather_station_dir  = os.path.join(weather_data_dir, f"stations_db.txt")
+    if not os.path.exists(weather_station_dir):
+        
+        download_weather_stations_from_ftp(ftp_server,weather_station_list_directory,weather_data_dir)
+        
+    closest_station = find_closest_station(lat, lon, weather_station_dir)
 
     try:
         dt_object = datetime.datetime.fromtimestamp(timestamp)
@@ -56,20 +66,25 @@ def get_weather(timestamp: int,
         day_month_year = dt_object.strftime('%d/%m/%Y')
 
         # Manually handle the file, using a persistent directory within the container
-        weather_data_dir  = "/app/weather_data"  # Change to a directory within the container
-        os.makedirs(weather_data_dir , exist_ok=True)
+        #weather_data_dir  = "/app/weather_data"  # Change to a directory within the container
+        #os.makedirs(weather_data_dir , exist_ok=True)
         
-        local_filepath = os.path.join(weather_data_dir , f"cape_otway_lighthouse-{year_month}.csv")
-        print(f"Attempting to download to: {local_filepath}")
+        local_filepath = os.path.join(weather_data_dir , f"{closest_station}-{year_month}.csv")
+        print(f"Checking for file: {local_filepath}")
 
-        #Try to download the file
-        try:
-            download_file_from_ftp(ftp_server, ftp_directory, weather_data_dir , year_month)
-            print(f"Download complete: {local_filepath}")
-        except Exception as e:
-            print(f"Error during file download: {e}")
-            raise HTTPException(status_code=500, detail=f"Failed to download file: {str(e)}")
-        
+        #Check if file already exists instead of redownloading
+
+        if not os.path.exists(local_filepath):
+
+            #Try to download the file
+            try:
+                download_file_from_ftp(ftp_server, ftp_directory, weather_data_dir , year_month, closest_station)
+                print(f"Download complete: {local_filepath}")
+            except Exception as e:
+                print(f"Error during file download: {e}")
+                raise HTTPException(status_code=500, detail=f"Failed to download file: {str(e)}")
+        else:
+            print("File already exists")
         # Try to read the file
         try:
             weather_data = read_file(local_filepath,day_month_year)
