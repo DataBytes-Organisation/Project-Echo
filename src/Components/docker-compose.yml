@@ -15,6 +15,8 @@ services:
       - credentials_volume:/root/.config/gcloud/
     stdin_open: false
     tty: true
+    environment:
+      - SERVICE_URL=http://model_server:8501
 
   echo_triangulation:
     build:
@@ -43,6 +45,8 @@ services:
       - credentials_volume:/root/.config/gcloud/
     stdin_open: true
     tty: true
+    environment:
+      - SERVICE_URL=http://echo_engine:80
 
 
   echo_hmi:
@@ -66,6 +70,8 @@ services:
     tty: true
     environment:
       - NODE_ENV=development
+      - SERVICE_URL=http://echo_hmi:8080
+
 
 
   echo_mqtt:
@@ -85,6 +91,8 @@ services:
       - "7070:7070"
     volumes:
       - ./MQTT-Server/config.xml:/opt/hivemq/conf/config.xml
+    environment:
+      - SERVICE_URL=http://echo_mqtt:1883
 
   echo_simulator:
     build:
@@ -99,6 +107,9 @@ services:
       - credentials_volume:/root/.config/gcloud/
     stdin_open: false
     tty: true
+    environment:
+      - SERVICE_URL=http://echo_simulator:80
+
 
 
   echo_api:
@@ -119,6 +130,8 @@ services:
     stdin_open: false
     tty: true
     command: uvicorn app.main:app --host 0.0.0.0 --port 9000 --reload
+    environment:
+      - SERVICE_URL=http://echo_api:9000
 
   mongo-express:
     image: mongo-express
@@ -136,6 +149,7 @@ services:
     networks:
       - echo-net
 
+  
   echo_store:
     build:
       context: MongoDB/
@@ -168,6 +182,8 @@ services:
       timeout: 5s
       retries: 5
     restart: on-failure
+    environment:
+      - SERVICE_URL=http://redis:6379
 
   echo_onset:
     build:
