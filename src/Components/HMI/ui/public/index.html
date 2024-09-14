@@ -107,6 +107,8 @@
           <div id="basemap"></div>
           <div id="editFormWrapper">
             <form id="editForm">
+
+              <span class="close-btn" id="closeFormButton">&times;</span>
               <!-- Add your form fields here -->
               <h2 id="formSpeciesName"></h2>
               <div id="ccs">
@@ -128,10 +130,17 @@
               </div>
               <label for="citationSneeded">Source:&nbsp;&nbsp;&nbsp; </label> <input type="text" id="citationSneeded" name="citationSneeded"> <br>
               <p>Please enter a link to a reliable source that backs up your claim to make this edit.</p>
+              <div class="form-group input-group">
+                <textarea id = "update_summary" class="form-control" placeholder="Summary" cols="30" rows="3"></textarea>
+              </div>
+              <br>
+              <div class="form-group input-group">
+                <textarea id = "update_desc" class="form-control" placeholder="Description" cols="30" rows="5"></textarea>
+              </div>
 
               <label for="important" id="important">Important:&nbsp;&nbsp;&nbsp; </label> <p id="currentConservationStatus" name="important">Spamming or intentionally abusing this functionality will not be tolerated and will result in your account being either suspended or banned.</p>
               <button id="submitEditButton">Submit</button>
-              <button id="closeFormButton">Close</button>
+              
             </form>
           </div>
 
@@ -1703,6 +1712,9 @@ function submitRequest(){
   animal = document.getElementById("desc_species").innerHTML;
   //Let Source equal to what is contained in the citation field
   source = document.getElementById("citationSneeded").value;
+  var desc = document.getElementById("update_desc").value;
+  var summary = document.getElementById("update_summary").value;
+
   //get the initial and modified values, these will be used for checks too
   initial = currentStatus;
   modified = newConservationStatus;
@@ -1717,14 +1729,13 @@ function submitRequest(){
 
   // Check the fields
 
-  checkFields();
 
   if (initial === modified){
     generateVisualResponse("SUBMISSION CANCELLED. New conservation status can't be the same as current status.");
     return;
   }
 
-  if (modified === undefined){
+  if (modified === undefined && summary == "" && desc == ""){
     generateVisualResponse("SUBMISSION CANCELLED. No new conservation status selected.");
     return;
   }
@@ -1733,14 +1744,31 @@ function submitRequest(){
     generateVisualResponse("SUBMISSION CANCELLED. Source field cannot be empty.");
     return
   }
+
+  
+  if(modified == undefined)
+   {
+      modified = "unchanged";
+    }
+   if(summary == "")
+    {
+      summary = "unchanged";
+    }
+
+    if(desc == "")
+     {
+      desc = "unchanged";
+     }
+
   //console.log(user);
   requestData = {
     username,
     animal,
-    requestingToChange,
     initial,
     modified,
-    source
+    source,
+    summary,
+    desc
   }
   
   fetch("/api/submit", {
@@ -1765,12 +1793,7 @@ function submitRequest(){
   });
 }
 
-function checkFields(){
-  if(source === "" || animalNewStatus === "none"){
-    return false
-  }
 
-}
 
 //Once the submission exits, the form resets it's values so that the form 
 //can be empty if the user chooses to request an edit for another animal
@@ -1779,6 +1802,10 @@ function exitSubmission(){
   source = "";
   animal = "";
   animalNewStatus = "";
+  document.getElementById("update_desc").value = "";
+  document.getElementById("update_summary").value = "";
+  document.getElementById("citationSneeded").value = "";
+  newStatus.innerHTML="Select New";
   editFormWrapper.style.display = "none";
   editForm.style.display = "none";
   dropdownOptions.style.display ="";

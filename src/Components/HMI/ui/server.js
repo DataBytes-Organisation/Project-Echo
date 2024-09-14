@@ -15,7 +15,7 @@ require('dotenv').config();
 const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY);
 const axios = require('axios');
 const { MongoClient, ObjectId } = require('mongodb');
-
+const json_path = './public/js/sample_data.json';
 
 
 // Temporarily removed the variables that need the captcha-canvas package
@@ -36,7 +36,7 @@ const storeItems = new Map([[
 app.use(express.json({limit: '10mb'}));
 
 // Import the User model
-const { User } = require('./models/user.model'); // Add this line
+const { User } = require('./model/user.model'); // Add this line
 
 // Middleware to check if the user is an admin
 function isAdmin(req, res, next) {
@@ -562,6 +562,14 @@ app.patch('/api/updateConservationStatus/:animal', async (req, res) => {
     res.status(500).send({ error: 'Error updating species status' });
   }
 });
+
+app.patch('/api/update_json/:animal', (req, res) => {
+  const animal = req.params.animal;
+  const desc = req.body.description;
+  const newsummary = req.body.summary;
+
+updateSpeciesData(animal, desc, newsummary,res);
+});
 //Fetch the requests for the admin dashboard
 app.get('/api/requests', async (req, res) => {
   try {
@@ -672,6 +680,48 @@ app.post('/suspendUser', async (req, res) => {
     const result = await suspendOrBlockUser(identifier, action);
     res.status(result.success ? 200 : 500).json(result);
 });
+
+function updateSpeciesData(speciesToUpdate, newDescriptions, newSummary, res) {
+  fs.readFile(json_path, 'utf8', (err, data) => {
+      if (err) {
+          console.error("Error reading file:", err);
+          return;
+      }
+
+      let jsonData = JSON.parse(data);
+      let speciesData = jsonData.data.find(item => item.species === speciesToUpdate);
+
+      if (!speciesData) {
+          console.log("Species not found");
+          return;
+      }
+
+      // Append new descriptions
+      if (newDescriptions != "unchanged") {
+          if (typeof newDescriptions === 'string') {
+              speciesData.description.push(newDescriptions);
+          } else if (Array.isArray(newDescriptions)) {
+              speciesData.description = speciesData.description.concat(newDescriptions);
+          }
+      }
+
+      // Update the summary if provided
+      if (newSummary !== "unchanged") {
+          speciesData.summary = newSummary;
+      }
+
+      fs.writeFile(json_path, JSON.stringify(jsonData, null, 2), 'utf8', (err) => {
+          if (err) {
+              console.error("Error writing JSON to file:", err);
+              return res.status(500).json({ error: "Failed to write to the file" });
+          }
+          else{
+          console.log("JSON file has been updated successfully.");
+          res.json({ message: "Update successful" });
+          }
+      });
+  });
+}
 
 
 

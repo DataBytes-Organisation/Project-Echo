@@ -1873,7 +1873,17 @@ i {
 #recording_simulation_master_container{
   width:440px;
 }
+reset-style {
+  all: unset;
+}
 
+.close-btn {
+  position: relative;
+  left: 95%;
+  cursor: pointer;
+  
+  font-size: 30px;
+}
 
 #request-edit-button {
   color: white;
@@ -1881,7 +1891,7 @@ i {
 
 #editFormWrapper {
   display: none;
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   width: 100%;

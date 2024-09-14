@@ -94,9 +94,11 @@ def requestEntity(request) -> dict:
         #"requestId": str(request["requestId"]),
         "username": str(request["username"]),
         "animal": str(request["animal"]),
-        "requestingToChange": str(request["requestingToChange"]),
+        # "requestingToChange": str(request["requestingToChange"]),
         "initial": str(request["initial"]),
         "modified": str(request["modified"]),
+        "summary": str(request["summary"]),
+        "desc": str(request["desc"]),
         "source": str(request["source"]),
         "date": str(request["date"]),
         "status": str(request["status"])
