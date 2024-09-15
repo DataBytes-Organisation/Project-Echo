@@ -11,5 +11,5 @@ paho-mqtt==1.6.1
 pandas
 pymongo[srv]
 soundfile
-tensorflow==2.15.0
+# tensorflow==2.15.0
 xgboost
