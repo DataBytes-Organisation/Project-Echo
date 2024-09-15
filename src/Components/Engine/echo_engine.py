@@ -334,70 +334,13 @@ class EchoEngine():
         print("Recieved audio message, processing via engine model...") 
         try:   
             audio_event = json.loads(msg.payload)
+            print(audio_event['timestamp'])
+
             audio_clip = ""
             image = None
             sample_rate = 0
 
-            #On message that comes from the clustering algorithm
-            if 'type' in audio_event:
-                
-                print("Received message from clustering algorithm:  ", audio_event)
-                # convert to string representation of audio to binary for processing
-                print("Recording_Mode_V2")
-                sample_rate = 16000
-                audio_clip = self.string_to_audio(audio_event['audioClip'])
-                file = io.BytesIO(audio_clip)
-                #wav = 'yamnet_dir/cat-goat-dingo.wav'
-                data_frame, audio_clip = self.sound_event_detection(file, sample_rate)
-                iteration_count = 0
-            
-                for index, row in data_frame.iterrows():
-                    #start_time	end_time	echonet_label_1	echonet_confidence_1
-                    start_time = float(row['start_time'])
-                    end_time = float(row['end_time'])
-                    predicted_class = row['echonet_label_1']
-
-                    if predicted_class == "Sus_Scrofa":
-                        predicted_class = "Sus Scrofa"
-                    
-                    predicted_probability = round(float(row['echonet_confidence_1']) * 100.0, 2)
-
-                    print(f'Predicted class : {predicted_class}')
-                    print(f'Predicted probability : {predicted_probability}')
-
-                    audio_subsection = self.load_specific_subsection(audio_clip, start_time, end_time, sample_rate)
-
-                    # update the audio event with the re-sampled audio
-                    audio_event["audioClip"] = self.audio_to_string(audio_subsection)
-
-                    #COMMENTED OUT AS TRIANGULATION ALGORITHM WILL TAKE CARE OF THIS
-                    #######################################################
-                    # new_lat = audio_event['animalEstLLA'][0]
-                    # new_lon = audio_event['animalEstLLA'][1]
-
-                    # if(iteration_count > 0):
-                    #     lat = audio_event['animalEstLLA'][0]
-                    #     lon = audio_event['animalEstLLA'][1]
-
-                    #     new_lat, new_lon = self.generate_random_location(lat, lon, 50, 100)
-
-                    # new_lla = [new_lat, new_lon, 0.0]
-
-                    # audio_event['animalEstLLA'] = new_lla
-                    # audio_event['animalTrueLLA'] = new_lla
-
-                    # populate the database with the result
-                    self.echo_api_send_detection_event_from_clustering(
-                        audio_event,
-                        sample_rate,
-                        predicted_class,
-                        predicted_probability)
-                    
-                    iteration_count = iteration_count + 1
-
-            #print(audio_event['timestamp'])
-
-            elif(audio_event['audioFile'] == "Recording_Mode"): # classic model
+            if(audio_event['audioFile'] == "Recording_Mode"): # classic model
                 # convert to string representation of audio to binary for processing
                 print("Recording_Mode")
                 audio_clip = self.string_to_audio(audio_event['audioClip'])
@@ -553,19 +496,6 @@ class EchoEngine():
         x = requests.post(url, json = detection_event)
         print(x.text)
         
-    def echo_api_send_detection_event_from_clustering(self, audio_event, sample_rate, predicted_class, predicted_probability):
-        
-        detection_event = {
-            "clusterID": audio_event["clusterID"],
-            "species": predicted_class,
-            "confidence": predicted_probability, 
-            "audioClip": audio_event["audioClip"],
-            "sampleRate": sample_rate        
-        }
-        
-        url = 'http://ts-api-cont:9000/engine/test-event'
-        x = requests.post(url, json = detection_event)
-        print(x.text)
 
     def load_audio_file(self, file_path):
         wav, sr = librosa.load(file_path, sr=16000)
@@ -692,7 +622,6 @@ class EchoEngine():
     def execute(self):
         print("Engine started.")
         client = paho.Client()
-
         client.on_subscribe = self.on_subscribe
         client.on_message = self.on_message
         
@@ -707,7 +636,7 @@ class EchoEngine():
         
         print(f'Subscribing to MQTT: {self.config["MQTT_CLIENT_URL"]} {self.config["MQTT_PUBLISH_URL"]}')
         client.subscribe(self.config['MQTT_PUBLISH_URL'])
-        client.subscribe("Clustering")
+        
         print("Retrieving species names from GCP")
         self.class_names = self.gcp_load_species_list()
         

@@ -47,7 +47,7 @@ class CommsManager():
         # Setup database client and connect
         try:
             # database connection string
-            self.connection_string=f"{os.getenv('ATLAS_CONNECTION_STRING')}"
+            self.connection_string=f"mongodb://{self.credentials['DB_USERNAME']}:{self.credentials['DB_PASSWORD']}@{os.environ['MONGODB_HOSTNAME']}/EchoNet"
 
             myclient = pymongo.MongoClient(self.connection_string)
             self.echo_store = myclient["EchoNet"]
