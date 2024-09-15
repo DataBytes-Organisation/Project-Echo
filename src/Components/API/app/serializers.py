@@ -5,8 +5,6 @@ def eventEntity(event) -> dict:
         "sensorId": event["sensorId"],
         "species": event["species"],
         "microphoneLLA": event["microphoneLLA"],
-        "clusterID":event['clusterID'],
-        "events": event["events"],
         "animalEstLLA": event["animalEstLLA"],
         "animalTrueLLA": event["animalTrueLLA"],
         "animalLLAUncertainty": event["animalLLAUncertainty"],
@@ -25,7 +23,6 @@ def eventSpeciesEntity(event) -> dict:
         "sensorId": event["sensorId"],
         "species": event["species"],
         "microphoneLLA": event["microphoneLLA"],
-        "events": event["events"],
         "animalEstLLA": event["animalEstLLA"],
         "animalTrueLLA": event["animalTrueLLA"],
         "animalLLAUncertainty": event["animalLLAUncertainty"],
@@ -39,13 +36,6 @@ def movementEntity(event) -> dict:
         "species": event["species"],
         "animalId": event["animalId"],
         "animalTrueLLA": event["animalTrueLLA"]
-    }
-
-def testEventEntity(event) -> dict:
-    return {
-        "clusteringID":event["clustingID"],   
-        "species": event["species"],
-        "confidence": event["confidence"],
     }
 
 def movementSpeciesEntity(event) -> dict:

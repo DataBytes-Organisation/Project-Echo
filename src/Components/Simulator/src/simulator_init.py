@@ -56,12 +56,10 @@ class Config:
         self.comms_manager.initialise_communications()
         
         # Use google cloud to initialise species list
-        # FOR KUBERNETES - DISABLING THE LINE BELOW
-        # species_list = self.comms_manager.gcp_load_species_list()
+        species_list = self.comms_manager.gcp_load_species_list()
         
         # Create the factories
-        # FOR KUBERNETES - DISABLING THE LINE BELOW
-        # animal_factory = self.create_animal_factory(species_list)
+        animal_factory = self.create_animal_factory(species_list)
         sensor_factory = self.create_sensor_factory()
         
         # Create Sensor Instances
@@ -74,10 +72,9 @@ class Config:
         self.create_sensor_graph()
         
         # Create Animal Instances
-        # FOR KUBERNETES - DISABLING THE LINE BELOW
-        # animal_instances = self.create_animal_instances(animal_factory)
-        # FOR KUBERNETES, ADD animal_instances back into below line
-        return sensor_instances    
+        animal_instances = self.create_animal_instances(animal_factory)
+        
+        return animal_instances, sensor_instances    
     
     def validate_configuration(self, config):
         # TODO

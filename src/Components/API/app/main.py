@@ -11,7 +11,7 @@ from app import serializers
 from app import schemas
 import pymongo
 import json
-from app.routers import hmi, engine, sim, volume, clustering, triangulation
+from app.routers import hmi, engine, sim
 app = FastAPI()
 
 # Add the CORS middleware
@@ -23,12 +23,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(volume.router, tags=['recordings'], prefix='/volume')
 app.include_router(hmi.router, tags=['hmi'], prefix='/hmi')
 app.include_router(engine.router, tags=['engine'], prefix='/engine')
 app.include_router(sim.router, tags=['sim'], prefix='/sim')
-app.include_router(clustering.router, tags=['clustering'], prefix='/clustering')
-app.include_router(triangulation.router, tags=['triangulation'], prefix='/triangulation')
 
 
 # Load the project echo credentials into a dictionary
@@ -46,3 +43,4 @@ print(f" database names: {client.list_database_names()}")
 @app.get("/", response_description="api-root")
 def show_home():
     return 'Welcome to echo api, move to /docs for more'
+

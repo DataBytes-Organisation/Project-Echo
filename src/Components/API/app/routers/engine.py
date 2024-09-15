@@ -1,11 +1,11 @@
-from fastapi import status, APIRouter, HTTPException
+from fastapi import status, APIRouter
 from app import serializers
 from app import schemas
 from app.database import Events
 import datetime
 from app import serializers
 from app import schemas
-from app.database import Events, Species, Test_Events
+from app.database import Events, Species
 import datetime
 from fastapi.responses import StreamingResponse
 import pandas as pd
@@ -13,52 +13,16 @@ import pandas as pd
 
 router = APIRouter()
 
-
 @router.post("/event", status_code=status.HTTP_201_CREATED)
 def create_event(event: schemas.EventSchema):
 
-    # Define the filter to match the record
     result = Events.insert_one(event.dict())
-    
     pipeline = [
             {'$match': {'_id': result.inserted_id}},
         ]
     new_post = serializers.eventListEntity(Events.aggregate(pipeline))[0]
     return new_post
 
-@router.post("/test-event", status_code=status.HTTP_201_CREATED)
-def test_event(event: schemas.TestEventSchema):
-    
-
-    filter = {'clusterID': event.clusterID }
-
-    # Define the update operation with multiple fields
-    update = {
-        '$set': {
-            'species': event.species,
-            'confidence': event.confidence,
-            'audioClip': event.audioClip,
-            'sampleRate': event.sampleRate
-            # Add more fields as needed
-        }
-    }
-
-    print("Filter:", filter)
-    print("Update:", update)
-    
-    result = Test_Events.update_one(filter, update)
-    
-    if result.matched_count == 0:
-        raise HTTPException(status_code=404, detail="Item not found")
-    
-    response = schemas.UpdateResponse(
-        matched_count=result.matched_count,
-        modified_count=result.modified_count,
-        acknowledged=result.acknowledged
-    )
-
-    return response
-     
     
 # Return all species data
 

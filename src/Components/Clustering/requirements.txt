@@ -1,7 +1,0 @@
-watchdog
-pytaglib
-pymongo
-requests
-aiohttp
-asyncio
-datetime
