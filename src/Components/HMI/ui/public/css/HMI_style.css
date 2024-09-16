@@ -2188,3 +2188,9 @@ input[type="radio"]:not(:disabled)+span:hover:before {
   outline-width: 2px;
   outline-style: dotted;
 }
+
+/* Style for the animal list to limit visible items and make the rest scrollable */
+#animal-list {
+  max-height: 200px; /* Adjust the height as needed */
+  overflow-y: auto; /* Enable scrolling */
+}

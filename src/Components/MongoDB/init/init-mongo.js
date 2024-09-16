@@ -49,6 +49,10 @@ userdb.roles.insertMany(roles);
 const users = JSON.parse(cat('/docker-entrypoint-initdb.d/user-seed.json'));
 userdb.users.insertMany(users);
 
+// Add notificationAnimals as an empty array for each user
+users.forEach(user => {
+  user.notificationAnimals = []; // Initialize notificationAnimals field
+});
 
 userdb.guests.insertMany([
         { 

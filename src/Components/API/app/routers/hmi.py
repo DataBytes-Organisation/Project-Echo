@@ -276,6 +276,7 @@ def signin(user: schemas.UserLoginSchema):
     #Assign the session token with JWT
     requests.session.token = jwtToken
     result = {
+        "id": str(account["_id"]),
         "username": account["username"],
         "email": account["email"],
         "role" : authorities,
@@ -578,5 +579,45 @@ def filter_name(algorithm_type : str):
             return JSONResponse(content=response, status_code=200) 
     except Exception as e:
         return JSONResponse({"error" : "Algorithm not Found - {}".format(e)}, status_code=404)
+    
+
+@router.get("/users/{user_id}/notifications", dependencies=[Depends(jwtBearer)], status_code=status.HTTP_200_OK)
+def get_user_notifications(user_id: str):
+    user = User.find_one({"_id": user_id})
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return {"notificationAnimals": user.get("notificationAnimals", [])}
+
+@router.post("/users/{user_id}/notifications", dependencies=[Depends(jwtBearer)], status_code=status.HTTP_201_CREATED)
+def add_animal_to_notifications(user_id: str, animal: schemas.AnimalNotificationSchema):
+    user = User.find_one({"_id": user_id})
+    print(user)
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # Check if animal is already in notifications
+    if any(a["species"] == animal.species for a in user.get("notificationAnimals", [])):
+        raise HTTPException(status_code=400, detail="Animal already in notifications")
+
+    # Add the animal to the user's notification list
+    User.update_one(
+        {"_id": user_id},
+        {"$push": {"notificationAnimals": animal.dict()}}
+    )
+    return {"message": "Animal added to notifications"}
+
+@router.delete("/users/{user_id}/notifications/{species}", dependencies=[Depends(jwtBearer)], status_code=status.HTTP_200_OK)
+def remove_animal_from_notifications(user_id: str, species: str):
+    user = User.find_one({"_id": user_id})
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # Remove the animal from the user's notification list
+    User.update_one(
+        {"_id": user_id},
+        {"$pull": {"notificationAnimals": {"species": species}}}
+    )
+    return {"message": "Animal removed from notifications"}
+
         
     

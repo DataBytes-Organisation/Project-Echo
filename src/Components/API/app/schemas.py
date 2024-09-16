@@ -115,7 +115,31 @@ class RequestSchema(BaseModel):
            
         } 
 
+class AnimalNotificationSchema(BaseModel):
+    species: str
+    common: str
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "species": "Sus scrofa",
+                "common": "Wild Boar"
+            }
+        }
+
+class EmailNotifications(BaseModel):
+    species: str
+    last_sent: datetime
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "species": "Sus scrofa",
+                "last_sent": "2024-09-15T10:30:00Z"
+            }
+        }
         
+
 class UserSignupSchema(BaseModel):
     username: str
     password: constr(min_length = 8)
@@ -126,6 +150,8 @@ class UserSignupSchema(BaseModel):
     address: AddressSchema
     organization: str
     phonenumber: Optional[str]
+    notificationAnimals: Optional[List[AnimalNotificationSchema]] = []
+    emailNotifications: Optional[List[EmailNotifications]] = []
 
 
     @validator('DoB', pre=True)
