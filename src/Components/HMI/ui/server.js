@@ -36,7 +36,7 @@ const storeItems = new Map([[
 app.use(express.json({limit: '10mb'}));
 
 // Import the User model
-const { User } = require('./models/user.model'); // Add this line
+const { User } = require('./model/user.model'); // Add this line
 
 // Middleware to check if the user is an admin
 function isAdmin(req, res, next) {

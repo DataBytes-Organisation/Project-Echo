@@ -60,6 +60,27 @@
     <title>Echo | Welcome</title>
   </head>
   <body>
+
+
+    <div class = "overlay1">
+      <div class="cross-container">
+          <div id="payment-response" class="hidden">
+              <div id="processing-indicator" class="hidden"></div>
+          </div>
+  
+          <div class="crossmark hidden">
+            
+              <div class="o-circle c-container__circle o-circle__sign--failure">
+                  <div class="o-circle__sign"></div>
+              </div>
+              <div class="button-container ">
+                  <button class="retry-button">Retry</button>
+                  <button class="cancel-button">Cancel</button>
+              </div>
+          </div>
+      </div>
+  </div>
+
     
     <div class="screen" id="screen" onclick="fadeAnim(); openSIMULATOR()">  
 			<div class="screen-image"></div>  
@@ -1260,6 +1281,7 @@ function convertSpeciesToCommon(species){
       rzp1.on('payment.failed', function (response) {
         rzp1.close();
         //payment failed
+        paymentcancel();
       }
       );
 
@@ -2314,6 +2336,21 @@ closeFormButton.addEventListener('click', (event) => {
         const savedTheme = localStorage.getItem('theme') || 'dark'; // Default to dark if no preference
         setTheme(savedTheme);
     });
+
+
+    document.querySelector('.cancel-button').addEventListener('click', () => {
+
+document.querySelector('.crossmark').style.display = 'none';
+document.querySelector('.overlay1').style.display = 'none'; // Hide overlay
+});
+
+document.querySelector('.retry-button').addEventListener('click', () => {
+      var options = payment(username, donorAmount * 100, email);
+      var rzp1 = new Razorpay(options);
+
+      rzp1.open();
+    });
+
 </script>
   </body>
 </html>
