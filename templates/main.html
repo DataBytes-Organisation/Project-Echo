@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animal Tagger</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+</head>
+
+<body>
+    {% include 'header.html' %}
+    <main class="main">
+        <div class="main-content responsive-wrapper">
+            <article class="widget">
+                <h2>Animal Image and Audio Tagger</h2>
+                <p>
+                Welcome to our Animal Identification tool! Upload a WAV audio file to identify animal sounds or an image in JPEG/PNG format 
+                to recognize animals visually. Our advanced algorithms work separately to provide accurate predictions for each type of input.
+                The <code>InceptionV3</code> model trained in the <code>imagenet</code> dataset is used for image identification .
+                A combination of <code>CNN</code> and <code>LSTM</code> is used for audion identification.Discover the power of AI in recognizing the animal world through sound and sight.
+                </p>
+                <p>
+                   The system is able to identify the animals like: Dog, Rooster, Pig, Cow, Frog, Cat, Hen, Insects, Sheep, Crow from their sounds. The InceptionV3
+                    model has the ability to identify many varieties of the animals also. Different dataset where used to train the models like E50 for the audio
+                     datset and Imagenet for the image identification model. 
+                </p>
+                
+            </article>
+        </div>
+    </main>
+</body>
+</html>
+

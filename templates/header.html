@@ -1,0 +1,14 @@
+<!-- Sticky header -->
+<header class="header-outer">
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+	<div class="header-inner responsive-wrapper">
+		<div class="header-logo">
+			<b>ANIMAL TAGGER</b>
+		</div>
+		<nav class="header-navigation">
+            <a href="{{ url_for('home') }}">Home</a>
+            <a href="{{ url_for('upload_file') }}">Upload</a>
+            <a href="{{ url_for('gallery') }}">Gallery</a>
+		</nav>
+	</div>
+</header>
