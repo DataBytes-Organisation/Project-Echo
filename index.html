@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animal Detection Map</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/ol@latest/dist/ol.js"></script> <!-- For OpenLayers -->
+    <link href="https://unpkg.com/ol@latest/ol.css" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <img src="" alt="Corangamite CMA Logo" width="50" height="50" class="d-inline-block align-text-top">
+    
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">HOME</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">PROJECTS</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-success text-white" href="#">CONTACT US</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Map Section -->
+    <div id="basemap" class="map-container"></div>
+
+    <!-- Unique Animal Detections Note -->
+    <div id="legend" class="legend-box">
+        <h6>Unique Animal Detections</h6>
+        <div><span class="legend-dot red-dot"></span> Animal detected</div>
+        <div><span class="legend-dot grey-dot"></span> Survey sites</div>
+    </div>
+
+    <!-- Sidebar Section -->
+    <div class="sidebar bg-light shadow-lg p-4">
+        <h3 class="text-primary">Unique Animal Detections</h3>
+        
+        <!-- Animal options laid out in flex layout -->
+        <div class="animal-options d-flex flex-wrap mb-3">
+            <div class="form-check me-3">
+                <input class="form-check-input" type="radio" name="animal" value="swamp_antechinus" id="swamp_antechinus" onclick="filterAnimal('swamp_antechinus')" checked>
+                <label class="form-check-label" for="swamp_antechinus">Swamp antechinus</label>
+            </div>
+            <div class="form-check me-3">
+                <input class="form-check-input" type="radio" name="animal" value="broad_toothed_rat" id="broad_toothed_rat" onclick="filterAnimal('broad_toothed_rat')">
+                <label class="form-check-label" for="broad_toothed_rat">Broad-toothed rat</label>
+            </div>
+            <div class="form-check me-3">
+                <input class="form-check-input" type="radio" name="animal" value="long_nosed_potoroo" id="long_nosed_potoroo" onclick="filterAnimal('long_nosed_potoroo')">
+                <label class="form-check-label" for="long_nosed_potoroo">Long-nosed potoroo</label>
+            </div>
+            <div class="form-check me-3">
+                <input class="form-check-input" type="radio" name="animal" value="southern_brown_bandicoot" id="southern_brown_bandicoot" onclick="filterAnimal('southern_brown_bandicoot')">
+                <label class="form-check-label" for="southern_brown_bandicoot">Southern brown bandicoot</label>
+            </div>
+            <div class="form-check me-3">
+                <input class="form-check-input" type="radio" name="animal" value="new_holland_mouse" id="new_holland_mouse" onclick="filterAnimal('new_holland_mouse')">
+                <label class="form-check-label" for="new_holland_mouse">New Holland mouse</label>
+            </div>
+            <div class="form-check me-3">
+                <input class="form-check-input" type="radio" name="animal" value="smoky_mouse" id="smoky_mouse" onclick="filterAnimal('smoky_mouse')">
+                <label class="form-check-label" for="smoky_mouse">Smoky mouse</label>
+            </div>
+        </div>
+
+        <!-- Button placed below the animal names, aligned to the left -->
+        <div class="text-start">
+            <button class="btn btn-success" id="recentre-map-btn">RECENTRE MAP</button>
+        </div>
+
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
