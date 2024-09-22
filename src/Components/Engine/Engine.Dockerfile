@@ -38,7 +38,7 @@ COPY ./echo_engine.py ./
 COPY ./echo_engine.sh ./
 COPY ./echo_engine.json ./
 COPY ./echo_credentials.json ./
-
+COPY ./helpers ./helpers
 RUN chmod +x ./echo_engine.sh
 RUN dos2unix ./echo_engine.sh
 
