@@ -1,0 +1,11 @@
+[
+  {
+    "species": "Koala",
+    "location": {
+      "latitude": -38.561992,
+      "longitude": 143.538208
+    },
+    "dateTime": "2024-09-21T15:56",
+    "observations": "sdbd"
+  }
+]

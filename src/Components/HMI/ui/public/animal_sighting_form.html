@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animal Sighting Form</title>
+    <style>
+        body {
+            background: #1a1a1a;
+            font-size: 17px;
+            font-family: 'Roboto', sans-serif;
+            color: rgba(247, 186, 206, 1);
+            margin: 0;
+            padding: 0;
+        }
+
+        .menu-header {
+            text-align: center;
+            background-color: rgba(10, 10, 25, 0.8);
+            padding: 20px 0;
+        }
+
+        .title {
+            font-size: 30px;
+            font-family: 'Stick No Bills', sans-serif;
+            color: rgba(247, 186, 206, 1);
+        }
+
+        .form-container {
+            width: 100%;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: rgb(10, 10, 25, 0.8);
+            border-radius: 10px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .form-label {
+            font-family: 'Roboto', sans-serif;
+            font-size: 16px;
+            color: rgba(247, 186, 206, 1);
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            background-color: #1a1a1a;
+            color: rgba(247, 186, 206, 1);
+            border: 1px solid rgba(247, 186, 206, 0.4);
+            border-radius: 5px;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .form-input::placeholder {
+            color: rgba(247, 186, 206, 0.6);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: rgba(247, 186, 206, 1);
+        }
+
+        textarea.form-input {
+            resize: vertical;
+            height: 100px;
+        }
+
+        .form-button {
+            width: 100%;
+            padding: 10px;
+            background-color: rgba(247, 186, 206, 1);
+            color: #1a1a1a;
+            font-size: 18px;
+            font-family: 'Stick No Bills', sans-serif;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .form-button:hover {
+            background-color: rgba(247, 186, 206, 0.8);
+        }
+
+        #map {
+            height: 400px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .form-container {
+                padding: 10px;
+                width: 90%;
+            }
+
+            .title {
+                font-size: 24px;
+            }
+        }
+    </style>
+
+    <!-- Leaflet CSS and JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+</head>
+<body>
+
+<div class="main">
+    <div class="menu-header">
+        <h2 class="title">Submit Animal Sighting</h2>
+    </div>
+
+    <form id="sightingForm" class="form-container">
+        <!-- Species Type Dropdown -->
+        <label for="species" class="form-label">Species Type:</label>
+        <select id="species" name="species" class="form-input" required>
+            <option value="">--Select Species--</option>
+            <option value="Kangaroo">Kangaroo</option>
+            <option value="Koala">Koala</option>
+            <option value="Echidna">Echidna</option>
+            <option value="Wombat">Wombat</option>
+            <option value="Other">Other</option>
+        </select>
+        <label for="observations" class="form-label">Additional Observations:</label>
+        <textarea id="observations" name="observations" class="form-input" placeholder="Enter additional details (optional)"></textarea>
+
+
+        <!-- Interactive Map for Location -->
+        <label class="form-label">Sighting Location:</label>
+        <div id="map"></div>
+
+        <!-- Latitude and Longitude -->
+        <label for="latitude" class="form-label">Latitude:</label>
+        <input type="number" id="latitude" name="latitude" class="form-input" placeholder="Latitude" step="0.000001" min="-90" max="90" required readonly>
+
+        <label for="longitude" class="form-label">Longitude:</label>
+        <input type="number" id="longitude" name="longitude" class="form-input" placeholder="Longitude" step="0.000001" min="-180" max="180" required readonly>
+
+        <!-- Date and Time of Sighting -->
+        <label for="dateTime" class="form-label">Date and Time of Sighting:</label>
+        <input type="datetime-local" id="dateTime" name="dateTime" class="form-input" required>
+
+        <!-- Additional Observations -->
+        
+
+        <!-- Submit Button -->
+        <button type="submit" class="form-button">Submit Sighting</button>
+    </form>
+</div>
+
+<!-- JavaScript for Interactive Map -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    // Initialize the map centered on the Otways region
+    const map = L.map('map').setView([-38.705, 143.703], 10); // Otways region coordinates
+
+    // Add OpenStreetMap tile layer (free, no access token needed)
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Initialize marker for selecting location
+    let marker;
+
+    // Function to update latitude and longitude fields
+    function updateLatLng(lat, lng) {
+        document.getElementById('latitude').value = lat.toFixed(6);
+        document.getElementById('longitude').value = lng.toFixed(6);
+    }
+
+    // Add click event listener on the map
+    map.on('click', function (e) {
+        const { lat, lng } = e.latlng;
+
+        // If marker exists, move it; otherwise, create a new one
+        if (marker) {
+            marker.setLatLng([lat, lng]);
+        } else {
+            marker = L.marker([lat, lng]).addTo(map);
+        }
+
+        // Update latitude and longitude input fields
+        updateLatLng(lat, lng);
+    });
+
+    // Handle form submission
+    document.getElementById('sightingForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        // Retrieve form data
+        const species = document.getElementById('species').value;
+        const latitude = document.getElementById('latitude').value;
+        const longitude = document.getElementById('longitude').value;
+        const dateTime = document.getElementById('dateTime').value;
+        const observations = document.getElementById('observations').value;
+
+        // Example data object that you would send to the backend
+        const sightingData = {
+            species: species,
+            location: {
+                latitude: parseFloat(latitude),
+                longitude: parseFloat(longitude)
+            },
+            dateTime: dateTime,
+            observations: observations
+        };
+
+        console.log(sightingData); // Replace this with an API call to your backend
+
+        // Clear form fields after submission
+        document.getElementById('sightingForm').reset();
+        alert('Sighting Submitted!');
+    });
+});
+</script>
+
+</body>
+</html>
