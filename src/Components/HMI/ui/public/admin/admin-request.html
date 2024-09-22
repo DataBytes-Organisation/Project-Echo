@@ -31,9 +31,91 @@
   <script src="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.min.js"></script>
   <script type="text/javascript" src="./admin/js/dashboard.js"></script>
   <script type="text/javascript" src="./admin/js/app.min.js"></script>
+
+  <style>
+    #update-form {
+      display: none;
+      position: fixed;
+      /* or 'absolute' if you prefer */
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      /* Semi-transparent background */
+
+      justify-content: center;
+      align-items: center;
+      z-index: -1;
+    }
+  </style>
 </head>
 
 <body>
+
+  <div id="update-form">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-md-5 mt-5 bg-body-tertiary rounded">
+          <form>
+            <div class="pt-3">
+              <h3 class="text-center font-weight-bold fw-bolder"> Updated Details</h3>
+            </div>
+            <hr class="bg-light">
+
+            <!-- <label class = "fw-bolder"> User Name: </label> -->
+            <div class="input-group">
+              <p class="fw-bolder" style="white-space: pre;">User Name: </p>
+              <p id="update_usernm"></p>
+            </div>
+            <div class="input-group">
+              <p class="fw-bolder" style="white-space: pre;">Animal: </p>
+              <p id="update_animal"></p>
+            </div>
+
+            <div class="input-group">
+              <p class="fw-bolder" style="white-space: pre;">Conservation: </p>
+              <p id="old_conser"></p>
+            </div>
+
+            <div class="input-group">
+              <p class="fw-bolder" style="white-space: pre;">New Conservation: </p>
+              <p id="udate_conser"></p>
+            </div>
+
+            <div class=" input-group">
+              <p class="fw-bolder" style="white-space: pre;">Link: </p>
+              <a href="" id="link_up" target="_blank">click for link</a>
+            </div>
+
+            <div class="row mb-3">
+              <label class="col-sm-2 col-form-label fw-bolder">Summary:</label>
+              <div class="col-sm-9 ">
+                <div class="bg-light rounded border border-black mb-4 bg-white"
+                  style="height: 120px; overflow-y: scroll;  overflow-x: hidden;">
+                  <p id="summ_para"></p>
+                </div>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <label class="col-sm-2 col-form-label fw-bolder">Description:</label>
+              <div class="col-sm-9 ">
+                <div class="bg-light rounded border border-black mb-4 bg-white"
+                  style="height: 120px; overflow-y: scroll; overflow-x: hidden;">
+                  <p id="desc_para"></p>
+                </div>
+              </div>
+            </div>
+            <div class="pb-4">
+              <button id="close-btn" type="button" class="btn btn-secondary d-grid gap-2 col-4 mx-auto ">close</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+  </div>
   <!--  Body Wrapper -->
   <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
     data-sidebar-position="fixed" data-header-position="fixed">
@@ -55,13 +137,14 @@
                 <table>
                   <thead>
                     <tr>
-                      <th>Request ID</th>
+                       <th>Request ID</th>
                       <th>Username</th>
                       <th>Animal</th>
-                      <th>Requesting To Change</th>
-                      <th>From</th>
-                      <th>To</th>
-                      <th>Reason</th>
+                      <!-- <th>Requesting To Change</th>
+                          <th>From</th>
+                          <th>To</th>
+                          <th>Reason</th> -->
+                      <th>More Details</th>
                       <th>Date</th>
                       <th>Status</th>
                     </tr>
@@ -100,8 +183,9 @@
         const options = document.createElement('div');
         options.classList.add('dropdown-options');
         options.innerHTML = `
-        <button class="approve-btn" data-request-id="${requestId}" data-animal="${animal}" data-to="${modified}">Approve</button>
-        <button class="deny-btn" data-request-id="${requestId}">Deny</button>
+        <button class="approve-btn" style = "z-index: 1000;"" data-request-id="${requestId}" data-animal="${animal}" 
+        data-to="${modified}" data-desc = "${desc}" data-summ = "${summary}">Approve</button>
+        <button class="deny-btn" style = "z-index: 1000;""  data-request-id="${requestId}">Deny</button>
       `;
         dropdown.appendChild(options);
 
@@ -120,22 +204,9 @@
               const row = document.createElement('tr');
               row.innerHTML = `
                   <td>${item._id}</td>
-                  <td>
-                 
-                  <div class="dropdown">
-                    <button class="dropdown-toggle btn-small" data-user-id="${item.username}">${item.username}</button>
-                    <div class="dropdown-menu" style="display: none;">
-                        <button class="dropdown-item suspend-btn" data-user-id="${item.username}">Suspend</button>
-                        <button class="dropdown-item ban-btn" data-user-id="${item.username}">Ban</button>
-                    </div>
-                    </div>
-                  </td>
-
+                  <td>${item.username}</td>
                   <td>${item.animal}</td>
-                  
-                  <td>${item.initial}</td>
-                  <td>${item.modified}</td>
-                  <td>${item.source}</td>
+                  <td><button class ="show-detail" style = "border-radius: 3px;" data-detail_id="${item._id}" >show details</button></td>           
                   <td>${item.date}</td>
   
                   <td></td> <!-- Placeholder for status cell -->
@@ -167,32 +238,19 @@
 
       updateTable();
 
-      dataBody.addEventListener('click', event => {
-        const target = event.target;
-
-
-
-      });
 
       // Close dropdowns when clicking elsewhere on the page
-      document.addEventListener('click', function (event) {
-        if (!event.target.closest('.dropdown')) {
-          document.querySelectorAll('.dropdown-menu').forEach(function (element) {
-            element.style.display = 'none';
-          });
-        }
-      }, true);
+
 
       dataBody.addEventListener('click', event => {
         const target = event.target;
         const requestId = target.getAttribute('data-request-id');
         const animal = target.getAttribute('data-animal');
         const modified = target.getAttribute('data-to');
-
         if (target.classList.contains('dropdown-toggle')) {
-          const dropdownMenu = target.nextElementSibling;
           dropdownMenu.style.display = dropdownMenu.style.display === 'none' ? 'block' : 'none';
         }
+
         else if (target.classList.contains('dropdown-item')) {
           const userId = target.getAttribute('data-user-id');
           if (target.classList.contains('suspend-btn')) {
@@ -207,17 +265,50 @@
           // Close dropdown after action
           target.closest('.dropdown-menu').style.display = 'none';
         }
+        const desc = target.getAttribute('data-desc');
+        const summary = target.getAttribute('data-summ');
 
 
 
         if (target.classList.contains('approve-btn')) {
           console.log(`Approving request...`);
 
-          console.log("Request ID select:   ", requestId)
-          console.log("Changing status to:  ", modified)
+          console.log("Request ID select:   ", requestId);
+          
 
+          if (desc != "unchanged" || summary != "unchanged") {
+          
+          fetch(`/api/update_json/${animal}`, {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              description: desc,
+              summary: summary,
+            })
+          })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Network response was not ok');
+              }
+              return response.json();
+            })
+            .then(data => {
+              // Handle the response data
+              console.log('Request status updated:', data);
+              clearTable();
+              updateTable();
+            })
+            .catch(error => {
+              console.error('Error updating request status:', error);
+              return;
+            });
 
+        }
+        if (modified != "unchanged") {
 
+            console.log('changing conservation');
 
           fetch(`/api/updateConservationStatus/${animal}`, {
             method: 'PATCH',
@@ -249,7 +340,7 @@
             .catch(error => {
               console.error('Error updating request status:', error);
             });
-
+          }
           //Perform API call to update the status
           fetch(`/api/requests/${requestId}`, {
             method: 'PATCH',
@@ -322,6 +413,45 @@
           updateTable();
         }
       })
+
+
+      const form = document.getElementById('update-form');
+    const closes = document.getElementById('close-btn');
+
+
+    dataBody.addEventListener('click', event => {
+
+      if (event.target.classList.contains('show-detail')) {
+        const detailId = event.target.dataset.detail_id;
+        console.log(`logging details for ID: ${detailId}`);
+
+        fetch('/api/requests').then(response => response.json()).then(data => {
+          data.forEach(item => {
+
+            if (item._id == detailId) {
+              document.getElementById('update_usernm').innerHTML = item.username;
+              document.getElementById('update_animal').innerHTML = item.animal;
+              document.getElementById('desc_para').innerHTML = item.desc;
+              document.getElementById('summ_para').innerHTML = item.summary;
+              document.getElementById('link_up').href = item.source;
+              document.getElementById('udate_conser').innerHTML = item.modified;
+              document.getElementById('old_conser').innerHTML = item.initial;
+            }
+
+          });
+        })
+
+        form.style.display = "block";
+        form.style.zIndex = "1000";
+      }
+
+    })
+
+    closes.addEventListener('click', event => {
+      form.style.display = "none";
+      form.style.zIndex = "-1";
+    })
+
 
     </script>
 
