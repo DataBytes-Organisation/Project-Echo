@@ -2261,7 +2261,7 @@ input[type="radio"]:not(:disabled)+span:hover:before {
 }
 
 /* Available animals and selected animals lists */
-#animalNotifications #animal-list, #animalNotifications #selected-animals {
+#animalNotifications #animalNotifications #selected-animals {
   max-height: 150px;
   overflow-y: scroll;
   background-color: #2b2b2b;
@@ -2302,6 +2302,18 @@ input[type="radio"]:not(:disabled)+span:hover:before {
 #animalNotifications center {
   display: block;
   text-align: center;
+}
+
+#animal-search-label{
+  color: white;
+}
+
+#available-animal-label{
+  color: white;
+}
+
+#selected-animal-label{
+  color: white;
 }
 
 /* Media queries for responsiveness */

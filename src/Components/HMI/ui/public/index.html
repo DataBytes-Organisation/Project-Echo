@@ -384,7 +384,7 @@
               </div>
             </div>
           </div>
-          <div id="animalNotifications" style="display:none;">
+          <div id="animalNotifications" style="width: 0%; height: 0%;">
             <div class="wrapper">
               <form action="/api/notifications/animals" method="POST">
                 <div id="notification-contents">
@@ -393,13 +393,13 @@
                   <!-- Animal Search and Selection -->
                   <div class="markup_form">
                     <div class="markup_column">
-                      <label for="animal-search">Search for animals:</label>
+                      <label for="animal-search" id="animal-search-label">Search for animals:</label>
                       <input type="text" id="animal-search" placeholder="Type animal name..." />
                     </div>
 
                     <!-- Dropdown or List of Animals (Can be dynamically populated) -->
                     <div class="markup_column">
-                      <label for="animal-list">Available Animals:</label>
+                      <label for="animal-list" id="available-animal-label" style="color:white"></label>Available Animals:</label>
                       <ul id="animal-list">
                         <!-- Dynamically populated list -->
                       </ul>
@@ -407,7 +407,7 @@
 
                     <!-- Selected Animals for Notification -->
                     <div class="markup_column">
-                      <label>Selected Animals:</label>
+                      <label id="selected-animal-label" >Selected Animals:</label>
                       <ul id="selected-animals">
                         <!-- Populated as animals are selected -->
                       </ul>
@@ -1719,7 +1719,7 @@
         case "animalNotifications":
           document.getElementById("notification-menu-button").classList.add("active");
           document.getElementById("animalNotifications").style.display = "block";
-          console.log("ello")
+          //console.log("ello")
           break;
       }
       if (tab != null) {
