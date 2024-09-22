@@ -17,7 +17,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update
 RUN apt-get install -y libopenexr-dev dos2unix
-RUN apt-get install pkg-config
+RUN apt-get install pkg-config -y
 RUN python3 -m pip install --upgrade pip
 RUN pip download -r requirements.txt
 RUN pip install -r requirements.txt
