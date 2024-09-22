@@ -4,29 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Profile</title>
+
     <style>
-        /* Stylish CSS styles for the user profile page */
+        /* Styles for the user profile page */
         body {
-            background-image: linear-gradient(135deg, #FAB2FF 10%, #1904E5 50%, #0E2941 100%); /* Dark Green, Green, Dark Blue */
+            background-image: linear-gradient(135deg, #FAB2FF 10%, #1904E5 50%, #0E2941 100%); /* Gradient background */
             background-size: cover;
             background-repeat: no-repeat;
             background-attachment: fixed;
-            font-family: "Arial", sans-serif;
-            color: #333333;
+            font-family: "Arial", sans-serif; /* Font style */
+            color: #333333; /* Text color */
             margin: 0;
             padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            min-height: 100vh; /* Full page height */
         }
 
+        /* Container styling */
         .container {
             width: 80%;
-            background: #FFFFFF;
+            background: #FFFFFF; /* White background for content */
             border-radius: 10px;
             overflow: hidden;
-            box-shadow: 0 0 20px 6px #090b6f85;
+            box-shadow: 0 0 20px 6px #090b6f85; /* Shadow effect */
             box-sizing: border-box;
             text-align: center;
         }
@@ -35,6 +37,7 @@
             height: auto;
         }
 
+        /* Left panel styling with background image */
         .left {
             color: #FFFFFF;
             background-image: url("https://i.pinimg.com/736x/5d/73/ea/5d73eaabb25e3805de1f8cdea7df4a42--tumblr-backgrounds-iphone-phone-wallpapers-iphone-wallaper-tumblr.jpg");
@@ -43,62 +46,73 @@
             overflow: hidden;
         }
 
+        /* Overlay styling on the left panel */
         .left .overlay {
             padding: 30px;
             width: 100%;
             height: 100%;
-            background: #5961f9ad;
+            background: #5961f9ad; /* Semi-transparent blue overlay */
             box-sizing: border-box;
         }
 
+        /* Title styling */
         .left .overlay h1 {
-            font-size: 10vmax;
-            font-weight: 900;
+            font-size: 10vmax; /* Responsive font size */
+            font-weight: 900; /* Bold font */
             margin-top: 40px;
             margin-bottom: 20px;
-            font-family: "Verdana", sans-serif;
+            font-family: "Verdana", sans-serif; /* Font style */
         }
 
+        /* Paragraph styling */
         .left .overlay span p {
             margin-top: 30px;
             font-weight: 900;
         }
 
+        /* Button styling */
         .left .overlay span a {
-            background: #3b5998;
-            color: #FFFFFF;
+            background: #3b5998; /* Facebook blue color */
+            color: #FFFFFF; /* White text */
             margin-top: 10px;
             padding: 14px 50px;
-            border-radius: 100px;
+            border-radius: 100px; /* Round button */
             display: inline-block;
-            box-shadow: 0 3px 6px 1px #042d4657;
+            box-shadow: 0 3px 6px 1px #042d4657; /* Button shadow */
             text-decoration: none;
             font-family: "Verdana", sans-serif;
         }
 
+        /* Styling for the second button (e.g., Sign Out) */
         .left .overlay span a:last-child {
-            background: #1dcaff;
+            background: #1dcaff; /* Light blue background */
             margin-left: 30px;
         }
 
+        /* Responsive styling for smaller devices */
         @media (max-width: 768px) {
             .container {
-                width: 90%;
+                width: 90%; /* Slightly smaller container */
             }
         }
     </style>
 </head>
 <body>
+    <!-- Main container -->
     <div class="container">
+        <!-- Left section with user profile details -->
         <div class="left">
             <div class="overlay">
+                <!-- User Profile title -->
                 <h1>User Profile</h1>
                 <span>
+                    <!-- Displaying user details -->
                     <p><strong>Username:</strong> Yohjit</p>
                     <p><strong>Email:</strong> dipansh@echo.com</p>
                     <p><strong>Personal Details:</strong> Task ON Creating user Profile UI.</p>
                 </span>
                 <span>
+                    <!-- Buttons for updating password, signing out, and deleting account -->
                     <a href="#" id="updatePasswordBtn">Update Password</a>
                     <a href="#" id="signOutBtn">Sign Out</a>
                     <a href="#" id="deleteAccountBtn" class="delete">Delete Account</a>
@@ -106,6 +120,8 @@
             </div>
         </div>
     </div>
+
+    <!-- JavaScript for interactive functionality -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             // Find the "Update Password" button by its ID
@@ -113,44 +129,44 @@
     
             // Add a click event listener to the button
             updatePasswordBtn.addEventListener("click", function (event) {
-                event.preventDefault(); // Prevent the default form submission behavior
+                event.preventDefault(); // Prevent the default behavior of the button (e.g., page reload)
     
                 // Prompt the user for the new password
                 const newPassword = prompt("Enter your new password:");
                 if (newPassword === null) {
-                    // User canceled the prompt, do nothing
+                    // If user cancels the prompt, do nothing
                     return;
                 }
     
                 // Prompt the user to confirm the new password
                 const confirmPassword = prompt("Confirm your new password:");
                 if (confirmPassword === null) {
-                    // User canceled the confirmation prompt, do nothing
+                    // If user cancels the confirmation, do nothing
                     return;
                 }
     
                 // Check if the passwords match
                 if (newPassword !== confirmPassword) {
-                    // Passwords do not match, show an error message
+                    // If passwords don't match, show an error message
                     alert("Passwords do not match. Please try again.");
                     return;
                 }
 
-                if (newPassword == confirmPassword) {
-                    // Passwords do not match, show an error message
-                    alert("Password Has been changed successfully !!!");
-
-                    // Make an AJAX request to your server to update the password
-                fetch('/updatePassword', {
-                    method: 'POST', // You should use the appropriate HTTP method
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ newPassword }), // Send the new password to the server
-                })
-                    .then((response) => response.json())
+                // If the passwords match, show a success message
+                if (newPassword === confirmPassword) {
+                    alert("Password has been changed successfully!");
+    
+                    // Make an AJAX request to the server to update the password
+                    fetch('/updatePassword', {
+                        method: 'POST', // Use the POST method to send data
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ newPassword }), // Send the new password as a JSON object
+                    })
+                    .then((response) => response.json()) // Parse the JSON response from the server
                     .then((data) => {
-                        // Handle the response from the server, e.g., show a success message or error message
+                        // Handle the response: show success or error messages
                         if (data.success) {
                             alert("Password updated successfully!");
                         } else {
@@ -158,18 +174,12 @@
                         }
                     })
                     .catch((error) => {
+                        // Log any error that occurs during the process
                         console.error('Error:', error);
                     });
-                    return;
                 }
-    
-                
             });
-
-            
         });
-
-        
     </script>
     
 </body>
