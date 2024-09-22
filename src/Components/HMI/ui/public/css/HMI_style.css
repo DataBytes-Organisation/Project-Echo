@@ -2198,33 +2198,25 @@ input[type="radio"]:not(:disabled)+span:hover:before {
 }
 
 /* Style for the animal list to limit visible items and make the rest scrollable */
-#animal-list {
+#animalNotifications #animal-list {
   max-height: 200px; /* Adjust the height as needed */
   overflow-y: auto; /* Enable scrolling */
 }
 
 /* Form structure */
-.markup_form {
+#animalNotifications .markup_form {
   display: flex;
   flex-direction: column; /* Stack items vertically */
   gap: 20px; /* Add spacing between each section */
 }
 
 /* Individual form sections take full width */
-.markup_column {
+#animalNotifications .markup_column {
   width: 100%; /* Full width */
   margin-bottom: 20px; /* Add spacing between sections */
 }
 
-/* Label and input styling */
-label {
-  display: block;
-  color: #f7bacf;
-  margin-bottom: 8px;
-  font-weight: 600;
-}
-
-input[type="text"], select {
+#animalNotifications input[type="text"], #animalNotifications select {
   width: 100%;
   padding: 10px;
   border-radius: 5px;
@@ -2236,12 +2228,12 @@ input[type="text"], select {
 }
 
 /* Hide the list when it's empty */
-ul:empty {
+#animalNotifications ul:empty {
   display: none; /* Hide the list when there are no items */
 }
 
 /* When the list is populated, display it normally */
-ul {
+#animalNotifications ul {
   list-style: none;
   padding: 10px;
   background-color: #2b2b2b;
@@ -2253,14 +2245,13 @@ ul {
 }
 
 /* List items styling */
-ul li {
+#animalNotifications ul li {
   margin: 10px 0;
   font-size: 14px;
 }
 
-
 /* Available animals and selected animals lists */
-#animal-list, #selected-animals {
+#animalNotifications #animal-list, #animalNotifications #selected-animals {
   max-height: 150px;
   overflow-y: scroll;
   background-color: #2b2b2b;
@@ -2271,7 +2262,7 @@ ul li {
 }
 
 /* Selected animals should have a distinct style */
-#selected-animals li {
+#animalNotifications #selected-animals li {
   background-color: #3b3b3b;
   padding: 5px;
   border-radius: 3px;
@@ -2280,46 +2271,32 @@ ul li {
 }
 
 /* Scrollbar styling */
-ul::-webkit-scrollbar {
+#animalNotifications ul::-webkit-scrollbar {
   width: 8px;
 }
 
-ul::-webkit-scrollbar-thumb {
+#animalNotifications ul::-webkit-scrollbar-thumb {
   background-color: #ff80ab;
   border-radius: 10px;
 }
 
-ul::-webkit-scrollbar-track {
+#animalNotifications ul::-webkit-scrollbar-track {
   background-color: #2b2b2b;
 }
 
-/* Button styling */
-button {
-  background-color: #ff80ab;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: background-color 0.3s ease;
-}
-
-button:hover {
+#animalNotifications button:hover {
   background-color: #ff4081;
 }
 
 /* Center button alignment */
-center {
+#animalNotifications center {
   display: block;
   text-align: center;
 }
 
 /* Media queries for responsiveness */
 @media (max-width: 768px) {
-  .markup_form {
+  #animalNotifications .markup_form {
       flex-direction: column;
   }
 }
-
-
