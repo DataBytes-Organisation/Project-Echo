@@ -43,13 +43,7 @@
 
             "modal": {
                 "ondismiss": function () {
-                    if (confirm("Are you sure, you want to close the form?")) {
-                        txt = "You pressed OK!";
-                        console.log("Checkout form closed by the user");
-                    } else {
-                        txt = "You pressed Cancel!";
-                        console.log("Complete the Payment")
-                    }
+                    paymentcancel();
                 }
             },
             "handler":
@@ -64,3 +58,37 @@
     }
 
    
+    function paymentcancel() {
+        const responseDiv = document.getElementById('payment-response');
+        const processingIndicator = document.getElementById('processing-indicator');
+        const crossmark = document.querySelector('.crossmark');
+        const buttonContainer = document.querySelector('.button-container');
+        const retryButton = document.querySelector('.retry-button');
+        const overlay = document.querySelector('.overlay1');
+       
+        // Duration of the processing indicator animation
+        const processingDuration = 2000; // Adjust to match your actual duration
+    
+        responseDiv.classList.remove('hidden');
+        processingIndicator.classList.remove('hidden');
+    
+        // Show processing indicator and hide crossmark initially
+        processingIndicator.style.display = 'block';
+        overlay.style.display = 'flex';    
+        crossmark.style.display = 'none';
+    
+        // After the processing duration, start crossmark animation
+        setTimeout(() => {
+            processingIndicator.style.display = 'none';
+            crossmark.style.display = 'flex'; // Make it visible
+            crossmark.style.opacity = '1'; // Fade in
+    
+            // Show the button container after the crossmark animation
+           
+            setTimeout(() => {
+                buttonContainer.style.display = 'flex';
+                retryButton.classList.add('shake-animation');
+            }, 800);
+    
+        }, processingDuration);
+    }
