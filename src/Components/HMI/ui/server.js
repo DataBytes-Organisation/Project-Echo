@@ -416,6 +416,14 @@ app.post("/request_access", async (req, res) => {
   }
 })
 
+// Endpoint to handle algorithm selection
+app.post('/api/applyAlgorithm', (req, res) => {
+  const { algorithm } = req.body;
+  console.log(`Algorithm ${algorithm} applied.`);
+  // Additional backend logic to apply the algorithm
+  res.send(`Algorithm ${algorithm} has been applied.`);
+});
+
 // routes
 require('./routes/auth.routes')(app);
 require('./routes/user.routes')(app);
