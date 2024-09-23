@@ -44,7 +44,8 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
-    
+    <script src = "paymentgateway.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <!-- Axios -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
@@ -59,6 +60,27 @@
     <title>Echo | Welcome</title>
   </head>
   <body>
+
+
+    <div class = "overlay1">
+      <div class="cross-container">
+          <div id="payment-response" class="hidden">
+              <div id="processing-indicator" class="hidden"></div>
+          </div>
+  
+          <div class="crossmark hidden">
+            
+              <div class="o-circle c-container__circle o-circle__sign--failure">
+                  <div class="o-circle__sign"></div>
+              </div>
+              <div class="button-container ">
+                  <button class="retry-button">Retry</button>
+                  <button class="cancel-button">Cancel</button>
+              </div>
+          </div>
+      </div>
+  </div>
+
     
     <div class="screen" id="screen" onclick="fadeAnim(); openSIMULATOR()">  
 			<div class="screen-image"></div>  
@@ -139,9 +161,11 @@
               <img src="./images/tabIcons/logo-removebg.png" alt="project echo logo">
             </div>
           </div>
+          <button id="themeToggle" class="theme-toggle-btn" style="position: absolute; right: 10px; top: 50px; color: green; z-index: 1001;">Switch to Light Theme</button>
           <div class="navbar">
             <a id="filter-menu-btn" class="tabs-button active" onclick="openTab('filter-menu')"></a>
             <a id="SIM-menu-btn" class="tabs-button" onclick="openTab('SIM')"></a>
+            <a id="config-settings-menu-btn" class="tabs-button" onclick="openTab('config-settings-tab')"></a>
             <a id="popup-menu-btn" class="tabs-button" onclick="openTab('animal-popup')"></a>
             <a id="mic-popup-menu-btn" class="tabs-button" onclick="openTab('mic-popup')"></a>
             <a id="FAQ-menu-btn" class="tabs-button" onclick="openTab('FAQ')"></a>
@@ -344,6 +368,77 @@
             </div>
             </div>
           </div> 
+          <!-- Configuration Tab Content -->
+          <div id="config-settings-tab">
+            <div class="wrapper">
+              <div id="config-settings-contents">
+                <h2>Configuration Settings</h2>
+                <p class="config-description">
+                  The Configuration Settings tab is a crucial component of the Echo Simulator interface, designed to customize and control various simulation parameters. This tab allows users to tailor the simulation environment by selecting specific microphones, species, and classes, which are critical for conducting targeted environmental studies and simulations.
+                </p>
+                <div class="accordion" id="configAccordion">
+                        <!-- Microphones Section -->
+                    <div class="dropdown">
+                      <button class="btn btn-secondary dropdown-toggle btn-no-background" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Select Microphones
+                      </button>
+                      <div class="dropdown-menu">
+                        <div class="row">
+                          <div class="col">
+                            <select id="config-microphone-list" class="form-control" multiple>
+                              
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Species Section -->
+                    <div class="dropdown">
+                      <button class="btn btn-secondary dropdown-toggle btn-no-background" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Select Species
+                      </button>
+                      <div class="dropdown-menu">
+                        <div class="row">
+                          <div class="col">
+                            
+                            <select id="config-species-list" class="form-control" multiple>
+                            
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Class Section -->
+                    <div class="dropdown">
+                      <button class="btn btn-secondary dropdown-toggle btn-no-background" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Select Class
+                      </button>
+                      <div class="dropdown-menu">
+                        <div class="row">
+                          <div class="col">
+                            
+                            <select id="config-class-list" class="form-control" multiple>
+                              
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <br></br>
+                    <!-- Configure Button -->
+                    <button id="config-configure-button" class="btn btn-primary">Configure</button>
+
+                    <!-- Current Configuration Information -->
+                    <div id="config-current-configuration" class="mt-4">
+                      <h3>Current Configuration</h3>
+                      <p id="config-details">No configuration selected.</p>
+                    </div>
+              </div>
+            </div>
+          </div>
+
           <!--DONATIONS TAB--->
           <div id="donate">
             <div class="wrapper">
@@ -621,6 +716,7 @@
             </div>
             <div id="mic-default-content">
               <h2 style="text-align: left; color: rgba(247, 186, 206, 1) !important;">Microhpone Bio Data</h2>
+              <br>
                 <p>Please click on a map marker to view microphone data.</p>
             </div>
             </div>
@@ -836,7 +932,7 @@
     </div>
 
 <script>
-
+  //test
   const iconDicts = {};
   var displayedAnimals = new Set();
   var hiddenAnimals = new Set();
@@ -1249,6 +1345,18 @@ function convertSpeciesToCommon(species){
     }
     // Update the quantity with the chosen donation amount
     cart[0].quantity=donorAmount;
+    var options = payment(username, donorAmount*100, email);
+      var rzp1 = new Razorpay(options);
+
+      rzp1.open();
+
+      rzp1.on('payment.failed', function (response) {
+        rzp1.close();
+        //payment failed
+        paymentcancel();
+      }
+      );
+
     fetch("/api/create-checkout-session", {
       method: "POST",
       headers: {
@@ -1355,6 +1463,9 @@ function convertSpeciesToCommon(species){
         break;
       case "SIM":
         document.getElementById("SIM-menu-btn").classList.add("active");
+        break;
+      case "config-settings-tab":
+        document.getElementById("config-settings-menu-btn").classList.add("active");
         break;
       case "donate":
         document.getElementById("donate-menu-btn").classList.add("active");
@@ -2263,6 +2374,57 @@ closeFormButton.addEventListener('click', (event) => {
   window.record = record;
   window.cancelRecording = cancelRecording;
   window.stopRecording = stopRecording;
+
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const themeToggleButton = document.getElementById('themeToggle');
+        const filterMenuTitle = document.querySelector('#filter-menu #filter-menu-contents h2');
+        const animalBioTitle = document.querySelector('#animal-default-content h2');
+        const micBioTitle = document.querySelector('#mic-default-content h2');
+
+        function setTheme(theme) {
+            document.body.classList.remove('light-theme', 'dark-theme');
+            document.body.classList.add(theme + '-theme');
+            localStorage.setItem('theme', theme);
+
+            // Update colors based on the theme
+            if (theme === 'light') {
+                filterMenuTitle.style.color = '#00a86b'; // Green color for light theme
+                animalBioTitle.style.color = '#00a86b'; // Green color for light theme
+                micBioTitle.style.color = '#00a86b'; // Green color for light theme
+                themeToggleButton.textContent = 'Switch to Dark Theme';
+            } else {
+                filterMenuTitle.style.color = 'rgba(247, 186, 206, 1)'; // Pink color for dark theme
+                animalBioTitle.style.color = 'rgba(247, 186, 206, 1)'; // Pink color for dark theme
+                micBioTitle.style.color = 'rgba(247, 186, 206, 1)'; // Pink color for dark theme
+                themeToggleButton.textContent = 'Switch to Light Theme';
+            }
+        }
+
+        themeToggleButton.addEventListener('click', () => {
+            const currentTheme = document.body.classList.contains('light-theme') ? 'light' : 'dark';
+            setTheme(currentTheme === 'light' ? 'dark' : 'light');
+        });
+
+        // Check for saved user preference on load
+        const savedTheme = localStorage.getItem('theme') || 'dark'; // Default to dark if no preference
+        setTheme(savedTheme);
+    });
+
+
+    document.querySelector('.cancel-button').addEventListener('click', () => {
+
+document.querySelector('.crossmark').style.display = 'none';
+document.querySelector('.overlay1').style.display = 'none'; // Hide overlay
+});
+
+document.querySelector('.retry-button').addEventListener('click', () => {
+      var options = payment(username, donorAmount * 100, email);
+      var rzp1 = new Razorpay(options);
+
+      rzp1.open();
+    });
 
 </script>
   </body>
