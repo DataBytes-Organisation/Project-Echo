@@ -1,6 +1,3 @@
-// ================================================
-//              IMPORTS AND MODULE INITIALIZATION
-// ================================================
 const express = require('express');
 const app = express();
 const path = require('path');
@@ -14,37 +11,34 @@ const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 client.connect();
 const cors = require('cors');
-require('dotenv').config(); // Load environment variables from .env
+require('dotenv').config();
 const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY);
 const axios = require('axios');
 const { MongoClient, ObjectId } = require('mongodb');
 
-// Temporarily removed the variables that need the captcha-canvas package
-// const {createCaptchaSync} = require("captcha-canvas");
 
-const port = process.env.PORT || 8080; // Use the port from the .env file if available
+
+// Temporarily removed the variables that need the captcha-canvas package
+//const {createCaptchaSync} = require("captcha-canvas");
+
+
+const port = 8080;
 
 const rootDirectory = __dirname; // This assumes the root directory is the current directory
 
-// ================================================
-//              EMAIL VALIDATION SETUP
-// ================================================
+
+//Security verification for email account and body content validation:
 const validation = require('deep-email-validator')
 
-// ================================================
-//              STORE ITEMS MAP
-// ================================================
 const storeItems = new Map([[
   1, { priceInCents: 100, name: "donation"}
-]]);
+]])
 app.use(express.json({limit: '10mb'}));
 
 // Import the User model
 const { User } = require('./model/user.model'); // Add this line
 
-// ================================================
-//              MIDDLEWARE: ADMIN CHECK
-// ================================================
+// Middleware to check if the user is an admin
 function isAdmin(req, res, next) {
   const token = req.headers.authorization.split(' ')[1];
   const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -56,9 +50,6 @@ function isAdmin(req, res, next) {
   next();
 }
 
-// ================================================
-//              USER MANAGEMENT ROUTES
-// ================================================
 // API to suspend a user
 app.patch('/api/users/:id/suspend', isAdmin, async (req, res) => {
   const userId = req.params.id;
@@ -106,12 +97,29 @@ app.get('/api/users/:id/status', isAdmin, async (req, res) => {
     res.status(500).json({ error: 'Error retrieving user status' });
   }
 });
+// Use helmet middleware to set security headers
 
-// ================================================
-//              STRIPE PAYMENT API ROUTES
-// ================================================
-// This API endpoint is fetched when the user clicks the donate button.
-// This endpoint generates a new checkout session using Stripe.
+// app.use(helmet());
+// Function to sanitize and normalize file paths
+// function sanitizeFilePath(filePath) {
+//   // Use path.normalize to ensure the path is in normalized form
+//   const normalizedPath = path.normalize(filePath);
+
+//   // Use path.join to join the normalized path with the root directory
+//   const rootDirectory = __dirname; // This assumes the root directory is the current directory of the script
+//   const absolutePath = path.join(rootDirectory, normalizedPath);
+
+//   // Ensure that the resulting path is still within the root directory
+//   if (absolutePath.startsWith(rootDirectory)) {
+//     return absolutePath;
+//   } else {
+//     // If the path goes outside the root directory, return null or handle the error as needed
+//     return null;
+//   }
+// }
+
+//This API endpoint is fetched when the user clicks the donate button.
+//This endpoint generates a new checkout session using Stripe.
 app.post("/api/create-checkout-session", async (req, res) => {
   try {
     console.log(req.body.items);
@@ -121,31 +129,31 @@ app.post("/api/create-checkout-session", async (req, res) => {
       payment_method_types: ["card"],
       mode: "payment",
       line_items: req.body.items.map(item => {
-        const storeItem = storeItems.get(item.id);
+        const storeItem = storeItems.get(item.id)
         return {
           price_data: {
             currency: "aud",
             product_data: {
               name: storeItem.name,
             },
-            // Conversion
+            //Conversion
             unit_amount: item.quantity * 100,
           },
           quantity: 1,
-        };
+        }
       }),
-      success_url: process.env.CLIENT_SERVER_URL, // Use CLIENT_SERVER_URL from .env
-      cancel_url: process.env.CLIENT_SERVER_URL // Use CLIENT_SERVER_URL from .env
-    });
+      success_url: "http://localhost:8080", //`${process.env.CLIENT_URL}`,
+      cancel_url: "http://localhost:8080"//`${process.env.CLIENT_URL}`,
+    })
     console.log("two");
-    res.json({ url: session.url });
+    res.json({ url: session.url })
   } catch (e) {
-    res.status(500).json({ error: e.message });
+    res.status(500).json({ error: e.message })
   }
-});
+})
 
-// This API endpoint fetches the "charges", AKA donations, from the Stripe account.
-// It returns a json object of all the charges
+//This API endpoint fetches the "charges", AKA donations, from the Stripe account.
+//It returns a json object of all the charges
 app.get('/donations', async(req,res) => {
   let charges;
   try{
@@ -162,7 +170,7 @@ app.get('/donations', async(req,res) => {
       if (!charges.has_more) {
         break; // Exit the loop when there are no more pages
       }
-      nextPage = charges[charges.length() - 1];
+      nextPage = charges[charges.length() - 1]
       charges = await stripe.charges.list({
         limit: 100,
         starting_next: nextPage
@@ -175,10 +183,9 @@ app.get('/donations', async(req,res) => {
     console.error('Error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
-});
-
-// This endpoint retrieves the donation amounts from the associated stripe account
-// it adds up the amounts to return a cumulative total. Used on admin dashboard.
+})
+//This endpoint retrieves the donation amounts from the associated stripe account
+//it adds up the amounts to return a cumulative total. Used on admin dashboard.
 app.get('/cumulativeDonations', async(req, res) => {
   let cumulativeTotal = 0;
   try{
@@ -193,17 +200,17 @@ app.get('/cumulativeDonations', async(req, res) => {
         firstPage = true;
       }
       
-      charges.data.forEach(charge => {
+    charges.data.forEach(charge => {
         cumulativeTotal += charge.amount;
-      });
-      if (!charges.has_more) {
-        break; // Exit the loop when there are no more pages
-      }
-      nextPage = charges[charges.length() - 1];
-      charges = await stripe.charges.list({
-        limit: 100,
-        starting_next: nextPage
-      });
+    });
+    if (!charges.has_more) {
+      break; // Exit the loop when there are no more pages
+    }
+    nextPage = charges[charges.length() - 1]
+    charges = await stripe.charges.list({
+      limit: 100,
+      starting_next: nextPage
+    });
       firstPage = true;
     }
     
@@ -217,11 +224,8 @@ app.get('/cumulativeDonations', async(req, res) => {
     console.error('Error:', error);
     res.status(500).json({ error: 'Internal server error' });
   } 
-});
+})
 
-// ================================================
-//              STATIC FILES SERVING
-// ================================================
 // Temporarily removed the route for the captcha function
 
 // app.get('/data/captcha', (req, res) => {
@@ -234,42 +238,36 @@ app.get('/cumulativeDonations', async(req, res) => {
 
 // serve static files from the public directory
 // app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.static(path.join(__dirname, 'public'), { index: path.join(__dirname, 'public/login.html')}));
+app.use(express.static(path.join(__dirname, 'public'), { index: path.join(__dirname, 'public/login.html')}))
 
 var corsOptions = {
   origin: ["http://localhost:8081", "*"]
 };
 
-app.use(cors(corsOptions));
+app.use(cors(corsOptions))
 
-// bodyParser to make sure post form data is read
+//bodyParser to make sure post form data is read
 const bodyParser = require("express");
 app.use(bodyParser.json({ limit: '10mb' }));
-app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }))
 
-// const serveIndex = require('serve-index'); 
-// app.use('/images/bio', serveIndex(express.static(path.join(__dirname, '/images/bio'))));
+//const serveIndex = require('serve-index'); 
+//app.use('/images/bio', serveIndex(express.static(path.join(__dirname, '/images/bio'))));
 
-// ================================================
-//              COOKIE SESSION SETUP
-// ================================================
 app.use(
   cookieSession({
     name: "echo-session",
-    keys: [process.env.COOKIE_SECRET_KEY], // Use COOKIE_SECRET_KEY from .env
+    keys: ["COOKIE_SECRET"], // should use as secret environment variable
     httpOnly: true
   })
 );
 
-// ================================================
-//              EMAIL SENDING SETUP (NODEMAILER)
-// ================================================
 const nodemailer = require('nodemailer');
 var transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: process.env.USER_EMAIL, // Use USER_EMAIL from .env
-    pass: process.env.PASSWORD // Use PASSWORD from .env
+    user: 'echodatabytes@gmail.com',
+    pass: 'ltzoycrrkpeipngi'
   }
 });
 
@@ -281,13 +279,11 @@ function escapeHtmlEntities(input) {
 }
 
 async function testEmail(input) {
-  let res = await validation.validate(input);
-  return {result: res.valid, response: res.validators};
+  let res = await validation.validate(input)
+  return {result: res.valid, response: res.validators}
+  
 }
 
-// ================================================
-//              EMAIL ROUTES
-// ================================================
 app.post("/send_email", async (req, res) => {
   const { email, query } = req.body;
   const validationResult = await testEmail(email);
@@ -305,7 +301,7 @@ app.post("/send_email", async (req, res) => {
 
       let mailOptions = {
         from: email,
-        to: `${process.env.USER_EMAIL}, ${email}`,
+        to: `echodatabytes@gmail.com, ${email}`,
         subject: 'New query received!',
         text: query,
         html: html_text,
@@ -321,24 +317,21 @@ app.post("/send_email", async (req, res) => {
           console.log(error);
         } else {
           console.log('Email sent: ' + info.response);
-          return res.send('<script> alert("user query sent! Please check your mailbox for further communication"); window.location.href = "/"; </script>');
+          return res.send('<script> alert("user query sent! Please check your mailbox for further communication"); window.location.href = "/"; </script>')
         }
       });
     } else {
       return res.status(400).send("<script> alert(`Sender's email is not valid!`)</script>");
     }
-});
+    
+  }
+);
 
-// ================================================
-//              STATIC FILES ROUTE
-// ================================================
-app.get("/send_email", (req,res) => {
-  setTimeout(() => res.redirect("/"), 5000);
-});
+  app.get("/send_email", (req,res) => {
+    setTimeout(() => res.redirect("/"), 5000)
+  });
 
-// ================================================
-//              GUEST USER ACCESS SETUP
-// ================================================
+
 var chars = "0123456789abcdefghijklmnopqrstuvwxyz!@#$%^&*()ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 function genPass(length) {
@@ -353,42 +346,42 @@ function genPass(length) {
 app.post("/request_access", async (req, res) => {
   console.log("email: ", req.body.email);
   const { email } = req.body;
-  // Generate Guest credentials + timestamp
+  //Generate Guest credentials + timestamp
   let salt = '';
   while (salt.length < 8) {
     salt = crypto.getRandomValues(new Uint32Array(1)).toString();
   }
   let username = 'guest_' + email.split('@')[0] + "_" + salt;
   let password = genPass(12);
-  let timestamp = new Date(Date.now() + 1800000); // Set time to live of 1800000 ms = 1800 s = 30 mins
+  let timestamp = new Date(Date.now() + 1800000) //Set time to live of 1800000 ms = 1800 s = 30 mins
   let request = {
     "username": username,
     "email": req.body.email,
     "password": password,
     "timestamp": timestamp
-  };
-  console.log("Guest details: ", request);
+  }
+  console.log("Guest details: ", request)
   try {
-    // Sending that to Guest signup
+    //Sending that to Guest signup
     const response = await controller.guestsignup(request);
 
     setTimeout(() => {
       console.log("response is back! ", response);
-      // Send email to user when success
+      //Send email to user when success
       if (response && response.status === 'success') {
         let html_text = '<div>';
-        html_text += '<h2>Echo HMI Temporary Access Requested!</h2>';
-        html_text += '<img src="cid:logo@echo.hmi" style="height: 150px; width: 150px; display: flex; margin: auto;"/>';
+        html_text += '<h2>Echo HMI Temporary Access Requested!</h2>'
+        html_text += '<img src="cid:logo@echo.hmi" style="height: 150px; width: 150px; display: flex; margin: auto;"/>'
         html_text += '<p>Dear \t <strong>' + req.body.email + '</strong></p>';
         html_text += '<hr>';
-        html_text += '<p>Thank you for your patience, here is your login credential </p>';
-        html_text += '<p><strong>Username:</strong> \t ' + username + '</p>';
-        html_text += '<p><strong>Password:</strong> \t ' + password + '</p>';
-        html_text += '<br><p>Please take in mind that this account will only be valid until ' + timestamp.toString() + ' (Subject to change based on development)</p>';
+        html_text += '<p>Thank you for your patience, here is your login credential </p>'
+        html_text += '<p><strong>Username:</strong> \t ' + username + '</p>'
+        html_text += '<p><strong>Password:</strong> \t ' + password + '</p>'
+        html_text += '<br><p>Please take in mind that this account will only be valid until ' + timestamp.toString() + ' (Subject to change based on development)</p>'
         html_text += '</div>';
         let mailOptions = {
           from: email,
-          to: `${process.env.USER_EMAIL}, ${email}`,
+          to: `echodatabytes@gmail.com, ${email}`,
           subject: 'Guest User Access Granted!',
           html: html_text,
           attachments: [{   // stream as an attachment
@@ -396,32 +389,32 @@ app.post("/request_access", async (req, res) => {
             content: fs.createReadStream(path.join(__dirname, 'public/images/tabIcons/logo.png')),
             cid: 'logo@echo.hmi' //same cid value as in the html
           }]
-        };
+        }
         transporter.sendMail(mailOptions, function (error, info) {
           if (error) {
             console.log(error);
           } else {
             console.log('Email sent: ' + info.response);
-            return res.send('<script> alert("Temporary credential granted! Please check your mailbox."); window.location.href = "/login"; </script>');
+            return res.send('<script> alert("Temporary credential granted! Please check your mailbox."); window.location.href = "/login"; </script>')
           }
         });
       } else {
         console.log("Something happened for Guest Access Granting: ", response);
         let error_box = document.getElementById("request-access-email-error");
-        error_box.innerHTML = `Exception error occurred: ${response.message}`;
-        error_box.style.display = "block";
+        error_box.innerHTML = `Exception error occured: ${response.message}`;
+        error_box.style.display = "block"
         setTimeout(() => {
           error_box.innerHTML = '';
           error_box.style.display = "none";
-        }, 3000);
+        }, 3000)
       }
 
-    }, 200);
+    }, 200)
 
   } catch (error) {
     res.status(500).send({ message: 'An error occurred while sending the request access: ' + error });
   }
-});
+})
 
 // Endpoint to handle algorithm selection
 app.post('/api/applyAlgorithm', (req, res) => {
@@ -431,83 +424,71 @@ app.post('/api/applyAlgorithm', (req, res) => {
   res.send(`Algorithm ${algorithm} has been applied.`);
 });
 
-
-// ================================================
-//              ROUTE IMPORTS
-// ================================================
-
+// routes
 require('./routes/auth.routes')(app);
 require('./routes/user.routes')(app);
 require('./routes/map.routes')(app);
-
 app.get('*', checkUserSession);
 app.get("/", async (req, res) => {
   console.log("token: ", await client.get('JWT', (err, storedToken) => {
-    if (err) {
-      return `Error retrieving token from Redis: ${err}`;
-    } else {
-      return storedToken;
-    }
-  }));
+          if (err) {
+            return `Error retrieving token from Redis: ${err}`
+          } else {
+            return storedToken
+          }
+  }))
   let role = await client.get('Roles', (err, storedToken) => {
     if (err) {
-      return `Error retrieving user role from Redis: ${err}`;
+      return `Error retrieving user role from Redis: ${err}`
     } else {
-      return storedToken;
+      return storedToken
     }
-  });
+  })
 
   if (role.toLowerCase().includes("admin")) {
-    res.redirect("/admin-dashboard");
+    res.redirect("/admin-dashboard")
   } else {
-    res.redirect("/map");
+    res.redirect("/map")
   }
-});
-
-// Serve the admin dashboard
-app.get("/admin-dashboard", (req, res) => {
+})
+//Serve the admin dashboard
+app.get("/admin-dashboard", (req,res)=> {
   return res.sendFile(path.join(__dirname, 'public/admin/dashboard.html'));
-});
+})
 
-app.get("/admin-template", (req, res) => {
+app.get("/admin-template", (req,res)=> {
   return res.sendFile(path.join(__dirname, 'public/admin/template.html'));
-});
-
-// Serve the donations tab
+})
+//Serve the donations tab
 app.get("/admin-donations", (req, res) => {
   return res.sendFile(path.join(__dirname, 'public/admin/donations.html'));
-});
-
-// Serve the login page
+})
+//Serve the login page
 app.get("/login", (req, res) => {
   res.sendFile(path.join(__dirname, 'public/login.html'));
-});
+})
 
-// ================================================
-//              API ENDPOINT: SUBMISSIONS
-// ================================================
+//API Endpoint for the submission requests
 app.post("/api/submit", async (req, res) => {
   let token = await client.get('JWT', (err, storedToken) => {
     if (err) {
       console.error('Error retrieving token from Redis:', err);
-      return null;
+      return null
     } else {
       console.log('Stored Token:', storedToken);
-      return storedToken;
+      return storedToken
     }
-  });
+  })
   let schema = req.body;
-  // Set the new submission to have a "pending" review status
+  //Set the new submission to have a "pending" review status
   schema.status = "pending";
   schema.date = new Date();
   try {
     console.log("Request submission data: ", JSON.stringify(schema));
-    const axiosResponse = await axios.post('http://ts-api-cont:9000/hmi/api/submit', JSON.stringify(schema), {
-      headers: {"Authorization" : `Bearer ${token}`, 'Content-Type': 'application/json'}
-    });
-    // If successful return a 201 status code
+    const axiosResponse = await axios.post('http://ts-api-cont:9000/hmi/api/submit', JSON.stringify(schema), { headers: {"Authorization" : `Bearer ${token}`, 'Content-Type': 'application/json'}})
+    //If successful return a 201 status code
     if (axiosResponse.status === 201) {
-      console.log('Status Code: ' + axiosResponse.status + ' ' + axiosResponse.statusText);
+      console.log('Status Code: ' + axiosResponse.status + ' ' + axiosResponse.statusText)
       res.status(201).send(`<script> window.location.href = "/login"; alert("Request Submitted successfully");</script>`);
     } else {
       res.status(400).send(`<script> window.location.href = "/login"; alert("Ooops! Something went wrong");</script>`);
@@ -518,45 +499,37 @@ app.post("/api/submit", async (req, res) => {
   }
 });
 
-// ================================================
-//              PASSWORD RESET ROUTES
-// ================================================
-app.get("/forgotPassword", async (req, res) => {
-  res.sendFile(path.join(__dirname, 'public/resetPassword.html'));
-});
+app.get("/forgotPassword",async (req,res) => {
+  res.sendFile(path.join(__dirname, 'public/resetPassword.html'))
+})
 
-app.post("/api/approve", async (req, res) => {
-  // Implementation of the approve endpoint
-});
+app.post("/api/approve", async (req,res) => {
 
-// ================================================
-//              ADMIN REQUESTS HANDLING
-// ================================================
-app.get("/requests", (req, res) => {
-  res.sendFile(path.join(__dirname, 'public/admin/admin-request.html'));
-});
+})
+//Navigate to requests tab on admin dashboard
+app.get("/requests", (req,res) => {
+  res.sendFile(path.join(__dirname, 'public/admin/admin-request.html'))
+})
 
-// API endpoint for patching the new review status to the newly reviewed edit request
+//API endpoint for patching the new review status to the newly reviewed edit request
 app.patch('/api/requests/:id', async (req, res) => {
   const requestId = req.params.id; // Get the request ID from the URL parameter
   const newStatus = req.body.status; // Get the new status from the request body
-  let schema = { requestId: requestId, newStatus: newStatus };
+  let schema = {requestId:requestId, newStatus: newStatus};
   let token = await client.get('JWT', (err, storedToken) => {
     if (err) {
       console.error('Error retrieving token from Redis:', err);
-      return null;
+      return null
     } else {
       console.log('Stored Token:', storedToken);
-      return storedToken;
+      return storedToken
     }
-  });
+  })
   try {
     console.log("Admin Request update data: ", JSON.stringify(schema));
-    const axiosResponse = await axios.patch('http://ts-api-cont:9000/hmi/api/requests', JSON.stringify(schema), {
-      headers: {"Authorization" : `Bearer ${token}`, 'Content-Type': 'application/json'}
-    });
+    const axiosResponse = await axios.patch('http://ts-api-cont:9000/hmi/api/requests', JSON.stringify(schema), { headers: {"Authorization" : `Bearer ${token}`, 'Content-Type': 'application/json'}})
     if (axiosResponse.status === 200) {
-      console.log('Status Code: ' + axiosResponse.status + ' ' + axiosResponse.statusText);
+      console.log('Status Code: ' + axiosResponse.status + ' ' + axiosResponse.statusText)
       res.status(200).send(`<script> window.location.href = "/login"; alert("Request data updated successfully");</script>`);
     } else {
       res.status(400).send(`<script> window.location.href = "/login"; alert("Ooops! Something went wrong with updating request table");</script>`);
@@ -567,29 +540,27 @@ app.patch('/api/requests/:id', async (req, res) => {
   }
 });
 
-// ================================================
-//              ANIMAL CONSERVATION STATUS API
-// ================================================
+//API endpoint is responsible for patching the conservation status
+//Of the animal within a edit request submission with the new conservation status
+//that the request includes.
 app.patch('/api/updateConservationStatus/:animal', async (req, res) => {
   const requestAnimal = req.params.animal;
   const newStatus = req.body.status;
-  let schema = { requestAnimal: requestAnimal, newStatus: newStatus };
+  let schema = {requestAnimal:requestAnimal, newStatus: newStatus};
   let token = await client.get('JWT', (err, storedToken) => {
     if (err) {
       console.error('Error retrieving token from Redis:', err);
-      return null;
+      return null
     } else {
       console.log('Stored Token:', storedToken);
-      return storedToken;
+      return storedToken
     }
-  });
+  })
   try {
     console.log("Admin update species data: ", JSON.stringify(schema));
-    const axiosResponse = await axios.patch('http://ts-api-cont:9000/hmi/api/updateConservationStatus', JSON.stringify(schema), {
-      headers: {"Authorization" : `Bearer ${token}`, 'Content-Type': 'application/json'}
-    });
+    const axiosResponse = await axios.patch('http://ts-api-cont:9000/hmi/api/updateConservationStatus', JSON.stringify(schema), { headers: {"Authorization" : `Bearer ${token}`, 'Content-Type': 'application/json'}})
     if (axiosResponse.status === 200) {
-      console.log('Status Code: ' + axiosResponse.status + ' ' + axiosResponse.statusText);
+      console.log('Status Code: ' + axiosResponse.status + ' ' + axiosResponse.statusText)
       res.status(200).send(`<script> window.location.href = "/login"; alert("Species Data updated successfully");</script>`);
     } else {
       res.status(400).send(`<script> window.location.href = "/login"; alert("Ooops! Something went wrong with updating species data");</script>`);
@@ -599,25 +570,21 @@ app.patch('/api/updateConservationStatus/:animal', async (req, res) => {
     res.status(500).send({ error: 'Error updating species status' });
   }
 });
-
-// ================================================
-//              FETCH ADMIN REQUESTS API
-// ================================================
+//Fetch the requests for the admin dashboard
 app.get('/api/requests', async (req, res) => {
   try {
+
     let token = await client.get('JWT', (err, storedToken) => {
       if (err) {
         console.error('Error retrieving token from Redis:', err);
-        return null;
+        return null
       } else {
         console.log('Stored Token:', storedToken);
-        return storedToken;
+        return storedToken
       }
-    });
+    })
 
-    const axiosResponse = await axios.get('http://ts-api-cont:9000/hmi/requests', {
-      headers: {"Authorization" : `Bearer ${token}`}
-    });
+    const axiosResponse = await axios.get('http://ts-api-cont:9000/hmi/requests', { headers: {"Authorization" : `Bearer ${token}`}})
   
     if (axiosResponse.status === 200) {
       res.json(axiosResponse.data);
@@ -625,112 +592,104 @@ app.get('/api/requests', async (req, res) => {
       res.status(500).json({ error: 'Error fetching data' });
     }
   } catch (err) {
-    console.log('Requests error: ', err);
-    res.status(401).redirect('/admin-dashboard');
+    console.log('Requests error: ', err)
+    res.status(401).redirect('/admin-dashboard')
   }
 });
-
-// ================================================
-//              WELCOME PAGE ROUTE
-// ================================================
-app.get("/welcome", async (req, res) => {
+//Page Direction to Welcome page after logging in
+app.get("/welcome", async (req,res) => {
   try {
     console.log("token: ", await client.get('JWT', (err, storedToken) => {
-      if (err) {
-        return `Error retrieving token from Redis: ${err}`;
-      } else {
-        return storedToken;
-      }
-    }));
+            if (err) {
+              return `Error retrieving token from Redis: ${err}`
+            } else {
+              return storedToken
+            }
+    }))
     let role = await client.get('Roles', (err, storedToken) => {
       if (err) {
-        return `Error retrieving user role from Redis: ${err}`;
+        return `Error retrieving user role from Redis: ${err}`
       } else {
-        return storedToken;
+        return storedToken
       }
-    });
-    // If the user that has just logged in is an admin, direct them
-    // to the admin dashboard. Otherwise direct them to the map.
+    })
+    //If the user that has just logged in is an admin, direct them
+    //to the admin dashboard. Otherwise direct them to the map.
     if (role.toLowerCase().includes("admin")) {
-      res.redirect("/admin-dashboard");
+      res.redirect("/admin-dashboard")
     } else {
-      res.redirect("/map");
+      res.redirect("/map")
     }
-  } catch {
+  }
+  catch {
     res.send(`<script> alert("No user info detected! Please login again"); window.location.href = "/login"; </script>`);
   }
-});
+})
 
-// ================================================
-//              MONGODB CONNECTION URI
-// ================================================
+// MongoDB connection URI
 const uri = process.env.MONGO_URI || "mongodb://localhost:27017";
 
 // Function to suspend or block a user by email or user ID
 const suspendOrBlockUser = async (identifier, action) => {
-  const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+    const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
-  try {
-    // Connect to MongoDB
-    await client.connect();
-    const userdb = client.db('UserSample');
-    const usersCollection = userdb.collection('users');
+    try {
+        // Connect to MongoDB
+        await client.connect();
+        const userdb = client.db('UserSample');
+        const usersCollection = userdb.collection('users');
 
-    // Determine the search criteria based on whether the identifier is an email or user ID
-    const query = ObjectId.isValid(identifier) 
-      ? { _id: new ObjectId(identifier) } 
-      : { email: identifier };
+        // Determine the search criteria based on whether the identifier is an email or user ID
+        const query = ObjectId.isValid(identifier) 
+            ? { _id: new ObjectId(identifier) } 
+            : { email: identifier };
 
-    // Determine the status and message based on the action
-    const status = action === "suspend" ? "suspended" : action === "block" ? "banned" : null;
-    if (!status) {
-      throw new Error("Invalid action. Use 'suspend' or 'block'.");
+        // Determine the status and message based on the action
+        const status = action === "suspend" ? "suspended" : action === "block" ? "banned" : null;
+        if (!status) {
+            throw new Error("Invalid action. Use 'suspend' or 'block'.");
+        }
+        const message = "Your account has been " + status + ". Please contact support to unblock your account.";
+
+        // Update the user's status and set the block message
+        const result = await usersCollection.updateOne(
+            query,
+            { $set: { status: status, blockMessage: message } }
+        );
+
+        if (result.matchedCount === 0) {
+            console.log("User not found.");
+            return { success: false, message: "User not found." };
+        }
+
+        console.log(`User with ${ObjectId.isValid(identifier) ? 'ID' : 'email'} ${identifier} has been ${status}.`);
+        return { success: true, message: `User has been ${status}.` };
+    } catch (error) {
+        console.error("Error suspending or blocking user:", error);
+        return { success: false, message: "Internal server error." };
+    } finally {
+        // Close the MongoDB connection
+        await client.close();
     }
-    const message = "Your account has been " + status + ". Please contact support to unblock your account.";
-
-    // Update the user's status and set the block message
-    const result = await usersCollection.updateOne(
-      query,
-      { $set: { status: status, blockMessage: message } }
-    );
-
-    if (result.matchedCount === 0) {
-      console.log("User not found.");
-      return { success: false, message: "User not found." };
-    }
-
-    console.log(`User with ${ObjectId.isValid(identifier) ? 'ID' : 'email'} ${identifier} has been ${status}.`);
-    return { success: true, message: `User has been ${status}.` };
-  } catch (error) {
-    console.error("Error suspending or blocking user:", error);
-    return { success: false, message: "Internal server error." };
-  } finally {
-    // Close the MongoDB connection
-    await client.close();
-  }
 };
 
-// ================================================
-//              USER SUSPENSION API
-// ================================================
 app.use(express.json());
 
 app.post('/suspendUser', async (req, res) => {
-  const { identifier, action } = req.body;
-  const result = await suspendOrBlockUser(identifier, action);
-  res.status(result.success ? 200 : 500).json(result);
+    const { identifier, action } = req.body;
+    const result = await suspendOrBlockUser(identifier, action);
+    res.status(result.success ? 200 : 500).json(result);
 });
 
-// ================================================
-//              MAP ROUTE
-// ================================================
-app.get("/map", async (req, res) => {
-  res.sendFile(path.join(__dirname, 'public/index.html'));
-});
 
-// ================================================
-//              START THE SERVER
-// ================================================
+
+//Page direction to the map
+app.get("/map", async(req,res) => {
+  res.sendFile(path.join(__dirname, 'public/index.html'))
+})
+
+
+// start the server
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
