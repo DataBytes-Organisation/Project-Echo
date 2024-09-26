@@ -71,7 +71,6 @@
         marked.parse('# Marked in the browser\n\nRendered by **marked**.');
     </script-->
 
-
   <div class="container" style="width:100% !important; margin-left: 0px !important; padding: 12px !important;">
     <!-- Row 1 with nav spanning the entire width and a fixed top-->
 
@@ -468,19 +467,99 @@
           </div>
           <div id="animal-popup">
             <div class="wrapper">
-              <div id="animal-popup-content">
-                <div class="markup_form">
-                  <!-- markup_icon -->
-                  <div class="markup_column">
-                    <div class="markup_row_left markup_row_title"
-                      style="width: 420px !important; margin: 0px !important;">
-                      <h2 id="desc_name"></h2>
-                    </div>
-                    <div class="markup_row_right markup_row_title"
-                      style="width: 100px !important; margin: 0px !important; padding: 0px !important;">
-                      <h2 id="desc_confidence"></h2>
-                      <!--img id="markup_img_2" src=""></img-->
-                    </div>
+              
+            <div id="animal-popup-content">
+              <div class="markup_form">
+                <!-- markup_icon -->
+                <div class="markup_column">
+                  <div class="markup_row_left markup_row_title" style="width: 420px !important; margin: 0px !important;">
+                    <h2 id="desc_name"></h2>
+                  </div>
+                  <div class="markup_row_right markup_row_title" style="width: 100px !important; margin: 0px !important; padding: 0px !important;">
+                    <h2 id="desc_confidence"></h2>
+                    <!--img id="markup_img_2" src=""></img-->
+                  </div>
+                </div>
+              </div>
+              
+              <img id= "desc_img" src=""></img>
+              <div id="desc_species" class="subtitle"></div>
+              <h2>Animal Summary</h2>
+              <div id="desc_summary" class="desc"></div>
+              <div id="desc_details" class="desc"></div>
+              
+              <h2 style="margin-top: 20px !important;">Weather</h2>
+              <div class="markup_form">
+                <div class="markup_column">
+                  <div class="markup_row_left">
+                    <div>Date</div>
+                  </div>
+                  <div class="markup_row_right">
+                    <div id="weather_date"></div>
+                  </div>
+                </div>
+                <div class="markup_column">
+                  <div class="markup_row_left">
+                    <div>Max Temperature</div>
+                  </div>
+                  <div class="markup_row_right">
+                    <div id="weather_maxtemp"></div>
+                  </div>
+                </div>
+                <div class="markup_column">
+                  <div class="markup_row_left">
+                    <div>Minimum Temperature</div>
+                  </div>
+                  <div class="markup_row_right">
+                    <div id="weather_mintemp"></div>
+                  </div>
+                </div>
+                <div class="markup_column">
+                  <div class="markup_row_left">
+                    <div>Rainfall</div>
+                  </div>
+                  <div class="markup_row_right">
+                    <div id="weather_rainfall"></div>
+                  </div>
+                </div>
+                <div class="markup_column">
+                  <div class="markup_row_left">
+                    <div>Wind speed</div>
+                  </div>
+                  <div class="markup_row_right">
+                    <div id="weather_windspeed"></div>
+                  </div>
+                </div>
+                <div class="markup_column">
+                  <div class="markup_row_left">
+                    <div>Maximum Humiditiy</div>
+                  </div>
+                  <div class="markup_row_right">
+                    <div id="weather_maxhumidity"></div>
+                  </div>
+                </div>
+                <div class="markup_column">
+                  <div class="markup_row_left">
+                    <div>Minimum Humiditiy</div>
+                  </div>
+                  <div class="markup_row_right">
+                    <div id="weather_minhumidity"></div>
+                  </div>
+                </div>
+
+
+              </div>
+
+              <h2 style="margin-top: 20px !important;">Event Details</h2>
+              <div class="markup_form">
+                <!-- markup_icon -->
+                <div class="markup_column">
+                  <div class="markup_row_left" style="width: 100px !important">
+                    <img id="markup_img" src=""></img>
+                  </div>
+                  <div class="markup_row_right" style="text-align: right !important; width: 400px !important">
+                    <div id="markup_details"></div>
+                    
                   </div>
                 </div>
 
