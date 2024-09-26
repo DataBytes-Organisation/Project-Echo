@@ -87,13 +87,19 @@ module.exports = function (app) {
             console.log("Set User roles successfully: ", res)
           }
         })
+        /*
         res.status(200).send(
         `<script> 
           alert("Login Successfully");
           window.location.href = "/welcome"
         </script>`);
-          
-        
+        */
+        res.status(200).json({
+          message: "Login Successful",
+          token: axiosResponse.data.tkn,
+          userId: axiosResponse.data.user.id,
+        });
+                
       } else {
         console.log("Login response: ", axiosResponse.data);
         res.status(400).send('<script> window.location.href = "/login"; alert("Failed! Invalid credentials!");</script>');

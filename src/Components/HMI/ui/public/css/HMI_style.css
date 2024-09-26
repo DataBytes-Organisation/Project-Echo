@@ -1521,6 +1521,14 @@ i {
   background-position: center;
 }
 
+#notification-menu-button{
+  background-image: url("../images/tabIcons/06_Notification.png");
+  background-size: cover;
+  background-size: 40%;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
 #filter-menu-btn::before {
   opacity: 0.5;
 }
@@ -2199,6 +2207,122 @@ input[type="radio"]:not(:disabled)+span:hover:before {
   outline-style: dotted;
 }
 
+/* Style for the animal list to limit visible items and make the rest scrollable */
+#animalNotifications #animal-list {
+  max-height: 200px; /* Adjust the height as needed */
+  overflow-y: auto; /* Enable scrolling */
+}
+
+/* Form structure */
+#animalNotifications .markup_form {
+  display: flex;
+  flex-direction: column; /* Stack items vertically */
+  gap: 20px; /* Add spacing between each section */
+}
+
+/* Individual form sections take full width */
+#animalNotifications .markup_column {
+  width: 100%; /* Full width */
+  margin-bottom: 20px; /* Add spacing between sections */
+}
+
+#animalNotifications input[type="text"], #animalNotifications select {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ff80ab;
+  background-color: #2b2b2b;
+  color: white;
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+/* Hide the list when it's empty */
+#animalNotifications ul:empty {
+  display: none; /* Hide the list when there are no items */
+}
+
+/* When the list is populated, display it normally */
+#animalNotifications ul {
+  list-style: none;
+  padding: 10px;
+  background-color: #2b2b2b;
+  border-radius: 5px;
+  color: white;
+  max-height: 150px; /* Fixed height */
+  overflow-y: auto; /* Scroll when items exceed height */
+  width: 100%; /* Full width */
+}
+
+/* List items styling */
+#animalNotifications ul li {
+  margin: 10px 0;
+  font-size: 14px;
+}
+
+/* Available animals and selected animals lists */
+#animalNotifications #animalNotifications #selected-animals {
+  max-height: 150px;
+  overflow-y: scroll;
+  background-color: #2b2b2b;
+  padding: 10px;
+  border-radius: 5px;
+  color: white;
+  width: 100%; /* Ensure full width */
+}
+
+/* Selected animals should have a distinct style */
+#animalNotifications #selected-animals li {
+  background-color: #3b3b3b;
+  padding: 5px;
+  border-radius: 3px;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+/* Scrollbar styling */
+#animalNotifications ul::-webkit-scrollbar {
+  width: 8px;
+}
+
+#animalNotifications ul::-webkit-scrollbar-thumb {
+  background-color: #ff80ab;
+  border-radius: 10px;
+}
+
+#animalNotifications ul::-webkit-scrollbar-track {
+  background-color: #2b2b2b;
+}
+
+#animalNotifications button:hover {
+  background-color: #ff4081;
+}
+
+/* Center button alignment */
+#animalNotifications center {
+  display: block;
+  text-align: center;
+}
+
+#animal-search-label{
+  color: white;
+}
+
+#available-animal-label{
+  color: white;
+}
+
+#selected-animal-label{
+  color: white;
+}
+
+/* Media queries for responsiveness */
+@media (max-width: 768px) {
+  #animalNotifications .markup_form {
+      flex-direction: column;
+  }
+}
+
 /*Config-Settings Tab*
 /* Hide all tab contents by default */
 .tab-content {
@@ -2527,8 +2651,6 @@ z-index: 1;
 .o-circle__sign--failure .o-circle__sign::after {
    background: rgba(175, 57, 55, .8);
 }
-
-
  
 /*CIRCLE*/
 @keyframes circle-appearance {
@@ -2547,8 +2669,6 @@ z-index: 1;
     
   100% { opacity: 1; transform: translateY(25%) rotate(45deg) scale(1); }
 }
-
-
 
 @keyframes set-overflow {
   to { overflow: hidden; }
