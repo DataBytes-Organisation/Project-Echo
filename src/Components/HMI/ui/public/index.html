@@ -1,144 +1,170 @@
 <html>
+  <head>
+    <!-- Imports -->
+    <meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1"> 
+    <!-- Open Layers -->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="./css/ol.css"
+    />
 
-<head>
-  <!-- Imports -->
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1">
-  <!-- Open Layers -->
-  <link rel="stylesheet" type="text/css" href="./css/ol.css" />
+    <script
+      type="text/javascript"
+      src="./js/ol.js"
+    ></script>
 
-  <script type="text/javascript" src="./js/ol.js"></script>
+    <!-- Bootstrap -->
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+		<script src="https://kit.fontawesome.com/8aa980d912.js" crossorigin="anonymous"></script>
 
-  <!-- Bootstrap -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
-  <script src="https://kit.fontawesome.com/8aa980d912.js" crossorigin="anonymous"></script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD"
+      crossorigin="anonymous"
+    />
 
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+    />
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+    <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
 
-  <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
+    <!-- SplashScreen Styling -->
+		<link rel="stylesheet" type="text/css" href="./css/splash_screen_style.css">
 
-  <!-- SplashScreen Styling -->
-  <link rel="stylesheet" type="text/css" href="./css/splash_screen_style.css">
+    <!-- xlsx -->
+    <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
 
-  <!-- xlsx -->
-  <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script> 
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <script src = "paymentgateway.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <!-- Axios -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
-  <!-- jQuery -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
-  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
-  <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
-  <script src="paymentgateway.js"></script>
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-  <!-- Axios -->
-  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+		<!-- HMI -->
+		<link rel="stylesheet" href="./css/HMI_style.css" type="text/css">
+		<script type="module" src='./js/HMI.js'></script>
+		<script type="text/javascript" src="./js/animation.js"></script>
+		<script type="module" src='./js/HMI-utils.js'></script>
+    <script type="module" src="./js/audio_recorder.js"></script>
 
-  <!-- HMI -->
-  <link rel="stylesheet" href="./css/HMI_style.css" type="text/css">
-  <script type="module" src='./js/HMI.js'></script>
-  <script type="text/javascript" src="./js/animation.js"></script>
-  <script type="module" src='./js/HMI-utils.js'></script>
-  <script type="module" src="./js/audio_recorder.js"></script>
+    <!-- End Imports -->
+    <title>Echo | Welcome</title>
+  </head>
+  <body>
 
-  <!-- End Imports -->
-  <title>Echo | Welcome</title>
-</head>
 
-<body>
-
-  <div class="screen" id="screen" onclick="fadeAnim(); openSIMULATOR()">
-    <div class="screen-image"></div>
-    <div class="screen-overlay"></div>
-    <div class="screen-content">
-      <!-- <i class="screen-icon fa-brands fa-codepen"></i> -->
-      <img src="./images/logo-splashscreen.png" style="width: 101px; height: 81px">
-      <div class="screen-user">
-        <span class="name" id="name" data-value="PROJECT ECHO" onmouseenter="{textFlex()}">PROJECT ECHO</span>
-        <span class="subtitle">Click to start</span>
+    <div class = "overlay1">
+      <div class="cross-container">
+          <div id="payment-response" class="hidden">
+              <div id="processing-indicator" class="hidden"></div>
+          </div>
+  
+          <div class="crossmark hidden">
+            
+              <div class="o-circle c-container__circle o-circle__sign--failure">
+                  <div class="o-circle__sign"></div>
+              </div>
+              <div class="button-container ">
+                  <button class="retry-button">Retry</button>
+                  <button class="cancel-button">Cancel</button>
+              </div>
+          </div>
       </div>
-    </div>
   </div>
 
-  <div id="blur"></div>
-  <!--div id="content"></div-->
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <!--script>
+    
+    <div class="screen" id="screen" onclick="fadeAnim(); openSIMULATOR()">  
+			<div class="screen-image"></div>  
+			<div class="screen-overlay"></div>  
+			<div class="screen-content">
+			  <!-- <i class="screen-icon fa-brands fa-codepen"></i> -->
+        <img src="./images/logo-splashscreen.png" style="width: 101px; height: 81px">
+			  <div class="screen-user">
+				<span class="name" id="name" data-value="PROJECT ECHO" onmouseenter="{textFlex()}">PROJECT ECHO</span>
+				<span class="subtitle" >Click to start</span>
+			  </div>
+			</div>
+		</div>
+		
+		<div id="blur"></div>
+    <!--div id="content"></div-->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!--script>
       document.getElementById('content').innerHTML =
         marked.parse('# Marked in the browser\n\nRendered by **marked**.');
     </script-->
 
-  <div class="container" style="width:100% !important; margin-left: 0px !important; padding: 12px !important;">
-    <!-- Row 1 with nav spanning the entire width and a fixed top-->
-
-    <div class="hamburger-icon" onclick="toggleNav()">
-      <span></span>
-      <span></span>
-      <span></span>
-    </div>
-
-    <div id="notification" class="hidden">
-      <div id="notification-content">
-        <span id="notification-text">Your notification text here</span>
-        <span id="notification-close" class="exit-icon">x</span>
+    <div class="container" style="width:100% !important; margin-left: 0px !important; padding: 12px !important;">
+      <!-- Row 1 with nav spanning the entire width and a fixed top-->
+      
+      <div class="hamburger-icon" onclick="toggleNav()">
+        <span></span>
+        <span></span>
+        <span></span>
       </div>
-    </div>
 
-    <!-- Row 2 with main contents spanning the entire width-->
-
-    <div class="row main bg-black" style="padding: 0px !important;">
-      <div class="col-md-12 col-main" style="padding: 0px !important;">
-
-        <div id="basemap"></div>
-        <div id="editFormWrapper">
-          <form id="editForm">
-            <!-- Add your form fields here -->
-            <h2 id="formSpeciesName"></h2>
-            <div id="ccs">
-              <label for="ccs">Current Conservation Status:&nbsp;&nbsp;&nbsp;</label>
-              <p id="currentConservationStatus" name="ccs"></p> <br>
-            </div>
-            <div id="ncs">
-              <label for="ncs">New Conservation Status:&nbsp;&nbsp;&nbsp; </label>
-              <div id="dropdownNCS">
-                <button id="selectNCS" name="ncs">Select New</button>
-                <div id="dropdownContentNCS">
-                  <button>endangered</button>
-                  <button>vulnerable</button>
-                  <button>near-threatened</button>
-                  <button>least concern</button>
-                  <button>invasive</button>
-                </div>
-              </div>
-              <br><br>
-            </div>
-            <label for="citationSneeded">Source:&nbsp;&nbsp;&nbsp; </label> <input type="text" id="citationSneeded"
-              name="citationSneeded"> <br>
-            <p>Please enter a link to a reliable source that backs up your claim to make this edit.</p>
-
-            <label for="important" id="important">Important:&nbsp;&nbsp;&nbsp; </label>
-            <p id="currentConservationStatus" name="important">Spamming or intentionally abusing this functionality will
-              not be tolerated and will result in your account being either suspended or banned.</p>
-            <button id="submitEditButton">Submit</button>
-            <button id="closeFormButton">Close</button>
-          </form>
+      <div id="notification" class="hidden">
+        <div id="notification-content">
+            <span id="notification-text">Your notification text here</span>
+            <span id="notification-close" class="exit-icon">x</span>
         </div>
+      </div>
 
-        <div id="menu" class="menu">
-          <div class="menu-header">
-            <div class="image-container">
+      <!-- Row 2 with main contents spanning the entire width-->
+      
+      <div class="row main bg-black" style="padding: 0px !important;">
+        <div class="col-md-12 col-main" style="padding: 0px !important;"> 
+          
+          <div id="basemap"></div>
+          <div id="editFormWrapper">
+            <form id="editForm">
+              <!-- Add your form fields here -->
+              <h2 id="formSpeciesName"></h2>
+              <div id="ccs">
+                <label for="ccs">Current Conservation Status:&nbsp;&nbsp;&nbsp;</label> <p id="currentConservationStatus" name="ccs"></p> <br>
+              </div>
+              <div id="ncs">
+                <label for="ncs">New Conservation Status:&nbsp;&nbsp;&nbsp; </label>
+                <div id="dropdownNCS">
+                  <button id="selectNCS" name="ncs">Select New</button>
+                  <div id="dropdownContentNCS">
+                    <button>endangered</button>
+                    <button>vulnerable</button>
+                    <button>near-threatened</button>
+                    <button>least concern</button>
+                    <button>invasive</button>
+                  </div>
+                </div> 
+                 <br><br>
+              </div>
+              <label for="citationSneeded">Source:&nbsp;&nbsp;&nbsp; </label> <input type="text" id="citationSneeded" name="citationSneeded"> <br>
+              <p>Please enter a link to a reliable source that backs up your claim to make this edit.</p>
+
+              <label for="important" id="important">Important:&nbsp;&nbsp;&nbsp; </label> <p id="currentConservationStatus" name="important">Spamming or intentionally abusing this functionality will not be tolerated and will result in your account being either suspended or banned.</p>
+              <button id="submitEditButton">Submit</button>
+              <button id="closeFormButton">Close</button>
+            </form>
+          </div>
+
+          <div id="menu" class="menu">
+            <div class="menu-header"><div class="image-container">
               <img src="./images/tabIcons/logo-removebg.png" alt="project echo logo">
             </div>
           </div>
-          <button id="themeToggle" class="theme-toggle-btn"
-            style="position: absolute; right: 10px; top: 50px; color: green; z-index: 1001;">Switch to Light
-            Theme</button>
+          <button id="themeToggle" class="theme-toggle-btn" style="position: absolute; right: 10px; top: 50px; color: green; z-index: 1001;">Switch to Light Theme</button>
           <div class="navbar">
             <a id="filter-menu-btn" class="tabs-button active" onclick="openTab('filter-menu')"></a>
             <a id="SIM-menu-btn" class="tabs-button" onclick="openTab('SIM')"></a>
+            <a id="config-settings-menu-btn" class="tabs-button" onclick="openTab('config-settings-tab')"></a>
             <a id="popup-menu-btn" class="tabs-button" onclick="openTab('animal-popup')"></a>
             <a id="mic-popup-menu-btn" class="tabs-button" onclick="openTab('mic-popup')"></a>
             <a id="FAQ-menu-btn" class="tabs-button" onclick="openTab('FAQ')"></a>
@@ -151,238 +177,198 @@
           <div id="FAQ">
             <div class="wrapper">
               <div id="FAQ-contents">
-                <h2>About Us</h2>
-                <div class="dropdown">
-                  <button class="btn btn-secondary btn-no-background dropdown-toggle" id="about_us_toggle"
-                    data-bs-toggle="dropdown" aria-expanded="false">
-                    Project Echo
-                  </button>
-                  <div class="dropdown-menu faq-content" id="about_us_content" aria-label="about_us_toggle">
-                    <h2>The Project</h2>
-                    <p>
-                      Project Echo, is a <strong>a bioacoustics classification tool</strong> that use AI/ML solution for
-                      understanding the density and classification of noise-producing animals in rainforests.
-                      Echo’s vision is to help ecologists and environmentalists to survey the environment in a
-                      non-destructive and efficient way to track threatened animal species population numbers over time.
-                      This research input will provide conservationists the information they need to make informed
-                      conservation decisions to protect our precious native fauna.
-                    </p>
-
-                    <h2>Who we are?</h2>
-                    <p>
-                      We are <strong>DataBytes</strong>, a cutting-edge, data-driven company that focuses on designing
-                      and implementing custom, cloud-based data collection and analytics platforms.
-                      With a team of experienced data scientists and software engineers, we specialize in developing
-                      intelligent systems that optimize business processes and automate task management for increased
-                      efficiency across various industries.
-                      From image recognition to language translation, our AI-driven technologies aim to transform the
-                      way businesses operate and enhance their capabilities for a brighter, more prosperous future.
-                    </p>
-                    <p>
-                      Having worked with companies across the country in the retail vertical, financial services,
-                      healthcare, e-commerce, and even telecom, we’re well versed in a wide variety of data needs.
-                      Our goal is to democratize AI and provide affordable, accessible solutions that enable our clients
-                      to accelerate their growth and improve their bottom line.
-                      With a passion for innovation and a commitment to excellence, we are the go-to AI partner for
-                      businesses looking to unlock the full potential of their data.
-                    </p>
-
-                    <p>
-                      We believe that sound analysis can revolutionize the way we monitor animal populations, and we aim
-                      to make our solution widely available to conservationists and researchers.
-                      Project Echo leverages machine learning to understand the density and classifications of animals
-                      in a survey area, using our curated sound datasets.
-                      Our team is making solid and comprehensive progress in the analysis of labeled data and its
-                      predictive ability using Artificial Intelligence and Machine Learning.
-                    </p>
-                  </div>
-                </div>
-
-                <div id="userProfile">
-                  <div class="wrapper">
-                    <div id="statistics">
-                      <div class="wrapper">
-
-                      </div>
-                    </div>
-
-                    <form action="/api/auth/signout" method="POST">
-                      <div id="userProfile-contents">
-                        <h2>User Profile</h2>
-                        <!-- <h3 id="display_name">Username: <span id="username"></span></h3>
-                    <h3 id="display_mail">Email: <span id="useremail"></span></h3> -->
-
-                        <div class="markup_form">
-                          <div class="markup_column">
-                            <div class="markup_row_left">
-                              <div>Username:</div>
-                            </div>
-                            <div class="markup_row_right">
-                              <div id="display_name"> <span id="username"></span></div>
-                            </div>
-                          </div>
-
-                          <div class="markup_column">
-                            <div class="markup_row_left">
-                              <div>Email:</div>
-                            </div>
-                            <div class="markup_row_right">
-                              <div id="display_mail"> <span id="useremail"></span></div>
-                            </div>
-                          </div>
-                        </div>
-
-                        <center><button type="submit">Logout</button></center>
-                      </div>
-                    </form>
-                  </div>
-                </div>
-
-                <div class="dropdown">
-                  <button class="btn btn-secondary dropdown-toggle btn-no-background" id="data_src_toggle"
-                    data-bs-toggle="dropdown" aria-expanded="false">
-                    Data Sourcing and Pooling
-                  </button>
-                  <div class="dropdown-menu faq-content" id="data_src_content" aria-labelledby="data_src_toggle">
-                    <h2>Audio data</h2>
-                    <p>
-                      In the early process of the project, the audio data is collected and extracted through the
-                      existing online researches. The data source can be categorized under two areas:
-                    </p>
-
-                    <h3>Research Paper sourced Data</h3>
-
-                    <p>
-                      Consistent with the systematic reviews of the literature, many papers are not following open
-                      science practices and are protecting their data.
-                      However one promising public resource of animal audio data emerged from papers produced by
-                      Phillips and Towsey (2018) and Teixeira et al (2019);
-                      Ecosounds (n.d.) is a repository of environmental audio recordings that provides publicly sourced
-                      annotations of animal sounds in Australia and other parts of the world.
-                    </p>
-
-                    <h3>Internet Search</h3>
-
-                    <p>
-
-                      An internet search using the Google search engine using various combinations of terms such as
-                      ‘animal sound’ ‘database’ ‘repository’ ‘Australia’ ‘data set’ ‘dataset’, yielded useful results.
-                      A non-exhaustive list of promising sources are provided in the appendix to this report.
-                      <br>
-                      The challenges for these sources is that data mining and scraping will be required to gain access
-                      to the audio files. This will be a required skill in Project Echo going forward.
-
-                    </p>
-
-                    <h2>Image and biographical data</h2>
-                    <p>
-                      The names of the species respective to the available audio data are found in the <strong>Otways
-                        from the book: Grant Palmer. Wildlife of the Otways and Shipwreck Coast. Clayton, VIC: CSIRO
-                        PUBLISHING, 2019</strong>.
-                    </p>
-
-                    <p>
-                      Currently, the species biographical data is generated using Generative AI in order to avoid
-                      copyrights issue. The images are generated using Dall-E, and then compare to the real
-                      visualization of the real picture to select the most similar and realistic image.
-                      <br>
-                      The summary and description of each species is generated using ChatGPT, which provide a succinct
-                      and brief information about the animal and its habitat.
-                    </p>
-                    <p>
-                      As the project is still in development, the biological information of the species can be improved
-                      further.
-                    </p>
-                  </div>
-                </div>
-
-                <div class="dropdown">
-                  <button class="btn btn-secondary dropdown-toggle btn-no-background" id="contact_us_toggle">
-                    Contact Us
-                  </button>
-                  <div class="dropdown-menu faq-content" id="contact_us_content" aria-labelledby="contact_us_toggle">
-                    <h2>Send a Message to Project Echo</h2>
-                    <p>
-                      You can submit your query or feedback using the form below:
-                    <form method="post" action="/send_email" method="POST">
-                      <div class="form-group row">
-                        <div>
-                          <input type="text" class="form-control" id="email" placeholder="Enter your email" name="email"
-                            oninput="emailValidate()">
-                          <span class="label" id="email_error_label">* Please enter the correct email address</span>
-                        </div>
-                      </div>
-
-                      <div class="form-group row">
-                        <div>
-                          <textarea rows="5" class="form-control" id="query" name="query"
-                            placeholder="Please type your query here..." onchange="queryValidate()"></textarea>
-                          <span class="label" id="query_error_label">* Please enter a query</span>
-                        </div>
-                      </div>
-
-                      <div class="form-group row">
-                        <div>
-                          <button type="submit" class="btn btn-primary" id="query_submit_button">Submit</button>
-                        </div>
-                      </div>
-                    </form>
-                  </div>
+              <h2>About Us</h2>
+              <div class="dropdown">
+                <button class="btn btn-secondary btn-no-background dropdown-toggle" id="about_us_toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                  Project Echo
+                </button>
+                <div class="dropdown-menu faq-content" id="about_us_content" aria-label="about_us_toggle">
+                  <h2>The Project</h2>
+                      <p>
+                        Project Echo, is a <strong>a bioacoustics classification tool</strong> that use AI/ML solution for understanding the density and classification of noise-producing animals in rainforests. 
+                        Echo’s vision is to help ecologists and environmentalists to survey the environment in a non-destructive and efficient way to track threatened animal species population numbers over time.
+                        This research input will provide conservationists the information they need to make informed conservation decisions to protect our precious native fauna. 
+                      </p>
+                      
+                      <h2>Who we are?</h2>
+                      <p>
+                        We are <strong>DataBytes</strong>, a cutting-edge, data-driven company that focuses on designing and implementing custom, cloud-based data collection and analytics platforms. 
+                        With a team of experienced data scientists and software engineers, we specialize in developing intelligent systems that optimize business processes and automate task management for increased efficiency across various industries. 
+                        From image recognition to language translation, our AI-driven technologies aim to transform the way businesses operate and enhance their capabilities for a brighter, more prosperous future. 
+                      </p>
+                      <p>
+                        Having worked with companies across the country in the retail vertical, financial services, healthcare, e-commerce, and even telecom, we’re well versed in a wide variety of data needs. 
+                        Our goal is to democratize AI and provide affordable, accessible solutions that enable our clients to accelerate their growth and improve their bottom line. 
+                        With a passion for innovation and a commitment to excellence, we are the go-to AI partner for businesses looking to unlock the full potential of their data. 
+                      </p>
+  
+                      <p>
+                        We believe that sound analysis can revolutionize the way we monitor animal populations, and we aim to make our solution widely available to conservationists and researchers. 
+                        Project Echo leverages machine learning to understand the density and classifications of animals in a survey area, using our curated sound datasets. 
+                        Our team is making solid and comprehensive progress in the analysis of labeled data and its predictive ability using Artificial Intelligence and Machine Learning.
+                      </p>
                 </div>
               </div>
-            </div>
 
+              <div id="userProfile">
+                <div class="wrapper">
+                  <div id="statistics">
+                    <div class="wrapper">
+                      
+                      </div>
+                    </div>
+    
+                  <form action="/api/auth/signout" method="POST">
+                  <div id="userProfile-contents">
+                    <h2>User Profile</h2>
+                    <!-- <h3 id="display_name">Username: <span id="username"></span></h3>
+                    <h3 id="display_mail">Email: <span id="useremail"></span></h3> -->
+                    
+                    <div class="markup_form">
+                      <div class="markup_column">
+                        <div class="markup_row_left">
+                          <div>Username:</div>
+                        </div>
+                        <div class="markup_row_right">
+                          <div id="display_name"> <span id="username"></span></div>
+                        </div>
+                      </div>
+  
+                      <div class="markup_column">
+                        <div class="markup_row_left">
+                          <div>Email:</div>
+                        </div>
+                        <div class="markup_row_right">
+                          <div id="display_mail"> <span id="useremail"></span></div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <center><button type="submit">Logout</button></center>
+                  </div>
+                </form>
+                </div>
+              </div>
+
+              <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle btn-no-background" id="data_src_toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                  Data Sourcing and Pooling
+                </button>
+                <div class="dropdown-menu faq-content" id="data_src_content" aria-labelledby="data_src_toggle">
+                  <h2>Audio data</h2>
+                  <p>
+                    In the early process of the project, the audio data is collected and extracted through the existing online researches. The data source can be categorized under two areas:
+                  </p>
+  
+                  <h3>Research Paper sourced Data</h3>
+                  
+                  <p>
+                    Consistent with the systematic reviews of the literature, many papers are not following open science practices and are protecting their data. 
+                    However one promising public resource of animal audio data emerged from papers produced by Phillips and Towsey (2018) and Teixeira et al (2019); 
+                    Ecosounds (n.d.) is a repository of environmental audio recordings that provides publicly sourced annotations of animal sounds in Australia and other parts of the world. 
+                  </p>
+                  
+                  <h3>Internet Search</h3>
+  
+                  <p>
+  
+                    An internet search using the Google search engine using various combinations of terms such as ‘animal sound’ ‘database’ ‘repository’ ‘Australia’ ‘data set’ ‘dataset’, yielded useful results. 
+                    A non-exhaustive list of promising sources are provided in the appendix to this report.
+                    <br>
+                    The challenges for these sources is that data mining and scraping will be required to gain access to the audio files. This will be a required skill in Project Echo going forward. 
+  
+                  </p>
+  
+                  <h2>Image and biographical data</h2>
+                  <p>
+                    The names of the species respective to the available audio data are found in the <strong>Otways from the book: Grant Palmer. Wildlife of the Otways and Shipwreck Coast. Clayton, VIC: CSIRO PUBLISHING, 2019</strong>.
+                  </p>
+                  
+                  <p>
+                    Currently, the species biographical data is generated using Generative AI in order to avoid copyrights issue. The images are generated using Dall-E, and then compare to the real visualization of the real picture to select the most similar and realistic image.
+                    <br>
+                    The summary and description of each species is generated using ChatGPT, which provide a succinct and brief information about the animal and its habitat.
+                  </p>
+                  <p>
+                    As the project is still in development, the biological information of the species can be improved further.
+                  </p>
+                </div>
+              </div>
+              
+              <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle btn-no-background" id="contact_us_toggle">
+                  Contact Us
+                </button>
+                <div class="dropdown-menu faq-content" id="contact_us_content" aria-labelledby="contact_us_toggle">
+                  <h2>Send a Message to Project Echo</h2>
+                  <p>
+                    You can submit your query or feedback using the form below:
+                    <form method="post" action="/send_email" method="POST">
+                      <div class="form-group row">
+                          <div>
+                              <input type="text" class="form-control" id="email"
+                                  placeholder="Enter your email" name="email" oninput="emailValidate()">
+                              <span class="label" id="email_error_label">* Please enter the correct email address</span>
+                          </div>
+                      </div>
+                      
+                      <div class="form-group row">
+                          <div>
+                              <textarea rows="5" class="form-control" id="query"
+                                  name="query"
+                                  placeholder="Please type your query here..." onchange="queryValidate()"></textarea>
+                                  <span class="label" id="query_error_label">* Please enter a query</span>
+                          </div>
+                      </div>
+                      
+                      <div class="form-group row">
+                          <div>
+                              <button type="submit" class="btn btn-primary" id="query_submit_button">Submit</button>
+                          </div>
+                      </div>
+                  </form>
+                </div>
+              </div>
+              </div>
+            </div>
+            
           </div>
           <div id="SIM">
             <div class="wrapper">
-              <div id="SIM-contents">
-                <h2>Simulator</h2>
-
-                <p>
-                  <strong>The Echo Simulator</strong> - an innovative system - aims to replicate the Otway’s National
-                  Forest environment by creating virtual microphone sensors strategically placed and interconnected in a
-                  mesh-like network. This advanced system effectively monitors semi-random simulated animal production
-                  events, contributing to wildlife research and conservation efforts. Upon detecting a sound, the
-                  simulator shows how our end-to-end solution is able to leverage the trigger times from the nearest
-                  microphones, employing a brute-force optimisation technique to accurately triangulate the source
-                  location of the sound. With minimal error, the audio sample and associated microphone IDs are
-                  seamlessly integrated and communicated throughout Echo-Net, a comprehensive framework comprising a
-                  bioacoustics engine, store, processing server, communications servers, and APIs. This rich data is
-                  then visually represented on our (HMI), allowing researchers and wildlife enthusiasts to analyse and
-                  better understand the complex acoustic interactions within the simulated Otway’s National Forest
-                  ecosystem.
-                </p>
-                <h2>Select Simulator Mode</h2>
-                <div class="toggle-switch-container">
-                  <div class="radio-group">
-                    <input type="radio" id="option1" name="options" value="option1"
-                      onclick="{simModeSwitch('Animal_Mode')}">
-                    <span for="option1">Simulate Movement</span>
-                  </div>
-                  <div class="radio-group">
-                    <input type="radio" id="option2" name="options" value="option2"
-                      onclick="{simModeSwitch('Recording_Mode')}">
-                    <span for="option2">Live Recording</span>
-                  </div>
-                  <div class="radio-group">
-                    <input type="radio" id="option3" name="options" value="option3"
-                      onclick="{simModeSwitch('Recording_Mode_V2')}">
-                    <span for="option3">Live Recording V2</span>
-                  </div>
-                  <div class="radio-group">
-                    <input type="radio" id="option4" name="options" value="option4" onclick="{simModeSwitch('Stop')}"
-                      checked>
-                    <span for="option4">Disable Simulator</span>
-                  </div>
-                  <!--label for="toggle-switch" class="toggle-label">Start Simulator:</label>
+            <div id="SIM-contents">
+              <h2>Simulator</h2>
+              
+                  <p>
+                    <strong>The Echo Simulator</strong> - an innovative system - aims to replicate the Otway’s National Forest environment by creating virtual microphone sensors strategically placed and interconnected in a mesh-like network. This advanced system effectively monitors semi-random simulated animal production events, contributing to wildlife research and conservation efforts. Upon detecting a sound, the simulator shows how our end-to-end solution is able to leverage the trigger times from the nearest microphones, employing a brute-force optimisation technique to accurately triangulate the source location of the sound. With minimal error, the audio sample and associated microphone IDs are seamlessly integrated and communicated throughout Echo-Net, a comprehensive framework comprising a bioacoustics engine, store, processing server, communications servers, and APIs. This rich data is then visually represented on our (HMI), allowing researchers and wildlife enthusiasts to analyse and better understand the complex acoustic interactions within the simulated Otway’s National Forest ecosystem.
+                  </p>
+              <h2>Select Simulator Mode</h2>
+                  <div class="toggle-switch-container">
+                    <div class="radio-group">
+                      <input type="radio" id="option1" name="options" value="option1" onclick="{simModeSwitch('Animal_Mode')}">
+                      <span for="option1">Simulate Movement</span>
+                    </div>
+                    <div class="radio-group">
+                      <input type="radio" id="option2" name="options" value="option2" onclick="{simModeSwitch('Recording_Mode')}">
+                      <span for="option2">Live Recording</span>
+                    </div>
+                    <div class="radio-group">
+                      <input type="radio" id="option3" name="options" value="option3" onclick="{simModeSwitch('Recording_Mode_V2')}">
+                      <span for="option3">Live Recording V2</span>
+                    </div>
+                    <div class="radio-group">
+                      <input type="radio" id="option4" name="options" value="option4" onclick="{simModeSwitch('Stop')}" checked>
+                      <span for="option4">Disable Simulator</span>
+                    </div>
+                    <!--label for="toggle-switch" class="toggle-label">Start Simulator:</label>
                     <label class="toggle-switch">
                       <input id="simulatorToggle" type="checkbox">
                       <span class="slider round"></span>
                     </label-->
-                </div>
-              </div>
+                  </div>
             </div>
-          </div>
+            </div>
+          </div> 
+
           <div id="animalNotifications" style="width: 0%; height: 0%;">
             <div class="wrapper">
               <form action="/api/notifications/animals" method="POST">
@@ -398,7 +384,8 @@
 
                     <!-- Dropdown or List of Animals (Can be dynamically populated) -->
                     <div class="markup_column">
-                      <label for="animal-list" id="available-animal-label" style="color:white"></label>Available Animals:</label>
+                      <label for="animal-list" id="available-animal-label" style="color:white">Available
+                        Animals:</label>
                       <ul id="animal-list">
                         <!-- Dynamically populated list -->
                       </ul>
@@ -406,33 +393,100 @@
 
                     <!-- Selected Animals for Notification -->
                     <div class="markup_column">
-                      <label id="selected-animal-label" >Selected Animals:</label>
+                      <label id="selected-animal-label">Selected Animals:</label>
                       <ul id="selected-animals">
                         <!-- Populated as animals are selected -->
                       </ul>
                     </div>
 
-                  <!-- Save Preferences Button -->
-                  <center><button type="submit">Save Notifications</button></center>
-                </div>
+                    <!-- Save Preferences Button -->
+                    <center><button type="submit">Save Notifications</button></center>
+                  </div>
               </form>
             </div>
           </div>
 
 
+          <!-- Configuration Tab Content -->
+          <div id="config-settings-tab">
+            <div class="wrapper">
+              <div id="config-settings-contents">
+                <h2>Configuration Settings</h2>
+                <p class="config-description">
+                  The Configuration Settings tab is a crucial component of the Echo Simulator interface, designed to customize and control various simulation parameters. This tab allows users to tailor the simulation environment by selecting specific microphones, species, and classes, which are critical for conducting targeted environmental studies and simulations.
+                </p>
+                <div class="accordion" id="configAccordion">
+                        <!-- Microphones Section -->
+                    <div class="dropdown">
+                      <button class="btn btn-secondary dropdown-toggle btn-no-background" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Select Microphones
+                      </button>
+                      <div class="dropdown-menu">
+                        <div class="row">
+                          <div class="col">
+                            <select id="config-microphone-list" class="form-control" multiple>
+                              
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
 
+                    <!-- Species Section -->
+                    <div class="dropdown">
+                      <button class="btn btn-secondary dropdown-toggle btn-no-background" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Select Species
+                      </button>
+                      <div class="dropdown-menu">
+                        <div class="row">
+                          <div class="col">
+                            
+                            <select id="config-species-list" class="form-control" multiple>
+                            
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Class Section -->
+                    <div class="dropdown">
+                      <button class="btn btn-secondary dropdown-toggle btn-no-background" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Select Class
+                      </button>
+                      <div class="dropdown-menu">
+                        <div class="row">
+                          <div class="col">
+                            
+                            <select id="config-class-list" class="form-control" multiple>
+                              
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <br></br>
+                    <!-- Configure Button -->
+                    <button id="config-configure-button" class="btn btn-primary">Configure</button>
+
+                    <!-- Current Configuration Information -->
+                    <div id="config-current-configuration" class="mt-4">
+                      <h3>Current Configuration</h3>
+                      <p id="config-details">No configuration selected.</p>
+                    </div>
+              </div>
+            </div>
+          </div>
 
           <!--DONATIONS TAB--->
           <div id="donate">
             <div class="wrapper">
-              <div id="donate-contents">
-                <h2>Donations</h2>
-                <p>
-                  As our project expands, we rely on the generosity of supporters like you to ensure the continuous
-                  operation of our mission. By donating, you contribute to the preservation of our endangered species.
-                  Thank you for being a crucial part of Project Echo's journey.
-                </p>
-                <!-- Animal donation images with hover and click effects -->
+            <div id="donate-contents">
+              <h2>Donations</h2>
+                  <p>
+                    As our project expands, we rely on the generosity of supporters like you to ensure the continuous operation of our mission. By donating, you contribute to the preservation of our endangered species. Thank you for being a crucial part of Project Echo's journey.
+                  </p>
+                  <!-- Animal donation images with hover and click effects -->
                 <div class="image-row" id="image-row">
                   <div class="image-description">
                     <img src="./images/$1.png" alt="Amphibian Vulnerable">
@@ -460,14 +514,13 @@
                   <img src="./images/Your Amount.png" alt="Light Bulb">
                   <p class="donation-amount">Your Amount:</p>
                 </div>
-
-                <button class="donate-button" id="donation-button">DONATE NOW</button>
-              </div>
+                
+                  <button class="donate-button" id="donation-button">DONATE NOW</button>
             </div>
-          </div>
+            </div>
+          </div> 
           <div id="animal-popup">
             <div class="wrapper">
-              
             <div id="animal-popup-content">
               <div class="markup_form">
                 <!-- markup_icon -->
@@ -559,70 +612,50 @@
                   </div>
                   <div class="markup_row_right" style="text-align: right !important; width: 400px !important">
                     <div id="markup_details"></div>
-                    
+                  </div>
+                </div>
+                <!-- markup_location -->
+                <div class="markup_column">
+                  <div class="markup_row_left">
+                    <div>Longitude</div>
+                  </div>
+                  <div class="markup_row_right">
+                    <div id="markup_loc_lon"></div>
+                  </div>
+                </div>
+                <div class="markup_column">
+                  <div class="markup_row_left">
+                    <div>Latitude</div>
+                  </div>
+                  <div class="markup_row_right">
+                    <div id="markup_loc_lat"></div>
                   </div>
                 </div>
 
-                <img id="desc_img" src=""></img>
-                <div id="desc_species" class="subtitle"></div>
-                <h2>Animal Summary</h2>
-                <div id="desc_summary" class="desc"></div>
-                <div id="desc_details" class="desc"></div>
-
-                <h2 style="margin-top: 20px !important;">Event Details</h2>
-                <div class="markup_form">
-                  <!-- markup_icon -->
-                  <div class="markup_column">
-                    <div class="markup_row_left" style="width: 100px !important">
-                      <img id="markup_img" src=""></img>
-                    </div>
-                    <div class="markup_row_right" style="text-align: right !important; width: 400px !important">
-                      <div id="markup_details"></div>
-                    </div>
+                <!-- markup_date -->
+                <div class="markup_column">
+                  <div class="markup_row_left" style="width: 100px !important">
+                    <div>Date</div>
                   </div>
-                  <!-- markup_location -->
-                  <div class="markup_column">
-                    <div class="markup_row_left">
-                      <div>Longitude</div>
-                    </div>
-                    <div class="markup_row_right">
-                      <div id="markup_loc_lon"></div>
-                    </div>
-                  </div>
-                  <div class="markup_column">
-                    <div class="markup_row_left">
-                      <div>Latitude</div>
-                    </div>
-                    <div class="markup_row_right">
-                      <div id="markup_loc_lat"></div>
-                    </div>
-                  </div>
-
-                  <!-- markup_date -->
-                  <div class="markup_column">
-                    <div class="markup_row_left" style="width: 100px !important">
-                      <div>Date</div>
-                    </div>
-                    <div class="markup_row_right" style="text-align: right !important; width: 400px !important">
-                      <div id="markup_date"></div>
-                    </div>
-                  </div>
-
-                  <!-- markup_confidence -->
-                  <div class="markup_column">
-                    <div class="markup_row_left">
-                      <div>Location Confidence</div>
-                    </div>
-                    <div class="markup_row_right">
-                      <div id="markup_confidence"></div>
-                    </div>
+                  <div class="markup_row_right" style="text-align: right !important; width: 400px !important">
+                    <div id="markup_date"></div>
                   </div>
                 </div>
-                <h2 id="audioHeader" style="margin-top: 20px !important;">Audio</h2>
+
+                <!-- markup_confidence -->
+                <div class="markup_column">
+                  <div class="markup_row_left">
+                    <div>Location Confidence</div>
+                  </div>
+                  <div class="markup_row_right">
+                    <div id="markup_confidence"></div>
+                  </div>
+                </div>             
+              </div>
+                <h2 id="audioHeader"style="margin-top: 20px !important;">Audio</h2>
 
                 <div id="audioControl" class="audio_component">
-                  <span><i id="animalAudioI" class="fa fa-volume-up fa-2x" style="color:rgba(247, 186, 206, 0.6);"
-                      onclick="{toggleAudio()}"></i></span>
+                  <span><i id="animalAudioI" class="fa fa-volume-up fa-2x" style="color:rgba(247, 186, 206, 0.6);" onclick="{toggleAudio()}"></i></span>
                   <div class="audioContainer">
                     <div class="box box1"></div>
                     <div class="box box2"></div>
@@ -649,399 +682,355 @@
                 <p style="margin-top: 40px !important;">
                   Is the information above inaccurate? <br>
                   Request to make an edit.
-                </p>
-                <button id="request-edit-button">Request Edit</button>
-              </div>
-              <div id="animal-default-content">
-                <h2 style="text-align: left; color: rgba(247, 186, 206, 1) !important;">Animal Bio Data</h2>
+               </p>
+               <button id="request-edit-button">Request Edit</button>
+            </div>
+            <div id="animal-default-content">
+              <h2 style="text-align: left; color: rgba(247, 186, 206, 1) !important;">Animal Bio Data</h2>
                 <p>Please click on a map marker to view bio data.</p>
-              </div>
+            </div>
             </div>
           </div>
           <div id="mic-popup">
             <div class="wrapper">
-              <div id="mic-popup-content">
-                <div class="markup_form">
-                  <!-- markup_icon -->
-                  <div class="markup_column">
-                    <div class="markup_row_left markup_row_title"
-                      style="width: 420px !important; margin: 0px !important;">
-                      <h2 id="mic_desc_name">Microphone</h2>
-                    </div>
+            <div id="mic-popup-content">
+              <div class="markup_form">
+                <!-- markup_icon -->
+                <div class="markup_column">
+                  <div class="markup_row_left markup_row_title" style="width: 420px !important; margin: 0px !important;">
+                    <h2 id="mic_desc_name">Microphone</h2>
+                  </div>
+                </div>
+              </div>
+              
+              <img id="mic_desc_img" src=""></img>
+              <div id="mic_desc_id" class="subtitle"></div>
+              <div id="mic_desc_details" class="desc"></div>
+              
+              <h2 style="margin-top: 20px !important;">Microphone Details</h2>
+              <div class="markup_form">
+                <!-- markup_icon -->
+                <div class="markup_column">
+                  <div class="markup_row_left" style="width: 100px !important">
+                    <img id="mic_markup_img" src=""></img>
+                  </div>
+                  <div class="markup_row_right" style="text-align: right !important; width: 400px !important">
+                    <div id="mic_markup_details"></div>
+                  </div>
+                </div>
+                <!-- markup_location -->
+                <div class="markup_column">
+                  <div class="markup_row_left">
+                    <div>Longitude</div>
+                  </div>
+                  <div class="markup_row_right">
+                    <div id="mic_markup_loc_lon"></div>
+                  </div>
+                </div>
+                <div class="markup_column">
+                  <div class="markup_row_left">
+                    <div>Latitude</div>
+                  </div>
+                  <div class="markup_row_right">
+                    <div id="mic_markup_loc_lat"></div>
                   </div>
                 </div>
 
-                <img id="mic_desc_img" src=""></img>
-                <div id="mic_desc_id" class="subtitle"></div>
-                <div id="mic_desc_details" class="desc"></div>
-
-                <h2 style="margin-top: 20px !important;">Microphone Details</h2>
-                <div class="markup_form">
-                  <!-- markup_icon -->
-                  <div class="markup_column">
-                    <div class="markup_row_left" style="width: 100px !important">
-                      <img id="mic_markup_img" src=""></img>
-                    </div>
-                    <div class="markup_row_right" style="text-align: right !important; width: 400px !important">
-                      <div id="mic_markup_details"></div>
-                    </div>
+                <!-- markup_date -->
+                <div class="markup_column">
+                  <div class="markup_row_left" style="width: 100px !important">
+                    <div>Date</div>
                   </div>
-                  <!-- markup_location -->
-                  <div class="markup_column">
-                    <div class="markup_row_left">
-                      <div>Longitude</div>
-                    </div>
-                    <div class="markup_row_right">
-                      <div id="mic_markup_loc_lon"></div>
-                    </div>
+                  <div class="markup_row_right" style="text-align: right !important; width: 400px !important">
+                    <div id="mic_markup_date"></div>
                   </div>
-                  <div class="markup_column">
-                    <div class="markup_row_left">
-                      <div>Latitude</div>
-                    </div>
-                    <div class="markup_row_right">
-                      <div id="mic_markup_loc_lat"></div>
-                    </div>
-                  </div>
-
-                  <!-- markup_date -->
-                  <div class="markup_column">
-                    <div class="markup_row_left" style="width: 100px !important">
-                      <div>Date</div>
-                    </div>
-                    <div class="markup_row_right" style="text-align: right !important; width: 400px !important">
-                      <div id="mic_markup_date"></div>
-                    </div>
-                  </div>
-
                 </div>
-                <h2 style="margin-top: 20px !important;">Record Live Audio</h2>
-                <div id="audio_recording_container">
-                  <i id="record_audio_button" class="toggle-button btn btn-secondary btn-no-background select-all-btn"
-                    onclick="{record()}" aria-hidden="true">Record</i>
-                  <div id="recording_contorls_container" class="recording_controls controls_item_row hide">
-                    <i id="cancel_recording_button"
-                      class="toggle-button btn btn-secondary btn-no-background select-all-btn"
-                      onclick="{cancelRecording()}" aria-hidden="true">Cancel</i>
+
+              </div>
+              <h2 style="margin-top: 20px !important;">Record Live Audio</h2>
+              <div id="audio_recording_container">
+                <i id="record_audio_button" class="toggle-button btn btn-secondary btn-no-background select-all-btn" onclick="{record()}" aria-hidden="true">Record</i>
+                <div id="recording_contorls_container" class="recording_controls controls_item_row hide">
+                    <i id="cancel_recording_button" class="toggle-button btn btn-secondary btn-no-background select-all-btn" onclick="{cancelRecording()}" aria-hidden="true">Cancel</i>
                     <div id="recording_info" class="controls_item_row">
-                      <i id="recording_indicator" class="fa fa-circle" aria-hidden="true"></i>
-                      <p id="recording_duration">"00:00:00"</p>
+                        <i id="recording_indicator" class="fa fa-circle" aria-hidden="true"></i>
+                        <p id="recording_duration">"00:00:00"</p>
                     </div>
-                    <i id="stop_recording_button"
-                      class="toggle-button btn btn-secondary btn-no-background select-all-btn"
-                      onclick="{stopRecording()}" aria-hidden="true">Stop</i>
-                  </div>
-                  <div id="audio_playback_div">
-                    <p id="audio_playback_indicator" class="playback_indicator hide">Audio is
-                      playing<span>.</span><span>.</span><span>.</span></p>
+                    <i id="stop_recording_button" class="toggle-button btn btn-secondary btn-no-background select-all-btn" onclick="{stopRecording()}" aria-hidden="true">Stop</i>
+                </div>
+                <div id="audio_playback_div">
+                    <p id="audio_playback_indicator" class="playback_indicator hide">Audio is playing<span>.</span><span>.</span><span>.</span></p>
+                </div>
+              </div>
+              <h2 id="audioHeader"style="margin-top: 20px !important;">Recording Playback</h2>
+              <div id="audio_playback_container">
+                <div id="audioControl" class="audio_component">
+                  <span><i id="recordingI" class="fa fa-volume-up fa-2x" style="color:rgba(247, 186, 206, 0.6);" onclick="{toggleRecordingAudio()}"></i></span>
+                  <div class="audioContainer">
+                    <div class="boxR box1"></div>
+                    <div class="boxR box2"></div>
+                    <div class="boxR box3"></div>
+                    <div class="boxR box4"></div>
+                    <div class="boxR box5"></div>
+                    <div class="boxR box6"></div>
+                    <div class="boxR box7"></div>
+                    <div class="boxR box8"></div>
+                    <div class="boxR box9"></div>
+                    <div class="boxR box10"></div>
+                    <div class="boxR box1"></div>
+                    <div class="boxR box2"></div>
+                    <div class="boxR box3"></div>
+                    <div class="boxR box4"></div>
+                    <div class="boxR box5"></div>
+                    <div class="boxR box6"></div>
+                    <div class="boxR box7"></div>
+                    <div class="boxR box8"></div>
+                    <div class="boxR box9"></div>
+                    <div class="boxR box10"></div>
                   </div>
                 </div>
-                <h2 id="audioHeader" style="margin-top: 20px !important;">Recording Playback</h2>
-                <div id="audio_playback_container">
-                  <div id="audioControl" class="audio_component">
-                    <span><i id="recordingI" class="fa fa-volume-up fa-2x" style="color:rgba(247, 186, 206, 0.6);"
-                        onclick="{toggleRecordingAudio()}"></i></span>
-                    <div class="audioContainer">
-                      <div class="boxR box1"></div>
-                      <div class="boxR box2"></div>
-                      <div class="boxR box3"></div>
-                      <div class="boxR box4"></div>
-                      <div class="boxR box5"></div>
-                      <div class="boxR box6"></div>
-                      <div class="boxR box7"></div>
-                      <div class="boxR box8"></div>
-                      <div class="boxR box9"></div>
-                      <div class="boxR box10"></div>
-                      <div class="boxR box1"></div>
-                      <div class="boxR box2"></div>
-                      <div class="boxR box3"></div>
-                      <div class="boxR box4"></div>
-                      <div class="boxR box5"></div>
-                      <div class="boxR box6"></div>
-                      <div class="boxR box7"></div>
-                      <div class="boxR box8"></div>
-                      <div class="boxR box9"></div>
-                      <div class="boxR box10"></div>
-                    </div>
-                  </div>
+              </div>
+              <h2 id="audioHeader"style="margin-top: 20px !important;">Recording Simulation</h2>
+              <div id="recording_simulation_master_container">
+                <div id="recording_export_container" style="margin-top: 10px !important;" class="recording_controls controls_item_row">
+                  <!--i id="save_recording_button" style="width:100px !important" class="toggle-button btn btn-secondary btn-no-background select-all-btn" onclick="{saveRecordingEvent()}" aria-hidden="true">Save</i-->
+                  <!--i id="load_recording_button" class="toggle-button btn btn-secondary btn-no-background select-all-btn" onclick="{loadRecordingEvent()}" aria-hidden="true">Load</i-->
+                  <input type="file" style="display: inline-block !important; width: 250px !important" id="fileInput">
                 </div>
-                <h2 id="audioHeader" style="margin-top: 20px !important;">Recording Simulation</h2>
-                <div id="recording_simulation_master_container">
-                  <div id="recording_export_container" style="margin-top: 10px !important;"
-                    class="recording_controls controls_item_row">
-                    <!--i id="save_recording_button" style="width:100px !important" class="toggle-button btn btn-secondary btn-no-background select-all-btn" onclick="{saveRecordingEvent()}" aria-hidden="true">Save</i-->
-                    <!--i id="load_recording_button" class="toggle-button btn btn-secondary btn-no-background select-all-btn" onclick="{loadRecordingEvent()}" aria-hidden="true">Load</i-->
-                    <input type="file" style="display: inline-block !important; width: 250px !important" id="fileInput">
-                  </div>
-
-                  <div id="recording_simulation_container" style="margin-top: 10px !important;"
-                    class="recording_controls controls_item_row">
-                    <i id="simulate_recording_button" style="width:120px !important"
-                      class="toggle-button btn btn-secondary btn-no-background select-all-btn"
-                      onclick="{simulateRecordingEvent()}" aria-hidden="true">Simulate</i>
-                  </div>
-                  <div id="downloadLink"></div>
+                
+                <div id="recording_simulation_container" style="margin-top: 10px !important;" class="recording_controls controls_item_row">
+                  <i id="simulate_recording_button" style="width:120px !important" class="toggle-button btn btn-secondary btn-no-background select-all-btn" onclick="{simulateRecordingEvent()}" aria-hidden="true">Simulate</i>
                 </div>
-                <!--div class="overlay hide">
+                <div id="downloadLink"></div>
+              </div>
+              <!--div class="overlay hide">
                 <div id="audio_recording_not_supported">
                     <p>To record audio, use browsers like Chrome and Firefox that support audio recording.</p>
                     <button type="button" id="acknowledge_button">Ok.</button>
                 </div>
               </div-->
+        
+              <audio controls id="audioElem" class="audio-element hide">
+              </audio>
 
-                <audio controls id="audioElem" class="audio-element hide">
-                </audio>
 
-
-              </div>
-              <div id="mic-default-content">
-                <h2 style="text-align: left; color: rgba(247, 186, 206, 1) !important;">Microhpone Bio Data</h2>
-                <br>
+            </div>
+            <div id="mic-default-content">
+              <h2 style="text-align: left; color: rgba(247, 186, 206, 1) !important;">Microhpone Bio Data</h2>
+              <br>
                 <p>Please click on a map marker to view microphone data.</p>
-              </div>
+            </div>
             </div>
           </div>
           <div id="filter-menu">
             <div class="wrapper">
-              <div id="filter-menu-contents">
-                <h2 style="text-align: left; color: rgba(247, 186, 206, 1) !important;">
-                  Filter Menu
-                </h2>
-                <div class="toggle-switch-container">
-                  <label for="toggle-switch" class="toggle-label">Live Mode:</label>
-                  <label class="toggle-switch">
-                    <input id="liveModeToggle" type="checkbox" checked>
-                    <span class="slider round"></span>
-                  </label>
-                </div>
-
-                <div class="past-data-container">
-                  <div class="past-data-header">View Past Data:</div>
-                  <div class="time-range-picker">
-                    <input type="text" id="datetime-range" name="datetime-range" style="width:100%" value="" />
-
-                  </div>
-                </div>
-                <div class="container">
-                  <input type="text" id="searchInput" placeholder="Search for an animal">
-                  <button onclick="{resetSearchFilter()}"
-                    class="toggle-button btn btn-secondary btn-no-background select-all-btn">Reset Filter</button>
-                  <ul id="animalList">
-                  </ul>
-                </div>
-                <div class="container">
-                  <span>Exclusive View Animal List</span>
-                  <ul id="displayOnlyAnimalList">
-                  </ul>
-                </div>
-                <div class="container">
-                  <span>Hidden Animal List</span>
-                  <ul id="hideAnimalList">
-                  </ul>
-                </div>
-
-
-
-                <div class="dropdown">
-                  <button class="btn btn-secondary dropdown-toggle btn-no-background" type="button"
-                    id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                    Animal Vocalizations
-                  </button>
-                  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                    <div class="row">
-                      <div class="col">
-
-                        <div class="form-check">
-                          <input class="form-check-input v" type="checkbox" value="" id="_reptile"
-                            onchange="updateFilter('_reptile')" checked>
-                          <label class="form-check-label" for="_reptile">Reptile</label>
-                        </div>
-                        <div class="form-check">
-                          <input class="form-check-input v" type="checkbox" value="" id="_bird"
-                            onchange="updateFilter('_bird')" checked>
-                          <label class="form-check-label" for="_bird">Bird</label>
-                        </div>
-                        <div class="form-check">
-                          <input class="form-check-input v" type="checkbox" value="" id="_mammal"
-                            onchange="updateFilter('_mammal')" checked>
-                          <label class="form-check-label" for="_mammal">Mammal</label>
-                        </div>
-
-                        <div class="form-check">
-                          <input class="form-check-input v" type="checkbox" value="" id="_insect"
-                            onchange="updateFilter('_insect')" checked>
-                          <label class="form-check-label" for="_insect">Insect</label>
-                        </div>
-
-                        <div class="form-check">
-                          <input class="form-check-input v" type="checkbox" value="" id="_amphibian"
-                            onchange="updateFilter('_amphibian')" checked>
-                          <label class="form-check-label" for="_amphibian">Amphibian</label>
-                        </div>
-
-                        <div class="form-check">
-                          <button onclick="{selectAll('_all')}"
-                            class="toggle-button btn btn-secondary btn-no-background select-all-btn">Select All</button>
-                        </div>
-
-                      </div>
-                      <div class="col-6">
-
-                        <div class="form-check">
-                          <input class="form-check-input v endangered" type="checkbox" value="" id="_endangered"
-                            onchange="updateFilter('_endangered')" checked>
-                          <label class="form-check-label" for="_endangered" onchange="">Endangered</label>
-                        </div>
-                        <div class="form-check">
-                          <input class="form-check-input v vulnerable" type="checkbox" value="" id="_vulnerable"
-                            onchange="updateFilter('_vulnerable')" checked>
-                          <label class="form-check-label" for="_vulnerable">Vunerable</label>
-                        </div>
-                        <div class="form-check">
-                          <input class="form-check-input v nearthreatened" type="checkbox" value=""
-                            id="_near-threatened" onchange="updateFilter('_near-threatened')" checked>
-                          <label class="form-check-label" for="_nearThreatened">Near Threatened</label>
-                        </div>
-                        <div class="form-check">
-                          <input class="form-check-input v normal" type="checkbox" value="" id="_normal"
-                            onchange="updateFilter('_normal')" checked>
-                          <label class="form-check-label" for="_normal">Normal</label>
-                        </div>
-
-                        <div class="form-check">
-                          <input class="form-check-input v invasive" type="checkbox" value="" id="_invasive"
-                            onchange="updateFilter('_invasive')" checked>
-                          <label class="form-check-label" for="_invasive">Invasive</label>
-                        </div>
-
-                        <div class="form-check">
-                          <button onclick="{selectAll('_clear')}"
-                            class="toggle-button btn btn-secondary btn-no-background select-all-btn">Clear All</button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="dropdown">
-                  <button class="btn btn-secondary dropdown-toggle btn-no-background" type="button"
-                    id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                    Animal Simulation
-                  </button>
-                  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                    <div class="row">
-                      <div class="col">
-
-                        <div class="form-check">
-                          <input class="form-check-input s" type="checkbox" value="" id="reptile"
-                            onchange="{updateFilter('reptile')}" checked>
-                          <label class="form-check-label" for="reptile">Reptile</label>
-                        </div>
-                        <div class="form-check">
-                          <input class="form-check-input s" type="checkbox" value="" id="bird"
-                            onchange="{updateFilter('bird')}" checked>
-                          <label class="form-check-label" for="bird">Bird</label>
-                        </div>
-                        <div class="form-check">
-                          <input class="form-check-input s" type="checkbox" value="" id="mammal"
-                            onchange="{updateFilter('mammal')}" checked>
-                          <label class="form-check-label" for="mammal">Mammal</label>
-                        </div>
-
-                        <div class="form-check">
-                          <input class="form-check-input s" type="checkbox" value="" id="insect"
-                            onchange="{updateFilter('insect')}" checked>
-                          <label class="form-check-label" for="insect">Insect</label>
-                        </div>
-
-                        <div class="form-check">
-                          <input class="form-check-input s" type="checkbox" value="" id="amphibian"
-                            onchange="{updateFilter('amphibian')}" checked>
-                          <label class="form-check-label" for="amphibian">Amphibian</label>
-                        </div>
-
-                        <div class="form-check">
-                          <button onclick="{selectAll('all')}"
-                            class="toggle-button btn btn-secondary btn-no-background select-all-btn">Select All</button>
-                        </div>
-
-                      </div>
-                      <div class="col-6">
-
-                        <div class="form-check">
-                          <input class="form-check-input s endangered" type="checkbox" value="" id="endangered"
-                            onchange="{updateFilter('endangered')}" checked>
-                          <label class="form-check-label" for="endangered">Endangered</label>
-                        </div>
-                        <div class="form-check">
-                          <input class="form-check-input s vulnerable" type="checkbox" value="" id="vulnerable"
-                            onchange="{updateFilter('vulnerable')}" checked>
-                          <label class="form-check-label" for="vulnerable">Vunerable</label>
-                        </div>
-
-                        <div class="form-check">
-                          <input class="form-check-input s nearthreatened" type="checkbox" value="" id="near-threatened"
-                            onchange="{updateFilter('near-threatened')}" checked>
-                          <label class="form-check-label" for="nearthreatened">Near Threatened</label>
-                        </div>
-
-                        <div class="form-check">
-                          <input class="form-check-input s normal" type="checkbox" value="" id="normal"
-                            onchange="{updateFilter('normal')}" checked>
-                          <label class="form-check-label" for="Normal">Normal</label>
-                        </div>
-
-                        <div class="form-check">
-                          <input class="form-check-input s invasive" type="checkbox" value="" id="invasive"
-                            onchange="{updateFilter('invasive')}" checked>
-                          <label class="form-check-label" for="invasive">Invasive</label>
-                        </div>
-                        <div class="form-check">
-                          <button onclick="selectAll('clear')"
-                            class="toggle-button btn btn-secondary btn-no-background select-all-btn">Clear All</button>
-                        </div>
-
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="dropdown">
-                  <button class="btn btn-secondary dropdown-toggle btn-no-background" type="button"
-                    id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                    Microphones
-                  </button>
-                  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                    <div class="row">
-                      <div class="col">
-                        <div class="form-check">
-                          <input class="form-check-input" type="checkbox" value="" id="microphones"
-                            onchange="{microphoneDisplay()}" checked>
-                          <label class="form-check-label" for="microphones">Microphones </label>
-                        </div>
-                        <div class="form-check">
-                          <input class="form-check-input" type="checkbox" value="" id="microphoneAnimations"
-                            onchange="{updateMicrophoneAnimation()}" checked>
-                          <label class="form-check-label" for="microphones">Enable Animation </label>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="export-tab">
-                <button id="export-csv" onclick="{downloadCSV()}">EXPORT AS CSV <i
-                    class="fa-solid fa-cloud-arrow-down"></i></button>
-                <button id="export-xlsx" onclick="{downloadXLSX()}">EXPORT AS XLSX <i
-                    class="fa-solid fa-cloud-arrow-down"></i></button>
-              </div>
-              <div class="error-box" id="error-msg"></div>
+            <div id="filter-menu-contents">
+            <h2 style="text-align: left; color: rgba(247, 186, 206, 1) !important;">
+              Filter Menu
+            </h2>
+            <div class="toggle-switch-container">
+              <label for="toggle-switch" class="toggle-label">Live Mode:</label>
+              <label class="toggle-switch">
+                <input id="liveModeToggle" type="checkbox" checked>
+                <span class="slider round"></span>
+              </label>
             </div>
+            
+            <div class="past-data-container">
+              <div class="past-data-header">View Past Data:</div>
+              <div class="time-range-picker">
+                <input type="text" id="datetime-range" name="datetime-range" style="width:100%" value="" />
+               
+              </div>
+            </div>
+            <div class="container">
+                <input type="text" id="searchInput" placeholder="Search for an animal">
+                <button onclick="{resetSearchFilter()}" class="toggle-button btn btn-secondary btn-no-background select-all-btn">Reset Filter</button>
+                <ul id="animalList">
+                </ul>
+            </div>
+            <div class="container">
+                <span>Exclusive View Animal List</span>
+                <ul id="displayOnlyAnimalList">
+                </ul>
+            </div>
+            <div class="container">
+              <span>Hidden Animal List</span>
+              <ul id="hideAnimalList">
+              </ul>
           </div>
-        </div>
+
+            
+
+            <div class="dropdown">
+              <button class="btn btn-secondary dropdown-toggle btn-no-background" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                Animal Vocalizations
+              </button>
+              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <div class="row">
+                  <div class="col">
+                    
+                    <div class="form-check">
+                      <input class="form-check-input v"  type="checkbox" value="" id="_reptile" onchange="updateFilter('_reptile')" checked>
+                      <label class="form-check-label" for="_reptile">Reptile</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input v"  type="checkbox" value="" id="_bird" onchange="updateFilter('_bird')" checked>
+                      <label class="form-check-label" for="_bird">Bird</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input v"  type="checkbox" value="" id="_mammal" onchange="updateFilter('_mammal')" checked>
+                      <label class="form-check-label" for="_mammal">Mammal</label>
+                    </div>
+
+                    <div class="form-check">
+                      <input class="form-check-input v"  type="checkbox" value="" id="_insect" onchange="updateFilter('_insect')" checked>
+                      <label class="form-check-label" for="_insect">Insect</label>
+                    </div>
+
+                    <div class="form-check">
+                      <input class="form-check-input v"  type="checkbox" value="" id="_amphibian" onchange="updateFilter('_amphibian')" checked>
+                      <label class="form-check-label" for="_amphibian">Amphibian</label>
+                    </div>
+
+                    <div class="form-check">
+                      <button onclick="{selectAll('_all')}" class="toggle-button btn btn-secondary btn-no-background select-all-btn">Select All</button>
+                    </div>
+
+                  </div>
+                  <div class="col-6">
+                    
+                    <div class="form-check">
+                      <input class="form-check-input v endangered"  type="checkbox" value="" id="_endangered" onchange="updateFilter('_endangered')" checked>
+                      <label class="form-check-label" for="_endangered" onchange="">Endangered</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input v vulnerable"  type="checkbox" value="" id="_vulnerable" onchange="updateFilter('_vulnerable')" checked>
+                      <label class="form-check-label" for="_vulnerable">Vunerable</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input v nearthreatened"  type="checkbox" value="" id="_near-threatened" onchange="updateFilter('_near-threatened')" checked>
+                      <label class="form-check-label" for="_nearThreatened">Near Threatened</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input v normal"  type="checkbox" value="" id="_normal" onchange="updateFilter('_normal')" checked>
+                      <label class="form-check-label" for="_normal">Normal</label>
+                    </div>
+
+                    <div class="form-check">
+                      <input class="form-check-input v invasive"  type="checkbox" value="" id="_invasive" onchange="updateFilter('_invasive')" checked>
+                      <label class="form-check-label" for="_invasive">Invasive</label>
+                    </div>
+
+                    <div class="form-check">
+                      <button onclick="{selectAll('_clear')}" class="toggle-button btn btn-secondary btn-no-background select-all-btn">Clear All</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="dropdown">
+              <button class="btn btn-secondary dropdown-toggle btn-no-background" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                Animal Simulation
+              </button>
+              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <div class="row">
+                  <div class="col">
+                    
+                    <div class="form-check">
+                      <input class="form-check-input s"  type="checkbox" value="" id="reptile" onchange="{updateFilter('reptile')}" checked>
+                      <label class="form-check-label" for="reptile">Reptile</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input s"  type="checkbox" value="" id="bird" onchange="{updateFilter('bird')}" checked>
+                      <label class="form-check-label" for="bird">Bird</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input s"  type="checkbox" value="" id="mammal" onchange="{updateFilter('mammal')}" checked>
+                      <label class="form-check-label" for="mammal">Mammal</label>
+                    </div>
+
+                    <div class="form-check">
+                      <input class="form-check-input s"  type="checkbox" value="" id="insect" onchange="{updateFilter('insect')}" checked>
+                      <label class="form-check-label" for="insect">Insect</label>
+                    </div>
+
+                    <div class="form-check">
+                      <input class="form-check-input s"  type="checkbox" value="" id="amphibian" onchange="{updateFilter('amphibian')}" checked>
+                      <label class="form-check-label" for="amphibian">Amphibian</label>
+                    </div>
+
+                    <div class="form-check">
+                      <button onclick="{selectAll('all')}" class="toggle-button btn btn-secondary btn-no-background select-all-btn">Select All</button>
+                    </div>
+
+                  </div>
+                  <div class="col-6">
+                    
+                    <div class="form-check">
+                      <input class="form-check-input s endangered"  type="checkbox" value="" id="endangered" onchange="{updateFilter('endangered')}" checked>
+                      <label class="form-check-label" for="endangered">Endangered</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input s vulnerable" type="checkbox" value="" id="vulnerable" onchange="{updateFilter('vulnerable')}" checked>
+                      <label class="form-check-label" for="vulnerable">Vunerable</label>
+                    </div>
+
+                    <div class="form-check">
+                      <input class="form-check-input s nearthreatened"  type="checkbox" value="" id="near-threatened" onchange="{updateFilter('near-threatened')}" checked>
+                      <label class="form-check-label" for="nearthreatened">Near Threatened</label>
+                    </div>
+
+                    <div class="form-check">
+                      <input class="form-check-input s normal"  type="checkbox" value="" id="normal" onchange="{updateFilter('normal')}" checked>
+                      <label class="form-check-label" for="Normal" >Normal</label>
+                    </div>
+
+                    <div class="form-check">
+                      <input class="form-check-input s invasive" type="checkbox" value="" id="invasive" onchange="{updateFilter('invasive')}" checked>
+                      <label class="form-check-label" for="invasive">Invasive</label>
+                    </div>
+                    <div class="form-check">
+                      <button onclick="selectAll('clear')" class="toggle-button btn btn-secondary btn-no-background select-all-btn">Clear All</button>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="dropdown">
+              <button class="btn btn-secondary dropdown-toggle btn-no-background" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                Microphones
+              </button>
+              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <div class="row">
+                  <div class="col">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="microphones" onchange="{microphoneDisplay()}" checked>
+                      <label class="form-check-label" for="microphones">Microphones </label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="microphoneAnimations" onchange="{updateMicrophoneAnimation()}" checked>
+                      <label class="form-check-label" for="microphones">Enable Animation </label>
+                    </div>
+                  </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="export-tab">
+              <button id="export-csv" onclick="{downloadCSV()}">EXPORT AS CSV <i class="fa-solid fa-cloud-arrow-down"></i></button>
+              <button id="export-xlsx" onclick="{downloadXLSX()}">EXPORT AS XLSX <i class="fa-solid fa-cloud-arrow-down"></i></button>
+            </div>
+            <div class="error-box" id="error-msg"></div>
+            </div>
+            </div> 
+          </div>
+          </div>      
       </div>
     </div>
-  </div>
 
   <script>
     // Function to autocomplete animals based on search input
@@ -1798,7 +1787,7 @@
         case "animalNotifications":
           document.getElementById("notification-menu-button").classList.add("active");
           document.getElementById("animalNotifications").style.display = "block";
-          //console.log("ello")
+          console.log("ello")
           break;
       }
       if (tab != null) {
@@ -2389,35 +2378,35 @@
     ];
 
     const vocalizationEvents = [
-      { eventId: "6457a315e03129cb130fa270", timestamp: 2349873234, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Tawny Frogmouth", speciesScientificName: "Podargus strigoides", speciesIdentificationConfidence: 90.98, locationLat: -38.80266562762370, locationLon: 143.563, locationConfidence: 90.98, animalType: "bird", animalStatus: "normal", animalDiet: "herbavore" },
-      { eventId: "6457a315e03129cb130fa271", timestamp: 2349873234, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Cane toad", speciesScientificName: "Rhinella marina", speciesIdentificationConfidence: 90.98, locationLat: -38.81905478815443, locationLon: 143.529, locationConfidence: 90.98, animalType: "amphibian", animalStatus: "invasive", animalDiet: "herbavore" },
-      { eventId: "6457a315e03129cb130fa272", timestamp: 2349873234, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Wild Boar", speciesScientificName: "Sus scrofa", speciesIdentificationConfidence: 90.98, locationLat: -38.80166562762364, locationLon: 143.545, locationConfidence: 90.98, animalType: "mammal", animalStatus: "endangered", animalDiet: "omnivore" },
-      { eventId: "6457a315e03129cb130fa273", timestamp: 2349873234, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Redeye", speciesScientificName: "Psaltoda moerens", speciesIdentificationConfidence: 90.98, locationLat: -38.82166562762360, locationLon: 143.545, locationConfidence: 90.98, animalType: "insect", animalStatus: "near-threatened", animalDiet: "carnivore" },
-      { eventId: "6457a315e03129cb130fa274", timestamp: 2349873234, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Brown Rat", speciesScientificName: "Rattus norvegicus", speciesIdentificationConfidence: 90.98, locationLat: -38.80266562762380, locationLon: 143.565, locationConfidence: 90.98, animalType: "reptile", animalStatus: "vulnerable", animalDiet: "herbavore" },
+      { eventId: "6457a315e03129cb130fa270", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Tawny Frogmouth", speciesScientificName: "Podargus strigoides", speciesIdentificationConfidence: 90.98, locationLat: -38.80266562762370, locationLon: 143.563, locationConfidence: 90.98, animalType: "bird", animalStatus: "normal", animalDiet: "herbavore" },
+      { eventId: "6457a315e03129cb130fa271", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Cane toad", speciesScientificName: "Rhinella marina", speciesIdentificationConfidence: 90.98, locationLat: -38.81905478815443, locationLon: 143.529, locationConfidence: 90.98, animalType: "amphibian", animalStatus: "invasive", animalDiet: "herbavore" },
+      { eventId: "6457a315e03129cb130fa272", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Wild Boar", speciesScientificName: "Sus scrofa", speciesIdentificationConfidence: 90.98, locationLat: -38.80166562762364, locationLon: 143.545, locationConfidence: 90.98, animalType: "mammal", animalStatus: "endangered", animalDiet: "omnivore" },
+      { eventId: "6457a315e03129cb130fa273", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Redeye", speciesScientificName: "Psaltoda moerens", speciesIdentificationConfidence: 90.98, locationLat: -38.82166562762360, locationLon: 143.545, locationConfidence: 90.98, animalType: "insect", animalStatus: "near-threatened", animalDiet: "carnivore" },
+      { eventId: "6457a315e03129cb130fa274", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Brown Rat", speciesScientificName: "Rattus norvegicus", speciesIdentificationConfidence: 90.98, locationLat: -38.80266562762380, locationLon: 143.565, locationConfidence: 90.98, animalType: "reptile", animalStatus: "vulnerable", animalDiet: "herbavore" },
     ];
 
 
     const movementEvents = {
-      "M_1": { animalId: "M_1", timestamp: 2349873234, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Brown Rat", speciesScientificName: "unknown", speciesIdentificationConfidence: 100, locationLat: -38.80266562762367, locationLon: 143.560, locationConfidence: 100, animalType: "reptile", animalStatus: "vulnerable", animalDiet: "herbavore" },
-      "M_2": { animalId: "M_2", timestamp: 2349873234, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Tawny Frogmouth", speciesScientificName: "Podargus strigoides", speciesIdentificationConfidence: 100, locationLat: -38.81905478815439, locationLon: 143.524, locationConfidence: 100, animalType: "bird", animalStatus: "normal", animalDiet: "herbavore" },
-      "M_3": { animalId: "M_3", timestamp: 2349873234, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Cane toad", speciesScientificName: "Rhinella marina", speciesIdentificationConfidence: 100, locationLat: -38.80166562762367, locationLon: 143.540, locationConfidence: 100, animalType: "amphibian", animalStatus: "invasive", animalDiet: "omnivore" },
-      "M_4": { animalId: "M_4", timestamp: 2349873234, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Red fox", speciesScientificName: "Vulpes vulpes", speciesIdentificationConfidence: 100, locationLat: -38.82166562762367, locationLon: 143.550, locationConfidence: 100, animalType: "mammal", animalStatus: "endangered", animalDiet: "carnivore" },
-      "M_5": { animalId: "M_5", timestamp: 2349873234, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Brown Rat", speciesScientificName: "Rattus norvegicus", speciesIdentificationConfidence: 100, locationLat: -38.80266562762367, locationLon: 143.570, locationConfidence: 100, animalType: "reptile", animalStatus: "vulnerable", animalDiet: "herbavore" },
-      "M_6": { animalId: "M_6", timestamp: 2349873234, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Australian Fairy Martin", speciesScientificName: "Petrochelidon ariel", speciesIdentificationConfidence: 100, locationLat: -38.81905478815439, locationLon: 143.580, locationConfidence: 100, animalType: "bird", animalStatus: "normal", animalDiet: "herbavore" },
-      "M_7": { animalId: "M_7", timestamp: 2349873234, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Cane toad", speciesScientificName: "Rhinella marina", speciesIdentificationConfidence: 100, locationLat: -38.80166562762367, locationLon: 143.510, locationConfidence: 100, animalType: "amphibian", animalStatus: "invasive", animalDiet: "omnivore" },
-      "M_8": { animalId: "M_8", timestamp: 2349873234, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Red fox", speciesScientificName: "Vulpes vulpes", speciesIdentificationConfidence: 100, locationLat: -38.82166562762367, locationLon: 143.520, locationConfidence: 100, animalType: "mammal", animalStatus: "endangered", animalDiet: "carnivore" },
-      "M_9": { animalId: "M_9", timestamp: 2349873234, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Redeye", speciesScientificName: "Psaltoda moerens", speciesIdentificationConfidence: 100, locationLat: -38.80066562762367, locationLon: 143.555, locationConfidence: 100, animalType: "insect", animalStatus: "near-threatened", animalDiet: "herbavore" },
+      "M_1": { animalId: "M_1", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Brown Rat", speciesScientificName: "unknown", speciesIdentificationConfidence: 100, locationLat: -38.80266562762367, locationLon: 143.560, locationConfidence: 100, animalType: "reptile", animalStatus: "vulnerable", animalDiet: "herbavore" },
+      "M_2": { animalId: "M_2", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Tawny Frogmouth", speciesScientificName: "Podargus strigoides", speciesIdentificationConfidence: 100, locationLat: -38.81905478815439, locationLon: 143.524, locationConfidence: 100, animalType: "bird", animalStatus: "normal", animalDiet: "herbavore" },
+      "M_3": { animalId: "M_3", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Cane toad", speciesScientificName: "Rhinella marina", speciesIdentificationConfidence: 100, locationLat: -38.80166562762367, locationLon: 143.540, locationConfidence: 100, animalType: "amphibian", animalStatus: "invasive", animalDiet: "omnivore" },
+      "M_4": { animalId: "M_4", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Red fox", speciesScientificName: "Vulpes vulpes", speciesIdentificationConfidence: 100, locationLat: -38.82166562762367, locationLon: 143.550, locationConfidence: 100, animalType: "mammal", animalStatus: "endangered", animalDiet: "carnivore" },
+      "M_5": { animalId: "M_5", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Brown Rat", speciesScientificName: "Rattus norvegicus", speciesIdentificationConfidence: 100, locationLat: -38.80266562762367, locationLon: 143.570, locationConfidence: 100, animalType: "reptile", animalStatus: "vulnerable", animalDiet: "herbavore" },
+      "M_6": { animalId: "M_6", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Australian Fairy Martin", speciesScientificName: "Petrochelidon ariel", speciesIdentificationConfidence: 100, locationLat: -38.81905478815439, locationLon: 143.580, locationConfidence: 100, animalType: "bird", animalStatus: "normal", animalDiet: "herbavore" },
+      "M_7": { animalId: "M_7", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Cane toad", speciesScientificName: "Rhinella marina", speciesIdentificationConfidence: 100, locationLat: -38.80166562762367, locationLon: 143.510, locationConfidence: 100, animalType: "amphibian", animalStatus: "invasive", animalDiet: "omnivore" },
+      "M_8": { animalId: "M_8", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Red fox", speciesScientificName: "Vulpes vulpes", speciesIdentificationConfidence: 100, locationLat: -38.82166562762367, locationLon: 143.520, locationConfidence: 100, animalType: "mammal", animalStatus: "endangered", animalDiet: "carnivore" },
+      "M_9": { animalId: "M_9", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Redeye", speciesScientificName: "Psaltoda moerens", speciesIdentificationConfidence: 100, locationLat: -38.80066562762367, locationLon: 143.555, locationConfidence: 100, animalType: "insect", animalStatus: "near-threatened", animalDiet: "herbavore" },
     };
 
     const sampleJSONmovementEvents = [
       { animalId: "M_1", timestamp: 1690765721, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Brown Rat", speciesScientificName: "Rattus norvegicus", speciesIdentificationConfidence: 100, locationLat: -38.80266562762367, locationLon: 143.560, locationConfidence: 100, animalType: "reptile", animalStatus: "vulnerable", animalDiet: "herbavore" },
       { animalId: "M_2", timestamp: 1672448921, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Tawny Frogmouth", speciesScientificName: "Podargus strigoides", speciesIdentificationConfidence: 100, locationLat: -38.81905478815439, locationLon: 143.524, locationConfidence: 100, animalType: "bird", animalStatus: "normal", animalDiet: "herbavore" },
-      { animalId: "M_3", timestamp: 2349873234, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Cane toad", speciesScientificName: "Rhinella marina", speciesIdentificationConfidence: 100, locationLat: -38.80166562762367, locationLon: 143.540, locationConfidence: 100, animalType: "amphibian", animalStatus: "invasive", animalDiet: "omnivore" },
-      { animalId: "M_4", timestamp: 2349873234, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Red fox", speciesScientificName: "Vulpes vulpes", speciesIdentificationConfidence: 100, locationLat: -38.82166562762367, locationLon: 143.550, locationConfidence: 100, animalType: "mammal", animalStatus: "endangered", animalDiet: "carnivore" },
-      { animalId: "M_5", timestamp: 2349873234, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Brown Rat", speciesScientificName: "Rattus norvegicus", speciesIdentificationConfidence: 100, locationLat: -38.80266562762367, locationLon: 143.570, locationConfidence: 100, animalType: "reptile", animalStatus: "vulnerable", animalDiet: "herbavore" },
+      { animalId: "M_3", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Cane toad", speciesScientificName: "Rhinella marina", speciesIdentificationConfidence: 100, locationLat: -38.80166562762367, locationLon: 143.540, locationConfidence: 100, animalType: "amphibian", animalStatus: "invasive", animalDiet: "omnivore" },
+      { animalId: "M_4", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Red fox", speciesScientificName: "Vulpes vulpes", speciesIdentificationConfidence: 100, locationLat: -38.82166562762367, locationLon: 143.550, locationConfidence: 100, animalType: "mammal", animalStatus: "endangered", animalDiet: "carnivore" },
+      { animalId: "M_5", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Brown Rat", speciesScientificName: "Rattus norvegicus", speciesIdentificationConfidence: 100, locationLat: -38.80266562762367, locationLon: 143.570, locationConfidence: 100, animalType: "reptile", animalStatus: "vulnerable", animalDiet: "herbavore" },
       { animalId: "M_6", timestamp: 1672448921, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Australian Fairy Martin", speciesScientificName: "Petrochelidon ariel", speciesIdentificationConfidence: 100, locationLat: -38.81905478815439, locationLon: 143.580, locationConfidence: 100, animalType: "bird", animalStatus: "normal", animalDiet: "herbavore" },
-      { animalId: "M_7", timestamp: 2349873234, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Cane toad", speciesScientificName: "Rhinella marina", speciesIdentificationConfidence: 100, locationLat: -38.80166562762367, locationLon: 143.510, locationConfidence: 100, animalType: "amphibian", animalStatus: "invasive", animalDiet: "omnivore" },
-      { animalId: "M_8", timestamp: 2349873234, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Red fox", speciesScientificName: "Vulpes vulpes", speciesIdentificationConfidence: 100, locationLat: -38.82166562762367, locationLon: 143.520, locationConfidence: 100, animalType: "mammal", animalStatus: "endangered", animalDiet: "carnivore" },
+      { animalId: "M_7", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Cane toad", speciesScientificName: "Rhinella marina", speciesIdentificationConfidence: 100, locationLat: -38.80166562762367, locationLon: 143.510, locationConfidence: 100, animalType: "amphibian", animalStatus: "invasive", animalDiet: "omnivore" },
+      { animalId: "M_8", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Red fox", speciesScientificName: "Vulpes vulpes", speciesIdentificationConfidence: 100, locationLat: -38.82166562762367, locationLon: 143.520, locationConfidence: 100, animalType: "mammal", animalStatus: "endangered", animalDiet: "carnivore" },
       { animalId: "M_9", timestamp: 1690765721, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Redeye", speciesScientificName: "Psaltoda moerens", speciesIdentificationConfidence: 100, locationLat: -38.80066562762367, locationLon: 143.555, locationConfidence: 100, animalType: "insect", animalStatus: "near-threatened", animalDiet: "herbavore" },
     ];
 
