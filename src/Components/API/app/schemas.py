@@ -100,10 +100,12 @@ class RequestSchema(BaseModel):
     #requestId: str
     username: str
     animal: str
-    requestingToChange: str
+    # requestingToChange: str
     initial: str
     modified: str
     source: str
+    summary: str
+    desc: str
     date: datetime
     status: str
 
