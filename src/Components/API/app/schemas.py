@@ -138,7 +138,7 @@ class RequestSchema(BaseModel):
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
 
-# User Signup Schema with custom validators
+
 class UserSignupSchema(BaseModel):
     username: str  # Username field
     password: constr(min_length=8)  # Password must be at least 8 characters long
@@ -149,8 +149,34 @@ class UserSignupSchema(BaseModel):
     address: AddressSchema  # Nested address schema
     organization: str  # User's organization
     phonenumber: Optional[str]  # Optional phone number field
+    notificationAnimals: Optional[List[AnimalNotificationSchema]] = []
+    emailNotifications: Optional[List[EmailNotifications]] = []
 
     # Custom date of birth validator
+class AnimalNotificationSchema(BaseModel):
+    species: str
+    common: str
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "species": "Sus scrofa",
+                "common": "Wild Boar"
+            }
+        }
+
+class EmailNotifications(BaseModel):
+    species: str
+    last_sent: datetime
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "species": "Sus scrofa",
+                "last_sent": "2024-09-15T10:30:00Z"
+            }
+        }
+        
     @validator('DoB', pre=True)
     def validate_dob(cls, value):
         if isinstance(value, str):

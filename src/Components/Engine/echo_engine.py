@@ -43,9 +43,6 @@ import librosa
 import paho.mqtt.client as paho
 # tensor flow / keras related libraries
 import tensorflow as tf
-import tensorflow_addons as tfa
-import tensorflow_hub as hub
-import tensorflow_io as tfio
 from tensorflow.keras.models import load_model
 
 from google.cloud import storage
@@ -61,10 +58,13 @@ from geopy.distance import geodesic
 # database libraries
 import pymongo
 
+# for weather label
+from sklearn.preprocessing import LabelEncoder
+
+
 # print system information
 print('Python Version           : ', python_version())
 print('TensorFlow Version       : ', tf.__version__)
-print('TensorFlow IO Version    : ', tfio.__version__)
 print('Librosa Version          : ', librosa.__version__)
 
 # Load the necessary data and models
@@ -80,8 +80,11 @@ yamnet_classes = yamnet_model.class_names('yamnet_dir/yamnet_class_map.csv')
 model = load_model('yamnet_dir/model_3_82_16000.h5')
 
 # Load the YAMNet model
-yamnet_model_handle = 'https://tfhub.dev/google/yamnet/1'
-yamnet_model = hub.load(yamnet_model_handle)
+# yamnet_model_handle = 'https://tfhub.dev/google/yamnet/1'
+# yamnet_model = hub.load(yamnet_model_handle)
+#TODO: Fix for above macOS, as installing tensorflow hub causes issue
+yamnet_model =tf.saved_model.load('yamnet_dir/model')
+
 
 class EchoEngine():
 
@@ -495,7 +498,72 @@ class EchoEngine():
         url = 'http://ts-api-cont:9000/engine/event'
         x = requests.post(url, json = detection_event)
         print(x.text)
-        
+    
+    def weather_pipeline(self, audio_clip):
+        """
+            Processes an audio clip to generate a resized log-mel spectrogram. To be used similar to combined_pipeline() function
+
+            Args:
+                audio_clip (bytes): The audio clip in bytes format.
+
+            Returns:
+                tuple: A tuple containing:
+                    - spectrogram_resized (numpy.ndarray): The resized log-mel spectrogram with shape (260, 260, 3).
+                    - audio (numpy.ndarray): The processed audio data.
+                    - sample_rate (int): The sample rate used for the audio processing.
+
+            The function performs the following steps:
+            1. Converts the audio clip from bytes to a file-like object.
+            2. Loads the audio data using librosa with a specified sample rate.
+            3. Pads or truncates the audio data to ensure it has the required number of samples.
+            4. Computes the mel spectrogram of the audio data.
+            5. Converts the mel spectrogram to a log-mel spectrogram.
+            6. Resizes the log-mel spectrogram to a fixed size of 260x260 pixels and repeats it across three channels.
+            7. Returns the resized log-mel spectrogram, the processed audio data, and the sample rate.
+        """
+
+        file = io.BytesIO(audio_clip)
+        # Load the audio data with librosa
+        audio, sample_rate = librosa.load(file, sr=self.config['WEATHER_SAMPLE_RATE'])
+        required_samples = self.config['WEATHER_SAMPLE_RATE'] * self.config['WEATHER_CLIP_DURATION']
+        if len(audio) < required_samples:
+            audio = np.pad(audio, (0, required_samples - len(audio)), 'constant')
+        else:
+            audio = audio[:required_samples]
+
+        mel_spectrogram = librosa.feature.melspectrogram(
+            y=audio, sr=self.config['WEATHER_SAMPLE_RATE'],
+            n_fft=self.config['AUDIO_NFFT'],
+            hop_length=self.config['AUDIO_STRIDE'],
+            n_mels=self.config['AUDIO_MELS'],
+            fmin=self.config['AUDIO_FMIN'],
+            fmax=self.config['AUDIO_FMAX']
+        )
+        log_mel_spectrogram = librosa.power_to_db(mel_spectrogram, top_db=self.config['AUDIO_TOP_DB'])
+        spectrogram_resized = tf.image.resize(log_mel_spectrogram[np.newaxis, :, :, np.newaxis], [260, 260])
+        spectrogram_resized = np.repeat(spectrogram_resized, 3, axis=-1)
+        return spectrogram_resized, audio, self.config['WEATHER_SAMPLE_RATE']    
+
+    def predict_weather_audio(self, audio_clip):
+        """
+        Call with audio clip, it will call weather detection model running on model container
+        """
+        image, audio, sample_rate = self.weather_pipeline(audio_clip)
+
+        image = tf.expand_dims(image, 0) 
+            
+        image_list = image.numpy().tolist()
+
+        data = json.dumps({"signature_name": "serving_default", "inputs": image_list})
+        url = self.config['WEATHER_SERVER']
+        headers = {"content-type": "application/json"}
+        json_response = requests.post(url, data=data, headers=headers)
+        model_result   = json.loads(json_response.text)
+        predictions = model_result['outputs'][0]
+        print("Weather Prediciton", predictions)
+        #TODO: Map prediciton of appropriate class label
+        return predictions
+
 
     def load_audio_file(self, file_path):
         wav, sr = librosa.load(file_path, sr=16000)

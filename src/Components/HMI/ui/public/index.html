@@ -103,7 +103,6 @@
         marked.parse('# Marked in the browser\n\nRendered by **marked**.');
     </script-->
 
-
     <div class="container" style="width:100% !important; margin-left: 0px !important; padding: 12px !important;">
       <!-- Row 1 with nav spanning the entire width and a fixed top-->
       
@@ -165,11 +164,13 @@
           <div class="navbar">
             <a id="filter-menu-btn" class="tabs-button active" onclick="openTab('filter-menu')"></a>
             <a id="SIM-menu-btn" class="tabs-button" onclick="openTab('SIM')"></a>
+            <a id="config-settings-menu-btn" class="tabs-button" onclick="openTab('config-settings-tab')"></a>
             <a id="popup-menu-btn" class="tabs-button" onclick="openTab('animal-popup')"></a>
             <a id="mic-popup-menu-btn" class="tabs-button" onclick="openTab('mic-popup')"></a>
             <a id="FAQ-menu-btn" class="tabs-button" onclick="openTab('FAQ')"></a>
             <a id="donate-menu-btn" class="tabs-button" onclick="openTab('donate')"></a>
             <a id="user-profile-button" class="tabs-button" onclick="openTab('userProfile'); fetchUser()"></a>
+            <a id="notification-menu-button" class="tabs-button" onclick="openTab('animalNotifications')"></a>
             <a id="statistics-menu-btn" class="tabs-button" onclick="openTab('statistics')"></a>
             <span id="pink-line" class="sudden-line"></span>
           </div>
@@ -367,6 +368,116 @@
             </div>
             </div>
           </div> 
+
+          <div id="animalNotifications" style="width: 0%; height: 0%;">
+            <div class="wrapper">
+              <form action="/api/notifications/animals" method="POST">
+                <div id="notification-contents">
+                  <h2>Animal Notifications</h2>
+
+                  <!-- Animal Search and Selection -->
+                  <div class="markup_form">
+                    <div class="markup_column">
+                      <label for="animal-search" id="animal-search-label">Search for animals:</label>
+                      <input type="text" id="animal-search" placeholder="Type animal name..." />
+                    </div>
+
+                    <!-- Dropdown or List of Animals (Can be dynamically populated) -->
+                    <div class="markup_column">
+                      <label for="animal-list" id="available-animal-label" style="color:white">Available
+                        Animals:</label>
+                      <ul id="animal-list">
+                        <!-- Dynamically populated list -->
+                      </ul>
+                    </div>
+
+                    <!-- Selected Animals for Notification -->
+                    <div class="markup_column">
+                      <label id="selected-animal-label">Selected Animals:</label>
+                      <ul id="selected-animals">
+                        <!-- Populated as animals are selected -->
+                      </ul>
+                    </div>
+
+                    <!-- Save Preferences Button -->
+                    <center><button type="submit">Save Notifications</button></center>
+                  </div>
+              </form>
+            </div>
+          </div>
+
+
+          <!-- Configuration Tab Content -->
+          <div id="config-settings-tab">
+            <div class="wrapper">
+              <div id="config-settings-contents">
+                <h2>Configuration Settings</h2>
+                <p class="config-description">
+                  The Configuration Settings tab is a crucial component of the Echo Simulator interface, designed to customize and control various simulation parameters. This tab allows users to tailor the simulation environment by selecting specific microphones, species, and classes, which are critical for conducting targeted environmental studies and simulations.
+                </p>
+                <div class="accordion" id="configAccordion">
+                        <!-- Microphones Section -->
+                    <div class="dropdown">
+                      <button class="btn btn-secondary dropdown-toggle btn-no-background" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Select Microphones
+                      </button>
+                      <div class="dropdown-menu">
+                        <div class="row">
+                          <div class="col">
+                            <select id="config-microphone-list" class="form-control" multiple>
+                              
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Species Section -->
+                    <div class="dropdown">
+                      <button class="btn btn-secondary dropdown-toggle btn-no-background" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Select Species
+                      </button>
+                      <div class="dropdown-menu">
+                        <div class="row">
+                          <div class="col">
+                            
+                            <select id="config-species-list" class="form-control" multiple>
+                            
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Class Section -->
+                    <div class="dropdown">
+                      <button class="btn btn-secondary dropdown-toggle btn-no-background" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Select Class
+                      </button>
+                      <div class="dropdown-menu">
+                        <div class="row">
+                          <div class="col">
+                            
+                            <select id="config-class-list" class="form-control" multiple>
+                              
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <br></br>
+                    <!-- Configure Button -->
+                    <button id="config-configure-button" class="btn btn-primary">Configure</button>
+
+                    <!-- Current Configuration Information -->
+                    <div id="config-current-configuration" class="mt-4">
+                      <h3>Current Configuration</h3>
+                      <p id="config-details">No configuration selected.</p>
+                    </div>
+              </div>
+            </div>
+          </div>
+
           <!--DONATIONS TAB--->
           <div id="donate">
             <div class="wrapper">
@@ -430,6 +541,68 @@
               <div id="desc_summary" class="desc"></div>
               <div id="desc_details" class="desc"></div>
               
+              <h2 style="margin-top: 20px !important;">Weather</h2>
+              <div class="markup_form">
+                <div class="markup_column">
+                  <div class="markup_row_left">
+                    <div>Date</div>
+                  </div>
+                  <div class="markup_row_right">
+                    <div id="weather_date"></div>
+                  </div>
+                </div>
+                <div class="markup_column">
+                  <div class="markup_row_left">
+                    <div>Max Temperature</div>
+                  </div>
+                  <div class="markup_row_right">
+                    <div id="weather_maxtemp"></div>
+                  </div>
+                </div>
+                <div class="markup_column">
+                  <div class="markup_row_left">
+                    <div>Minimum Temperature</div>
+                  </div>
+                  <div class="markup_row_right">
+                    <div id="weather_mintemp"></div>
+                  </div>
+                </div>
+                <div class="markup_column">
+                  <div class="markup_row_left">
+                    <div>Rainfall</div>
+                  </div>
+                  <div class="markup_row_right">
+                    <div id="weather_rainfall"></div>
+                  </div>
+                </div>
+                <div class="markup_column">
+                  <div class="markup_row_left">
+                    <div>Wind speed</div>
+                  </div>
+                  <div class="markup_row_right">
+                    <div id="weather_windspeed"></div>
+                  </div>
+                </div>
+                <div class="markup_column">
+                  <div class="markup_row_left">
+                    <div>Maximum Humiditiy</div>
+                  </div>
+                  <div class="markup_row_right">
+                    <div id="weather_maxhumidity"></div>
+                  </div>
+                </div>
+                <div class="markup_column">
+                  <div class="markup_row_left">
+                    <div>Minimum Humiditiy</div>
+                  </div>
+                  <div class="markup_row_right">
+                    <div id="weather_minhumidity"></div>
+                  </div>
+                </div>
+
+
+              </div>
+
               <h2 style="margin-top: 20px !important;">Event Details</h2>
               <div class="markup_form">
                 <!-- markup_icon -->
@@ -859,169 +1032,377 @@
       </div>
     </div>
 
-<script>
-  //test
-  const iconDicts = {};
-  var displayedAnimals = new Set();
-  var hiddenAnimals = new Set();
-  var animalSpeciesToCommon = {};
+  <script>
+    // Function to autocomplete animals based on search input
 
-  //Sanitizing to prevent Cross-Site Scripting attacks through the search bar
-  function sanitizeInput(str) {
-    var temp = document.createElement('div');
-    temp.textContent = str;
-    return temp.innerHTML;
-  }
 
-  document.getElementById('searchInput').addEventListener('input', function(e) {
-    this.value = sanitizeInput(this.value); // Sanitize every input
-  });
-  //Search functionality for filter  
-  document.addEventListener("DOMContentLoaded", function() {
-    const jsonUrl = './js/sample_data.json';
-    const animalListElement = document.getElementById('animalList');
-    const searchInput = document.getElementById('searchInput');
-    let animalData = [];
+    //test
+    const iconDicts = {};
+    var displayedAnimals = new Set();
+    var hiddenAnimals = new Set();
+    var animalSpeciesToCommon = {};
 
-  
-    fetch(jsonUrl)
+    //Sanitizing to prevent Cross-Site Scripting attacks through the search bar
+    function sanitizeInput(str) {
+      var temp = document.createElement('div');
+      temp.textContent = str;
+      return temp.innerHTML;
+    }
+
+    document.querySelector('form').addEventListener('submit', function (event) {
+      event.preventDefault(); // Prevents the form from submitting and reloading the page
+      // Handle the form submission with JavaScript
+    });
+
+    document.getElementById('searchInput').addEventListener('input', function (e) {
+      this.value = sanitizeInput(this.value); // Sanitize every input
+    });
+
+    //Search functionality for filter  
+    document.addEventListener("DOMContentLoaded", function () {
+
+      const jsonUrl = './js/sample_data.json';
+      const animalListElement = document.getElementById('animalList');
+      const searchInput = document.getElementById('searchInput');
+      const searchForNotifications = document.getElementById('animal-search')
+      const animalNotificationListElement = document.getElementById('animal-list');
+      const selectedAnimalsElement = document.getElementById('selected-animals');
+      let animalData = [];
+      let selectedAnimals = [];
+
+      // Fetch animal data from JSON
+      fetch(jsonUrl)
         .then(response => response.json())
         .then(data => {
-            animalData = data.data; 
+          animalData = data.data;
         })
-        .then(()=>{
-          animalData.forEach(animal=>{
-          animalSpeciesToCommon[animal.species.toLowerCase()] = animal.common;
-        });
+        .then(() => {
+          animalData.forEach(animal => {
+            animalSpeciesToCommon[animal.species.toLowerCase()] = animal.common;
+          });
         })
         .catch(error => console.error('Error loading JSON:', error));
 
-    
+      // Fetch selected animals from the backend on page load
+      function loadSelectedAnimalsFromBackend() {
+        token = localStorage.getItem('token');  // JWT token from localStorage
+        userId = localStorage.getItem('userId'); // userId from localStorage
 
-    // Function to display animal names in the list
-    function displayAnimalList(filteredData) {
-        animalListElement.innerHTML = ''; 
-        filteredData.forEach(animal => {
+        const backendUrl = 'http://localhost:9000';
+        fetch(`${backendUrl}/hmi/users/${userId}/notifications`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token // JWT token for authentication
+          }
+        })
+          .then(response => response.json())
+          .then(data => {
+            selectedAnimals = data.notificationAnimals || [];
+            updateSelectedAnimals(); // Update UI to display the animals
+          })
+          .catch(error => {
+            console.error('Error fetching selected animals:', error);
+          });
+      }
+
+      // Call the function to load selected animals from the backend
+      loadSelectedAnimalsFromBackend();
+
+      searchForNotifications.addEventListener('keyup', function () {
+        autocompleteAnimalsForNotifications();
+      });
+
+      // Autocomplete function for notification search
+      function autocompleteAnimalsForNotifications() {
+        const searchValue = searchForNotifications.value.toLowerCase();
+        const filteredAnimals = animalData.filter(animal =>
+          animal.common.toLowerCase().includes(searchValue)
+        );
+        displayAnimalNotificationList(filteredAnimals);
+      }
+
+      // Function to display animals in the notification list
+      function displayAnimalNotificationList(filteredData) {
+        animalNotificationListElement.innerHTML = ''; // Clear the current list
+        const top5Animals = filteredData.slice(0, 5);
+
+        top5Animals.forEach(animal => {
+          const li = document.createElement('li');
+          const textSpan = document.createElement('span');
+          textSpan.textContent = animal.common;
+
+          li.appendChild(textSpan);
+
+          // Create "Add to Notifications" button
+          const addButton = document.createElement('button');
+          addButton.textContent = 'Add to Notifications';
+          addButton.className = 'btn btn-add';
+          addButton.style.color = 'green';
+
+          addButton.onclick = (event) => {
+            event.preventDefault();
+            console.log("Add button clicked for", animal.common);
+            addAnimalToNotifications(animal);
+          };
+
+          li.appendChild(addButton);
+          animalNotificationListElement.appendChild(li); // Append to the list
+        });
+
+        if (filteredData.length > 5) {
+          const remainingAnimals = filteredData.slice(5);
+          remainingAnimals.forEach(animal => {
             const li = document.createElement('li');
             const textSpan = document.createElement('span');
             textSpan.textContent = animal.common;
-            //li.textContent = animal.common;
-            textSpan.onclick = (event) => displayPopup(animal,event);
-            li.appendChild(textSpan)
 
-            // Create "Show" button
-            const showButton = document.createElement('button');
-            showButton.textContent = 'Show';
-            showButton.className = 'btn btn-show'; 
-            showButton.style.color='green'
-            
-            showButton.onclick = () => {
-                console.log("Show button clicked for", animal.common);
-                showAnimal(animal)
+            li.appendChild(textSpan);
+
+            const addButton = document.createElement('button');
+            addButton.textContent = 'Add to Notifications';
+            addButton.className = 'btn btn-add';
+            addButton.style.color = 'green';
+
+            addButton.onclick = () => {
+              console.log("Add button clicked for", animal.common);
+              addAnimalToNotifications(animal);
             };
 
-            // Create "Hide" button
-            const hideButton = document.createElement('button');
-            hideButton.textContent = 'Hide';
-            hideButton.className = 'btn btn-hide';
-            hideButton.style.color='red'
+            li.appendChild(addButton);
+            animalNotificationListElement.appendChild(li); // Append to the list
+          });
+        }
+      }
 
-            hideButton.onclick = () => {
-                console.log("Hide button clicked for", animal.common);
-                hideAnimal(animal.species.toLowerCase());
-            };
+      // Function to add an animal to the notifications list
+      function addAnimalToNotifications(animal) {
+        if (!selectedAnimals.some(a => a.species === animal.species)) {
+          selectedAnimals.push(animal);
+          updateSelectedAnimals(); // Update UI to show selected animals
+          saveNotificationToBackend(animal); // Persist the notification to backend
+        } else {
+          console.log(`${animal.common} is already selected for notifications.`);
+        }
+      }
 
-            // Create "Show only" button
-            const showOnlyButton = document.createElement('button');
-            showOnlyButton.textContent = 'Add to Exclusive View';
-            showOnlyButton.className = 'btn btn-hide';
-            showOnlyButton.style.color='green'
+      // Function to remove an animal from the notifications list
+      function removeAnimalFromNotifications(animal) {
+        selectedAnimals = selectedAnimals.filter(a => a.species !== animal.species);
+        updateSelectedAnimals(); // Update UI to show selected animals
+        removeNotificationFromBackend(animal); // Remove from backend
+      }
 
-            showOnlyButton.onclick = () => {
-                console.log("Show only button clicked for", animal.common);
-                showOnly(animal)
-            };
-            
-            // Create "Unhide all" button
-            const unHideAllButton = document.createElement('button');
-            unHideAllButton.textContent = 'Hide';
-            unHideAllButton.className = 'btn btn-hide';
-            unHideAllButton.style.color='red'
+      // Function to update the UI with the selected animals for notifications
+      function updateSelectedAnimals() {
+        selectedAnimalsElement.innerHTML = ''; // Clear previous list
+        selectedAnimals.forEach(animal => {
+          const li = document.createElement('li');
+          li.textContent = animal.common;
 
-            unHideAllButton.onclick = () => {
-                console.log("Unhide all button clicked for", animal.common);
-                unHideAll(animal)
-            };
-            li.appendChild(showOnlyButton);
-            //li.appendChild(unHideAllButton);
-            //li.appendChild(showButton);
-            li.appendChild(hideButton);
+          // Create "Remove" button
+          const removeButton = document.createElement('button');
+          removeButton.textContent = 'Remove';
+          removeButton.className = 'btn btn-remove';
+          removeButton.style.color = 'red';
 
-            
-            animalListElement.appendChild(li);
+          removeButton.onclick = () => {
+            console.log("Remove button clicked for", animal.common);
+            removeAnimalFromNotifications(animal);
+          };
+
+          li.appendChild(removeButton);
+          selectedAnimalsElement.appendChild(li);
         });
-    }
+      }
 
-    // Function to display a popup with animal details
-    function displayPopup(animal,event) {
-    
-      const popup = document.createElement('div');
-      popup.className = 'popup'
-      setTimeout(() => popup.style.opacity = '1', 10); 
+      // Persist the notification to the backend
+      function saveNotificationToBackend(animal) {
+        token = localStorage.getItem('token');  // JWT token
+        userId = localStorage.getItem('userId'); // User ID
 
-      const title = document.createElement('h4');
-      title.className = 'popup-title'
-      title.textContent = animal.common;
+        const backendUrl = 'http://localhost:9000'
+        fetch(`${backendUrl}/hmi/users/${userId}/notifications`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token // JWT token for authentication
+          },
+          body: JSON.stringify({
+            species: animal.species,
+            common: animal.common
+          })
+        })
+          .then(response => {
+            if (!response.ok) {
+              return response.json().then(error => {
+                console.error('Error adding animal to notifications:', error);
+                alert('Error adding animal to notifications.');
+              });
+            }
+            alert(`${animal.common} added to notifications!`);
+          })
+          .catch(error => {
+            console.error('Error adding animal to notifications:', error);
+          });
+      }
 
-      const summary = document.createElement('p');
-      summary.textContent = animal.summary;
-      //summary.style.textAlign = 'left'; 
+      //Remove the notification from the backend
+      function removeNotificationFromBackend(animal) {
+        token = localStorage.getItem('token');  // JWT token
+        userId = localStorage.getItem('userId'); // User ID
+        const backendUrl = 'http://localhost:9000'
+        fetch(`${backendUrl}/hmi/users/${userId}/notifications/${animal.species}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': 'Bearer ' + token // JWT token for authentication
+          }
+        })
+          .then(response => {
+            if (!response.ok) {
+              return response.json().then(error => {
+                console.error('Error removing animal from notifications:', error);
+                alert('Error removing animal from notifications.');
+              });
+            }
+            alert(`${animal.common} removed from notifications.`);
+          })
+          .catch(error => {
+            console.error('Error removing animal from notifications:', error);
+          });
+      }
 
-      const descriptionList = document.createElement('ul')
-      
-      animal.description.forEach(desc => {
+      // Filter animals based on search input for notifications
+      searchInput.addEventListener('keyup', function () {
+        const searchValue = searchInput.value.toLowerCase();
+        const filteredAnimals = animalData.filter(animal => animal.common.toLowerCase().includes(searchValue));
+        displayAnimalNotificationList(filteredAnimals); // Display filtered animals for notification
+      });
+
+      // Function to display animal names in the list
+      function displayAnimalList(filteredData) {
+        animalListElement.innerHTML = '';
+        filteredData.forEach(animal => {
+          const li = document.createElement('li');
+          const textSpan = document.createElement('span');
+          textSpan.textContent = animal.common;
+          //li.textContent = animal.common;
+          textSpan.onclick = (event) => displayPopup(animal, event);
+          li.appendChild(textSpan)
+
+          // Create "Show" button
+          const showButton = document.createElement('button');
+          showButton.textContent = 'Show';
+          showButton.className = 'btn btn-show';
+          showButton.style.color = 'green'
+
+          showButton.onclick = () => {
+            console.log("Show button clicked for", animal.common);
+            showAnimal(animal)
+          };
+
+          // Create "Hide" button
+          const hideButton = document.createElement('button');
+          hideButton.textContent = 'Hide';
+          hideButton.className = 'btn btn-hide';
+          hideButton.style.color = 'red'
+
+          hideButton.onclick = () => {
+            console.log("Hide button clicked for", animal.common);
+            hideAnimal(animal.species.toLowerCase());
+          };
+
+          // Create "Show only" button
+          const showOnlyButton = document.createElement('button');
+          showOnlyButton.textContent = 'Add to Exclusive View';
+          showOnlyButton.className = 'btn btn-hide';
+          showOnlyButton.style.color = 'green'
+
+          showOnlyButton.onclick = () => {
+            console.log("Show only button clicked for", animal.common);
+            showOnly(animal)
+          };
+
+          // Create "Unhide all" button
+          const unHideAllButton = document.createElement('button');
+          unHideAllButton.textContent = 'Hide';
+          unHideAllButton.className = 'btn btn-hide';
+          unHideAllButton.style.color = 'red'
+
+          unHideAllButton.onclick = () => {
+            console.log("Unhide all button clicked for", animal.common);
+            unHideAll(animal)
+          };
+          li.appendChild(showOnlyButton);
+          //li.appendChild(unHideAllButton);
+          //li.appendChild(showButton);
+          li.appendChild(hideButton);
+
+
+          animalListElement.appendChild(li);
+        });
+      }
+
+      // Function to display a popup with animal details
+      function displayPopup(animal, event) {
+
+        const popup = document.createElement('div');
+        popup.className = 'popup'
+        setTimeout(() => popup.style.opacity = '1', 10);
+
+        const title = document.createElement('h4');
+        title.className = 'popup-title'
+        title.textContent = animal.common;
+
+        const summary = document.createElement('p');
+        summary.textContent = animal.summary;
+        //summary.style.textAlign = 'left'; 
+
+        const descriptionList = document.createElement('ul')
+
+        animal.description.forEach(desc => {
           const description = document.createElement('li')
           description.textContent = desc
           descriptionList.appendChild(description)
-      })
+        })
 
-      
-      const closeButton = document.createElement('button');
-      closeButton.className ='popup-close-button';
-      closeButton.textContent = 'Close';
-      closeButton.onclick = function() {
+
+        const closeButton = document.createElement('button');
+        closeButton.className = 'popup-close-button';
+        closeButton.textContent = 'Close';
+        closeButton.onclick = function () {
           popup.style.opacity = '0';
           setTimeout(() => document.body.removeChild(popup), 390);
-      };
+        };
 
-     
-      popup.appendChild(title);
-      popup.appendChild(summary);
-      popup.appendChild(descriptionList);
-      popup.appendChild(closeButton);
-      document.body.appendChild(popup);
 
-      const rect = event.target.getBoundingClientRect();
-      const popupWidth=300;
-      popup.style.top = `${rect.top + window.scrollY}px`;
-      popup.style.left = `${rect.left - popupWidth - 10}px`; 
+        popup.appendChild(title);
+        popup.appendChild(summary);
+        popup.appendChild(descriptionList);
+        popup.appendChild(closeButton);
+        document.body.appendChild(popup);
 
-  }
+        const rect = event.target.getBoundingClientRect();
+        const popupWidth = 300;
+        popup.style.top = `${rect.top + window.scrollY}px`;
+        popup.style.left = `${rect.left - popupWidth - 10}px`;
 
-    // Event listener for search input
-    searchInput.addEventListener('keyup', function() {
+      }
+
+      // Event listener for search input
+      searchInput.addEventListener('keyup', function () {
         const searchTerm = searchInput.value.toLowerCase();
         // Filter full animal data based on search term, then limit to top 5 results
-        const filteredData = animalData.filter(animal => 
-            animal.common.toLowerCase().includes(searchTerm)
+        const filteredData = animalData.filter(animal =>
+          animal.common.toLowerCase().includes(searchTerm)
         ).slice(0, 3);
 
-        displayAnimalList(filteredData); 
+        displayAnimalList(filteredData);
+      });
     });
-  });
 
- 
-const visibleStyle = (url) => new ol.style.Style({
+
+    const visibleStyle = (url) => new ol.style.Style({
       image: new ol.style.Icon({
         src: url,
         anchor: [0.5, 1],
@@ -1030,250 +1411,250 @@ const visibleStyle = (url) => new ol.style.Style({
       }),
     })
 
-// 
+    // 
 
-function showAnimal(animal) {
-    const layers = window.hmiState.basemap.getLayers().getArray();
-    
-    layers.forEach(layer => {
+    function showAnimal(animal) {
+      const layers = window.hmiState.basemap.getLayers().getArray();
+
+      layers.forEach(layer => {
         if (layer instanceof ol.layer.Vector) {
-            layer.getSource().getFeatures().forEach(feature => {
-                if(feature.get('animalSpecies')!=undefined){
-                const animalName = feature.get('animalSpecies').toLowerCase();
-                //console.log(animalName,animal)
-                if (animalName.includes(animal)) {
-                    key = feature.get('eventId') + feature.get('animalSpecies').toLowerCase();
-                    url =  iconDicts[key];
-                    console.log(iconDicts);
-                    feature.setStyle(visibleStyle(url)); //Show animal
-                    console.log("Showing ", animalName);
-                }else {
-                    console.log("Not changing anything else", animalName)
-                }
+          layer.getSource().getFeatures().forEach(feature => {
+            if (feature.get('animalSpecies') != undefined) {
+              const animalName = feature.get('animalSpecies').toLowerCase();
+              //console.log(animalName,animal)
+              if (animalName.includes(animal)) {
+                key = feature.get('eventId') + feature.get('animalSpecies').toLowerCase();
+                url = iconDicts[key];
+                console.log(iconDicts);
+                feature.setStyle(visibleStyle(url)); //Show animal
+                console.log("Showing ", animalName);
+              } else {
+                console.log("Not changing anything else", animalName)
+              }
             };
-        })
-      }
-    });
-    hiddenAnimals.delete(animal);
-    displayedAnimals.add(animal);
-    updateDisplayedAnimalsList(displayedAnimals);
-    updateHiddenAnimalsList();
-}
+          })
+        }
+      });
+      hiddenAnimals.delete(animal);
+      displayedAnimals.add(animal);
+      updateDisplayedAnimalsList(displayedAnimals);
+      updateHiddenAnimalsList();
+    }
 
-function hideAnimal(animal) {
-    const layers = window.hmiState.basemap.getLayers().getArray();
-    hiddenAnimals.add(animal);
-    layers.forEach(layer => {
+    function hideAnimal(animal) {
+      const layers = window.hmiState.basemap.getLayers().getArray();
+      hiddenAnimals.add(animal);
+      layers.forEach(layer => {
         if (layer instanceof ol.layer.Vector) {
-            layer.getSource().getFeatures().forEach(feature => {
-                if(feature.get('animalSpecies')!=undefined){
-                const animalName = feature.get('animalSpecies').toLowerCase();
-                //console.log(animalName,animal)
-                if (feature.get('animalSpecies').toLowerCase() == animal) {
-                    key = feature.get('eventId') + feature.get('animalSpecies').toLowerCase();
-                    iconDicts[key] = feature.get('animalIcon');
-                    
-                    feature.setStyle(new ol.style.Style({ display: 'none' })); // Hide animal
-                    console.log("Hiding ", animalName)
-                }else {
-                    console.log("Not changing anything else", animalName)
-                }
+          layer.getSource().getFeatures().forEach(feature => {
+            if (feature.get('animalSpecies') != undefined) {
+              const animalName = feature.get('animalSpecies').toLowerCase();
+              //console.log(animalName,animal)
+              if (feature.get('animalSpecies').toLowerCase() == animal) {
+                key = feature.get('eventId') + feature.get('animalSpecies').toLowerCase();
+                iconDicts[key] = feature.get('animalIcon');
+
+                feature.setStyle(new ol.style.Style({ display: 'none' })); // Hide animal
+                console.log("Hiding ", animalName)
+              } else {
+                console.log("Not changing anything else", animalName)
+              }
             }
-        });
-      }
-    });
-    displayedAnimals.delete(animal);
-    updateDisplayedAnimalsList(displayedAnimals);
-    updateHiddenAnimalsList();
-}
+          });
+        }
+      });
+      displayedAnimals.delete(animal);
+      updateDisplayedAnimalsList(displayedAnimals);
+      updateHiddenAnimalsList();
+    }
 
 
 
-function showOnly(animal) {
-    const layers = window.hmiState.basemap.getLayers().getArray();
-    hiddenAnimals.delete(animal.species.toLowerCase());
-    layers.forEach(layer => {
+    function showOnly(animal) {
+      const layers = window.hmiState.basemap.getLayers().getArray();
+      hiddenAnimals.delete(animal.species.toLowerCase());
+      layers.forEach(layer => {
         if (layer instanceof ol.layer.Vector) {
-            layer.getSource().getFeatures().forEach(feature => {
-                
-                if(feature.get('animalSpecies')!=undefined){
-                const animalName = feature.get('animalSpecies').toLowerCase();
-                //console.log(animalName,animal)
-                displayedAnimals.add(animal.species.toLowerCase());
-                if (displayedAnimals.has(animalName)){
-                    key = feature.get('eventId') + feature.get('animalSpecies').toLowerCase();
-                    //const listItem = document.createElement('li');
-                    //listItem.textContent = feature.get('animalSpecies');
-                    feature.setStyle(visibleStyle(feature.get('animalIcon')));
-                    updateDisplayedAnimalsList(displayedAnimals);
-                    //listContainer.appendChild(listItem);
-                    console.log("Not hiding ", animalName);
-                }else {
-                    key = feature.get('eventId') + feature.get('animalSpecies').toLowerCase();
-                    iconDicts[key] = feature.get('animalIcon');
-                    feature.setStyle(new ol.style.Style({ display: 'none' })); // Hide animal
-                    console.log("Hiding ", animalName)
-                    console.log(iconDicts)
-                    hiddenAnimals.add(animalName);
-                }
+          layer.getSource().getFeatures().forEach(feature => {
+
+            if (feature.get('animalSpecies') != undefined) {
+              const animalName = feature.get('animalSpecies').toLowerCase();
+              //console.log(animalName,animal)
+              displayedAnimals.add(animal.species.toLowerCase());
+              if (displayedAnimals.has(animalName)) {
+                key = feature.get('eventId') + feature.get('animalSpecies').toLowerCase();
+                //const listItem = document.createElement('li');
+                //listItem.textContent = feature.get('animalSpecies');
+                feature.setStyle(visibleStyle(feature.get('animalIcon')));
+                updateDisplayedAnimalsList(displayedAnimals);
+                //listContainer.appendChild(listItem);
+                console.log("Not hiding ", animalName);
+              } else {
+                key = feature.get('eventId') + feature.get('animalSpecies').toLowerCase();
+                iconDicts[key] = feature.get('animalIcon');
+                feature.setStyle(new ol.style.Style({ display: 'none' })); // Hide animal
+                console.log("Hiding ", animalName)
+                console.log(iconDicts)
+                hiddenAnimals.add(animalName);
+              }
             };
           });
         }
-    });
-    updateHiddenAnimalsList();
-   
-}
-
-function updateDisplayedAnimalsList(displayedAnimals){
-  
-  const listContainer = document.getElementById('displayOnlyAnimalList');
-  listContainer.innerHTML = '';
-  displayedAnimals.forEach(function(animal){
-    const listItem = document.createElement('li');
-    const textSpan = document.createElement('span');
-    textSpan.textContent = convertSpeciesToCommon(animal);
-    const hideButton = document.createElement('button');
-    hideButton.textContent = 'Hide';
-    hideButton.className = 'btn btn-hide';
-    hideButton.style.color='red';
-
-    hideButton.onclick = () => {
-        console.log("Hide button clicked for", animal);
-        hideAnimal(animal);
-    };
-    listItem.appendChild(textSpan);
-    listItem.appendChild(hideButton);
-    //listItem.textContent = animal;
-    listContainer.appendChild(listItem);
-  })
-  
-
-}
-
-function updateHiddenAnimalsList(){
-
-  const listContainer = document.getElementById('hideAnimalList');
-  listContainer.innerHTML = '';
-  hiddenAnimals.forEach(function(animal){
-    const listItem = document.createElement('li');
-    const textSpan = document.createElement('span');
-    textSpan.textContent = convertSpeciesToCommon(animal);
-    const showButton = document.createElement('button');
-    showButton.textContent = 'Show';
-    showButton.className = 'btn btn-hide';
-    showButton.style.color='green';
-
-    showButton.onclick = () => {
-        console.log("Show button clicked for", animal);
-        showAnimal(animal);
-    };
-    listItem.appendChild(textSpan);
-    listItem.appendChild(showButton);
-    //listItem.textContent = animal;
-    listContainer.appendChild(listItem);
-  })
-
-}
-
-
-function resetSearchFilter() {
-    const layers = window.hmiState.basemap.getLayers().getArray();
-
-    layers.forEach(layer => {
-        if (layer instanceof ol.layer.Vector) {
-            layer.getSource().getFeatures().forEach(feature => {
-                
-                if(feature.get('animalSpecies')!=undefined){
-                const animalName = feature.get('animalSpecies').toLowerCase();
-                //console.log(animalName,animal)
-                if (displayedAnimals.has(animalName)) {
-                    console.log("Not Unhiding ", animalName)
-                }else {
-                    key = feature.get('eventId') + feature.get('animalSpecies').toLowerCase();
-                    url =  iconDicts[key];
-                    console.log(iconDicts);
-                    feature.setStyle(visibleStyle(url)); //Show animal
-                    console.log("Showing ", animalName)
-                }
-            };
-        });
-      }
-    });
-    hiddenAnimals.clear();
-    displayedAnimals.clear();
-    updateHiddenAnimalsList();
-    updateDisplayedAnimalsList();
-}
-
-function convertSpeciesToCommon(species){
-    return animalSpeciesToCommon[species.toLowerCase()];
-}
-
-  // Variable to keep track of which donation amount has been selected
-  let donorAmount;
-  // Donation amounts
-  var donationData = [
-        { amount: 1, image: '$1.png' },
-        { amount: 5, image: '$5.png' },
-        { amount: 10, image: '$10.png' },
-        { amount: 20, image: '$20.png' },
-        { amount: 50, image: '$50.png' }
-      ];
-
-      // Update the image sources based on the donation amounts
-      var imageDescriptions = document.querySelectorAll('.image-description');
-      imageDescriptions.forEach(function (description, index) {
-        var image = description.querySelector('img');
-        var amount = description.querySelector('.image-amount');
-        amount.textContent = donationData[index].amount;
-        var imageFilename = donationData[index].image;
-        image.src = './images/' + imageFilename;
-
       });
+      updateHiddenAnimalsList();
 
-      // Add event listeners for image hover and click effects
-      imageDescriptions.forEach(function (description) {
-        var image = description.querySelector('img');
-        var amount = description.querySelector('.image-amount');
-        var yourAmountElement = document.querySelector('.donation-amount'); // Get the "Your Amount" element
-        var lightbulbIcon = document.querySelector('.lightbulb-container img'); // Get the lightbulb icon element
-
-        // Change opacity on hover
-        image.addEventListener('mouseenter', function () {
-          image.style.opacity = '0.8';
-        });
-
-        image.addEventListener('mouseleave', function () {
-          image.style.opacity = '1'; // Restore original opacity
-        });
-
-        // Display donation amount on click
-        image.addEventListener('click', function () {
-          donorAmount = amount.textContent;
-          yourAmountElement.textContent = 'Your Amount: $' + donorAmount;
-          // Fill the lightbulb container with the clicked icon
-          lightbulbIcon.src = image.src;
-          lightbulbIcon.style.transform = 'scale(1.3)';
-        });
-      });
-
-  // Cart that is sent in the body of the API request
-  let cart = [
-    { id: 1, quantity: 0 }
-  ];
-  // Donation Button Functionality
-  const donationButton = document.getElementById('donation-button');
-  donationButton.addEventListener("click", () => {
-    // Check to see if a donation amount has been selected
-    // before executing the api call to the stripe session
-    console.log(cart);
-    if (donorAmount == undefined){
-      console.log("Must choose a donation amount");
-      return
     }
-    // Update the quantity with the chosen donation amount
-    cart[0].quantity=donorAmount;
-    var options = payment(username, donorAmount*100, email);
+
+    function updateDisplayedAnimalsList(displayedAnimals) {
+
+      const listContainer = document.getElementById('displayOnlyAnimalList');
+      listContainer.innerHTML = '';
+      displayedAnimals.forEach(function (animal) {
+        const listItem = document.createElement('li');
+        const textSpan = document.createElement('span');
+        textSpan.textContent = convertSpeciesToCommon(animal);
+        const hideButton = document.createElement('button');
+        hideButton.textContent = 'Hide';
+        hideButton.className = 'btn btn-hide';
+        hideButton.style.color = 'red';
+
+        hideButton.onclick = () => {
+          console.log("Hide button clicked for", animal);
+          hideAnimal(animal);
+        };
+        listItem.appendChild(textSpan);
+        listItem.appendChild(hideButton);
+        //listItem.textContent = animal;
+        listContainer.appendChild(listItem);
+      })
+
+
+    }
+
+    function updateHiddenAnimalsList() {
+
+      const listContainer = document.getElementById('hideAnimalList');
+      listContainer.innerHTML = '';
+      hiddenAnimals.forEach(function (animal) {
+        const listItem = document.createElement('li');
+        const textSpan = document.createElement('span');
+        textSpan.textContent = convertSpeciesToCommon(animal);
+        const showButton = document.createElement('button');
+        showButton.textContent = 'Show';
+        showButton.className = 'btn btn-hide';
+        showButton.style.color = 'green';
+
+        showButton.onclick = () => {
+          console.log("Show button clicked for", animal);
+          showAnimal(animal);
+        };
+        listItem.appendChild(textSpan);
+        listItem.appendChild(showButton);
+        //listItem.textContent = animal;
+        listContainer.appendChild(listItem);
+      })
+
+    }
+
+
+    function resetSearchFilter() {
+      const layers = window.hmiState.basemap.getLayers().getArray();
+
+      layers.forEach(layer => {
+        if (layer instanceof ol.layer.Vector) {
+          layer.getSource().getFeatures().forEach(feature => {
+
+            if (feature.get('animalSpecies') != undefined) {
+              const animalName = feature.get('animalSpecies').toLowerCase();
+              //console.log(animalName,animal)
+              if (displayedAnimals.has(animalName)) {
+                console.log("Not Unhiding ", animalName)
+              } else {
+                key = feature.get('eventId') + feature.get('animalSpecies').toLowerCase();
+                url = iconDicts[key];
+                console.log(iconDicts);
+                feature.setStyle(visibleStyle(url)); //Show animal
+                console.log("Showing ", animalName)
+              }
+            };
+          });
+        }
+      });
+      hiddenAnimals.clear();
+      displayedAnimals.clear();
+      updateHiddenAnimalsList();
+      updateDisplayedAnimalsList();
+    }
+
+    function convertSpeciesToCommon(species) {
+      return animalSpeciesToCommon[species.toLowerCase()];
+    }
+
+    // Variable to keep track of which donation amount has been selected
+    let donorAmount;
+    // Donation amounts
+    var donationData = [
+      { amount: 1, image: '$1.png' },
+      { amount: 5, image: '$5.png' },
+      { amount: 10, image: '$10.png' },
+      { amount: 20, image: '$20.png' },
+      { amount: 50, image: '$50.png' }
+    ];
+
+    // Update the image sources based on the donation amounts
+    var imageDescriptions = document.querySelectorAll('.image-description');
+    imageDescriptions.forEach(function (description, index) {
+      var image = description.querySelector('img');
+      var amount = description.querySelector('.image-amount');
+      amount.textContent = donationData[index].amount;
+      var imageFilename = donationData[index].image;
+      image.src = './images/' + imageFilename;
+
+    });
+
+    // Add event listeners for image hover and click effects
+    imageDescriptions.forEach(function (description) {
+      var image = description.querySelector('img');
+      var amount = description.querySelector('.image-amount');
+      var yourAmountElement = document.querySelector('.donation-amount'); // Get the "Your Amount" element
+      var lightbulbIcon = document.querySelector('.lightbulb-container img'); // Get the lightbulb icon element
+
+      // Change opacity on hover
+      image.addEventListener('mouseenter', function () {
+        image.style.opacity = '0.8';
+      });
+
+      image.addEventListener('mouseleave', function () {
+        image.style.opacity = '1'; // Restore original opacity
+      });
+
+      // Display donation amount on click
+      image.addEventListener('click', function () {
+        donorAmount = amount.textContent;
+        yourAmountElement.textContent = 'Your Amount: $' + donorAmount;
+        // Fill the lightbulb container with the clicked icon
+        lightbulbIcon.src = image.src;
+        lightbulbIcon.style.transform = 'scale(1.3)';
+      });
+    });
+
+    // Cart that is sent in the body of the API request
+    let cart = [
+      { id: 1, quantity: 0 }
+    ];
+    // Donation Button Functionality
+    const donationButton = document.getElementById('donation-button');
+    donationButton.addEventListener("click", () => {
+      // Check to see if a donation amount has been selected
+      // before executing the api call to the stripe session
+      console.log(cart);
+      if (donorAmount == undefined) {
+        console.log("Must choose a donation amount");
+        return
+      }
+      // Update the quantity with the chosen donation amount
+      cart[0].quantity = donorAmount;
+      var options = payment(username, donorAmount * 100, email);
       var rzp1 = new Razorpay(options);
 
       rzp1.open();
@@ -1281,1076 +1662,1068 @@ function convertSpeciesToCommon(species){
       rzp1.on('payment.failed', function (response) {
         rzp1.close();
         //payment failed
-        paymentcancel();
       }
       );
 
-    fetch("/api/create-checkout-session", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        items: cart,
-        userEmail: email
-      }),
+      fetch("/api/create-checkout-session", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          items: cart,
+          userEmail: email
+        }),
+      })
+        .then(res => {
+          if (res.ok) return res.json()
+          return res.json().then(json => Promise.reject(json))
+        })
+        .then(({ url }) => {
+          window.location = url
+        })
+        .catch(e => {
+          console.error(e.error)
+        })
     })
-      .then(res => {
-        if (res.ok) return res.json()
-        return res.json().then(json => Promise.reject(json))
-      })
-      .then(({ url }) => {
-        window.location = url
-      })
-      .catch(e => {
-        console.error(e.error)
-      })
-})
-</script>
-<script>
-  let button = document.getElementById("query_submit_button");
+  </script>
+  <script>
+    let button = document.getElementById("query_submit_button");
 
-  emailValidate = function() {
-    let email_value = document.getElementById("email").value;
-    if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email_value)){
-      $("#email_error_label").hide();
-      button.disabled = false;
-    } else {
-      $("#email_error_label").show();
-      button.disabled = true;
+    emailValidate = function () {
+      let email_value = document.getElementById("email").value;
+      if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email_value)) {
+        $("#email_error_label").hide();
+        button.disabled = false;
+      } else {
+        $("#email_error_label").show();
+        button.disabled = true;
+      }
     }
-  } 
 
-  queryValidate = function(){
-    let query_value = document.getElementById("query").value;
-    if (query_value.replace(/\s/g, "") != ""){
-      $("#query_error_label").hide();
-      button.disabled = false;
-    } else {
-      $("#query_error_label").show();
-      button.disabled = true;
+    queryValidate = function () {
+      let query_value = document.getElementById("query").value;
+      if (query_value.replace(/\s/g, "") != "") {
+        $("#query_error_label").hide();
+        button.disabled = false;
+      } else {
+        $("#query_error_label").show();
+        button.disabled = true;
+      }
     }
-  }
 
-  var hamburgerStatus = false;
-  var currentTab = document.getElementById('filter-menu');
+    var hamburgerStatus = false;
+    var currentTab = document.getElementById('filter-menu');
 
-	if(hamburgerStatus == false){
-	  document.getElementById("pink-line").style.width = "0px";
-	}
-	else {
-	  document.getElementById("pink-line").style.width = "100vw";
-	}  
-
-  function toggleNav() {
-    var hamburger = document.querySelector('.hamburger-icon');
-    
-    hamburger.classList.toggle('active');
-
-    if(hamburgerStatus == false){
-      openMenu();
+    if (hamburgerStatus == false) {
+      document.getElementById("pink-line").style.width = "0px";
     }
     else {
-      closeMenu();
+      document.getElementById("pink-line").style.width = "100vw";
     }
-  }
-  
-  function openMenu() {
-    document.getElementById("menu").style.width = "100vw";
-    document.getElementById("menu").style.height = "100%";
-    hamburgerStatus = true;
-    openTab("filter-menu")
-	document.getElementById("pink-line").style.width = "100vw";
-  }
 
-  function closeMenu() {
-    document.getElementById("menu").style.width = "0%";
-    document.getElementById("menu").style.height = "0%";
-    hamburgerStatus = false;
-	document.getElementById("pink-line").style.width = "0px";
-    closeTab()
-  }
-  
-  //Populate User profile based with username and email variable
-  function fetchUser() {
-        document.getElementById("username").innerText = `${username}`
-        document.getElementById("useremail").innerText = `${email}`
-  }
+    function toggleNav() {
+      var hamburger = document.querySelector('.hamburger-icon');
 
-  function openTab(tab) {
-    $(".tabs-button").removeClass("active");
-    switch (tab){
-      case "filter-menu":
-        document.getElementById("filter-menu-btn").classList.add("active");
-        break;
-      case "animal-popup":
-        document.getElementById("popup-menu-btn").classList.add("active");
-        break;
-      case "FAQ":
-        document.getElementById("FAQ-menu-btn").classList.add("active");
-        break;
-      case "SIM":
-        document.getElementById("SIM-menu-btn").classList.add("active");
-        break;
-      case "donate":
-        document.getElementById("donate-menu-btn").classList.add("active");
-        break;
-      case "mic-popup":
-        document.getElementById("mic-popup-menu-btn").classList.add("active");
-        break;
-      case "userProfile":
-        document.getElementById("user-profile-button").classList.add("active");
-        break;
-      case "statistics":
-        document.getElementById("statistics-menu-btn").classList.add("active");
-        break;
-    }
-    if (tab != null){
-      if (currentTab != document.getElementById(tab)){
-        
-        closeTab()
+      hamburger.classList.toggle('active');
+
+      if (hamburgerStatus == false) {
+        openMenu();
       }
-      currentTab = document.getElementById(tab)
+      else {
+        closeMenu();
+      }
     }
-    currentTab.style.width = "100vw";
-    currentTab.style.height = "90%";
-  }
 
-  function closeTab() {
-    currentTab.style.width = "0%"
-    currentTab.style.height = "0%"
-  }
-  var overlay = null;
-
-  function openSIMULATOR(){
-    if(overlay){
-      closeOverlay(overlay)
+    function openMenu() {
+      document.getElementById("menu").style.width = "100vw";
+      document.getElementById("menu").style.height = "100%";
+      hamburgerStatus = true;
+      openTab("filter-menu")
+      document.getElementById("pink-line").style.width = "100vw";
     }
-    //console.log("Opening Simulator...")
-  }
 
-  function openNav(tab) {
-    var hamburger = document.querySelector('.hamburger-icon');
-    if(!hamburger.classList.contains('active')){
-      toggleNav();
+    function closeMenu() {
+      document.getElementById("menu").style.width = "0%";
+      document.getElementById("menu").style.height = "0%";
+      hamburgerStatus = false;
+      document.getElementById("pink-line").style.width = "0px";
+      closeTab()
     }
-    if (tab){
-      openTab(tab)
-    } else {
-      openTab('filter-menu')
-    } 
-  }
 
-  document.addEventListener('animalToggled', function(event){
-    closeTab()
-    setTimeout(()=> {
-      currentTab = document.getElementById('animal-popup') 
-      openNav('animal-popup')
-    },10)
-  })
+    //Populate User profile based with username and email variable
+    function fetchUser() {
+      document.getElementById("username").innerText = `${username}`
+      document.getElementById("useremail").innerText = `${email}`
+    }
 
-  document.addEventListener('micToggled', function(event){
-    closeTab()
-    setTimeout(()=> {
-      currentTab = document.getElementById('mic-popup') 
-      openNav('mic-popup')
-    },10)
-  })
+    function openTab(tab) {
+      $(".tabs-button").removeClass("active");
+      switch (tab) {
+        case "filter-menu":
+          document.getElementById("filter-menu-btn").classList.add("active");
+          break;
+        case "animal-popup":
+          document.getElementById("popup-menu-btn").classList.add("active");
+          break;
+        case "FAQ":
+          document.getElementById("FAQ-menu-btn").classList.add("active");
+          break;
+        case "SIM":
+          document.getElementById("SIM-menu-btn").classList.add("active");
+          break;
+        case "donate":
+          document.getElementById("donate-menu-btn").classList.add("active");
+          break;
+        case "mic-popup":
+          document.getElementById("mic-popup-menu-btn").classList.add("active");
+          break;
+        case "userProfile":
+          document.getElementById("user-profile-button").classList.add("active");
+          break;
+        case "statistics":
+          document.getElementById("statistics-menu-btn").classList.add("active");
+          break;
+        case "animalNotifications":
+          document.getElementById("notification-menu-button").classList.add("active");
+          document.getElementById("animalNotifications").style.display = "block";
+          console.log("ello")
+          break;
+      }
+      if (tab != null) {
+        if (currentTab != document.getElementById(tab)) {
 
-  let aud = false;
-  let recordingAud = false;
+          closeTab()
+        }
+        currentTab = document.getElementById(tab)
+      }
+      currentTab.style.width = "100vw";
+      currentTab.style.height = "90%";
+    }
 
-  function animateAudioPlay() {
-    $(".boxmuted").removeClass("boxmuted");
+    function closeTab() {
+      currentTab.style.width = "0%"
+      currentTab.style.height = "0%"
+    }
+    var overlay = null;
+
+    function openSIMULATOR() {
+      if (overlay) {
+        closeOverlay(overlay)
+      }
+      //console.log("Opening Simulator...")
+    }
+
+    function openNav(tab) {
+      var hamburger = document.querySelector('.hamburger-icon');
+      if (!hamburger.classList.contains('active')) {
+        toggleNav();
+      }
+      if (tab) {
+        openTab(tab)
+      } else {
+        openTab('filter-menu')
+      }
+    }
+
+    document.addEventListener('animalToggled', function (event) {
+      closeTab()
+      setTimeout(() => {
+        currentTab = document.getElementById('animal-popup')
+        openNav('animal-popup')
+      }, 10)
+    })
+
+    document.addEventListener('micToggled', function (event) {
+      closeTab()
+      setTimeout(() => {
+        currentTab = document.getElementById('mic-popup')
+        openNav('mic-popup')
+      }, 10)
+    })
+
+    let aud = false;
+    let recordingAud = false;
+
+    function animateAudioPlay() {
+      $(".boxmuted").removeClass("boxmuted");
       aud = true;
-      document.getElementById("animalAudioI").style.opacity=".5";
-  }
+      document.getElementById("animalAudioI").style.opacity = ".5";
+    }
 
-  function animateAudioMute(){
-    $(".box").addClass("boxmuted");
+    function animateAudioMute() {
+      $(".box").addClass("boxmuted");
       aud = false;
-      document.getElementById("animalAudioI").style.opacity="1";
-  }
-
-  function toggleAudio() {
-    if(aud==false){
-      const play_audio = new CustomEvent('playAudio',{
-            detail: {
-              message: "play audio"
-            }
-          })
-
-      document.dispatchEvent(play_audio);
-
-      animateAudioPlay();
-    } 
-    else {
-      const stop_audio = new CustomEvent('stopAudio',{
-            detail: {
-              message: "stop audio"
-            }
-          })
-
-      document.dispatchEvent(stop_audio);
-
-      animateAudioMute();
-    }			
-  }
-
-  function simModeSwitch(mode){
-    const mode_switch = new CustomEvent('modeSwitch',{
-            detail: {
-              message: mode
-            }
-          })
-
-    document.dispatchEvent(mode_switch);
-  }
-  
-  function saveRecordingEvent(){
-    const save_recording = new CustomEvent('saveRecording',{
-            detail: {
-              message: "save"
-            }
-          })
-
-    document.dispatchEvent(save_recording);
-  }
-
-  function loadRecordingEvent(){
-    const load_recording = new CustomEvent('loadRecording',{
-            detail: {
-              message: "load"
-            }
-          })
-
-    document.dispatchEvent(load_recording);
-  }
-
-  function simulateRecordingEvent(){
-    const simulate_recording = new CustomEvent('simulateRecording',{
-            detail: {
-              message: "simulate"
-            }
-          })
-
-    document.dispatchEvent(simulate_recording);
-  }
-
-  function animateRecordedAudioPlay() {
-    $(".boxmutedR").removeClass("boxmutedR");
-      recordingAud = true;
-      document.getElementById("recordingI").style.opacity=".5";
-  }
-
-  function animateRecordedAudioMute(){
-    $(".boxR").addClass("boxmutedR");
-      recordingAud = false;
-      document.getElementById("recordingI").style.opacity="1";
-  }
-
-  function toggleRecordingAudio() {
-    if(recordingAud==false){
-      animateRecordedAudioPlay();
-
-      const play_recorded_audio = new CustomEvent('playRecordedAudio',{
-            detail: {
-              message: "play audio"
-            }
-          })
-
-      document.dispatchEvent(play_recorded_audio);
-    } 
-    else {
-      animateRecordedAudioMute();
-
-      const stop_recorded_audio = new CustomEvent('stopRecordedAudio',{
-            detail: {
-              message: "stop audio"
-            }
-          })
-
-      document.dispatchEvent(stop_recorded_audio);
-    }			
-  }
-
-  toggleAudio();
-  animateRecordedAudioMute();
-
-  document.addEventListener('muteAnimation', function(event){
-    animateAudioMute();
-  })
-
-  document.addEventListener('muteRecordingAnimation', function(event){
-    animateRecordedAudioMute();
-  })
-  
-</script>
-
-<script>
-const requestButton = document.getElementById("request-edit-button")
-const editForm = document.getElementById("editForm");
-const editFormWrapper = document.getElementById("editFormWrapper");
-const closeFormButton = document.getElementById("closeFormButton");
-const submit = document.getElementById("submitEditButton");
-var divElement = document.getElementById("desc_species");
-var divContent = divElement.innerHTML;
-const markupDetails = document.getElementById("markup_details");
-
-const newStatus = document.getElementById("selectNCS");
-const conservationButtons = document.getElementById("dropdownContentNCS"); 
-const dropdownOptions = document.getElementById("dropdownContentNCS");
-
-//Load the request form for the user to fill out
-requestButton.addEventListener('click', () => {
-
-  editFormWrapper.style.display = "";
-  console.log("Request edit button clicked.");
-  content = markupDetails.innerHTML;
-  //Split the content using the '|' delimiter
-  items = content.split('|');
-
-  //Trim whitespace from each item
-  trimmedItems = items.map(item => item.trim());
-  //Access the third item (index 2) after trimming
-  currentStatus = trimmedItems[2];
-  console.log(currentStatus);
-  //console.log("Third item:", thirdItem);
-  //Populate form with the species name, and the current conservation status
-  document.getElementById("formSpeciesName").innerHTML = divElement.innerHTML;
-  document.getElementById("currentConservationStatus").innerHTML = currentStatus;
-  console.log("Species: ", divContent);
-  editFormWrapper.style.zIndex = "1000";
-  editForm.style.display = "block";
-
-})
-
-  //Listening for the different conservation buttons
-  conservationButtons.addEventListener("click", (event) => {
-    if (event.target.tagName === 'BUTTON') {
-      event.preventDefault();
-      newConservationStatus = event.target.innerHTML;
-      console.log("Clicked on:", newConservationStatus);
-      newStatus.innerHTML = newConservationStatus;
-      dropdownOptions.style.display = "none";
+      document.getElementById("animalAudioI").style.opacity = "1";
     }
 
-  })
-  //New Status Button Clicked, display the options
-  newStatus.addEventListener('click', (event) => {
+    function toggleAudio() {
+      if (aud == false) {
+        const play_audio = new CustomEvent('playAudio', {
+          detail: {
+            message: "play audio"
+          }
+        })
 
-    event.preventDefault();
-    console.log("New Status clicked! ")
-    newConservationStatus = newStatus.innerHTML
-  
-    if (dropdownOptions.style.display === "none" || dropdownOptions.style.display === "") {
-  //     console.log("Adding new conservation status ")
-        dropdownOptions.style.display = "block";
-    } else {
-        dropdownOptions.style.display = "none";
-    }
-  })
-  
+        document.dispatchEvent(play_audio);
 
-//Form Field Submission Values
-var currentStatus;
-var animalNewStatus;
+        animateAudioPlay();
+      }
+      else {
+        const stop_audio = new CustomEvent('stopAudio', {
+          detail: {
+            message: "stop audio"
+          }
+        })
 
-//For now we're just requesting to change the conservation status
-//This will change in the future so this statically typed 
-var requestingToChange = "conservation status";
-var newConservationStatus; 
-// current user to get the current user who is logged in, this is just a temporary value for now
-//var username = 'TN-HMI';
-var source;
-var animal;
-var requestData;
+        document.dispatchEvent(stop_audio);
 
-const notification = document.getElementById('notification');
-const notificationText = document.getElementById('notification-text');
-const notificationClose = document.getElementById('notification-close');
-
-//This function receives text as a parameter and generates a visual response with it
-//It is responsible for generating a response once a user submits a edit request
-//The visual response appears in the bottom left of the screen like a notification
-function generateVisualResponse(text){
-  
-// Function to show the notification
-  notificationText.textContent = text;
-  notification.style.display = 'block';
-}
-
-//The notification is hidden once the user clicks on the 'x'
-function hideNotification() {
-    notification.style.display = 'none';
-}
-// Event listener for the close button
-notificationClose.addEventListener('click', hideNotification);
-
-let username;
-let email;
-
-//This function fetches the user email and username. It stores them as variables client side so that 
-// They can be used for forms, and the user profile
-function getUser(){
-  fetch("/user_profile")
-      .then(res => {
-        if (res.ok) return res.json()
-        return res.json().then(json => Promise.reject(json))
-      })
-      .then( userData => {
-        console.log("User profile data: ", userData)
-        username = String(userData.username);
-        email = `${userData.email}`
-      }) 
-      .catch(e => {
-        console.error(e.error)
-      })
-}
-
-getUser();
-
-
-
-//This is responsible for when the user submits their request
-//It gets the data from the fields and proceeds to generate the payload 
-//For the API endpoint
-//In the process of doing so checks are performed to ensure that the user
-//Hasn't missed a field, or hasn't entered redundant information
-function submitRequest(){
-  //Get the inner name of the animal 
-  animal = document.getElementById("desc_species").innerHTML;
-  //Let Source equal to what is contained in the citation field
-  source = document.getElementById("citationSneeded").value;
-  //get the initial and modified values, these will be used for checks too
-  initial = currentStatus;
-  modified = newConservationStatus;
-  console.log(newConservationStatus);
-  
-  // console.log(currentUser);
-  // console.log(thirdItem);
-  // console.log("Source:", source);
-  // console.log("Animal:", animal);
-  // console.log("New Status: ", modified);
-  // console.log("Initial: ", initial);
-
-  // Check the fields
-
-  checkFields();
-
-  if (initial === modified){
-    generateVisualResponse("SUBMISSION CANCELLED. New conservation status can't be the same as current status.");
-    return;
-  }
-
-  if (modified === undefined){
-    generateVisualResponse("SUBMISSION CANCELLED. No new conservation status selected.");
-    return;
-  }
-
-  if (source === ""){
-    generateVisualResponse("SUBMISSION CANCELLED. Source field cannot be empty.");
-    return
-  }
-  //console.log(user);
-  requestData = {
-    username,
-    animal,
-    requestingToChange,
-    initial,
-    modified,
-    source
-  }
-  
-  fetch("/api/submit", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify(requestData)
-  })
-  .then(response => {
-    if (response.status===201){
-      console.log("Submission Success...");
-      generateVisualResponse("Thank you. Your submission was succesfully received and is now awaiting review.");
-    }
-    else {
-      console.log("Submission Unsuccessful...");
-      generateVisualResponse("There was an error in receiving your submission. Please try again.")
-    }
-  })
-  .catch(error => {
-    console.log("Error here.");
-  });
-}
-
-function checkFields(){
-  if(source === "" || animalNewStatus === "none"){
-    return false
-  }
-
-}
-
-//Once the submission exits, the form resets it's values so that the form 
-//can be empty if the user chooses to request an edit for another animal
-function exitSubmission(){
-  currentStatus = "";
-  source = "";
-  animal = "";
-  animalNewStatus = "";
-  editFormWrapper.style.display = "none";
-  editForm.style.display = "none";
-  dropdownOptions.style.display ="";
-}
-
-submit.addEventListener('click', (event) => {
-  event.preventDefault();
-  submitRequest();
-  exitSubmission();
-});
-
-closeFormButton.addEventListener('click', (event) => {
-  event.preventDefault();
-  exitSubmission();
-});
-</script>
-
-<script>
-  
-  //import { updateLayers } from "./js/HMI.js";
-  //selecting the .form-check-input class (all the filter checkboxes fall under this class)                   
-  const myClass = document.querySelectorAll('.form-check-input')
-  const sim = document.querySelectorAll('.s')
-  const voc = document.querySelectorAll('.v')
-  //An array to store the ID for each checkbox 
-  const checkboxIDs = []
-  const simIds = []
-  
-  //Populating the checkbox
-  myClass.forEach(element => {
-    //console.log("doingsomething")
-    checkboxIDs.push(element.id);
-  });
-
-  sim.forEach(element => {
-    //console.log("doingsomething with it")
-    simIds.push(element.id);
-  });
-  //init variable is set to true before the user has selected any filter options
-  //before a user has checked any filter options, all layers will appear on screen
-  let filterState = [...checkboxIDs];
-  console.log(filterState, "FilterState:  ")
-  console.log(checkboxIDs)
-
-  function updateFilter(checkbox){ 
-
-    if (document.getElementById(checkbox).checked){
-      if(!filterState.includes(checkbox)){
-        filterState.push(checkbox)
+        animateAudioMute();
       }
     }
-    else{
-      let index = filterState.indexOf(checkbox)
+
+    function simModeSwitch(mode) {
+      const mode_switch = new CustomEvent('modeSwitch', {
+        detail: {
+          message: mode
+        }
+      })
+
+      document.dispatchEvent(mode_switch);
+    }
+
+    function saveRecordingEvent() {
+      const save_recording = new CustomEvent('saveRecording', {
+        detail: {
+          message: "save"
+        }
+      })
+
+      document.dispatchEvent(save_recording);
+    }
+
+    function loadRecordingEvent() {
+      const load_recording = new CustomEvent('loadRecording', {
+        detail: {
+          message: "load"
+        }
+      })
+
+      document.dispatchEvent(load_recording);
+    }
+
+    function simulateRecordingEvent() {
+      const simulate_recording = new CustomEvent('simulateRecording', {
+        detail: {
+          message: "simulate"
+        }
+      })
+
+      document.dispatchEvent(simulate_recording);
+    }
+
+    function animateRecordedAudioPlay() {
+      $(".boxmutedR").removeClass("boxmutedR");
+      recordingAud = true;
+      document.getElementById("recordingI").style.opacity = ".5";
+    }
+
+    function animateRecordedAudioMute() {
+      $(".boxR").addClass("boxmutedR");
+      recordingAud = false;
+      document.getElementById("recordingI").style.opacity = "1";
+    }
+
+    function toggleRecordingAudio() {
+      if (recordingAud == false) {
+        animateRecordedAudioPlay();
+
+        const play_recorded_audio = new CustomEvent('playRecordedAudio', {
+          detail: {
+            message: "play audio"
+          }
+        })
+
+        document.dispatchEvent(play_recorded_audio);
+      }
+      else {
+        animateRecordedAudioMute();
+
+        const stop_recorded_audio = new CustomEvent('stopRecordedAudio', {
+          detail: {
+            message: "stop audio"
+          }
+        })
+
+        document.dispatchEvent(stop_recorded_audio);
+      }
+    }
+
+    toggleAudio();
+    animateRecordedAudioMute();
+
+    document.addEventListener('muteAnimation', function (event) {
+      animateAudioMute();
+    })
+
+    document.addEventListener('muteRecordingAnimation', function (event) {
+      animateRecordedAudioMute();
+    })
+
+  </script>
+
+  <script>
+    const requestButton = document.getElementById("request-edit-button")
+    const editForm = document.getElementById("editForm");
+    const editFormWrapper = document.getElementById("editFormWrapper");
+    const closeFormButton = document.getElementById("closeFormButton");
+    const submit = document.getElementById("submitEditButton");
+    var divElement = document.getElementById("desc_species");
+    var divContent = divElement.innerHTML;
+    const markupDetails = document.getElementById("markup_details");
+
+    const newStatus = document.getElementById("selectNCS");
+    const conservationButtons = document.getElementById("dropdownContentNCS");
+    const dropdownOptions = document.getElementById("dropdownContentNCS");
+
+    //Load the request form for the user to fill out
+    requestButton.addEventListener('click', () => {
+
+      editFormWrapper.style.display = "";
+      console.log("Request edit button clicked.");
+      content = markupDetails.innerHTML;
+      //Split the content using the '|' delimiter
+      items = content.split('|');
+
+      //Trim whitespace from each item
+      trimmedItems = items.map(item => item.trim());
+      //Access the third item (index 2) after trimming
+      currentStatus = trimmedItems[2];
+      console.log(currentStatus);
+      //console.log("Third item:", thirdItem);
+      //Populate form with the species name, and the current conservation status
+      document.getElementById("formSpeciesName").innerHTML = divElement.innerHTML;
+      document.getElementById("currentConservationStatus").innerHTML = currentStatus;
+      console.log("Species: ", divContent);
+      editFormWrapper.style.zIndex = "1000";
+      editForm.style.display = "block";
+
+    })
+
+    //Listening for the different conservation buttons
+    conservationButtons.addEventListener("click", (event) => {
+      if (event.target.tagName === 'BUTTON') {
+        event.preventDefault();
+        newConservationStatus = event.target.innerHTML;
+        console.log("Clicked on:", newConservationStatus);
+        newStatus.innerHTML = newConservationStatus;
+        dropdownOptions.style.display = "none";
+      }
+
+    })
+    //New Status Button Clicked, display the options
+    newStatus.addEventListener('click', (event) => {
+
+      event.preventDefault();
+      console.log("New Status clicked! ")
+      newConservationStatus = newStatus.innerHTML
+
+      if (dropdownOptions.style.display === "none" || dropdownOptions.style.display === "") {
+        //     console.log("Adding new conservation status ")
+        dropdownOptions.style.display = "block";
+      } else {
+        dropdownOptions.style.display = "none";
+      }
+    })
+
+
+    //Form Field Submission Values
+    var currentStatus;
+    var animalNewStatus;
+
+    //For now we're just requesting to change the conservation status
+    //This will change in the future so this statically typed 
+    var requestingToChange = "conservation status";
+    var newConservationStatus;
+    // current user to get the current user who is logged in, this is just a temporary value for now
+    //var username = 'TN-HMI';
+    var source;
+    var animal;
+    var requestData;
+
+    const notification = document.getElementById('notification');
+    const notificationText = document.getElementById('notification-text');
+    const notificationClose = document.getElementById('notification-close');
+
+    //This function receives text as a parameter and generates a visual response with it
+    //It is responsible for generating a response once a user submits a edit request
+    //The visual response appears in the bottom left of the screen like a notification
+    function generateVisualResponse(text) {
+
+      // Function to show the notification
+      notificationText.textContent = text;
+      notification.style.display = 'block';
+    }
+
+    //The notification is hidden once the user clicks on the 'x'
+    function hideNotification() {
+      notification.style.display = 'none';
+    }
+    // Event listener for the close button
+    notificationClose.addEventListener('click', hideNotification);
+
+    let username;
+    let email;
+
+    //This function fetches the user email and username. It stores them as variables client side so that 
+    // They can be used for forms, and the user profile
+    function getUser() {
+      fetch("/user_profile")
+        .then(res => {
+          if (res.ok) return res.json()
+          return res.json().then(json => Promise.reject(json))
+        })
+        .then(userData => {
+          console.log("User profile data: ", userData)
+          username = String(userData.username);
+          email = `${userData.email}`
+        })
+        .catch(e => {
+          console.error(e.error)
+        })
+    }
+
+    getUser();
+
+
+
+    //This is responsible for when the user submits their request
+    //It gets the data from the fields and proceeds to generate the payload 
+    //For the API endpoint
+    //In the process of doing so checks are performed to ensure that the user
+    //Hasn't missed a field, or hasn't entered redundant information
+    function submitRequest() {
+      //Get the inner name of the animal 
+      animal = document.getElementById("desc_species").innerHTML;
+      //Let Source equal to what is contained in the citation field
+      source = document.getElementById("citationSneeded").value;
+      //get the initial and modified values, these will be used for checks too
+      initial = currentStatus;
+      modified = newConservationStatus;
+      console.log(newConservationStatus);
+
+      // console.log(currentUser);
+      // console.log(thirdItem);
+      // console.log("Source:", source);
+      // console.log("Animal:", animal);
+      // console.log("New Status: ", modified);
+      // console.log("Initial: ", initial);
+
+      // Check the fields
+
+      checkFields();
+
+      if (initial === modified) {
+        generateVisualResponse("SUBMISSION CANCELLED. New conservation status can't be the same as current status.");
+        return;
+      }
+
+      if (modified === undefined) {
+        generateVisualResponse("SUBMISSION CANCELLED. No new conservation status selected.");
+        return;
+      }
+
+      if (source === "") {
+        generateVisualResponse("SUBMISSION CANCELLED. Source field cannot be empty.");
+        return
+      }
+      //console.log(user);
+      requestData = {
+        username,
+        animal,
+        requestingToChange,
+        initial,
+        modified,
+        source
+      }
+
+      fetch("/api/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(requestData)
+      })
+        .then(response => {
+          if (response.status === 201) {
+            console.log("Submission Success...");
+            generateVisualResponse("Thank you. Your submission was succesfully received and is now awaiting review.");
+          }
+          else {
+            console.log("Submission Unsuccessful...");
+            generateVisualResponse("There was an error in receiving your submission. Please try again.")
+          }
+        })
+        .catch(error => {
+          console.log("Error here.");
+        });
+    }
+
+    function checkFields() {
+      if (source === "" || animalNewStatus === "none") {
+        return false
+      }
+
+    }
+
+    //Once the submission exits, the form resets it's values so that the form 
+    //can be empty if the user chooses to request an edit for another animal
+    function exitSubmission() {
+      currentStatus = "";
+      source = "";
+      animal = "";
+      animalNewStatus = "";
+      editFormWrapper.style.display = "none";
+      editForm.style.display = "none";
+      dropdownOptions.style.display = "";
+    }
+
+    submit.addEventListener('click', (event) => {
+      event.preventDefault();
+      submitRequest();
+      exitSubmission();
+    });
+
+    closeFormButton.addEventListener('click', (event) => {
+      event.preventDefault();
+      exitSubmission();
+    });
+  </script>
+
+  <script>
+
+    //import { updateLayers } from "./js/HMI.js";
+    //selecting the .form-check-input class (all the filter checkboxes fall under this class)                   
+    const myClass = document.querySelectorAll('.form-check-input')
+    const sim = document.querySelectorAll('.s')
+    const voc = document.querySelectorAll('.v')
+    //An array to store the ID for each checkbox 
+    const checkboxIDs = []
+    const simIds = []
+
+    //Populating the checkbox
+    myClass.forEach(element => {
+      //console.log("doingsomething")
+      checkboxIDs.push(element.id);
+    });
+
+    sim.forEach(element => {
+      //console.log("doingsomething with it")
+      simIds.push(element.id);
+    });
+    //init variable is set to true before the user has selected any filter options
+    //before a user has checked any filter options, all layers will appear on screen
+    let filterState = [...checkboxIDs];
+    console.log(filterState, "FilterState:  ")
+    console.log(checkboxIDs)
+
+    function updateFilter(checkbox) {
+
+      if (document.getElementById(checkbox).checked) {
+        if (!filterState.includes(checkbox)) {
+          filterState.push(checkbox)
+        }
+      }
+      else {
+        let index = filterState.indexOf(checkbox)
         if (index > -1) {
           filterState.splice(index, 1);
         }
+      }
+      //console.log("Current filter state:  ", filterState);
+      updateLayers(filterState)
     }
-    //console.log("Current filter state:  ", filterState);
-    updateLayers(filterState)
-  }
 
-  function microphoneDisplay(){
+    function microphoneDisplay() {
       updateMics()
-  }
-
-  function selectAll(filter){
-  
-    if (filter == 'clear'){
-      sim.forEach(id => {
-        if(filterState.includes(id.id)){
-          filterState.splice(filterState.indexOf(id.id), 1)
-          id.checked = false;
-        }
-      })
-    }
-  
-    else if (filter == '_clear'){
-      voc.forEach(id => {
-        if(filterState.includes(id.id)){
-          filterState.splice(filterState.indexOf(id.id), 1)
-          id.checked = false;
-        }
-      })
     }
 
-    else if (filter == 'all'){
-      sim.forEach(id => {
-        if (!filterState.includes(id.id)){
-          console.log("Filter state doesn't include: ",id.id)
-          filterState.push(id.id)
-        }
-        id.checked = true;
-      })
-      
-    
+    function selectAll(filter) {
+
+      if (filter == 'clear') {
+        sim.forEach(id => {
+          if (filterState.includes(id.id)) {
+            filterState.splice(filterState.indexOf(id.id), 1)
+            id.checked = false;
+          }
+        })
+      }
+
+      else if (filter == '_clear') {
+        voc.forEach(id => {
+          if (filterState.includes(id.id)) {
+            filterState.splice(filterState.indexOf(id.id), 1)
+            id.checked = false;
+          }
+        })
+      }
+
+      else if (filter == 'all') {
+        sim.forEach(id => {
+          if (!filterState.includes(id.id)) {
+            console.log("Filter state doesn't include: ", id.id)
+            filterState.push(id.id)
+          }
+          id.checked = true;
+        })
+
+
+      }
+      else if (filter == '_all') {
+        console.log(filter)
+        voc.forEach(id => {
+          if (!filterState.includes(id.id)) {
+            console.log("Filter state doesn't include: ", id.id)
+            filterState.push(id.id)
+          }
+          id.checked = true;
+        })
+      }
+
+      updateLayers(filterState)
     }
-    else if (filter == '_all'){
-      console.log(filter)
-      voc.forEach(id => {
-        if (!filterState.includes(id.id)){
-          console.log("Filter state doesn't include: ",id.id)
-          filterState.push(id.id)
-        }
-        id.checked = true;
-      })
-    }
 
-    updateLayers(filterState)
-  }
+    // Get all the dropdowns on the page
+    const dropdowns = document.querySelectorAll(".dropdown");
+    //console.log('dropdowns: ', dropdowns)
 
-  // Get all the dropdowns on the page
-  const dropdowns = document.querySelectorAll(".dropdown");
-  //console.log('dropdowns: ', dropdowns)
-  
-  // Add a click event listener to each dropdown
-  dropdowns.forEach((dropdown) => {
-    const button = dropdown.querySelector(".dropdown-toggle");
-    const menu = dropdown.querySelector(".dropdown-menu");
-    const inputs = dropdown.querySelectorAll(".form-check-input");
+    // Add a click event listener to each dropdown
+    dropdowns.forEach((dropdown) => {
+      const button = dropdown.querySelector(".dropdown-toggle");
+      const menu = dropdown.querySelector(".dropdown-menu");
+      const inputs = dropdown.querySelectorAll(".form-check-input");
 
-    // Toggle the 'show' class on the menu and button when clicked
-    button.addEventListener("click", () => {
-      
-      menu.classList.toggle("show");
-      button.classList.toggle("show");
-      
+      // Toggle the 'show' class on the menu and button when clicked
+      button.addEventListener("click", () => {
+
+        menu.classList.toggle("show");
+        button.classList.toggle("show");
+
+      });
+
+
     });
 
-    
-  });
 
 
+  </script>
 
-</script>
 
+  <script type="module">
+    import {
+      updateLayers, initialiseHMI, showMics, hideMics, updateAnimalMovementLayerFromPastData, updateVocalizationLayerFromPastData,
+      resetWildlifeLayers, MapOpenNav, MapCloseNav, getAnimalToggled, enableMicAnimation, disableMicAnimation, getUTC, startAudioRecording,
+      stopAudioRecording, cancelAudioRecording, testFunct, convertCSV
+    } from "./js/HMI.js";
+    import { retrieveTruthEventsInTimeRange, retrieveVocalizationEventsInTimeRange } from "./js/routes.js";
+    window.updateMics = updateMics;
+    window.downloadCSV = downloadCSV;
+    window.downloadXLSX = downloadXLSX;
+    window.updateMicrophoneAnimation = updateMicrophoneAnimation;
+    window.updateLayers = updateLayers;
+    window.closeNav = MapCloseNav;
 
-<script type="module">
-  import { updateLayers, initialiseHMI, showMics, hideMics, updateAnimalMovementLayerFromPastData, updateVocalizationLayerFromPastData,
-  resetWildlifeLayers, MapOpenNav, MapCloseNav, getAnimalToggled, enableMicAnimation, disableMicAnimation, getUTC, startAudioRecording,
-  stopAudioRecording, cancelAudioRecording, testFunct, convertCSV} from "./js/HMI.js";
-  import {retrieveTruthEventsInTimeRange, retrieveVocalizationEventsInTimeRange} from "./js/routes.js";
-  window.updateMics = updateMics;
-  window.downloadCSV = downloadCSV;
-  window.downloadXLSX = downloadXLSX;
-  window.updateMicrophoneAnimation = updateMicrophoneAnimation;
-  window.updateLayers = updateLayers;
-  window.closeNav = MapCloseNav;
+    //All global state based info is stored in the hmiState
+    let hmiState = {};
+    window.hmiState = hmiState;
+    hmiState.truthEventId = 10;
 
-  //All global state based info is stored in the hmiState
-  let hmiState = {};
-  window.hmiState = hmiState; 
-  hmiState.truthEventId = 10;
+    let datepickerStart = hmiState.currentTime;
+    let datepickerEnd = hmiState.previousUpdateTime;
 
-  let datepickerStart = hmiState.currentTime;
-  let datepickerEnd = hmiState.previousUpdateTime;
+    //update config
+    hmiState.liveMode = true;
+    hmiState.simUpdateDelay = 10000;
+    hmiState.liveWindow = 60000;
+    hmiState.simMode = "Stop";
 
-  //update config
-  hmiState.liveMode = true;
-  hmiState.simUpdateDelay = 10000;
-  hmiState.liveWindow = 60000;
-  hmiState.simMode = "Stop";
-
-  //NOTE: Use the replay date to replay past data as though it were live
+    //NOTE: Use the replay date to replay past data as though it were live
     //const replayDate = new Date('March 23, 2023 20:35:00');
     //const replayTimestamp = replayDate.getTime();
 
-  const utcTime = getUTC();
-  const replayTimestamp = utcTime;
+    const utcTime = getUTC();
+    const replayTimestamp = utcTime;
 
-  hmiState.timeOffset = 0;
-  hmiState.simTime = getUTC();
-  hmiState.currentTime = Math.floor((utcTime - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
-  hmiState.previousUpdateTime = Math.floor((utcTime - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
-  hmiState.liveEventCutoff = Math.floor((utcTime - hmiState.timeOffset - hmiState.simUpdateDelay - hmiState.liveWindow) / 1000);
+    hmiState.timeOffset = 0;
+    hmiState.simTime = getUTC();
+    hmiState.currentTime = Math.floor((utcTime - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
+    hmiState.previousUpdateTime = Math.floor((utcTime - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
+    hmiState.liveEventCutoff = Math.floor((utcTime - hmiState.timeOffset - hmiState.simUpdateDelay - hmiState.liveWindow) / 1000);
 
-  //Basemap config
-  //pls do not change origin lat long, these are set to target wild otways region
-  hmiState.originLat = -38.8078;
-  hmiState.originLon = 143.54741;
-  hmiState.defaultZoom = 10;
-  hmiState.requestInterval = 1000;
-  hmiState.layers = {};
-  hmiState.layerPool = 1000;
+    //Basemap config
+    //pls do not change origin lat long, these are set to target wild otways region
+    hmiState.originLat = -38.8078;
+    hmiState.originLon = 143.54741;
+    hmiState.defaultZoom = 10;
+    hmiState.requestInterval = 1000;
+    hmiState.layers = {};
+    hmiState.layerPool = 1000;
 
-  const microphoneLocations = [
-    { lat: -38.808, lon: 143.554, id:1 },
-    { lat: -38.813, lon: 143.537, id:2 },
-    { lat: -38.794, lon: 143.52, id:3 },
-    { lat: -38.824, lon: 143.51, id:4 },
-    { lat: -38.812, lon: 143.573, id:5 },
-  ];
-  
-  const vocalizationEvents = [
-    {eventId: "6457a315e03129cb130fa270", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Tawny Frogmouth", speciesScientificName: "Podargus strigoides", speciesIdentificationConfidence: 90.98, locationLat:-38.80266562762370,locationLon:143.563 , locationConfidence:90.98 , animalType:"bird", animalStatus:"normal" ,animalDiet: "herbavore" },
-    {eventId: "6457a315e03129cb130fa271", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Cane toad", speciesScientificName: "Rhinella marina", speciesIdentificationConfidence: 90.98, locationLat:-38.81905478815443 ,locationLon:143.529, locationConfidence:90.98 , animalType:"amphibian", animalStatus:"invasive" ,animalDiet: "herbavore" },
-    {eventId: "6457a315e03129cb130fa272", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Wild Boar", speciesScientificName: "Sus scrofa", speciesIdentificationConfidence: 90.98, locationLat:-38.80166562762364 ,locationLon:143.545  , locationConfidence:90.98 , animalType:"mammal", animalStatus:"endangered" ,animalDiet: "omnivore" },
-    {eventId: "6457a315e03129cb130fa273", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Redeye", speciesScientificName: "Psaltoda moerens", speciesIdentificationConfidence: 90.98, locationLat:-38.82166562762360 ,locationLon:143.545 , locationConfidence:90.98 , animalType:"insect", animalStatus:"near-threatened" ,animalDiet: "carnivore" },
-    {eventId: "6457a315e03129cb130fa274", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Brown Rat", speciesScientificName: "Rattus norvegicus", speciesIdentificationConfidence: 90.98, locationLat:-38.80266562762380 ,locationLon:143.565 , locationConfidence:90.98 , animalType:"reptile", animalStatus:"vulnerable" ,animalDiet: "herbavore" },
-  ];
-  
+    const microphoneLocations = [
+      { lat: -38.808, lon: 143.554, id: 1 },
+      { lat: -38.813, lon: 143.537, id: 2 },
+      { lat: -38.794, lon: 143.52, id: 3 },
+      { lat: -38.824, lon: 143.51, id: 4 },
+      { lat: -38.812, lon: 143.573, id: 5 },
+    ];
 
-  const movementEvents = {
-    "M_1":{animalId: "M_1", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Brown Rat", speciesScientificName: "unknown", speciesIdentificationConfidence: 100, locationLat:-38.80266562762367 ,locationLon:143.560 , locationConfidence:100 , animalType:"reptile", animalStatus:"vulnerable" , animalDiet: "herbavore" },
-    "M_2":{animalId: "M_2", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Tawny Frogmouth", speciesScientificName: "Podargus strigoides", speciesIdentificationConfidence: 100, locationLat:-38.81905478815439 ,locationLon:143.524 , locationConfidence:100 , animalType:"bird", animalStatus:"normal" ,animalDiet: "herbavore" },
-    "M_3":{animalId: "M_3", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Cane toad", speciesScientificName: "Rhinella marina", speciesIdentificationConfidence: 100, locationLat:-38.80166562762367 ,locationLon:143.540 , locationConfidence:100 , animalType:"amphibian", animalStatus:"invasive" ,animalDiet: "omnivore" },
-    "M_4":{animalId: "M_4", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Red fox", speciesScientificName: "Vulpes vulpes", speciesIdentificationConfidence: 100, locationLat:-38.82166562762367 ,locationLon:143.550 , locationConfidence:100 , animalType:"mammal", animalStatus:"endangered" ,animalDiet: "carnivore" },
-    "M_5":{animalId: "M_5", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Brown Rat", speciesScientificName: "Rattus norvegicus", speciesIdentificationConfidence: 100, locationLat:-38.80266562762367 ,locationLon:143.570 , locationConfidence:100 , animalType:"reptile", animalStatus:"vulnerable" , animalDiet: "herbavore" },
-    "M_6":{animalId: "M_6", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Australian Fairy Martin", speciesScientificName: "Petrochelidon ariel", speciesIdentificationConfidence: 100, locationLat:-38.81905478815439 ,locationLon:143.580 , locationConfidence:100 , animalType:"bird", animalStatus:"normal" ,animalDiet: "herbavore" },
-    "M_7":{animalId: "M_7", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Cane toad", speciesScientificName: "Rhinella marina", speciesIdentificationConfidence: 100, locationLat:-38.80166562762367 ,locationLon:143.510 , locationConfidence:100 , animalType:"amphibian", animalStatus:"invasive" ,animalDiet: "omnivore" },
-    "M_8":{animalId: "M_8", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Red fox", speciesScientificName: "Vulpes vulpes", speciesIdentificationConfidence: 100, locationLat:-38.82166562762367 ,locationLon:143.520 , locationConfidence:100 , animalType:"mammal", animalStatus:"endangered" ,animalDiet: "carnivore" },
-    "M_9":{animalId: "M_9", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Redeye", speciesScientificName: "Psaltoda moerens", speciesIdentificationConfidence: 100, locationLat:-38.80066562762367 ,locationLon:143.555 , locationConfidence:100 , animalType:"insect", animalStatus:"near-threatened" ,animalDiet: "herbavore" },
-  };
-
-  const sampleJSONmovementEvents = [
-    {animalId: "M_1", timestamp: 1690765721, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Brown Rat", speciesScientificName: "Rattus norvegicus", speciesIdentificationConfidence: 100, locationLat:-38.80266562762367 ,locationLon:143.560 , locationConfidence:100 , animalType:"reptile", animalStatus:"vulnerable" , animalDiet: "herbavore" },
-    {animalId: "M_2", timestamp: 1672448921, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Tawny Frogmouth", speciesScientificName: "Podargus strigoides", speciesIdentificationConfidence: 100, locationLat:-38.81905478815439 ,locationLon:143.524 , locationConfidence:100 , animalType:"bird", animalStatus:"normal" ,animalDiet: "herbavore" },
-    {animalId: "M_3", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Cane toad", speciesScientificName: "Rhinella marina", speciesIdentificationConfidence: 100, locationLat:-38.80166562762367 ,locationLon:143.540 , locationConfidence:100 , animalType:"amphibian", animalStatus:"invasive" ,animalDiet: "omnivore" },
-    {animalId: "M_4", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Red fox", speciesScientificName: "Vulpes vulpes", speciesIdentificationConfidence: 100, locationLat:-38.82166562762367 ,locationLon:143.550 , locationConfidence:100 , animalType:"mammal", animalStatus:"endangered" ,animalDiet: "carnivore" },
-    {animalId: "M_5", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Brown Rat", speciesScientificName: "Rattus norvegicus", speciesIdentificationConfidence: 100, locationLat:-38.80266562762367 ,locationLon:143.570 , locationConfidence:100 , animalType:"reptile", animalStatus:"vulnerable" , animalDiet: "herbavore" },
-    {animalId: "M_6", timestamp: 1672448921, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Australian Fairy Martin", speciesScientificName: "Petrochelidon ariel", speciesIdentificationConfidence: 100, locationLat:-38.81905478815439 ,locationLon:143.580 , locationConfidence:100 , animalType:"bird", animalStatus:"normal" ,animalDiet: "herbavore" },
-    {animalId: "M_7", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Cane toad", speciesScientificName: "Rhinella marina", speciesIdentificationConfidence: 100, locationLat:-38.80166562762367 ,locationLon:143.510 , locationConfidence:100 , animalType:"amphibian", animalStatus:"invasive" ,animalDiet: "omnivore" },
-    {animalId: "M_8", timestamp: 2349873234, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Red fox", speciesScientificName: "Vulpes vulpes", speciesIdentificationConfidence: 100, locationLat:-38.82166562762367 ,locationLon:143.520 , locationConfidence:100 , animalType:"mammal", animalStatus:"endangered" ,animalDiet: "carnivore" },
-    {animalId: "M_9", timestamp: 1690765721, detectingmicID:1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Redeye", speciesScientificName: "Psaltoda moerens", speciesIdentificationConfidence: 100, locationLat:-38.80066562762367 ,locationLon:143.555 , locationConfidence:100 , animalType:"insect", animalStatus:"near-threatened" ,animalDiet: "herbavore" },
-];
-
-  hmiState.movementEvents = movementEvents;
-  hmiState.vocalizationEvents = vocalizationEvents;
-  hmiState.microphoneLocations = microphoneLocations;
-
-  const el = (sel) => {return document.getElementById(sel);}
-  const elArea  = el("basemap");
-
-  const simulatorOl = el("screen")
-
-  simulatorOl.addEventListener("click",openSIMULATOR)
-
-  window.onload = function() {
-    console.log("Website loaded!");
-    initialiseHMI(hmiState);
-    //sim is usually on by default, but this functionality is disabled during development
-  };
-
-  //Microphone show/hide
-  function updateMics(){
-  //console.log("mic visibility toggled!")
-    let anim = document.getElementById("microphoneAnimations");
-    let mic = document.getElementById("microphones");
-    if(anim.checked && mic.checked){
-      enableMicAnimation(hmiState);
-    }
-    else if (mic.checked && !anim.checked){
-      showMics(hmiState);
-    }
-    else if (!mic.checked && anim.checked){
-      disableMicAnimation(hmiState);
-    }  
-    else {
-      hideMics(hmiState);
-    }
-  }
-
-  function updateMicrophoneAnimation(){
-    let anim = document.getElementById("microphoneAnimations");
-    let mic = document.getElementById("microphones");
-    if (anim.checked && mic.checked){
-      enableMicAnimation(hmiState);
-    } 
-    else {
-      disableMicAnimation(hmiState);
-
-      if(mic.checked){
-        showMics(hmiState);
-      }
-    }
-  }
-  //Live mode and date range picker
-
-  const toggleSwitch = document.querySelector('#liveModeToggle');
-  const simulatorSwitch = document.querySelector('#simulatorToggle');
-  
-  const pastDataContainer = document.querySelector('.past-data-container');
-  //console.log("Live mode enabled");
-
-  toggleSwitch.addEventListener('change', function() {
-    if (this.checked) {
-      resetWildlifeLayers(hmiState);
-      hmiState.currentTime = Math.floor((getUTC()- hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
-      hmiState.previousUpdate = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
-      datepickerStart = Math.floor((getUTC()- hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
-      datepickerEnd = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
-      hmiState.liveMode = true;
-      //console.log("Live mode enabled");
-      pastDataContainer.style.maxHeight = '0';
-    } else {
-      resetWildlifeLayers(hmiState);
-      hmiState.liveMode = false;
-      //console.log("Live mode disabled");
-      pastDataContainer.style.maxHeight = pastDataContainer.scrollHeight + 'px';
-    }
-  });
+    const vocalizationEvents = [
+      { eventId: "6457a315e03129cb130fa270", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Tawny Frogmouth", speciesScientificName: "Podargus strigoides", speciesIdentificationConfidence: 90.98, locationLat: -38.80266562762370, locationLon: 143.563, locationConfidence: 90.98, animalType: "bird", animalStatus: "normal", animalDiet: "herbavore" },
+      { eventId: "6457a315e03129cb130fa271", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Cane toad", speciesScientificName: "Rhinella marina", speciesIdentificationConfidence: 90.98, locationLat: -38.81905478815443, locationLon: 143.529, locationConfidence: 90.98, animalType: "amphibian", animalStatus: "invasive", animalDiet: "herbavore" },
+      { eventId: "6457a315e03129cb130fa272", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Wild Boar", speciesScientificName: "Sus scrofa", speciesIdentificationConfidence: 90.98, locationLat: -38.80166562762364, locationLon: 143.545, locationConfidence: 90.98, animalType: "mammal", animalStatus: "endangered", animalDiet: "omnivore" },
+      { eventId: "6457a315e03129cb130fa273", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Redeye", speciesScientificName: "Psaltoda moerens", speciesIdentificationConfidence: 90.98, locationLat: -38.82166562762360, locationLon: 143.545, locationConfidence: 90.98, animalType: "insect", animalStatus: "near-threatened", animalDiet: "carnivore" },
+      { eventId: "6457a315e03129cb130fa274", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Brown Rat", speciesScientificName: "Rattus norvegicus", speciesIdentificationConfidence: 90.98, locationLat: -38.80266562762380, locationLon: 143.565, locationConfidence: 90.98, animalType: "reptile", animalStatus: "vulnerable", animalDiet: "herbavore" },
+    ];
 
 
-  $(function() {
-    $('#datetime-range').daterangepicker({
-      timePicker: true,
-      timePicker24Hour: true,
-      timePickerIncrement: 1,
-      locale: {
-        format: 'YYYY-MM-DD HH:mm:ss'
-      }
-    }, function(start, end, label) {
-      // Callback function that executes when the date and time range is changed
-      hmiState.startTime = start.unix(); 
-      hmiState.endTime = end.unix();
-      datepickerStart = start.unix();
-      datepickerEnd = end.unix();
-      console.log("date range updated: " + hmiState.startTime + " to " + hmiState.endTime); 
-      retrieveTruthEventsInTimeRange(hmiState.startTime, hmiState.endTime).then((res) => {
-        updateAnimalMovementLayerFromPastData(hmiState, res.data);
-      })
-
-      retrieveVocalizationEventsInTimeRange(hmiState.startTime, hmiState.endTime).then((res) => {
-        updateVocalizationLayerFromPastData(hmiState, res.data);
-      })
-    });
-  });
-
-  let active_content = $("#animal-popup-content");
-  let default_content = $("#animal-default-content");
-  active_content.hide();
-  default_content.show();
-
-  // Function to rename the keys in an object
-  function renameKeys(obj) {
-    const keyMappings = {
-      date: "Date",
-      timestamp: "Time Stamp",
-      animalId: "Animal ID",
-      detectingmicID: "Detecting Mic ID",
-      detectingMicLat: "Detecting Mic Lat",
-      detectingMicLon: "Detecting Mic Lon",
-      commonName: "Common Name",
-      speciesScientificName: "Species Scientific Name",
-      speciesIdentificationConfidence: "Species Identification Confidence",
-      locationLat: "Location Lat",
-      locationLon: "Location Lon",
-      locationConfidence: "Location Confidence",
-      animalType: "Animal Type",
-      animalStatus: "Animal Status",
-      animalDiet: "Animal Diet",
+    const movementEvents = {
+      "M_1": { animalId: "M_1", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Brown Rat", speciesScientificName: "unknown", speciesIdentificationConfidence: 100, locationLat: -38.80266562762367, locationLon: 143.560, locationConfidence: 100, animalType: "reptile", animalStatus: "vulnerable", animalDiet: "herbavore" },
+      "M_2": { animalId: "M_2", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Tawny Frogmouth", speciesScientificName: "Podargus strigoides", speciesIdentificationConfidence: 100, locationLat: -38.81905478815439, locationLon: 143.524, locationConfidence: 100, animalType: "bird", animalStatus: "normal", animalDiet: "herbavore" },
+      "M_3": { animalId: "M_3", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Cane toad", speciesScientificName: "Rhinella marina", speciesIdentificationConfidence: 100, locationLat: -38.80166562762367, locationLon: 143.540, locationConfidence: 100, animalType: "amphibian", animalStatus: "invasive", animalDiet: "omnivore" },
+      "M_4": { animalId: "M_4", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Red fox", speciesScientificName: "Vulpes vulpes", speciesIdentificationConfidence: 100, locationLat: -38.82166562762367, locationLon: 143.550, locationConfidence: 100, animalType: "mammal", animalStatus: "endangered", animalDiet: "carnivore" },
+      "M_5": { animalId: "M_5", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Brown Rat", speciesScientificName: "Rattus norvegicus", speciesIdentificationConfidence: 100, locationLat: -38.80266562762367, locationLon: 143.570, locationConfidence: 100, animalType: "reptile", animalStatus: "vulnerable", animalDiet: "herbavore" },
+      "M_6": { animalId: "M_6", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Australian Fairy Martin", speciesScientificName: "Petrochelidon ariel", speciesIdentificationConfidence: 100, locationLat: -38.81905478815439, locationLon: 143.580, locationConfidence: 100, animalType: "bird", animalStatus: "normal", animalDiet: "herbavore" },
+      "M_7": { animalId: "M_7", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Cane toad", speciesScientificName: "Rhinella marina", speciesIdentificationConfidence: 100, locationLat: -38.80166562762367, locationLon: 143.510, locationConfidence: 100, animalType: "amphibian", animalStatus: "invasive", animalDiet: "omnivore" },
+      "M_8": { animalId: "M_8", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Red fox", speciesScientificName: "Vulpes vulpes", speciesIdentificationConfidence: 100, locationLat: -38.82166562762367, locationLon: 143.520, locationConfidence: 100, animalType: "mammal", animalStatus: "endangered", animalDiet: "carnivore" },
+      "M_9": { animalId: "M_9", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Redeye", speciesScientificName: "Psaltoda moerens", speciesIdentificationConfidence: 100, locationLat: -38.80066562762367, locationLon: 143.555, locationConfidence: 100, animalType: "insect", animalStatus: "near-threatened", animalDiet: "herbavore" },
     };
 
-    const renamedObj = {};
-    for (const [oldKey, newKey] of Object.entries(keyMappings)) {
-      if (obj.hasOwnProperty(oldKey)) {
-        renamedObj[newKey] = obj[oldKey];
+    const sampleJSONmovementEvents = [
+      { animalId: "M_1", timestamp: 1690765721, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Brown Rat", speciesScientificName: "Rattus norvegicus", speciesIdentificationConfidence: 100, locationLat: -38.80266562762367, locationLon: 143.560, locationConfidence: 100, animalType: "reptile", animalStatus: "vulnerable", animalDiet: "herbavore" },
+      { animalId: "M_2", timestamp: 1672448921, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Tawny Frogmouth", speciesScientificName: "Podargus strigoides", speciesIdentificationConfidence: 100, locationLat: -38.81905478815439, locationLon: 143.524, locationConfidence: 100, animalType: "bird", animalStatus: "normal", animalDiet: "herbavore" },
+      { animalId: "M_3", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Cane toad", speciesScientificName: "Rhinella marina", speciesIdentificationConfidence: 100, locationLat: -38.80166562762367, locationLon: 143.540, locationConfidence: 100, animalType: "amphibian", animalStatus: "invasive", animalDiet: "omnivore" },
+      { animalId: "M_4", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Red fox", speciesScientificName: "Vulpes vulpes", speciesIdentificationConfidence: 100, locationLat: -38.82166562762367, locationLon: 143.550, locationConfidence: 100, animalType: "mammal", animalStatus: "endangered", animalDiet: "carnivore" },
+      { animalId: "M_5", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Brown Rat", speciesScientificName: "Rattus norvegicus", speciesIdentificationConfidence: 100, locationLat: -38.80266562762367, locationLon: 143.570, locationConfidence: 100, animalType: "reptile", animalStatus: "vulnerable", animalDiet: "herbavore" },
+      { animalId: "M_6", timestamp: 1672448921, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Australian Fairy Martin", speciesScientificName: "Petrochelidon ariel", speciesIdentificationConfidence: 100, locationLat: -38.81905478815439, locationLon: 143.580, locationConfidence: 100, animalType: "bird", animalStatus: "normal", animalDiet: "herbavore" },
+      { animalId: "M_7", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Cane toad", speciesScientificName: "Rhinella marina", speciesIdentificationConfidence: 100, locationLat: -38.80166562762367, locationLon: 143.510, locationConfidence: 100, animalType: "amphibian", animalStatus: "invasive", animalDiet: "omnivore" },
+      { animalId: "M_8", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Red fox", speciesScientificName: "Vulpes vulpes", speciesIdentificationConfidence: 100, locationLat: -38.82166562762367, locationLon: 143.520, locationConfidence: 100, animalType: "mammal", animalStatus: "endangered", animalDiet: "carnivore" },
+      { animalId: "M_9", timestamp: 1690765721, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Redeye", speciesScientificName: "Psaltoda moerens", speciesIdentificationConfidence: 100, locationLat: -38.80066562762367, locationLon: 143.555, locationConfidence: 100, animalType: "insect", animalStatus: "near-threatened", animalDiet: "herbavore" },
+    ];
+
+    hmiState.movementEvents = movementEvents;
+    hmiState.vocalizationEvents = vocalizationEvents;
+    hmiState.microphoneLocations = microphoneLocations;
+
+    const el = (sel) => { return document.getElementById(sel); }
+    const elArea = el("basemap");
+
+    const simulatorOl = el("screen")
+
+    simulatorOl.addEventListener("click", openSIMULATOR)
+
+    window.onload = function () {
+      console.log("Website loaded!");
+      initialiseHMI(hmiState);
+      //sim is usually on by default, but this functionality is disabled during development
+    };
+
+    //Microphone show/hide
+    function updateMics() {
+      //console.log("mic visibility toggled!")
+      let anim = document.getElementById("microphoneAnimations");
+      let mic = document.getElementById("microphones");
+      if (anim.checked && mic.checked) {
+        enableMicAnimation(hmiState);
+      }
+      else if (mic.checked && !anim.checked) {
+        showMics(hmiState);
+      }
+      else if (!mic.checked && anim.checked) {
+        disableMicAnimation(hmiState);
+      }
+      else {
+        hideMics(hmiState);
       }
     }
-    return renamedObj;
-  }
 
-  function dataCleansing(json_data) {
-    //Escape if there is no data
-    if (json_data === null | typeof json_data === undefined | json_data.length === 0){
-      return null
-    }
-    //Add date column with converted timestamp value
-    for (let i = 0; i < json_data.length; i++){
-          json_data[i].date = new Date(json_data[i].timestamp*1000).toLocaleString();
-    }
-    
-    //Re-index the columns: move date to first column
-    //The headers are in accordance to the data schema and desired export column order
-    const headers = [
-      "date", "timestamp", "animalId", , "detectingmicID", "detectingMicLat",
-      "detectingMicLon", "commonName", "speciesScientificName", "speciesIdentificationConfidence",
-      "locationLat", "locationLon", "locationConfidence", "animalType", "animalStatus",
-      "animalDiet"
-    ]
-    
-    // Parse JSON to have date as first column:
-    let data = JSON.parse(JSON.stringify( json_data, headers, 4))
-    // Rename Keys in data
-
-    data = data.map(renameKeys);
-    return data;
-  }
-  
-  function downloadCSV() {
-    let filename= "exportedCSV.csv"
-    let csv = null;
-    let data = null;
-    datepickerStart = hmiState.currentTime;
-    datepickerEnd = hmiState.previousUpdateTime;
-    if (toggleSwitch.checked) {
-      //Reset datePicker range in case toggle mode Off -> On
-      console.log("Current Live mode ON!")
-      datepickerStart = hmiState.currentTime;
-      datepickerEnd = hmiState.previousUpdateTime;
-    } else {
-      console.log("Current Live mode OFF!")
-    }
-    
-    console.log(`Download selected time range ${datepickerStart} - ${datepickerEnd}`)
-    retrieveTruthEventsInTimeRange(datepickerStart, datepickerEnd).then((res) => {
-      console.log("GET JSON FROM TIME RANGE: ", res.data)
-      data = dataCleansing(res.data)
-      csv = convertCSV(data);
-      if (csv === null) {
-        ErrDisplay("There is no result");
-        data = dataCleansing(sampleJSONmovementEvents)
-        csv=convertCSV(data)
-        
+    function updateMicrophoneAnimation() {
+      let anim = document.getElementById("microphoneAnimations");
+      let mic = document.getElementById("microphones");
+      if (anim.checked && mic.checked) {
+        enableMicAnimation(hmiState);
       }
-      exportCSV(filename, csv);
-      console.log("CSV RESULT: ", csv);
-    })
-  }
+      else {
+        disableMicAnimation(hmiState);
 
-  function downloadXLSX() {
-    let filename = "exportedExcel.xlsx"
-    let xlsx = null
-    let data = null
-    datepickerStart = hmiState.currentTime;
-    datepickerEnd = hmiState.previousUpdateTime;
-    if (toggleSwitch.checked) {
-      //Reset datePicker range in case toggle mode Off -> On
-      console.log("Current Live mode ON!")
-      datepickerStart = hmiState.currentTime;
-      datepickerEnd = hmiState.previousUpdateTime;
-    } else {
-      console.log("Current Live mode OFF!")
+        if (mic.checked) {
+          showMics(hmiState);
+        }
+      }
     }
-    
-    console.log(`Download selected time range ${datepickerStart} - ${datepickerEnd}`)
-    retrieveTruthEventsInTimeRange(datepickerStart, datepickerEnd).then((res) => {
-      if (res.data === null | typeof res.data === undefined | res.data.length === 0){
-        ErrDisplay("There is no result");
-        data = sampleJSONmovementEvents
+    //Live mode and date range picker
+
+    const toggleSwitch = document.querySelector('#liveModeToggle');
+    const simulatorSwitch = document.querySelector('#simulatorToggle');
+
+    const pastDataContainer = document.querySelector('.past-data-container');
+    //console.log("Live mode enabled");
+
+    toggleSwitch.addEventListener('change', function () {
+      if (this.checked) {
+        resetWildlifeLayers(hmiState);
+        hmiState.currentTime = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
+        hmiState.previousUpdate = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
+        datepickerStart = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
+        datepickerEnd = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
+        hmiState.liveMode = true;
+        //console.log("Live mode enabled");
+        pastDataContainer.style.maxHeight = '0';
       } else {
-        data = res.data
+        resetWildlifeLayers(hmiState);
+        hmiState.liveMode = false;
+        //console.log("Live mode disabled");
+        pastDataContainer.style.maxHeight = pastDataContainer.scrollHeight + 'px';
+      }
+    });
+
+
+    $(function () {
+      $('#datetime-range').daterangepicker({
+        timePicker: true,
+        timePicker24Hour: true,
+        timePickerIncrement: 1,
+        locale: {
+          format: 'YYYY-MM-DD HH:mm:ss'
+        }
+      }, function (start, end, label) {
+        // Callback function that executes when the date and time range is changed
+        hmiState.startTime = start.unix();
+        hmiState.endTime = end.unix();
+        datepickerStart = start.unix();
+        datepickerEnd = end.unix();
+        console.log("date range updated: " + hmiState.startTime + " to " + hmiState.endTime);
+        retrieveTruthEventsInTimeRange(hmiState.startTime, hmiState.endTime).then((res) => {
+          updateAnimalMovementLayerFromPastData(hmiState, res.data);
+        })
+
+        retrieveVocalizationEventsInTimeRange(hmiState.startTime, hmiState.endTime).then((res) => {
+          updateVocalizationLayerFromPastData(hmiState, res.data);
+        })
+      });
+    });
+
+    let active_content = $("#animal-popup-content");
+    let default_content = $("#animal-default-content");
+    active_content.hide();
+    default_content.show();
+
+    // Function to rename the keys in an object
+    function renameKeys(obj) {
+      const keyMappings = {
+        date: "Date",
+        timestamp: "Time Stamp",
+        animalId: "Animal ID",
+        detectingmicID: "Detecting Mic ID",
+        detectingMicLat: "Detecting Mic Lat",
+        detectingMicLon: "Detecting Mic Lon",
+        commonName: "Common Name",
+        speciesScientificName: "Species Scientific Name",
+        speciesIdentificationConfidence: "Species Identification Confidence",
+        locationLat: "Location Lat",
+        locationLon: "Location Lon",
+        locationConfidence: "Location Confidence",
+        animalType: "Animal Type",
+        animalStatus: "Animal Status",
+        animalDiet: "Animal Diet",
+      };
+
+      const renamedObj = {};
+      for (const [oldKey, newKey] of Object.entries(keyMappings)) {
+        if (obj.hasOwnProperty(oldKey)) {
+          renamedObj[newKey] = obj[oldKey];
+        }
+      }
+      return renamedObj;
+    }
+
+    function dataCleansing(json_data) {
+      //Escape if there is no data
+      if (json_data === null | typeof json_data === undefined | json_data.length === 0) {
+        return null
+      }
+      //Add date column with converted timestamp value
+      for (let i = 0; i < json_data.length; i++) {
+        json_data[i].date = new Date(json_data[i].timestamp * 1000).toLocaleString();
       }
 
-      //Data preprocessing
-      data = dataCleansing(data)
-      
-      //Initiate worksheet and workbook instance
-      var ws = XLSX.utils.json_to_sheet(data);
-      var wb = XLSX.utils.book_new();
-      //Enable filter
-      ws["!autofilter"] = { ref: XLSX.utils.encode_range(XLSX.utils.decode_range(ws['!ref'])) };
+      //Re-index the columns: move date to first column
+      //The headers are in accordance to the data schema and desired export column order
+      const headers = [
+        "date", "timestamp", "animalId", , "detectingmicID", "detectingMicLat",
+        "detectingMicLon", "commonName", "speciesScientificName", "speciesIdentificationConfidence",
+        "locationLat", "locationLon", "locationConfidence", "animalType", "animalStatus",
+        "animalDiet"
+      ]
 
-      //Save data as datasheet and export
-      XLSX.utils.book_append_sheet(wb, ws, "Records");
-      XLSX.writeFile(wb,filename, { bookType: "xlsx", header: Object.keys(data[0]) });
-      console.log("EXCEL RESULT: ", ws);
-    })
-    
-  }
+      // Parse JSON to have date as first column:
+      let data = JSON.parse(JSON.stringify(json_data, headers, 4))
+      // Rename Keys in data
 
-  function exportCSV(filename, csvData) {
-			const element = document.createElement("a");
+      data = data.map(renameKeys);
+      return data;
+    }
 
-			element.setAttribute("href", `data:text/csv;charset=utf-8,${csvData}`);
-			element.setAttribute("download", filename);
-			element.style.display = "none";
+    function downloadCSV() {
+      let filename = "exportedCSV.csv"
+      let csv = null;
+      let data = null;
+      datepickerStart = hmiState.currentTime;
+      datepickerEnd = hmiState.previousUpdateTime;
+      if (toggleSwitch.checked) {
+        //Reset datePicker range in case toggle mode Off -> On
+        console.log("Current Live mode ON!")
+        datepickerStart = hmiState.currentTime;
+        datepickerEnd = hmiState.previousUpdateTime;
+      } else {
+        console.log("Current Live mode OFF!")
+      }
 
-			document.body.appendChild(element);
-			element.click();
-			document.body.removeChild(element);
-		}
+      console.log(`Download selected time range ${datepickerStart} - ${datepickerEnd}`)
+      retrieveTruthEventsInTimeRange(datepickerStart, datepickerEnd).then((res) => {
+        console.log("GET JSON FROM TIME RANGE: ", res.data)
+        data = dataCleansing(res.data)
+        csv = convertCSV(data);
+        if (csv === null) {
+          ErrDisplay("There is no result");
+          data = dataCleansing(sampleJSONmovementEvents)
+          csv = convertCSV(data)
 
-  function ErrDisplay(text){
-    let errorbox = document.getElementById("error-msg");
-    errorbox.innerHTML = `Exception error occured: ${text}`;
-    errorbox.style.display = "block"
-    setTimeout(()=> {
-      errorbox.innerHTML = '';
-      errorbox.style.display = "none";
-    },2000)
-  }
+        }
+        exportCSV(filename, csv);
+        console.log("CSV RESULT: ", csv);
+      })
+    }
 
-  function record(){
-    //console.log("calling startAudioRecording...");
-    //testFunct();
-    startAudioRecording();
-  }
+    function downloadXLSX() {
+      let filename = "exportedExcel.xlsx"
+      let xlsx = null
+      let data = null
+      datepickerStart = hmiState.currentTime;
+      datepickerEnd = hmiState.previousUpdateTime;
+      if (toggleSwitch.checked) {
+        //Reset datePicker range in case toggle mode Off -> On
+        console.log("Current Live mode ON!")
+        datepickerStart = hmiState.currentTime;
+        datepickerEnd = hmiState.previousUpdateTime;
+      } else {
+        console.log("Current Live mode OFF!")
+      }
 
-  function stopRecording(){
-    //console.log("calling stopAudioRecording...");
-    stopAudioRecording();
-  }
-
-  function cancelRecording(){
-    //console.log("calling cancelAudioRecording...");
-    cancelAudioRecording();
-  }
-
-  window.record = record;
-  window.cancelRecording = cancelRecording;
-  window.stopRecording = stopRecording;
-
-</script>
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const themeToggleButton = document.getElementById('themeToggle');
-        const filterMenuTitle = document.querySelector('#filter-menu #filter-menu-contents h2');
-        const animalBioTitle = document.querySelector('#animal-default-content h2');
-        const micBioTitle = document.querySelector('#mic-default-content h2');
-
-        function setTheme(theme) {
-            document.body.classList.remove('light-theme', 'dark-theme');
-            document.body.classList.add(theme + '-theme');
-            localStorage.setItem('theme', theme);
-
-            // Update colors based on the theme
-            if (theme === 'light') {
-                filterMenuTitle.style.color = '#00a86b'; // Green color for light theme
-                animalBioTitle.style.color = '#00a86b'; // Green color for light theme
-                micBioTitle.style.color = '#00a86b'; // Green color for light theme
-                themeToggleButton.textContent = 'Switch to Dark Theme';
-            } else {
-                filterMenuTitle.style.color = 'rgba(247, 186, 206, 1)'; // Pink color for dark theme
-                animalBioTitle.style.color = 'rgba(247, 186, 206, 1)'; // Pink color for dark theme
-                micBioTitle.style.color = 'rgba(247, 186, 206, 1)'; // Pink color for dark theme
-                themeToggleButton.textContent = 'Switch to Light Theme';
-            }
+      console.log(`Download selected time range ${datepickerStart} - ${datepickerEnd}`)
+      retrieveTruthEventsInTimeRange(datepickerStart, datepickerEnd).then((res) => {
+        if (res.data === null | typeof res.data === undefined | res.data.length === 0) {
+          ErrDisplay("There is no result");
+          data = sampleJSONmovementEvents
+        } else {
+          data = res.data
         }
 
-        themeToggleButton.addEventListener('click', () => {
-            const currentTheme = document.body.classList.contains('light-theme') ? 'light' : 'dark';
-            setTheme(currentTheme === 'light' ? 'dark' : 'light');
-        });
+        //Data preprocessing
+        data = dataCleansing(data)
 
-        // Check for saved user preference on load
-        const savedTheme = localStorage.getItem('theme') || 'dark'; // Default to dark if no preference
-        setTheme(savedTheme);
+        //Initiate worksheet and workbook instance
+        var ws = XLSX.utils.json_to_sheet(data);
+        var wb = XLSX.utils.book_new();
+        //Enable filter
+        ws["!autofilter"] = { ref: XLSX.utils.encode_range(XLSX.utils.decode_range(ws['!ref'])) };
+
+        //Save data as datasheet and export
+        XLSX.utils.book_append_sheet(wb, ws, "Records");
+        XLSX.writeFile(wb, filename, { bookType: "xlsx", header: Object.keys(data[0]) });
+        console.log("EXCEL RESULT: ", ws);
+      })
+
+    }
+
+    function exportCSV(filename, csvData) {
+      const element = document.createElement("a");
+
+      element.setAttribute("href", `data:text/csv;charset=utf-8,${csvData}`);
+      element.setAttribute("download", filename);
+      element.style.display = "none";
+
+      document.body.appendChild(element);
+      element.click();
+      document.body.removeChild(element);
+    }
+
+    function ErrDisplay(text) {
+      let errorbox = document.getElementById("error-msg");
+      errorbox.innerHTML = `Exception error occured: ${text}`;
+      errorbox.style.display = "block"
+      setTimeout(() => {
+        errorbox.innerHTML = '';
+        errorbox.style.display = "none";
+      }, 2000)
+    }
+
+    function record() {
+      //console.log("calling startAudioRecording...");
+      //testFunct();
+      startAudioRecording();
+    }
+
+    function stopRecording() {
+      //console.log("calling stopAudioRecording...");
+      stopAudioRecording();
+    }
+
+    function cancelRecording() {
+      //console.log("calling cancelAudioRecording...");
+      cancelAudioRecording();
+    }
+
+    window.record = record;
+    window.cancelRecording = cancelRecording;
+    window.stopRecording = stopRecording;
+
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const themeToggleButton = document.getElementById('themeToggle');
+      const filterMenuTitle = document.querySelector('#filter-menu #filter-menu-contents h2');
+      const animalBioTitle = document.querySelector('#animal-default-content h2');
+      const micBioTitle = document.querySelector('#mic-default-content h2');
+
+      function setTheme(theme) {
+        document.body.classList.remove('light-theme', 'dark-theme');
+        document.body.classList.add(theme + '-theme');
+        localStorage.setItem('theme', theme);
+
+        // Update colors based on the theme
+        if (theme === 'light') {
+          filterMenuTitle.style.color = '#00a86b'; // Green color for light theme
+          animalBioTitle.style.color = '#00a86b'; // Green color for light theme
+          micBioTitle.style.color = '#00a86b'; // Green color for light theme
+          themeToggleButton.textContent = 'Switch to Dark Theme';
+        } else {
+          filterMenuTitle.style.color = 'rgba(247, 186, 206, 1)'; // Pink color for dark theme
+          animalBioTitle.style.color = 'rgba(247, 186, 206, 1)'; // Pink color for dark theme
+          micBioTitle.style.color = 'rgba(247, 186, 206, 1)'; // Pink color for dark theme
+          themeToggleButton.textContent = 'Switch to Light Theme';
+        }
+      }
+
+      themeToggleButton.addEventListener('click', () => {
+        const currentTheme = document.body.classList.contains('light-theme') ? 'light' : 'dark';
+        setTheme(currentTheme === 'light' ? 'dark' : 'light');
+      });
+
+      // Check for saved user preference on load
+      const savedTheme = localStorage.getItem('theme') || 'dark'; // Default to dark if no preference
+      setTheme(savedTheme);
     });
+  </script>
+</body>
 
-
-    document.querySelector('.cancel-button').addEventListener('click', () => {
-
-document.querySelector('.crossmark').style.display = 'none';
-document.querySelector('.overlay1').style.display = 'none'; // Hide overlay
-});
-
-document.querySelector('.retry-button').addEventListener('click', () => {
-      var options = payment(username, donorAmount * 100, email);
-      var rzp1 = new Razorpay(options);
-
-      rzp1.open();
-    });
-
-</script>
-  </body>
 </html>
