@@ -1,0 +1,165 @@
+/* Add color and improve overall style */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #fefae0; /* Light beige background */
+}
+
+#basemap {
+    width: 100%;
+    height: 75vh;
+    border-bottom: 5px solid #2e5d34; /* Adding border to map for style */
+}
+
+.sidebar {
+    position: relative;
+    width: 100%;
+    background-color: white;
+    padding: 15px;
+    box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Style for "Project Echo" */
+.navbar-brand {
+    font-weight: bold; /* Make text bold */
+    font-size: 32px; /* Increase font size */
+    color: #2e5d34 !important; /* Matching green color */
+    padding-left: 20px; /* Add padding to the left */
+}
+
+/* Button styling for smaller buttons */
+.navbar .btn-home, .navbar .btn-projects, .navbar .btn-contact {
+    padding: 5px 10px; /* Reduced padding for smaller button size */
+    font-size: 16px; /* Smaller font size */
+    color: #2e5d34 !important; /* Darker text color to match "Project Echo" */
+    border-radius: 5px; /* Add some rounding for a modern look */
+    border: none; /* Remove borders */
+    margin-left: 10px; /* Add margin between buttons */
+    font-weight: normal; /* Keep font weight normal */
+}
+
+.navbar .btn-home {
+    background-color: #faedcd; /* Light peach color */
+}
+
+.navbar .btn-home:hover {
+    background-color: #fefae0; /* Light beige hover */
+}
+
+.navbar .btn-projects {
+    background-color: #ccd5ae; /* Light green color */
+}
+
+.navbar .btn-projects:hover {
+    background-color: #d4a373; /* Warm brown hover */
+}
+
+.navbar .btn-contact {
+    background-color: #e9edc9; /* Soft green color */
+}
+
+.navbar .btn-contact:hover {
+    background-color: #fefae0; /* Light beige hover */
+}
+
+/* Change text color for the sidebar title */
+.sidebar h3 {
+    color: #2e5d34; /* Matching green shade for the title */
+    margin-bottom: 20px;
+}
+
+/* Change the color of radio button labels */
+.form-check-label {
+    font-size: 1rem;
+    color: #d4a373; /* Warm brown for all radio button text */
+}
+
+.form-check-input:checked + .form-check-label {
+    color: #d4a373; /* Highlighted radio button text color */
+}
+
+.animal-options {
+    margin-bottom: 20px;
+    flex-grow: 1;
+}
+
+/* Hover effect for buttons */
+.btn {
+    transition: all 0.3s ease;
+}
+
+/* Custom button styling for Recente Map button */
+.custom-btn {
+    background-color: #e9edc9; /* Soft green background */
+    border: 1px solid #d4a373; /* Warm brown border */
+    color: #d4a373; /* Warm brown text color */
+}
+
+.custom-btn:hover {
+    background-color: #fefae0; /* Light beige hover */
+    border-color: #faedcd; /* Light peach border on hover */
+    color: #000;
+}
+
+/* Footer styling */
+.footer {
+    background-color: #ccd5ae; /* Light green footer background */
+    color: #2e5d34; /* Matching green shade for footer text */
+    font-size: 14px;
+}
+
+/* Ensure map and body content take up full space */
+html, body {
+    height: 100%;
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+}
+
+.sidebar button {
+    padding: 10px 20px;
+    font-size: 18px;
+    border-color: #d4a373;
+    color: #d4a373; /* Button text color */
+}
+
+/* Text color for the "Unique Animal Detections" section */
+h3, label, .custom-btn {
+    color: #d4a373; /* Apply warm brown color to all text */
+}
+
+/* Styles for the "Unique Animal Detections" note */
+.legend-box {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.2);
+    font-size: 14px;
+    line-height: 1.5;
+    z-index: 1000;
+}
+
+.legend-box h6 {
+    font-size: 16px;
+    margin-bottom: 8px;
+    color: #2e5d34;
+}
+
+.legend-dot {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+.red-dot {
+    background-color: red;
+}
+
+.grey-dot {
+    background-color: grey;
+}
