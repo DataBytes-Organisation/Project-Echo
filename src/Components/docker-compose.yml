@@ -5,8 +5,12 @@ services:
     build:
       context: ./Engine
       dockerfile: Model.Dockerfile
+      args:
+        BASE_IMAGE: tensorflow/serving:2.3.0
+        # BASE_IMAGE: emacski/tensorflow-serving # Uncomment if on macos and comment above line
     image: ts-echo-model
     container_name: ts-echo-model-cont
+    command: --model_config_file=/models/models.config
     networks:
       - echo-net
     ports:
@@ -20,6 +24,9 @@ services:
     build:
       context: ./Engine
       dockerfile: Engine.Dockerfile
+      args:
+        BASE_IMAGE: tensorflow/tensorflow:latest-gpu
+        # BASE_IMAGE: armswdev/tensorflow-arm-neoverse:r24.03-tf-2.15.1-onednn-acl #Uncomment if on MacOS and comment above line
     image: ts-echo-engine
     container_name: ts-echo-engine-cont
     networks:
@@ -97,6 +104,8 @@ services:
     volumes:
       - ./API:/app # Mount the API's src directory to /app in the container
       - credentials_volume:/root/.config/gcloud/
+      - weather_data:/app/weather_data  # Add a volume for weather data
+
     stdin_open: false
     tty: true
     command: uvicorn app.main:app --host 0.0.0.0 --port 9000 --reload
@@ -159,3 +168,4 @@ networks:
 volumes:
   credentials_volume:
   db-data:
+  weather_data:

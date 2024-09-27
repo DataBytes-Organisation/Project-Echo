@@ -32,6 +32,24 @@ apidb.movements.insertMany(movementsData);
 const speciesData = JSON.parse(cat('/docker-entrypoint-initdb.d/species.json'));
 apidb.species.insertMany(speciesData);
 
+// ----------------------------------------------
+// BULK UPDATE OPERATION
+// ----------------------------------------------
+const bulk = apidb.microphones.initializeOrderedBulkOp();
+bulk.find({ status: "inactive" }).update({ $set: { status: "active" } });
+bulk.find({ status: "deprecated" }).remove();
+bulk.execute();
+
+// ----------------------------------------------
+// AGGREGATION PIPELINE OPERATION
+// ----------------------------------------------
+const aggregationResult = apidb.movements.aggregate([
+  { $group: { _id: "$type", total: { $sum: 1 } } },
+  { $sort: { total: -1 } }
+]);
+
+print("Movement Aggregation Result:", JSON.stringify(aggregationResult.toArray(), null, 2));
+
 
 // ----------------------------------------------
 // INITIALIZE HMI SAMPLE DATA
@@ -49,6 +67,10 @@ userdb.roles.insertMany(roles);
 const users = JSON.parse(cat('/docker-entrypoint-initdb.d/user-seed.json'));
 userdb.users.insertMany(users);
 
+// Add notificationAnimals as an empty array for each user
+users.forEach(user => {
+  user.notificationAnimals = []; // Initialize notificationAnimals field
+});
 
 userdb.guests.insertMany([
         { 

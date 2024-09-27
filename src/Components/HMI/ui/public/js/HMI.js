@@ -1046,6 +1046,21 @@ var current_mic_lat = 0.0;
 var current_mic_lon = 0.0;
 var current_mic_id = "";
 
+async function fetchWeatherData(timestamp,lat,lon) {
+  try {
+      const response = await fetch(`http://localhost:9000/hmi/weather?timestamp=${timestamp}&lat=${lat}&lon=${lon}`);
+      if (!response.ok) {
+          throw new Error('Failed to fetch weather data');
+      }
+      const weatherData = await response.json();
+      //console.log(weatherData);
+      return weatherData
+  } catch (error) {
+      console.error('Error fetching weather data:', error);
+  }
+}
+
+
 
 function createMapClickEvent(hmiState){
   hmiState.basemap.on("click", function (evt) {
@@ -1060,6 +1075,42 @@ function createMapClickEvent(hmiState){
     if (feature){
 
       let values = feature.getProperties();
+
+
+      if (values.hasOwnProperty('animalRecordDate')) {
+        
+        fetchWeatherData(values.animalRecordDate,values.animalLat,values.animalLon).then((weatherData)=>{
+
+          const key = Object.keys(weatherData.Date)[0]
+          //console.log(key)
+          const date_ele = document.getElementById("weather_date")
+          date_ele.innerHTML = weatherData["Date"][key]
+
+          const mintemp_ele = document.getElementById("weather_mintemp")
+          mintemp_ele.innerHTML = weatherData["Min Temperature (°C)"][key] + " (°C)"
+
+          const maxtemp_ele = document.getElementById("weather_maxtemp")
+          maxtemp_ele.innerHTML = weatherData["Max Temperature (°C)"][key] + " (°C)"
+
+          const rainfall_ele = document.getElementById("weather_rainfall")
+          rainfall_ele.innerHTML = weatherData["Rainfall (mm)"][key] + " (mm)"
+
+          const windspeed_ele = document.getElementById("weather_windspeed")
+          windspeed_ele.innerHTML = weatherData["Wind Speed (m/sec)"][key] + " (m/sec)"
+
+          const maxhumidity_ele = document.getElementById("weather_maxhumidity")
+          maxhumidity_ele.innerHTML = weatherData["Max Humidity (%)"][key] + " (%)"
+
+          const minhumidity_ele = document.getElementById("weather_minhumidity")
+          minhumidity_ele.innerHTML = weatherData["Min Humidity (%)"][key] + " (%)"
+        }).catch(error => {
+          console.error('Error fetching weather data:', error);
+        });
+
+       
+      }
+
+
       if (values.isMic){
         active_mic_content.show();
         default_mic_content.hide();
