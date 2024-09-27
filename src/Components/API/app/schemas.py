@@ -20,18 +20,6 @@ class PyObjectId(ObjectId):
     def __modify_schema__(cls, field_schema):
         field_schema.update(type="string")
 
-class EventTimeSchema(BaseModel):
-    start: datetime  # Automatically parses ISO 8601 date strings into datetime objects
-    end: datetime    # Automatically parses ISO 8601 date strings into datetime objects
-
-    class Config:
-        schema_extra = {
-            "example": {
-                "start": "2023-01-01T00:00:00",
-                "end": "2023-01-02T00:00:00"
-            }
-        }
-
 # Event Schema for input validation
 class EventSchema(BaseModel):
     timestamp: datetime  # Timestamp for the event
@@ -46,7 +34,7 @@ class EventSchema(BaseModel):
     sampleRate: int  # Sample rate for audio
 
     class Config:
-        populate_by_name = True
+        allow_population_by_field_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
         schema_extra = {
@@ -72,7 +60,7 @@ class MovementSchema(BaseModel):
     animalTrueLLA: conlist(float, min_items=3, max_items=3)  # True location of the animal
 
     class Config:
-        populate_by_name = True
+        allow_population_by_field_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
         schema_extra = {
@@ -90,7 +78,7 @@ class MicrophoneSchema(BaseModel):
     microphoneLLA: conlist(float, min_items=3, max_items=3)  # Microphone location (latitude, longitude, altitude)
 
     class Config:
-        populate_by_name = True
+        allow_population_by_field_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
         schema_extra = {
@@ -115,7 +103,7 @@ class AddressSchema(BaseModel):
         return value
 
     class Config:
-        populate_by_name = True
+        allow_population_by_field_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
 
@@ -131,7 +119,7 @@ class RequestSchema(BaseModel):
     status: str  # Request status (pending, completed, etc.)
 
     class Config:
-        populate_by_name = True
+        allow_population_by_field_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
 
@@ -190,7 +178,7 @@ class UserSignupSchema(BaseModel):
         return value.upper()
 
     class Config:
-        populate_by_name = True
+        allow_population_by_field_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
 
@@ -201,7 +189,7 @@ class UserLoginSchema(BaseModel):
     password: str  # Password field
 
     class Config:
-        populate_by_name = True
+        allow_population_by_field_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
 
@@ -215,7 +203,7 @@ class GuestSchema(BaseModel):
     expiresAt: datetime  # Expiry date for the guest account
 
     class Config:
-        populate_by_name = True
+        allow_population_by_field_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
 
@@ -227,7 +215,7 @@ class GuestSignupSchema(BaseModel):
     timestamp: datetime  # Timestamp for guest account creation
 
     class Config:
-        populate_by_name = True
+        allow_population_by_field_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
 
@@ -236,7 +224,7 @@ class ForgotPasswordSchema(BaseModel):
     user: str  # Username or email for password reset
 
     class Config:
-        populate_by_name = True
+        allow_population_by_field_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
 
@@ -247,7 +235,7 @@ class ResetPasswordSchema(BaseModel):
     otp: int  # OTP code for verification
 
     class Config:
-        populate_by_name = True
+        allow_population_by_field_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
 
@@ -264,6 +252,6 @@ class RecordingData(BaseModel):
     audioFile: str  # Audio file name
 
     class Config:
-        populate_by_name = True
+        allow_population_by_field_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
