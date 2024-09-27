@@ -57,6 +57,7 @@ from geopy.distance import geodesic
 
 # database libraries
 import pymongo
+from helpers import melspectrogram_to_cam
 
 # for weather label
 from sklearn.preprocessing import LabelEncoder
@@ -354,7 +355,10 @@ class EchoEngine():
                 audio_event["audioClip"] = self.audio_to_string(audio_clip)
 
                 image = tf.expand_dims(image, 0) 
-            
+
+                #returned is melspectrogram with cam overlay,
+                #TODO: Can add this image to database
+                cam = melspectrogram_to_cam.convert(image)
                 image_list = image.numpy().tolist()
             
                 # Run the model via tensorflow serve
@@ -377,6 +381,7 @@ class EchoEngine():
                     sample_rate,
                     predicted_class,
                     predicted_probability)
+                    
             
                 image = tf.expand_dims(image, 0) 
             
@@ -440,6 +445,11 @@ class EchoEngine():
             
                 image, audio_clip, sample_rate = self.combined_pipeline(audio_clip, "Animal_Mode")
             
+                #returned is melspectrogram with cam overlay,
+                #TODO: Can add this image to database
+                cam = melspectrogram_to_cam.convert(image)
+
+
                 # update the audio event with the re-sampled audio
                 audio_event["audioClip"] = self.audio_to_string(audio_clip)
                 
@@ -492,7 +502,7 @@ class EchoEngine():
             "animalTrueLLA": audio_event["animalTrueLLA"], 
             "animalLLAUncertainty": audio_event["animalLLAUncertainty"],
             "audioClip": audio_event["audioClip"],
-            "sampleRate": sample_rate        
+            "sampleRate": sample_rate     
         }
         
         url = 'http://ts-api-cont:9000/engine/event'
