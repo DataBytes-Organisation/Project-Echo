@@ -1370,7 +1370,7 @@
       "img": ""
     },
     {
-      "species": "Trichoglossus haematodus",
+      "species": "Trichoglossus moluccanus",
       "common": "Rainbow Lorikeet",
       "summary": "Trichoglossus haematodus, commonly known as the rainbow lorikeet, is a species of parrot found in Australia, Indonesia, Papua New Guinea, and the Solomon Islands. These colorful birds have become popular as pets due to their stunning plumage and playful personalities.",
       "description": [
@@ -3311,7 +3311,7 @@
     },
     {
       "species": "Crinia signifera",
-      "common": "Common Froglet",
+      "common": "Common Eastern Froglet",
       "summary": "Crinia signifera, commonly known as the Common Froglet, is a small species of ground- dwelling frog found throughout southern and eastern Australia.",
       "description": [
         "The Common Froglet is one of the smallest frog species in Australia, measuring only up to 3cm in length.",
@@ -4856,6 +4856,53 @@
         "Conservation efforts are vital for the survival of this species, focusing on habitat restoration and protection."
       ],
       "img": ""
-    }
+    },
+        {
+      "species": "Dromaius novaehollandiae",
+      "common": "Emu",
+      "summary": "The emu (/ˈiːmjuː/; Dromaius novaehollandiae) is a species of flightless bird endemic to Australia, where it is the tallest native bird. It is the only extant member of the genus Dromaius and the third-tallest living bird after its African ratite relatives, the common ostrich and Somali ostrich.",
+      "description": [
+        "The emu's native ranges cover most of the Australian mainland. The Tasmanian, Kangaroo Island and King Island subspecies became extinct after the European settlement of Australia in 1788.",
+        "They are robust bipedal runners that can travel great distances, and when necessary can sprint at 48 km/h (30 mph).",
+        "They are omnivorous and forage on a variety of plants and insects, and can go for weeks without eating.",
+        "They drink infrequently, but take in copious amounts of fresh water when the opportunity arises.",
+        "Breeding takes place in May and June, and fighting among females for a mate is common."
+      ],
+      "img": ""
+    },
+            {
+      "species": "Casuarius casuarius",
+      "common": "Southern Cassowary",
+      "summary": "The southern cassowary (Casuarius casuarius), also known as double-wattled cassowary, Australian cassowary, or two-wattled cassowary, is a large flightless black bird, found in Indonesia, Papua New Guinea, and northeastern Australia.",
+      "description": [
+        "It is one of the three living species of cassowary, alongside the dwarf cassowary and the northern cassowary.",
+        "It is a ratite and therefore related to the emu, ostrich, rhea and kiwi.",
+        "The Australian population is listed as Endangered under federal and Queensland state legislation.",
+      ],
+      "img": ""
+    },
+                {
+      "species": "Pseudechis australiss",
+      "common": "King Brown Snake",
+      "summary": "The king brown snake (Pseudechis australis) is a species of highly venomous snake of the family Elapidae, native to northern, western, and Central Australia.",
+      "description": [
+        "The king brown snake is the largest terrestrial venomous snake in Australia.",
+        "Despite its common name, it is a member of the genus Pseudechis (black snakes) and only distantly related to true brown snakes.",
+        "First described by English zoologist John Edward Gray in 1842, it is a robust snake up to 3.3 m (11 ft) long.",
+      ],
+      "img": ""
+    },
+                    {
+      "species": "Petrogale penicillata",
+      "common": "Brush-tailed rock-wallaby",
+      "summary": "The brush-tailed rock-wallaby or small-eared rock-wallaby (Petrogale penicillata) is a kind of wallaby, one of several rock-wallabies in the genus Petrogale.",
+      "description": [
+        "It inhabits rock piles and cliff lines along the Great Dividing Range.",
+        "Populations have declined seriously in the south and west of its range.",
+        "70% of all the wallaby's habitat has been lost as of January 2020.",
+      ],
+      "img": ""
+    },
+    
   ]
 }
