@@ -7,7 +7,6 @@
 tensorboard_logs/
 logs/
 models/
-src/Components/Engine/models/*
 src/Components/Engine/models/echo_model/1/variables/variables.data-00000-of-00001
 
 src\Prototypes\api\__pycache__
