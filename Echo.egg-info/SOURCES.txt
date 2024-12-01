@@ -1,0 +1,11 @@
+README.md
+setup.py
+Echo/__init__.py
+Echo.egg-info/PKG-INFO
+Echo.egg-info/SOURCES.txt
+Echo.egg-info/dependency_links.txt
+Echo.egg-info/requires.txt
+Echo.egg-info/top_level.txt
+Echo/Models/echo_model/1/saved_model.pb
+Echo/Models/echo_model/1/variables/variables.data-00000-of-00001
+Echo/Models/echo_model/1/variables/variables.index

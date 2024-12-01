@@ -1,0 +1,16 @@
+Metadata-Version: 2.1
+Name: Echo
+Version: 1.0
+Summary: Robust Bioaccoustic Recognition and Classification Tool
+Author: Deakin University 2022 T3 Project Echo DataByte Capstone A Team
+Requires-Python: >=3.7
+Requires-Dist: numpy<1.25.0,>=1.21.0
+Requires-Dist: ffmpeg-python==0.2.0
+Requires-Dist: tensorflow==2.10.0
+Requires-Dist: tensorflow-io==0.31.0
+Requires-Dist: keras==2.10.0
+Requires-Dist: pydub>=0.25.1
+Requires-Dist: scipy>=1.7.0
+Requires-Dist: numba>=0.56.0
+Provides-Extra: dev
+Requires-Dist: pytest; extra == "dev"
