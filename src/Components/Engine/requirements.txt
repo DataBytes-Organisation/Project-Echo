@@ -11,8 +11,8 @@ paho-mqtt==1.6.1
 pandas
 pymongo[srv]
 soundfile
-tensorflow==2.15.0
-tensorflow-addons
-tensorflow_hub
-tensorflow_io
+# tensorflow==2.15.0
 xgboost
+# torch==1.9.0+cpu
+# torchvision==0.10.0+cpu
+

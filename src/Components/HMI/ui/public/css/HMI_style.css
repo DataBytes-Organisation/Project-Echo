@@ -215,6 +215,9 @@ body{
   #SIM{
     max-width: 520px;
   }
+  #config-settings-tab { 
+    max-width: 520px;
+  }
   #donate{
     max-width: 520px;
   }
@@ -1479,6 +1482,13 @@ i {
   background-position: center;
 }
 
+#config-settings-menu-btn {
+  background-image: url("../images/tabIcons/Config-Tab.png");
+  background-size: 75%;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
 #donate-menu-btn{
   background-image: url("../images/tabIcons/donate.png");
   background-size: cover;
@@ -1505,6 +1515,14 @@ i {
 
 #statistics-menu-btn{
   background-image: url("../images/tabIcons/statistics.png");
+  background-size: cover;
+  background-size: 40%;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+#notification-menu-button{
+  background-image: url("../images/tabIcons/06_Notification.png");
   background-size: cover;
   background-size: 40%;
   background-repeat: no-repeat;
@@ -2034,4 +2052,624 @@ input[type="radio"]:not(:disabled)+span:hover:before {
     border-radius: 5px;
     cursor: pointer;
     margin-top: 20px;
+}
+
+/* Light Theme */
+
+.light-theme {
+  background: #f5f5f5;
+}
+
+.light-theme .title,
+.light-theme h2,
+.light-theme h3 {
+  color: #298405 !important; /* Green color for headings */
+}
+
+.light-theme body {
+  background: #f5f5f5;
+  color: #000; /* Black color for main text */
+  font-size: 17px;
+  font-weight: bold;
+}
+
+.light-theme #blur {
+  background-color: #f5f5f5;
+}
+
+.light-theme .menu-header {
+  background-color: rgb(13, 12, 23, 0.8);
+}
+
+.light-theme #menu {
+  background-color: rgba(245, 245, 245, 0.8);
+}
+
+.light-theme .tabs-button {
+  background-color: rgba(9, 86, 16, 0.463); /* Light green background */
+  color: #000; /* Black text */
+}
+
+.light-theme .tabs-button.active {
+  background-color: rgba(0, 168, 107, 0.8); /* Darker green for active state */
+}
+
+.light-theme #filter-menu-btn,
+.light-theme #popup-menu-btn,
+.light-theme #FAQ-menu-btn,
+.light-theme #SIM-menu-btn,
+.light-theme #donate-menu-btn,
+.light-theme #user-profile-button,
+.light-theme #mic-popup-menu-btn,
+.light-theme #statistics-menu-btn {
+  filter: invert(1) hue-rotate(180deg); /* Invert colors for icon images */
+}
+
+
+.light-theme * {
+  color: #000 !important; /* Black color for all text */
+}
+
+.light-theme #userProfile-contents button:hover {
+  transition: .5s;
+  background-color: rgba(0, 168, 107, 0.8) !important; /* Background color for hover state */
+  color: #fff; /* Text color for hover state */
+}
+
+
+.light-theme .donate-button {
+  width: fit-content;
+  height: 30%;
+  min-width: 50px;
+  max-height: 40px;
+  background-color: rgba(0, 168, 107, 0.8) !important; /* green color for background */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+  font-size: 16px;
+  font-family: 'Roboto', sans-serif;
+}
+
+.light-theme .export-tab button {
+  width: 40%;
+  height: 30%;
+  min-width: 50px;
+  max-height: 40px;
+  background-color: rgba(0, 168, 107, 0.8) !important;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+  font-size: 16px;
+  font-family: 'Roboto', sans-serif;
+}
+
+
+/* Light Theme specific rule for checkboxes */
+.light-theme input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  background-color: rgba(0, 168, 107, 0.8); /* Green background */
+  border-color: white;
+  outline: none;
+}
+
+.light-theme input[type="checkbox"]:checked {
+  background-color: rgba(0, 168, 107, 0.8) !important; /* Green background when checked */
+  border: solid 2px white;
+}
+
+
+/* Scrollbar for .wrapper in light theme */
+.light-theme .wrapper::-webkit-scrollbar-thumb {
+  background: rgba(0, 168, 107, 0.6); /* Light green background */
+  border: 3px solid transparent;
+  border-radius: 9px;
+  background-clip: content-box;
+}
+
+/* On hover, highlight the scrollbar thumb in light theme */
+.light-theme .wrapper::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 168, 107, 0.8); /* Darker green background */
+  border: 3px solid transparent;
+  border-radius: 9px;
+  background-clip: content-box;
+}
+
+/* Radio button styling in light theme */
+.light-theme input[type="radio"]+span:before {
+  content: '';
+  border: 1px solid rgba(0, 168, 107, 0.8); /* Light green border */
+  border-radius: 50%;
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  margin-right: 0.5em;
+  margin-top: 0.5em;
+  vertical-align: -2px;
+}
+
+.light-theme input[type="radio"]:checked+span:before {
+  border-radius: 50%;
+  background-color: rgba(0, 168, 107, 0.6); /* Light green background when checked */
+  border: 6px solid rgba(0, 168, 107, 0.8); /* Darker green border when checked */
+}
+
+.light-theme input[type="radio"]:focus+span:before,
+.light-theme input[type="radio"]:not(:disabled)+span:hover:before {
+  box-shadow:
+    0px 0px 0px 1px rgba(0, 168, 107, 0.6), /* Green shadow */
+    0px 0px 0px 2px rgba(0, 168, 107, 0.8); /* Darker green shadow */
+  
+  outline-color: transparent;
+  outline-width: 2px;
+  outline-style: dotted;
+}
+
+/* Style for the animal list to limit visible items and make the rest scrollable */
+#animalNotifications #animal-list {
+  max-height: 200px; /* Adjust the height as needed */
+  overflow-y: auto; /* Enable scrolling */
+}
+
+/* Form structure */
+#animalNotifications .markup_form {
+  display: flex;
+  flex-direction: column; /* Stack items vertically */
+  gap: 20px; /* Add spacing between each section */
+}
+
+/* Individual form sections take full width */
+#animalNotifications .markup_column {
+  width: 100%; /* Full width */
+  margin-bottom: 20px; /* Add spacing between sections */
+}
+
+#animalNotifications input[type="text"], #animalNotifications select {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ff80ab;
+  background-color: #2b2b2b;
+  color: white;
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+/* Hide the list when it's empty */
+#animalNotifications ul:empty {
+  display: none; /* Hide the list when there are no items */
+}
+
+/* When the list is populated, display it normally */
+#animalNotifications ul {
+  list-style: none;
+  padding: 10px;
+  background-color: #2b2b2b;
+  border-radius: 5px;
+  color: white;
+  max-height: 150px; /* Fixed height */
+  overflow-y: auto; /* Scroll when items exceed height */
+  width: 100%; /* Full width */
+}
+
+/* List items styling */
+#animalNotifications ul li {
+  margin: 10px 0;
+  font-size: 14px;
+}
+
+/* Available animals and selected animals lists */
+#animalNotifications #animalNotifications #selected-animals {
+  max-height: 150px;
+  overflow-y: scroll;
+  background-color: #2b2b2b;
+  padding: 10px;
+  border-radius: 5px;
+  color: white;
+  width: 100%; /* Ensure full width */
+}
+
+/* Selected animals should have a distinct style */
+#animalNotifications #selected-animals li {
+  background-color: #3b3b3b;
+  padding: 5px;
+  border-radius: 3px;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+/* Scrollbar styling */
+#animalNotifications ul::-webkit-scrollbar {
+  width: 8px;
+}
+
+#animalNotifications ul::-webkit-scrollbar-thumb {
+  background-color: #ff80ab;
+  border-radius: 10px;
+}
+
+#animalNotifications ul::-webkit-scrollbar-track {
+  background-color: #2b2b2b;
+}
+
+#animalNotifications button:hover {
+  background-color: #ff4081;
+}
+
+/* Center button alignment */
+#animalNotifications center {
+  display: block;
+  text-align: center;
+}
+
+#animal-search-label{
+  color: white;
+}
+
+#available-animal-label{
+  color: white;
+}
+
+#selected-animal-label{
+  color: white;
+}
+
+/* Media queries for responsiveness */
+@media (max-width: 768px) {
+  #animalNotifications .markup_form {
+      flex-direction: column;
+  }
+}
+
+/*Config-Settings Tab*
+/* Hide all tab contents by default */
+.tab-content {
+  display: none;
+  width: 50%;
+  height: auto; /* Adjust height as needed */
+}
+
+/* Show the active tab */
+.tab-content.active {
+  display: block;
+}
+
+/* Configuration Tab Specific Styling */
+#config-settings-tab {
+  padding: 0px 0px 0px 0px; 
+  height: 100%;
+  width: 0%; 
+  position: fixed;
+  z-index: 995;
+  top: 0; 
+  right: 0;
+  background-color: none;
+  color: rgb(141, 141, 141, 1.0);
+  overflow-x: hidden;
+  padding-top: 180px;
+  margin-top: 30px;
+}
+
+#config-settings-contents {
+  padding-top: 20px;
+  margin-left: 10px;
+  margin-right: 30px;
+  height: 3000px;
+  width: 440px;
+  overflow-wrap: break-word;
+  font-family: 'Roboto', sans-serif;
+}
+
+/* Light mode style for the Configure button */
+body.light-theme #config-configure-button {
+  background-color: rgba(0, 168, 107, 0.8); 
+  color: #fff; 
+  border: none; 
+  outline: none; /* Removes the blue outline */
+  box-shadow: none;
+}
+
+/* Dark mode style for the Configure button */
+body.dark-theme #config-configure-button {
+  background-color: rgba(247, 186, 206, 1); 
+  color: #000;
+  border: none;
+  outline: none; /* Removes the blue outline */
+  box-shadow: none;
+}
+
+/* General button styling */
+#config-configure-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  outline: none; 
+  box-shadow: none;
+  font-weight: bold;
+  font-family: 'Roboto', sans-serif; 
+  text-transform: uppercase;
+  color: black;
+}
+
+/* Style for the dropdown select elements */
+select.form-control {
+  background-color: transparent;
+  border: none;
+  color: rgb(141, 141, 141);
+  width: 100%;
+  box-shadow: none;
+  font-size: 16px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding: 10px;
+  outline: none;
+  height: auto; 
+}
+
+/* Uniform background on hover and focus */
+select.form-control:focus,
+select.form-control:hover {
+  background-color: transparent;
+  color: rgb(141, 141, 141);
+  border: none;
+  outline: none;
+  box-shadow: none;
+}
+
+/* Specific style to remove inner box effect on open */
+select[multiple] {
+  background-color: transparent;
+  border: none;
+  color: rgb(141, 141, 141);
+  width: 100%;
+  height: auto;
+  box-shadow: none;
+  padding: 10px;
+  outline: none;
+}
+
+/* Remove the box effect inside the dropdown list */
+select::-ms-expand {
+  display: none;
+}
+
+/* Dropdown menu styling */
+.dropdown-menu {
+  background-color: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  width: 100%;
+}
+
+/* Light mode and dark mode styles */
+body.light-theme .form-control,
+body.light-theme select {
+  color: #333;
+}
+
+body.dark-theme .form-control,
+body.dark-theme select { 
+  color: #ddd; 
+}
+
+/* General button styling */
+.tabs-button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 10px;
+  transition: all 0.3s ease;
+  background-size: 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+
+#payment-response {
+  padding: 15px;
+  border-radius: 5px;
+  margin-top: 250px;
+  text-align: center;
+}
+.crossmark {
+
+z-index: 2;
+}
+
+#payment-response, .crossmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.overlay1 {
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: rgba(0, 0, 0, 0.7);
+backdrop-filter: blur(px); 
+-webkit-backdrop-filter: blur(5px); 
+display: none; 
+justify-content: center;
+align-items: center;
+z-index: 1;
+}
+
+
+.hidden {
+  display: none;
+}
+
+#processing-indicator {
+  width: 100px;
+  height: 100px;
+  border: 5px solid #f8d7da;
+  border-left: 5px solid #721c24;
+  border-radius: 50%;
+  margin: 0 auto;
+  animation: spin 1s linear infinite;
+}
+
+.cross-container {
+  position: relative;
+  width: 100%;
+  height: 80vh; 
+  overflow: hidden; 
+}
+
+@keyframes spin {
+  to {
+      transform: rotate(360deg);
+  }
+}
+
+
+
+@keyframes shake {
+  0% { transform:  rotate(0deg); }
+  25% { transform:  rotate(-10deg); }
+  50% { transform:  rotate(10deg); }
+  75% { transform:  rotate(-10deg); }
+  100% { transform:  rotate(0deg); }
+}
+
+.retry-button, .cancel-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin: 0 10px; 
+}
+
+.shake-animation {
+  animation: shake 2s ease-in-out infinite;
+}
+.retry-button {
+  background-color: #721c24;
+  color: #fff;
+}
+
+.retry-button:hover {
+  background-color: #f5c6cb;
+}
+
+.cancel-button {
+  background-color: #6c757d;
+  color: #fff;
+}
+
+.cancel-button:hover {
+  background-color: #e2e3e5;
+}
+
+.button-container {
+  position: absolute;
+  bottom: 22%; 
+  left: 50%;
+  transform: translateX(-50%);
+ 
+  display: none;
+  gap: 10px; 
+}
+
+
+.o-circle {
+  display: flex;
+  width: 10rem; height: 10rem;
+  justify-content: center;
+  align-items: flex-start;
+  border-radius: 100%; 
+  animation: circle-appearance 1s ease-in-out 1 forwards, set-overflow .1s 1.1s forwards;
+}
+
+.c-container__circle {
+
+  margin: 250px auto;
+}
+
+      
+.o-circle__sign {
+  position: relative;
+  opacity: 0;
+  background: #fff;
+  animation-duration: .8s;
+  animation-delay: .2s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+}
+
+.o-circle__sign::before, 
+.o-circle__sign::after {
+  content: "";
+  position: absolute;
+  background: inherit;
+}
+
+.o-circle__sign::after {
+  left: 100%; top: 0%;
+  width: 500%; height: 95%; 
+  transform: translateY(4%) rotate(0deg);
+  border-radius: 0;
+  opacity: 0;
+  z-index: -1;
+}
+
+
+
+.o-circle__sign--failure {
+  background: rgb(236, 78, 75);
+}
+
+.o-circle__sign--failure .o-circle__sign {
+  width: 1rem; height: 7rem;
+  transform: translateY(25%) rotate(45deg) scale(.1);
+  border-radius: 50% 50% 50% 50% / 10%;
+  animation-name: failure-sign-appearance;
+}
+
+.o-circle__sign--failure .o-circle__sign::before {
+   top: 50%;
+   width: 100%; height: 100%; 
+   transform: translateY(-50%) rotate(90deg);
+   border-radius: inherit;
+} 
+
+/*--shadow--*/
+.o-circle__sign--failure .o-circle__sign::after {
+   background: rgba(175, 57, 55, .8);
+}
+ 
+/*CIRCLE*/
+@keyframes circle-appearance {
+  0% { transform: scale(0); }
+  
+  50% { transform: scale(1.5); }
+          
+  60% { transform: scale(1); }
+  
+  100% { transform: scale(1); }
+}
+
+/*SIGN*/
+@keyframes failure-sign-appearance {         
+  50% { opacity: 1;  transform: translateY(25%) rotate(45deg) scale(1.7); }
+    
+  100% { opacity: 1; transform: translateY(25%) rotate(45deg) scale(1); }
+}
+
+@keyframes set-overflow {
+  to { overflow: hidden; }
 }
