@@ -1,0 +1,84 @@
+Audio Processing Summary Report
+==================================================
+
+Total processed files: 15/15
+Average SNR: 12.92 dB
+Average Signal Retention: 100.0%
+Average Size Reduction: 25.4%
+
+Individual File Results:
+
+File: 12- steps fox.wav.wav
+SNR: -1.04 dB
+Signal Retention: 100.1%
+Size Reduction: 15.4%
+
+File: 25-fox eats.wav.wav
+SNR: 9.65 dB
+Signal Retention: 100.0%
+Size Reduction: 16.4%
+
+File: 26-angry fox.wav.wav
+SNR: 12.65 dB
+Signal Retention: 100.0%
+Size Reduction: 15.7%
+
+File: 27-hungry fox.wav.wav
+SNR: 9.41 dB
+Signal Retention: 100.0%
+Size Reduction: 16.5%
+
+File: Alien Fox Bark.mp3.wav
+SNR: 17.41 dB
+Signal Retention: 100.0%
+Size Reduction: 27.0%
+
+File: Chris Fox KRLD.mp3.wav
+SNR: 8.63 dB
+Signal Retention: 100.0%
+Size Reduction: 33.1%
+
+File: Cute Arctic White Fox Laughing Vine.mp3.wav
+SNR: 22.28 dB
+Signal Retention: 100.0%
+Size Reduction: 16.0%
+
+File: Fox Barking.wav
+SNR: 1.60 dB
+Signal Retention: 100.0%
+Size Reduction: 30.3%
+
+File: Fox Scream Mating Call.wav
+SNR: 14.16 dB
+Signal Retention: 100.0%
+Size Reduction: 25.6%
+
+File: Fox screaming in the night.mp3.wav
+SNR: 16.74 dB
+Signal Retention: 100.0%
+Size Reduction: 30.6%
+
+File: fox sex.wav
+SNR: 23.59 dB
+Signal Retention: 100.0%
+Size Reduction: 30.9%
+
+File: Fox, Vocal Cry, Distant, 01.wav.wav
+SNR: 35.22 dB
+Signal Retention: 100.0%
+Size Reduction: 29.0%
+
+File: foxBark2.wav.wav
+SNR: 5.89 dB
+Signal Retention: 100.0%
+Size Reduction: 32.8%
+
+File: fox_barks_cut.wav.wav
+SNR: 0.87 dB
+Signal Retention: 100.0%
+Size Reduction: 31.2%
+
+File: red fox screeching.mp3.wav
+SNR: 16.76 dB
+Signal Retention: 100.0%
+Size Reduction: 30.8%
