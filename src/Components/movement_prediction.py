@@ -2,106 +2,73 @@ import json
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
-from sklearn.preprocessing import PolynomialFeatures
-from datetime import datetime
 
-# Load the movement data from the file
-file_path = r"C:\Users\ragul\OneDrive\Documents\Project-Echo\src\Components\MongoDB\init\movements.json"
-with open(file_path, 'r') as f:
-    movements_data = json.load(f)
+# Load the cleaned movement data from the new file
+cleaned_data_file = r"C:\Users\ragul\OneDrive\Documents\Project-Echo\src\Components\MongoDB\init\cleaned_animal_movements.json"
 
-# Function to clean and filter the coordinates (latitude, longitude)
-def clean_coordinates(coords):
-    """
-    Ensure that only valid lat/lon data is used (ignore extra values like altitude).
-    :param coords: List of coordinates (latitude, longitude, altitude)
-    :return: Cleaned coordinates as [latitude, longitude] or None if invalid
-    """
-    if isinstance(coords, list) and len(coords) >= 2:
-        # Only take the first two values (latitude, longitude)
-        return coords[:2]
-    else:
-        return None  # Return None if data is invalid
+with open(cleaned_data_file, 'r') as f:
+    cleaned_data = json.load(f)
 
-# Function to predict future coordinates using linear regression
+# Function to predict future movement based on cleaned coordinates
 def predict_future_movement(coords, steps=3):
-    """
-    Predict future coordinates using polynomial regression.
-    :param coords: List of [lat, lon] pairs
-    :param steps: Number of future points to predict
-    :return: List of predicted coordinates
-    """
     if len(coords) < 2:
+        print("Insufficient data for prediction.")
         return []
 
-    # Ensure coords is a list of pairs [lat, lon]
-    coords = np.array([clean_coordinates(coord) for coord in coords if clean_coordinates(coord) is not None])
+    # Use Linear Regression to predict future movement
+    model = LinearRegression()
 
-    # If no valid data after cleaning, return an empty list
-    if coords.shape[0] < 2:
-        return []
+    # Prepare data for regression (treat latitudes as X and longitudes as Y)
+    latitudes = np.array([coord[0] for coord in coords]).reshape(-1, 1)
+    longitudes = np.array([coord[1] for coord in coords])
 
-    latitudes = coords[:, 0]
-    longitudes = coords[:, 1]
-
-    # Use index as a time variable
-    time = np.arange(len(coords)).reshape(-1, 1)
-
-    # Polynomial feature transformation (degree 2)
-    poly = PolynomialFeatures(degree=2)
-    time_poly = poly.fit_transform(time)
-
-    # Linear regression for latitude and longitude prediction
-    model_lat = LinearRegression().fit(time_poly, latitudes)
-    model_lon = LinearRegression().fit(time_poly, longitudes)
-
-    # Generate future time steps
-    future_time = np.arange(len(coords), len(coords) + steps).reshape(-1, 1)
-    future_time_poly = poly.transform(future_time)
+    model.fit(latitudes, longitudes)
 
     # Predict future coordinates
-    future_lats = model_lat.predict(future_time_poly)
-    future_lons = model_lon.predict(future_time_poly)
+    last_lat = latitudes[-1]
+    predicted_coords = []
+    for i in range(steps):
+        predicted_long = model.predict([[last_lat + i]])  # Incrementing the latitude step by step
+        predicted_coords.append([last_lat + i, predicted_long[0]])
 
-    # Combine latitudes and longitudes into a list of coordinates
-    return list(zip(future_lats, future_lons))
+    return predicted_coords
 
-# Plot the movement of each animal
-plt.figure(figsize=(10, 6))
-
-for entry in movements_data:
-    species = entry.get("species", "Unknown")
-    coords = entry.get("animalTrueLLA", [])
+# Loop through the data and make predictions for each species
+for record in cleaned_data:
+    species = record['species']
+    coords = record['animalTrueLLA']
     
-    # Skip invalid data
-    if not coords or len(coords) < 2:
-        print(f"Skipping invalid data for {species}")
-        continue
-    
-    # Clean the coordinates (latitude, longitude only)
-    coords = [clean_coordinates(coord) for coord in coords if clean_coordinates(coord) is not None]
+    print(f"Species: {species}")
+    print(f"Raw animalTrueLLA: {coords}")
 
-    # If there are valid coordinates, proceed with prediction and plotting
-    if coords:
-        # Predict future movements based on historical data
-        predicted_coords = predict_future_movement(coords, steps=3)
+    # Ensure the coordinates are valid
+    if isinstance(coords, list) and len(coords) == 2:
+        # Cleaned Coordinates (Lat, Lon)
+        cleaned_coords = [coords]  # We treat each as a single point for prediction
+        print(f"Cleaned Coordinates: {cleaned_coords}")
         
-        # Plot the historical data
-        coords = np.array(coords)
-        plt.plot(coords[:, 1], coords[:, 0], marker="o", label=f"{species} (Observed)")
+        # Make predictions for the next 3 steps
+        predicted_coords = predict_future_movement(cleaned_coords, steps=3)
+        print(f"Predicted Coordinates: {predicted_coords}")
+        
+        # Plot the predicted and observed data
+        lats, lons = zip(*cleaned_coords)  # Unpacking cleaned coordinates (Lat, Lon)
+        plt.plot(lons, lats, marker="o", label=f"{species} (Observed)")
 
-        # Plot the predicted future movements
         if predicted_coords:
-            predicted_coords = np.array(predicted_coords)
-            plt.plot(predicted_coords[:, 1], predicted_coords[:, 0], marker="x", linestyle="--", label=f"{species} (Predicted)")
+            pred_lats, pred_lons = zip(*predicted_coords)
+            plt.plot(pred_lons, pred_lats, marker="x", label=f"{species} (Predicted)")
 
-# Customize the plot
-plt.title("Projected and Predicted Animal Movements")
+    else:
+        print(f"Invalid coordinate data for {species}. Skipping prediction.")
+
+# Customize plot
+plt.title("Projected Animal Movements")
 plt.xlabel("Longitude")
 plt.ylabel("Latitude")
 plt.legend(loc='upper right')
-plt.grid(True)
 
-# Save and show the plot
-plt.savefig("movement_prediction_with_future.png")
+# Save the plot
+plt.savefig("projected_movement.png")
 plt.show()
+
