@@ -1,123 +1,110 @@
-
 #############################################################################
-# This class represents a simulated sensor manager for microphones
+# Implementation for Simulated Sensor Manager
 #############################################################################
 
 import entities.entity
 from entities.species import Species
-import datetime
 from entities.animal import Animal
 import entities.microphone
 import networkx as nx
-import itertools
+from geopy.distance import geodesic
+from scipy.optimize import minimize
 import numpy as np
-from geopy.distance import distance
-from scipy.optimize import least_squares
+import datetime
 import logging
-logger1 = logging.getLogger('_sys_logger')
+from itertools import combinations
 
+logger2 = logging.getLogger('_alt_logger')
 
-class SensorManager(entities.entity.Entity):
-    def __init__(self) -> None:
+class SensorManagerAlt(entities.entity.Entity):
+    def __init__(self):
+        super().__init__()
+        self.microphones = []
+        self.graph = nx.Graph()
+        self.distance_threshold = 0.008
+        self.speed_of_sound = 343  # Speed of sound in m/s
 
-        super(SensorManager, self).__init__()
-        self.MicrophoneObjects = []
-        self.GRAPH = nx.Graph()
-        self.NODE_THRESHOLD = 0.008
-        self.c = 343
-        
+    def add_microphone(self, microphone):
+        """Add a microphone to the sensor manager."""
+        self.microphones.append(microphone)
 
-    def add_sensor_object(self, MicObj: entities.microphone) -> None:
-        self.MicrophoneObjects.append(MicObj)
-    
-    def generate_sensor_graph(self) -> None:
-        for mic in self.MicrophoneObjects:
-            self.GRAPH.add_node(mic)
+    def build_graph(self):
+        """Build a graph connecting microphones based on proximity."""
+        for mic in self.microphones:
+            self.graph.add_node(mic)
 
-        for mic1, mic2 in itertools.combinations(self.MicrophoneObjects, 2):
-            lat1, long1 = mic1.getLLA()[0], mic1.getLLA()[1]
-            lat2, long2 = mic2.getLLA()[0], mic2.getLLA()[1]
-            _distance = ((lat1 - lat2) ** 2 + (long1 - long2) ** 2) ** 0.5
-            if _distance <= self.NODE_THRESHOLD:
-                self.GRAPH.add_edge(mic1, mic2)
+        for mic1, mic2 in combinations(self.microphones, 2):
+            coord1, coord2 = mic1.getLLA()[:2], mic2.getLLA()[:2]
+            if geodesic(coord1, coord2).km <= self.distance_threshold:
+                self.graph.add_edge(mic1, mic2)
 
-    def find_closest_mics(self, event_lat, event_long, n):
-        mics_distances = [(mic, ((mic.getLLA()[0] - event_lat) ** 2 + (mic.getLLA()[1] - event_long) ** 2) ** 0.5) for mic in self.GRAPH.nodes()]
-        mics_distances.sort(key=lambda x: x[1])
-        return [mic for mic, _ in mics_distances[:n]]
+    def get_nearest_microphones(self, lat, lon, count):
+        """Find the nearest microphones to a given location."""
+        distances = [
+            (mic, geodesic((lat, lon), mic.getLLA()[:2]).km)
+            for mic in self.graph.nodes
+        ]
+        distances.sort(key=lambda x: x[1])
+        return [mic for mic, _ in distances[:count]]
 
-    def vocalisation(self, animal) -> None:
-        mics_around_event = self.find_closest_mics(animal.getLLA()[0], animal.getLLA()[1], 4)
-        for mic in mics_around_event:
-            mic.set_trigger_event_time(animal.last_vocalisation_time + datetime.timedelta(seconds=mic.distance(animal)/self.c))
+    def process_vocalization(self, animal):
+        """Handle vocalization detection and triangulation."""
+        lat, lon = animal.getLLA()[:2]
+        nearby_mics = self.get_nearest_microphones(lat, lon, 4)
 
-        predicted_lla = self.solve_animal_lla_optimized(mics_around_event, animal)        
-        min_error = distance((animal.getLLA()[0], animal.getLLA()[1]), (predicted_lla[0], predicted_lla[1])).m
+        for mic in nearby_mics:
+            mic.set_trigger_event_time(
+                animal.last_vocalisation_time + datetime.timedelta(seconds=mic.distance(animal) / self.speed_of_sound)
+            )
 
-        for mic in mics_around_event:
+        predicted_location, error = self.triangulate_location(nearby_mics, animal)
+
+        for mic in nearby_mics:
             mic.reset_trigger_event_time()
 
-        logger1.info(f'Min triangulation error: {min_error}\n')
-        return predicted_lla, mics_around_event[0],min_error
-    
-    def func_to_minimize(self, x, list_triggered_mics, c):
-        lat, lon, z = x
-        estimate_animal = Animal(species=Species("dummy_triangulation"))
-        estimate_animal.setLLA((lat, lon, z))
-        
-        st_est = [mic.distance(estimate_animal) / c - np.min([m.distance(estimate_animal) / c for m in list_triggered_mics]) for mic in list_triggered_mics]
-        st_obs = [(mic.triggered_sim_clock_time - list_triggered_mics[0].triggered_sim_clock_time).total_seconds() for mic in list_triggered_mics]
+        logger2.info(f'Triangulation error: {error} meters')
+        return predicted_location, nearby_mics[0], error
 
-        return [st_obs[i] - st_est[i] for i in range(4)]
+    def triangulate_location(self, microphones, reference_animal):
+        """Estimate the location of the animal using time difference of arrival."""
+        def error_function(x):
+            est_animal = Animal(species=Species("temp"))
+            est_animal.setLLA(x)
 
-    def solve_animal_lla_optimized(self, list_triggered_mics, truth_animal):
-        z_start = 10.0
+            observed_deltas = [
+                (mic.triggered_sim_clock_time - microphones[0].triggered_sim_clock_time).total_seconds()
+                for mic in microphones
+            ]
+            estimated_deltas = [
+                mic.distance(est_animal) / self.speed_of_sound - \
+                microphones[0].distance(est_animal) / self.speed_of_sound
+                for mic in microphones
+            ]
+            return np.sum((np.array(observed_deltas) - np.array(estimated_deltas))**2)
 
-        # Improved initial guess using the average of the microphones' positions
-        avg_lat = np.mean([mic.getLLA()[0] for mic in list_triggered_mics])
-        avg_lon = np.mean([mic.getLLA()[1] for mic in list_triggered_mics])
-        improved_initial_guess = np.array([avg_lat, avg_lon, z_start])
+        initial_guess = np.mean([mic.getLLA()[:2] for mic in microphones], axis=0).tolist() + [10.0]
+        bounds = (
+            [self.get_region_bounds()["lat_min"], self.get_region_bounds()["lon_min"], 0],
+            [self.get_region_bounds()["lat_max"], self.get_region_bounds()["lon_max"], np.inf]
+        )
 
-        max_retries = 10
-        retry_count = 0
-        large_error_threshold = 50  # acceptable error threshold in meters
+        result = minimize(
+            error_function,
+            initial_guess,
+            method="L-BFGS-B",
+            bounds=bounds
+        )
 
-        while retry_count < max_retries:
-            try:
-                res = least_squares(
-                    self.func_to_minimize,
-                    improved_initial_guess,
-                    args=(list_triggered_mics, self.c),
-                    method="trf",
-                    bounds=(
-                        [self.get_otways_coordinates()[3][0], self.get_otways_coordinates()[4][1], 0],
-                        [self.get_otways_coordinates()[1][0], self.get_otways_coordinates()[2][1], np.inf],
-                    ),
-                )
+        predicted_lat, predicted_lon, predicted_alt = result.x
+        error = geodesic(reference_animal.getLLA()[:2], (predicted_lat, predicted_lon)).m
 
-                best_lat, best_lon, best_z = res.x
-                predicted_lla = (best_lat, best_lon)
+        return (predicted_lat, predicted_lon, predicted_alt), error
 
-                error = distance((truth_animal.getLLA()[0], truth_animal.getLLA()[1]), predicted_lla).m
-
-                if error < large_error_threshold:
-                    break
-                else:
-                    # Update the initial guess to try again
-                    low_bounds = [
-                        min(self.get_otways_coordinates()[3][0], best_lat - 0.01),
-                        min(self.get_otways_coordinates()[4][1], best_lon - 0.01),
-                        0,
-                    ]
-                    high_bounds = [
-                        max(self.get_otways_coordinates()[1][0], best_lat + 0.01),
-                        max(self.get_otways_coordinates()[2][1], best_lon + 0.01),
-                        np.inf,
-                    ]
-                    improved_initial_guess = np.random.uniform(low=low_bounds, high=high_bounds)
-
-                    retry_count += 1
-            except:
-                retry_count += 1
-
-        return best_lat, best_lon, best_z
+    def get_region_bounds(self):
+        """Define the geographic bounds for triangulation."""
+        return {
+            "lat_min": -90,
+            "lat_max": 90,
+            "lon_min": -180,
+            "lon_max": 180
+        }
