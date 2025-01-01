@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Request Form</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>User Request Form</h1>
+        <form id="user-request-form">
+            <label for="username">Name:</label>
+            <input type="text" id="username" name="username" required>
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="animal">Animal (optional):</label>
+            <input type="text" id="animal" name="animal">
+
+            <label for="request_type">Request Type:</label>
+            <select id="request_type" name="request_type" required>
+                <option value="monitor">Monitor Animal</option>
+                <option value="update_status">Update Conservation Status</option>
+                <option value="other">Other</option>
+            </select>
+
+            <label for="details">Details (optional):</label>
+            <textarea id="details" name="details" rows="4"></textarea>
+
+            <button type="submit">Submit</button>
+        </form>
+        <div id="response-message"></div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

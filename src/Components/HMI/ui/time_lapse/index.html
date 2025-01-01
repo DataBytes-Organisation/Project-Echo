@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Lapse of Animals</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+</head>
+<body>
+    <div class="container">
+        <h1>Time Lapse of Animals</h1>
+        <div class="controls">
+            <label for="start">Start Time:</label>
+            <input type="datetime-local" id="start">
+            <label for="stop">Stop Time:</label>
+            <input type="datetime-local" id="stop">
+            <button id="fetch-timelapse">Generate Time Lapse</button>
+        </div>
+        <div id="map"></div>
+    </div>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
