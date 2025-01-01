@@ -1,0 +1,38 @@
+#sighting-upload-form {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    font-family: Arial, sans-serif;
+  }
+  
+  #sighting-upload-form label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+  }
+  
+  #sighting-upload-form input,
+  #sighting-upload-form textarea,
+  #sighting-upload-form button {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+  }
+  
+  #sighting-upload-form button {
+    background-color: #4caf50;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  #sighting-upload-form button:hover {
+    background-color: #45a049;
+  }
+  
