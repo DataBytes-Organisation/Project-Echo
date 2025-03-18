@@ -1,0 +1,308 @@
+{
+  "name": "HMI_API_onboarding_task",
+  "version": "1",
+  "format": "json",
+  "data": [
+    {
+      "Bird": "Acanthagenys rufogularis",
+      "description": []
+    },
+    {
+        "Bird": "Acanthiza apicalis",
+        "description": []
+    },
+    {
+        "Bird": "Acanthiza chrysorrhoa",
+        "description": []
+    },
+    {
+        "Bird": "Acanthiza lineata",
+        "description": []
+    },
+    {
+        "Bird": "Acanthiza nana",
+        "description": []
+    },
+    {
+        "Bird": "Acanthiza pusilla",
+        "description": []
+    },
+    {
+        "Bird": "Acanthiza reguloides",
+        "description": []
+    },
+    {
+        "Bird": "Acanthiza uropygialis",
+        "description": []
+    },
+    {
+        "Bird": "Acanthorhynchus tenuirostris",
+        "description": []
+    },
+    {
+        "Bird": "Accipiter cirrocephalus",
+        "description": []
+    },
+    {
+        "Bird": "Accipiter fasciatus",
+        "description": []
+    },
+    {
+        "Bird": "Accipiter cooperi",
+        "description": []
+    },
+    {
+        "Bird": "Acrocephalus australis",
+        "description": []
+    },
+    {
+        "Bird": "Aegotheles cristatus",
+        "description": []
+    },
+    {
+        "Bird": "Aidemosyne modesta",
+        "description": []
+    },
+    {
+        "Bird": "Alisterus scapularis",
+        "description": []
+    },
+    {
+        "Bird": "Alauda Arvensis",
+        "description": []
+    },
+    {
+        "Bird": "Amytornis purnelli",
+        "description": []
+    },
+    {
+        "Bird": "Anas superciliosa",
+        "description": []
+    },
+    {
+        "Bird": "Anhinga novaehollandiae",
+        "description": []
+    },
+    {
+        "Bird": "Anseranas semipalmata",
+        "description": []
+    },
+    {
+        "Bird": "Anthochaera carunculata",
+        "description": []
+    },
+    {
+        "Bird": "Anthus novaeseelandiae",
+        "description": []
+    },
+    {
+        "Bird": "Antigone antigone",
+        "description": []
+    },
+    {
+        "Bird": "Antigone rubicunda",
+        "description": []
+    },
+    {
+        "Bird": "Aphelocephala leucopsis",
+        "description": []
+    },
+    {
+        "Bird": "ApocritaÂ sp.",
+        "description": []
+    },
+    {
+        "Bird": "Aprosmictus erythropterus",
+        "description": []
+    },
+    {
+        "Bird": "Aquila audax",
+        "description": []
+    },
+    {
+        "Bird": "Artamus cinereus",
+        "description": []
+    },
+    {
+        "Bird": "Artamus cyanopterus",
+        "description": []
+    },
+    {
+        "Bird": "Artamus minor",
+        "description": []
+    },
+    {
+        "Bird": "Artamus superciliosus",
+        "description": []
+    },
+    {
+        "Bird": "Atrapsalta encaustica",
+        "description": []
+    },
+    {
+        "Bird": "Auscala spinosa",
+        "description": []
+    },
+    {
+        "Bird": "Austrochaperina pluvialis",
+        "description": []
+    },
+    {
+        "Bird": "Austronomus australis",
+        "description": []
+    },
+    {
+        "Bird": "AvesÂ sp.",
+        "description": []
+    },
+    {
+        "Bird": "Aythya australis",
+        "description": []
+    },
+    {
+        "Bird": "Barnardius zonarius",
+        "description": []
+    },
+    {
+        "Bird": "Biziura lobata",
+        "description": []
+    },
+    {
+        "Bird": "Burhinus grallarius",
+        "description": []
+    },
+    {
+        "Bird": "Cacatua galerita",
+        "description": []
+    },
+    {
+        "Bird": "Cacatua sanguinea",
+        "description": []
+    },
+    {
+        "Bird": "Cacomantis flabelliformis",
+        "description": []
+    },
+    {
+        "Bird": "Cacomantis variolosus",
+        "description": []
+    },
+    {
+        "Bird": "CaeliferaÂ sp.",
+        "description": []
+    },
+    {
+        "Bird": "Caligavis chrysops",
+        "description": []
+    },
+    {
+        "Bird": "Callocephalon fimbriatum",
+        "description": []
+    },
+    {
+        "Bird": "Calyptorhynchus banksii",
+        "description": []
+    },
+    {
+        "Bird": "Calyptorhynchus lathami",
+        "description": []
+    },
+    {
+        "Bird": "Canis familiaris",
+        "description": []
+    },
+    {
+        "Bird": "Capra hircus",
+        "description": []
+    },
+    {
+        "Bird": "Carduelis carduelis",
+        "description": []
+    },
+    {
+        "Bird": "Carterornis leucotis",
+        "description": []
+    },
+    {
+        "Bird": "Centropus phasianinus",
+        "description": []
+    },
+    {
+        "Bird": "Cervus Unicolour",
+        "description": []
+    },
+    {
+        "Bird": "Ceyx azureus",
+        "description": []
+    },
+    {
+        "Bird": "Conopophila albogularis",
+        "description": []
+    },
+    {
+        "Bird": "Cophixalus bombiens",
+        "description": []
+    },
+    {
+        "Bird": "Cophixalus exiguus",
+        "description": []
+    },
+    {
+        "Bird": "Cophixalus infacetus",
+        "description": []
+    },
+    {
+        "Bird": "Cophixalus ornatus",
+        "description": []
+    },
+    {
+        "Bird": "Coracina novaehollandiae",
+        "description": []
+    },
+    {
+        "Bird": "Coracina papuensis",
+        "description": []
+    },
+    {
+        "Bird": "Corcorax melanorhamphos",
+        "description": []
+    },
+    {
+        "Bird": "Cormobates leucophaea",
+        "description": []
+    },
+    {
+        "Bird": "Corvus bennetti",
+        "description": []
+    },
+    {
+        "Bird": "Corvus coronoides",
+        "description": []
+    },
+    {
+        "Bird": "Corvus mellori",
+        "description": []
+    },
+    {
+        "Bird": "Corvus orru",
+        "description": []
+    },
+    {
+        "Bird": "Coturnix pectoralis",
+        "description": []
+    },
+    {
+        "Bird": "Cracticus nigrogularis",
+        "description": []
+    },
+    {
+        "Bird": "Cracticus torquatus",
+        "description": []
+    },
+    {
+        "Bird": "Crinia signifera",
+        "description": []
+    }
+    
+  ]
+}
