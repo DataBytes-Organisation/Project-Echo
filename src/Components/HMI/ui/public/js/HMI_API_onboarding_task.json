@@ -302,6 +302,26 @@
     {
         "Bird": "Crinia signifera",
         "description": []
+    },
+    {
+        "Bird": "Zosterops lateralis",
+        "description": ["The Silvereye is a small bird with a conspicuous ring of white feathers around the eye and belongs to a group of birds known as white-eyes. The Silvereye shows interesting plumage variations across its range. The grey back and olive-green head and wings are found in birds through the east, while western birds have a uniformly olive-green back."]
+    },
+    {
+        "Bird": "Pseudomys australis",
+        "description": ["The Plains Rat is a small rodent with thick, soft, silver-grey fur above; white to cream underneath; and with relatively large ears. This species grows to 14 cm long and weighs up to 80 g. Its tail is brown to grey and grows to 12 cm long and ends in a white tip."]
+    },
+    {
+        "Bird": "Pteropus scapulatus",
+        "description": ["The little red flying-fox is a megachiropteran bat native to northern and eastern Australia. The species weighs about half a kilogram, one US pound, and is the smallest species of Pteropus in mainland Australia."]
+    },
+    {
+        "Bird": "Pteropus poliocephalus",
+        "description": ["The grey-headed flying fox is a megabat native to Australia. The species shares mainland Australia with three other members of the genus Pteropus: the little red P. scapulatus, spectacled P. conspicillatus, and the black P. alecto. The grey-headed flying fox is the largest bat in Australia."]
+    },
+    {
+        "Bird": "Pycnoptilus floccosus",
+        "description": ["Pilotbirds are plump, large headed ground dwelling birds with dark brown on the upper body as well as on the head."]
     }
     
   ]
