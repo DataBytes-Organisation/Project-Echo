@@ -25,23 +25,42 @@
     },
     {
         "Bird": "Acanthiza pusilla",
-        "description": []
+        "description": "A small, brownish songbird with a grey-brown head, streaked forehead,
+        and a pale, off-white throat. The underparts are buff to pale brown, and the wings 
+        and tail are darker with rufous (reddish-brown) edges. It is found in dense forests
+        , woodlands, coastal scrub, and urban gardens across southeastern Australia and Tasmania.
+        Prefers thick understory vegetation."
     },
     {
         "Bird": "Acanthiza reguloides",
-        "description": []
+        "description": "Small, olive-brown bird with a pale buff-colored rump, greyish-brown head,
+        and a faintly streaked forehead. Its underparts are a light creamy color, and it has a fine,
+        pointed bill. The tail is long with white tips on the outer feathers. Found in open woodlands,
+        dry forests, and shrubby areas across southeastern and eastern Australia. Prefers habitats
+        with a mix of trees and open ground."
     },
     {
         "Bird": "Acanthiza uropygialis",
-        "description": []
+        "description": "A small bird with brownish-olive upperparts, a pale, off-white throat and 
+        belly, and a distinctive chestnut-colored rump. The forehead is lightly streaked, and the 
+        tail is relatively long with white tips on the outer feathers. It is found in dry woodlands, 
+        shrublands, and arid regions across inland Australia. Prefers areas with scattered trees,
+        mulga, and mallee scrub."
     },
     {
         "Bird": "Acanthorhynchus tenuirostris",
-        "description": []
+        "description": "A small, slender honeyeater with a distinctive long, curved bill adapted 
+        for feeding on nectar. It has a black head, white throat with a black stripe, and chestnut-colored
+        underparts. The wings and tail are dark, with white outer tail feathers visible in flight. It is found
+        in forests, woodlands, heathlands, and gardens across southeastern Australia, including Tasmania.
+        Often seen in areas with flowering plants, particularly banksias, grevilleas, and epacrid shrubs."
     },
     {
         "Bird": "Accipiter cirrocephalus",
-        "description": []
+        "description": "A small, agile raptor with a slender build, long tail, and rounded wings. It has a
+        grey head, rufous (reddish) underparts with fine barring, and yellow legs. The eyes are orange to
+        red in adults, while juveniles have brown eyes. It is found in forests, woodlands, scrublands, and urban
+        areas across Australia, including Tasmania. Prefers habitats with some tree cover for hunting."
     },
     {
         "Bird": "Accipiter fasciatus",
