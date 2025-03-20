@@ -85,23 +85,48 @@
     },
     {
         "Bird": "Anseranas semipalmata",
-        "description": []
+        "description": [
+            "Commonly known as Magpie Goose, distinctive waterbird has partially webbed feet, setting it apart from most other waterfowl.",
+            "Often referred to as a living fossil, it is part of an ancient lineage of birds. ",
+            " It inhabits northern Australia and Papua New Guinea, frequently found in wetlands and floodplains.",
+            "Unlike many geese, it does not experience complete molting, allowing it to maintain its ability to fly at all times."
+        ]
     },
     {
         "Bird": "Anthochaera carunculata",
-        "description": []
+        "description": [
+            "Commonly known as Red Wattlebird, one of the biggest honeyeaters in Australia, it is distinguished by its eye-catching crimson facial wattles.",
+            "Its call is strong, unique, and frequently characterized as rough and noisy.",
+            "Feeds on nectar from native flowers, which helps with pollination.",
+            "Aggressive in securing its area, frequently driving other birds away."
+        ]
     },
     {
         "Bird": "Anthus novaeseelandiae",
-        "description": []
+        "description": [
+            "Commonly known as Australasian Pipit, is small and lives on the ground, recognized for its swift movements and the way it wags its tail.",
+            "It inhabits open grasslands, agricultural areas, and coastal dunes in Australia and New Zealand.",
+            "Its coloring allows it to camouflage well with its environment, making it difficult to see.",
+            "Additionally, it has a unique, high-pitched call that aids in communication and marking its territory."
+        ]
     },
     {
         "Bird": "Antigone antigone",
-        "description": []
+        "description": [
+            "Commonly known as Sarus Crane, with a maximum height of 1.8 meters (5.9 feet), it is the tallest flying bird in the world.",
+            "Renowned for its intricate courtship dances and enduring pair relationships.",
+            "Found throughout Australia, Southeast Asia, and South Asia in agricultural areas and marshes.",
+            "Regarded in Indian culture as a representation of faithfulness and affection."
+        ]
     },
     {
         "Bird": "Antigone rubicunda",
-        "description": []
+        "description": [
+            "Commonly known as Brolga, it is renowned for its graceful and spectacular mating dances, making it one of Australia's most recognizable birds.",
+            "Frequently found in northern and eastern Australia's floodplains, grasslands, and wetlands.",
+            "It may be identified by its characteristic red head patch, long legs, and gray feathers.",
+            "Aboriginal mythology features this character, frequently referred to as the native companion."
+        ]
     },
     {
         "Bird": "Aphelocephala leucopsis",
