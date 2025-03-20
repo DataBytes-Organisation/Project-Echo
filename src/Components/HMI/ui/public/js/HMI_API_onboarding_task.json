@@ -245,23 +245,48 @@
     },
     {
         "Bird": "Cophixalus exiguus",
-        "description": []
+        "description": ["Cophixalus exiguus, commonly known as the tiny rain frog, is a species of frog in the family Microhylidae.",
+        "This species is native to tropical rainforests in New Guinea and parts of surrounding regions.",
+        "Cophixalus exiguus is known for its small size and its ability to adapt to humid, forested environments.",
+        "It has a distinctive appearance with a dark brown body and lighter markings, blending well with its natural habitat.",
+        "Like many other species in the genus Cophixalus, it is arboreal, spending much of its time in the trees.",
+        "Due to habitat destruction and climate change, this species may be facing threats, though it is currently not listed as endangered."]
     },
     {
         "Bird": "Cophixalus infacetus",
-        "description": []
+        "description": ["Cophixalus infacetus, also known as the rough-sided rain frog, is a species of frog in the family Microhylidae.",
+        "It is native to the rainforests of New Guinea, where it is commonly found in humid, forested areas.",
+        "The species is characterized by its small size and rough, granular skin, which helps it blend into its environment.",
+        "Cophixalus infacetus is arboreal, often found in the trees and shrubs of its rainforest habitat.",
+        "This frog species is nocturnal, typically becoming active at night to hunt for small invertebrates.",
+        "Like other species in the genus Cophixalus, it faces threats from habitat loss, but its conservation status remains uncertain."]
     },
     {
         "Bird": "Cophixalus ornatus",
-        "description": []
+        "description": ["Cophixalus ornatus, commonly known as the ornate rain frog, is a species of frog in the family Microhylidae.",
+        "It is found in the rainforests of New Guinea and surrounding islands, where it inhabits humid, tropical environments.",
+        "The species is named for its distinctive, ornamental appearance, with intricate patterns and a rough, granular texture on its skin.",
+        "Cophixalus ornatus is typically arboreal, spending much of its time in the trees, but it can also be found in leaf litter on the forest floor.",
+        "This frog is nocturnal, foraging at night for insects and other small invertebrates.",
+        "While not widely studied, Cophixalus ornatus may be vulnerable to habitat destruction, though it has not been extensively assessed for conservation status."]
     },
     {
         "Bird": "Coracina novaehollandiae",
-        "description": []
+        "description": ["Coracina novaehollandiae, commonly known as the Black-faced Cuckoo-shrike, is a species of bird in the family Campephagidae.",
+        "This bird is found across a wide range of habitats in Australia, including forests, woodlands, and urban areas.",
+        "It is characterized by its striking black face and contrasting white underparts, with a greyish back and wings.",
+        "Coracina novaehollandiae is a medium-sized passerine bird that feeds primarily on insects, including beetles and caterpillars, as well as some fruits.",
+        "This species is known for its distinctive, melodious calls, which it uses to communicate with others, especially during the breeding season.",
+        "The Black-faced Cuckoo-shrike is a relatively common and adaptable species, and its population is stable despite habitat changes."]
     },
     {
         "Bird": "Coracina papuensis",
-        "description": []
+        "description": ["Coracina papuensis, commonly known as the White-bellied Cuckoo-shrike, is a species of bird in the family Campephagidae.",
+        "This bird is native to New Guinea, as well as parts of surrounding islands, and is typically found in forests, woodlands, and coastal habitats.",
+        "Coracina papuensis is characterized by its distinctive white underparts, with a dark grey upper body, and a slightly forked tail.",
+        "It primarily feeds on insects, such as beetles, ants, and caterpillars, but also consumes some fruits and berries.",
+        "The species is known for its quiet, soft calls, often heard while foraging or during the breeding season.",
+        "While not considered threatened, the White-bellied Cuckoo-shrike may be impacted by habitat loss due to deforestation and human activity."]
     },
     {
         "Bird": "Corcorax melanorhamphos",
