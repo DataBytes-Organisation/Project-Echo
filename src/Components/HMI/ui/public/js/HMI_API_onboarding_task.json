@@ -205,23 +205,23 @@
     },
     {
         "Bird": "Calyptorhynchus lathami",
-        "description": []
+        "description": ["A black cockatoo native to eastern Australia, characterized by its red tail feathers. It primarily feeds on seeds and nuts."]
     },
     {
         "Bird": "Canis familiaris",
-        "description": []
+        "description": ["A domesticated animal closely associated with humans, with various breeds serving as pets and working animals."]
     },
     {
         "Bird": "Capra hircus",
-        "description": []
+        "description": ["A widely domesticated herbivore used for milk, meat, and fur. It is known for its ability to climb steep cliffs."]
     },
     {
         "Bird": "Carduelis carduelis",
-        "description": []
+        "description": ["A small bird native to Europe, recognized for its red face and yellow wing markings. It has a beautiful song and is popular as a pet."]
     },
     {
         "Bird": "Carterornis leucotis",
-        "description": []
+        "description": ["A small monarch flycatcher found in Australia, distinguished by its white ear feathers. It inhabits forests and shrublands."]
     },
     {
         "Bird": "Centropus phasianinus",
