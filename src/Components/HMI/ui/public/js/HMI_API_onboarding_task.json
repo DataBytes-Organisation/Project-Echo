@@ -65,23 +65,32 @@
     },
     {
         "Bird": "Alisterus scapularis",
-        "description": []
+        "description": [The Australian king parrot (Alisterus scapularis) is a species of parrot endemic to eastern Australia ranging from Cooktown in Queensland to Port Campbell in Victoria. 
+                        Found in humid and heavily forested upland regions of the eastern portion of the continent,
+                        including eucalyptus wooded areas in and directly adjacent to subtropical and temperate rainforest. ]
     },
     {
         "Bird": "Alauda Arvensis",
-        "description": []
+        "description": [The Eurasian skylark (Alauda arvensis) is a passerine bird in the lark family, Alaudidae. 
+                        It is a widespread species found across Europe and the Palearctic with introduced populations in Australia, New Zealand and on the Hawaiian Islands. 
+                        It is a bird of open farmland and heath, known for the song of the male, which is delivered in hovering flight from heights of 50 to 100 metres (160 to 330 ft). ]
     },
     {
         "Bird": "Amytornis purnelli",
-        "description": []
+        "description": [The dusky grasswren (Amytornis purnelli) is a species of small passerine bird in the family Maluridae. 
+                        The species is endemic to Australia but is limited to inland areas of the Northern Territory, 
+                        Western Australia and South Australia.]
     },
     {
         "Bird": "Anas superciliosa",
-        "description": []
+        "description": [The Pacific black duck (Anas superciliosa), commonly known as the PBD, is a dabbling duck found in much of Indonesia,
+                        New Guinea, Australia, New Zealand, and many islands in the southwestern Pacific, 
+                        reaching to the Caroline Islands in the north and French Polynesia in the east.]
     },
     {
         "Bird": "Anhinga novaehollandiae",
-        "description": []
+        "description": [The Australasian darter or Australian darter (Anhinga novaehollandiae) is a species of bird in the darter family, Anhingidae.
+                        It is found in Australia, Indonesia, and Papua New Guinea. It weighs around 2.6 kg and spans 86–94 cm (34–37 in) in length.]
     },
     {
         "Bird": "Anseranas semipalmata",
