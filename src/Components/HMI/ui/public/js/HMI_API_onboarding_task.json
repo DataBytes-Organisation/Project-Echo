@@ -105,23 +105,41 @@
     },
     {
         "Bird": "Aphelocephala leucopsis",
-        "description": []
+        "description": [The southern whiteface (Aphelocephala leucopsis) is a small passerine found in arid regions across
+          most of the southern half of the Australian continent, excluding Tasmania. Superficially finch-like in appearance,
+      this insectivorous bird is relatively common throughout most of its range, however, overall populations appear to be
+      in decline.]
     },
     {
         "Bird": "ApocritaÂ sp.",
-        "description": []
+        "description": [Apocrita sp. refers to an unidentified species within the suborder Apocrita, which includes ants,
+      bees, and most wasps. These insects are known for their narrow waist separating the thorax and abdomen. They play
+      important ecological roles such as pollination, pest control, and decomposition. The label “sp.” indicates that the 
+      exact species is not specified, only the broader group is known.]
     },
     {
         "Bird": "Aprosmictus erythropterus",
-        "description": []
+        "description": [Aprosmictus erythropterus, commonly known as the Red-winged Parrot, is a brightly colored bird 
+      native to Australia and southern New Guinea. Males are easily recognized by their vibrant green body, red shoulder
+      patches, and blue rump, while females are duller with more green and less red. They are often found in woodlands, 
+      river edges, and open forests, feeding on seeds, fruits, and blossoms. The Red-winged Parrot is known for its loud,
+      ringing calls and strong, direct flight.]
     },
     {
         "Bird": "Aquila audax",
-        "description": []
+        "description": [Aquila audax, commonly known as the Wedge-tailed Eagle, is Australia's largest bird of prey and one
+      of the largest eagles in the world. It is easily recognized by its long, broad wings and distinctive wedge-shaped tail.
+      Found across mainland Australia and Tasmania, it inhabits open forests, grasslands, and mountainous regions. The
+      Wedge-tailed Eagle feeds on a variety of prey, including mammals, reptiles, and carrion, and is known for its soaring 
+      flight and impressive hunting skills.]
     },
     {
         "Bird": "Artamus cinereus",
-        "description": []
+        "description": [Artamus cinereus, commonly known as the Black-faced Woodswallow, is a small, social bird native to
+      Australia. It has a soft grey body, a distinctive black face mask, and a short, stout bill adapted for catching insects
+      in flight. These birds are often seen perched in groups on wires or branches in open woodlands, grasslands, and arid 
+      regions. They feed primarily on flying insects and are known for their cooperative behavior, often roosting and 
+      nesting in close-knit colonies.]
     },
     {
         "Bird": "Artamus cyanopterus",
