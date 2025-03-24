@@ -4,305 +4,183 @@
   "format": "json",
   "data": [
     {
-      "Bird": "Acanthagenys rufogularis",
-      "description": []
+        "Bird": "Acanthagenys rufogularis",
+        "description": [
+            "Medium-sized honeyeater, around 22–27 cm (8.6–10.6 inches) in length.",
+            "Common Name: Spiny-cheeked Honeyeater.",
+            "Spiny feathers on the cheeks, giving it its name."
+        ]
     },
     {
         "Bird": "Acanthiza apicalis",
-        "description": []
+        "description": [
+            "Small insectivorous bird, about 10 cm (3.9 inches) in length.",
+            "Common Name: Inland Thornbill.",
+            "Brownish-grey plumage with streaked underparts and a pale eye-ring."
+        ]
     },
     {
         "Bird": "Acanthiza chrysorrhoa",
-        "description": []
+        "description": [
+            "Small, active bird, measuring around 10–12 cm (4–4.7 inches).",
+            "Common Name: Yellow-rumped Thornbill.",
+            "Distinct yellow patch on the rump, brown upperparts, and white underparts with black streaks."
+        ]
     },
     {
         "Bird": "Acanthiza lineata",
-        "description": []
+        "description": [
+            "Small thornbill species, about 10–11 cm (4–4.3 inches) in length.",
+            "Common Name: Striated Thornbill.",
+            "Olive-brown upperparts, streaked underparts, and a pale face with fine markings."
+        ]
     },
     {
         "Bird": "Acanthiza nana",
-        "description": []
+        "description": [
+            "Tiny passerine bird, approximately 9–10 cm (3.5–3.9 inches) long.",
+            "Common Name: Yellow Thornbill.",
+            "Bright yellow underparts, olive-brown upperparts, and a slender, pointed bill."
+        ]
     },
     {
         "Bird": "Acanthiza pusilla",
-        "description": []
+        "description": [
+            "Small warbler-like bird, around 9–10 cm (3.5–3.9 inches) in length.",
+            "Common Name: Brown Thornbill.",
+            "Brownish plumage with streaked underparts and a reddish-brown forehead."
+        ]
     },
     {
         "Bird": "Acanthiza reguloides",
-        "description": []
+        "description": [
+            "Small, active bird, measuring about 10 cm (3.9 inches).",
+            "Common Name: Buff-rumped Thornbill.",
+            "Buff-colored rump, brownish-grey body, and pale streaked underparts."
+        ]
     },
     {
         "Bird": "Acanthiza uropygialis",
-        "description": []
+        "description": [
+            "Small songbird, around 10 cm (3.9 inches) long.",
+            "Common Name: Chestnut-rumped Thornbill.",
+            "Distinct chestnut-colored rump, greyish upperparts, and pale underparts with faint streaks."
+        ]
     },
     {
         "Bird": "Acanthorhynchus tenuirostris",
-        "description": []
+        "description": [
+            "Slender honeyeater, about 15 cm (5.9 inches) in length.",
+            "Common Name: Eastern Spinebill.",
+            "Long, curved bill, black head, white throat, and reddish-brown underparts."
+        ]
     },
     {
         "Bird": "Accipiter cirrocephalus",
-        "description": []
+        "description": [
+            "Small to medium-sized raptor, 29–41 cm (11.4–16.1 inches) long.",
+            "Common Name: Collared Sparrowhawk.",
+            "Slender body, grey upperparts, rufous underparts, and sharp talons."
+        ]
     },
     {
         "Bird": "Accipiter fasciatus",
-        "description": []
+        "description": [
+            "Medium-sized hawk, measuring 30–45 cm (11.8–17.7 inches) in length.",
+            "Common Name: Brown Goshawk.",
+            "Brownish-grey upperparts, pale underparts with fine barring, and a hooked beak."
+        ]
     },
     {
         "Bird": "Accipiter cooperi",
-        "description": []
+        "description": [
+            "Medium-sized bird of prey, 35–50 cm (13.8–19.7 inches) long.",
+            "Common Name: Cooper’s Hawk.",
+            "Slate-grey back, reddish-barred chest, and yellow eyes."
+        ]
     },
     {
         "Bird": "Acrocephalus australis",
-        "description": []
+        "description": [
+            "Small warbler, around 15–18 cm (5.9–7.1 inches) in length.",
+            "Common Name: Australian Reed Warbler.",
+            "Brown upperparts, pale underparts, and a loud, melodic song."
+        ]
     },
     {
         "Bird": "Aegotheles cristatus",
-        "description": []
+        "description": [
+            "Nocturnal bird, measuring around 21–25 cm (8.3–9.8 inches).",
+            "Common Name: Australian Owlet-nightjar.",
+            "Greyish-brown plumage, large eyes, and a wide, flat bill."
+        ]
     },
     {
         "Bird": "Aidemosyne modesta",
-        "description": []
+        "description": [
+            "Small finch, about 10–11 cm (3.9–4.3 inches) in length.",
+            "Common Name: Plum-headed Finch.",
+            "Brown body, streaked underparts, and a distinctive red-brown head."
+        ]
     },
     {
         "Bird": "Alisterus scapularis",
-        "description": []
+        "description": [
+            "Large parrot, around 41–44 cm (16.1–17.3 inches) long.",
+            "Common Name: Australian King Parrot.",
+            "Bright red head and chest, green wings, and a long tail."
+        ]
     },
     {
-        "Bird": "Alauda Arvensis",
-        "description": []
+        "Bird": "Alauda arvensis",
+        "description": [
+            "Medium-sized songbird, measuring 16–18 cm (6.3–7.1 inches).",
+            "Common Name: Eurasian Skylark.",
+            "Streaked brown upperparts, pale underparts, and a distinctive singing display."
+        ]
     },
     {
         "Bird": "Amytornis purnelli",
-        "description": []
+        "description": [
+            "Small, ground-dwelling bird, around 12–14 cm (4.7–5.5 inches) long.",
+            "Common Name: Purnell’s Grasswren.",
+            "Brownish-grey plumage, streaked back, and a long tail."
+        ]
     },
     {
         "Bird": "Anas superciliosa",
-        "description": []
+        "description": [
+            "Medium-sized duck, about 47–60 cm (18.5–23.6 inches) in length.",
+            "Common Name: Pacific Black Duck.",
+            "Dark brown plumage, pale face stripes, and a distinctive blue speculum on the wings."
+        ]
     },
     {
         "Bird": "Anhinga novaehollandiae",
-        "description": []
+        "description": [
+            "Large waterbird, measuring 85–90 cm (33.5–35.4 inches) in length.",
+            "Common Name: Australasian Darter.",
+            "Long neck, sharp bill, dark plumage, and often seen drying wings."
+        ]
     },
     {
         "Bird": "Anseranas semipalmata",
-        "description": []
+        "description": [
+            "Large waterfowl, around 75–90 cm (29.5–35.4 inches) long.",
+            "Common Name: Magpie Goose.",
+            "Black-and-white plumage, long legs, and partially webbed feet."
+        ]
     },
     {
         "Bird": "Anthochaera carunculata",
-        "description": []
-    },
-    {
-        "Bird": "Anthus novaeseelandiae",
-        "description": []
-    },
-    {
-        "Bird": "Antigone antigone",
-        "description": []
-    },
-    {
-        "Bird": "Antigone rubicunda",
-        "description": []
-    },
-    {
-        "Bird": "Aphelocephala leucopsis",
-        "description": []
-    },
-    {
-        "Bird": "ApocritaÂ sp.",
-        "description": []
-    },
-    {
-        "Bird": "Aprosmictus erythropterus",
-        "description": []
-    },
-    {
-        "Bird": "Aquila audax",
-        "description": []
-    },
-    {
-        "Bird": "Artamus cinereus",
-        "description": []
-    },
-    {
-        "Bird": "Artamus cyanopterus",
-        "description": []
-    },
-    {
-        "Bird": "Artamus minor",
-        "description": []
-    },
-    {
-        "Bird": "Artamus superciliosus",
-        "description": []
-    },
-    {
-        "Bird": "Atrapsalta encaustica",
-        "description": []
-    },
-    {
-        "Bird": "Auscala spinosa",
-        "description": []
-    },
-    {
-        "Bird": "Austrochaperina pluvialis",
-        "description": []
-    },
-    {
-        "Bird": "Austronomus australis",
-        "description": []
-    },
-    {
-        "Bird": "AvesÂ sp.",
-        "description": []
-    },
-    {
-        "Bird": "Aythya australis",
-        "description": []
-    },
-    {
-        "Bird": "Barnardius zonarius",
-        "description": []
-    },
-    {
-        "Bird": "Biziura lobata",
-        "description": []
-    },
-    {
-        "Bird": "Burhinus grallarius",
-        "description": []
-    },
-    {
-        "Bird": "Cacatua galerita",
-        "description": []
-    },
-    {
-        "Bird": "Cacatua sanguinea",
-        "description": []
-    },
-    {
-        "Bird": "Cacomantis flabelliformis",
-        "description": []
-    },
-    {
-        "Bird": "Cacomantis variolosus",
-        "description": []
-    },
-    {
-        "Bird": "CaeliferaÂ sp.",
-        "description": []
-    },
-    {
-        "Bird": "Caligavis chrysops",
-        "description": []
-    },
-    {
-        "Bird": "Callocephalon fimbriatum",
-        "description": []
-    },
-    {
-        "Bird": "Calyptorhynchus banksii",
-        "description": []
-    },
-    {
-        "Bird": "Calyptorhynchus lathami",
-        "description": []
-    },
-    {
-        "Bird": "Canis familiaris",
-        "description": []
-    },
-    {
-        "Bird": "Capra hircus",
-        "description": []
-    },
-    {
-        "Bird": "Carduelis carduelis",
-        "description": []
-    },
-    {
-        "Bird": "Carterornis leucotis",
-        "description": []
-    },
-    {
-        "Bird": "Centropus phasianinus",
-        "description": []
-    },
-    {
-        "Bird": "Cervus Unicolour",
-        "description": []
-    },
-    {
-        "Bird": "Ceyx azureus",
-        "description": []
-    },
-    {
-        "Bird": "Conopophila albogularis",
-        "description": []
-    },
-    {
-        "Bird": "Cophixalus bombiens",
-        "description": []
-    },
-    {
-        "Bird": "Cophixalus exiguus",
-        "description": []
-    },
-    {
-        "Bird": "Cophixalus infacetus",
-        "description": []
-    },
-    {
-        "Bird": "Cophixalus ornatus",
-        "description": []
-    },
-    {
-        "Bird": "Coracina novaehollandiae",
-        "description": []
-    },
-    {
-        "Bird": "Coracina papuensis",
-        "description": []
-    },
-    {
-        "Bird": "Corcorax melanorhamphos",
-        "description": []
-    },
-    {
-        "Bird": "Cormobates leucophaea",
-        "description": []
-    },
-    {
-        "Bird": "Corvus bennetti",
-        "description": []
-    },
-    {
-        "Bird": "Corvus coronoides",
-        "description": []
-    },
-    {
-        "Bird": "Corvus mellori",
-        "description": []
-    },
-    {
-        "Bird": "Corvus orru",
-        "description": []
-    },
-    {
-        "Bird": "Coturnix pectoralis",
-        "description": []
-    },
-    {
-        "Bird": "Cracticus nigrogularis",
-        "description": []
-    },
-    {
-        "Bird": "Cracticus torquatus",
-        "description": []
-    },
-    {
-        "Bird": "Crinia signifera",
-        "description": []
+        "description": [
+            "Large honeyeater, about 32–36 cm (12.6–14.2 inches) in length.",
+            "Common Name: Red Wattlebird.",
+            "Grey-brown body, yellow belly, and red wattles on the face."
+        ]
     }
+
+      
     
   ]
 }
