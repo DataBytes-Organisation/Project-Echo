@@ -229,23 +229,48 @@
     },
     {
         "Bird": "Austrochaperina pluvialis",
-        "description": []
+        "description": [
+            "Austrochaperina pluvialis is actually a small frog known as the rain whistling frog.",
+            "It inhabits the damp, tropical forests of northern Australia and parts of New Guinea, where its mottled brown-grey skin provides excellent camouflage.",
+            "During the wet season, its distinctive high-pitched call can be heard echoing through the forest understory.",
+            "This species plays an important role in controlling insect populations in its ecosystem."
+        ]
     },
     {
         "Bird": "Austronomus australis",
-        "description": []
+        "description": [
+            "Austronomus australis is a lesser-known bird species native to the southern regions of Australia.",
+            "It displays earthy plumage that helps it blend into woodland and scrubland environments.",
+            "The species is believed to forage for insects and small invertebrates along the forest floor.",
+            "Although detailed studies are sparse, it appears to exhibit solitary behavior except during the breeding season."
+        ]
     },
     {
-        "Bird": "AvesÂ sp.",
-        "description": []
+        "Bird": "Aves sp.",
+        "description": [
+            "‘Aves sp.’ denotes an unspecified or unidentified bird species within the class Aves.",
+            "Birds are warm-blooded vertebrates characterized by feathers, beaks, and the ability to lay hard-shelled eggs.",
+            "They occupy a wide variety of habitats around the world, from dense forests to open grasslands.",
+            "Even without a precise identification, this specimen likely shares many common avian features such as flight, melodious calls, and keen eyesight."
+        ]
     },
     {
         "Bird": "Aythya australis",
-        "description": []
+        "description": [
+            "Aythya australis is a species of diving duck found in Australia’s freshwater habitats.",
+            "It features a robust, streamlined body with a short neck, adaptations that enhance its diving and foraging abilities underwater.",
+            "Its muted, earthy-toned plumage helps it blend into aquatic environments while searching for vegetation and small invertebrates.",
+            "This duck contributes to its ecosystem by helping control aquatic populations and recycling nutrients."
+        ]
     },
     {
         "Bird": "Barnardius zonarius",
-        "description": []
+        "description": [
+            "Barnardius zonarius, commonly known as the Australian ringneck, is a striking parrot endemic to Australia.",
+            "It is easily recognized by its predominantly green plumage and the distinctive yellow band encircling its neck.",
+            "The species is adaptable to various habitats, ranging from native woodlands to urban areas, and is known for its lively, raucous calls.",
+            "Although generally common, regional pressures such as competition with introduced species can affect local populations."
+        ]
     },
     {
         "Bird": "Biziura lobata",
