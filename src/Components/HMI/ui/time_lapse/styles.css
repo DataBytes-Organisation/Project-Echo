@@ -1,0 +1,29 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+    color: #333;
+}
+
+.container {
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 10px;
+    text-align: center;
+}
+
+h1 {
+    color: #4CAF50;
+}
+
+.controls {
+    margin-bottom: 20px;
+}
+
+#map {
+    height: 500px;
+    margin-top: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
