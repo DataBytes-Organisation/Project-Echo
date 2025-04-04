@@ -37,6 +37,53 @@
       <div class="container-fluid">
         <div class="card">
           <div class="card-body">
+            <!-- Public Profile Section -->
+            <h5 class="card-title fw-semibold mb-4">Profile</h5>
+            
+            <div class="profile-picture-section mb-4">
+              <div class="d-flex align-items-center">
+                <div class="profile-image-container me-3">
+                  <img src="./admin/images/default-profile.png" alt="Profile Picture" class="profile-image rounded-circle">
+                </div>
+                <div>
+                  <button type="button" class="btn btn-primary btn-sm me-2 change-picture-btn">Change Picture</button>
+                  <button type="button" class="btn btn-outline-secondary btn-sm delete-picture-btn">Delete Picture</button>
+                  <input type="file" id="profilePictureInput" accept="image/*" style="display: none;">
+                </div>
+              </div>
+            </div>
+
+            <form id="profile-form">
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label for="firstName" class="form-label">First Name</label>
+                  <input type="text" class="form-control" id="firstName" placeholder="Enter First Name" required>
+                </div>
+                <div class="col-md-6">
+                  <label for="lastName" class="form-label">Last Name</label>
+                  <input type="text" class="form-control" id="lastName" placeholder="Enter Last Name" required>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="location" class="form-label">Email</label>
+                <input type="text" class="form-control" id="location" placeholder="Enter Email" required>
+              </div>
+
+              <div class="mb-3">
+                <label for="profession" class="form-label">Profession</label>
+                <input type="text" class="form-control" id="profession" placeholder="Enter Profession" required>
+              </div>
+
+              <div class="mb-4">
+                <label for="bio" class="form-label">Bio</label>
+                <textarea class="form-control" id="bio" rows="3" placeholder="Enter Text"></textarea>
+              </div>
+
+              <button type="submit" class="btn btn-primary mb-4">Save Profile</button>
+            </form>
+
+            <!-- Change Password Section -->
             <h5 class="card-title fw-semibold mb-4">Change Password</h5>
             
             <form id="change-password-form">
@@ -53,7 +100,7 @@
                 <input type="password" class="form-control" id="confirmPassword" required>
               </div>
               <div class="mb-3">
-                <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="submit" class="btn btn-primary">Change Password</button>
               </div>
             </form>
 
@@ -67,11 +114,57 @@
 
   <script type="text/javascript">
     $(document).ready(function() {
-      // Load sidebar and header components
       $("#sidebar").load("./admin/component/sidebar-component.html");
       $("#header").load("./admin/component/header-component.html");
 
-      // Handle form submission
+      // Profile picture change
+      $(".change-picture-btn").click(function() {
+        $("#profilePictureInput").click();
+      });
+
+      $("#profilePictureInput").change(function(e) {
+        const file = e.target.files[0];
+        if (file) {
+          // Validate file type
+          const validImageTypes = ['image/jpeg', 'image/png', 'image/gif'];
+          if (!validImageTypes.includes(file.type)) {
+            $("#message-container").html(
+              '<div class="alert alert-danger" role="alert">Please upload a valid image file (JPEG, PNG, or GIF).</div>'
+            );
+            return;
+          }
+
+          // Validate file size (e.g., max 5MB)
+          const maxSizeInBytes = 5 * 1024 * 1024; // 5MB
+          if (file.size > maxSizeInBytes) {
+            $("#message-container").html(
+              '<div class="alert alert-danger" role="alert">Image size must be less than 5MB.</div>'
+            );
+            return;
+          }
+
+          // Preview the image
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            $(".profile-image").attr("src", e.target.result);
+            $("#message-container").html(
+              '<div class="alert alert-success" role="alert">Profile Picture Updated. Save your Profile to confirm.</div>'
+            );
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+      // Delete picture
+      $(".delete-picture-btn").click(function() {
+        $(".profile-image").attr("src", "./admin/images/default-profile.png");
+        $("#message-container").html(
+          '<div class="alert alert-success" role="alert">Profile Picture Removed. Save your Profile to confirm.</div>'
+        );
+      });
+
+
+      // Change password form submission
       $("#change-password-form").submit(function(e) {
         e.preventDefault();
         
@@ -79,28 +172,26 @@
         const newPassword = $("#newPassword").val();
         const confirmPassword = $("#confirmPassword").val();
         
-        // Basic validation
+        // Validation
         if (newPassword !== confirmPassword) {
           $("#message-container").html(
-            '<div class="alert alert-danger" role="alert">New passwords do not match!</div>'
+            '<div class="alert alert-danger" role="alert">Passwords Do Not Match</div>'
           );
           return;
         }
 
         if (newPassword.length < 8) {
           $("#message-container").html(
-            '<div class="alert alert-danger" role="alert">Password must be at least 8 characters long!</div>'
+            '<div class="alert alert-danger" role="alert">Password must be at least 8 characters long</div>'
           );
           return;
         }
 
-        // Here you would typically make an API call to change the password
-        // For this example, we'll just show a success message
+        // API call to change the password
         $("#message-container").html(
-          '<div class="alert alert-success" role="alert">Password successfully changed!</div>'
+          '<div class="alert alert-success" role="alert">Password Successfully Changed</div>'
         );
         
-        // Clear the form
         this.reset();
       });
     });
