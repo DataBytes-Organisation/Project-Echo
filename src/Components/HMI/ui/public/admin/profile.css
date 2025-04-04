@@ -1,0 +1,110 @@
+/* admin/css/profile.css */
+
+/* Container styling */
+.container-fluid {
+    padding: 20px;
+}
+
+/* Card styling */
+.card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,.08);
+    background-color: #fff;
+}
+
+/* Card body padding */
+.card-body {
+    padding: 25px;
+}
+
+/* Title styling */
+.card-title {
+    color: #1a1a1a;
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 20px !important;
+}
+
+/* Form styling */
+#change-password-form {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+/* Form labels */
+.form-label {
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+/* Form inputs */
+.form-control {
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+    padding: 10px 15px;
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #5d87ff;
+    box-shadow: 0 0 0 0.2rem rgba(93, 135, 255, 0.25);
+}
+
+/* Spacing between form groups */
+.mb-3 {
+    margin-bottom: 20px !important;
+}
+
+/* Submit button */
+.btn-primary {
+    background-color: #5d87ff;
+    border-color: #5d87ff;
+    padding: 10px 25px;
+    font-weight: 500;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #4a73e8;
+    border-color: #4a73e8;
+    transform: translateY(-1px);
+}
+
+/* Alert messages */
+.alert {
+    border-radius: 6px;
+    padding: 12px 15px;
+    margin-top: 15px;
+    font-size: 14px;
+}
+
+.alert-success {
+    background-color: #e6ffe6;
+    border-color: #b3ffb3;
+    color: #006600;
+}
+
+.alert-danger {
+    background-color: #ffe6e6;
+    border-color: #ffb3b3;
+    color: #660000;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .card-body {
+        padding: 15px;
+    }
+    
+    #change-password-form {
+        max-width: 100%;
+    }
+    
+    .card-title {
+        font-size: 20px;
+    }
+}
