@@ -24,6 +24,8 @@
 			
 		],
 		"organization": "Deakin",
+		"notificationAnimals": [],
+		"emailNotifications": [],
 		"phonenumber": "0499999999"
 	},
 	{
@@ -51,6 +53,8 @@
 			
 		],
 		"organization": "Deakin",
+		"notificationAnimals": [],
+		"emailNotifications": [],
 		"phonenumber": "0499999999"
 	},
 	{
@@ -78,6 +82,8 @@
 			
 		],
 		"organization": "Deakin",
+		"notificationAnimals": [],
+		"emailNotifications": [],
 		"phonenumber": "0499999999"
 	},
 	{
@@ -102,6 +108,8 @@
 			
 		],
 		"organization": "Deakin",
+		"notificationAnimals": [],
+		"emailNotifications": [],
 		"phonenumber": "0499999999"
 	},
 	{
@@ -127,6 +135,29 @@
 		],
 		"organization": "Deakin",
 		"phonenumber": "0499999999"
+	},
+	{
+		"_id": "321bf7e5-04e4-4f80-8ca8-7175c5e9876e",
+		"username": "VP-HMI",
+		"password": "$2b$08$bWH/bT1rOhb8o6qj6pNU9emaw5CGPbTZL.FEeJhkiWanNktTRAUc2",
+		"email": "vishnuprasad9797@gmail.com",
+		"roles": [
+			{
+				"_id": "64be1d0f05225843178d91d6"
+			}
+		],
+		"__v": 1,
+		"gender": "MALE",
+		"DoB": "01-01-2000",
+		"address": {
+			"country": "Australia",
+			"state": "VIC"
+		},
+		"organization": "Project Echo",
+		"phonenumber": "444444455",
+		"notificationAnimals": [],
+		"emailNotifications": [],
+		"userId": "VP-HMI"
 	}
 	
 ]
