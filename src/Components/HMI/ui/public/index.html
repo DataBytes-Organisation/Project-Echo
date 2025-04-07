@@ -59,6 +59,7 @@
     <!-- End Imports -->
     <title>Echo | Welcome</title>
   </head>
+ 
   <body>
 
 
@@ -172,7 +173,39 @@
             <a id="user-profile-button" class="tabs-button" onclick="openTab('userProfile'); fetchUser()"></a>
             <a id="notification-menu-button" class="tabs-button" onclick="openTab('animalNotifications')"></a>
             <a id="statistics-menu-btn" class="tabs-button" onclick="openTab('statistics')"></a>
+            <a id="enquiry-menu-btn" class="tabs-button" onclick="openTab('enquiry')"><i class="fas fa-comment-alt"></i></a>
             <span id="pink-line" class="sudden-line"></span>
+          </div>
+          <!-- Enquiry Form Tab Content (hidden by default until opened) -->
+          <div id="enquiry" class="tab-content" style="display: none;">
+            <div class="wrapper">
+              <div id="enquiry-contents"
+                <h2>Submit an Enquiry</h2>
+                <form id="enquiryForm">
+                  <div class="mb-3">
+                    <label>Username:</label>
+                    <input type="text" id="username" class="form-control" required />
+                  </div>
+                  <div class="mb-3">
+                    <label>Organisation / Detail:</label>
+                    <input type="text" id="userDetail" class="form-control" required />
+                  </div>
+                  <div class="mb-3">
+                    <label>Enquiry:</label>
+                    <textarea id="content" class="form-control" required></textarea>
+                  </div>
+                  <div class="mb-3">
+                    <label>Category:</label>
+                    <select id="category" class="form-select" required>
+                      <option value="Enquiry">Enquiry</option>
+                      <option value="Request">Request</option>
+                    </select>
+                  </div>
+                  <button type="submit" class="btn btn-primary">Submit</button>
+                  <p id="enquirySuccess" class="text-success" style="display:none;">Submitted successfully!</p>
+                </form>
+              </div>
+            </div>
           </div>
           <div id="FAQ">
             <div class="wrapper">
@@ -249,7 +282,8 @@
                 </form>
                 </div>
               </div>
-
+             
+             
               <div class="dropdown">
                 <button class="btn btn-secondary dropdown-toggle btn-no-background" id="data_src_toggle" data-bs-toggle="dropdown" aria-expanded="false">
                   Data Sourcing and Pooling
@@ -1784,6 +1818,10 @@
         case "statistics":
           document.getElementById("statistics-menu-btn").classList.add("active");
           break;
+        case "enquiry":
+          document.getElementById("enquiry-menu-btn").classList.add("active");
+          document.getElementById("enquiry").style.display = "block";
+          break;
         case "animalNotifications":
           document.getElementById("notification-menu-button").classList.add("active");
           document.getElementById("animalNotifications").style.display = "block";
@@ -2722,6 +2760,35 @@
       // Check for saved user preference on load
       const savedTheme = localStorage.getItem('theme') || 'dark'; // Default to dark if no preference
       setTheme(savedTheme);
+    });
+  </script>
+   <script>
+    document.getElementById("enquiryForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+  
+      const data = {
+        username: document.getElementById("username").value,
+        userDetail: document.getElementById("userDetail").value,
+        content: document.getElementById("content").value,
+        category: document.getElementById("category").value,
+        date: new Date().toISOString().split("T")[0]
+      };
+  //enquiry scipt for form
+      fetch("/api/enquiries", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      }).then(res => {
+        if (res.ok) {
+          document.getElementById("enquiryForm").reset();
+          document.getElementById("enquirySuccess").style.display = "block";
+        } else {
+          alert("Failed to submit enquiry.");
+        }
+      }).catch(err => {
+        console.error("Error:", err);
+        alert("Failed to submit enquiry.");
+      });
     });
   </script>
 </body>

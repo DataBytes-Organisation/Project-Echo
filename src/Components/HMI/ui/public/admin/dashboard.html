@@ -182,7 +182,7 @@
           <div class="col-lg-12 d-flex align-items-stretch">
             <div class="card w-100">
               <div class="card-body p-4">
-                <h5 class="card-title fw-semibold mb-4">Enquiries History</h5>
+                <h5 class="card-title fw-semibold mb-4">Enquiries123 History</h5>
                 <div class="table-responsive">
                   <table class="table text-nowrap mb-0 align-middle">
                     <thead class="text-dark fs-4">
@@ -204,80 +204,11 @@
                         </th>
                       </tr>
                     </thead>
-                    <tbody>
-                      <tr>
-                        <td class="border-bottom-0"><h6 class="fw-semibold mb-0">vtn0901</h6></td>
-                        <td class="border-bottom-0">
-                            <h6 class="fw-semibold mb-1">Tung Nguyen</h6>
-                            <span class="fw-normal">Deakin</span>                          
-                        </td>
-                        <td class="border-bottom-0">
-                          <p class="mb-0 fw-normal">I would like to talk abouut....</p>
-                        </td>
-                        <td class="border-bottom-0">
-                            <div class="d-flex align-items-center gap-2">
-                                <span class="badge bg-success rounded-3 fw-semibold">Enquiry</span>
-                              </div>
-                        </td>
-                        <td class="border-bottom-0">
-                          <h6 class="fw-semibold mb-0 fs-4">02/08/2023</h6>
-                        </td>
-                      </tr> 
-                      <tr>
-                        <td class="border-bottom-0"><h6 class="fw-semibold mb-0">qtnck</h6></td>
-                        <td class="border-bottom-0">
-                            <h6 class="fw-semibold mb-1">Quentin Cooke</h6>
-                            <span class="fw-normal">Echo</span>                          
-                        </td>
-                        <td class="border-bottom-0">
-                          <p class="mb-0 fw-normal">I would like to talk abouut....</p>
-                        </td>
-                        <td class="border-bottom-0">
-                          <div class="d-flex align-items-center gap-2">
-                            <span class="badge bg-secondary rounded-3 fw-semibold">Request</span>
-                          </div>
-                        </td>
-                        <td class="border-bottom-0">
-                          <h6 class="fw-semibold mb-0 fs-4">06/06/2023</h6>
-                        </td>
-                      </tr> 
-                      <tr>
-                        <td class="border-bottom-0"><h6 class="fw-semibold mb-0">ben</h6></td>
-                        <td class="border-bottom-0">
-                            <h6 class="fw-semibold mb-1">Benedict Nicholls</h6>
-                            <span class="fw-normal">DataBytes</span>                          
-                        </td>
-                        <td class="border-bottom-0">
-                          <p class="mb-0 fw-normal">I would like to talk abouut....</p>
-                        </td>
-                        <td class="border-bottom-0">
-                            <div class="d-flex align-items-center gap-2">
-                                <span class="badge bg-secondary rounded-3 fw-semibold">Request</span>
-                              </div>
-                        </td>
-                        <td class="border-bottom-0">
-                          <h6 class="fw-semibold mb-0 fs-4">13/04/2023</h6>
-                        </td>
-                      </tr>      
-                      <tr>
-                        <td class="border-bottom-0"><h6 class="fw-semibold mb-0">rhtbj</h6></td>
-                        <td class="border-bottom-0">
-                            <h6 class="fw-semibold mb-1">Rohit Bajaj</h6>
-                            <span class="fw-normal">Firebase community</span>                          
-                        </td>
-                        <td class="border-bottom-0">
-                          <p class="mb-0 fw-normal">I would like to talk abouut....</p>
-                        </td>
-                        <td class="border-bottom-0">
-                          <div class="d-flex align-items-center gap-2">
-                            <span class="badge bg-success rounded-3 fw-semibold">Enquiry</span>
-                          </div>
-                        </td>
-                        <td class="border-bottom-0">
-                          <h6 class="fw-semibold mb-0 fs-4">29/03/2023</h6>
-                        </td>
-                      </tr>                       
-                    </tbody>
+                  
+                      <tbody id="enquiry-table-body">
+                        <!-- Enquiries will be injected here via JS -->
+                      </tbody>                
+                    
                   </table>
                 </div>
               </div>
@@ -334,7 +265,42 @@
   </script>
 
 </body>
+<script>
+  fetch('/api/enquiries')
+    .then(response => response.json())
+    .then(data => {
+      const tbody = document.getElementById('enquiry-table-body');
+      tbody.innerHTML = ''; // Clear any existing-rows
 
+      data.forEach(entry => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td class="border-bottom-0"><h6 class="fw-semibold mb-0">${entry.username}</h6></td>
+          <td class="border-bottom-0">
+            <h6 class="fw-semibold mb-1">${entry.userDetail}</h6>
+            <span class="fw-normal">${entry.userDetail}</span>
+          </td>
+          <td class="border-bottom-0">
+            <p class="mb-0 fw-normal">${entry.content}</p>
+          </td>
+          <td class="border-bottom-0">
+            <div class="d-flex align-items-center gap-2">
+              <span class="badge ${entry.category === 'Request' ? 'bg-secondary' : 'bg-success'} rounded-3 fw-semibold">
+                ${entry.category}
+              </span>
+            </div>
+          </td>
+          <td class="border-bottom-0">
+            <h6 class="fw-semibold mb-0 fs-4">${entry.date}</h6>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    })
+    .catch(error => {
+      console.error("Failed to load enquiries:", error);
+    });
+</script>
 
 
 </html>

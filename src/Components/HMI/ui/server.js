@@ -14,9 +14,8 @@ const cors = require('cors');
 require('dotenv').config();
 const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY);
 const axios = require('axios');
+const mongoose = require('mongoose');
 const { MongoClient, ObjectId } = require('mongodb');
-
-
 
 // Temporarily removed the variables that need the captcha-canvas package
 //const {createCaptchaSync} = require("captcha-canvas");
@@ -596,6 +595,28 @@ app.get('/api/requests', async (req, res) => {
     res.status(401).redirect('/admin-dashboard')
   }
 });
+
+let enquiries = []; // This will store enquiries in memory
+// POST -- Save enquiry to in-memory array
+app.post('/api/enquiries', (req, res) => {
+  const { username, userDetail, content, category, date } = req.body;
+
+  if (!username || !content) {
+    return res.status(400).json({ message: "Missing required fields" });
+  }
+
+  const newEnquiry = { username, userDetail, content, category, date };
+  enquiries.push(newEnquiry);
+
+  console.log("✅ Enquiry submitted:", newEnquiry);
+  res.status(201).json({ message: "Enquiry submitted successfully" });
+});
+
+// GET - Return all stored enquiries
+app.get('/api/enquiries', (req, res) => {
+  res.json(enquiries);
+});
+
 //Page Direction to Welcome page after logging in
 app.get("/welcome", async (req,res) => {
   try {
