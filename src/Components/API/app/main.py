@@ -1,6 +1,7 @@
 import os
 from fastapi import FastAPI, Body, HTTPException, status, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
+from app.routers import species_predictor
 from fastapi.responses import Response, JSONResponse
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel, Field, EmailStr
@@ -26,6 +27,8 @@ app.add_middleware(
 app.include_router(hmi.router, tags=['hmi'], prefix='/hmi')
 app.include_router(engine.router, tags=['engine'], prefix='/engine')
 app.include_router(sim.router, tags=['sim'], prefix='/sim')
+app.include_router(species_predictor.router, tags=["predict"])
+
 
 
 # Load the project echo credentials into a dictionary
