@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submission Overview</title>
+</head>
+<body>
+    <h1>Audio Submissions Overview</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Submission Date</th>
+                <th>Detected Animal</th>
+                <th>Audio File</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for submission in submissions %}
+                <tr>
+                    <td>{{ submission.submission_date }}</td>
+                    <td>{{ submission.detected_animal }}</td>
+                    <td>{{ submission.audio_file }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
