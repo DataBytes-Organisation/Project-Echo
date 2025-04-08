@@ -1,0 +1,22 @@
+/* public/css/detectedAnimals.css */
+body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+  
+  th, td {
+    padding: 10px;
+    border: 1px solid #ccc;
+  }
+  
+  #animal-popup {
+    background-color: #f9f9f9;
+    width: 400px;
+  }
+  

@@ -26,6 +26,9 @@ const port = 8080;
 
 const rootDirectory = __dirname; // This assumes the root directory is the current directory
 
+// Serve static files from the public folder
+app.use('/public', express.static(path.join(__dirname, 'public')));
+
 
 //Security verification for email account and body content validation:
 const validation = require('deep-email-validator')
