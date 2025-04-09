@@ -47,13 +47,14 @@ services:
       - echo-net
     volumes:
       - ./HMI/ui:/usr/src/app/ui # Mount the HMI/ui directory to /usr/src/app/ui in the container
+      - ../../src/io:/usr/src/app/io # Mount JSON data for Detected Animals
       - /usr/src/app/ui/node_modules
       - credentials_volume:/root/.config/gcloud/
     ports:
       - "8080:8080"
     restart: on-failure
-    depends_on:
-      - redis
+    #depends_on:
+    #  - redis
     stdin_open: true
     tty: true
     environment:

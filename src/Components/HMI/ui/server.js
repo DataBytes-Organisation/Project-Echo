@@ -5,11 +5,11 @@ const fs = require('fs');
 const cookieSession = require('cookie-session');
 const helmet = require('helmet');
 const jwt = require('jsonwebtoken');
-const { client, checkUserSession } = require('./middleware');
+//const { client, checkUserSession } = require('./middleware');
 const controller = require('./controller/auth.controller');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
-client.connect();
+//client.connect();
 const cors = require('cors');
 require('dotenv').config();
 const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY);
@@ -431,7 +431,7 @@ app.post('/api/applyAlgorithm', (req, res) => {
 require('./routes/auth.routes')(app);
 require('./routes/user.routes')(app);
 require('./routes/map.routes')(app);
-app.get('*', checkUserSession);
+//app.get('*', checkUserSession);
 app.get("/", async (req, res) => {
   console.log("token: ", await client.get('JWT', (err, storedToken) => {
           if (err) {
@@ -677,6 +677,9 @@ const suspendOrBlockUser = async (identifier, action) => {
 };
 
 app.use(express.json());
+// Publicly serve JSON data from src/io (for detected animals page)
+app.use('/io', express.static('/usr/src/app/io'));
+
 
 app.post('/suspendUser', async (req, res) => {
     const { identifier, action } = req.body;

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Detected Animal on Map</title>
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+  />
+  <style>
+    #map {
+      height: 600px;
+      width: 100%;
+      margin-top: 20px;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 30px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Detected Animal on Map</h2>
+  <div id="map"></div>
+
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const index = parseInt(urlParams.get("animalIndex"), 10);
+
+    const map = L.map("map").setView([-25.27, 133.77], 4);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+    }).addTo(map);
+
+    fetch("/io/combined_animal_data.json")
+      .then((res) => res.json())
+      .then((data) => {
+        const animal = data[index];
+        if (!animal) {
+          alert("Animal data not found.");
+          return;
+        }
+
+        const name = animal["Common Name"] || "Unknown";
+        const time = animal.timestamp || "Unknown";
+        const micId = animal.microphone_id || "Unknown";
+        const coords = animal.microphone_coords;
+
+        if (!coords || coords.length !== 2) {
+          alert("Microphone coordinates not available.");
+          return;
+        }
+
+        const marker = L.marker(coords).addTo(map);
+        marker.bindPopup(
+          `<b>${name}</b><br>Detected at: ${time}<br>Mic ID: ${micId}`
+        ).openPopup();
+
+        map.setView(coords, 12);
+      })
+      .catch((err) => {
+        console.error("Failed to load animal data:", err);
+      });
+  </script>
+</body>
+</html>
