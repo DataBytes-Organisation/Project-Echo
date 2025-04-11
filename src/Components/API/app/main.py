@@ -12,35 +12,36 @@ from app import schemas
 import pymongo
 import json
 from app.routers import hmi, engine, sim
-app = FastAPI()
 
-# Add the CORS middleware
+# ✅ Add metadata here
+app = FastAPI(
+    title="Project Echo API",
+    description="""
+    Project Echo is an IoT-based system designed to record and analyze audio data for species identification and ecosystem monitoring.
+
+    This API provides endpoints to:
+    - Upload audio files
+    - Simulate audio responses
+    - Interface with HMI and audio engine modules
+    """,
+    version="1.0.0"
+)
+
+# ✅ CORS Middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:8080"],  # Replace with your own allowed origins
+    allow_origins=["http://localhost:8080"],  # Replace with your frontend origin
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# ✅ Include routers
 app.include_router(hmi.router, tags=['hmi'], prefix='/hmi')
 app.include_router(engine.router, tags=['engine'], prefix='/engine')
 app.include_router(sim.router, tags=['sim'], prefix='/sim')
 
-
-# Load the project echo credentials into a dictionary
-
-'''try:
-    file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'echo_config.json')
-    with open(file_path, 'r') as f:
-        echo_config = json.load(f)
-    print(f"Echo API echo_config successfully loaded", flush=True)
-except:
-    print(f"Could not API echo_config : {file_path}") 
-print(f" database names: {client.list_database_names()}")
-'''
-
-@app.get("/", response_description="api-root")
+# ✅ Root endpoint
+@app.get("/", response_description="API Root")
 def show_home():
-    return 'Welcome to echo api, move to /docs for more'
-
+    return 'Welcome to Project Echo API. Visit /docs for interactive documentation.'
