@@ -13,7 +13,7 @@ from app import schemas
 import pymongo
 import json
 
-from app.routers import hmi, engine, sim, iot
+from app.routers import hmi, engine, sim, iot, public
 
 # ✅ Add metadata here
 app = FastAPI(
@@ -32,7 +32,7 @@ app = FastAPI(
 # ✅ CORS Middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins
+    allow_origins=["http://localhost:8080"],  # 可根据实际需求配置
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -46,6 +46,7 @@ app.include_router(sim.router, tags=['sim'], prefix='/sim')
 app.include_router(iot.router, tags=['iot'], prefix='/iot')
 app.include_router(species_predictor.router, tags=["predict"])
 
+app.include_router(public.router, tags=['public'], prefix='/public')
 
 # ✅ Root endpoint
 @app.get("/", response_description="API Root")
