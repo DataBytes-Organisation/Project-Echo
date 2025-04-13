@@ -1,3 +1,4 @@
+## app.serializers.py
 def eventEntity(event) -> dict:
     return {
         "_id": str(event["_id"]),

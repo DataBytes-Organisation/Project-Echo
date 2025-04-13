@@ -12,12 +12,12 @@ from app import schemas
 import pymongo
 import json
 from app.routers import hmi, engine, sim
+from app.routers import public
 app = FastAPI()
 
-# Add the CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:8080"],  # Replace with your own allowed origins
+    allow_origins=["http://localhost:8080"],  # 可根据实际需求配置
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -27,8 +27,7 @@ app.include_router(hmi.router, tags=['hmi'], prefix='/hmi')
 app.include_router(engine.router, tags=['engine'], prefix='/engine')
 app.include_router(sim.router, tags=['sim'], prefix='/sim')
 
-
-# Load the project echo credentials into a dictionary
+app.include_router(public.router, tags=['public'], prefix='/public')
 
 '''try:
     file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'echo_config.json')
