@@ -455,6 +455,7 @@ app.get("/", async (req, res) => {
 app.get("/admin-dashboard", (req,res)=> {
   return res.sendFile(path.join(__dirname, 'public/admin/dashboard.html'));
 })
+
 //Serve the profile tab
 app.get("/admin-profile", (req,res)=> {
   return res.sendFile(path.join(__dirname, 'public/admin/profile.html'));
