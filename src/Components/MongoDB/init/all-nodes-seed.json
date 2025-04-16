@@ -1,0 +1,405 @@
+[
+  {
+    "_id": "node_1",
+    "name": "Node Alpha",
+    "type": "master",
+    "model": "RaspberryPi4",
+    "location": {
+      "latitude": -37.8136,
+      "longitude": 144.9631
+    },
+    "customProperties": {
+      "processorSpeed": "1.5GHz",
+      "memory": "8GB",
+      "storage": "64GB"
+    },
+    "connectedNodes": ["node_1_1", "node_1_2", "node_1_3"],
+    "components": [
+      {
+        "id": "comp_1_1",
+        "type": "microphone",
+        "model": "AudioTechnica AT2020",
+        "category": "audio",
+        "customProperties": {
+          "frequency": "20Hz-20kHz",
+          "sensitivity": "-37dB",
+          "volume": 75
+        }
+      },
+      {
+        "id": "comp_1_2",
+        "type": "solar_panel",
+        "model": "SunPower X22-360",
+        "category": "power",
+        "customProperties": {
+          "wattage": 360,
+          "efficiency": 0.85,
+          "currentOutput": 320
+        }
+      }
+    ]
+  },
+  {
+    "_id": "node_2",
+    "name": "Node Beta",
+    "type": "master",
+    "model": "RaspberryPi4",
+    "location": {
+      "latitude": -37.8236,
+      "longitude": 144.9531
+    },
+    "customProperties": {
+      "processorSpeed": "1.5GHz",
+      "memory": "8GB",
+      "storage": "128GB"
+    },
+    "connectedNodes": ["node_2_1", "node_2_2", "node_2_3", "node_2_4", "node_4"],
+    "components": [
+      {
+        "id": "comp_2_1",
+        "type": "battery",
+        "model": "LithiumPro 5000",
+        "category": "power",
+        "customProperties": {
+          "capacity": "5000mAh",
+          "health": 0.95,
+          "currentCharge": 0.82
+        }
+      }
+    ]
+  },
+  {
+    "_id": "node_3",
+    "name": "Node Gamma",
+    "type": "master",
+    "model": "RaspberryPi4",
+    "location": {
+      "latitude": -37.8336,
+      "longitude": 144.9431
+    },
+    "customProperties": {
+      "processorSpeed": "1.5GHz",
+      "memory": "8GB",
+      "storage": "128GB"
+    },
+    "connectedNodes": ["node_3_1", "node_3_2", "node_3_3", "node_4"],
+    "components": [
+      {
+        "id": "comp_3_1",
+        "type": "fan",
+        "model": "CoolMaster Pro",
+        "category": "cooling",
+        "customProperties": {
+          "speed": 1200,
+          "maxSpeed": 2000,
+          "temperature": 35
+        }
+      }
+    ]
+  },
+  {
+    "_id": "node_4",
+    "name": "Node Delta",
+    "type": "master",
+    "model": "RaspberryPi4",
+    "location": {
+      "latitude": -37.8436,
+      "longitude": 144.9331
+    },
+    "customProperties": {
+      "processorSpeed": "1.5GHz",
+      "memory": "16GB",
+      "storage": "256GB"
+    },
+    "connectedNodes": ["node_2", "node_3"],
+    "components": [
+      {
+        "id": "comp_4_1",
+        "type": "microphone",
+        "model": "Shure SM58",
+        "category": "audio",
+        "customProperties": {
+          "frequency": "50Hz-15kHz",
+          "sensitivity": "-56dB",
+          "volume": 80
+        }
+      }
+    ]
+  },
+  {
+    "_id": "node_1_1",
+    "name": "Alpha Sub 1",
+    "type": "arduino",
+    "model": "Arduino Uno",
+    "parentNode": "node_1",
+    "location": {
+      "latitude": -37.8137,
+      "longitude": 144.9632
+    },
+    "customProperties": {
+      "processor": "ATmega328P",
+      "clockSpeed": "16MHz"
+    },
+    "connectedNodes": ["node_1"],
+    "components": [
+      {
+        "id": "comp_1_1_1",
+        "type": "microphone",
+        "model": "MAX9814",
+        "category": "audio",
+        "customProperties": {
+          "gain": "40dB",
+          "volume": 65
+        }
+      }
+    ]
+  },
+  {
+    "_id": "node_1_2",
+    "name": "Alpha Sub 2",
+    "type": "raspberry_pi",
+    "model": "RaspberryPi Zero",
+    "parentNode": "node_1",
+    "location": {
+      "latitude": -37.8138,
+      "longitude": 144.9633
+    },
+    "customProperties": {
+      "processorSpeed": "1GHz",
+      "memory": "512MB"
+    },
+    "connectedNodes": ["node_1"],
+    "components": [
+      {
+        "id": "comp_1_2_1",
+        "type": "battery",
+        "model": "LithiumPro 2000",
+        "category": "power",
+        "customProperties": {
+          "capacity": "2000mAh",
+          "health": 0.92,
+          "currentCharge": 0.75
+        }
+      }
+    ]
+  },
+  {
+    "_id": "node_1_3",
+    "name": "Alpha Sub 3",
+    "type": "arduino",
+    "model": "Arduino Nano",
+    "parentNode": "node_1",
+    "location": {
+      "latitude": -37.8139,
+      "longitude": 144.9634
+    },
+    "customProperties": {
+      "processor": "ATmega328",
+      "clockSpeed": "16MHz"
+    },
+    "connectedNodes": ["node_1"],
+    "components": [
+      {
+        "id": "comp_1_3_1",
+        "type": "solar_panel",
+        "model": "SunPower X21-335",
+        "category": "power",
+        "customProperties": {
+          "wattage": 335,
+          "efficiency": 0.82,
+          "currentOutput": 290
+        }
+      }
+    ]
+  },
+  {
+    "_id": "node_2_1",
+    "name": "Beta Sub 1",
+    "type": "raspberry_pi",
+    "model": "RaspberryPi 3B+",
+    "parentNode": "node_2",
+    "location": {
+      "latitude": -37.8237,
+      "longitude": 144.9532
+    },
+    "customProperties": {
+      "processorSpeed": "1.4GHz",
+      "memory": "1GB"
+    },
+    "connectedNodes": ["node_2"],
+    "components": [
+      {
+        "id": "comp_2_1_1",
+        "type": "fan",
+        "model": "CoolBreeze Mini",
+        "category": "cooling",
+        "customProperties": {
+          "speed": 800,
+          "maxSpeed": 1500,
+          "temperature": 32
+        }
+      }
+    ]
+  },
+  {
+    "_id": "node_2_2",
+    "name": "Beta Sub 2",
+    "type": "arduino",
+    "model": "Arduino Mega",
+    "parentNode": "node_2",
+    "location": {
+      "latitude": -37.8238,
+      "longitude": 144.9533
+    },
+    "customProperties": {
+      "processor": "ATmega2560",
+      "clockSpeed": "16MHz"
+    },
+    "connectedNodes": ["node_2"],
+    "components": [
+      {
+        "id": "comp_2_2_1",
+        "type": "microphone",
+        "model": "MAX9814",
+        "category": "audio",
+        "customProperties": {
+          "gain": "40dB",
+          "volume": 70
+        }
+      }
+    ]
+  },
+  {
+    "_id": "node_2_3",
+    "name": "Beta Sub 3",
+    "type": "raspberry_pi",
+    "model": "RaspberryPi Zero W",
+    "parentNode": "node_2",
+    "location": {
+      "latitude": -37.8239,
+      "longitude": 144.9534
+    },
+    "customProperties": {
+      "processorSpeed": "1GHz",
+      "memory": "512MB"
+    },
+    "connectedNodes": ["node_2"],
+    "components": [
+      {
+        "id": "comp_2_3_1",
+        "type": "battery",
+        "model": "LithiumPro 3000",
+        "category": "power",
+        "customProperties": {
+          "capacity": "3000mAh",
+          "health": 0.88,
+          "currentCharge": 0.65
+        }
+      }
+    ]
+  },
+  {
+    "_id": "node_2_4",
+    "name": "Beta Sub 4",
+    "type": "arduino",
+    "model": "Arduino Nano",
+    "parentNode": "node_2",
+    "location": {
+      "latitude": -37.8240,
+      "longitude": 144.9535
+    },
+    "customProperties": {
+      "processor": "ATmega328",
+      "clockSpeed": "16MHz"
+    },
+    "connectedNodes": ["node_2"],
+    "components": []
+  },
+  {
+    "_id": "node_3_1",
+    "name": "Gamma Sub 1",
+    "type": "raspberry_pi",
+    "model": "RaspberryPi 4B",
+    "parentNode": "node_3",
+    "location": {
+      "latitude": -37.8337,
+      "longitude": 144.9432
+    },
+    "customProperties": {
+      "processorSpeed": "1.5GHz",
+      "memory": "4GB"
+    },
+    "connectedNodes": ["node_3"],
+    "components": [
+      {
+        "id": "comp_3_1_1",
+        "type": "microphone",
+        "model": "AudioTechnica AT2020",
+        "category": "audio",
+        "customProperties": {
+          "frequency": "20Hz-20kHz",
+          "sensitivity": "-37dB",
+          "volume": 72
+        }
+      }
+    ]
+  },
+  {
+    "_id": "node_3_2",
+    "name": "Gamma Sub 2",
+    "type": "arduino",
+    "model": "Arduino Uno",
+    "parentNode": "node_3",
+    "location": {
+      "latitude": -37.8338,
+      "longitude": 144.9433
+    },
+    "customProperties": {
+      "processor": "ATmega328P",
+      "clockSpeed": "16MHz"
+    },
+    "connectedNodes": ["node_3"],
+    "components": [
+      {
+        "id": "comp_3_2_1",
+        "type": "fan",
+        "model": "CoolMaster Mini",
+        "category": "cooling",
+        "customProperties": {
+          "speed": 1000,
+          "maxSpeed": 1800,
+          "temperature": 30
+        }
+      }
+    ]
+  },
+  {
+    "_id": "node_3_3",
+    "name": "Gamma Sub 3",
+    "type": "raspberry_pi",
+    "model": "RaspberryPi Zero 2W",
+    "parentNode": "node_3",
+    "location": {
+      "latitude": -37.8339,
+      "longitude": 144.9434
+    },
+    "customProperties": {
+      "processorSpeed": "1GHz",
+      "memory": "512MB"
+    },
+    "connectedNodes": ["node_3"],
+    "components": [
+      {
+        "id": "comp_3_3_1",
+        "type": "solar_panel",
+        "model": "SunPower X21-345",
+        "category": "power",
+        "customProperties": {
+          "wattage": 345,
+          "efficiency": 0.86,
+          "currentOutput": 310
+        }
+      }
+    ]
+  }
+]

@@ -11,7 +11,7 @@ from app import serializers
 from app import schemas
 import pymongo
 import json
-from app.routers import hmi, engine, sim
+from app.routers import hmi, engine, sim, iot
 app = FastAPI()
 
 # Add the CORS middleware
@@ -26,6 +26,7 @@ app.add_middleware(
 app.include_router(hmi.router, tags=['hmi'], prefix='/hmi')
 app.include_router(engine.router, tags=['engine'], prefix='/engine')
 app.include_router(sim.router, tags=['sim'], prefix='/sim')
+app.include_router(iot.router, tags=['iot'], prefix='/iot')
 
 
 # Load the project echo credentials into a dictionary

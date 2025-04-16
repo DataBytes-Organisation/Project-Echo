@@ -1,53 +1,63 @@
-from fastapi import status, APIRouter
-from app.database import Nodes, Components, Commands
-
-from bson.objectid import ObjectId
-import datetime
+from fastapi import APIRouter, HTTPException, status
+from typing import List
+from app.database import Nodes
 
 router = APIRouter()
 
-def get_node(node_id):
-    """
-    Retrieve a node from MongoDB by its id.
-    """
+@router.get("/nodes", response_description="List all nodes")
+def get_nodes():
     try:
-        node = Nodes.find_one({"_id": ObjectId(node_id)})
-    except Exception:
-        return None
-    return node
+        nodes = list(Nodes.find({}))
+        return nodes
+    except Exception as error:
+        raise HTTPException(status_code=500, detail=f"Error retrieving nodes: {str(error)}")
 
-def get_component(component_id):
-    """
-    Retrieve a component from MongoDB by its id.
-    """
+@router.get("/nodes/{node_id}", response_description="Get a single node by ID")
+def get_node(node_id: str):
     try:
-        component = Components.find_one({"_id": ObjectId(component_id)})
-    except Exception:
-        return None
-    return component
+        node = Nodes.find_one({"_id": node_id})
+        
+        if not node:
+            raise HTTPException(status_code=404, detail="Node not found")
+            
+        # If node has connected nodes, fetch their basic info
+        if node.get('connectedNodes') and len(node['connectedNodes']) > 0:
+            connected_nodes = list(Nodes.find(
+                {"_id": {"$in": node['connectedNodes']}},
+                {"name": 1, "type": 1, "model": 1, "location": 1}
+            ))
+            node['connectedNodesData'] = connected_nodes
+            
+        return node
+    except Exception as error:
+        raise HTTPException(status_code=500, detail=f"Error retrieving node: {str(error)}")
 
-def create_command(target_type, target_id, command_type, parameters):
-    """
-    Log a command in the commands collection.
-    The target_type can be "node" or "component".
-    """
-    command = {
-        "target_type": target_type,
-        "target_id": ObjectId(target_id),
-        "command_type": command_type,
-        "parameters": parameters,
-        "status": "pending",  # Updated later once command is dispatched/received
-        "issued_at": datetime.datetime.utcnow()
-    }
-    command_id = Commands.insert_one(command).inserted_id
-    return str(command_id)
+@router.get("/nodes/{node_id}/components", response_description="Get components for a node")
+def get_node_components(node_id: str):
+    try:
+        node = Nodes.find_one({"_id": node_id})
+        
+        if not node:
+            raise HTTPException(status_code=404, detail="Node not found")
+            
+        return node.get('components', [])
+    except Exception as error:
+        raise HTTPException(status_code=500, detail=f"Error retrieving node components: {str(error)}")
 
-def dispatch_command(target_id, command_type, parameters, target_type="node"):
-    """
-    Placeholder function to send a command to a node or component.
-    In a real system, this could interface with an MQTT broker, WebSocket, etc.
-    """
-    print(f"Dispatching command '{command_type}' with parameters {parameters} to {target_type} {target_id}")
-    
-    return True
-
+@router.get("/nodes/{node_id}/connections", response_description="Get connections for a node")
+def get_node_connections(node_id: str):
+    try:
+        node = Nodes.find_one({"_id": node_id})
+        
+        if not node:
+            raise HTTPException(status_code=404, detail="Node not found")
+            
+        # Get connected nodes with basic info
+        connected_nodes = list(Nodes.find(
+            {"_id": {"$in": node.get('connectedNodes', [])}},
+            {"name": 1, "type": 1, "model": 1, "location": 1}
+        ))
+        
+        return {"connectedNodes": connected_nodes}
+    except Exception as error:
+        raise HTTPException(status_code=500, detail=f"Error retrieving node connections: {str(error)}")
