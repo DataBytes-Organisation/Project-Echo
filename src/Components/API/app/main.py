@@ -1,4 +1,5 @@
 import os
+from Components.API.app.routers import add_csv_output_option, audio_upload_router
 from fastapi import FastAPI, Body, HTTPException, status, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response, JSONResponse
@@ -26,6 +27,8 @@ app.add_middleware(
 app.include_router(hmi.router, tags=['hmi'], prefix='/hmi')
 app.include_router(engine.router, tags=['engine'], prefix='/engine')
 app.include_router(sim.router, tags=['sim'], prefix='/sim')
+app.include_router(add_csv_output_option.router, tags=['csv'], prefix='/api')
+app.include_router(audio_upload_router.router, tags=['audio'], prefix='/api')
 
 
 # Load the project echo credentials into a dictionary
