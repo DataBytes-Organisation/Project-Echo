@@ -1,0 +1,5 @@
+outs:
+- md5: e0f28c53976c5eec75eaeb1a54e18ba0
+  size: 54
+  hash: md5
+  path: dvc_model_output.txt
