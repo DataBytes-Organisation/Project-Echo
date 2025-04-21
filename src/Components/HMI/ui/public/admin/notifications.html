@@ -52,8 +52,12 @@
         <div class="container-fluid">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title fw-semibold mb-4">Sample Page</h5>
-                    <p class="mb-0">This is a sample page </p>
+                    <h5 class="card-title fw-semibold mb-4">Notifications</h5>
+                    <p class="mb-0">Notifications </p>
+                    <!-- Notification List -->
+                    <div id="notification-list">
+                        <!-- Notifications will be loaded here dynamically -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -68,6 +72,33 @@
         $("#sidebar").load("./admin/component/sidebar-component.html");
         $("#header").load("./admin/component/header-component.html");
     });
+
+    // Dummy notification data
+    const notifications = [
+        { id: 1, message: "You have a new order.", date: "2025-04-07", read: false },
+        { id: 2, message: "Server maintenance scheduled for tomorrow.", date: "2025-04-06", read: true },
+        { id: 3, message: "Your password will expire soon.", date: "2025-04-05", read: false }
+    ];
+
+    // Render notifications
+    function renderNotifications() {
+        const notificationContainer = $("#notification-list");
+        notificationContainer.empty();
+        notifications.forEach(notification => {
+            const notificationItem = `
+            <div class="notification-item ${notification.read ? 'read' : 'unread'}" data-id="${notification.id}">
+              <p><strong>${notification.message}</strong></p>
+              <p><small>Received on: ${notification.date}</small></p>
+              <button class="btn btn-sm btn-secondary mark-read" ${notification.read ? 'disabled' : ''}>Mark as Read</button>
+              <button class="btn btn-sm btn-danger delete-notification">Delete</button>
+            </div>
+          `;
+            notificationContainer.append(notificationItem);
+        });
+    }
+
+    renderNotifications();
+
 </script>
 </body>
 
