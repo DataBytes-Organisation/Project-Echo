@@ -5,7 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="10041674-e6c8-4c79-bb50-316e826bf443" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/src/Prototypes/engine/Integration_Demo/IntegrationModel.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/Prototypes/engine/Integration_Demo/IntegrationModel.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/public/admin/notifications.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/public/admin/notifications.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -32,7 +33,8 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "EE/SW/Updated-Model-Integration",
+    "disable.download.node.interpreter.editor.notification": "true",
+    "git-widget-placeholder": "EHMI/lb/admin-notification-page",
     "last_opened_file_path": "C:/Users/22396/PycharmProjects/temporaryEcho/yamnet/IntegrationModel.py",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",

@@ -53,7 +53,6 @@
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title fw-semibold mb-4">Notifications</h5>
-                    <p class="mb-0">Notifications </p>
                     <!-- Notification List -->
                     <div id="notification-list">
                         <!-- Notifications will be loaded here dynamically -->
@@ -97,6 +96,23 @@
         });
     }
 
+    // Mark notification as read
+    $(document).on("click", ".mark-read", function() {
+        const notificationId = $(this).closest(".notification-item").data("id");
+        const notification = notifications.find(n => n.id === notificationId);
+        notification.read = true;
+        renderNotifications();
+    });
+
+    // Delete notification
+    $(document).on("click", ".delete-notification", function() {
+        const notificationId = $(this).closest(".notification-item").data("id");
+        const index = notifications.findIndex(n => n.id === notificationId);
+        if (index !== -1) {
+            notifications.splice(index, 1);
+            renderNotifications();
+        }
+    });
     renderNotifications();
 
 </script>
