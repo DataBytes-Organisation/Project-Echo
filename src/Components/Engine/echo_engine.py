@@ -554,6 +554,27 @@ class EchoEngine():
         spectrogram_resized = np.repeat(spectrogram_resized, 3, axis=-1)
         return spectrogram_resized, audio, self.config['WEATHER_SAMPLE_RATE']    
 
+    def predict_weather_audio(self, audio_clip):
+        """
+        Call with audio clip, it will call weather detection model running on model container
+        """
+        image, audio, sample_rate = self.weather_pipeline(audio_clip)
+
+        image = tf.expand_dims(image, 0) 
+            
+        image_list = image.numpy().tolist()
+
+        data = json.dumps({"signature_name": "serving_default", "inputs": image_list})
+        url = self.config['WEATHER_SERVER']
+        headers = {"content-type": "application/json"}
+        json_response = requests.post(url, data=data, headers=headers)
+        model_result   = json.loads(json_response.text)
+        predictions = model_result['outputs'][0]
+        print("Weather Prediciton", predictions)
+        #TODO: Map prediciton of appropriate class label
+        return predictions
+
+
     def load_audio_file(self, file_path):
         wav, sr = librosa.load(file_path, sr=16000)
         return np.array([wav])
