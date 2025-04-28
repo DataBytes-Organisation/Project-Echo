@@ -1,160 +1,256 @@
 <!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Echo Admin - Donations</title>
+    <link rel="shortcut icon" type="image/png" href="./admin/images/logos/favicon.png" />
+    <link type="text/css" rel="stylesheet" href="./admin/css/styles.min.css" />
 
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Echo Admin</title>
-  <link rel="shortcut icon" type="image/png" href="./images/logos/favicon.png" />
-  <link type="text/css" rel="stylesheet" href="./css/styles.min.css" />
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
-  <scrip type="text/javascript" src="https://kit.fontawesome.com/8aa980d912.js" crossorigin="anonymous"></script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD"
+      crossorigin="anonymous"
+    />
 
-  <link
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
-    rel="stylesheet"
-    integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD"
-    crossorigin="anonymous"
-  />
+    <script
+      type="text/javascript"
+      src="https://kit.fontawesome.com/8aa980d912.js"
+      crossorigin="anonymous"
+    ></script>
 
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
-  />
-  <!--- Requests Page Styling -->
-  <link type="text/css" rel="stylesheet" href="./css/requests.css" >
-  <!-- jQuery -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script> 
-  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
-  <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <link type="text/css" rel="stylesheet" href="./css/requests.css" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
 
-  <script type="text/javascript" src="./js/sidebarmenu.js"></script>
-  <script type="text/javascript" src="./js/app.min.js"></script>
-  <!-- <script type="text/javascript" src="../../node_modules/apexcharts/dist/apexcharts.min.js"></script> -->
-  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-  <link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.css"
-  />
-  <script src="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.min.js"></script>
-  <script type="text/javascript" src="./js/dashboard.js"></script>
-</head>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css"
+    />
+    <script
+      type="text/javascript"
+      src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"
+    ></script>
 
+    <script type="text/javascript" src="./admin/js/sidebarmenu.js"></script>
+    <script type="text/javascript" src="./admin/js/app.min.js"></script>
+    <script type="text/javascript" src="./admin/js/dashboard.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.min.js"></script>
+
+    
+    <style>
+      /* Color-code donation status */
+      .status-succeeded { color: green; font-weight: 600; }
+      .status-failed { color: red; font-weight: 600; }
+      .status-pending { color: orange; font-weight: 600; }
+    </style>
+  </head>
+
+  
 <body>
-  <!--  Body Wrapper -->
-  <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
-    data-sidebar-position="fixed" data-header-position="fixed">
-    <!-- Sidebar Start -->
+  <!-- Page Wrapper with Admin Layout -->
+  <div
+    class="page-wrapper"
+    id="main-wrapper"
+    data-layout="vertical"
+    data-navbarbg="skin6"
+    data-sidebartype="full"
+    data-sidebar-position="fixed"
+    data-header-position="fixed"
+  >
+
     <div id="sidebar"></div>
-    <!--  Sidebar End -->
-    <!--  Main wrapper -->
+
+    <!-- Main Content Wrapper -->
     <div class="body-wrapper">
       <div id="header"></div>
       <div class="container-fluid">
-        <div class="card" id="card-charges">
-          <div class="card-body">
-            <div class="screen-content">
-
-              <h1>Donations</h1>
-              <!-- <i class="screen-icon fa-brands fa-codepen"></i> -->
-              <!-- Create the empty table to display the donations in --->
-              <div class="screen-user">
-                  <table>
-                      <thead>
-                        <tr>
-                          <th>Amount</th>
-                          <th>Status</th>
-                          <th>Customer</th>
-                          <th>Date</th>
-                        </tr>
-                      </thead>
-                      <tbody id="data-body">
-                      </tbody>
-                    </table>               
+        <div class="row mb-4">
+          <div class="col-md-4">
+            <div class="card">
+              <div class="card-body text-center">
+                <h5>Total Donations</h5>
+                <h2 id="total-donations">$0.00</h2>
               </div>
+            </div>
+          </div>
+        </div>
+      
+
+        <!-- Donations Table Card -->
+        <div class="card" id="card-donations">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h1 class="mb-0">Donations</h1>
+              <button id="refresh-btn" class="btn btn-primary">Refresh</button>
+            </div>
+
+            <table class="table table-striped table-hover align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th>Amount</th>
+                  <th>Status</th>
+                  <th>Customer</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody id="data-body">
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ( Donation Type Chart Card -->
+        <div class="row mb-4">
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">Donation Types</h5>
+                <canvas id="donationChart" width="400" height="300"></canvas>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-
+  <!-- Load Sidebar & Header Components -->
   <script type="text/javascript">
     $(document).ready(function() {
-              // Use jQuery's load() method to load component contents
-              console.log("Start!")
-              $("#sidebar").load("./component/sidebar-component.html");
-              $("#header").load("./component/header-component.html");
-          });
+      console.log("Loading sidebar and header...");
+      $("#sidebar").load("./admin/component/sidebar-component.html");
+      $("#header").load("./admin/component/header-component.html");
+    });
   </script>
 
+  <!-- Donation Table Script-->
 
-<script>
-  
+  <script>
     const dataBody = document.getElementById('data-body');
+    const refreshBtn = document.getElementById('refresh-btn');
   
-      
-    //Update the table of donations
-    //This calls the donations API in server.js
-    function updateTable() {
-        fetch('/donations')
-        .then(response => response.json())
-        .then(data => {
-            let charges = data.charges.data;
-            console.log("Data Fetched: ", charges);
-
-            charges.forEach(item => {
-            const row = document.createElement('tr');
-
-            // Convert the amount and date as you did
-            const amount = (item.amount / 100).toFixed(2);
-            const date = new Date(item.created * 1000);
-            const formattedDate = date.toLocaleDateString();
-
-            // Create a td element for the donation status
-            const statusCell = document.createElement('td');
-            statusCell.textContent = item.status;
-
-            
-            //color status based on status
-            console.log("Coloring status");
-            statusCell.classList.add(item.status);
-
-            // Create td elements for other columns
-            const amountCell = document.createElement('td');
-            amountCell.textContent = `$${amount}`;
-
-            const emailCell = document.createElement('td');
-            emailCell.textContent = item.billing_details.email;
-
-            const dateCell = document.createElement('td');
-            dateCell.textContent = formattedDate;
-
-            // Append all td elements to the row
-            row.appendChild(amountCell);
-            row.appendChild(statusCell);
-            row.appendChild(emailCell);
-            row.appendChild(dateCell);
-
-            // Append the row to the table body
-            dataBody.appendChild(row);
+    function clearTable() {
+      dataBody.innerHTML = '';
+    }
+  
+    async function updateTable() {
+      try {
+        const response = await fetch('/donations');
+        const data = await response.json();
+        const charges = data.charges?.data || [];
+  
+        clearTable();
+  
+        if (charges.length === 0) {
+          dataBody.innerHTML = `<tr><td colspan="4" class="text-center">No donations found.</td></tr>`;
+          return;
+        }
+  
+        charges.forEach(item => {
+          const row = document.createElement('tr');
+  
+          const amountDollars = (item.amount / 100).toFixed(2);
+          const amountCell = document.createElement('td');
+          amountCell.textContent = `$${amountDollars}`;
+  
+          const statusCell = document.createElement('td');
+          statusCell.textContent = item.status;
+          statusCell.classList.add(`status-${item.status.toLowerCase()}`);
+  
+          const emailCell = document.createElement('td');
+          emailCell.textContent = item.billing_details?.email || 'N/A';
+  
+          const dateCell = document.createElement('td');
+          const dateObj = new Date(item.created * 1000);
+          dateCell.textContent = dateObj.toLocaleDateString();
+  
+          row.appendChild(amountCell);
+          row.appendChild(statusCell);
+          row.appendChild(emailCell);
+          row.appendChild(dateCell);
+  
+          dataBody.appendChild(row);
         });
-        })
-        .catch(error => {
-        console.error('Error fetching data:', error);
-        });
-}
   
-  function clearTable() {
-    const dataBody = document.getElementById('data-body');
-    dataBody.innerHTML = ''; // Remove all rows
-  }
-  updateTable();
+        updateDonationChart(charges);
+        updateTotalAmount(charges);
   
+      } catch (error) {
+        console.error('Error fetching donations:', error);
+      }
+    }
   
-  </script> 
+    refreshBtn.addEventListener('click', updateTable);
+  
+    let donationChartInstance = null;
 
+    function updateDonationChart(donations) {
+      const typeCounts = {};
+      donations.forEach(d => {
+        const type = d.type || 'Unknown';
+        typeCounts[type] = (typeCounts[type] || 0) + 1;
+      });
+
+      const labels = Object.keys(typeCounts);
+      const data = Object.values(typeCounts);
+
+      const ctx = document.getElementById('donationChart').getContext('2d');
+
+      // Destroy old chart if it exists
+      if (donationChartInstance) {
+        donationChartInstance.destroy();
+      }
+
+      donationChartInstance = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Donation Types',
+            data: data,
+            backgroundColor: ['green', 'orange', 'blue', 'purple', 'gray'],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'bottom',
+            },
+            title: {
+              display: true,
+              text: 'Donation Types'
+            }
+          }
+        }
+      });
+    }
+
+  
+    function updateTotalAmount(donations) {
+      const total = donations
+        .filter(d => d.status === 'succeeded')  // Only count successful donations.
+        .reduce((acc, curr) => acc + curr.amount, 0);
+      document.getElementById('total-donations').textContent = `$${(total / 100).toFixed(2)}`;
+    }
+  
+    updateTable();
+  </script>
+  
+  
+  
+  
 </body>
-
 </html>

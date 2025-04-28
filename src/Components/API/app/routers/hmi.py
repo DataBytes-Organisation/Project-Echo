@@ -9,6 +9,7 @@ import datetime
 from app import serializers
 from app import schemas
 from app.database import Events, Movements, Microphones, User, Role, ROLES, Requests, Guest, ForgotPassword, LogoutToken, Species
+from fastapi.responses import JSONResponse
 import paho.mqtt.publish as publish
 import bcrypt
 from flask import jsonify
@@ -682,6 +683,7 @@ def remove_animal_from_notifications(user_id: str, species: str):
     )
     return {"message": "Animal removed from notifications"}
 
+
         
 @router.get("/users", response_description="Get all users with visit data")
 def get_all_users():
@@ -700,4 +702,4 @@ def increment_user_visit(username: str, visit_duration: float = 5.0):
         {"$inc": {"visits": 1, "totalTime": visit_duration}}
     )
     return {"message": f"Visit recorded for {username}"}
-    
+
