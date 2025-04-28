@@ -106,3 +106,32 @@ userdb.guests.insertMany([
     ])
 
 
+// ----------------------------------------------
+// INITIALIZE DONATIONS COLLECTION
+// ----------------------------------------------
+const donations = [
+  {
+    amount: 5000,
+    status: 'succeeded',
+    billing_details: { email: 'john@google.com' },
+    created: 1743705600,
+    type: 'One-Time'
+  },
+  {
+    amount: 2500,
+    status: 'pending',
+    billing_details: { email: 'jane@icloud.com' },
+    created: 1743792000,
+    type: 'Monthly'
+  },
+  {
+    amount: 10000,
+    status: 'failed',
+    billing_details: { email: 'hugo@outlook.com' },
+    created: 1743619200,
+    type: 'In-Kind'
+  }
+];
+
+apidb.createCollection("donations");
+apidb.donations.insertMany(donations);

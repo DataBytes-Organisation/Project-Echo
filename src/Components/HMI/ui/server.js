@@ -154,7 +154,7 @@ app.post("/api/create-checkout-session", async (req, res) => {
 
 //This API endpoint fetches the "charges", AKA donations, from the Stripe account.
 //It returns a json object of all the charges
-app.get('/donations', async(req,res) => {
+/* app.get('/donations', async(req,res) => {
   let charges;
   try{
     while (true) {
@@ -183,7 +183,26 @@ app.get('/donations', async(req,res) => {
     console.error('Error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
-})
+}) */
+
+app.get('/donations', async (req, res) => {
+  try {
+    const client = new MongoClient("mongodb://modelUser:EchoNetAccess2023@ts-mongodb-cont:27017/EchoNet",
+    {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+    });
+    await client.connect();
+    const db = client.db("EchoNet");
+    const donations = await db.collection("donations").find({}).toArray();
+    res.json({ charges: { data: donations } });
+  } catch (error) {
+    console.error("Error fetching donations from MongoDB:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+  
+  
 //This endpoint retrieves the donation amounts from the associated stripe account
 //it adds up the amounts to return a cumulative total. Used on admin dashboard.
 app.get('/cumulativeDonations', async(req, res) => {
