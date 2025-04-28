@@ -506,9 +506,15 @@ app.get("/forgotPassword",async (req,res) => {
 app.post("/api/approve", async (req,res) => {
 
 })
+
 //Navigate to requests tab on admin dashboard
 app.get("/requests", (req,res) => {
   res.sendFile(path.join(__dirname, 'public/admin/admin-request.html'))
+})
+
+//Navigate to notifications tab on admin dashboard
+app.get("/notifications", (req,res) => {
+  res.sendFile(path.join(__dirname, 'public/admin/notifications.html'))
 })
 
 //API endpoint for patching the new review status to the newly reviewed edit request
