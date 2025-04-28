@@ -5,6 +5,7 @@ import { getAudioRecorder } from "./audio_recorder.js";
 import { retrieveTruthEventsInTimeRange, retrieveVocalizationEventsInTimeRange, 
   retrieveMicrophones, retrieveAudio, retrieveSimTime, postRecording, 
   setSimModeAnimal, setSimModeRecording, setSimModeRecordingV2, stopSimulator } from "./routes.js";
+import { addIoTNodesToMap } from "./nodes-overlay.js";
 
   //import data from "./sample_data.json" assert { type: 'json' }; Browser assertions not yet supported in all browsers, alternative method used instead.
 
@@ -140,9 +141,10 @@ export function initialiseHMI(hmiState) {
   createMapClickEvent(hmiState);
 
   retrieveMicrophones().then((res) => {
-    
     updateMicrophoneLayer(hmiState, res.data);
     stepMicAnimation(hmiState);
+    // Add IoT nodes to the map after microphones are loaded
+    addIoTNodesToMap(hmiState);
   })
   addmicrophones(hmiState);
   stepMicAnimation(hmiState);

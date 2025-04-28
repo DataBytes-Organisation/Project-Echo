@@ -5,8 +5,8 @@
     "type": "master",
     "model": "RaspberryPi4",
     "location": {
-      "latitude": -37.8136,
-      "longitude": 144.9631
+      "latitude": -38.7789,
+      "longitude": 143.5705
     },
     "customProperties": {
       "processorSpeed": "1.5GHz",
@@ -17,17 +17,6 @@
     "components": [
       {
         "id": "comp_1_1",
-        "type": "microphone",
-        "model": "AudioTechnica AT2020",
-        "category": "audio",
-        "customProperties": {
-          "frequency": "20Hz-20kHz",
-          "sensitivity": "-37dB",
-          "volume": 75
-        }
-      },
-      {
-        "id": "comp_1_2",
         "type": "solar_panel",
         "model": "SunPower X22-360",
         "category": "power",
@@ -35,6 +24,17 @@
           "wattage": 360,
           "efficiency": 0.85,
           "currentOutput": 320
+        }
+      },
+      {
+        "id": "comp_1_2",
+        "type": "fan",
+        "model": "CoolMaster Pro",
+        "category": "cooling",
+        "customProperties": {
+          "speed": 1200,
+          "maxSpeed": 2000,
+          "temperature": 35
         }
       }
     ]
@@ -45,8 +45,8 @@
     "type": "master",
     "model": "RaspberryPi4",
     "location": {
-      "latitude": -37.8236,
-      "longitude": 144.9531
+      "latitude": -38.7812,
+      "longitude": 143.5804
     },
     "customProperties": {
       "processorSpeed": "1.5GHz",
@@ -57,13 +57,24 @@
     "components": [
       {
         "id": "comp_2_1",
-        "type": "battery",
-        "model": "LithiumPro 5000",
+        "type": "solar_panel",
+        "model": "SunPower X22-360",
         "category": "power",
         "customProperties": {
-          "capacity": "5000mAh",
-          "health": 0.95,
-          "currentCharge": 0.82
+          "wattage": 360,
+          "efficiency": 0.85,
+          "currentOutput": 320
+        }
+      },
+      {
+        "id": "comp_2_2",
+        "type": "fan",
+        "model": "CoolMaster Pro",
+        "category": "cooling",
+        "customProperties": {
+          "speed": 1200,
+          "maxSpeed": 2000,
+          "temperature": 35
         }
       }
     ]
@@ -74,8 +85,8 @@
     "type": "master",
     "model": "RaspberryPi4",
     "location": {
-      "latitude": -37.8336,
-      "longitude": 144.9431
+      "latitude": -38.7762,
+      "longitude": 143.5746
     },
     "customProperties": {
       "processorSpeed": "1.5GHz",
@@ -86,6 +97,17 @@
     "components": [
       {
         "id": "comp_3_1",
+        "type": "solar_panel",
+        "model": "SunPower X22-360",
+        "category": "power",
+        "customProperties": {
+          "wattage": 360,
+          "efficiency": 0.85,
+          "currentOutput": 320
+        }
+      },
+      {
+        "id": "comp_3_2",
         "type": "fan",
         "model": "CoolMaster Pro",
         "category": "cooling",
@@ -103,8 +125,8 @@
     "type": "master",
     "model": "RaspberryPi4",
     "location": {
-      "latitude": -37.8436,
-      "longitude": 144.9331
+      "latitude": -38.7785,
+      "longitude": 143.5775
     },
     "customProperties": {
       "processorSpeed": "1.5GHz",
@@ -115,13 +137,24 @@
     "components": [
       {
         "id": "comp_4_1",
-        "type": "microphone",
-        "model": "Shure SM58",
-        "category": "audio",
+        "type": "solar_panel",
+        "model": "SunPower X22-360",
+        "category": "power",
         "customProperties": {
-          "frequency": "50Hz-15kHz",
-          "sensitivity": "-56dB",
-          "volume": 80
+          "wattage": 360,
+          "efficiency": 0.85,
+          "currentOutput": 320
+        }
+      },
+      {
+        "id": "comp_4_2",
+        "type": "fan",
+        "model": "CoolMaster Pro",
+        "category": "cooling",
+        "customProperties": {
+          "speed": 1200,
+          "maxSpeed": 2000,
+          "temperature": 35
         }
       }
     ]
@@ -133,8 +166,8 @@
     "model": "Arduino Uno",
     "parentNode": "node_1",
     "location": {
-      "latitude": -37.8137,
-      "longitude": 144.9632
+      "latitude": -38.7791,
+      "longitude": 143.5707
     },
     "customProperties": {
       "processor": "ATmega328P",
@@ -151,6 +184,17 @@
           "gain": "40dB",
           "volume": 65
         }
+      },
+      {
+        "id": "comp_1_1_2",
+        "type": "solar_panel",
+        "model": "SunPower X21-335",
+        "category": "power",
+        "customProperties": {
+          "wattage": 335,
+          "efficiency": 0.82,
+          "currentOutput": 290
+        }
       }
     ]
   },
@@ -161,8 +205,8 @@
     "model": "RaspberryPi Zero",
     "parentNode": "node_1",
     "location": {
-      "latitude": -37.8138,
-      "longitude": 144.9633
+      "latitude": -38.7792,
+      "longitude": 143.5708
     },
     "customProperties": {
       "processorSpeed": "1GHz",
@@ -190,8 +234,8 @@
     "model": "Arduino Nano",
     "parentNode": "node_1",
     "location": {
-      "latitude": -37.8139,
-      "longitude": 144.9634
+      "latitude": -38.7795,
+      "longitude": 143.5711
     },
     "customProperties": {
       "processor": "ATmega328",
@@ -219,8 +263,8 @@
     "model": "RaspberryPi 3B+",
     "parentNode": "node_2",
     "location": {
-      "latitude": -37.8237,
-      "longitude": 144.9532
+      "latitude": -38.7814,
+      "longitude": 143.5806
     },
     "customProperties": {
       "processorSpeed": "1.4GHz",
@@ -248,8 +292,8 @@
     "model": "Arduino Mega",
     "parentNode": "node_2",
     "location": {
-      "latitude": -37.8238,
-      "longitude": 144.9533
+      "latitude": -38.7815,
+      "longitude": 143.5807
     },
     "customProperties": {
       "processor": "ATmega2560",
@@ -266,6 +310,17 @@
           "gain": "40dB",
           "volume": 70
         }
+      },
+      {
+        "id": "comp_2_2_2",
+        "type": "solar_panel",
+        "model": "SunPower X21-335",
+        "category": "power",
+        "customProperties": {
+          "wattage": 335,
+          "efficiency": 0.82,
+          "currentOutput": 290
+        }
       }
     ]
   },
@@ -276,8 +331,8 @@
     "model": "RaspberryPi Zero W",
     "parentNode": "node_2",
     "location": {
-      "latitude": -37.8239,
-      "longitude": 144.9534
+      "latitude": -38.7813,
+      "longitude": 143.5805
     },
     "customProperties": {
       "processorSpeed": "1GHz",
@@ -305,15 +360,37 @@
     "model": "Arduino Nano",
     "parentNode": "node_2",
     "location": {
-      "latitude": -37.8240,
-      "longitude": 144.9535
+      "latitude": -38.7816,
+      "longitude": 143.5808
     },
     "customProperties": {
       "processor": "ATmega328",
       "clockSpeed": "16MHz"
     },
     "connectedNodes": ["node_2"],
-    "components": []
+    "components": [
+      {
+        "id": "comp_2_4_1",
+        "type": "microphone",
+        "model": "MAX9814",
+        "category": "audio",
+        "customProperties": {
+          "gain": "40dB",
+          "volume": 70
+        }
+      },
+      {
+        "id": "comp_2_4_2",
+        "type": "solar_panel",
+        "model": "SunPower X21-335",
+        "category": "power",
+        "customProperties": {
+          "wattage": 335,
+          "efficiency": 0.82,
+          "currentOutput": 290
+        }
+      }
+    ]
   },
   {
     "_id": "node_3_1",
@@ -322,8 +399,8 @@
     "model": "RaspberryPi 4B",
     "parentNode": "node_3",
     "location": {
-      "latitude": -37.8337,
-      "longitude": 144.9432
+      "latitude": -38.7764,
+      "longitude": 143.5748
     },
     "customProperties": {
       "processorSpeed": "1.5GHz",
@@ -351,8 +428,8 @@
     "model": "Arduino Uno",
     "parentNode": "node_3",
     "location": {
-      "latitude": -37.8338,
-      "longitude": 144.9433
+      "latitude": -38.7765,
+      "longitude": 143.5749
     },
     "customProperties": {
       "processor": "ATmega328P",
@@ -380,8 +457,8 @@
     "model": "RaspberryPi Zero 2W",
     "parentNode": "node_3",
     "location": {
-      "latitude": -37.8339,
-      "longitude": 144.9434
+      "latitude": -38.7766,
+      "longitude": 143.5750
     },
     "customProperties": {
       "processorSpeed": "1GHz",

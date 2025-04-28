@@ -688,6 +688,17 @@ app.post('/suspendUser', async (req, res) => {
 
 
 //Page direction to the map
+// Proxy route for IoT nodes API
+app.get('/iot/nodes', async (req, res) => {
+  try {
+    const response = await axios.get('http://ts-api-cont:9000/iot/nodes');
+    res.json(response.data);
+  } catch (error) {
+    console.error('Error fetching IoT nodes:', error);
+    res.status(500).json({ error: 'Error fetching IoT nodes' });
+  }
+});
+
 app.get("/map", async(req,res) => {
   res.sendFile(path.join(__dirname, 'public/index.html'))
 })
