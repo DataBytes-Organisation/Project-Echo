@@ -456,6 +456,10 @@ app.get("/admin-dashboard", (req,res)=> {
   return res.sendFile(path.join(__dirname, 'public/admin/dashboard.html'));
 })
 
+
+app.get("/admin-nodes", (req, res) => {
+  return res.sendFile(path.join(__dirname, 'public/admin/admin-nodes.html'));
+
 //Serve the profile tab
 app.get("/admin-profile", (req,res)=> {
   return res.sendFile(path.join(__dirname, 'public/admin/profile.html'));
@@ -695,6 +699,17 @@ app.post('/suspendUser', async (req, res) => {
 
 
 //Page direction to the map
+// Proxy route for IoT nodes API
+app.get('/iot/nodes', async (req, res) => {
+  try {
+    const response = await axios.get('http://ts-api-cont:9000/iot/nodes');
+    res.json(response.data);
+  } catch (error) {
+    console.error('Error fetching IoT nodes:', error);
+    res.status(500).json({ error: 'Error fetching IoT nodes' });
+  }
+});
+
 app.get("/map", async(req,res) => {
   res.sendFile(path.join(__dirname, 'public/index.html'))
 })

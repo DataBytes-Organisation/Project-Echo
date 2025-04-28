@@ -9,6 +9,7 @@ import datetime
 from app import serializers
 from app import schemas
 from app.database import Events, Movements, Microphones, User, Role, ROLES, Requests, Guest, ForgotPassword, LogoutToken, Species
+from fastapi.responses import JSONResponse
 import paho.mqtt.publish as publish
 import bcrypt
 from flask import jsonify
@@ -681,6 +682,3 @@ def remove_animal_from_notifications(user_id: str, species: str):
         {"$pull": {"notificationAnimals": {"species": species}}}
     )
     return {"message": "Animal removed from notifications"}
-
-        
-    
