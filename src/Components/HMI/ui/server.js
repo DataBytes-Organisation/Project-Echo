@@ -478,6 +478,7 @@ app.get("/admin-dashboard", (req,res)=> {
 
 app.get("/admin-nodes", (req, res) => {
   return res.sendFile(path.join(__dirname, 'public/admin/admin-nodes.html'));
+});
 
 //Serve the profile tab
 app.get("/admin-profile", (req,res)=> {
