@@ -456,8 +456,13 @@ app.get("/admin-dashboard", (req,res)=> {
   return res.sendFile(path.join(__dirname, 'public/admin/dashboard.html'));
 })
 
+
 app.get("/admin-nodes", (req, res) => {
   return res.sendFile(path.join(__dirname, 'public/admin/admin-nodes.html'));
+
+//Serve the profile tab
+app.get("/admin-profile", (req,res)=> {
+  return res.sendFile(path.join(__dirname, 'public/admin/profile.html'));
 })
 
 app.get("/admin-template", (req,res)=> {
@@ -510,9 +515,15 @@ app.get("/forgotPassword",async (req,res) => {
 app.post("/api/approve", async (req,res) => {
 
 })
+
 //Navigate to requests tab on admin dashboard
 app.get("/requests", (req,res) => {
   res.sendFile(path.join(__dirname, 'public/admin/admin-request.html'))
+})
+
+//Navigate to notifications tab on admin dashboard
+app.get("/notifications", (req,res) => {
+  res.sendFile(path.join(__dirname, 'public/admin/notifications.html'))
 })
 
 //API endpoint for patching the new review status to the newly reviewed edit request
