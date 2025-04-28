@@ -14,7 +14,7 @@ Events = db.events
 Movements = db.movements
 Species = db.species
 Microphones = db.microphones
-
+Traffic = Userdb.traffic
 User_connection_string = "mongodb://root:root_password@ts-mongodb-cont/UserSample?authSource=admin"
 Userclient = pymongo.MongoClient(User_connection_string)
 Userdb = Userclient['UserSample']

@@ -296,3 +296,18 @@ class RecordingData(BaseModel):
         json_encoders = {ObjectId: str}
         schema_extra = {}
 
+class UserTrafficSchema(BaseModel):
+    username: str
+    email: EmailStr
+    visit_count: int
+    last_visit_time: datetime
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "username": "johndoe",
+                "email": "johndoe@example.com",
+                "visit_count": 5,
+                "last_visit_time": "2025-04-15T12:30:00"
+            }
+        }

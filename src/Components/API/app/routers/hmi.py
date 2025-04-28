@@ -8,7 +8,7 @@ from bson import ObjectId
 import datetime
 from app import serializers
 from app import schemas
-from app.database import Events, Movements, Microphones, User, Role, ROLES, Requests, Guest, ForgotPassword, LogoutToken, Species
+from app.database import Traffic, Events, Movements, Microphones, User, Role, ROLES, Requests, Guest, ForgotPassword, LogoutToken, Species
 import paho.mqtt.publish as publish
 import bcrypt
 from flask import jsonify
@@ -682,5 +682,28 @@ def remove_animal_from_notifications(user_id: str, species: str):
     )
     return {"message": "Animal removed from notifications"}
 
-        
-    
+
+@router.get("/traffic", response_model=List[UserTrafficSchema])
+def fetch_traffic_data():
+    traffic = Traffic.find()
+    return list(traffic)
+
+@router.post("/traffic/visit")
+def add_or_update_visit(username: str, email: str):
+    existing_user = Traffic.find_one({"email": email})
+
+    if existing_user:
+        # Update existing user's visit count and last visit time
+        Traffic.update_one(
+            {"email": email},
+            {"$inc": {"visit_count": 1}, "$set": {"last_visit_time": datetime.utcnow()}}
+        )
+    else:
+        # Create new user entry
+        Traffic.insert_one({
+            "username": username,
+            "email": email,
+            "visit_count": 1,
+            "last_visit_time": datetime.utcnow()
+        })
+    return {"message": "Visit updated successfully"}
