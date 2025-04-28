@@ -1,5 +1,10 @@
+
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+
+const Setting = require('./component/Setting");
+const SettingController = require('./component/SettingController');
+
 
 const TwoFactorSetupPage = () => {
   const [qrCodeUrl, setQrCodeUrl] = useState('');
