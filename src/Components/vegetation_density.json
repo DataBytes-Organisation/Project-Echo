@@ -1,0 +1,14 @@
+[
+  {
+    "region": "North Forest",
+    "density": 80
+  },
+  {
+    "region": "South Savannah",
+    "density": 60
+  },
+  {
+    "region": "East Plains",
+    "density": 40
+  }
+]

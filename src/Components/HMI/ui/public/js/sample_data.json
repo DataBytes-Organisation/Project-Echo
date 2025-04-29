@@ -772,17 +772,16 @@
     {
       "species": "Melopsittacus undulatus",
       "common": "Budgerigar",
-
-      "summary": "Melopsittacus undulatus, commonly known as Budgerigar or Budgie, is a small parrot species native to Australia, popular as pets worldwide.",
+      "summary": "The Budgerigar (Melopsittacus undulatus), often called Budgie, is a small, social parrot native to Australia and a popular pet worldwide due to its vibrant colors and playful nature.",
       "description": [
-        "Budgerigars are small birds, usually around 7 inches in length, with a distinctive hooked beak and a long, tapered tail.",
-        "In the wild, they are found in large flocks in arid regions of Australia, feeding on seeds, grasses, and vegetation.",
-        "Budgerigars are capable of mimicking human speech and other sounds, though not as consistently or accurately as some other parrot species.",
-        "They are known for their acrobatic flying abilities, darting and weaving through the air during food pursuit or courtship displays.",
-        "Wild budgerigars average 18 cm (7 in) long,[6] weigh 30–40 grams (1.1–1.4 oz), 30 cm (12 in) in wingspan, and display a light green body colour (abdomen and rumps), while their mantles (back and wing coverts) display pitch-black mantle markings (blackish in fledglings and immatures) edged in clear yellow undulations. The forehead and face is yellow in adults."
+        "Budgerigars are small birds, averaging about 18 cm (7 inches) in length and weighing between 30–40 grams (1.1–1.4 oz). They have a slender build with a hooked beak and long, tapered tail.",
+        "In the wild, they are predominantly light green with black mantle markings and yellow faces, while selective breeding has produced a wide variety of color mutations in captivity.",
+        "Budgerigars inhabit arid and semi-arid regions of Australia, forming large, nomadic flocks that feed primarily on seeds, grasses, and vegetation.",
+        "They are capable of mimicking human speech and sounds, though their vocal repertoire varies significantly among individuals.",
+        "Wild budgerigars are highly agile flyers, showcasing their speed and maneuverability during courtship displays and while evading predators."
       ],
       "img": ""
-    },
+    },    
     {
       "species": "Menura alberti",
       "common": "Albert's Lyrebird",
@@ -1037,17 +1036,16 @@
     {
       "species": "Lophochroa leadbeateri",
       "common": "Major Mitchell's Cockatoo",
-
-      "summary": "Major Mitchell's Cockatoo, also known as Pink Cockatoo, is a species of cockatoo found in Australia.",
+      "summary": "Major Mitchell's Cockatoo, also known as the Pink Cockatoo, is a species of cockatoo native to arid and semi-arid regions of Australia, admired for its striking pink and white plumage.",
       "description": [
-        "Major Mitchell's Cockatoo is named after the explorer Sir Thomas Mitchell and is also known as the Pink Cockatoo due to its distinctive pink and white plumage.",
-        "This species is relatively large, measuring around 30-35 cm in length, with a crest of feathers on their heads.",
-        "They are social birds and often found in flocks of up to 20 individuals, communicating through various vocalizations.",
-        "Major Mitchell's Cockatoo is omnivorous, feeding on plant and animal matter, including seeds, fruits, insects, and small vertebrates.",
-        "They perform spectacular courtship displays, with the male bobbing its head, spreading its wings, and emitting calls and whistles. Mating pairs are monogamous."
+        "Major Mitchell's Cockatoo is named after explorer Sir Thomas Mitchell and is renowned for its soft pink body, white wings, and a vibrant crest with red and yellow bands.",
+        "This species measures approximately 35-40 cm in length and is one of the most beautiful cockatoos due to its unique coloration and elegant crest.",
+        "They are highly social and often seen in small flocks or pairs, communicating with an array of soft calls and whistles.",
+        "Their diet primarily consists of seeds, fruits, nuts, and occasionally insects, reflecting their omnivorous nature.",
+        "During courtship, males perform elaborate displays involving head-bobbing, crest-raising, and calls to attract mates. They form strong monogamous bonds."
       ],
       "img": ""
-    },
+    },    
 
     {
       "species": "Macropus giganteus",
@@ -1375,7 +1373,7 @@
       "img": ""
     },
     {
-      "species": "Trichoglossus haematodus",
+      "species": "Trichoglossus moluccanus",
       "common": "Rainbow Lorikeet",
       "summary": "Trichoglossus haematodus, commonly known as the rainbow lorikeet, is a species of parrot found in Australia, Indonesia, Papua New Guinea, and the Solomon Islands. These colorful birds have become popular as pets due to their stunning plumage and playful personalities.",
       "description": [
@@ -1560,16 +1558,16 @@
     {
       "species": "Pseudocheirus peregrinus",
       "common": "Common Ringtail Possum",
-      "summary": "The Common Ringtail Possum (Pseudocheirus peregrinus) is a small and nocturnal marsupial native to Australia. These possums are named after their distinctive prehensile tails, which are used for grasping and balancing while climbing.",
+      "summary": "The Common Ringtail Possum (Pseudocheirus peregrinus) is a small, nocturnal marsupial native to Australia, known for its prehensile tail and arboreal lifestyle.",
       "description": [
-        "Common Ringtail Possums can grow up to 35cm in length (including their tail) and weigh between 350-550g.",
-        "They are primarily arboreal and are commonly found in eucalyptus forests and woodlands.",
-        "Common Ringtail Possums are herbivorous and feed mainly on leaves, flowers, and fruits.",
-        "These possums are highly social and usually live in family groups consisting of one adult male, one or more adult females, and their offspring.",
-        "The breeding season for Common Ringtail Possums is typically between April and December.  Females give birth to a single young, which remains in the mother's pouch for around 4 months."
+        "Common Ringtail Possums can grow up to 35 cm in body length, with an additional 30-35 cm for their tail. They typically weigh between 350-550 g.",
+        "They are primarily arboreal, inhabiting eucalyptus forests, woodlands, and suburban gardens with suitable vegetation.",
+        "Common Ringtail Possums are herbivorous, feeding mainly on leaves, flowers, and fruits. Eucalyptus leaves form a significant part of their diet.",
+        "These possums are highly social and often live in family groups, which typically include an adult male, one or more females, and their offspring.",
+        "The breeding season for Common Ringtail Possums usually occurs between April and December. Females give birth to a single young, which remains in the mother's pouch for about 4 months before transitioning to riding on her back."
       ],
       "img": ""
-    },
+    },    
     {
       "species": "Psaltoda plaga",
       "common": "Silver Knight",
@@ -2368,15 +2366,41 @@
     {
       "species": "Acanthagenys rufogularis",
       "common": "Spiny-cheeked Honeyeater",
-      "summary": "Acanthagenys rufogularis is a small bird species, commonly known as Spiny-cheeked Honeyeater.",
+      "summary": "Acanthagenys rufogularis is a medium-sized bird species, commonly known as Spiny-cheeked Honeyeater.",
       "description": [
-        "Spiny-cheeked Honeyeater is known for its distinctive spiny cheek feathers and rusty-red throat patch.",
-        "Acanthagenys rufogularis inhabits the dry montane forests, scrublands, and even agricultural areas, where it feeds on nectar, insects, and small fruits.",
-        "The males display unique plumage with black and white stripes on the head, a bluish gray back, and a rufous throat and underparts, while the females have a more uniform grayish-brown coloration.",
+        "Spiny-cheeked Honeyeater is known for its streaked brown and white plumage with rusty-red markings on the throat.",
+        "Acanthagenys rufogularis inhabits arid and semi-arid scrublands, woodlands, and agricultural areas, where it feeds on nectar, insects, and small fruits.",
+        "Both males and females have similar appearances, with a mix of streaked brown and white plumage, a reddish throat patch, and a slightly curved bill.",
         "Acanthagenys rufogularis is not considered endangered, although its population is threatened by deforestation, habitat fragmentation, and pesticide use in agricultural areas."
       ],
       "img": ""
     },
+    {
+      "species": "Tiliqua scincoides",
+      "common": "Blue-tongued Skink",
+      "summary": "Tiliqua scincoides is a large, ground-dwelling lizard commonly known as the Blue-tongued Skink, named for its striking blue tongue.",
+      "description": [
+        "Blue-tongued Skinks are known for their smooth, shiny scales, robust bodies, and characteristic blue tongue, which they use as a defensive display to startle predators.",
+        "Tiliqua scincoides inhabits a wide range of environments, including woodlands, grasslands, and suburban areas, and is often found in gardens and parks.",
+        "The species is omnivorous, feeding on a mix of fruits, vegetables, insects, small animals, and carrion.",
+        "Blue-tongued Skinks are docile in nature and are commonly kept as pets due to their calm temperament and ease of care.",
+        "Tiliqua scincoides is not endangered and is listed as Least Concern by the IUCN, though it faces threats from habitat destruction and road accidents."
+      ],
+      "img": ""
+    },
+    {
+      "species": "Sarcophilus harrisii",
+      "common": "Tasmanian Devil",
+      "summary": "The Tasmanian Devil (Sarcophilus harrisii) is a carnivorous marsupial native to Tasmania, Australia. Known for its powerful jaws and ferocious feeding behavior, this species is one of the most iconic animals of Tasmania.",
+      "description": [
+        "Tasmanian Devils are the largest carnivorous marsupial in the world. They have a stocky build, powerful jaws, and a loud, aggressive feeding behavior.",
+        "They are scavengers and often feed on carrion, but they will also hunt small prey such as birds, reptiles, and insects.",
+        "Tasmanian Devils are primarily nocturnal, spending their days in dens and becoming active at night when they forage for food.",
+        "They communicate using a range of vocalizations, including growls, screeches, and the distinctive 'devil's scream' during feeding and territorial disputes.",
+        "Tasmanian Devils are currently classified as endangered due to the spread of a contagious facial tumor disease (DFTD) that has caused a dramatic decline in their population."
+      ],
+      "img": ""
+    },    
     {
       "species": "Acanthiza apicalis",
       "common": "Inland thornbill",
@@ -3308,7 +3332,7 @@
     },
     {
       "species": "Crinia signifera",
-      "common": "Common Froglet",
+      "common": "Common Eastern Froglet",
       "summary": "Crinia signifera, commonly known as the Common Froglet, is a small species of ground- dwelling frog found throughout southern and eastern Australia.",
       "description": [
         "The Common Froglet is one of the smallest frog species in Australia, measuring only up to 3cm in length.",
@@ -3902,16 +3926,16 @@
     {
       "species": "Alectura lathami",
       "common": "Australian Brushturkey",
-      "summary": "The Australian Brushturkey is a fascinating bird native to Australia, known for its unusual nesting and breeding habits.",
+      "summary": "The Australian Brushturkey (Alectura lathami) is a large, ground-dwelling bird native to eastern Australia, known for its unique mound-building behavior and adaptation to urban environments.",
       "description": [
-        "Australian Brushturkeys are prolific mound builders. They construct large, volcano-shaped mounds made of leaves, soil, and other organic material. These mounds serve as incubators for their eggs.",
-        "Brushturkeys are meticulous in regulating the temperature of their mounds. They adjust the mound's height and thickness to maintain the ideal temperature for incubating their eggs, which can be as high as 90 degrees Celsius (194 degrees Fahrenheit).",
-        "Unlike most birds, Brushturkey parents provide no direct care for their offspring. Once the eggs are laid in the mound, they rely on the heat generated by the decomposition of organic material to incubate and hatch.",
-        "Brushturkeys are skilled foragers, using their strong legs and sharp claws to scratch through leaf litter and forest floors in search of insects, seeds, and fallen fruits.",
-        "These birds have shown a remarkable ability to adapt to urban environments. They can be found in suburban gardens and parks, where they sometimes create mounds in unexpected places, such as backyard gardens and even golf courses."
+        "Australian Brushturkeys are famous for constructing large, volcano-shaped mounds made from leaves, soil, and organic material to incubate their eggs.",
+        "They are skilled at regulating the temperature of their mounds, adjusting the mound's structure to maintain an ideal incubation temperature of around 33–34 degrees Celsius (91–93 degrees Fahrenheit), not the 90°C previously mentioned.",
+        "Unlike most birds, Brushturkeys provide no parental care once the eggs are laid. The heat generated from decomposing organic material in the mound incubates the eggs, and the chicks emerge fully developed and self-sufficient.",
+        "These birds are omnivorous and forage for insects, seeds, fruits, and small animals by scratching through leaf litter and forest floors.",
+        "Australian Brushturkeys have become increasingly common in suburban areas, where they adapt to human environments by building mounds in gardens, parks, and even golf courses."
       ],
       "img": ""
-    },
+    },    
     {
       "species": "Canis lupus dingo",
       "common": "Dingo",
@@ -4250,17 +4274,16 @@
     {
       "species": "Gymnorhina tibicen",
       "common": "Australian Magpie",
-      "summary": "The Australian magpie is a passerine bird native to Australia, New Zealand and southern New Guinea. It is a highly regarded songbird with a wide variety of calls, many of which are complex.",
+      "summary": "The Australian Magpie (Gymnorhina tibicen) is a large passerine bird native to Australia, New Guinea, and southern parts of Indonesia, known for its complex and varied calls, as well as its intelligence.",
       "description": [
-        "Gymnorhina tibicen, also known as the Australian magpie or magpie-lark, is indeed a native bird species found in various parts",
-        "of Australia. Its distinctive black and white plumage and beautiful melodious song make it a well-known and easily recognizable",
-        "bird in the country. Apart from its vocal talents, the Australian magpie is also renowned for its intelligence and ability to adapt",
-        "to different environments, making it a fascinating and iconic species in Australian wildlife.",
-        "The Australian magpie generally lives to around 25 years of age, though ages of up to 30 years have been recorded. The reported",
-        "age of first breeding has varied according to area, but the average is between the ages of three and five years."
+        "The Australian Magpie, also known as Gymnorhina tibicen, is a striking bird with distinctive black and white plumage and a melodious, complex song that is often heard in open woodlands, parks, and urban areas.",
+        "In addition to its vocal talents, the Australian Magpie is known for its remarkable intelligence and adaptability to a variety of environments, which has contributed to its widespread presence in both rural and urban settings.",
+        "The average lifespan of an Australian Magpie is around 25 years, although some individuals have been known to live up to 30 years.",
+        "First breeding typically occurs between three and five years of age, though this can vary depending on environmental factors and location.",
+        "The Australian Magpie is a highly territorial bird, often observed defending its nesting areas during breeding seasons, particularly in suburban areas where they may swoop at passers-by."
       ],
       "img": ""
-    },
+    },    
     {
       "species": "Haliastur sphenurus",
       "common": "Whistling Kite",
@@ -4493,16 +4516,16 @@
     {
       "species": "Ranoidea caerulea",
       "common": "Australian green tree frog",
-      "summary": "The Australian green tree frog is a popular and docile species of tree frog native to Australia and New Guinea, with introduced populations in the United States and New Zealand. It is larger than most Australian frogs, reaching over 10 cm (4 in) in length and has a long lifespan compared to most frogs.",
+      "summary": "The Australian green tree frog (Ranoidea caerulea) is a docile and popular species native to Australia and New Guinea, with introduced populations kept as pets in the United States and New Zealand. It is one of the larger Australian frogs, reaching over 10 cm (4 in) in length, and has a long lifespan compared to most frogs.",
       "description": [
-        "The Australian green tree frog is known for its green colouration, although specimens sent to England for scientific study were damaged by preservatives and appeared blue. Its colour is caused by blue and green pigments covered in a yellow layer.",
-        "Docile and well-suited to living near human dwellings, these frogs are often found on window sills or inside houses, eating insects drawn by the light. When in danger, they will scream to scare off their foe and squeak when touched.",
-        "The skin secretions of the Australian green tree frog have antibacterial and antiviral properties, which may be useful in pharmaceutical preparations and have rendered it relatively immune to population declines experienced by many species of amphibian.",
-        "The green tree frog is a popular exotic pet worldwide due to its appearance and behavioural traits. However, it is also a common species in the wild and has been assessed as least concern by the International Union for Conservation of Nature.",
-        "Belonging to the family Hylidae, the Australian green tree frog is a member of the subfamily Pelodryadinae, which includes over 100 species in the genera Ranoidea and Nyctimystes. It was the first Australian frog to be scientifically described and is sometimes referred to as Pelodryas caerulea in the scientific literature."
+        "The Australian green tree frog is typically green in color, though it may appear blue when preserved for study due to the effects of preservatives. Its coloration results from blue and green pigments covered by a yellow layer.",
+        "This species is often found near human dwellings, taking advantage of insects attracted to lights. When threatened, it can produce a loud scream to deter predators and emits a squeak when handled.",
+        "The skin secretions of the Australian green tree frog possess antibacterial and antiviral properties, which may have pharmaceutical applications and help protect the species from diseases affecting other amphibians.",
+        "Due to its calm nature, appealing appearance, and ease of care, the Australian green tree frog is a popular exotic pet worldwide. It is also common in the wild and has been classified as Least Concern by the IUCN.",
+        "Belonging to the family Hylidae, the Australian green tree frog is part of the subfamily Pelodryadinae, which includes over 100 species in the genera Ranoidea and Nyctimystes. Historically, it was the first Australian frog to be scientifically described and is sometimes referred to as Pelodryas caerulea in older scientific literature."
       ],
       "img": ""
-    },
+    },    
     {
       "species": "Ranoidea Gracilenta",
       "common": "Dainty Green Tree Frog",
@@ -4558,16 +4581,16 @@
     {
       "species": "Haliastur sphenurus",
       "common": "Whistling Kite",
-      "summary": "Haliastur sphenurus, known as the Whistling Kite, is a medium-sized raptor found throughout Australia, New Guinea, and parts of Indonesia. Recognized by its distinctive whistling call, this bird of prey occupies a variety of habitats, from wetlands to forests.",
+      "summary": "The Whistling Kite (Haliastur sphenurus) is a medium-sized raptor native to Australia, New Guinea, and parts of Indonesia. Known for its distinct whistling calls, this bird of prey thrives in diverse habitats, including wetlands, forests, and open grasslands.",
       "description": [
-        "Whistling Kites have a light brown body with paler underparts and a distinctive M-shaped silhouette while flying.",
-        "They feed on a wide range of prey, including small mammals, birds, fish, and carrion, showcasing their adaptability as hunters.",
-        "These birds are often seen soaring or hovering in the sky, utilizing thermal updrafts to glide effortlessly.",
-        "Whistling Kites play a vital role in their ecosystems as top predators, controlling populations of various small animals.",
-        "They are known for their complex vocalizations, including the characteristic whistling sound that gives them their name."
+        "Whistling Kites have a light brown plumage with paler underparts, a slightly forked tail, and a distinctive M-shaped silhouette when in flight.",
+        "They are opportunistic feeders, preying on small mammals, birds, reptiles, fish, and carrion, demonstrating remarkable adaptability in diet.",
+        "These raptors are often seen gliding or soaring on thermal currents, using minimal energy as they survey for prey or carrion.",
+        "Whistling Kites play an essential role in their ecosystems as both predators and scavengers, helping control populations of smaller animals and cleaning up carrion.",
+        "Their vocal repertoire includes a variety of calls, most notably a high-pitched whistle, which gives them their name."
       ],
       "img": ""
-    },
+    },    
     {
       "species": "Henicopsaltria eydouxii",
       "common": "razor grinder",
@@ -4854,6 +4877,51 @@
       ],
       "img": ""
     },
+
+        {
+      "species": "Dromaius novaehollandiae",
+      "common": "Emu",
+      "summary": "The emu (/ˈiːmjuː/; Dromaius novaehollandiae) is a species of flightless bird endemic to Australia, where it is the tallest native bird. It is the only extant member of the genus Dromaius and the third-tallest living bird after its African ratite relatives, the common ostrich and Somali ostrich.",
+      "description": [
+        "The emu's native ranges cover most of the Australian mainland. The Tasmanian, Kangaroo Island and King Island subspecies became extinct after the European settlement of Australia in 1788.",
+        "They are robust bipedal runners that can travel great distances, and when necessary can sprint at 48 km/h (30 mph).",
+        "They are omnivorous and forage on a variety of plants and insects, and can go for weeks without eating.",
+        "They drink infrequently, but take in copious amounts of fresh water when the opportunity arises.",
+        "Breeding takes place in May and June, and fighting among females for a mate is common."
+      ],
+      "img": ""
+    },
+            {
+      "species": "Casuarius casuarius",
+      "common": "Southern Cassowary",
+      "summary": "The southern cassowary (Casuarius casuarius), also known as double-wattled cassowary, Australian cassowary, or two-wattled cassowary, is a large flightless black bird, found in Indonesia, Papua New Guinea, and northeastern Australia.",
+      "description": [
+        "It is one of the three living species of cassowary, alongside the dwarf cassowary and the northern cassowary.",
+        "It is a ratite and therefore related to the emu, ostrich, rhea and kiwi.",
+        "The Australian population is listed as Endangered under federal and Queensland state legislation.",
+      ],
+      "img": ""
+    },
+                {
+      "species": "Pseudechis australiss",
+      "common": "King Brown Snake",
+      "summary": "The king brown snake (Pseudechis australis) is a species of highly venomous snake of the family Elapidae, native to northern, western, and Central Australia.",
+      "description": [
+        "The king brown snake is the largest terrestrial venomous snake in Australia.",
+        "Despite its common name, it is a member of the genus Pseudechis (black snakes) and only distantly related to true brown snakes.",
+        "First described by English zoologist John Edward Gray in 1842, it is a robust snake up to 3.3 m (11 ft) long.",
+      ],
+      "img": ""
+    },
+                    {
+      "species": "Petrogale penicillata",
+      "common": "Brush-tailed rock-wallaby",
+      "summary": "The brush-tailed rock-wallaby or small-eared rock-wallaby (Petrogale penicillata) is a kind of wallaby, one of several rock-wallabies in the genus Petrogale.",
+      "description": [
+        "It inhabits rock piles and cliff lines along the Great Dividing Range.",
+        "Populations have declined seriously in the south and west of its range.",
+        "70% of all the wallaby's habitat has been lost as of January 2020.",
+
     {
       "species": "ApocritaÂ sp.",
       "common": "Wasps/Bees/Ants",

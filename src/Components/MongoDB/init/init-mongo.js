@@ -19,6 +19,7 @@ apidb.createCollection("events");
 apidb.createCollection("microphones");
 apidb.createCollection("movements");
 apidb.createCollection("species");
+apidb.createCollection("nodes");
 
 //const eventsData = JSON.parse(cat('/docker-entrypoint-initdb.d/events.json'));
 //db.events.insertMany(eventsData);
@@ -31,6 +32,27 @@ apidb.movements.insertMany(movementsData);
 
 const speciesData = JSON.parse(cat('/docker-entrypoint-initdb.d/species.json'));
 apidb.species.insertMany(speciesData);
+
+const nodesData = JSON.parse(cat('/docker-entrypoint-initdb.d/all-nodes-seed.json'));
+apidb.nodes.insertMany(nodesData);
+
+// ----------------------------------------------
+// BULK UPDATE OPERATION
+// ----------------------------------------------
+const bulk = apidb.microphones.initializeOrderedBulkOp();
+bulk.find({ status: "inactive" }).update({ $set: { status: "active" } });
+bulk.find({ status: "deprecated" }).remove();
+bulk.execute();
+
+// ----------------------------------------------
+// AGGREGATION PIPELINE OPERATION
+// ----------------------------------------------
+const aggregationResult = apidb.movements.aggregate([
+  { $group: { _id: "$type", total: { $sum: 1 } } },
+  { $sort: { total: -1 } }
+]);
+
+print("Movement Aggregation Result:", JSON.stringify(aggregationResult.toArray(), null, 2));
 
 
 // ----------------------------------------------
@@ -49,6 +71,10 @@ userdb.roles.insertMany(roles);
 const users = JSON.parse(cat('/docker-entrypoint-initdb.d/user-seed.json'));
 userdb.users.insertMany(users);
 
+// Add notificationAnimals as an empty array for each user
+users.forEach(user => {
+  user.notificationAnimals = []; // Initialize notificationAnimals field
+});
 
 userdb.guests.insertMany([
         { 
@@ -80,3 +106,32 @@ userdb.guests.insertMany([
     ])
 
 
+// ----------------------------------------------
+// INITIALIZE DONATIONS COLLECTION
+// ----------------------------------------------
+const donations = [
+  {
+    amount: 5000,
+    status: 'succeeded',
+    billing_details: { email: 'john@google.com' },
+    created: 1743705600,
+    type: 'One-Time'
+  },
+  {
+    amount: 2500,
+    status: 'pending',
+    billing_details: { email: 'jane@icloud.com' },
+    created: 1743792000,
+    type: 'Monthly'
+  },
+  {
+    amount: 10000,
+    status: 'failed',
+    billing_details: { email: 'hugo@outlook.com' },
+    created: 1743619200,
+    type: 'In-Kind'
+  }
+];
+
+apidb.createCollection("donations");
+apidb.donations.insertMany(donations);
