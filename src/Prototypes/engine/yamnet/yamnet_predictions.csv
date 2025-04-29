@@ -1,0 +1,17 @@
+start_time,end_time,class,score,Segment Start Time,Segment End Time,1st Prediction,1st Probability,2nd Prediction,2nd Probability,3rd Prediction,3rd Probability
+0.0,0.96,"Boat, Water vehicle","tf.Tensor(0.35477933, shape=(), dtype=float32)",,,,,,,,
+0.96,1.92,"Boat, Water vehicle","tf.Tensor(0.32618198, shape=(), dtype=float32)",,,,,,,,
+1.92,2.88,Wind noise (microphone),"tf.Tensor(0.33662477, shape=(), dtype=float32)",,,,,,,,
+2.88,3.84,Vehicle,"tf.Tensor(0.27127737, shape=(), dtype=float32)",,,,,,,,
+3.84,4.8,Wind,"tf.Tensor(0.1733847, shape=(), dtype=float32)",,,,,,,,
+4.8,5.76,Eruption,"tf.Tensor(0.22219002, shape=(), dtype=float32)",,,,,,,,
+5.76,6.72,Wind noise (microphone),"tf.Tensor(0.35104856, shape=(), dtype=float32)",,,,,,,,
+6.72,7.68,Wind noise (microphone),"tf.Tensor(0.23010474, shape=(), dtype=float32)",,,,,,,,
+,,,,0.0,0.96,"Boat, Water vehicle","tf.Tensor(0.35477933, shape=(), dtype=float32)",Vehicle,"tf.Tensor(0.34038845, shape=(), dtype=float32)",Gurgling,"tf.Tensor(0.17315012, shape=(), dtype=float32)"
+,,,,0.96,1.92,"Boat, Water vehicle","tf.Tensor(0.32618198, shape=(), dtype=float32)","Rowboat, canoe, kayak","tf.Tensor(0.23093905, shape=(), dtype=float32)",Vehicle,"tf.Tensor(0.2296424, shape=(), dtype=float32)"
+,,,,1.92,2.88,Wind noise (microphone),"tf.Tensor(0.33662477, shape=(), dtype=float32)",Wind,"tf.Tensor(0.30727103, shape=(), dtype=float32)","Boat, Water vehicle","tf.Tensor(0.21730751, shape=(), dtype=float32)"
+,,,,2.88,3.84,Vehicle,"tf.Tensor(0.27127737, shape=(), dtype=float32)",Wind,"tf.Tensor(0.12323366, shape=(), dtype=float32)",Wind noise (microphone),"tf.Tensor(0.110034734, shape=(), dtype=float32)"
+,,,,3.84,4.8,Wind,"tf.Tensor(0.1733847, shape=(), dtype=float32)",Wind noise (microphone),"tf.Tensor(0.16824435, shape=(), dtype=float32)",Vehicle,"tf.Tensor(0.14489634, shape=(), dtype=float32)"
+,,,,4.8,5.76,Eruption,"tf.Tensor(0.22219002, shape=(), dtype=float32)",Explosion,"tf.Tensor(0.21065418, shape=(), dtype=float32)","Burst, pop","tf.Tensor(0.18022639, shape=(), dtype=float32)"
+,,,,5.76,6.72,Wind noise (microphone),"tf.Tensor(0.35104856, shape=(), dtype=float32)",Wind,"tf.Tensor(0.3444215, shape=(), dtype=float32)",Explosion,"tf.Tensor(0.1758886, shape=(), dtype=float32)"
+,,,,6.72,7.68,Wind noise (microphone),"tf.Tensor(0.23010474, shape=(), dtype=float32)",Wind,"tf.Tensor(0.206532, shape=(), dtype=float32)",Vehicle,"tf.Tensor(0.1621926, shape=(), dtype=float32)"
