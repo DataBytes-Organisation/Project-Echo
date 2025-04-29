@@ -314,5 +314,23 @@ class RecordingData(BaseModel):
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
+        schema_extra = {
+           
+        } 
+
+class TwoFactorVerifySchema(BaseModel):
+    user_id: str
+    otp: str
+
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+        schema_extra = {
+            "example": {
+                "user_id": "user-uuid-here",
+                "otp": "123456"
+            }
+        }
         schema_extra = {}
 
