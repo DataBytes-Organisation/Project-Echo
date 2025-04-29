@@ -93,3 +93,59 @@ async def generate_2fa_code(credentials = Depends(security)):
         "expires_at": expiration
     }
 
+@router.post("/2fa/verify")
+async def verify_2fa_code(verify_data: schemas.TwoFactorVerifySchema):
+    """
+    Verify a 2FA code and issue a JWT token if valid
+    """
+    # Find the user
+    user = User.find_one({"_id": verify_data.user_id})
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    # Check if user has a valid 2FA code
+    two_factor = user.get("two_factor", {})
+    if not two_factor:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No 2FA code has been generated for this user"
+        )
+    
+    # Check if code has expired
+    expiry = two_factor.get("expires_at")
+    if not expiry or datetime.datetime.utcnow() > expiry:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="2FA code has expired"
+        )
+    
+    # Verify the code
+    if verify_data.otp != two_factor.get("code"):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid 2FA code"
+        )
+    
+    # Clear the 2FA code after successful verification
+    User.update_one(
+        {"_id": verify_data.user_id},
+        {"$unset": {"two_factor": ""}}
+    )
+    
+    # Get user roles for JWT
+    authorities = []
+    for role_id in user.get('roles', []):
+        role = Role.find_one({"_id": str(role_id["_id"])})
+        if role:
+            authorities.append("ROLE_" + role['name'].upper())
+    
+    # Generate JWT token
+    jwt_token = signJWT(user=user, authorities=authorities)
+    
+    return {
+        "message": "2FA verification successful",
+        "token": jwt_token
+    }
