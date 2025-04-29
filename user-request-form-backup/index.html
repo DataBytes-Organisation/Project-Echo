@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>HMI - User Request Form</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Minimal feedback styling (optional if already in style.css) */
+    #statusMsg {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="form-card">
+      <h1>User Request Form</h1>
+      <p class="subtitle">Suggest updates to the animal Summary or Description</p>
+
+      <form id="requestForm">
+        <label for="animalId">🐾 Animal Identifier:</label>
+        <input type="text" id="animalId" name="animalId" placeholder="Enter Animal ID" required>
+
+        <label for="section">📄 Section to Update:</label>
+        <select id="section" name="section" required>
+          <option value="">-- Select Section --</option>
+          <option value="Summary">Summary</option>
+          <option value="Description">Description</option>
+        </select>
+
+        <label for="suggestion">💬 Suggested Changes:</label>
+        <textarea id="suggestion" name="suggestion" placeholder="Enter your proposed changes..." rows="5" required></textarea>
+
+        <button type="submit">Submit for Review</button>
+        <p id="statusMsg"></p>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // JavaScript to handle form submission via fetch
+    document.getElementById("requestForm").addEventListener("submit", function(event) {
+      event.preventDefault();
+
+      const form = event.target;
+      const formData = new FormData(form);
+      const statusMsg = document.getElementById("statusMsg");
+
+      fetch("submit_request.php", {
+        method: "POST",
+        body: formData,
+      })
+      .then(response => response.text())
+      .then(data => {
+        if (data.includes("success")) {
+          statusMsg.innerHTML = "✅ Request submitted successfully.";
+          statusMsg.style.color = "green";
+        } else {
+          statusMsg.innerHTML = "❌ Submission failed: " + data;
+          statusMsg.style.color = "red";
+        }
+      })
+      .catch(error => {
+        statusMsg.innerHTML = "❌ Submission failed. " + error;
+        statusMsg.style.color = "red";
+      });
+    });
+  </script>
+</body>
+</html>
