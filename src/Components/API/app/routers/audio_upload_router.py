@@ -5,7 +5,7 @@ import os
 router = APIRouter()
 
 # Ensure the uploads directory exists
-UPLOAD_DIR = "uploads"
+UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "uploads")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 @router.post("/audio/upload")
