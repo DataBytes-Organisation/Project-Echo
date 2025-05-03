@@ -1,0 +1,6 @@
+artifact_location: file:///C:/Project%20Echo/Project-Echo/mlruns/429523776908015899
+creation_time: 1745128244630
+experiment_id: '429523776908015899'
+last_update_time: 1745128244630
+lifecycle_stage: active
+name: echo_complex_model_experiment

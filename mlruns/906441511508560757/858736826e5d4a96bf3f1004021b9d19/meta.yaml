@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Project%20Echo/Project-Echo/mlruns/906441511508560757/858736826e5d4a96bf3f1004021b9d19/artifacts
+end_time: 1744946901539
+entry_point_name: ''
+experiment_id: '906441511508560757'
+lifecycle_stage: active
+run_id: 858736826e5d4a96bf3f1004021b9d19
+run_name: bedecked-gull-358
+run_uuid: 858736826e5d4a96bf3f1004021b9d19
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1744946893194
+status: 3
+tags: []
+user_id: ragul
