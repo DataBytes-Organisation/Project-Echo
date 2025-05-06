@@ -1,0 +1,33 @@
+<!-- public/detectedAnimals.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Detected Animals</title>
+  <link rel="stylesheet" href="css/detectedAnimals.css" />
+</head>
+<body>
+  <h1>Detected Animals</h1>
+  <table id="animals-table" border="1">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Detected Time</th>
+        <th>Microphone ID</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <!-- Animal detail popup -->
+  <div id="animal-popup" style="display:none; border:1px solid #ccc; padding:10px; margin-top:20px;">
+    <h2 id="animal-name"></h2>
+    <p id="animal-time"></p>
+    <p id="animal-mic"></p>
+    <button id="show-map">Show in Echo Map</button>
+    <button onclick="closePopup()">Close</button>
+  </div>
+
+  <script src="js/detectedAnimals.js"></script>
+</body>
+</html>
