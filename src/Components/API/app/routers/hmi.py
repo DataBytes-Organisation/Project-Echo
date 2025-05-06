@@ -99,15 +99,13 @@ def get_weather(timestamp: int,
     
 
 @router.get("/events_time", response_description="Get detection events within certain duration")
-def show_event_from_time(start: str, end: str):
-    datetime_start = datetime.datetime.fromtimestamp(float(start))
-    datetime_end = datetime.datetime.fromtimestamp(float(end))
-    # print(f'we think query date is {datetime_start}', flush=True)
-    # print(datetime_end)
+def show_event_from_time(start: float, end: float):
+    datetime_start = datetime.datetime.fromtimestamp(start)
+    datetime_end = datetime.datetime.fromtimestamp(end)
+
     aggregate = [
         {
-            '$match':{'timestamp': { '$gte' : datetime_start, '$lt' : datetime_end}}
-            
+            '$match': {'timestamp': {'$gte': datetime_start, '$lt': datetime_end}}
         },
         {
             '$lookup': {
@@ -118,19 +116,38 @@ def show_event_from_time(start: str, end: str):
             }
         },
         {
-            "$replaceRoot": { "newRoot": { "$mergeObjects": [ { "$arrayElemAt": [ "$info", 0 ] }, "$$ROOT" ] } }
+            "$replaceRoot": {
+                "newRoot": {
+                    "$mergeObjects": [{"$arrayElemAt": ["$info", 0]}, "$$ROOT"]
+                }
+            }
         },
         {
-            '$project': { "audioClip": 0, "sampleRate": 0}
+            '$project': {
+                "audioClip": 0,
+                "sampleRate": 0,
+                "info": 0,
+                "animalEstLLA": 0,
+                "animalTrueLLA": 0,
+                "animalLLAUncertainty": 0,
+                "confidence": 0
+            }
         },
         {
             "$addFields": {
-            "timestamp": { "$toLong": "$timestamp" }}
-        }       
-
+                "timestamp": {"$toLong": "$timestamp"}
+            }
+        }
     ]
-    events = serializers.eventSpeciesListEntity(Events.aggregate(aggregate))
+    events = list(Events.aggregate(aggregate))
+
+    
+    for e in events:
+        e["_id"] = str(e["_id"])  
+        e["microphone_id"] = e.get("sensorId")  
+
     return events
+
 
 @router.get("/audio", response_description="returns audio given ID")
 def show_audio(id: str):

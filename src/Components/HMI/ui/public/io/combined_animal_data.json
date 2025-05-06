@@ -38,7 +38,7 @@
     {
       "Common Name": "Koala",
       "timestamp": "2023-05-16 08:30:00",
-      "microphone_id": 1280,
+      "microphone_id": "mic_001",
       "microphone_coords": [-42.88, 147.32]
     },
     {

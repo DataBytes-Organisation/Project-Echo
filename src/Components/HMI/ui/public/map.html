@@ -2,12 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Detected Animal on Map</title>
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
-  />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
   <style>
     #map {
       height: 600px;
@@ -27,40 +24,62 @@
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
   <script>
     const urlParams = new URLSearchParams(window.location.search);
-    const index = parseInt(urlParams.get("animalIndex"), 10);
+    const index = urlParams.get("animalIndex");
+    const highlightMic = urlParams.get("highlightMic");
 
     const map = L.map("map").setView([-25.27, 133.77], 4);
 
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution:
-        '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+      attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
     }).addTo(map);
 
     fetch("/io/combined_animal_data.json")
       .then((res) => res.json())
       .then((data) => {
-        const animal = data[index];
-        if (!animal) {
-          alert("Animal data not found.");
-          return;
+        if (index !== null) {
+          const animal = data[parseInt(index, 10)];
+          if (!animal) {
+            alert("Animal data not found.");
+            return;
+          }
+
+          const name = animal["Common Name"] || "Unknown";
+          const time = animal.timestamp || "Unknown";
+          const micId = animal.microphone_id || "Unknown";
+          const coords = animal.microphone_coords;
+
+          if (!coords || coords.length !== 2) {
+            alert("Microphone coordinates not available.");
+            return;
+          }
+
+          const marker = L.marker(coords).addTo(map);
+          marker.bindPopup(`<b>${name}</b><br>Detected at: ${time}<br>Mic ID: ${micId}`).openPopup();
+          map.setView(coords, 12);
+
+        } else if (highlightMic !== null) {
+          const micData = data.find((animal) => animal.microphone_id.toString() === highlightMic);
+
+          if (!micData || !micData.microphone_coords || micData.microphone_coords.length !== 2) {
+            alert("Microphone not found or missing coordinates.");
+            return;
+          }
+
+          const coords = micData.microphone_coords;
+          const marker = L.marker(coords, {
+            icon: L.icon({
+              iconUrl: 'https://cdn-icons-png.flaticon.com/512/190/190411.png',
+              iconSize: [32, 32],
+              iconAnchor: [16, 32],
+              popupAnchor: [0, -32]
+            })
+          }).addTo(map);
+
+          marker.bindPopup(`<b>Highlighted Microphone</b><br>Mic ID: ${highlightMic}`).openPopup();
+          map.setView(coords, 12);
+        } else {
+          alert("No animal or microphone specified.");
         }
-
-        const name = animal["Common Name"] || "Unknown";
-        const time = animal.timestamp || "Unknown";
-        const micId = animal.microphone_id || "Unknown";
-        const coords = animal.microphone_coords;
-
-        if (!coords || coords.length !== 2) {
-          alert("Microphone coordinates not available.");
-          return;
-        }
-
-        const marker = L.marker(coords).addTo(map);
-        marker.bindPopup(
-          `<b>${name}</b><br>Detected at: ${time}<br>Mic ID: ${micId}`
-        ).openPopup();
-
-        map.setView(coords, 12);
       })
       .catch((err) => {
         console.error("Failed to load animal data:", err);

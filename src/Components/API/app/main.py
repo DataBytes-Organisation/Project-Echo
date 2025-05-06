@@ -23,7 +23,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(hmi.router, tags=['hmi'], prefix='/hmi')
+app.include_router(hmi.router, tags=["hmi"], prefix="/hmi")
 app.include_router(engine.router, tags=['engine'], prefix='/engine')
 app.include_router(sim.router, tags=['sim'], prefix='/sim')
 
