@@ -1,7 +1,7 @@
 # Configuration parameters (update paths as needed)
 SC = {
-    'AUDIO_DATA_DIRECTORY': r"C:\path\to\audio\data",  # set your audio data directory here
-    'CACHE_DIRETORY': r"./pipeline_cache",
+    'AUDIO_DATA_DIRECTORY': r"D:\Echo\Audio_data",  # set your audio data directory here
+    'CACHE_DIRETORY': r"D:\Echo\Training_cache",
 
     'AUDIO_CLIP_DURATION': 5,  # seconds
     'AUDIO_SAMPLE_RATE': 48000,
@@ -11,6 +11,7 @@ SC = {
     'AUDIO_FMIN': 20,
     'AUDIO_FMAX': 13000,
     'AUDIO_TOP_DB': 80,
+    'AUDIO_WINDOW': None,
 
     'MODEL_INPUT_IMAGE_WIDTH': 260,
     'MODEL_INPUT_IMAGE_HEIGHT': 260,
