@@ -74,7 +74,7 @@
 
             <form class="modal-content animate" id="login-form" action="/api/auth/signin" method="POST">
                 <div class="imgcontainer">
-                    <span onclick="{closeForm('login-form-container')}" class="close" title="Close Modal">&times;</span>
+                    <span onclick="{closeForm('login-form-container')}" class="close" title="Close Modal">×</span>
                     <!-- <img src="img_avatar2.png" alt="Avatar" class="avatar"> -->
                 </div>
 
@@ -127,7 +127,7 @@
             <form class="modal-content animate" method="POST" id="form-sign-up"
                 style="margin-top: -75px;">
                 <div class="imgcontainer">
-                    <span onclick="{closeForm('signup-form')}" class="close" title="Close Modal">&times;</span>
+                    <span onclick="{closeForm('signup-form')}" class="close" title="Close Modal">×</span>
                 </div>
 
                 <div class="container">
@@ -235,12 +235,11 @@
             showPage(currentPage);
         </script>
 
-
         <div id="request-access-form" class="user-auth-form modal">
 
             <form class="modal-content animate" action="/request_access" method="POST">
                 <div class="imgcontainer">
-                    <span onclick="{closeForm('request-access-form')}" class="close" title="Close Modal">&times;</span>
+                    <span onclick="{closeForm('request-access-form')}" class="close" title="Close Modal">×</span>
                 </div>
 
                 <div class="container">
@@ -261,7 +260,7 @@
 
             <form class="modal-content animate" id="forgotpassword-form" action="/api/auth/forgot" method="POST">
                 <div class="imgcontainer">
-                    <span onclick="{closeForm('forgotpassword-form')}" class="close" title="Close Modal">&times;</span>
+                    <span onclick="{closeForm('forgotpassword-form')}" class="close" title="Close Modal">×</span>
                     <!-- <img src="img_avatar2.png" alt="Avatar" class="avatar"> -->
                 </div>
 
@@ -284,8 +283,6 @@
         <div id="error-box" class="error_box"></div>
 
     </div>
-
-
 
     <div id="blur"></div>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -315,7 +312,6 @@
 
 </body>
 
-
 <script>
     function toggleLoginType() {
         const emailInput = document.getElementById('emailInput');
@@ -336,7 +332,6 @@
             document.getElementById('email').removeAttribute('required');
         }
     }
-
 
     var captchaTxt = "";
     // Get the modal
@@ -361,65 +356,7 @@
         const eleCheckbox = id + "-checkbox"
         //document.getElementById(eleCheckbox).checked = false
         document.getElementById(ele).style.display = 'block';
-
-
-
-        // console.log("Fetched data start!")
-        // await fetch('/data/captcha')
-        //     .then((response) => response.json())
-        //     .then((data) => {
-        //         console.log("Captcha data: ", data)
-        //         captchaTxt = data.text;
-        //     })
-        //     .catch((error) => {
-        //         console.error('Error fetching data:', error);
-        //     });
-        // // document.getElementById(project-title).style.display='none';
     }
-
-    // function openCaptcha(id){
-    //     const eleImg = id + "-img"
-    //     const eleDiv = id + "-captcha"
-    //     const eleCheckbox = id + "-checkbox"
-    //     //If already verified, no more
-    //     if (document.getElementById(eleCheckbox).checked && document.getElementById(eleCheckbox +"-txt").innerText == " Verified") {
-    //         return
-    //     } else {
-    //         //Set image source
-    //         document.getElementById(eleDiv).style.display = "block"
-    //         document.getElementById(eleImg).src = "./captchaImg.png"
-    //         document.getElementById(eleCheckbox).checked = false
-    //     }
-    // }
-    // function closeCaptcha(id){
-    //     const eleImg = id + "-img"
-    //     const eleDiv = id + "-captcha"
-    //     //Set image source
-    //     document.getElementById(eleDiv).style.display = "none"
-    //     document.getElementById(eleImg).src = null
-    // }
-    //
-    // function VerifyCaptcha(id) {
-    //     const eletxt = id + "-txt"
-    //     const eleCheckbox = id + "-checkbox"
-    //     const err = id + "-captcha-error"
-    //     const input = document.getElementById(eletxt).value;
-    //     let error_ele = document.getElementById(err);
-    //     const eleBtn = id + "-submit"
-    //     if (input == captchaTxt) {
-    //         closeCaptcha(id)
-    //         document.getElementById(eleCheckbox).checked = true
-    //         document.getElementById(eleCheckbox+"-txt").innerText = " Verified"
-    //         document.getElementById(eleBtn).disabled = false;
-    //         document.getElementById(eleBtn).classList.remove("disabled");
-    //         error_ele.style.display = 'none';
-    //         error_ele.innerHTML = '';
-    //     } else {
-    //         console.log("Wrong captcha: ", eletxt);
-    //         error_ele.style.display = 'block';
-    //         error_ele.innerHTML = 'Wrong captcha! please try again';
-    //     }
-    // }
 
     function closeForm(id) {
         let ele = id;
@@ -444,94 +381,46 @@
         }
     }
 
-    // const form = document.getElementById('form-sign-up');
-    // const password = document.getElementById('passwordSignUp');
-    // const confirmSignup = document.getElementById('confirmSignup');
+    document.getElementById('login-form').addEventListener('submit', async function(event) {
+        event.preventDefault(); // Prevent the page from reloading on form submission
 
-    // form.addEventListener('buttonSignUp', function (event) {
-    //     if (password.value !== confirmSignup.value) {
-    //         event.preventDefault();
-    //         alert('Passwords do not match');
-    //     }
-    // });
+        // Get the values from the form
+        const username = document.querySelector('input[name="username"]').value;
+        const password = document.querySelector('input[name="password"]').value;
+        const email = document.querySelector('input[name="email"]') ? document.querySelector('input[name="email"]').value : '';
 
+        try {
+            const response = await fetch('/api/auth/signin', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username: username,
+                    password: password,
+                    email: email
+                })
+            });
 
-    //For Authentication, matching credentials from client side with those of database
+            if (response.ok) {
+                const data = await response.json();
 
-    // document.getElementById('login-form').addEventListener('submit', async (e) => {
-    //   e.preventDefault();
+                // Store JWT token, userId, and currentUser in localStorage
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('userId', data.userId);
+                localStorage.setItem('currentUser', username); // Set the currentUser to the entered username
 
-    //   const username = document.getElementById('usernameLogin').value;
-    //   const password = document.getElementById('passwordLogin').value;
-    //   const response = await fetch('/login', {
-    //     method: 'POST',
-    //     headers: {
-    //       'Content-Type': 'application/json'
-    //     },
-    //     body: JSON.stringify({ username, password })
-    //   });
-
-    //   //For redirecting user to welcome page, if the credentials are correct and a response.ok is received
-
-    //   try {
-    //     const data = await response.json();
-    //     if (response.ok) {
-    //       if (data.redirectTo) {
-    //         window.open(data.redirectTo, "_blank");
-    //       } else {
-    //         alert(data.message);
-    //       }
-    //     } else {
-    //       alert(data.error);
-    //     }
-    //   } catch (error) {
-    //     console.error(error);
-    //     alert('An error occurred.');
-    //   }
-    // });
-
-</script>
-<script>
-  document.getElementById('login-form').addEventListener('submit', async function(event) {
-    event.preventDefault(); // Prevent the page from reloading on form submission
-
-    // Get the values from the form
-    const username = document.querySelector('input[name="username"]').value;
-    const password = document.querySelector('input[name="password"]').value;
-    const email = document.querySelector('input[name="email"]').value;
-
-    try {
-        const response = await fetch('/api/auth/signin', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                username: username,
-                password: password,
-                email: email
-            })
-        });
-
-        if (response.ok) {
-            const data = await response.json();
-
-            // Store JWT token and user info in localStorage
-            localStorage.setItem('token', data.token);
-            localStorage.setItem('userId', data.userId);
-
-            // Redirect user to the welcome page
-            window.location.href = "/welcome";
-        } else {
-            const errorData = await response.json();
-            alert(errorData.message);
+                // Redirect user to the admin dashboard
+                window.location.href = "/admin-dashboard"; // CHANGED: Redirect to admin-dashboard instead of index.html
+            } else {
+                const errorData = await response.json();
+                alert(errorData.message);
+            }
+        } catch (err) {
+            console.error('Login error:', err);
+            alert("An error occurred during login.");
         }
-    } catch (err) {
-        console.error('Login error:', err);
-        alert("An error occurred during login.");
-    }
-});
-
+    });
 </script>
 
 </html>
