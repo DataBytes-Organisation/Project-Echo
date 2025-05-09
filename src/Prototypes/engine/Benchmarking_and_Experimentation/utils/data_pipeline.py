@@ -43,7 +43,7 @@ from audiomentations import Compose, AddGaussianNoise, TimeStretch, PitchShift, 
 
 from config.system_config import SC  # Import system settings
 from config.model_configs import MODELS  # Import model configurations
-from augmentations import tensorflow_image_augmentations, python_audio_augmentations   # Import augmentation configurations
+from utils.augmentations import tensorflow_image_augmentations, python_audio_augmentations   # Import augmentation configurations
 
 
 from tensorflow.keras.mixed_precision import set_global_policy
