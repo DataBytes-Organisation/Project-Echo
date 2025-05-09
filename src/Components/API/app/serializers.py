@@ -12,7 +12,6 @@ def eventEntity(event) -> dict:
         "confidence": event["confidence"],
     }
 
-
 def eventSpeciesEntity(event) -> dict:
     return {
         "_id": str(event["_id"]),
@@ -93,14 +92,12 @@ def requestEntity(request) -> dict:
         "status": str(request["status"])
     }
 
-# def userEntity(user) -> dict:
-#     return{
-#         "userId": user["userId"]
-#     }
-
+# Updated userEntity to include visits and totalTime
 def userEntity(user) -> dict:
     return{
-        "username": user["username"]
+        "username": user["username"],
+        "visits": user.get("visits", 0),  # Include visits, default to 0 if not present
+        "totalTime": user.get("totalTime", 0)  # Include totalTime, default to 0 if not present
     }
     
 def eventListEntity(events) -> list:
@@ -124,11 +121,9 @@ def microphoneListEntity(microphones) -> list:
 def timestampListEntity(timestamps) -> list:
     return [timestampEntity(timestamp) for timestamp in timestamps]
 
-# def userListEntity(userIds) -> list:
-#     return [userEntity(userId) for userId in userIds]
-
-def userListEntity(username) -> list:
-    return [userEntity(userName) for userName in username]
+# Fixed typo in userListEntity (username -> users, userName -> user)
+def userListEntity(users) -> list:
+    return [userEntity(user) for user in users]
 
 def requestListEntity(requests) -> list:
     return [requestEntity(request) for request in requests]
