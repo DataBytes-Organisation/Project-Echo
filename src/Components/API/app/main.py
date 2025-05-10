@@ -4,6 +4,7 @@ from .routers import add_csv_output_option, audio_upload_router
 
 from fastapi import FastAPI, Body, HTTPException, status, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
+from app.routers import species_predictor
 from fastapi.responses import Response, JSONResponse
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel, Field, EmailStr
@@ -16,9 +17,27 @@ import json
 app = FastAPI()
 
 # Add the CORS middleware
+
+from app.routers import hmi, engine, sim, iot
+
+# ✅ Add metadata here
+app = FastAPI(
+    title="Project Echo API",
+    description="""
+    Project Echo is an IoT-based system designed to record and analyze audio data for species identification and ecosystem monitoring.
+
+    This API provides endpoints to:
+    - Upload audio files
+    - Simulate audio responses
+    - Interface with HMI and audio engine modules
+    """,
+    version="1.0.0"
+)
+
+# ✅ CORS Middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:8080"],  # Replace with your own allowed origins
+    allow_origins=["*"],  # Allow all origins
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -30,20 +49,11 @@ app.add_middleware(
 # app.include_router(add_csv_output_option.router, tags=['csv'], prefix='/api')
 app.include_router(audio_upload_router.router, tags=['audio'], prefix='/api')
 
+app.include_router(iot.router, tags=['iot'], prefix='/iot')
+app.include_router(species_predictor.router, tags=["predict"])
 
-# Load the project echo credentials into a dictionary
 
-'''try:
-    file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'echo_config.json')
-    with open(file_path, 'r') as f:
-        echo_config = json.load(f)
-    print(f"Echo API echo_config successfully loaded", flush=True)
-except:
-    print(f"Could not API echo_config : {file_path}") 
-print(f" database names: {client.list_database_names()}")
-'''
-
-@app.get("/", response_description="api-root")
+# ✅ Root endpoint
+@app.get("/", response_description="API Root")
 def show_home():
-    return 'Welcome to echo api, move to /docs for more'
-
+    return 'Welcome to Project Echo API. Visit /docs for interactive documentation.'
