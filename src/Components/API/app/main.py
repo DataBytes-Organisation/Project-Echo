@@ -1,4 +1,7 @@
 import os
+# from Components.API.app.routers import add_csv_output_option, audio_upload_router
+from .routers import add_csv_output_option, audio_upload_router
+
 from fastapi import FastAPI, Body, HTTPException, status, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import species_predictor
@@ -8,10 +11,12 @@ from pydantic import BaseModel, Field, EmailStr
 from bson import ObjectId
 from typing import Optional, List
 import datetime
-from app import serializers
-from app import schemas
 import pymongo
 import json
+# from .routers import hmi, engine, sim
+app = FastAPI()
+
+# Add the CORS middleware
 
 from app.routers import hmi, engine, sim, iot
 
@@ -38,10 +43,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ✅ Include routers
-app.include_router(hmi.router, tags=['hmi'], prefix='/hmi')
-app.include_router(engine.router, tags=['engine'], prefix='/engine')
-app.include_router(sim.router, tags=['sim'], prefix='/sim')
+# app.include_router(hmi.router, tags=['hmi'], prefix='/hmi')
+# app.include_router(engine.router, tags=['engine'], prefix='/engine')
+# app.include_router(sim.router, tags=['sim'], prefix='/sim')
+# app.include_router(add_csv_output_option.router, tags=['csv'], prefix='/api')
+app.include_router(audio_upload_router.router, tags=['audio'], prefix='/api')
 
 app.include_router(iot.router, tags=['iot'], prefix='/iot')
 app.include_router(species_predictor.router, tags=["predict"])
