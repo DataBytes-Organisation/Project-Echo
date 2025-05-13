@@ -1,0 +1,17 @@
+[
+    {
+      "animalId": "LION-0342",
+      "section": "Summary",
+      "suggestion": "Update the summary to include: 'Lions live in prides...'",
+      "status": "Pending Review",
+      "timestamp": "2025-04-06 10:15:00"
+    },
+    {
+      "animalId": "ELEPHANT-889",
+      "section": "Description",
+      "suggestion": "Add details about trunk usage.",
+      "status": "Pending Review",
+      "timestamp": "2025-04-06 10:20:00"
+    }
+  ]
+  
