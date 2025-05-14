@@ -1,0 +1,27 @@
+body {
+  background-color: #f8f9fa;
+}
+
+h2 {
+  text-align: center;
+}
+
+#userTable {
+  background-color: white;
+  border-radius: 5px;
+}
+
+#status {
+  text-align: center;
+  font-weight: bold;
+}
+
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  
+  table {
+    text-align: center;
+  }
+  

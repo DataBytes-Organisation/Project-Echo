@@ -699,5 +699,18 @@ def remove_animal_from_notifications(user_id: str, species: str):
     )
     return {"message": "Animal removed from notifications"}
 
+@router.get("/users", response_description="Get all registered users", status_code=status.HTTP_200_OK)
+def get_all_users():
+    users_cursor = User.find()
+    users = []
+    for user in users_cursor:
+        users.append({
+            "username": user.get("username", ""),
+            "role": [r.get("name", "") for r in user.get("roles", [])],
+            "last_login": user.get("last_login", "")
+        })
+    return users
+
+
         
     

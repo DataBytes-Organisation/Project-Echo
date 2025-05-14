@@ -171,3 +171,13 @@ def animalEntity(animal) -> dict:
 
 def animalListEntity(animals) -> list:
     return [animalEntity(animal) for animal in animals]
+
+def userTableEntity(user) -> dict:
+    return {
+        "username": user.get("username", ""),
+        "role": [r.get("name", "") for r in user.get("roles", [])],
+        "last_login": user.get("last_login", "")
+    }
+
+def userTableListEntity(users) -> list:
+    return [userTableEntity(user) for user in users]

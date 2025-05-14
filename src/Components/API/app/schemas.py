@@ -296,3 +296,19 @@ class RecordingData(BaseModel):
         json_encoders = {ObjectId: str}
         schema_extra = {}
 
+class UserSchema(BaseModel):
+    username: str
+    role: List[str]
+    last_login: Optional[datetime] = None
+
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+        schema_extra = {
+            "example": {
+                "username": "admin_user",
+                "role": ["admin"],
+                "last_login": "2024-08-01T10:30:00"
+            }
+        }
