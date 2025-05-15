@@ -179,7 +179,7 @@
           <!-- Enquiry Form Tab Content (hidden by default until opened) -->
           <div id="enquiry" class="tab-content" style="display: none;">
             <div class="wrapper">
-              <div id="enquiry-contents"
+              <div id="enquiry-contents">
                 <h2>Submit an Enquiry</h2>
                 <form id="enquiryForm">
                   <div class="mb-3">
@@ -2762,10 +2762,11 @@
       setTheme(savedTheme);
     });
   </script>
-   <script>
+  <script>
     document.getElementById("enquiryForm").addEventListener("submit", function (e) {
       e.preventDefault();
   
+      // Gather form data
       const data = {
         username: document.getElementById("username").value,
         userDetail: document.getElementById("userDetail").value,
@@ -2773,24 +2774,37 @@
         category: document.getElementById("category").value,
         date: new Date().toISOString().split("T")[0]
       };
-  //enquiry scipt for form
-      fetch("/api/enquiries", {
-        method: "POST",
+  
+      // Dynamically get the enquiry ID (this might come from an existing form or data attribute)
+      const enquiryId = document.getElementById("enquiryForm").dataset.enquiryId;
+  
+      if (!enquiryId) {
+        alert("Enquiry ID is missing.");
+        return;
+      }
+  
+      // Send PUT request to update the enquiry
+      fetch(`/api/enquiries/${enquiryId}`, {
+        method: "PUT",  // Change method to PUT for updating an existing enquiry
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data)
-      }).then(res => {
+      })
+      .then(res => {
         if (res.ok) {
+          // Reset form and show success message
           document.getElementById("enquiryForm").reset();
           document.getElementById("enquirySuccess").style.display = "block";
         } else {
-          alert("Failed to submit enquiry.");
+          // Handle failure to submit enquiry
+          alert("Failed to update enquiry.");
         }
-      }).catch(err => {
+      })
+      .catch(err => {
         console.error("Error:", err);
-        alert("Failed to submit enquiry.");
+        alert("Failed to update enquiry.");
       });
     });
-  </script>
+  </script>  
 </body>
 
 </html>

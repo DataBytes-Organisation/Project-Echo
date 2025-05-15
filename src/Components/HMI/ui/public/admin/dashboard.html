@@ -1,306 +1,354 @@
 <!doctype html>
 <html lang="en">
 
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Echo Admin</title>
-    <link rel="shortcut icon" type="image/png" href="./admin/images/logos/project-title.png" />
-    <link type="text/css" rel="stylesheet" href="./admin/css/styles.min.css" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
-		<scrip type="text/javascript" src="https://kit.fontawesome.com/8aa980d912.js" crossorigin="anonymous"></script>
+    <link rel="shortcut icon" type="image/png" href="/admin/images/logos/project-title.png" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="/admin/css/styles.min.css" />
+    <style>
+        .clickable-row {
+            cursor: pointer;
+        }
 
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD"
-      crossorigin="anonymous"
-    />
+        .clickable-row:hover {
+            background-color: #f8f9fa;
+        }
 
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
-    />
-    <!-- jQuery -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script> 
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
-    <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+        .wave-container {
+            width: 100%;
+            height: 50px;
+            overflow: hidden;
+            margin-top: -10px;
+        }
 
-    <script type="text/javascript" src="./admin/js/sidebarmenu.js"></script>
-    <script type="text/javascript" src="./admin/js/app.min.js"></script>
-    <!-- <script type="text/javascript" src="../../node_modules/apexcharts/dist/apexcharts.min.js"></script> -->
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.css"
-    />
-    <script src="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.min.js"></script>
-    <script type="text/javascript" src="./admin/js/dashboard.js"></script>
-    <script type="text.javascript" src="./admin/js/app.min.js"></script>
-  </head>
-    
+        .wave-container svg {
+            width: 200%;
+            height: 100%;
+        }
 
-    
+        #breakup {
+            height: 100px;
+        }
+    </style>
+</head>
 
 <body>
-  <!--  Body Wrapper -->
-  <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
-    data-sidebar-position="fixed" data-header-position="fixed">
-    <!-- Sidebar Start -->
-    <div id="sidebar"></div>
-    <!--  Sidebar End -->
-    <!--  Main wrapper -->
-    <div class="body-wrapper">
-      <div id="header"></div>
-      <div class="container-fluid">
-        <!--  Row 1 -->
-        <div class="row">
-            <div class="col-xl-4 col-md-12">
-                <div class="card mat-stat-card">
-                    <div class="card-block">
-                        <div class="row align-items-center b-b-default">
-                            <div class="col-sm-6 b-r-default p-b-20 p-t-20">
-                                <div class="row align-items-center justify-content-center text-center">
-                                    <div class="col-4 p-r-0">
-                                        <i class="ti ti-user-check ti-2fa"></i>
-                                    </div>
-                                    <div class="col-8 p-l-0">
-                                        <h5>10K</h5>
-                                        <p class="text-muted m-b-0">Visitors</p>
-                                        <img src="./admin/images/logos/visitors-icon.png" width="42" height="42">
-                                    </div>
-                                </div>
-                            </div>
-                            
-                        <div class="col-sm-6 p-b-20 p-t-20">
-                                <div class="row align-items-center text-center">
-                                    <div class="col-4 p-r-0">
-                                        <i class="ti ti-wifi"></i>
-                                    </div>
-                                    <div class="col-8 p-l-0">
-                                        <h5>600</h5>
-                                        <p class="text-muted m-b-0">Network</p>
-                                        <img src="./admin/images/logos/network-icon.png" width="42" height="42">
-                                    </div>
-                                </div>
-                            </div></div>
-                        <div class="row align-items-center">
-                            <div class="col-sm-6 p-b-20 p-t-20 b-r-default">
-                                <div class="row align-items-center text-center">
-                                    <div class="col-4 p-r-0">
-                                        <i class="ti ti-file"></i>
-                                    </div>
-                                    <div class="col-8 p-l-0">
-                                        <h5>2000+</h5>
-                                        <p class="text-muted m-b-0">Files</p>
-                                        <img src="./admin/images/logos/files-icon.png" width="42" height="42">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-sm-6 p-b-20 p-t-20">
-                                <div class="row align-items-center text-center">
-                                    <div class="col-4 p-r-0">
-                                        <i class="ti ti-mail"></i>
-                                    </div>
-                                    <div class="col-8 p-l-0">
-                                        <h5>120</h5>
-                                        <p class="text-muted m-b-0">Enquiries</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-          <div class="col-lg-8 d-flex align-items-strech">
-            <div class="card w-100">
-                <div class="card-body">
-                    <div class="d-sm-flex d-block align-items-center justify-content-between mb-9">
-                      <div class="mb-3 mb-sm-0">
-                        <h5 class="card-title fw-semibold">Live Event log</h5>
-                      </div>
-                    </div>
-                    <!-- <div id="chart"></div> -->
-                  </div>
-            </div>
-          </div>
-          <div class="col-lg-4">
-            <div class="row">
-              <div class="col-lg-12">
-                <div class="card overflow-hidden">
-                  <div class="card-body p-4">
-                    <h5 class="card-title mb-9 fw-semibold">Donation Progress</h5>
-                    <div class="row align-items-center">
-                      <div class="col-8">
-                        <h4 class="fw-semibold mb-3">Goal: AUD$1000</h4>
-                        <h4 class="" id="totalDonations" >Total Received: $</h4>
-                        <div class="d-flex align-items-center">
-                          <div class="me-4">
-                            <span class="round-8 bg-primary rounded-circle me-2 d-inline-block"></span>
-                            <span class="">Donations</span>
-                          </div>
-                          <div>
-                            <span class="round-8 bg-light-primary rounded-circle me-2 d-inline-block"></span>
-                            <span class="">Subscription</span>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="col-4">
-                        <div class="d-flex justify-content-center">
-                          <div id="breakup"></div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            
-              
-              <div class="col-lg-12">
-                <div class="card">
-                  <div class="card-body">
-                    <div class="row alig n-items-start">
-                      <div class="col-12">
-                        <h5 class="card-title mb-12 fw-semibold"> Echo Map Access log - 7 days </h5>
-                        <h4 class="fw-semibold mb-3">242 visits</h4>
-                        
-                      </div>
+    <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
+        data-sidebar-position="fixed" data-header-position="fixed">
+        <div id="sidebar"></div>
 
+        <div class="body-wrapper">
+            <div id="header"></div>
+
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-xl-4 col-md-12">
+                        <div class="card mat-stat-card">
+                            <div class="card-block">
+                                <div class="row align-items-center b-b-default">
+                                    <div class="col-sm-6 b-r-default p-b-20 p-t-20">
+                                        <div class="row align-items-center justify-content-center text-center">
+                                            <div class="col-4 p-r-0">
+                                                <i class="fas fa-user-check fa-2x text-primary"></i>
+                                            </div>
+                                            <div class="col-8 p-l-0">
+                                                <h5>10K</h5>
+                                                <p class="text-muted m-b-0">Visitors</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6 p-b-20 p-t-20">
+                                        <div class="row align-items-center text-center">
+                                            <div class="col-4 p-r-0">
+                                                <i class="fas fa-wifi fa-2x text-primary"></i>
+                                            </div>
+                                            <div class="col-8 p-l-0">
+                                                <h5>600</h5>
+                                                <p class="text-muted m-b-0">Network</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row align-items-center">
+                                    <div class="col-sm-6 p-b-20 p-t-20 b-r-default">
+                                        <div class="row align-items-center text-center">
+                                            <div class="col-4 p-r-0">
+                                                <i class="fas fa-file fa-2x text-primary"></i>
+                                            </div>
+                                            <div class="col-8 p-l-0">
+                                                <h5>2000+</h5>
+                                                <p class="text-muted m-b-0">Files</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6 p-b-20 p-t-20">
+                                        <div class="row align-items-center text-center">
+                                            <div class="col-4 p-r-0">
+                                                <i class="fas fa-envelope fa-2x text-primary"></i>
+                                            </div>
+                                            <div class="col-8 p-l-0">
+                                                <h5>120</h5>
+                                                <p class="text-muted m-b-0">Enquiries</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                  </div>
-                  <div id="visited"></div>
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          
-          <div class="col-lg-12 d-flex align-items-stretch">
-            <div class="card w-100">
-              <div class="card-body p-4">
-                <h5 class="card-title fw-semibold mb-4">Enquiries123 History</h5>
-                <div class="table-responsive">
-                  <table class="table text-nowrap mb-0 align-middle">
-                    <thead class="text-dark fs-4">
-                      <tr>
-                        <th class="border-bottom-0">
-                          <h6 class="fw-semibold mb-0">Username</h6>
-                        </th>
-                        <th class="border-bottom-0">
-                          <h6 class="fw-semibold mb-0">User Detail</h6>
-                        </th>
-                        <th class="border-bottom-0">
-                          <h6 class="fw-semibold mb-0">Content</h6>
-                        </th>
-                        <th class="border-bottom-0">
-                          <h6 class="fw-semibold mb-0">Category</h6>
-                        </th>
-                        <th class="border-bottom-0">
-                          <h6 class="fw-semibold mb-0">Date</h6>
-                        </th>
-                      </tr>
-                    </thead>
-                  
-                      <tbody id="enquiry-table-body">
-                        <!-- Enquiries will be injected here via JS -->
-                      </tbody>                
-                    
-                  </table>
+
+                <div class="row">
+                    <div class="col-lg-8 d-flex">
+                        <div class="card w-100 h-100">
+                            <div class="card-body">
+                                <h5 class="card-title fw-semibold">Live Event log</h5>
+                                </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="card  h-100">
+                                    <div class="card-body p-4">
+                                        <h5 class="card-title mb-3 fw-semibold">Donation Progress</h5>
+                                        <div class="row align-items-center">
+                                            <div class="col-8">
+                                                <h4 class="fw-semibold mb-3">Goal: AUD$1000</h4>
+                                                <h4 id="totalDonations">Total Received: $0</h4>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="me-4">
+                                                        <span
+                                                            class="round-8 bg-primary rounded-circle me-2 d-inline-block"></span>
+                                                        <span>Donations</span>
+                                                    </div>
+                                                    <div>
+                                                        <span
+                                                            class="round-8 bg-light-primary rounded-circle me-2 d-inline-block"></span>
+                                                        <span>Subscription</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-4">
+                                                <div id="breakup"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-12 mt-3">
+                                <div class="card  h-100">
+                                    <div class="card-body d-flex flex-column justify-content-between">
+                                        <div>
+                                            <h5 class="card-title fw-semibold mb-2">Echo Map Access log - 7 days</h5>
+                                        </div>
+                                        <div>
+                                            <h4 class="fw-semibold mb-3 mt-3">242 visits</h4>
+                                            <div class="wave-container">
+                                                <svg viewBox="0 0 500 50" preserveAspectRatio="none">
+                                                    <path d="M0,25 C100,0 200,50 300,25 C400,0 500,50 600,25" fill="none"
+                                                        stroke="#0d6efd" stroke-width="3">
+                                                        <animateTransform attributeName="transform" type="translate"
+                                                            from="0 0" to="-100 0" dur="2s" repeatCount="indefinite" />
+                                                    </path>
+                                                </svg>
+                                            </div>
+                                            <div id="visited"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-              </div>
+
+                <div class="row mt-4">
+                    <div class="col-lg-12">
+                        <div class="card w-100">
+                            <div class="card-body">
+                                <h5 class="card-title fw-semibold mb-4">Enquiries History</h5>
+                                <div class="table-responsive">
+                                    <table class="table align-middle">
+                                        <thead class="text-dark fs-4">
+                                            <tr>
+                                                <th>Username</th>
+                                                <th>User Detail</th>
+                                                <th>Content</th>
+                                                <th>Category</th>
+                                                <th>Date & Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="enquiry-table-body"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal fade" id="enquiryModal" tabindex="-1" aria-labelledby="enquiryModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="enquiryModalLabel">Enquiry Details</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <h6>Username:</h6>
+                                        <p id="modal-username" class="text-muted"></p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6>Date:</h6>
+                                        <p id="modal-date" class="text-muted"></p>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <h6>User Details:</h6>
+                                        <p id="modal-userDetail" class="text-muted"></p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6>Category:</h6>
+                                        <p id="modal-category" class="text-muted"></p>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <h6>Content:</h6>
+                                    <p id="modal-content" class="text-muted"></p>
+                                </div>
+                                <div class="mb-3">
+                                    <h6>Status:</h6>
+                                    <select class="form-select" id="modal-status">
+                                        <option value="Open">Open</option>
+                                        <option value="In Progress">In Progress</option>
+                                        <option value="Completed">Completed</option>
+                                        <option value="Closed">Closed</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <h6>Notes:</h6>
+                                    <textarea class="form-control" id="modal-notes" rows="3"></textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button class="btn btn-primary" id="saveEnquiryBtn">Save Changes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
-          </div>
         </div>
-        
-      </div>
     </div>
-  </div>
 
-  <script type="text/javascript">
-    $(document).ready(function() {
-              // Use jQuery's load() method to load component contents
-              console.log("Start!")
-              $("#sidebar").load("./admin/component/sidebar-component.html");
-              $("#header").load("./admin/component/header-component.html");
-          });
-    
-    
-  //Get the cumulative donations from the Stripe Account
-  //Calling API in server.js
-  fetch('/cumulativeDonations')
-    .then(response => response.json()) // Parse the JSON data
-    .then(data => {
-      // Update the content of the "totalDonations" element
-      const totalDonationsElement = document.getElementById('totalDonations');
-      if (data === 0) {
-        console.log("data does not exists");
-        totalDonationsElement.innerHTML = "Total Donations: Connect Stripe Account";
-        // totalDonationsElement.innerHTML = `Total Donations: $${data.cumulativeTotal}`;
-      }
-      else if(data === undefined){
-        console.log("data is undefined");
-        totalDonationsElement.innerHTML = "Total Donations: Connect Stripe Account";
-      }
-      else{
-        console.log("data exists");
-        console.log(data);
-        if (data.cumulativeTotal === undefined) {
-          console.log("cumulativeTotal is undefined");
-          totalDonationsElement.innerHTML = "Total Donations: Connect Stripe Account";
-        }
-        else{
-          totalDonationsElement.innerHTML = `Total Donations: $${data.cumulativeTotal}`;
-        }
-        // totalDonationsElement.innerHTML = `Total Donations: Connect Stripe Account`;
-      }
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      // Handle any errors that occur during the fetch
-    });
-  </script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script>
+        let currentEnquiryId = null;
 
+        const mockEnquiries = [
+            { id: 1, username: 'john_doe', userDetail: 'John Doe (john@example.com)', email: 'john@example.com', content: 'I have a question about your services...', category: 'Question', date: '2025-04-28', status: 'Open', notes: '' },
+            { id: 2, username: 'jane_smith', userDetail: 'Jane Smith (jane@example.com)', email: 'jane@example.com', content: 'I would like to request more info...', category: 'Request', date: '2025-04-27', status: 'In Progress', notes: 'Waiting on materials' },
+            { id: 3, username: 'bob_johnson', userDetail: 'Bob Johnson (bob@example.com)', email: 'bob@example.com', content: 'The website was not loading...', category: 'Complaint', date: '2025-04-26', status: 'Completed', notes: 'Fixed issue' }
+        ];
+
+        const getCategoryBadgeClass = category => ({
+            'Request': 'bg-secondary',
+            'Question': 'bg-info',
+            'Feedback': 'bg-warning',
+            'Complaint': 'bg-danger'
+        }[category] || 'bg-primary');
+
+        const getStatusBadgeClass = status => ({
+            'Open': 'bg-primary',
+            'In Progress': 'bg-info',
+            'Completed': 'bg-success',
+            'Closed': 'bg-secondary'
+        }[status] || 'bg-light text-dark');
+
+        function openEnquiryModal(enquiry) {
+            currentEnquiryId = enquiry.id;
+            $('#modal-username').text(enquiry.username);
+            $('#modal-date').text(enquiry.date);
+            $('#modal-userDetail').text(enquiry.userDetail);
+            $('#modal-category').text(enquiry.category);
+            $('#modal-content').text(enquiry.content);
+            $('#modal-status').val(enquiry.status);
+            $('#modal-notes').val(enquiry.notes);
+            new bootstrap.Modal(document.getElementById('enquiryModal')).show();
+        }
+
+        function loadEnquiries() {
+            const tbody = document.getElementById('enquiry-table-body');
+            tbody.innerHTML = '';
+            mockEnquiries.forEach(enquiry => {
+                const row = document.createElement('tr');
+                row.className = 'clickable-row';
+                row.innerHTML = `
+                    <td>${enquiry.username}</td>
+                    <td>${enquiry.userDetail}<br><small>${enquiry.email}</small></td>
+                    <td>${enquiry.content.substring(0, 50)}${enquiry.content.length > 50 ? '...' : ''}</td>
+                    <td><span class="badge ${getCategoryBadgeClass(enquiry.category)}">${enquiry.category}</span></td>
+                    <td>${enquiry.date}<br><span class="badge ${getStatusBadgeClass(enquiry.status)}">${enquiry.status}</span></td>
+                    `;
+                row.onclick = () => openEnquiryModal(enquiry);
+                tbody.appendChild(row);
+            });
+        }
+
+        function loadDonations() {
+            const chart = new ApexCharts(document.querySelector("#breakup"), {
+                chart: { type: 'donut', height: 100 },
+                series: [750, 250],
+                labels: ['Received', 'Remaining'],
+                colors: ['#0d6efd', '#e0e0e0'],
+                legend: { show: false }
+            });
+            chart.render();
+            document.getElementById('totalDonations').textContent = 'Total Received: $750';
+        }
+
+        document.getElementById('saveEnquiryBtn').addEventListener('click', () => {
+            const status = document.getElementById('modal-status').value;
+            const notes = document.getElementById('modal-notes').value;
+
+            const enquiry = mockEnquiries.find(e => e.id === currentEnquiryId);
+            if (enquiry) {
+                enquiry.status = status;
+                enquiry.notes = notes;
+            }
+
+            loadEnquiries();
+            bootstrap.Modal.getInstance(document.getElementById('enquiryModal')).hide();
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            $('#sidebar').load('/admin/component/sidebar-component.html', function () {
+                // Fix image paths after the content is loaded
+                $('#sidebar img').each(function () {
+                    let currentSrc = $(this).attr('src');
+                    if (currentSrc && currentSrc.startsWith('./admin/')) {
+                        let newSrc = currentSrc.replace('./admin/', '/admin/');
+                        $(this).attr('src', newSrc);
+                    }
+                });
+            });
+            $('#header').load('/admin/component/header-component.html');
+            loadEnquiries();
+            loadDonations();
+        });
+    </script>
 </body>
-<script>
-  fetch('/api/enquiries')
-    .then(response => response.json())
-    .then(data => {
-      const tbody = document.getElementById('enquiry-table-body');
-      tbody.innerHTML = ''; // Clear any existing-rows
-
-      data.forEach(entry => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td class="border-bottom-0"><h6 class="fw-semibold mb-0">${entry.username}</h6></td>
-          <td class="border-bottom-0">
-            <h6 class="fw-semibold mb-1">${entry.userDetail}</h6>
-            <span class="fw-normal">${entry.userDetail}</span>
-          </td>
-          <td class="border-bottom-0">
-            <p class="mb-0 fw-normal">${entry.content}</p>
-          </td>
-          <td class="border-bottom-0">
-            <div class="d-flex align-items-center gap-2">
-              <span class="badge ${entry.category === 'Request' ? 'bg-secondary' : 'bg-success'} rounded-3 fw-semibold">
-                ${entry.category}
-              </span>
-            </div>
-          </td>
-          <td class="border-bottom-0">
-            <h6 class="fw-semibold mb-0 fs-4">${entry.date}</h6>
-          </td>
-        `;
-        tbody.appendChild(row);
-      });
-    })
-    .catch(error => {
-      console.error("Failed to load enquiries:", error);
-    });
-</script>
-
 
 </html>
+

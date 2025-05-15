@@ -1,0 +1,30 @@
+<div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="userModalLabel">Enquiry Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Name: <span id="modal-user-name"></span></p>
+                <p>Role: <span id="modal-user-role"></span></p>
+
+                <!-- Dropdown for Status -->
+                <label for="modal-enquiry-status">Status</label>
+                <select id="modal-enquiry-status">
+                    <option value="Open">Open</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                </select>
+
+                <!-- Textarea for Notes -->
+                <label for="modal-enquiry-notes">Notes</label>
+                <textarea id="modal-enquiry-notes" rows="4" cols="50"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="saveEnquiryButton">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
