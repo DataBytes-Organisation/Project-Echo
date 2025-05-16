@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Site Traffic Analytics</title>
+  <link rel="shortcut icon" type="image/png" href="./admin/images/logos/favicon.png" />
+  <link type="text/css" rel="stylesheet" href="./admin/css/styles.min.css" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+  <script type="text/javascript" src="https://kit.fontawesome.com/8aa980d912.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+</head>
+
+<body>
+  <!-- Page Wrapper -->
+  <div class="page-wrapper" id="main-wrapper">
+    <!-- Sidebar -->
+    <div id="sidebar"></div>
+    <!-- Main Content -->
+    <div class="body-wrapper">
+      <div id="header"></div>
+      <div class="container-fluid">
+        <div class="card mt-4">
+          <div class="card-body">
+            <h5 class="card-title fw-semibold mb-4">Site Traffic Analytics</h5>
+            <!-- Traffic Table -->
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>Username</th>
+                  <th>Email</th>
+                  <th>Visit Count</th>
+                  <th>Last Visit</th>
+                </tr>
+              </thead>
+              <tbody id="trafficTable">
+                <tr>
+                  <td>Loading...</td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                </tr>
+              </tbody>
+            </table>
+            <!-- Visit Chart -->
+            <div id="visitChart" class="mt-4"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $("#sidebar").load("./admin/component/sidebar-component.html");
+      $("#header").load("./admin/component/header-component.html");
+
+      // Fetch traffic data
+      fetch("/traffic")
+        .then(response => response.json())
+        .then(data => {
+          const table = document.getElementById("trafficTable");
+          table.innerHTML = data.map(user => `
+            <tr>
+              <td>${user.username}</td>
+              <td>${user.email}</td>
+              <td>${user.visit_count}</td>
+              <td>${new Date(user.last_visit_time).toLocaleString()}</td>
+            </tr>
+          `).join("");
+
+          // Prepare chart data
+          const usernames = data.map(user => user.username);
+          const visitCounts = data.map(user => user.visit_count);
+
+          // Render chart
+          var options = {
+            chart: { type: 'bar' },
+            series: [{ name: 'Visits', data: visitCounts }],
+            xaxis: { categories: usernames }
+          };
+          var chart = new ApexCharts(document.querySelector("#visitChart"), options);
+          chart.render();
+        });
+    });
+  </script>
+</body>
+
+</html>
