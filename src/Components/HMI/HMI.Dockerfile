@@ -9,12 +9,18 @@ WORKDIR /usr/src/app
 # Copy the entire contents of the current directory to the Docker image
 COPY . .
 
-# Change to the UI directory where your package.json file is located
-WORKDIR /usr/src/app/ui
+# Install express in /usr/src/app (for server.js)
+RUN npm install express
 
-# Install your application's dependencies
+# Install dependencies from /usr/src/app/ui (if package.json exists there)
+WORKDIR /usr/src/app/ui
 RUN npm install
+
+# Install nodemon globally
 RUN npm install -g nodemon
+
+# Change back to /usr/src/app to run server.js
+WORKDIR /usr/src/app
 
 # The application runs on port 8080, so let Docker know about this
 EXPOSE 8080
