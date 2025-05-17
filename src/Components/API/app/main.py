@@ -12,6 +12,10 @@ from app import serializers
 from app import schemas
 import pymongo
 import json
+from app.routers import hmi, engine, sim, two_factor
+app = FastAPI()
+
+
 
 from app.routers import hmi, engine, sim, iot
 
@@ -42,14 +46,16 @@ app.add_middleware(
 app.include_router(hmi.router, tags=['hmi'], prefix='/hmi')
 app.include_router(engine.router, tags=['engine'], prefix='/engine')
 app.include_router(sim.router, tags=['sim'], prefix='/sim')
-
+app.include_router(two_factor.router)
 app.include_router(iot.router, tags=['iot'], prefix='/iot')
 app.include_router(species_predictor.router, tags=["predict"])
+
 
 
 # ✅ Root endpoint
 @app.get("/", response_description="API Root")
 def show_home():
+    return 'Welcome to echo api, move to /docs for more'
     return 'Welcome to Project Echo API. Visit /docs for interactive documentation.'
 
 import os  # ✅ Ensure this is already imported at the top
@@ -93,3 +99,4 @@ def export_openapi_to_file():
     print(f"✅ OpenAPI spec exported to {output_path}")
 
 export_openapi_to_file()
+
