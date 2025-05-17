@@ -1,4 +1,342 @@
 {
+  "name": "HMI_API_onboarding_task",
+  "version": "1",
+  "format": "json",
+  "data": [
+    {
+      "Bird": "Acanthagenys rufogularis",
+      "description": [
+            "Spiny-cheeked Honeyeater is known for its distinctive spiny cheek feathers and rusty-red throat patch.",
+            "Acanthagenys rufogularis inhabits the dry montane forests, scrublands, and even agricultural areas, where it feeds on nectar, insects, and small fruits.",
+            "The males display unique plumage with black and white stripes on the head, a bluish gray back, and a rufous throat and underparts, while the females have a more uniform grayish-brown coloration.",
+            "Acanthagenys rufogularis is not considered endangered, although its population is threatened by deforestation, habitat fragmentation, and pesticide use in agricultural areas."
+      ]
+    },
+    {
+        "Bird": "Acanthiza apicalis",
+        "description": [
+            "The Inland thornbill is named for its preference for arid inland habitats of Australia.",
+         "  They have a distinctive high-pitched call that can be heard from a long distance.",
+            "These small birds are skilled at hopping along branches and twigs in search of food.",
+            "The Inland thornbill is threatened by habitat loss due to land clearing for agriculture.",
+        "   They are monogamous and form lasting pairs, with both partners involved in nest building and caring for young."
+        ]
+    },
+    {
+        "Bird": "Acanthiza chrysorrhoa",
+        "description": [
+            "This bird is named for the bright yellow patch of feathers on its rump.",
+            "They can survive in a range of habitats, from forests to semi-arid scrublands.",
+            "Yellow-rumped thornbills are known for their energetic, acrobatic movements as they forage for insects.",
+            "They have been observed making use of tools, such as using sticks to pry open bark to expose insects.",
+            "This thornbill has a clutch size of only 2-4 eggs, and they often lay multiple clutches per year.",
+            "They are commonly found throughout eastern and southeastern Australia, including Tasmania, as well as in southern parts of the Northern Territory and Western Australia."
+        ]
+    },
+    {
+        "Bird": "Acanthiza lineata",
+        "description": [
+            "The Striated thornbill is named for the distinctive markings on its wings and back.",
+            "These birds are found throughout southeastern mainland Australia, from southern Queensland to eastern South Australia, inhabiting open forests and woodlands dominated by eucalypts",
+            "These birds are highly territorial and aggressive towards other bird species.",
+            "Young Striated thornbills remain in the nest for up to 3 weeks after hatching, and are fed by both parents.",
+            "They have a varied diet that includes insects, nectar, and fruit.",
+            "The Striated Thornbill can often be seen in small flocks outside the breeding season and may feed in mixed groups with other small insect-eating birds​ "
+        ]
+    },
+    {
+        "Bird": "Acanthiza nana",
+        "description": [
+            "This thornbill is named for its bright yellow plumage on the head and underparts.",
+            "They are the smallest thornbill species, weighing only around 6 grams.",
+            "Yellow thornbills are socially monogamous, but males may mate with multiple females.",
+            "These birds are able to survive in a range of habitats, including eucalypt forests and mangroves.",
+            "They have been observed using feathers to line their nests, which are constructed in tree forks or other hidden locations."
+        ]
+    },
+    {
+        "Bird": "Acanthiza pusilla",
+        "description": []
+    },
+    {
+        "Bird": "Acanthiza reguloides",
+        "description": []
+    },
+    {
+        "Bird": "Acanthiza uropygialis",
+        "description": []
+    },
+    {
+        "Bird": "Acanthorhynchus tenuirostris",
+        "description": []
+    },
+    {
+        "Bird": "Accipiter cirrocephalus",
+        "description": []
+    },
+    {
+        "Bird": "Accipiter fasciatus",
+        "description": []
+    },
+    {
+        "Bird": "Accipiter cooperi",
+        "description": []
+    },
+    {
+        "Bird": "Acrocephalus australis",
+        "description": []
+    },
+    {
+        "Bird": "Aegotheles cristatus",
+        "description": []
+    },
+    {
+        "Bird": "Aidemosyne modesta",
+        "description": []
+    },
+    {
+        "Bird": "Alisterus scapularis",
+        "description": []
+    },
+    {
+        "Bird": "Alauda Arvensis",
+        "description": []
+    },
+    {
+        "Bird": "Amytornis purnelli",
+        "description": []
+    },
+    {
+        "Bird": "Anas superciliosa",
+        "description": []
+    },
+    {
+        "Bird": "Anhinga novaehollandiae",
+        "description": []
+    },
+    {
+        "Bird": "Anseranas semipalmata",
+        "description": []
+    },
+    {
+        "Bird": "Anthochaera carunculata",
+        "description": []
+    },
+    {
+        "Bird": "Anthus novaeseelandiae",
+        "description": []
+    },
+    {
+        "Bird": "Antigone antigone",
+        "description": []
+    },
+    {
+        "Bird": "Antigone rubicunda",
+        "description": []
+    },
+    {
+        "Bird": "Aphelocephala leucopsis",
+        "description": []
+    },
+    {
+        "Bird": "ApocritaÂ sp.",
+        "description": []
+    },
+    {
+        "Bird": "Aprosmictus erythropterus",
+        "description": []
+    },
+    {
+        "Bird": "Aquila audax",
+        "description": []
+    },
+    {
+        "Bird": "Artamus cinereus",
+        "description": []
+    },
+    {
+        "Bird": "Artamus cyanopterus",
+        "description": []
+    },
+    {
+        "Bird": "Artamus minor",
+        "description": []
+    },
+    {
+        "Bird": "Artamus superciliosus",
+        "description": []
+    },
+    {
+        "Bird": "Atrapsalta encaustica",
+        "description": []
+    },
+    {
+        "Bird": "Auscala spinosa",
+        "description": []
+    },
+    {
+        "Bird": "Austrochaperina pluvialis",
+        "description": []
+    },
+    {
+        "Bird": "Austronomus australis",
+        "description": []
+    },
+    {
+        "Bird": "AvesÂ sp.",
+        "description": []
+    },
+    {
+        "Bird": "Aythya australis",
+        "description": []
+    },
+    {
+        "Bird": "Barnardius zonarius",
+        "description": []
+    },
+    {
+        "Bird": "Biziura lobata",
+        "description": []
+    },
+    {
+        "Bird": "Burhinus grallarius",
+        "description": []
+    },
+    {
+        "Bird": "Cacatua galerita",
+        "description": []
+    },
+    {
+        "Bird": "Cacatua sanguinea",
+        "description": []
+    },
+    {
+        "Bird": "Cacomantis flabelliformis",
+        "description": []
+    },
+    {
+        "Bird": "Cacomantis variolosus",
+        "description": []
+    },
+    {
+        "Bird": "CaeliferaÂ sp.",
+        "description": []
+    },
+    {
+        "Bird": "Caligavis chrysops",
+        "description": []
+    },
+    {
+        "Bird": "Callocephalon fimbriatum",
+        "description": []
+    },
+    {
+        "Bird": "Calyptorhynchus banksii",
+        "description": []
+    },
+    {
+        "Bird": "Calyptorhynchus lathami",
+        "description": []
+    },
+    {
+        "Bird": "Canis familiaris",
+        "description": []
+    },
+    {
+        "Bird": "Capra hircus",
+        "description": []
+    },
+    {
+        "Bird": "Carduelis carduelis",
+        "description": []
+    },
+    {
+        "Bird": "Carterornis leucotis",
+        "description": []
+    },
+    {
+        "Bird": "Centropus phasianinus",
+        "description": []
+    },
+    {
+        "Bird": "Cervus Unicolour",
+        "description": []
+    },
+    {
+        "Bird": "Ceyx azureus",
+        "description": []
+    },
+    {
+        "Bird": "Conopophila albogularis",
+        "description": []
+    },
+    {
+        "Bird": "Cophixalus bombiens",
+        "description": []
+    },
+    {
+        "Bird": "Cophixalus exiguus",
+        "description": []
+    },
+    {
+        "Bird": "Cophixalus infacetus",
+        "description": []
+    },
+    {
+        "Bird": "Cophixalus ornatus",
+        "description": []
+    },
+    {
+        "Bird": "Coracina novaehollandiae",
+        "description": []
+    },
+    {
+        "Bird": "Coracina papuensis",
+        "description": []
+    },
+    {
+        "Bird": "Corcorax melanorhamphos",
+        "description": []
+    },
+    {
+        "Bird": "Cormobates leucophaea",
+        "description": []
+    },
+    {
+        "Bird": "Corvus bennetti",
+        "description": []
+    },
+    {
+        "Bird": "Corvus coronoides",
+        "description": []
+    },
+    {
+        "Bird": "Corvus mellori",
+        "description": []
+    },
+    {
+        "Bird": "Corvus orru",
+        "description": []
+    },
+    {
+        "Bird": "Coturnix pectoralis",
+        "description": []
+    },
+    {
+        "Bird": "Cracticus nigrogularis",
+        "description": []
+    },
+    {
+        "Bird": "Cracticus torquatus",
+        "description": []
+    },
+    {
+        "Bird": "Crinia signifera",
+        "description": []
+    }
+    
+  ]
+
     "name": "HMI_API_onboarding_task",
     "version": "1",
     "format": "json",
