@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Review Submitted Requests</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&family=Stick+No+Bills:wght@300&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Roboto', sans-serif;
+    }
+
+    body {
+      background-color: #1a1a1a;
+      color: rgba(247, 186, 206, 1);
+      padding: 40px 20px;
+      min-height: 100vh;
+    }
+
+    h1 {
+      text-align: center;
+      color: rgba(247, 186, 206, 1);
+      margin-bottom: 30px;
+      font-weight: 600;
+      font-family: 'Stick No Bills', sans-serif;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 25px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .review-box {
+      background: rgba(10, 10, 25, 0.8);
+      border-radius: 15px;
+      padding: 25px 30px;
+      width: 100%;
+      box-shadow: 0 8px 20px rgba(247, 186, 206, 0.1);
+    }
+
+    .review-box h2 {
+      text-align: center;
+      font-size: 20px;
+      margin-bottom: 20px;
+      color: rgba(247, 186, 206, 1);
+    }
+
+    .review-box label {
+      display: block;
+      font-weight: 500;
+      margin-top: 10px;
+      color: rgba(247, 186, 206, 0.9);
+    }
+
+    .review-box input,
+    .review-box textarea {
+      width: 100%;
+      margin-top: 5px;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1.5px solid #555;
+      background-color: #2b2b2b;
+      color: white;
+      font-size: 14px;
+    }
+
+    .review-box textarea {
+      resize: vertical;
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+
+    .buttons button {
+      width: 48%;
+      padding: 12px;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      font-size: 14px;
+      color: white;
+    }
+
+    .approve {
+      background-color: #2ecc71;
+    }
+
+    .approve:hover {
+      background-color: #27ae60;
+    }
+
+    .disapprove {
+      background-color: #e74c3c;
+    }
+
+    .disapprove:hover {
+      background-color: #c0392b;
+    }
+
+    .no-data {
+      text-align: center;
+      font-size: 18px;
+      color: rgba(247, 186, 206, 0.7);
+      margin-top: 40px;
+    }
+
+    .error-msg {
+      text-align: center;
+      font-size: 16px;
+      color: red;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+  <h1>📋 User Requests Awaiting Review</h1>
+  <div class="container" id="requestsContainer"></div>
+
+  <script>
+    fetch("requests.json")
+      .then(res => res.json())
+      .then(data => {
+        const container = document.getElementById("requestsContainer");
+
+        const pending = data.filter(item => item.status === "Pending Review");
+
+        if (pending.length === 0) {
+          container.innerHTML = `<div class="no-data">🎉 No pending requests right now.</div>`;
+          return;
+        }
+
+        pending.forEach((req, index) => {
+          const box = document.createElement("div");
+          box.className = "review-box";
+          box.innerHTML = `
+            <h2>Changes Requested</h2>
+            <label>Animal Identifier:</label>
+            <input type="text" value="${req.animalId}" readonly />
+
+            <label>Summary/Description:</label>
+            <textarea rows="4" readonly>${req.suggestion}</textarea>
+
+            <div class="buttons">
+              <button class="approve">Approve</button>
+              <button class="disapprove">Disapprove</button>
+            </div>
+          `;
+
+          // Add functionality
+          const approveBtn = box.querySelector(".approve");
+          const disapproveBtn = box.querySelector(".disapprove");
+
+          approveBtn.addEventListener("click", () => {
+            updateStatus(req.animalId, req.section, "Approved", box);
+          });
+
+          disapproveBtn.addEventListener("click", () => {
+            updateStatus(req.animalId, req.section, "Disapproved", box);
+          });
+
+          container.appendChild(box);
+        });
+      })
+      .catch(err => {
+        console.error("Error loading requests:", err);
+        document.getElementById("requestsContainer").innerHTML =
+          "<div class='error-msg'>⚠️ Error loading submitted requests. Please check your requests.json file.</div>";
+      });
+
+    function updateStatus(animalId, section, newStatus, element) {
+      fetch("update_status.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ animalId, section, status: newStatus })
+      })
+        .then(res => res.text())
+        .then(response => {
+          element.remove(); 
+          alert(response); // Notify user
+        })
+        .catch(err => {
+          console.error(err);
+          alert("❌ Failed to update status.");
+        });
+    }
+  </script>
+</body>
+</html>
