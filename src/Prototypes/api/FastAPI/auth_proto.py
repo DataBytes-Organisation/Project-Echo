@@ -120,6 +120,7 @@ def genotp(length: int = 6) -> str:
     return "".join(random.sample(digits, length))
 
 
+
 # User Lookup Function
 def find_user(username: str):
     """Look up a user by username in the 'users' collection."""
@@ -133,6 +134,7 @@ router = APIRouter()
 @router.post("/auth/generate-2fa", status_code=status.HTTP_200_OK)
 def generate_2fa(username: str = Body(...), password: str = Body(...)):
     """
+
     Generate a one-time password (OTP) for 2FA after validating user credentials.
     Expects JSON body with 'username' and 'password'.
     """
