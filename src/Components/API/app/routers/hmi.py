@@ -9,6 +9,7 @@ import datetime
 from app import serializers
 from app import schemas
 from app.database import Events, Movements, Microphones, User, Role, ROLES, Requests, Guest, ForgotPassword, LogoutToken, Species
+from fastapi.responses import JSONResponse
 import paho.mqtt.publish as publish
 import bcrypt
 from flask import jsonify
@@ -608,6 +609,11 @@ def remove_animal_from_notifications(user_id: str, species: str):
     )
     return {"message": "Animal removed from notifications"}
 
+<<<<<<< HEAD
+=======
+
+        
+>>>>>>> 6bbd3e07195434498a940840024054221b5b3901
 @router.get("/users", response_description="Get all users with visit data")
 def get_all_users():
     users = User.find()
@@ -626,6 +632,7 @@ def increment_user_visit(username: str, visit_duration: float = 5.0):
     )
     return {"message": f"Visit recorded for {username}"}
 
+<<<<<<< HEAD
 from pymongo import MongoClient
 
 # MongoDB connection
@@ -647,3 +654,5 @@ async def update_config(config: dict):
 async def get_current_config():
     config = config_collection.find_one({"current_config": {"$exists": True}})
     return config["current_config"] if config else {"microphone": "default", "species": "default", "class": "default"}
+=======
+>>>>>>> 6bbd3e07195434498a940840024054221b5b3901
