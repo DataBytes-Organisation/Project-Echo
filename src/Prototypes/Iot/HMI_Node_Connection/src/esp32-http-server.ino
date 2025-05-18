@@ -1,18 +1,3 @@
-/* ESP32 HTTP IoT Server Example for Wokwi.com
-
-  https://wokwi.com/projects/320964045035274834
-
-  To test, you need the Wokwi IoT Gateway, as explained here:
-
-  https://docs.wokwi.com/guides/esp32-wifi#the-private-gateway
-
-  Then start the simulation, and open http://localhost:9080
-  in another browser tab.
-
-  Note that the IoT Gateway requires a Wokwi Club subscription.
-  To purchase a Wokwi Club subscription, go to https://wokwi.com/club
-*/
-
 #include <WiFi.h>
 #include <WiFiClient.h>
 #include <WebServer.h>
@@ -127,7 +112,45 @@ void setup(void) {
   Serial.println("HTTP server started");
 }
 
+unsigned long lastHeartbeat = 0;
+const unsigned long HEARTBEAT_INTERVAL = 10000; // 10 seconds in milliseconds
+
+void sendHeartbeat() {
+  Serial.println("Sending heartbeat...");
+  HTTPClient http;
+  String url = String("http://") + String(server_ip) + ":9000/iot/nodes/" + String(node_id) + "/heartbeat";
+  http.begin(url);
+  
+  // Set content type header
+  http.addHeader("Content-Type", "application/json");
+  
+  // Create JSON payload
+  String payload = "{\"message\": \"ESP32 is alive\"}";
+  
+  int httpResponseCode = http.PUT(payload);
+  
+  if (httpResponseCode > 0) {
+    Serial.print("Heartbeat sent successfully, response code: ");
+    Serial.println(httpResponseCode);
+  } else {
+    Serial.print("Error sending heartbeat: ");
+    Serial.println(http.errorToString(httpResponseCode));
+  }
+  
+  http.end();
+}
+
 void loop(void) {
   server.handleClient();
+  
+  // Get current time
+  unsigned long currentMillis = millis();
+  
+  // Check for first run or if interval has passed (handles overflow)
+  if (lastHeartbeat == 0 || (currentMillis - lastHeartbeat) >= HEARTBEAT_INTERVAL) {
+    sendHeartbeat();
+    lastHeartbeat = currentMillis;
+  }
+  
   delay(2);
 }
