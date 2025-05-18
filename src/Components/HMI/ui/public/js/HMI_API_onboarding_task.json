@@ -1,5 +1,4 @@
 {
-
   "name": "HMI_API_onboarding_task",
   "version": "1",
   "format": "json",
@@ -337,6 +336,7 @@
     }
     
   ]
+
     "name": "HMI_API_onboarding_task",
     "version": "1",
     "format": "json",

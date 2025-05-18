@@ -1,0 +1,1743 @@
+swagger: '2.0'
+info:
+  version: 1.0.0
+  title: Project Echo API
+  description: "\n    Project Echo is an IoT-based system designed to record and analyze\
+    \ audio data for species identification and ecosystem monitoring.\n\n    This\
+    \ API provides endpoints to:\n    - Upload audio files\n    - Simulate audio responses\n\
+    \    - Interface with HMI and audio engine modules\n    "
+  contact: {}
+host: www.example.com
+basePath: /
+securityDefinitions:
+  api_key:
+    type: apiKey
+    name: key
+    in: query
+security:
+- api_key: []
+schemes:
+- https
+consumes:
+- application/json
+produces:
+- application/json
+paths:
+  /hmi/weather:
+    get:
+      description: ''
+      summary: get_weather_hmi_weather_get
+      tags:
+      - hmi
+      operationId: get_weather_hmi_weather_get
+      deprecated: false
+      produces:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        default: Bearer {token}
+        type: string
+      - name: timestamp
+        in: query
+        required: true
+        type: integer
+        format: int32
+        description: ''
+      - name: lat
+        in: query
+        required: true
+        type: number
+        format: double
+        description: ''
+      - name: lon
+        in: query
+        required: true
+        type: number
+        format: double
+        description: ''
+      responses:
+        '200':
+          description: Get weather data for the day and location provided
+          schema:
+            type: object
+          headers: {}
+        '422':
+          description: Validation Error
+          schema:
+            $ref: '#/definitions/HTTPValidationError'
+          headers: {}
+  /hmi/events_time:
+    get:
+      description: ''
+      summary: show_event_from_time_hmi_events_time_get
+      tags:
+      - hmi
+      operationId: show_event_from_time_hmi_events_time_get
+      deprecated: false
+      produces:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        default: Bearer {token}
+        type: string
+      - name: start
+        in: query
+        required: true
+        type: string
+        description: ''
+      - name: end
+        in: query
+        required: true
+        type: string
+        description: ''
+      responses:
+        '200':
+          description: Get detection events within certain duration
+          schema:
+            type: object
+          headers: {}
+        '422':
+          description: Validation Error
+          schema:
+            $ref: '#/definitions/HTTPValidationError'
+          headers: {}
+  /hmi/audio:
+    get:
+      description: ''
+      summary: show_audio_hmi_audio_get
+      tags:
+      - hmi
+      operationId: show_audio_hmi_audio_get
+      deprecated: false
+      produces:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        default: Bearer {token}
+        type: string
+      - name: id
+        in: query
+        required: true
+        type: string
+        description: ''
+      responses:
+        '200':
+          description: returns audio given ID
+          schema:
+            type: object
+          headers: {}
+        '422':
+          description: Validation Error
+          schema:
+            $ref: '#/definitions/HTTPValidationError'
+          headers: {}
+  /hmi/movement_time:
+    get:
+      description: ''
+      summary: show_event_from_time_hmi_movement_time_get
+      tags:
+      - hmi
+      operationId: show_event_from_time_hmi_movement_time_get
+      deprecated: false
+      produces:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        default: Bearer {token}
+        type: string
+      - name: start
+        in: query
+        required: true
+        type: string
+        description: ''
+      - name: end
+        in: query
+        required: true
+        type: string
+        description: ''
+      responses:
+        '200':
+          description: Get true animal movement data within certain duration
+          schema:
+            type: object
+          headers: {}
+        '422':
+          description: Validation Error
+          schema:
+            $ref: '#/definitions/HTTPValidationError'
+          headers: {}
+  /hmi/microphones:
+    get:
+      description: ''
+      summary: list_microphones_hmi_microphones_get
+      tags:
+      - hmi
+      operationId: list_microphones_hmi_microphones_get
+      deprecated: false
+      produces:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        default: Bearer {token}
+        type: string
+      responses:
+        '200':
+          description: returns location of all microphones
+          schema:
+            type: object
+          headers: {}
+  /hmi/latest_movement:
+    get:
+      description: ''
+      summary: latest_movememnt_hmi_latest_movement_get
+      tags:
+      - hmi
+      operationId: latest_movememnt_hmi_latest_movement_get
+      deprecated: false
+      produces:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        default: Bearer {token}
+        type: string
+      responses:
+        '200':
+          description: returns the latest simluated movement message
+          schema:
+            type: object
+          headers: {}
+  /hmi/api/submit:
+    post:
+      description: ''
+      summary: submit_request_hmi_api_submit_post
+      tags:
+      - hmi
+      operationId: submit_request_hmi_api_submit_post
+      deprecated: false
+      produces:
+      - application/json
+      consumes:
+      - application/json
+      parameters:
+      - name: Content-Type
+        in: header
+        required: false
+        enum:
+        - application/json
+        type: string
+        description: ''
+      - name: body
+        in: body
+        required: true
+        description: ''
+        schema:
+          $ref: '#/definitions/RequestSchema'
+      responses:
+        '201':
+          description: Successful Response
+          schema:
+            type: object
+          headers: {}
+        '422':
+          description: Validation Error
+          schema:
+            $ref: '#/definitions/HTTPValidationError'
+          headers: {}
+  /hmi/sim_control:
+    post:
+      description: ''
+      summary: post_control_hmi_sim_control_post
+      tags:
+      - hmi
+      operationId: post_control_hmi_sim_control_post
+      deprecated: false
+      produces:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        default: Bearer {token}
+        type: string
+      - name: control
+        in: query
+        required: true
+        type: string
+        description: ''
+      responses:
+        '201':
+          description: Successful Response
+          schema:
+            type: object
+          headers: {}
+        '422':
+          description: Validation Error
+          schema:
+            $ref: '#/definitions/HTTPValidationError'
+          headers: {}
+  /hmi/post_recording:
+    post:
+      description: ''
+      summary: post_recording_hmi_post_recording_post
+      tags:
+      - hmi
+      operationId: post_recording_hmi_post_recording_post
+      deprecated: false
+      produces:
+      - application/json
+      consumes:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        default: Bearer {token}
+        type: string
+      - name: Content-Type
+        in: header
+        required: false
+        enum:
+        - application/json
+        type: string
+        description: ''
+      - name: body
+        in: body
+        required: true
+        description: ''
+        schema:
+          $ref: '#/definitions/RecordingData'
+      responses:
+        '201':
+          description: Successful Response
+          schema:
+            type: object
+          headers: {}
+        '422':
+          description: Validation Error
+          schema:
+            $ref: '#/definitions/HTTPValidationError'
+          headers: {}
+  /hmi/signup:
+    post:
+      description: ''
+      summary: signup_hmi_signup_post
+      tags:
+      - hmi
+      operationId: signup_hmi_signup_post
+      deprecated: false
+      produces:
+      - application/json
+      consumes:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        default: Bearer {token}
+        type: string
+      - name: Content-Type
+        in: header
+        required: false
+        enum:
+        - application/json
+        type: string
+        description: ''
+      - name: body
+        in: body
+        required: true
+        description: ''
+        schema:
+          $ref: '#/definitions/UserSignupSchema'
+      responses:
+        '201':
+          description: Successful Response
+          schema:
+            type: object
+          headers: {}
+        '422':
+          description: Validation Error
+          schema:
+            $ref: '#/definitions/HTTPValidationError'
+          headers: {}
+  /hmi/signin:
+    post:
+      description: ''
+      summary: signin_hmi_signin_post
+      tags:
+      - hmi
+      operationId: signin_hmi_signin_post
+      deprecated: false
+      produces:
+      - application/json
+      consumes:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        default: Bearer {token}
+        type: string
+      - name: Content-Type
+        in: header
+        required: false
+        enum:
+        - application/json
+        type: string
+        description: ''
+      - name: body
+        in: body
+        required: true
+        description: ''
+        schema:
+          $ref: '#/definitions/UserLoginSchema'
+      responses:
+        '200':
+          description: Successful Response
+          schema:
+            type: object
+          headers: {}
+        '422':
+          description: Validation Error
+          schema:
+            $ref: '#/definitions/HTTPValidationError'
+          headers: {}
+  /hmi/signout:
+    post:
+      description: ''
+      summary: signout_hmi_signout_post
+      tags:
+      - hmi
+      operationId: signout_hmi_signout_post
+      deprecated: false
+      produces:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        default: Bearer {token}
+        type: string
+      - name: jwtToken
+        in: query
+        required: true
+        type: string
+        description: ''
+      responses:
+        '200':
+          description: Successful Response
+          schema:
+            type: object
+          headers: {}
+        '422':
+          description: Validation Error
+          schema:
+            $ref: '#/definitions/HTTPValidationError'
+          headers: {}
+  /hmi/guestsignup:
+    post:
+      description: ''
+      summary: guestsignup_hmi_guestsignup_post
+      tags:
+      - hmi
+      operationId: guestsignup_hmi_guestsignup_post
+      deprecated: false
+      produces:
+      - application/json
+      consumes:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        default: Bearer {token}
+        type: string
+      - name: Content-Type
+        in: header
+        required: false
+        enum:
+        - application/json
+        type: string
+        description: ''
+      - name: body
+        in: body
+        required: true
+        description: ''
+        schema:
+          $ref: '#/definitions/GuestSignupSchema'
+      responses:
+        '200':
+          description: Successful Response
+          schema:
+            type: object
+          headers: {}
+        '422':
+          description: Validation Error
+          schema:
+            $ref: '#/definitions/HTTPValidationError'
+          headers: {}
+  /hmi/api/requests:
+    patch:
+      description: ''
+      summary: update_request_status_hmi_api_requests_patch
+      tags:
+      - hmi
+      operationId: update_request_status_hmi_api_requests_patch
+      deprecated: false
+      produces:
+      - application/json
+      consumes:
+      - application/json
+      parameters:
+      - name: Content-Type
+        in: header
+        required: false
+        enum:
+        - application/json
+        type: string
+        description: ''
+      - name: body
+        in: body
+        required: true
+        description: ''
+        schema:
+          type: object
+      responses:
+        '200':
+          description: Successful Response
+          schema:
+            type: object
+          headers: {}
+        '422':
+          description: Validation Error
+          schema:
+            $ref: '#/definitions/HTTPValidationError'
+          headers: {}
+  /hmi/api/updateConservationStatus:
+    patch:
+      description: ''
+      summary: update_request_status_hmi_api_updateConservationStatus_patch
+      tags:
+      - hmi
+      operationId: update_request_status_hmi_api_updateConservationStatus_patch
+      deprecated: false
+      produces:
+      - application/json
+      consumes:
+      - application/json
+      parameters:
+      - name: Content-Type
+        in: header
+        required: false
+        enum:
+        - application/json
+        type: string
+        description: ''
+      - name: body
+        in: body
+        required: true
+        description: ''
+        schema:
+          type: object
+      responses:
+        '200':
+          description: Successful Response
+          schema:
+            type: object
+          headers: {}
+        '422':
+          description: Validation Error
+          schema:
+            $ref: '#/definitions/HTTPValidationError'
+          headers: {}
+  /hmi/ChangePassword:
+    post:
+      description: ''
+      summary: passwordchange_hmi_ChangePassword_post
+      tags:
+      - hmi
+      operationId: passwordchange_hmi_ChangePassword_post
+      deprecated: false
+      produces:
+      - application/json
+      parameters:
+      - name: oldpw
+        in: query
+        required: true
+        type: string
+        description: ''
+      - name: newpw
+        in: query
+        required: true
+        type: string
+        description: ''
+      - name: cfm_newpw
+        in: query
+        required: true
+        type: string
+        description: ''
+      responses:
+        '200':
+          description: Successful Response
+          schema:
+            type: object
+          headers: {}
+        '422':
+          description: Validation Error
+          schema:
+            $ref: '#/definitions/HTTPValidationError'
+          headers: {}
+  /hmi/admin-dashboard:
+    post:
+      description: ''
+      summary: checkAdmin_hmi_admin_dashboard_post
+      tags:
+      - hmi
+      operationId: checkAdmin_hmi_admin_dashboard_post
+      deprecated: false
+      produces:
+      - application/json
+      consumes:
+      - application/json
+      parameters:
+      - name: Content-Type
+        in: header
+        required: false
+        enum:
+        - application/json
+        type: string
+        description: ''
+      - name: body
+        in: body
+        required: true
+        description: ''
+        schema:
+          $ref: '#/definitions/UserLoginSchema'
+      responses:
+        '200':
+          description: Successful Response
+          schema:
+            type: object
+          headers: {}
+        '422':
+          description: Validation Error
+          schema:
+            $ref: '#/definitions/HTTPValidationError'
+          headers: {}
+  /hmi/requests:
+    get:
+      description: ''
+      summary: getRequests_hmi_requests_get
+      tags:
+      - hmi
+      operationId: getRequests_hmi_requests_get
+      deprecated: false
+      produces:
+      - application/json
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+          schema:
+            type: object
+          headers: {}
+  /hmi/change-credential:
+    post:
+      description: ''
+      summary: changeCredential_hmi_change_credential_post
+      tags:
+      - hmi
+      operationId: changeCredential_hmi_change_credential_post
+      deprecated: false
+      produces:
+      - application/json
+      parameters:
+      - name: field
+        in: query
+        required: true
+        type: string
+        description: ''
+      - name: new
+        in: query
+        required: true
+        type: string
+        description: ''
+      responses:
+        '200':
+          description: Successful Response
+          schema:
+            type: object
+          headers: {}
+        '422':
+          description: Validation Error
+          schema:
+            $ref: '#/definitions/HTTPValidationError'
+          headers: {}
+  /hmi/delete-account:
+    delete:
+      description: ''
+      summary: deleteaccount_hmi_delete_account_delete
+      tags:
+      - hmi
+      operationId: deleteaccount_hmi_delete_account_delete
+      deprecated: false
+      produces:
+      - application/json
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+          schema:
+            type: object
+          headers: {}
+  /hmi/forgot-password:
+    post:
+      description: ''
+      summary: forgotpassword_hmi_forgot_password_post
+      tags:
+      - hmi
+      operationId: forgotpassword_hmi_forgot_password_post
+      deprecated: false
+      produces:
+      - application/json
+      consumes:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        default: Bearer {token}
+        type: string
+      - name: Content-Type
+        in: header
+        required: false
+        enum:
+        - application/json
+        type: string
+        description: ''
+      - name: body
+        in: body
+        required: true
+        description: ''
+        schema:
+          $ref: '#/definitions/ForgotPasswordSchema'
+      responses:
+        '201':
+          description: Successful Response
+          schema:
+            type: object
+          headers: {}
+        '422':
+          description: Validation Error
+          schema:
+            $ref: '#/definitions/HTTPValidationError'
+          headers: {}
+  /hmi/reset-password:
+    post:
+      description: ''
+      summary: forgotpassword_hmi_reset_password_post
+      tags:
+      - hmi
+      operationId: forgotpassword_hmi_reset_password_post
+      deprecated: false
+      produces:
+      - application/json
+      consumes:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        default: Bearer {token}
+        type: string
+      - name: Content-Type
+        in: header
+        required: false
+        enum:
+        - application/json
+        type: string
+        description: ''
+      - name: body
+        in: body
+        required: true
+        description: ''
+        schema:
+          $ref: '#/definitions/ResetPasswordSchema'
+      responses:
+        '201':
+          description: Successful Response
+          schema:
+            type: object
+          headers: {}
+        '422':
+          description: Validation Error
+          schema:
+            $ref: '#/definitions/HTTPValidationError'
+          headers: {}
+  /hmi/filter_algorithm/{algorithm_type}:
+    get:
+      description: ''
+      summary: filter_name_hmi_filter_algorithm__algorithm_type__get
+      tags:
+      - hmi
+      operationId: filter_name_hmi_filter_algorithm__algorithm_type__get
+      deprecated: false
+      produces:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        default: Bearer {token}
+        type: string
+      - name: algorithm_type
+        in: path
+        required: true
+        type: string
+        description: ''
+      responses:
+        '200':
+          description: returns the running filter algorithm name
+          schema:
+            type: object
+          headers: {}
+        '422':
+          description: Validation Error
+          schema:
+            $ref: '#/definitions/HTTPValidationError'
+          headers: {}
+  /hmi/users/{user_id}/notifications:
+    get:
+      description: ''
+      summary: get_user_notifications_hmi_users__user_id__notifications_get
+      tags:
+      - hmi
+      operationId: get_user_notifications_hmi_users__user_id__notifications_get
+      deprecated: false
+      produces:
+      - application/json
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        type: string
+        description: ''
+      responses:
+        '200':
+          description: Successful Response
+          schema:
+            type: object
+          headers: {}
+        '422':
+          description: Validation Error
+          schema:
+            $ref: '#/definitions/HTTPValidationError'
+          headers: {}
+    post:
+      description: ''
+      summary: add_animal_to_notifications_hmi_users__user_id__notifications_post
+      tags:
+      - hmi
+      operationId: add_animal_to_notifications_hmi_users__user_id__notifications_post
+      deprecated: false
+      produces:
+      - application/json
+      consumes:
+      - application/json
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        type: string
+        description: ''
+      - name: Content-Type
+        in: header
+        required: false
+        enum:
+        - application/json
+        type: string
+        description: ''
+      - name: body
+        in: body
+        required: true
+        description: ''
+        schema:
+          $ref: '#/definitions/AnimalNotificationSchema'
+      responses:
+        '201':
+          description: Successful Response
+          schema:
+            type: object
+          headers: {}
+        '422':
+          description: Validation Error
+          schema:
+            $ref: '#/definitions/HTTPValidationError'
+          headers: {}
+  /hmi/users/{user_id}/notifications/{species}:
+    delete:
+      description: ''
+      summary: remove_animal_from_notifications_hmi_users__user_id__notifications__species__delete
+      tags:
+      - hmi
+      operationId: remove_animal_from_notifications_hmi_users__user_id__notifications__species__delete
+      deprecated: false
+      produces:
+      - application/json
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        type: string
+        description: ''
+      - name: species
+        in: path
+        required: true
+        type: string
+        description: ''
+      responses:
+        '200':
+          description: Successful Response
+          schema:
+            type: object
+          headers: {}
+        '422':
+          description: Validation Error
+          schema:
+            $ref: '#/definitions/HTTPValidationError'
+          headers: {}
+  /hmi/users:
+    get:
+      description: ''
+      summary: get_all_users_hmi_users_get
+      tags:
+      - hmi
+      operationId: get_all_users_hmi_users_get
+      deprecated: false
+      produces:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        default: Bearer {token}
+        type: string
+      responses:
+        '200':
+          description: Get all users with visit data
+          schema:
+            type: object
+          headers: {}
+  /hmi/users/{username}/visit:
+    post:
+      description: ''
+      summary: increment_user_visit_hmi_users__username__visit_post
+      tags:
+      - hmi
+      operationId: increment_user_visit_hmi_users__username__visit_post
+      deprecated: false
+      produces:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        default: Bearer {token}
+        type: string
+      - name: username
+        in: path
+        required: true
+        type: string
+        description: ''
+      - name: visit_duration
+        in: query
+        required: false
+        default: 5
+        type: number
+        format: double
+        description: ''
+      responses:
+        '200':
+          description: Increment user visit count and time
+          schema:
+            type: object
+          headers: {}
+        '422':
+          description: Validation Error
+          schema:
+            $ref: '#/definitions/HTTPValidationError'
+          headers: {}
+  /engine/event:
+    post:
+      description: ''
+      summary: create_event_engine_event_post
+      tags:
+      - engine
+      operationId: create_event_engine_event_post
+      deprecated: false
+      produces:
+      - application/json
+      consumes:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        default: Bearer {token}
+        type: string
+      - name: Content-Type
+        in: header
+        required: false
+        enum:
+        - application/json
+        type: string
+        description: ''
+      - name: body
+        in: body
+        required: true
+        description: ''
+        schema:
+          $ref: '#/definitions/EventSchema'
+      responses:
+        '201':
+          description: Successful Response
+          schema:
+            type: object
+          headers: {}
+        '422':
+          description: Validation Error
+          schema:
+            $ref: '#/definitions/HTTPValidationError'
+          headers: {}
+  /engine/animal_records:
+    get:
+      description: ''
+      summary: list_species_data_engine_animal_records_get
+      tags:
+      - engine
+      operationId: list_species_data_engine_animal_records_get
+      deprecated: false
+      produces:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        default: Bearer {token}
+        type: string
+      - name: species
+        in: query
+        required: false
+        type: string
+        description: ''
+      - name: event_start
+        in: query
+        required: false
+        type: string
+        description: ''
+      - name: event_end
+        in: query
+        required: false
+        type: string
+        description: ''
+      - name: microphoneLLA_0
+        in: query
+        required: false
+        type: number
+        format: double
+        description: ''
+      - name: microphoneLLA_1
+        in: query
+        required: false
+        type: number
+        format: double
+        description: ''
+      - name: microphoneLLA_2
+        in: query
+        required: false
+        type: number
+        format: double
+        description: ''
+      responses:
+        '200':
+          description: Get all record of animals
+          schema:
+            type: object
+          headers: {}
+        '422':
+          description: Validation Error
+          schema:
+            $ref: '#/definitions/HTTPValidationError'
+          headers: {}
+  /engine/algorithms_data:
+    get:
+      description: ''
+      summary: filter_name_engine_algorithms_data_get
+      tags:
+      - engine
+      operationId: filter_name_engine_algorithms_data_get
+      deprecated: false
+      produces:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        default: Bearer {token}
+        type: string
+      responses:
+        '200':
+          description: returns the running list of algorithm data
+          schema:
+            type: object
+          headers: {}
+  /sim/movement:
+    post:
+      description: ''
+      summary: create_movement_sim_movement_post
+      tags:
+      - sim
+      operationId: create_movement_sim_movement_post
+      deprecated: false
+      produces:
+      - application/json
+      consumes:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        default: Bearer {token}
+        type: string
+      - name: Content-Type
+        in: header
+        required: false
+        enum:
+        - application/json
+        type: string
+        description: ''
+      - name: body
+        in: body
+        required: true
+        description: ''
+        schema:
+          $ref: '#/definitions/MovementSchema'
+      responses:
+        '201':
+          description: Successful Response
+          schema:
+            type: object
+          headers: {}
+        '422':
+          description: Validation Error
+          schema:
+            $ref: '#/definitions/HTTPValidationError'
+          headers: {}
+  /sim/microphones:
+    post:
+      description: ''
+      summary: create_microphones_sim_microphones_post
+      tags:
+      - sim
+      operationId: create_microphones_sim_microphones_post
+      deprecated: false
+      produces:
+      - application/json
+      consumes:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        default: Bearer {token}
+        type: string
+      - name: Content-Type
+        in: header
+        required: false
+        enum:
+        - application/json
+        type: string
+        description: ''
+      - name: body
+        in: body
+        required: true
+        description: ''
+        schema:
+          type: object
+          properties:
+            data:
+              type: array
+              items:
+                type: object
+      responses:
+        '201':
+          description: Successful Response
+          schema:
+            type: object
+          headers: {}
+        '422':
+          description: Validation Error
+          schema:
+            $ref: '#/definitions/HTTPValidationError'
+          headers: {}
+  /iot/nodes:
+    get:
+      description: ''
+      summary: get_nodes_iot_nodes_get
+      tags:
+      - iot
+      operationId: get_nodes_iot_nodes_get
+      deprecated: false
+      produces:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        default: Bearer {token}
+        type: string
+      responses:
+        '200':
+          description: List all nodes
+          schema:
+            type: object
+          headers: {}
+  /iot/nodes/{node_id}:
+    get:
+      description: ''
+      summary: get_node_iot_nodes__node_id__get
+      tags:
+      - iot
+      operationId: get_node_iot_nodes__node_id__get
+      deprecated: false
+      produces:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        default: Bearer {token}
+        type: string
+      - name: node_id
+        in: path
+        required: true
+        type: string
+        description: ''
+      responses:
+        '200':
+          description: Get a single node by ID
+          schema:
+            type: object
+          headers: {}
+        '422':
+          description: Validation Error
+          schema:
+            $ref: '#/definitions/HTTPValidationError'
+          headers: {}
+  /iot/nodes/{node_id}/components:
+    get:
+      description: ''
+      summary: get_node_components_iot_nodes__node_id__components_get
+      tags:
+      - iot
+      operationId: get_node_components_iot_nodes__node_id__components_get
+      deprecated: false
+      produces:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        default: Bearer {token}
+        type: string
+      - name: node_id
+        in: path
+        required: true
+        type: string
+        description: ''
+      responses:
+        '200':
+          description: Get components for a node
+          schema:
+            type: object
+          headers: {}
+        '422':
+          description: Validation Error
+          schema:
+            $ref: '#/definitions/HTTPValidationError'
+          headers: {}
+  /iot/nodes/{node_id}/connections:
+    get:
+      description: ''
+      summary: get_node_connections_iot_nodes__node_id__connections_get
+      tags:
+      - iot
+      operationId: get_node_connections_iot_nodes__node_id__connections_get
+      deprecated: false
+      produces:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        default: Bearer {token}
+        type: string
+      - name: node_id
+        in: path
+        required: true
+        type: string
+        description: ''
+      responses:
+        '200':
+          description: Get connections for a node
+          schema:
+            type: object
+          headers: {}
+        '422':
+          description: Validation Error
+          schema:
+            $ref: '#/definitions/HTTPValidationError'
+          headers: {}
+  /predict:
+    post:
+      description: ''
+      summary: predict_predict_post
+      tags:
+      - predict
+      operationId: predict_predict_post
+      deprecated: false
+      produces:
+      - application/json
+      consumes:
+      - multipart/form-data
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        default: Bearer {token}
+        type: string
+      - name: audio
+        in: formData
+        required: true
+        type: string
+        format: binary
+        description: ''
+      responses:
+        '200':
+          description: Successful Response
+          schema:
+            type: object
+          headers: {}
+        '422':
+          description: Validation Error
+          schema:
+            $ref: '#/definitions/HTTPValidationError'
+          headers: {}
+definitions:
+  AddressSchema:
+    title: AddressSchema
+    type: object
+    properties:
+      country:
+        type: string
+      state:
+        type: string
+    required:
+    - country
+  AnimalNotificationSchema:
+    title: AnimalNotificationSchema
+    type: object
+    properties:
+      species:
+        type: string
+      confidence:
+        type: number
+        format: double
+      common:
+        type: string
+    required:
+    - species
+    - confidence
+    - common
+  Body_predict_predict_post:
+    title: Body_predict_predict_post
+    type: object
+    properties:
+      audio:
+        type: string
+        format: binary
+    required:
+    - audio
+  EmailNotifications:
+    title: EmailNotifications
+    example:
+      species: Sus scrofa
+      last_sent: 2024-09-15 10:30:00+00:00
+    type: object
+    properties:
+      species:
+        type: string
+      last_sent:
+        type: string
+        format: date-time
+    required:
+    - species
+    - last_sent
+  EventSchema:
+    title: EventSchema
+    example:
+      timestamp: 2023-03-22 13:45:12+00:00
+      sensorId: '2'
+      species: Sus Scrofa
+      microphoneLLA:
+      - -33.1101
+      - 150.0567
+      - 23
+      animalEstLLA:
+      - -33.1105
+      - 150.0569
+      - 23
+      animalTrueLLA:
+      - -33.1106
+      - 150.057
+      - 23
+      animalLLAUncertainty: 10
+      audioClip: some audio_base64 data
+      confidence: 99.4
+      sampleRate: 48000
+    type: object
+    properties:
+      timestamp:
+        type: string
+        format: date-time
+      sensorId:
+        type: string
+        minLength: 1
+      species:
+        type: string
+        minLength: 1
+      microphoneLLA:
+        type: array
+        items:
+          type: number
+          format: double
+        minItems: 3
+        maxItems: 3
+      animalEstLLA:
+        type: array
+        items:
+          type: number
+          format: double
+        minItems: 3
+        maxItems: 3
+      animalTrueLLA:
+        type: array
+        items:
+          type: number
+          format: double
+        minItems: 3
+        maxItems: 3
+      animalLLAUncertainty:
+        type: integer
+        format: int32
+      audioClip:
+        type: string
+      confidence:
+        type: number
+        format: double
+      sampleRate:
+        type: integer
+        format: int32
+    required:
+    - timestamp
+    - sensorId
+    - species
+    - microphoneLLA
+    - animalEstLLA
+    - animalTrueLLA
+    - animalLLAUncertainty
+    - audioClip
+    - confidence
+    - sampleRate
+  ForgotPasswordSchema:
+    title: ForgotPasswordSchema
+    type: object
+    properties:
+      user:
+        type: string
+    required:
+    - user
+  GuestSignupSchema:
+    title: GuestSignupSchema
+    type: object
+    properties:
+      username:
+        type: string
+      email:
+        type: string
+      password:
+        type: string
+      timestamp:
+        type: string
+        format: date-time
+    required:
+    - username
+    - email
+    - password
+    - timestamp
+  HTTPValidationError:
+    title: HTTPValidationError
+    type: object
+    properties:
+      detail:
+        type: array
+        items:
+          $ref: '#/definitions/ValidationError'
+  MicrophoneSchema:
+    title: MicrophoneSchema
+    example:
+      sensorId: '2'
+      microphoneLLA:
+      - -33.1106
+      - 150.057
+      - 23
+    type: object
+    properties:
+      sensorId:
+        type: string
+        minLength: 1
+      microphoneLLA:
+        type: array
+        items:
+          type: number
+          format: double
+        minItems: 3
+        maxItems: 3
+    required:
+    - sensorId
+    - microphoneLLA
+  MovementSchema:
+    title: MovementSchema
+    example:
+      timestamp: 2023-03-22 13:45:12+00:00
+      species: Sus Scrofa
+      animalId: '1'
+      animalTrueLLA:
+      - -33.1106
+      - 150.057
+      - 23
+    type: object
+    properties:
+      timestamp:
+        type: string
+        format: date-time
+      species:
+        type: string
+        minLength: 1
+      animalId:
+        type: string
+        minLength: 1
+      animalTrueLLA:
+        type: array
+        items:
+          type: number
+          format: double
+        minItems: 3
+        maxItems: 3
+    required:
+    - timestamp
+    - species
+    - animalId
+    - animalTrueLLA
+  RecordingData:
+    title: RecordingData
+    type: object
+    properties:
+      timestamp:
+        type: string
+        format: date-time
+      sensorId:
+        type: string
+      microphoneLLA:
+        type: array
+        items:
+          type: number
+          format: double
+        minItems: 3
+        maxItems: 3
+      animalEstLLA:
+        type: array
+        items:
+          type: number
+          format: double
+        minItems: 3
+        maxItems: 3
+      animalTrueLLA:
+        type: array
+        items:
+          type: number
+          format: double
+        minItems: 3
+        maxItems: 3
+      animalLLAUncertainty:
+        type: number
+        format: double
+      audioClip:
+        type: string
+      mode:
+        type: string
+      audioFile:
+        type: string
+    required:
+    - timestamp
+    - sensorId
+    - microphoneLLA
+    - animalEstLLA
+    - animalTrueLLA
+    - animalLLAUncertainty
+    - audioClip
+    - mode
+    - audioFile
+  RequestSchema:
+    title: RequestSchema
+    type: object
+    properties:
+      username:
+        type: string
+      animal:
+        type: string
+      requestingToChange:
+        type: string
+      initial:
+        type: string
+      modified:
+        type: string
+      source:
+        type: string
+      date:
+        type: string
+        format: date-time
+      status:
+        type: string
+    required:
+    - username
+    - animal
+    - requestingToChange
+    - initial
+    - modified
+    - source
+    - date
+    - status
+  ResetPasswordSchema:
+    title: ResetPasswordSchema
+    type: object
+    properties:
+      user:
+        type: string
+      password:
+        type: string
+      otp:
+        type: integer
+        format: int32
+    required:
+    - user
+    - password
+    - otp
+  UserLoginSchema:
+    title: UserLoginSchema
+    type: object
+    properties:
+      username:
+        type: string
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - username
+    - email
+    - password
+  UserSignupSchema:
+    title: UserSignupSchema
+    type: object
+    properties:
+      username:
+        type: string
+      password:
+        type: string
+        minLength: 8
+      email:
+        type: string
+      roles:
+        type: array
+        items:
+          type: string
+      gender:
+        type: string
+      DoB:
+        type: string
+        format: date-time
+      address:
+        type: object
+        allOf:
+        - $ref: '#/definitions/AddressSchema'
+        - {}
+      organization:
+        type: string
+      phonenumber:
+        type: string
+      notificationAnimals:
+        type: array
+        items:
+          $ref: '#/definitions/AnimalNotificationSchema'
+      emailNotifications:
+        type: array
+        items:
+          $ref: '#/definitions/EmailNotifications'
+    required:
+    - username
+    - password
+    - email
+    - roles
+    - gender
+    - DoB
+    - address
+    - organization
+  ValidationError:
+    title: ValidationError
+    type: object
+    properties:
+      loc:
+        type: array
+        items:
+          type: string
+      msg:
+        type: string
+      type:
+        type: string
+    required:
+    - loc
+    - msg
+    - type
+tags:
+- name: hmi
+  description: ''
+- name: engine
+  description: ''
+- name: sim
+  description: ''
+- name: iot
+  description: ''
+- name: predict
+  description: ''
