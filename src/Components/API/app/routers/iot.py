@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, status, Body
+from fastapi import APIRouter, HTTPException, status, Request, Body
 from typing import List, Optional
 from app.database import Nodes
 from datetime import datetime
@@ -86,13 +86,20 @@ def register_node(node_id: str):
         raise HTTPException(status_code=500, detail=f"Error registering node: {str(error)}")
 
 @router.put("/nodes/{node_id}/heartbeat", response_description="Update node's last message and connection status")
-def update_node_connection(node_id: str, message: Optional[str] = Body(None)):
+async def update_node_connection(node_id: str, request: Request):
     try:
-        current_time = datetime.now().isoformat()
+        # Store time with timezone offset
+        current_time = datetime.now().astimezone().isoformat()
         update_fields = {"lastSeen": current_time}
         
-        if message is not None:
-            update_fields["lastMessage"] = message
+        # Try to get message from request body if it exists
+        try:
+            body = await request.json()
+            if "message" in body:
+                update_fields["lastMessage"] = body["message"]
+        except:
+            # No body or invalid JSON - just update lastSeen
+            pass
             
         result = Nodes.update_one(
             {"_id": node_id},

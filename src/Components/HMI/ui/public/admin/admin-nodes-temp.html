@@ -123,6 +123,22 @@
     });
 
     // Network visualization
+    let currentNodeId = null;
+    let refreshInterval = null;
+    let network = null;
+
+    async function refreshNodeDetails() {
+      if (!currentNodeId) return;
+      
+      try {
+        const response = await fetch(`http://localhost:9000/iot/nodes/${currentNodeId}`);
+        const node = await response.json();
+        showNodeDetails(node);
+      } catch (error) {
+        console.error('Error refreshing node details:', error);
+      }
+    }
+
     async function initNetwork() {
       try {
         const response = await fetch('http://localhost:9000/iot/nodes');
@@ -192,15 +208,33 @@
           }
         };
 
-        const network = new vis.Network(container, data, options);
+        network = new vis.Network(container, data, options);
 
         // Show node details when clicked
         network.on('click', async function(params) {
           if (params.nodes.length > 0) {
-            const nodeId = params.nodes[0];
-            const response = await fetch(`http://localhost:9000/iot/nodes/${nodeId}`);
+            currentNodeId = params.nodes[0];
+            
+            // Clear existing interval if any
+            if (refreshInterval) {
+              clearInterval(refreshInterval);
+            }
+            
+            // Initial load of node details
+            const response = await fetch(`http://localhost:9000/iot/nodes/${currentNodeId}`);
             const node = await response.json();
             showNodeDetails(node);
+            
+            // Set up auto-refresh every 10 seconds
+            refreshInterval = setInterval(refreshNodeDetails, 10000);
+          } else {
+            // If clicking away from a node, clear the interval and hide details
+            if (refreshInterval) {
+              clearInterval(refreshInterval);
+              refreshInterval = null;
+            }
+            currentNodeId = null;
+            document.getElementById('node-details').style.display = 'none';
           }
         });
 
@@ -235,12 +269,15 @@
         heartbeatContainer.style.display = 'block';
         
         if (node.lastSeen) {
+          // Both timestamps have timezone info, so direct comparison works
           const lastSeen = new Date(node.lastSeen);
           const now = new Date();
           const timeDiff = now - lastSeen;
           const minutesDiff = Math.floor(timeDiff / (1000 * 60));
           
-          lastSeenTime.textContent = `Last seen: ${node.lastSeen}`;
+          // Format the last seen time in local timezone
+          lastSeenTime.textContent = `Last seen: ${lastSeen.toLocaleString()}`;
+          console.log(`Minutes since last heartbeat: ${minutesDiff}`);
           
           if (minutesDiff > 5) {
             heartbeatStatus.textContent = 'Warning: No Recent Heartbeat';
@@ -293,6 +330,15 @@
         componentsDiv.innerHTML = '<p>No components found.</p>';
       }
     }
+
+
+
+    // Clean up interval when page unloads
+    window.addEventListener('unload', function() {
+      if (refreshInterval) {
+        clearInterval(refreshInterval);
+      }
+    });
 
     // Initialize network when page loads
     window.addEventListener('load', initNetwork);
