@@ -88,6 +88,10 @@
                       <div class="mb-3" id="registration-time-container" style="display: none;">
                         <strong>Registered Time:</strong> <span id="node-registration-time"></span>
                       </div>
+                      <div class="mb-3" id="heartbeat-container" style="display: none;">
+                        <strong>Heartbeat Status:</strong> <span id="node-heartbeat-status"></span>
+                        <div class="small text-muted" id="last-seen-time"></div>
+                      </div>
                     </div>
                     <div class="col-md-6">
                       <div class="mb-3">
@@ -223,10 +227,38 @@
         registrationStatus.style.color = '#4CAF50';
         registrationTimeContainer.style.display = 'block';
         registrationTime.textContent = node.registeredTime || 'Unknown';
+        
+        // Show heartbeat status for registered nodes
+        const heartbeatContainer = document.getElementById('heartbeat-container');
+        const heartbeatStatus = document.getElementById('node-heartbeat-status');
+        const lastSeenTime = document.getElementById('last-seen-time');
+        heartbeatContainer.style.display = 'block';
+        
+        if (node.lastSeen) {
+          const lastSeen = new Date(node.lastSeen);
+          const now = new Date();
+          const timeDiff = now - lastSeen;
+          const minutesDiff = Math.floor(timeDiff / (1000 * 60));
+          
+          lastSeenTime.textContent = `Last seen: ${node.lastSeen}`;
+          
+          if (minutesDiff > 5) {
+            heartbeatStatus.textContent = 'Warning: No Recent Heartbeat';
+            heartbeatStatus.style.color = '#FFA500';
+          } else {
+            heartbeatStatus.textContent = 'Active';
+            heartbeatStatus.style.color = '#4CAF50';
+          }
+        } else {
+          heartbeatStatus.textContent = 'No Heartbeat Received';
+          heartbeatStatus.style.color = '#F44336';
+          lastSeenTime.textContent = '';
+        }
       } else {
         registrationStatus.textContent = 'Not Registered';
         registrationStatus.style.color = '#F44336';
         registrationTimeContainer.style.display = 'none';
+        document.getElementById('heartbeat-container').style.display = 'none';
       }
 
       // Show custom properties

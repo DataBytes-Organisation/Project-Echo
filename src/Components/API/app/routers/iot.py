@@ -1,5 +1,5 @@
-from fastapi import APIRouter, HTTPException, status
-from typing import List
+from fastapi import APIRouter, HTTPException, status, Body
+from typing import List, Optional
 from app.database import Nodes
 from datetime import datetime
 
@@ -84,3 +84,28 @@ def register_node(node_id: str):
             
     except Exception as error:
         raise HTTPException(status_code=500, detail=f"Error registering node: {str(error)}")
+
+@router.put("/nodes/{node_id}/heartbeat", response_description="Update node's last message and connection status")
+def update_node_connection(node_id: str, message: Optional[str] = Body(None)):
+    try:
+        current_time = datetime.now().isoformat()
+        update_fields = {"lastSeen": current_time}
+        
+        if message is not None:
+            update_fields["lastMessage"] = message
+            
+        result = Nodes.update_one(
+            {"_id": node_id},
+            {"$set": update_fields}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Node not found")
+            
+        if result.modified_count == 1:
+            return {"message": "Node connection status updated successfully"}
+        else:
+            return {"message": "Node connection status unchanged"}
+            
+    except Exception as error:
+        raise HTTPException(status_code=500, detail=f"Error updating node connection: {str(error)}")
