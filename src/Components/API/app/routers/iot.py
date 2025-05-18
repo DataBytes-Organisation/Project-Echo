@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, status
 from typing import List
 from app.database import Nodes
+from datetime import datetime
 
 router = APIRouter()
 
@@ -61,3 +62,25 @@ def get_node_connections(node_id: str):
         return {"connectedNodes": connected_nodes}
     except Exception as error:
         raise HTTPException(status_code=500, detail=f"Error retrieving node connections: {str(error)}")
+
+@router.put("/nodes/{node_id}/register", response_description="Register a node")
+def register_node(node_id: str):
+    try:
+        result = Nodes.update_one(
+            {"_id": node_id},
+            {"$set": {
+                "registered": True,
+                "registeredTime": datetime.utcnow().isoformat() + "+00:00"
+            }}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Node not found")
+            
+        if result.modified_count == 1:
+            return {"message": "Node registered successfully"}
+        else:
+            return {"message": "Node was already registered"}
+            
+    except Exception as error:
+        raise HTTPException(status_code=500, detail=f"Error registering node: {str(error)}")
