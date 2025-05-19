@@ -1,7 +1,8 @@
 # Configuration parameters (update paths as needed)
 SC = {
     'AUDIO_DATA_DIRECTORY': r"D:\Echo\Audio_data",  # set your audio data directory here
-    'CACHE_DIRETORY': r"D:\Echo\Training_cache",
+    'CACHE_DIRECTORY': r"D:\Echo\Training_cache",
+    'OUTPUT_DIRECTORY': r"D:\Echo\Output",
 
     'AUDIO_CLIP_DURATION': 5,  # seconds
     'AUDIO_SAMPLE_RATE': 48000,
