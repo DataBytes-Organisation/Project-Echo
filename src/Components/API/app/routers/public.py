@@ -8,6 +8,8 @@ from bson import ObjectId
 
 from app.database import Events
 from app import serializers
+from app.database import Events, AudioUploads
+from app.schemas import AudioUploadSchema
 
 router = APIRouter()
 
@@ -60,3 +62,50 @@ def filter_data(
 
     serialized = serializers.eventListEntity(results)
     return serialized
+
+@router.post("/upload-metadata", response_description="Store audio upload metadata")
+def store_audio_metadata(metadata: AudioUploadSchema):
+    """
+    Receives audio upload metadata (including file reference, 
+    predicted species, timestamp, optional user ID) and saves 
+    it into the AudioUploads collection.
+    """
+
+    data_to_insert = metadata.dict()
+
+    # data_to_insert["_id"] = str(ObjectId())
+
+    insert_result = AudioUploads.insert_one(data_to_insert)
+    
+    # Retrieve inserted document
+    new_record = AudioUploads.find_one({"_id": insert_result.inserted_id})
+    
+    # Construct a response
+    return JSONResponse(
+        status_code=status.HTTP_201_CREATED,
+        content={
+            "message": "Audio upload metadata stored successfully",
+            "data": {
+                "_id": str(new_record["_id"]),
+                "fileName": new_record["fileName"],
+                "predictedSpecies": new_record.get("predictedSpecies", "Unknown"),
+                "uploadTimestamp": new_record["uploadTimestamp"],
+                "userId": new_record.get("userId")
+            }
+        }
+    )
+
+
+# -----------------------------------------------
+# Endpoint to retrieve stored metadata
+# -----------------------------------------------
+@router.get("/upload-metadata", response_description="List all audio upload metadata")
+def list_audio_metadata():
+    """
+    Returns all records from the AudioUploads collection.
+    """
+    uploads = list(AudioUploads.find({}))
+    # Convert ObjectId to string
+    for doc in uploads:
+        doc["_id"] = str(doc["_id"])
+    return uploads

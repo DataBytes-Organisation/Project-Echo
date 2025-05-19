@@ -19,6 +19,7 @@ Microphones = db.microphones
 Nodes = db.nodes
 Components = db.components
 Commands = db.commands
+AudioUploads = db.audio_uploads 
 
 User_connection_string = "mongodb://root:root_password@ts-mongodb-cont/UserSample?authSource=admin"
 Userclient = pymongo.MongoClient(User_connection_string)

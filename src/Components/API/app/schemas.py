@@ -317,3 +317,19 @@ class RecordingData(BaseModel):
         json_encoders = {ObjectId: str}
         schema_extra = {}
 
+class AudioUploadSchema(BaseModel):
+    fileName: str
+    predictedSpecies: Optional[str] = "Unknown"
+    uploadTimestamp: datetime
+    userId: Optional[str] = None
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "fileName": "my_audio_file.wav",
+                "predictedSpecies": "Sus scrofa",
+                "uploadTimestamp": "2025-05-10T14:30:00Z",
+                "userId": "abc123"
+            }
+        }
+
