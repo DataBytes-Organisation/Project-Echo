@@ -45,6 +45,12 @@
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
     <script src = "paymentgateway.js"></script>
+    <!-- Razorpay locale fallback to fix './en' module issue -->
+    <script>
+    window.__Razorpay__ = {
+      locale: 'en'
+    };</script>
+
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <!-- Axios -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>

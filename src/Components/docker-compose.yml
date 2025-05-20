@@ -43,6 +43,8 @@ services:
       dockerfile: HMI.Dockerfile
     image: ts-echo-hmi
     container_name: ts-echo-hmi-cont
+    # env_file:
+    #   - .env
     networks:
       - echo-net
     volumes:

@@ -160,24 +160,42 @@
         charges.forEach(item => {
           const row = document.createElement('tr');
   
-          const amountDollars = (item.amount / 100).toFixed(2);
+          const amountDollars = (item.amount).toFixed(2);
           const amountCell = document.createElement('td');
           amountCell.textContent = `$${amountDollars}`;
   
           const statusCell = document.createElement('td');
           statusCell.textContent = item.status;
-          statusCell.classList.add(`status-${item.status.toLowerCase()}`);
-  
-          const emailCell = document.createElement('td');
-          emailCell.textContent = item.billing_details?.email || 'N/A';
-  
+          statusCell.classList.add(`status-${item.status.toLowerCase()}`); 
+          
+          const nameOremailCell = document.createElement('td');
+          const name = item.name || item.billing_details?.name;
+          const email = item.email || item.billing_details?.email;
+
+          if (name && name !== 'Anonymous') {
+            nameOremailCell.textContent = name;
+          } else if (email && email !== 'N/A') {
+            nameOremailCell.textContent = email;
+          } else {
+            nameOremailCell.textContent = 'N/A';
+          }
+
+          let dateObj;
           const dateCell = document.createElement('td');
-          const dateObj = new Date(item.created * 1000);
-          dateCell.textContent = dateObj.toLocaleDateString();
+          if (item.created) {
+            dateObj = new Date(item.created * 1000); // Razorpay
+          } else if (item.timestamp) {
+            dateObj = new Date(item.timestamp);     // Stripe
+          } else {
+            dateObj = new Date();                   // fallback (today)
+          }
+
+          dateCell.textContent = isNaN(dateObj) ? 'Invalid Date' : dateObj.toLocaleDateString();
+
   
           row.appendChild(amountCell);
           row.appendChild(statusCell);
-          row.appendChild(emailCell);
+          row.appendChild(nameOremailCell);
           row.appendChild(dateCell);
   
           dataBody.appendChild(row);
@@ -243,7 +261,7 @@
       const total = donations
         .filter(d => d.status === 'succeeded')  // Only count successful donations.
         .reduce((acc, curr) => acc + curr.amount, 0);
-      document.getElementById('total-donations').textContent = `$${(total / 100).toFixed(2)}`;
+      document.getElementById('total-donations').textContent = `$${(total).toFixed(2)}`;
     }
   
     updateTable();
