@@ -53,7 +53,9 @@ app.include_router(iot.router, tags=['iot'], prefix='/iot')
 app.include_router(species_predictor.router, tags=["predict"])
 
 
-# ✅ Root endpoint
+# Root endpoint
 @app.get("/", response_description="API Root")
 def show_home():
     return 'Welcome to Project Echo API. Visit /docs for interactive documentation.'
+
+app.include_router(auth_router.router, tags=["auth"], prefix="/api")
