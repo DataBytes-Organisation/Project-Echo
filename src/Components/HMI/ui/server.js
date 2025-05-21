@@ -154,7 +154,7 @@ app.post("/api/create-checkout-session", async (req, res) => {
 
 //This API endpoint fetches the "charges", AKA donations, from the Stripe account.
 //It returns a json object of all the charges
-app.get('/donations', async(req,res) => {
+/* app.get('/donations', async(req,res) => {
   let charges;
   try{
     while (true) {
@@ -183,7 +183,26 @@ app.get('/donations', async(req,res) => {
     console.error('Error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
-})
+}) */
+
+app.get('/donations', async (req, res) => {
+  try {
+    const client = new MongoClient("mongodb://modelUser:EchoNetAccess2023@ts-mongodb-cont:27017/EchoNet",
+    {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+    });
+    await client.connect();
+    const db = client.db("EchoNet");
+    const donations = await db.collection("donations").find({}).toArray();
+    res.json({ charges: { data: donations } });
+  } catch (error) {
+    console.error("Error fetching donations from MongoDB:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+  
+  
 //This endpoint retrieves the donation amounts from the associated stripe account
 //it adds up the amounts to return a cumulative total. Used on admin dashboard.
 app.get('/cumulativeDonations', async(req, res) => {
@@ -456,6 +475,16 @@ app.get("/admin-dashboard", (req,res)=> {
   return res.sendFile(path.join(__dirname, 'public/admin/dashboard.html'));
 })
 
+
+app.get("/admin-nodes", (req, res) => {
+  return res.sendFile(path.join(__dirname, 'public/admin/admin-nodes.html'));
+});
+
+//Serve the profile tab
+app.get("/admin-profile", (req,res)=> {
+  return res.sendFile(path.join(__dirname, 'public/admin/profile.html'));
+})
+
 app.get("/admin-template", (req,res)=> {
   return res.sendFile(path.join(__dirname, 'public/admin/template.html'));
 })
@@ -506,9 +535,15 @@ app.get("/forgotPassword",async (req,res) => {
 app.post("/api/approve", async (req,res) => {
 
 })
+
 //Navigate to requests tab on admin dashboard
 app.get("/requests", (req,res) => {
   res.sendFile(path.join(__dirname, 'public/admin/admin-request.html'))
+})
+
+//Navigate to notifications tab on admin dashboard
+app.get("/notifications", (req,res) => {
+  res.sendFile(path.join(__dirname, 'public/admin/notifications.html'))
 })
 
 //API endpoint for patching the new review status to the newly reviewed edit request
@@ -766,6 +801,17 @@ app.post('/suspendUser', async (req, res) => {
 
 
 //Page direction to the map
+// Proxy route for IoT nodes API
+app.get('/iot/nodes', async (req, res) => {
+  try {
+    const response = await axios.get('http://ts-api-cont:9000/iot/nodes');
+    res.json(response.data);
+  } catch (error) {
+    console.error('Error fetching IoT nodes:', error);
+    res.status(500).json({ error: 'Error fetching IoT nodes' });
+  }
+});
+
 app.get("/map", async(req,res) => {
   res.sendFile(path.join(__dirname, 'public/index.html'))
 })
