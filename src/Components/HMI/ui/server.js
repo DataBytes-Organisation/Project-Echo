@@ -625,6 +625,88 @@ app.get("/welcome", async (req,res) => {
     res.send(`<script> alert("No user info detected! Please login again"); window.location.href = "/login"; </script>`);
   }
 })
+//node list for Iot nodes page in admin dashboard
+const nodes = [
+  {
+    id: "node-001",
+    type: "Sensor",
+    model: "Raspberry Pi 4",
+    location: "Forest Edge",
+    status: "Active",
+    battery: { percentage: 87, voltage: "3.7V" },
+    raspberryPi: { processor: "ARM Cortex-A72", powerUsage: "5W" },
+    gps: { powerUsage: "0.5W", frequency: "1.575 GHz", coordinates: { lat: -38.6, lng: 143.3 }, state: "on" },
+    fan: { speed: "auto" },
+    temperature: "28°C",
+    windspeed: "14 km/h",
+    microphone: { powerUsage: "0.2W", volume: "70%", state: "on" }
+  },
+  {
+    id: "node-002",
+    type: "Transmitter",
+    model: "Raspberry Pi 3",
+    location: "Hilltop",
+    status: "Inactive",
+    battery: { percentage: 52, voltage: "3.3V" },
+    raspberryPi: { processor: "ARM Cortex-A53", powerUsage: "3W" },
+    gps: { powerUsage: "0.3W", frequency: "1.227 GHz", coordinates: { lat: -38.61, lng: 143.29 }, state: "off" },
+    fan: { speed: "slow" },
+    temperature: "22°C",
+    windspeed: "9 km/h",
+    microphone: { powerUsage: "0.1W", volume: "50%", state: "off" }
+  },
+  {
+    id: "node-003",
+    type: "Sensor",
+    model: "Raspberry Pi Zero W",
+    location: "Coastal Station",
+    status: "Active",
+    battery: { percentage: 64, voltage: "3.5V" },
+    raspberryPi: { processor: "ARM1176JZF-S", powerUsage: "2.5W" },
+    gps: { powerUsage: "0.4W", frequency: "1.6 GHz", coordinates: { lat: -38.55, lng: 143.25 }, state: "on" },
+    fan: { speed: "medium" },
+    temperature: "26°C",
+    windspeed: "11 km/h",
+    microphone: { powerUsage: "0.15W", volume: "65%", state: "on" }
+  },
+  {
+    id: "node-004",
+    type: "Transmitter",
+    model: "Raspberry Pi 4",
+    location: "Base Camp",
+    status: "Active",
+    battery: { percentage: 91, voltage: "3.8V" },
+    raspberryPi: { processor: "ARM Cortex-A72", powerUsage: "5.1W" },
+    gps: { powerUsage: "0.55W", frequency: "1.575 GHz", coordinates: { lat: -38.62, lng: 143.27 }, state: "on" },
+    fan: { speed: "fast" },
+    temperature: "30°C",
+    windspeed: "15 km/h",
+    microphone: { powerUsage: "0.25W", volume: "80%", state: "on" }
+  },
+  {
+    id: "node-005",
+    type: "Sensor",
+    model: "Raspberry Pi 3 B+",
+    location: "Valley Entrance",
+    status: "Inactive",
+    battery: { percentage: 46, voltage: "3.2V" },
+    raspberryPi: { processor: "ARM Cortex-A53", powerUsage: "3.2W" },
+    gps: { powerUsage: "0.25W", frequency: "1.227 GHz", coordinates: { lat: -38.58, lng: 143.35 }, state: "off" },
+    fan: { speed: "slow" },
+    temperature: "21°C",
+    windspeed: "8 km/h",
+    microphone: { powerUsage: "0.1W", volume: "40%", state: "off" }
+  }
+];
+
+app.get('/api/iot-nodes', (req, res) => {
+  res.json(nodes);
+});
+
+app.get("/iot-nodes", (req, res) => {
+  return res.sendFile(path.join(__dirname, 'public/admin/iot-nodes.html'));
+});
+
 
 // MongoDB connection URI
 const uri = process.env.MONGO_URI || "mongodb://localhost:27017";
