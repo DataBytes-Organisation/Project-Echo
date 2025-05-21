@@ -141,11 +141,17 @@ async def verify_2fa_code(verify_data: schemas.TwoFactorVerifySchema):
         role = Role.find_one({"_id": str(role_id["_id"])})
         if role:
             authorities.append("ROLE_" + role['name'].upper())
-    
+    result = {
+        "username": user["username"],
+        "email": user["email"],
+        "role" : authorities,
+    }
     # Generate JWT token
     jwt_token = signJWT(user=user, authorities=authorities)
     
     return {
         "message": "2FA verification successful",
-        "token": jwt_token
+        "tkn": jwt_token,
+        "roles": authorities,
+        "user": result
     }
