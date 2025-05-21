@@ -31,6 +31,20 @@
       "top": 63.6,
       "left": -140.2,
       "attrs": { "color": "green" }
+    },
+    {
+      "type": "wokwi-dht22",
+      "id": "dht1",
+      "top": 0,
+      "left": -200,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-mpu6050",
+      "id": "imu1",
+      "top": -82.58,
+      "left": -208.88,
+      "attrs": {}
     }
   ],
   "connections": [
@@ -41,7 +55,14 @@
     [ "esp:GND.1", "led2:C", "black", [ "h0" ] ],
     [ "esp:GND.1", "led1:C", "black", [ "h0" ] ],
     [ "esp:26", "r1:2", "green", [ "h0" ] ],
-    [ "r2:2", "esp:27", "green", [ "v0" ] ]
+    [ "r2:2", "esp:27", "green", [ "v0" ] ],
+    [ "dht1:VCC", "esp:3V3", "red", [ "h0" ] ],
+    [ "dht1:GND", "esp:GND.1", "black", [ "h0" ] ],
+    [ "dht1:SDA", "esp:15", "green", [ "h0" ] ],
+    [ "imu1:VCC", "esp:3V3", "red", [ "h0" ] ],
+    [ "imu1:GND", "esp:GND.1", "black", [ "h0" ] ],
+    [ "imu1:SCL", "esp:22", "blue", [ "h0" ] ],
+    [ "imu1:SDA", "esp:21", "yellow", [ "h0" ] ]
   ],
   "dependencies": {}
 }

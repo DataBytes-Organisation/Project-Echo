@@ -47,6 +47,38 @@
       padding: 5px 0;
       border-bottom: 1px dashed #eee;
     }
+    .sensor-data {
+      background-color: #f8f9ff;
+      border-radius: 4px;
+      padding: 10px;
+      margin-top: 15px;
+    }
+    .sensor-value {
+      font-weight: 500;
+      color: #0d6efd;
+    }
+    .config-section {
+      background-color: #f8f9fa;
+      border-radius: 4px;
+      padding: 10px;
+    }
+    .sensor-group {
+      background-color: rgba(13, 110, 253, 0.03);
+      border-radius: 4px;
+      padding: 8px;
+      margin-bottom: 10px;
+    }
+    .sensor-group-title {
+      font-weight: 500;
+      color: #0d6efd;
+      margin-bottom: 5px;
+      font-size: 0.9rem;
+    }
+    .property-item.nested {
+      padding-left: 15px;
+      border-left: 2px solid rgba(13, 110, 253, 0.1);
+      margin-left: 5px;
+    }
   </style>
 </head>
 
@@ -315,14 +347,50 @@
           componentsDiv.innerHTML += `
             <div class="component-card">
               <h5>${component.type} - ${component.model}</h5>
-              <div class="properties">
-                ${Object.entries(component.customProperties)
+              <div class="mb-3">
+                <strong>ID:</strong> ${component.id}
+              </div>
+              <div class="mb-3">
+                <strong>Category:</strong> ${component.category}
+              </div>
+              <div class="properties config-section">
+                <h6 class="mb-2">Configuration:</h6>
+                ${Object.entries(component.customProperties || {})
                   .map(([key, value]) => `
                     <div class="property-item">
                       <span>${key}:</span> <span>${value}</span>
                     </div>
                   `).join('')}
               </div>
+              ${component.sensorData ? `
+                <div class="properties sensor-data">
+                  <h6 class="mb-2 text-primary">Live Sensor Data:</h6>
+                  ${Object.entries(component.sensorData)
+                    .map(([key, value]) => {
+                      if (typeof value === 'object' && value !== null) {
+                        return `
+                          <div class="sensor-group mb-2">
+                            <div class="sensor-group-title">${key}:</div>
+                            ${Object.entries(value)
+                              .map(([subKey, subValue]) => `
+                                <div class="property-item nested">
+                                  <span>${subKey}:</span> 
+                                  <span class="sensor-value">${typeof subValue === 'number' ? subValue.toFixed(2) : subValue}</span>
+                                </div>
+                              `).join('')}
+                          </div>
+                        `;
+                      } else {
+                        return `
+                          <div class="property-item">
+                            <span>${key}:</span> 
+                            <span class="sensor-value">${typeof value === 'number' ? value.toFixed(2) : value}</span>
+                          </div>
+                        `;
+                      }
+                    }).join('')}
+                </div>
+              ` : ''}
             </div>
           `;
         });

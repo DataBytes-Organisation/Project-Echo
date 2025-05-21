@@ -1,8 +1,27 @@
+/* ESP32 HTTP IoT Server Example for Wokwi.com
+
+  https://wokwi.com/projects/320964045035274834
+
+  To test, you need the Wokwi IoT Gateway, as explained here:
+
+  https://docs.wokwi.com/guides/esp32-wifi#the-private-gateway
+
+  Then start the simulation, and open http://localhost:9080
+  in another browser tab.
+
+  Note that the IoT Gateway requires a Wokwi Club subscription.
+  To purchase a Wokwi Club subscription, go to https://wokwi.com/club
+*/
+
 #include <WiFi.h>
 #include <WiFiClient.h>
 #include <WebServer.h>
 #include <uri/UriBraces.h>
 #include <HTTPClient.h>
+#include <DHT.h>
+#include <Adafruit_MPU6050.h>
+#include <Adafruit_Sensor.h>
+#include <Wire.h>
 
 #define WIFI_SSID "Wokwi-GUEST"
 #define WIFI_PASSWORD ""
@@ -17,8 +36,13 @@ const int LED2 = 27;
 bool led1State = false;
 bool led2State = false;
 
-const char* node_id = "node_3_3";
+const char* node_id = "node_3_2";
 const char* server_ip = "192.168.1.9";
+
+#define DHTPIN 15     // Digital pin connected to the DHT sensor
+#define DHTTYPE DHT22 // DHT22 (AM2302)
+DHT dht(DHTPIN, DHTTYPE);
+Adafruit_MPU6050 mpu;
 void sendHtml() {
   String response = R"(
     <!DOCTYPE html><html>
@@ -58,6 +82,20 @@ void setup(void) {
   Serial.begin(115200);
   pinMode(LED1, OUTPUT);
   pinMode(LED2, OUTPUT);
+  dht.begin();
+
+  // Initialize MPU6050
+  if (!mpu.begin()) {
+    Serial.println("Failed to find MPU6050 chip");
+    while (1) {
+      delay(10);
+    }
+  }
+  Serial.println("MPU6050 Found!");
+
+  mpu.setAccelerometerRange(MPU6050_RANGE_8_G);
+  mpu.setGyroRange(MPU6050_RANGE_500_DEG);
+  mpu.setFilterBandwidth(MPU6050_BAND_21_HZ);
 
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD, WIFI_CHANNEL);
   Serial.print("Connecting to WiFi ");
@@ -113,7 +151,9 @@ void setup(void) {
 }
 
 unsigned long lastHeartbeat = 0;
+unsigned long lastSensorUpdate = 0;
 const unsigned long HEARTBEAT_INTERVAL = 10000; // 10 seconds in milliseconds
+const unsigned long SENSOR_UPDATE_INTERVAL = 15000; // 15 seconds in milliseconds
 
 void sendHeartbeat() {
   Serial.println("Sending heartbeat...");
@@ -140,16 +180,77 @@ void sendHeartbeat() {
   http.end();
 }
 
+void sendSensorUpdates() {
+  // Read DHT sensor
+  float humidity = dht.readHumidity();
+  float temperature = dht.readTemperature();
+
+  // Check if DHT reads failed
+  if (isnan(humidity) || isnan(temperature)) {
+    Serial.println("Failed to read from DHT sensor!");
+    return;
+  }
+
+  // Read MPU6050 sensor
+  sensors_event_t a, g, temp;
+  mpu.getEvent(&a, &g, &temp);
+
+  // Prepare the updates array
+  String updates = String("[") +
+    // DHT22 update
+    "{\"component_id\": \"dht11\", \"data\": {" +
+    "\"temperature\": " + String(temperature) + "," +
+    "\"humidity\": " + String(humidity) +
+    "}}," +
+    // MPU6050 update
+    "{\"component_id\": \"imu1\", \"data\": {" +
+    "\"accelerometer\": {" +
+    "\"x\": " + String(a.acceleration.x) + "," +
+    "\"y\": " + String(a.acceleration.y) + "," +
+    "\"z\": " + String(a.acceleration.z) +
+    "}," +
+    "\"gyroscope\": {" +
+    "\"x\": " + String(g.gyro.x) + "," +
+    "\"y\": " + String(g.gyro.y) + "," +
+    "\"z\": " + String(g.gyro.z) +
+    "}" +
+    "}}" +
+    "]";  
+
+  // Send to server
+  HTTPClient http;
+  String url = String("http://") + String(server_ip) + ":9000/iot/nodes/" + String(node_id) + "/updates";
+  http.begin(url);
+  
+  // Set content type header
+  http.addHeader("Content-Type", "application/json");
+  
+  int httpResponseCode = http.POST(updates);
+  
+  if (httpResponseCode > 0) {
+    Serial.println("Sensor updates sent successfully, response code: " + String(httpResponseCode));
+  } else {
+    Serial.println("Error sending sensor updates: " + http.errorToString(httpResponseCode));
+  }
+  
+  http.end();
+}
+
 void loop(void) {
   server.handleClient();
   
-  // Get current time
   unsigned long currentMillis = millis();
   
-  // Check for first run or if interval has passed (handles overflow)
+  // Check for heartbeat
   if (lastHeartbeat == 0 || (currentMillis - lastHeartbeat) >= HEARTBEAT_INTERVAL) {
     sendHeartbeat();
     lastHeartbeat = currentMillis;
+  }
+
+  // Check for sensor updates
+  if (lastSensorUpdate == 0 || (currentMillis - lastSensorUpdate) >= SENSOR_UPDATE_INTERVAL) {
+    sendSensorUpdates();
+    lastSensorUpdate = currentMillis;
   }
   
   delay(2);
