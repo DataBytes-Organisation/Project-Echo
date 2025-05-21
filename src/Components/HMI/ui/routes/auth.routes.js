@@ -159,11 +159,12 @@ module.exports = function (app) {
         
       } else {
         console.log("Login response: ", axiosResponse.data);
-        res.status(400).send('<script> window.location.href = "/login"; alert("Failed! Invalid credentials!");</script>');
+        res.status(400).send(`<script> window.location.href = "/verify-otp?user_id=${axiosResponse.data.user_id}"; alert("Failed! Invalid OTP, Please try again !");</script>`);
       }
     } catch (err) {
-      console.log('Login exception error: ' + err)
-      res.send(`<script> window.location.href = "/login"; alert("Login exception Error: ${err}!");</script>`);
+        res.status(400).send(`<script> window.location.href = "/verify-otp?user_id=${req.body.user_id}"; alert("Failed! Invalid OTP, Please try again !");</script>`);
+      console.log('Login exception error: ' + err);
+      // res.send(`<script> window.location.href = "/login"; alert("Login exception Error: ${err}!");</script>`);
     }  
   });
 
