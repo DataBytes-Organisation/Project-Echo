@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Echo Admin - IoT Nodes</title>
+  <link rel="shortcut icon" type="image/png" href="/admin/images/logos/favicon.png" />
+  <link rel="stylesheet" href="/admin/css/styles.min.css" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+  
+  <script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=SYpQ30yuenjgFfR1b5sjsEmbUTdVRzzS7ToZH9azuR9OsXmyoisWxLH8o57SwSJACYmuXUveMt2G_tIyLbcA9V3yJ0WwPwRKt0l_zDIXsFlLet0zaWDBC7OmvHx3CC1SOLIX4q6aVOaUplS_JEsVXjOtIEiqNPt6WvSALp63-hRm9tlRtuWFJK2uX6PVLeXujr4nv9_f7XhZyEv_6IINzlCP38b7Bo9jhaQP8YJw2MWdu4cq80J23HXeq60vyU7s0s49hXIIDAxcEgIJwxABIfVs1TyZw_bsgFYf6aswtcVXHPgieaYTTXIQdAYms02taI_PgsgDuHidYCLyeRWlwI58pgBC60w77h2fhF1CZZPustlkwnw-ddIPhOYcuOMcKmEyQXjCrZc3seKQOYy4akRgYSIB3KPGs1G3t9Kz3HYR79_SOMKHvkvivZ-zBAFyLrJemqxatcHBwBeWVIPc1uTeS0dyfj0xa4I8A0U_uoWNISLr2zMIoLVkK3zrkjEtr4X2QhNNn2GrmrWSyDxCKiWlPUU37Iy7hWhh88unbaFZu9oaSBQgQDeJ0vQ35se7EbcFwaZ9FOJzmcv5sKoYE7KGI6j0ozJjTkruq5m5ckFnedYjm4wOnqZR3YYgrCb_PlA2ZND0kVIX3wKwaFKpeoNrkG46h0RonVaVsGKP6y3WTD1PnG5XjYlgdBEI7t-opkUoSaNixbZAgstRooAuPm78vR8X_i1pa5ozaQP7OEW1593wjlCll83hplk5E25_HTj-eXQ9Qd649RpUhRzjWgMZJZ5bYr98fzmtup05tYPIX2znsSsl16EJZ98Ayz5OGZYnKY6SMJl0uCztKdD73MEZumUEWhWLl9qlz8mun1PSwnQ6E76kz4nzhoMmqWV1KMz-2Krjbw1oC6zlJ6j7c2il5hDXwrkergyWXi4ZNHZ21_e6pFTPdp5iEXPFNMQ3xR-Ed01NyR5azsFYhFKPEJqCMooTnOOPHHdoWh203XoVBzraBzLGcVMTx1gv--jznwrXGG6MpC7GfBg43-SS39yaezR-tbvojNGn247OjAw1t4b9YFAoNZ3rX0kwzt3TrBiNNHXptOEf-g66yTvs_1V7hWxDHUp2kDrtOXRL26TJDRn0yKz3rVG9SLbT4CxAeJ7humh8kLYfKNCEcutb81DMSqCBAjhgm9HZ_6Ps1T9StpyzWqpJwHfd1-MJb97tK8TkgnHCtBhMTTpH-ZHNkyIPUFfMvFTtx5_8jmrVLoJJdWkkp_TEs3_rHD7Z1g2Q75Y3VWUBO7-PXTu5weXxiESHEZPgZV51lNJ5q2tKlzverUk7Xfxt7tKH7EuqxgDaS1udcKINzKSB5ClgmqwS3B7Urvg2FbIF7cNH52NkmbeG-_BIaPfIoJLDThEHS9w546qNc5qNIi-f_AbUPOyrvt4hIJTvNiS3ydIdQVEKc8bHJjBSGNdqsEl5CL04csDuaY1cX8TOliORS2gopQS4PFGtThRX9xIHYJhfR03FwJ8" charset="UTF-8"></script><script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="/admin/js/iot-nodes.js" defer></script>
+</head>
+<body>
+  <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6"
+       data-sidebartype="full" data-sidebar-position="fixed" data-header-position="fixed">
+    
+    <!-- Sidebar -->
+    <div id="sidebar"></div>
+
+    <!-- Main Content -->
+    <div class="body-wrapper">
+      <div id="header"></div>
+      <div class="container-fluid">
+        <h3 class="mb-4">IoT Nodes</h3>
+
+        <div class="mb-3 d-flex gap-3">
+          <select id="filter-type" class="form-select w-auto">
+            <option value="">All Types</option>
+            <option value="Sensor">Sensor</option>
+            <option value="Transmitter">Transmitter</option>
+          </select>
+
+          <select id="filter-model" class="form-select w-auto">
+            <option value="">All Models</option>
+            <option value="Raspberry Pi 4">Raspberry Pi 4</option>
+            <option value="Raspberry Pi 3">Raspberry Pi 3</option>
+            <option value="Raspberry Pi Zero W">Raspberry Pi Zero W</option>
+            <option value="Raspberry Pi 3 B+">Raspberry Pi 3 B+</option>
+          </select>
+
+          <input id="filter-search" class="form-control w-auto" placeholder="Search by ID or Location" />
+        </div>
+
+        <table class="table table-hover" id="iot-nodes-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Type</th>
+              <th>Model</th>
+              <th>Location</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="iot-nodes-body"></tbody>
+        </table>
+
+        <div id="node-details" class="mt-4 d-none">
+          <h5>Node Details</h5>
+          <div id="node-details-content" class="p-3 bg-light rounded border">
+            <form id="edit-node-form">
+              <div class="mb-3">
+                <label for="nodeName" class="form-label">Node Name</label>
+                <input type="text" class="form-control" id="nodeName" readonly>
+              </div>
+          
+              <div class="mb-3">
+                <label for="model" class="form-label">Model</label>
+                <input type="text" class="form-control" id="model" readonly>
+              </div>
+          
+              <div class="mb-3">
+                <label for="location" class="form-label">Location</label>
+                <input type="text" class="form-control" id="location" readonly>
+              </div>
+          
+              <button type="button" id="editBtn" class="btn btn-primary">Edit</button>
+              <button type="button" id="saveBtn" class="btn btn-success d-none">Save</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Component Injections -->
+  <script>
+    $(document).ready(() => {
+      $("#sidebar").load("/admin/component/sidebar-component.html");
+      $("#header").load("/admin/component/header-component.html");
+    });
+  </script>
+
+  <!-- Shared Admin Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+  <script src="/admin/js/sidebarmenu.js"></script>
+  <script src="/admin/js/app.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+  <script src="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.min.js"></script>
+  <script src="/admin/js/dashboard.js"></script>
+</body>
+</html>
