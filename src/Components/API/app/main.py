@@ -67,13 +67,20 @@ app.include_router(iot.router, tags=['iot'], prefix='/iot')
 app.include_router(species_predictor.router, tags=["predict"])
 
 
+<<<<<<< HEAD
+# Root endpoint
+=======
 
 # ✅ Root endpoint
+>>>>>>> c2e206ca2fbbfc354570676519501aee3cc2725a
 @app.get("/", response_description="API Root")
 def show_home():
     return 'Welcome to echo api, move to /docs for more'
     return 'Welcome to Project Echo API. Visit /docs for interactive documentation.'
 
+<<<<<<< HEAD
+app.include_router(auth_router.router, tags=["auth"], prefix="/api")
+=======
 import os  # ✅ Ensure this is already imported at the top
 
 # ✅ /openapi-export - fetch live OpenAPI spec
@@ -116,3 +123,4 @@ def export_openapi_to_file():
 
 export_openapi_to_file()
 
+>>>>>>> c2e206ca2fbbfc354570676519501aee3cc2725a
