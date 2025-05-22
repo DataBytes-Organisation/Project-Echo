@@ -1,163 +1,105 @@
 [
 	{
-		"_id": "64bf20397e048a9822077b74",
-		"userId": "TN-HMI",
-		"username": "TN-HMI",
-		"email": "nguyenviet@deakin.edu.au",
-		"password": "$2a$08$23RMN.TG2bqU3Mf5c.uVOunFr4Klw8yPU60dZlQsGkodHrTnfFHiu",
-		"roles": [
-			{
-				"_id":"64be1d0f05225843178d91d5"
-			},
-			{
-				"_id": "64be1d0f05225843178d91d6"
-			}	
-		],
-		"__v": 1,
-		"gender": "MALE",
-		"DoB": "01-01-2000",
-		"address":[
-			{
-				"country": "australia",
-				"state": "vic"
-			}
-			
-		],
-		"organization": "Deakin",
-		"notificationAnimals": [],
-		"emailNotifications": [],
-		"phonenumber": "0499999999"
+	  "_id": "64bf20397e048a9822077b74",
+	  "userId": "TN-HMI",
+	  "username": "TN-HMI",
+	  "email": "nguyenviet@deakin.edu.au",
+	  "password": "$2a$08$23RMN.TG2bqU3Mf5c.uVOunFr4Klw8yPU60dZlQsGkodHrTnfFHiu",
+	  "roles": [
+		{ "_id": "64be1d0f05225843178d91d5" },
+		{ "_id": "64be1d0f05225843178d91d6" }
+	  ],
+	  "__v": 1,
+	  "gender": "MALE",
+	  "DoB": "01-01-2000",
+	  "address": [{ "country": "australia", "state": "vic" }],
+	  "organization": "Deakin",
+	  "notificationAnimals": [],
+	  "emailNotifications": [],
+	  "phonenumber": "0499999999"
 	},
 	{
-		"_id": "64bf206f7e048a9822077b7a",
-		"userId": "QC-HMI",
-		"username": "QC-HMI",
-		"email": "s222462544@deakin.edu.au",
-		"password": "$2a$08$374O8C27Jv5.4T5dv41amO1J/EhBld/fxeCA.BaY33ug5ipfSJArS",
-		"roles": [
-			{
-				"_id":"64be1d0f05225843178d91d5"
-			},
-			{
-				"_id": "64be1d0f05225843178d91d6"
-			}	
-		],
-		"__v": 1,
-		"gender": "MALE",
-		"DoB": "01-01-2000",
-		"address":[
-			{
-				"country": "australia",
-				"state": "vic"
-			}
-			
-		],
-		"organization": "Deakin",
-		"notificationAnimals": [],
-		"emailNotifications": [],
-		"phonenumber": "0499999999"
+	  "_id": "64bf206f7e048a9822077b7a",
+	  "userId": "QC-HMI",
+	  "username": "QC-HMI",
+	  "email": "s222462544@deakin.edu.au",
+	  "password": "$2a$08$374O8C27Jv5.4T5dv41amO1J/EhBld/fxeCA.BaY33ug5ipfSJArS",
+	  "roles": [
+		{ "_id": "64be1d0f05225843178d91d5" },
+		{ "_id": "64be1d0f05225843178d91d6" }
+	  ],
+	  "__v": 1,
+	  "gender": "MALE",
+	  "DoB": "01-01-2000",
+	  "address": [{ "country": "australia", "state": "vic" }],
+	  "organization": "Deakin",
+	  "notificationAnimals": [],
+	  "emailNotifications": [],
+	  "phonenumber": "0499999999"
 	},
 	{
-		"_id": "64bf209e7e048a9822077b80",
-		"userId": "BenNi-HMI",
-		"username": "BenNi-HMI",
-		"email": "nichollsb@deakin.edu.au",
-		"password": "$2a$08$VTGZ.hWGr2OsMIwDysRpdOwqRjLqV9dIusNei1..dm3O8ops9PUFe",
-		"roles": [
-			{
-				"_id":"64be1d0f05225843178d91d5"
-			},
-			{
-				"_id": "64be1d0f05225843178d91d6"
-			}	
-		],
-		"__v": 1,
-		"gender": "MALE",
-		"DoB": "01-01-2000",
-		"address":[
-			{
-				"country": "australia",
-				"state": "vic"
-			}
-			
-		],
-		"organization": "Deakin",
-		"notificationAnimals": [],
-		"emailNotifications": [],
-		"phonenumber": "0499999999"
+	  "_id": "64bf209e7e048a9822077b80",
+	  "userId": "BenNi-HMI",
+	  "username": "BenNi-HMI",
+	  "email": "nichollsb@deakin.edu.au",
+	  "password": "$2a$08$VTGZ.hWGr2OsMIwDysRpdOwqRjLqV9dIusNei1..dm3O8ops9PUFe",
+	  "roles": [
+		{ "_id": "64be1d0f05225843178d91d5" },
+		{ "_id": "64be1d0f05225843178d91d6" }
+	  ],
+	  "__v": 1,
+	  "gender": "MALE",
+	  "DoB": "01-01-2000",
+	  "address": [{ "country": "australia", "state": "vic" }],
+	  "organization": "Deakin",
+	  "notificationAnimals": [],
+	  "emailNotifications": [],
+	  "phonenumber": "0499999999"
 	},
 	{
-		"_id": "64bf20e37e048a9822077b86",
-		"userId": "BaNa-HMI",
-		"username": "BaNa-HMI",
-		"email": "bnaidu@deakin.edu.au",
-		"password": "$2a$08$cuJfjVi6G06u6I5FaYrHAOXbnqXMBsWn1xbYKowdr3wsQNfmTh2yC",
-		"roles": [
-			{
-				"_id": "64be1d0f05225843178d91d6"
-			}	
-		],
-		"__v": 1,
-		"gender": "MALE",
-		"DoB": "01-01-2000",
-		"address":[
-			{
-				"country": "australia",
-				"state": "vic"
-			}
-			
-		],
-		"organization": "Deakin",
-		"notificationAnimals": [],
-		"emailNotifications": [],
-		"phonenumber": "0499999999"
+	  "_id": "64bf20e37e048a9822077b86",
+	  "userId": "BaNa-HMI",
+	  "username": "BaNa-HMI",
+	  "email": "bnaidu@deakin.edu.au",
+	  "password": "$2a$08$cuJfjVi6G06u6I5FaYrHAOXbnqXMBsWn1xbYKowdr3wsQNfmTh2yC",
+	  "roles": [{ "_id": "64be1d0f05225843178d91d6" }],
+	  "__v": 1,
+	  "gender": "MALE",
+	  "DoB": "01-01-2000",
+	  "address": [{ "country": "australia", "state": "vic" }],
+	  "organization": "Deakin",
+	  "notificationAnimals": [],
+	  "emailNotifications": [],
+	  "phonenumber": "0499999999"
 	},
 	{
-		"_id": "64ef2f255806fc1f18d222c4",
-		"userId": "SB-API",
-		"username": "SB-API",
-		"email": "csbo@deakin.edu.au",
-		"password": "$2b$08$6GElz7vKlytDwBQYmMk5rOXHXXno/NDRnQwlzS.6GbDrGnkPH7BNu",
-		"roles": [
-			{
-				"_id":"64be1d0f05225843178d91d5"
-			}	
-		],
-		"__v": 1,
-		"gender": "MALE",
-		"DoB": "01-01-2000",
-		"address":[
-			{
-				"country": "australia",
-				"state": "vic"
-			}
-			
-		],
-		"organization": "Deakin",
-		"phonenumber": "0499999999"
+	  "_id": "64ef2f255806fc1f18d222c4",
+	  "userId": "SB-API",
+	  "username": "SB-API",
+	  "email": "csbo@deakin.edu.au",
+	  "password": "$2b$08$6GElz7vKlytDwBQYmMk5rOXHXXno/NDRnQwlzS.6GbDrGnkPH7BNu",
+	  "roles": [{ "_id": "64be1d0f05225843178d91d5" }],
+	  "__v": 1,
+	  "gender": "MALE",
+	  "DoB": "01-01-2000",
+	  "address": [{ "country": "australia", "state": "vic" }],
+	  "organization": "Deakin",
+	  "phonenumber": "0499999999"
 	},
 	{
-		"_id": "321bf7e5-04e4-4f80-8ca8-7175c5e9876e",
-		"username": "VP-HMI",
-		"password": "$2b$08$bWH/bT1rOhb8o6qj6pNU9emaw5CGPbTZL.FEeJhkiWanNktTRAUc2",
-		"email": "vishnuprasad9797@gmail.com",
-		"roles": [
-			{
-				"_id": "64be1d0f05225843178d91d6"
-			}
-		],
-		"__v": 1,
-		"gender": "MALE",
-		"DoB": "01-01-2000",
-		"address": {
-			"country": "Australia",
-			"state": "VIC"
-		},
-		"organization": "Project Echo",
-		"phonenumber": "444444455",
-		"notificationAnimals": [],
-		"emailNotifications": [],
-		"userId": "VP-HMI"
+	  "_id": "64f000000000000000000001",
+	  "username": "VP-HMI",
+	  "password": "$2b$08$bWH/bT1rOhb8o6qj6pNU9emaw5CGPbTZL.FEeJhkiWanNktTRAUc2",
+	  "email": "vishnuprasad9797@gmail.com",
+	  "roles": [{ "_id": "64be1d0f05225843178d91d6" }],
+	  "__v": 1,
+	  "gender": "MALE",
+	  "DoB": "01-01-2000",
+	  "address": { "country": "Australia", "state": "VIC" },
+	  "organization": "Project Echo",
+	  "phonenumber": "444444455",
+	  "notificationAnimals": [],
+	  "emailNotifications": [],
+	  "userId": "VP-HMI"
 	}
-	
-]
+  ]  

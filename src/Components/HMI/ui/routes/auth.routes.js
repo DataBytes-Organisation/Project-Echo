@@ -1,9 +1,8 @@
 const { verifySignUp, client } = require("../middleware");
 const controller = require("../controller/auth.controller");
 const emailcontroller = require('../controller/email.controller');
-//const cntroller = require("../public/js/routes");
 const axios = require('axios');
-const redis = require("redis")
+const redis = require("redis");
 
 module.exports = function (app) {
   app.use(function (req, res, next) {
@@ -15,208 +14,116 @@ module.exports = function (app) {
   });
 
   app.post("/api/auth/signup", verifySignUp.confirmPassword, async (req, res) => {
-    
-    const rolesList = [req.body.roles]
-    // After signup page are completed and merged
-    // Use this schema instead of the bottom one 
+    const rolesList = [req.body.roles];
     let schema = {
-      username : req.body.username,
-      password : req.body.password,
-      email : req.body.email,
-      roles : rolesList,
-      gender : req.body.gender,
-      DoB : req.body.DoB,
-      organization : req.body.organization,
-      phonenumber : req.body.phonenumber,
-      
-      address : {"country": req.body.country, "state": req.body.state} 
-    }
+      username: req.body.username,
+      password: req.body.password,
+      email: req.body.email,
+      roles: rolesList,
+      gender: req.body.gender,
+      DoB: req.body.DoB,
+      organization: req.body.organization,
+      phonenumber: req.body.phonenumber,
+      address: { country: req.body.country, state: req.body.state }
+    };
 
-  
-      try {
-        const axiosResponse = await axios.post('http://ts-api-cont:9000/hmi/signup',schema)
-      
-        if (axiosResponse.status === 201) {
-          console.log('Status Code: ' + axiosResponse.status + ' ' + axiosResponse.statusText)
-          res.status(201).send(`<script> window.location.href = "/login"; alert("User registered successfully");</script>`);
-        } else {
-          res.status(400).send(`<script> window.location.href = "/login"; alert("Ooops! Something went wrong");</script>`);
-        }
-      } catch (err) {
-        console.log('Status Code: ' + err.response.status + ' ' + err.response.statusText)
-        console.log(err.response.data)
-        res.status(404).send(`<script> window.location.href = "/login"; alert("Register exception error occured!");</script>`);
-      }
-});
-    
-  app.post("/api/auth/signin", async (req, res) => {
-    let uname = req.body.username;
-    let pw = req.body.password;
-
-    let email = req.body.email;
-      
     try {
-      const axiosResponse = await axios.post('http://ts-api-cont:9000/hmi/signin',{
-        username: uname,
-        email: email,
-        password: pw
-      });
-      
-      if (axiosResponse.status === 200) {
-        console.log('Status Code: ' + axiosResponse.status + ' ' + axiosResponse.statusText)
-        console.log("Login response: ", axiosResponse.data);
-        
-        await client.set("JWT", axiosResponse.data.tkn, (err, res)=> {
-          if (err) {
-            console.log("Set JWT Token error: ", err)
-          } else {
-            console.log("Set JWT successfully: ", res)
-          }
-        })
-        await client.set("Roles", axiosResponse.data.roles.toString(), (err, res)=> {
-          if (err) {
-            console.log("Set User Roles Token error: ", err)
-          } else {
-            console.log("Set User roles successfully: ", res)
-          }
-        })
-        await client.set("Users", JSON.stringify(axiosResponse.data.user), (err, res)=> {
-          if (err) {
-            console.log("Set User Roles Token error: ", err)
-          } else {
-            console.log("Set User roles successfully: ", res)
-          }
-        })
-        /*
-        res.status(200).send(
-        `<script> 
-          alert("Login Successfully");
-          window.location.href = "/welcome"
-        </script>`);
-        */
-        res.status(200).json({
-          message: "Login Successful",
-          token: axiosResponse.data.tkn,
-          userId: axiosResponse.data.user.id,
-        });
-                
+      const axiosResponse = await axios.post('http://localhost:9000/hmi/signup', schema);
+
+      if (axiosResponse.status === 201) {
+        console.log('Signup OK:', axiosResponse.status);
+        res.status(201).send(`<script> alert("User registered successfully"); window.location.href = "/login"; </script>`);
       } else {
-        console.log("Login response: ", axiosResponse.data);
-        res.status(400).send('<script> window.location.href = "/login"; alert("Failed! Invalid credentials!");</script>');
+        res.status(400).send(`<script> alert("Ooops! Something went wrong"); window.location.href = "/login"; </script>`);
       }
     } catch (err) {
-      console.log('Login exception error: ' + err)
-      res.send(`<script> window.location.href = "/login"; alert("Login exception Error: ${err}!");</script>`);
-    }  
+      console.log('Signup exception:', err.response?.status, err.response?.data);
+      res.status(404).send(`<script> alert("Register exception occurred!"); window.location.href = "/login"; </script>`);
+    }
+  });
+
+  app.post("/api/auth/signin", async (req, res) => {
+    const uname = req.body.username;
+    const pw = req.body.password;
+
+    if (!uname || !pw) {
+      return res.status(400).send(`<script>alert("Username or password missing."); window.location.href="/login";</script>`);
+    }
+
+    console.log("POSTING TO BACKEND WITH:", { username: uname, password: pw });
+
+    try {
+      const axiosResponse = await axios.post('http://localhost:9000/hmi/signin', {
+        username: uname,
+        password: pw,
+        email: uname
+      });
+
+      if (axiosResponse.status === 200) {
+        const data = axiosResponse.data;
+        console.log("Login response:", data);
+
+        await client.set("JWT", data.tkn);
+        await client.set("Roles", data.roles.toString());
+        await client.set("Users", JSON.stringify(data.user));
+
+        res.status(200).json({
+          token: data.tkn,
+          userId: data.user.id
+        });
+      } else {
+        res.status(400).send(`<script> alert("Failed! Invalid credentials!"); window.location.href = "/login"; </script>`);
+      }
+    } catch (err) {
+      console.log('Login exception error:', err.response?.status, err.response?.data);
+      res.send(`<script> alert("Login exception occurred!"); window.location.href = "/login"; </script>`);
+    }
   });
 
   app.post("/api/auth/forgot", async (req, res) => {
-    // let account = req.body.account;
-    // console.log(account)
-    
-    // try {
-    //   const axiosResponse = await axios.post('http://ts-api-cont:9000/hmi/forgot-password', {
-    //     user: account
-    //   });
-      
-    //   if (axiosResponse.status === 201) {
-    //     console.log('Status Code: ' + axiosResponse.status + ' ' + axiosResponse.statusText)
-    //     console.log("Server's response: ", axiosResponse.data);
-
-    //     enquiry = `Your new password is ${axiosResponse.data.password}`
-        
-    //     await emailcontroller.send_enquiry(axiosResponse.data.email, 'Recovery Password', enquiry)
-
-    //     res.status(201).send(
-    //     `<script> 
-    //       alert("Password has been changed. Check your email!");
-    //       window.location.href = "/login"
-    //     </script>`);
-          
-        
-    //   } else {
-    //     console.log("Error response: ", axiosResponse.data);
-    //     res.status(404).send('<script> window.location.href = "/login"; alert("Failed! Account not found!");</script>');
-    //   }
-    // } catch (err) {
-    //   console.log('Exception error: ' + err)
-    //   res.send(`<script> window.location.href = "/login"; alert("Exception Error: ${err}!");</script>`);
-    // }  
-
     let account = req.body.account;
-    console.log(account)
-    
+    console.log("Forgot-password input:", account);
+
     try {
-      const axiosResponse = await axios.post('http://ts-api-cont:9000/hmi/forgot-password', {
+      const axiosResponse = await axios.post('http://localhost:9000/hmi/forgot-password', {
         user: account
       });
-      
+
       if (axiosResponse.status === 201) {
-        console.log('Status Code: ' + axiosResponse.status + ' ' + axiosResponse.statusText)
-        console.log("Server's response: ", axiosResponse.data);
+        const enquiry = `Your new OTP is ${axiosResponse.data.otp} and click here to reset password: http://localhost:8080/forgotPassword`;
+        await emailcontroller.send_enquiry(axiosResponse.data.email, 'Recovery Password', enquiry);
 
-        enquiry = `Your new OTP is ${axiosResponse.data.otp} and click here to reset password :- http://localhost:8080/forgotPassword`
-        
-        await emailcontroller.send_enquiry(axiosResponse.data.email, 'Recovery Password', enquiry)
-
-        res.status(201).send(
-        `<script> 
-          alert("Password has been changed. Check your email!");
-          window.location.href = "/login"
-        </script>`);
-          
-        
+        res.status(201).send(`<script>alert("Password has been changed. Check your email!"); window.location.href = "/login";</script>`);
       } else {
-        console.log("Error response: ", axiosResponse.data);
-        res.status(404).send('<script> window.location.href = "/login"; alert("Failed! Account not found!");</script>');
+        res.status(404).send(`<script>alert("Failed! Account not found!"); window.location.href = "/login";</script>`);
       }
     } catch (err) {
-      console.log('Exception error: ' + err)
-      res.send(`<script> window.location.href = "/login"; alert("Exception Error: ${err}!");</script>`);
-    } 
+      console.log('Forgot exception:', err.response?.status, err.response?.data);
+      res.send(`<script>alert("Exception Error occurred!"); window.location.href = "/login";</script>`);
+    }
   });
 
   app.post("/api/auth/reset_password", async (req, res) => {
     let uname = req.body.username;
     let pw = req.body.password;
-    // let _otp_ = req.body.otp;
 
     try {
-      const axiosResponse = await axios.post('http://ts-api-cont:9000/hmi/reset-password',{
+      const axiosResponse = await axios.post('http://localhost:9000/hmi/reset-password', {
         username: uname,
         password: pw
-        // otp : _otp_
       });
-    
-      if (axiosResponse.status === 201) {
-        console.log('Status Code: ' + axiosResponse.status + ' ' + axiosResponse.statusText)
-        console.log("Reset response: ", axiosResponse.data);
 
-        res.status(201).send(
-        `<script> 
-          alert("Login Successfully");
-          window.location.href = "/welcome"
-        </script>`);
-          
-        
+      if (axiosResponse.status === 201) {
+        res.status(201).send(`<script>alert("Password reset successfully."); window.location.href = "/welcome";</script>`);
       } else {
-        console.log("Error response: ", axiosResponse.data);
-        res.status(404).send('<script> window.location.href = "/login"; alert("Failed! Account not found!");</script>');
+        res.status(404).send(`<script>alert("Failed! Account not found!"); window.location.href = "/login";</script>`);
       }
     } catch (err) {
-      console.log('Exception error: ' + err)
-      res.send(`<script> window.location.href = "/login"; alert("Exception Error: ${err}!");</script>`);
-    } 
-        
-
+      console.log('Reset password exception:', err.response?.status, err.response?.data);
+      res.send(`<script>alert("Exception Error occurred!"); window.location.href = "/login";</script>`);
+    }
   });
 
-
   app.post("/api/auth/signout", controller.signout);
-
   app.post("/api/auth/guestsignup", controller.guestsignup);
-
-  // app.delete("/api/auth/delete-account", controller.deleteaccount);
-
-  // app.post("/api/auth/guestsignin", controller.guestsignin);
 };

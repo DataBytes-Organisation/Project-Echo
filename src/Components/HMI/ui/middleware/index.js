@@ -1,37 +1,46 @@
 const verifySignUp = require("./verifySignup");
 const redis = require('redis');
 
+// ✅ Updated Redis config for local development
 const redisConfig = {
-  host: 'echo-redis',
+  host: 'localhost',
   port: 6379,
 };
+
+// ✅ Create Redis client using localhost
 const client = redis.createClient({
   socket: {
-      host: 'echo-redis',
-      port: 6379
+    host: redisConfig.host,
+    port: redisConfig.port
   }
 });
 
-async function checkUserSession(req, res, next) {
-  console.log("Get user session: ", req.path)
-  if (req.path == '/welcome' || req.path == '/' || req.path == '/map' | req.path.includes("admin") | req.path == null | req.path == undefined) {
+// Connect the Redis client
+client.connect().catch(console.error);
 
-    let token = await client.get('JWT', (err, storedToken) => {
-      if (err) {
-        console.error('Error retrieving token from Redis:', err);
-        return null
-      } else {
-        console.log('Stored Token:', storedToken);
-        return storedToken
+// Middleware to check user session
+async function checkUserSession(req, res, next) {
+  console.log("Get user session: ", req.path);
+  if (
+    req.path === '/welcome' ||
+    req.path === '/' ||
+    req.path === '/map' ||
+    req.path.includes("admin") ||
+    req.path == null ||
+    req.path == undefined
+  ) {
+    try {
+      const token = await client.get('JWT');
+      if (!token) {
+        console.log("No stored token, return to login");
+        return res.redirect('/login');
       }
-    })
-    if (token == null) {
-      // Token is missing, redirect the user to the login page
-      console.log("No stored token, return to login")
+    } catch (err) {
+      console.error('Error retrieving token from Redis:', err);
       return res.redirect('/login');
     }
   }
-  return next()
+  return next();
 }
 
 module.exports = {
