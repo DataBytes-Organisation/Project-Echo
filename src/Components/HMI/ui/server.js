@@ -2,21 +2,44 @@ const express = require('express');
 const app = express();
 const path = require('path');
 const fs = require('fs');
-const cookieSession = require('cookie-session');
+// const cookieSession = require('cookie-session');
 const helmet = require('helmet');
 const jwt = require('jsonwebtoken');
 const { client, checkUserSession } = require('./middleware');
 const controller = require('./controller/auth.controller');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
-client.connect();
+// client.connect();
 const cors = require('cors');
 require('dotenv').config();
 const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY);
 const axios = require('axios');
 const { MongoClient, ObjectId } = require('mongodb');
+const mongoose = require('mongoose');
+
+const session = require('express-session');
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+const analyticsRoutes = require('./routes/analytics.routes');
+app.use('/api', analyticsRoutes);
+
+app.use(session({
+  secret: 'echo-secret',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false }
+}));
+
+if (process.env.NODE_ENV !== 'production') {
+  app.use('/admin', require('./routes/adminTest.routes'));
+}
 
 
+
+mongoose.connect('mongodb://root:root_password@localhost:27017/EchoNet?authSource=admin')
+  .then(() => console.log("Connected to MongoDB via Mongoose"))
+  .catch(err => console.error(" Mongoose connection error:", err));
 
 // Temporarily removed the variables that need the captcha-canvas package
 //const {createCaptchaSync} = require("captcha-canvas");
@@ -36,7 +59,7 @@ const storeItems = new Map([[
 app.use(express.json({limit: '10mb'}));
 
 // Import the User model
-const { User } = require('./model/user.model'); // Add this line
+const User = require('./model/user.model');
 
 // Middleware to check if the user is an admin
 function isAdmin(req, res, next) {
@@ -152,9 +175,20 @@ app.post("/api/create-checkout-session", async (req, res) => {
   }
 })
 
+// Existing route
+app.post("/api/approve", async (req, res) => {
+  // approval logic here...
+});
+
+// Existing route
+app.post("/api/approve", async (req, res) => {
+  // approval logic here...
+});
+
+
 //This API endpoint fetches the "charges", AKA donations, from the Stripe account.
 //It returns a json object of all the charges
-/* app.get('/donations', async(req,res) => {
+app.get('/donations', async(req,res) => {
   let charges;
   try{
     while (true) {
@@ -183,26 +217,7 @@ app.post("/api/create-checkout-session", async (req, res) => {
     console.error('Error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
-}) */
-
-app.get('/donations', async (req, res) => {
-  try {
-    const client = new MongoClient("mongodb://modelUser:EchoNetAccess2023@ts-mongodb-cont:27017/EchoNet",
-    {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-    });
-    await client.connect();
-    const db = client.db("EchoNet");
-    const donations = await db.collection("donations").find({}).toArray();
-    res.json({ charges: { data: donations } });
-  } catch (error) {
-    console.error("Error fetching donations from MongoDB:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
-  
-  
+})
 //This endpoint retrieves the donation amounts from the associated stripe account
 //it adds up the amounts to return a cumulative total. Used on admin dashboard.
 app.get('/cumulativeDonations', async(req, res) => {
@@ -257,7 +272,15 @@ app.get('/cumulativeDonations', async(req, res) => {
 
 // serve static files from the public directory
 // app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.static(path.join(__dirname, 'public'), { index: path.join(__dirname, 'public/login.html')}))
+//app.use(express.static(path.join(__dirname, 'public'), { index: path.join(__dirname, 'public/login.html')}))
+
+// Serve static files from /public
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Serve login.html explicitly on /login route
+//app.get('/login', (req, res) => {
+//  res.sendFile(path.join(__dirname, 'public', 'login.html'));
+//});
 
 var corsOptions = {
   origin: ["http://localhost:8081", "*"]
@@ -273,13 +296,13 @@ app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }))
 //const serveIndex = require('serve-index'); 
 //app.use('/images/bio', serveIndex(express.static(path.join(__dirname, '/images/bio'))));
 
-app.use(
-  cookieSession({
-    name: "echo-session",
-    keys: ["COOKIE_SECRET"], // should use as secret environment variable
-    httpOnly: true
-  })
-);
+//app.use(
+//  cookieSession({
+//    name: "echo-session",
+//    keys: ["COOKIE_SECRET"], // should use as secret environment variable
+//    httpOnly: true
+//  })
+//);
 
 const nodemailer = require('nodemailer');
 var transporter = nodemailer.createTransport({
@@ -447,6 +470,7 @@ app.post('/api/applyAlgorithm', (req, res) => {
 require('./routes/auth.routes')(app);
 require('./routes/user.routes')(app);
 require('./routes/map.routes')(app);
+
 app.get('*', checkUserSession);
 app.get("/", async (req, res) => {
   console.log("token: ", await client.get('JWT', (err, storedToken) => {
@@ -473,16 +497,6 @@ app.get("/", async (req, res) => {
 //Serve the admin dashboard
 app.get("/admin-dashboard", (req,res)=> {
   return res.sendFile(path.join(__dirname, 'public/admin/dashboard.html'));
-})
-
-
-app.get("/admin-nodes", (req, res) => {
-  return res.sendFile(path.join(__dirname, 'public/admin/admin-nodes.html'));
-});
-
-//Serve the profile tab
-app.get("/admin-profile", (req,res)=> {
-  return res.sendFile(path.join(__dirname, 'public/admin/profile.html'));
 })
 
 app.get("/admin-template", (req,res)=> {
@@ -528,6 +542,27 @@ app.post("/api/submit", async (req, res) => {
   }
 });
 
+//API endpoint for resetting password
+app.post('/admin/reset-password', (req, res) => {
+  const { email } = req.body;
+  const newPassword = crypto.randomBytes(6).toString('hex');
+
+  console.log(`Reset password for ${email}. New password: ${newPassword}`);
+
+  // For now, simulate success. Replace this with actual DB logic later.
+  res.json({ success: true, newPassword });
+});
+
+// API endpoint for enabling/disabling MFA
+app.post('/admin/update-user', (req, res) => {
+  const { email, mfaEnabled } = req.body;
+
+  console.log(`MFA update for ${email}: ${mfaEnabled}`);
+
+  // Simulate success (replace with real DB update logic later)
+  res.json({ success: true });
+});
+
 app.get("/forgotPassword",async (req,res) => {
   res.sendFile(path.join(__dirname, 'public/resetPassword.html'))
 })
@@ -535,16 +570,32 @@ app.get("/forgotPassword",async (req,res) => {
 app.post("/api/approve", async (req,res) => {
 
 })
-
 //Navigate to requests tab on admin dashboard
 app.get("/requests", (req,res) => {
   res.sendFile(path.join(__dirname, 'public/admin/admin-request.html'))
 })
 
-//Navigate to notifications tab on admin dashboard
-app.get("/notifications", (req,res) => {
-  res.sendFile(path.join(__dirname, 'public/admin/notifications.html'))
+//Navigate to requests tab on site analytics
+app.get("/site-analytics", (req,res) => {
+  res.sendFile(path.join(__dirname, 'public/admin/site-analytics.html'))
 })
+
+// API to get user details (email, status, mfaEnabled)
+app.get('/api/users', async (req, res) => {
+  try {
+    console.log("GET /api/users called ");
+
+    // This will log all users to the terminal to confirm MongoDB connection
+    const users = await User.find({}, 'email status mfaEnabled visitCount lastVisit');
+
+    console.log("Fetched users from DB:", users);
+
+    res.json(users);
+  } catch (error) {
+    console.error('Error fetching users:', error.message);
+    res.status(500).json({ error: 'Failed to fetch users' });
+  }
+});
 
 //API endpoint for patching the new review status to the newly reviewed edit request
 app.patch('/api/requests/:id', async (req, res) => {
@@ -719,17 +770,6 @@ app.post('/suspendUser', async (req, res) => {
 
 
 //Page direction to the map
-// Proxy route for IoT nodes API
-app.get('/iot/nodes', async (req, res) => {
-  try {
-    const response = await axios.get('http://ts-api-cont:9000/iot/nodes');
-    res.json(response.data);
-  } catch (error) {
-    console.error('Error fetching IoT nodes:', error);
-    res.status(500).json({ error: 'Error fetching IoT nodes' });
-  }
-});
-
 app.get("/map", async(req,res) => {
   res.sendFile(path.join(__dirname, 'public/index.html'))
 })
@@ -739,4 +779,3 @@ app.get("/map", async(req,res) => {
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
-
