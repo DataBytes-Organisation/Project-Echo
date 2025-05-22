@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Site Analytics</title>
+  <link rel="shortcut icon" type="image/png" href="./admin/images/logos/project-title.png" />
+  <link type="text/css" rel="stylesheet" href="./admin/css/styles.min.css" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://kit.fontawesome.com/8aa980d912.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+  <script src="./admin/js/sidebarmenu.js"></script>
+  <script src="./admin/js/app.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.css" />
+  <script src="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.min.js"></script>
+  <script src="./admin/js/dashboard.js"></script>
+</head>
+
+<body>
+  <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full" data-sidebar-position="fixed" data-header-position="fixed">
+    <div id="sidebar"></div>
+    <div class="body-wrapper">
+      <div id="header"></div>
+      <div class="container-fluid">
+
+        <!-- Summary Cards -->
+        <div class="row">
+          <div class="col-lg-6 col-md-6 mb-3">
+            <div class="card p-3 text-center">
+              <h6>Total Users</h6>
+              <h4 id="total-users">--</h4>
+            </div>
+          </div>
+          <div class="col-lg-6 col-md-6 mb-3">
+            <div class="card p-3 text-center">
+              <h6>Active Users</h6>
+              <h4 id="active-users">--</h4>
+            </div>
+          </div>
+          <div class="col-lg-6 col-md-6 mb-3">
+            <div class="card p-3 text-center">
+              <h6>Average Visits</h6>
+              <h4 id="avg-visits">--</h4>
+            </div>
+          </div>
+          <div class="col-lg-6 col-md-6 mb-3">
+            <div class="card p-3 text-center">
+              <h6>Top User</h6>
+              <h4 id="top-user">--</h4>
+            </div>
+          </div>
+        </div>
+
+        <!-- Users Table -->
+        <div class="card w-100">
+          <div class="card-body p-4">
+            <h5 class="card-title fw-semibold mb-4">User Visit Summary</h5>
+            <div class="table-responsive">
+              <table class="table text-nowrap mb-0 align-middle">
+                <thead class="text-dark fs-4">
+                  <tr>
+                    <th>Email</th>
+                    <th>Visit Count</th>
+                    <th>Last Visit</th>
+                    <th>Status</th>
+                    <th>Reset PW</th>
+                    <th>Toggle MFA</th>
+                  </tr>
+                </thead>
+                <tbody id="user-visit-summary">
+                  <!-- Rows inserted via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    $(document).ready(function () {
+      $("#sidebar").load("./admin/component/sidebar-component.html");
+      $("#header").load("./admin/component/header-component.html");
+
+      fetch('/api/users')
+        .then(response => response.json())
+        .then(users => {
+          const tbody = document.getElementById("user-visit-summary");
+          tbody.innerHTML = '';
+
+          let total = 0, active = 0, totalVisits = 0;
+          let topUser = null;
+
+          users.forEach(user => {
+            total++;
+            if (user.status === 'Active') active++;
+
+            const visits = user.visitCount || 0;
+            totalVisits += visits;
+
+            if (!topUser || visits > (topUser.visitCount || 0)) {
+              topUser = user;
+            }
+
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+              <td>${user.email}</td>
+              <td>${visits}</td>
+              <td>${user.lastVisit ? new Date(user.lastVisit).toLocaleString() : '--'}</td>
+              <td>
+                <span class="badge ${user.status === 'Active' ? 'bg-success' : 'bg-danger'} rounded-3 fw-semibold">
+                  ${user.status}
+                </span>
+              </td>
+              <td>
+                <button class="btn btn-warning btn-sm" onclick="resetPassword('${user._id}', '${user.email}')">Reset</button>
+              </td>
+              <td>
+                <button class="btn btn-info btn-sm" onclick="toggleMfa('${user._id}', '${user.email}')">Toggle</button>
+              </td>
+            `;
+            tbody.appendChild(tr);
+          });
+
+          document.getElementById("total-users").textContent = total;
+          document.getElementById("active-users").textContent = active;
+          document.getElementById("avg-visits").textContent = total > 0 ? (totalVisits / total).toFixed(2) : "0.00";
+          document.getElementById("top-user").textContent = topUser ? topUser.email : "--";
+        })
+        .catch(err => {
+          console.error("Failed to load users:", err);
+        });
+    });
+
+    /* Button functions
+    
+    Test with Postman app: PUT Request. 
+
+    URL: http://localhost:8080/admin/dev/users/64bf20397e048a9822077b74/reset-password 
+    switch /reset-password to /toggle-mfa depending on which one you want
+    64bf20397e048a9822077b74 is user TN-HMI, email: nguyenviet@deakin.edu.au .
+    
+    Updates of this will show up on terminal too. */
+
+    function resetPassword(userId, email) {
+      fetch(`/admin/dev/users/${userId}/reset-password`, {
+        method: 'PUT'
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.newPassword) {
+          alert(`✅ Password reset for ${email}\nNew password: ${data.newPassword}`);
+        } else {
+          alert(`❌ Failed to reset password: ${data.error}`);
+        }
+      })
+      .catch(err => {
+        console.error("Reset password failed:", err);
+      });
+    }
+
+
+    function toggleMfa(userId, email) {
+      fetch(`/admin/dev/users/${userId}/toggle-mfa`, {
+        method: 'PUT'
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (typeof data.mfaEnabled !== "undefined") {
+          alert(`✅ MFA is now ${data.mfaEnabled ? "ENABLED" : "DISABLED"} for ${email}`);
+        } else {
+          alert(`❌ Failed to toggle MFA: ${data.error}`);
+        }
+      })
+      .catch(err => {
+        console.error("Toggle MFA failed:", err);
+      });
+    }
+  </script>
+</body>
+</html>
