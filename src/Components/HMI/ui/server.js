@@ -390,7 +390,7 @@ app.post("/request_access", async (req, res) => {
       if (response && response.status === 'success') {
         let html_text = '<div>';
         html_text += '<h2>Echo HMI Temporary Access Requested!</h2>'
-        html_text += '<img src="cid:logo@echo.hmi" style="height: 150px; width: 150px; display: flex; margin: auto;"/>'
+        html_text += '<img src="cid:logo@echo.hmi" style="height: 150px; width: 150px; display: flex; margin: auto;"/>';
         html_text += '<p>Dear \t <strong>' + req.body.email + '</strong></p>';
         html_text += '<hr>';
         html_text += '<p>Thank you for your patience, here is your login credential </p>'
@@ -448,6 +448,9 @@ require('./routes/auth.routes')(app);
 require('./routes/user.routes')(app);
 require('./routes/map.routes')(app);
 app.get('*', checkUserSession);
+app.get("/verify-otp", (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/verify-otp.html'));
+});
 app.get("/", async (req, res) => {
   console.log("token: ", await client.get('JWT', (err, storedToken) => {
           if (err) {
@@ -530,7 +533,7 @@ app.post("/api/submit", async (req, res) => {
 
 app.get("/forgotPassword",async (req,res) => {
   res.sendFile(path.join(__dirname, 'public/resetPassword.html'))
-})
+});
 
 app.post("/api/approve", async (req,res) => {
 
@@ -739,4 +742,3 @@ app.get("/map", async(req,res) => {
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
-

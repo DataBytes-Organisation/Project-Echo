@@ -346,6 +346,35 @@ def signin(user: schemas.UserLoginSchema):
         "role" : authorities,
     }
 
+    mfa_phone_enabled = account.get("mfa_phone_enabled", False)
+    
+    if mfa_phone_enabled:
+        # Call 2FA generate endpoint
+        headers = {"Authorization": f"Bearer {jwtToken}"}
+        try:
+            response = requests.post(
+                "http://localhost:9000/2fa/generate",
+                headers=headers
+            )
+            print(response.json())
+            if response.status_code != 200:
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Failed to generate 2FA code"
+                )
+            
+            # Return response indicating MFA is required with only user_id
+            return JSONResponse(content={
+                "mfa_phone_enabled": True,
+                "user_id": str(account["_id"])
+            }, status_code=200)
+            
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Failed to generate 2FA code: {str(e)}"
+            )
+
     #Set up response (FOR TESTING ONLY)
     response = {"message": "User Login Successfully!", "tkn" : jwtToken, "roles": authorities, 'user': result}
 
