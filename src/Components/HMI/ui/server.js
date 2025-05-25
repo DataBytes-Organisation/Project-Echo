@@ -125,7 +125,7 @@ app.post("/api/create-checkout-session", async (req, res) => {
     console.log(req.body.items);
     const session = await stripe.checkout.sessions.create({
       submit_type: 'donate',
-      customer_email: req.body.userEmail,
+      customer_email: req.body.userEmail || undefined,
       payment_method_types: ["card"],
       mode: "payment",
       line_items: req.body.items.map(item => {
@@ -142,7 +142,10 @@ app.post("/api/create-checkout-session", async (req, res) => {
           quantity: 1,
         }
       }),
-      success_url: "http://localhost:8080", //`${process.env.CLIENT_URL}`,
+      metadata: {
+      type: "One-Time"
+      },
+      success_url: "http://localhost:8080/donation-success?session_id={CHECKOUT_SESSION_ID}", //`${process.env.CLIENT_URL}`,
       cancel_url: "http://localhost:8080"//`${process.env.CLIENT_URL}`,
     })
     console.log("two");
@@ -152,98 +155,91 @@ app.post("/api/create-checkout-session", async (req, res) => {
   }
 })
 
-//This API endpoint fetches the "charges", AKA donations, from the Stripe account.
-//It returns a json object of all the charges
-/* app.get('/donations', async(req,res) => {
-  let charges;
-  try{
-    while (true) {
-      nextPage = null;
-      firstPage = false;
-      if(firstPage == false){
-        charges = await stripe.charges.list({
-          limit: 100,
-        });
-        firstPage = true;
+// Handle Stripe success redirect and save donation to MongoDB
+app.get('/donation-success', async (req, res) => {
+  const session_id = req.query.session_id;
+
+  try {
+    const session = await stripe.checkout.sessions.retrieve(session_id);
+    console.log("🔍 Stripe session details:", session.customer_details);
+
+    const donation = {
+      paymentId: session.payment_intent,
+      name: session.customer_details?.name || 'Anonymous',
+      email: session.customer_details?.email || 'N/A',
+      amount: session.amount_total / 100,
+      currency: session.currency,
+      method: "Stripe",
+      status: "succeeded",
+      timestamp: new Date(),
+      type: session.metadata?.type || "Unknown"
+    };
+
+    // 🔁 Force MongoDB connection retry if missing
+    if (!connectedDB) {
+      try {
+        await donationClient.connect();
+        connectedDB = donationClient.db("EchoNet");
+        console.log("✅ Reconnected to MongoDB in fallback.");
+      } catch (err) {
+        console.error("❌ Retry DB connection failed:", err.message);
+        return res.status(500).send("Database connection error.");
       }
-      
-      if (!charges.has_more) {
-        break; // Exit the loop when there are no more pages
-      }
-      nextPage = charges[charges.length() - 1]
-      charges = await stripe.charges.list({
-        limit: 100,
-        starting_next: nextPage
-      });
-      firstPage = true;
     }
-    res.json({ charges });
+
+    const donations = connectedDB.collection("donations");
+    await donations.insertOne(donation);
+
+    console.log("✅ Stripe donation saved (via redirect)");
+    res.send(`<script>alert("Donation successful! Thank you."); window.location.href = "/";</script>`);
+
+  } catch (err) {
+    console.error("❌ Error saving Stripe donation:", err.message);
+    res.status(500).send("Error retrieving session details.");
   }
-  catch(error){
-    console.error('Error:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-}) */
+});
+
+
 
 app.get('/donations', async (req, res) => {
   try {
-    const client = new MongoClient("mongodb://modelUser:EchoNetAccess2023@ts-mongodb-cont:27017/EchoNet",
-    {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-    });
-    await client.connect();
-    const db = client.db("EchoNet");
-    const donations = await db.collection("donations").find({}).toArray();
+    // Ensure MongoDB is connected
+    if (!connectedDB) {
+      await donationClient.connect();
+      connectedDB = donationClient.db("EchoNet");
+      console.log("✅ Reconnected to MongoDB for /donations");
+    }
+
+    const donations = await connectedDB.collection("donations").find({}).toArray();
     res.json({ charges: { data: donations } });
   } catch (error) {
-    console.error("Error fetching donations from MongoDB:", error);
+    console.error("❌ Error fetching donations from MongoDB:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
-  
-  
-//This endpoint retrieves the donation amounts from the associated stripe account
-//it adds up the amounts to return a cumulative total. Used on admin dashboard.
-app.get('/cumulativeDonations', async(req, res) => {
-  let cumulativeTotal = 0;
-  try{
-    while (true) {
-      nextPage = null;
-      firstPage = false;
-      let charges;
-      if(firstPage == false){
-        charges = await stripe.charges.list({
-          limit: 100,
-        });
-        firstPage = true;
-      }
-      
-    charges.data.forEach(charge => {
-        cumulativeTotal += charge.amount;
-    });
-    if (!charges.has_more) {
-      break; // Exit the loop when there are no more pages
+
+
+app.get('/cumulativeDonations', async (req, res) => {
+  try {
+    if (!connectedDB) {
+      await donationClient.connect();
+      connectedDB = donationClient.db("EchoNet");
     }
-    nextPage = charges[charges.length() - 1]
-    charges = await stripe.charges.list({
-      limit: 100,
-      starting_next: nextPage
-    });
-      firstPage = true;
-    }
-    
-    cumulativeTotal = cumulativeTotal / 100;
-    cumulativeTotal = cumulativeTotal.toFixed(2);
-    
-    console.log('Cumulative Total:', cumulativeTotal);
-    res.json({ cumulativeTotal });
+
+    const donations = await connectedDB
+      .collection("donations")
+      .find({ status: "succeeded" })
+      .toArray();
+
+    const totalAmount = donations.reduce((sum, donation) => sum + (donation.amount || 0), 0);
+
+    res.json({ cumulativeTotal: totalAmount.toFixed(2) });
+  } catch (error) {
+    console.error("❌ Error calculating cumulative donations:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
-  catch(error){
-    console.error('Error:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  } 
-})
+});
+
 
 // Temporarily removed the route for the captcha function
 
@@ -257,10 +253,57 @@ app.get('/cumulativeDonations', async(req, res) => {
 
 // serve static files from the public directory
 // app.use(express.static(path.join(__dirname, 'public')));
+
+// =======================
+// Save Razorpay Payment to MongoDB
+// =======================
+const donationClient = new MongoClient(process.env.MONGODB_URI || "mongodb://root:root_password@ts-mongodb-cont:27017", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+});
+
+let connectedDB;
+
+(async () => {
+  try {
+    await donationClient.connect();
+    connectedDB = donationClient.db("EchoNet");
+    console.log("✅ Donation MongoDB connected.");
+  } catch (err) {
+    console.error("❌ Failed to connect to MongoDB for donations:", err);
+  }
+})();
+
+app.post('/api/save-razorpay-payment', async (req, res) => {
+  const { paymentId, name, email, amount, currency, method } = req.body;
+
+  try {
+    const donations = connectedDB.collection("donations");
+
+    await donations.insertOne({
+      paymentId,
+      name,
+      email,
+      amount,
+      currency,
+      method,
+      status: 'succeeded',
+      timestamp: new Date()
+    });
+
+    res.status(201).json({ status: 'success' });
+  } catch (error) {
+    console.error('❌ Error saving donation:', error);
+    res.status(500).send("Error retrieving session details.");
+  }
+});
+
+
+
 app.use(express.static(path.join(__dirname, 'public'), { index: path.join(__dirname, 'public/login.html')}))
 
 var corsOptions = {
-  origin: ["http://localhost:8081", "*"]
+  origin: [ "http://localhost:8081", "*"]
 };
 
 app.use(cors(corsOptions))
