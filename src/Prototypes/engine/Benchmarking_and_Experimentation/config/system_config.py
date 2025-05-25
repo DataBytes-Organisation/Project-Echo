@@ -1,6 +1,6 @@
 # Configuration parameters (update paths as needed)
 SC = {
-    'AUDIO_DATA_DIRECTORY': r"D:\Echo\Audio_data",  # set your audio data directory here
+    'AUDIO_DATA_DIRECTORY': r"D:\Users\Moiz\Documents\Github\data",  # set your audio data directory here
     'CACHE_DIRECTORY': r"D:\Echo\Training_cache",
     'OUTPUT_DIRECTORY': r"D:\Echo\Output",
 
