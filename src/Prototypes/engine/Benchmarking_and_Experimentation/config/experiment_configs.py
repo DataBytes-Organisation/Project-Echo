@@ -6,13 +6,33 @@ from .model_configs import MODELS
 # Define experiments to run
 EXPERIMENTS = [
     {
-        "name": "baseline",
+        "name": "baseline_30_epochs",
         "audio_augmentation": "none",
         "image_augmentation": "none",
         "model": "EfficientNetV2B0",
-        "epochs": 10,
+        "epochs": 30,
         "batch_size": 16,
     },
+
+        {
+        "name": "baseline_MobileNetV2_30_epochs",
+        "audio_augmentation": "none",
+        "image_augmentation": "none",
+        "model": "EfficientNetV2B0",
+        "epochs": 30,
+        "batch_size": 16,
+    },
+
+    {
+        "name": "baseline_Resnet_30_epochs",
+        "audio_augmentation": "none",
+        "image_augmentation": "none",
+        "model": "ResNet50V2",
+        "epochs": 30,
+        "batch_size": 16,
+    },
+
+
     {
         "name": "basic_audio_aug",
         "audio_augmentation": "basic",

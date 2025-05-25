@@ -25,7 +25,7 @@ from config.system_config import SC  # Import system settings
 from config.model_configs import MODELS  # Import model configurations
 from utils.data_pipeline import create_datasets, build_datasets   # Import dataset creation function
 
-# For brevity, create a dummy dataset.
+# For brevity, create a dummy dataset. # Actual data loading has now been implemented. This is a depreciated function.
 def create_dummy_dataset(num_samples=100, num_classes=3):
     images = tf.random.uniform(
         (num_samples, SC['MODEL_INPUT_IMAGE_HEIGHT'], SC['MODEL_INPUT_IMAGE_WIDTH'], SC['MODEL_INPUT_IMAGE_CHANNELS'])

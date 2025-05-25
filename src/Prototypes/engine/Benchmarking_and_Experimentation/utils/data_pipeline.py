@@ -565,7 +565,7 @@ def create_function_key(func, *args, **kwargs):
     return key, key_hash, partial_func
 
 if SC['USE_DISK_CACHE']:
-    cache = dc.Cache(SC['CACHE_DIRETORY'], cull_limit=0, size_limit=10**9)
+    cache = dc.Cache(SC['CACHE_DIRECTORY'], cull_limit=0, size_limit=10**9)
 else:
     cache = None 
 
@@ -767,116 +767,7 @@ def build_datasets(train_ds, val_ds, test_ds, class_names_list, model_name="Effi
 
     return train_dataset, validation_dataset, test_dataset
 
-
-
-'''def build_datasets(train_ds, val_ds, test_ds, class_names_list, model_name="EfficientNetV2B0"):
-    """
-    Creates training, validation, and test datasets with specified data pipeline transformations.
-
-    Args:
-        train_ds (tf.data.Dataset): Initial training dataset (paths and labels).
-        val_ds (tf.data.Dataset): Initial validation dataset (paths and labels).
-        test_ds (tf.data.Dataset): Initial test dataset (paths and labels).
-        class_names_list (list): List of class names. Used to set global for shape setter.
-        model_name (str, optional): Name of the model to determine expected input shape. Defaults to "EfficientNetV2B0".
-
-    Returns:
-        tuple: A tuple containing the processed training, validation, and test datasets.
-    """
-
-    print(f"Building datasets for {model_name}...")
-
-    # Set global class_names used by tensorflow_output_shape_setter
-    global class_names
-    class_names = class_names_list
-
-    # Get the length of the training dataset
-    len_train_ds = tf.data.experimental.cardinality(train_ds).numpy() # Use cardinality for TF Dataset
-    parallel_calls = tf.data.AUTOTUNE
-    cache_output_types = (tf.string, tf.float32, tf.int32, tf.string, tf.int32)
-    procs_output_types = (tf.float32, tf.float32, tf.int32, tf.string, tf.int32)
-
-    # --- Create partial functions with model_name ---
-    # For Python functions needing the wrapper
-    melspec_fn_partial = functools.partial(python_dataset_melspectro_pipeline, model_name=model_name)
-    # For TensorFlow functions (no wrapper needed)
-    shape_setter_partial = functools.partial(tensorflow_output_shape_setter, model_name=model_name)
-
-    # -----------------------------------------------
-
-    # Create the training dataset pipeline
-    train_dataset = (train_ds
-                     .shuffle(len_train_ds)
-                     .map(tensorflow_add_variant_and_cache, num_parallel_calls=parallel_calls)
-                     .map(functools.partial(python_fuction_wrapper, python_disk_cache_start, cache_output_types), num_parallel_calls=parallel_calls)
-                     .map(functools.partial(python_fuction_wrapper, python_load_and_decode_file, procs_output_types), num_parallel_calls=parallel_calls)
-                     .map(tensorflow_load_random_subsection, num_parallel_calls=parallel_calls)
-                     .map(functools.partial(python_fuction_wrapper, python_audio_augmentations, procs_output_types), num_parallel_calls=parallel_calls)
-                     # Use the partial melspec function with the wrapper
-                     .map(functools.partial(python_fuction_wrapper, melspec_fn_partial, procs_output_types), num_parallel_calls=parallel_calls)
-                     .map(tensorflow_reshape_image_pipeline, num_parallel_calls=parallel_calls)
-                     .map(tensorflow_image_augmentations, num_parallel_calls=parallel_calls) # Assuming this is TF compatible
-                     .map(functools.partial(python_fuction_wrapper, python_disk_cache_end, procs_output_types), num_parallel_calls=parallel_calls)
-                     .cache() # Cache after processing before shape setting/dropping extras
-                     # Use the partial shape setter directly (it's a TF function)
-                     .map(shape_setter_partial, num_parallel_calls=parallel_calls)
-                     .map(tensorflow_drop_variant_and_cache, num_parallel_calls=parallel_calls)
-                     .batch(SC['CLASSIFIER_BATCH_SIZE'])
-                     .prefetch(parallel_calls)
-                     # Removed repeat(count=1) as it's usually not needed with model.fit epochs
-                     )
-    
-    print(f"Train dataset size: {len(train_dataset)}")
-
-    # Create the validation dataset pipeline (no audio/image augmentation)
-    validation_dataset = (val_ds
-                          .map(tensorflow_add_variant_and_cache, num_parallel_calls=parallel_calls)
-                          .map(functools.partial(python_fuction_wrapper, python_disk_cache_start, cache_output_types), num_parallel_calls=parallel_calls)
-                          .map(functools.partial(python_fuction_wrapper, python_load_and_decode_file, procs_output_types), num_parallel_calls=parallel_calls)
-                          .map(tensorflow_load_random_subsection, num_parallel_calls=parallel_calls)
-                          # Use the partial melspec function with the wrapper
-                          .map(functools.partial(python_fuction_wrapper, melspec_fn_partial, procs_output_types), num_parallel_calls=parallel_calls)
-                          .map(tensorflow_reshape_image_pipeline, num_parallel_calls=parallel_calls)
-                          # No image augmentation for validation
-                          .map(functools.partial(python_fuction_wrapper, python_disk_cache_end, procs_output_types), num_parallel_calls=parallel_calls)
-                          .cache()  # Use TensorFlow's in-memory cache
-                          # Use the partial shape setter directly
-                          .map(shape_setter_partial, num_parallel_calls=parallel_calls)
-                          .map(tensorflow_drop_variant_and_cache, num_parallel_calls=parallel_calls)
-                          .batch(SC['CLASSIFIER_BATCH_SIZE'])
-                          .prefetch(parallel_calls)
-                          # Removed repeat(count=1)
-                          )
-    
-    print(f"Validation dataset size: {len(validation_dataset)}")
-
-    # Create the test dataset pipeline (no audio/image augmentation)
-    test_dataset = (test_ds
-                    .map(tensorflow_add_variant_and_cache, num_parallel_calls=parallel_calls)
-                    .map(functools.partial(python_fuction_wrapper, python_disk_cache_start, cache_output_types), num_parallel_calls=parallel_calls)
-                    .map(functools.partial(python_fuction_wrapper, python_load_and_decode_file, procs_output_types), num_parallel_calls=parallel_calls)
-                    .map(tensorflow_load_random_subsection, num_parallel_calls=parallel_calls)
-                    # Use the partial melspec function with the wrapper
-                    .map(functools.partial(python_fuction_wrapper, melspec_fn_partial, procs_output_types), num_parallel_calls=parallel_calls)
-                    .map(tensorflow_reshape_image_pipeline, num_parallel_calls=parallel_calls)
-                    # No image augmentation for test
-                    .map(functools.partial(python_fuction_wrapper, python_disk_cache_end, procs_output_types), num_parallel_calls=parallel_calls)
-                    # Cache is optional for test set, depends on memory/repeated evaluation needs
-                    # .cache()
-                    # Use the partial shape setter directly
-                    .map(shape_setter_partial, num_parallel_calls=parallel_calls)
-                    .map(tensorflow_drop_variant_and_cache, num_parallel_calls=parallel_calls)
-                    .batch(SC['CLASSIFIER_BATCH_SIZE'])
-                    .prefetch(parallel_calls)
-                    # Removed repeat(count=1)
-                    )
-    
-    print(f"Test dataset size: {len(test_dataset)}")
-    print("Datasets built successfully!")
-
-    return train_dataset, validation_dataset, test_dataset'''
-
-
+# Example usage
 
 if __name__ == "__main__":
     # Create datasets
