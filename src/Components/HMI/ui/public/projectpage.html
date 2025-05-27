@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Echo | Projects</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+  <!-- Font Awesome -->
+  <script src="https://kit.fontawesome.com/8aa980d912.js" crossorigin="anonymous"></script>
+
+  <!-- Axios -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+  <!-- Custom Echo Styles (if used in your index.html) -->
+  <link rel="stylesheet" href="./css/HMI_style.css" />
+  <link rel="stylesheet" href="./css/HMI.css" />
+  <link rel="stylesheet" href="./css/HMI-menu.css" />
+  <link rel="stylesheet" href="./css/HMI-controls.css" />
+  <link rel="stylesheet" href="./css/HMI-audio.css" />
+  <link rel="stylesheet" href="./css/HMI-weather.css" />
+  <link rel="stylesheet" href="./css/nodes.css" />
+</head>
+
+<body class="bg-dark text-white">
+  <div class="container py-5">
+
+    <!-- Header -->
+    <div class="text-center mb-4">
+      <h1 class="display-4 fw-bold text-light">
+        <i class="fas fa-folder-open text-warning me-2"></i>Projects Dashboard
+      </h1>
+      <p class="text-secondary fs-5">Manage your IoT node-based project groups easily.</p>
+    </div>
+
+    <!-- Add Project Button -->
+    <div class="text-center mb-4">
+      <button class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#addProjectModal">
+        <i class="fas fa-plus-circle me-2"></i>Add Project
+      </button>
+    </div>
+
+    <!-- Existing Projects Card -->
+    <div class="card bg-secondary bg-opacity-10 border-light shadow-lg text-light">
+      <div class="card-header bg-dark border-bottom border-secondary">
+        <h5 class="mb-0">Existing Projects</h5>
+      </div>
+      <ul class="list-group list-group-flush" id="projectList">
+        <!-- Projects will load here -->
+      </ul>
+    </div>
+
+    <!-- Add Project Modal -->
+    <div class="modal fade" id="addProjectModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <form id="projectForm" class="modal-content bg-dark text-light border-secondary">
+          <div class="modal-header">
+            <h5 class="modal-title">Add New Project</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">Project Name</label>
+              <input type="text" class="form-control" name="name" required />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Description</label>
+              <textarea class="form-control" name="description" rows="3" required></textarea>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Select IoT Nodes</label>
+              <select class="form-select" name="nodes" id="nodeSelect" multiple required></select>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-success">Save Project</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bootstrap JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- JavaScript to handle form logic -->
+  <script>
+    // Load IoT Nodes
+    async function loadNodes() {
+      try {
+        const res = await axios.get("http://127.0.0.1:8000/nodes");
+        const nodeSelect = document.getElementById("nodeSelect");
+        nodeSelect.innerHTML = '';
+        res.data.forEach(node => {
+          const option = document.createElement("option");
+          option.value = node._id;
+          option.textContent = `${node.name} | ${node.type} | (${node.location.latitude}, ${node.location.longitude})`;
+          nodeSelect.appendChild(option);
+        });
+      } catch (error) {
+        console.error("Error fetching nodes:", error);
+      }
+    }
+
+    // Load Projects
+    async function loadProjects() {
+      try {
+        const res = await axios.get("http://127.0.0.1:8000/api/projects");
+        const list = document.getElementById("projectList");
+        list.innerHTML = '';
+        res.data.forEach(project => {
+          const item = document.createElement("li");
+          item.className = "list-group-item bg-dark text-white border-bottom border-secondary";
+          item.innerHTML = `<strong>${project.name}</strong><br><small>${project.description}</small>`;
+          list.appendChild(item);
+        });
+      } catch (error) {
+        console.error("Error loading projects:", error);
+      }
+    }
+
+    // Handle form submission
+    document.getElementById("projectForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      const name = form.name.value.trim();
+      const description = form.description.value.trim();
+      const node_ids = Array.from(form.nodes.selectedOptions).map(opt => opt.value);
+
+      try {
+        await axios.post("http://127.0.0.1:8000/api/projects", {
+          name,
+          description,
+          node_ids
+        });
+        bootstrap.Modal.getInstance(document.getElementById("addProjectModal")).hide();
+        form.reset();
+        loadProjects();
+      } catch (error) {
+        alert("Failed to create project.");
+        console.error(error);
+      }
+    });
+
+    // Initialize
+    loadNodes();
+    loadProjects();
+  </script>
+</body>
+</html>
