@@ -1,0 +1,50 @@
+[
+  {
+    "_id": "node001",
+    "name": "Alpha Node",
+    "type": "Sensor",
+    "model": "Model-X1",
+    "location": {
+      "latitude": -33.1234,
+      "longitude": 150.5678
+    },
+    "customProperties": {
+      "region": "North",
+      "active": "true"
+    },
+    "components": [
+      {
+        "type": "Microphone",
+        "model": "MicPro",
+        "customProperties": {
+          "sensitivity": "high"
+        }
+      }
+    ],
+    "connectedNodes": []
+  },
+  {
+    "_id": "node002",
+    "name": "Beta Node",
+    "type": "Sensor",
+    "model": "Model-Y2",
+    "location": {
+      "latitude": -33.5678,
+      "longitude": 150.9876
+    },
+    "customProperties": {
+      "region": "South",
+      "active": "true"
+    },
+    "components": [
+      {
+        "type": "Camera",
+        "model": "CamLite",
+        "customProperties": {
+          "resolution": "1080p"
+        }
+      }
+    ],
+    "connectedNodes": []
+  }
+]
