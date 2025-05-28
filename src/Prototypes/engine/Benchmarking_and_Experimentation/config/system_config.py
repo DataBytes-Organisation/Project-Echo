@@ -1,6 +1,6 @@
 # Configuration parameters (update paths as needed)
 SC = {
-    'AUDIO_DATA_DIRECTORY': r"D:\Echo\Audio_data",  # set your audio data directory here
+    'AUDIO_DATA_DIRECTORY': r"D:\Users\Moiz\Documents\Github\data",  # set your audio data directory here
     'CACHE_DIRECTORY': r"D:\Echo\Training_cache",
     'OUTPUT_DIRECTORY': r"D:\Echo\Output",
 
@@ -13,6 +13,8 @@ SC = {
     'AUDIO_FMAX': 13000,
     'AUDIO_TOP_DB': 80,
     'AUDIO_WINDOW': None,
+    'AUDIO_AUGMENTATION': 'none',
+    'IMAGE_AUGMENTATION': 'none',
 
     'MODEL_INPUT_IMAGE_WIDTH': 260,
     'MODEL_INPUT_IMAGE_HEIGHT': 260,
