@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Approved Requests</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .approved-heading {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 28px;
+      font-family: 'Stick No Bills', sans-serif;
+      color: rgba(247, 186, 206, 1);
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .popup-card {
+      background-color: #1a1a1a;
+      padding: 30px;
+      border-radius: 15px;
+      color: rgba(247, 186, 206, 1);
+      box-shadow: 0 10px 25px rgba(247, 186, 206, 0.3);
+      width: 90%;
+      max-width: 500px;
+      text-align: center;
+    }
+
+    .popup-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+
+    .popup-buttons button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .approve-btn {
+      background-color: #2ecc71;
+      color: white;
+    }
+
+    .decline-btn {
+      background-color: #e74c3c;
+      color: white;
+    }
+
+    #reviewStatus {
+      text-align: center;
+      margin-top: 15px;
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    .review-box {
+      position: relative;
+      background: #111;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      color: white;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+    }
+
+    .delete-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #ff5c5c;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 25px;
+      height: 25px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="approved-heading">✅ Approved User Requests</h1>
+    <div id="reviewStatus"></div>
+    <div id="approvedContainer"></div>
+  </div>
+
+  <div class="popup-overlay" id="popupOverlay">
+    <div class="popup-card">
+      <h2>Review New Request</h2>
+      <p><strong>Animal ID:</strong> <span id="popupAnimalId"></span></p>
+      <p><strong>Section:</strong> <span id="popupSection"></span></p>
+      <p><strong>Suggestion:</strong></p>
+      <p id="popupSuggestion" style="white-space: pre-wrap;"></p>
+      <div class="popup-buttons">
+        <button class="approve-btn" onclick="approvePopup()">Accept</button>
+        <button class="decline-btn" onclick="declinePopup()">Decline</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentRequest = null;
+
+    function showPopup(request) {
+      currentRequest = request;
+      document.getElementById('popupAnimalId').textContent = request.animalId;
+      document.getElementById('popupSection').textContent = request.section;
+      document.getElementById('popupSuggestion').textContent = request.suggestion;
+      document.getElementById('popupOverlay').style.display = 'flex';
+      document.getElementById('reviewStatus').innerHTML = "⏳ Result pending...";
+    }
+
+    function closePopup() {
+      currentRequest = null;
+      document.getElementById('popupOverlay').style.display = 'none';
+    }
+
+    function approvePopup() {
+      if (currentRequest) {
+        const approvedRequests = JSON.parse(localStorage.getItem('approvedRequests') || '[]');
+        approvedRequests.push({
+          ...currentRequest,
+          status: 'Approved',
+          timestamp: new Date().toLocaleString()
+        });
+        localStorage.setItem('approvedRequests', JSON.stringify(approvedRequests));
+        localStorage.setItem("feedbackMessage", "🎉 Hurray! Request Accepted");
+        localStorage.removeItem('pendingRequest');
+        window.location.href = "index.html";
+      }
+    }
+
+    function declinePopup() {
+      localStorage.setItem("feedbackMessage", "😥 Oops! Request Not Accepted");
+      localStorage.removeItem('pendingRequest');
+      window.location.href = "index.html";
+    }
+
+    function deleteRequest(index) {
+      const approved = JSON.parse(localStorage.getItem('approvedRequests') || '[]');
+      approved.splice(index, 1);
+      localStorage.setItem('approvedRequests', JSON.stringify(approved));
+      displayApprovedRequests();
+    }
+
+    function displayApprovedRequests() {
+      const container = document.getElementById('approvedContainer');
+      container.innerHTML = '';
+      const approved = JSON.parse(localStorage.getItem('approvedRequests') || '[]');
+
+      if (approved.length === 0) {
+        container.innerHTML = '<div class="no-data">No approved requests yet.</div>';
+        return;
+      }
+
+      approved.forEach((req, index) => {
+        const box = document.createElement('div');
+        box.className = 'review-box';
+        box.innerHTML = `
+          <button class="delete-btn" onclick="deleteRequest(${index})">×</button>
+          <h2>Request Accepted</h2>
+          <label>Animal Identifier:</label>
+          <input type="text" value="${req.animalId}" readonly />
+
+          <label>Section:</label>
+          <input type="text" value="${req.section}" readonly />
+
+          <label>Suggestion:</label>
+          <textarea rows="4" readonly>${req.suggestion}</textarea>
+
+          <label>Status:</label>
+          <input type="text" value="${req.status}" readonly />
+
+          <label>Submitted:</label>
+          <input type="text" value="${req.timestamp}" readonly />
+        `;
+        container.appendChild(box);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const pending = localStorage.getItem('pendingRequest');
+      if (pending) {
+        const newRequest = JSON.parse(pending);
+        showPopup(newRequest);
+      }
+      displayApprovedRequests();
+    });
+  </script>
+</body>
+</html>

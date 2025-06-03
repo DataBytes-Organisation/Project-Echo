@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>User Request Form</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    #popupOverlay, #feedbackPopup {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .popup-card {
+      background-color: #1a1a1a;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 10px 25px rgba(247, 186, 206, 0.3);
+      color: rgba(247, 186, 206, 1);
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+    }
+
+    .popup-card h2 {
+      margin-bottom: 10px;
+      font-size: 24px;
+    }
+
+    .popup-card button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      background-color: #f7bad0;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="form-card">
+      <h1>User Request Form</h1>
+      <p class="subtitle">Suggest updates to the animal Summary or Description</p>
+
+      <form id="requestForm">
+        <label for="animalId">🐾 Animal Identifier:</label>
+        <input type="text" id="animalId" name="animalId" placeholder="Enter Animal ID" required>
+
+        <label for="section">📄 Section to Update:</label>
+        <select id="section" name="section" required>
+          <option value="">-- Select Section --</option>
+          <option value="Summary">Summary</option>
+          <option value="Description">Description</option>
+        </select>
+
+        <label for="suggestion">💬 Suggested Changes:</label>
+        <textarea id="suggestion" name="suggestion" placeholder="Enter your proposed changes..." rows="5" required></textarea>
+
+        <button type="submit">Submit for Review</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Popup after form submission -->
+  <div id="popupOverlay">
+    <div class="popup-card">
+      <h2>✅ Submitted!</h2>
+      <p>Your request is under review.<br><strong>Result pending...</strong></p>
+      <button onclick="closePopup()">Close</button>
+    </div>
+  </div>
+
+  <!-- Feedback popup from approval page -->
+  <div id="feedbackPopup">
+    <div class="popup-card">
+      <h2 id="feedbackMessage"></h2>
+      <p>Thanks for reviewing the request.</p>
+      <button onclick="closeFeedback()">Close</button>
+    </div>
+  </div>
+
+  <script>
+    // Show feedback popup if redirected from approved.html
+    document.addEventListener('DOMContentLoaded', () => {
+      const feedback = localStorage.getItem("feedbackMessage");
+      if (feedback) {
+        document.getElementById("feedbackMessage").textContent = feedback;
+        document.getElementById("feedbackPopup").style.display = "flex";
+        localStorage.removeItem("feedbackMessage");
+      }
+    });
+
+    function closePopup() {
+      document.getElementById("popupOverlay").style.display = "none";
+    }
+
+    function closeFeedback() {
+      document.getElementById("feedbackPopup").style.display = "none";
+    }
+
+    document.getElementById("requestForm").addEventListener("submit", function(event) {
+      event.preventDefault();
+
+      const animalId = document.getElementById("animalId").value;
+      const section = document.getElementById("section").value;
+      const suggestion = document.getElementById("suggestion").value;
+
+      const pendingRequest = {
+        animalId,
+        section,
+        suggestion
+      };
+
+      localStorage.setItem("pendingRequest", JSON.stringify(pendingRequest));
+      document.getElementById("popupOverlay").style.display = "flex";
+
+      event.target.reset();
+    });
+  </script>
+</body>
+</html>
