@@ -36,9 +36,9 @@
                     }
                 }
             },
-            "handler": function (response) {
-                alert(response.razorpay_payment_id);
-            },
+            //"handler": function (response) {
+            //    alert(response.razorpay_payment_id);
+            //},
 
 
             "modal": {
@@ -46,13 +46,27 @@
                     paymentcancel();
                 }
             },
-            "handler":
-                function (response) {
-                    if (response.razorpay_payment_id) {
-                        //payment sucessfull
-                    }
+            "handler": function (response) {
+                alert("Payment Success: " + response.razorpay_payment_id); // merged from both
 
-                }
+                fetch('/api/save-razorpay-payment', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        paymentId: response.razorpay_payment_id,
+                        name: options.prefill.name,
+                        email: options.prefill.email,
+                        amount: options.amount / 100,
+                        currency: options.currency,
+                        method: "Razorpay"
+                    })
+                })
+                .then(res => res.json())
+                .then(data => console.log('✅ Donation saved:', data))
+                .catch(err => console.error('❌ Error saving donation:', err));
+            }
+
+                
         };
         return options;
     }
