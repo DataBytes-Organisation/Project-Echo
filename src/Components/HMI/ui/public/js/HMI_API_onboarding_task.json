@@ -552,23 +552,48 @@
         },
         {
             "Bird": "Artamus minor",
-            "description": []
+            "description": [        
+              "They are known for their striking blue-grey plumage, which makes them easy to spot.",
+              "These birds are highly social and feed in large flocks, often flying in complex formations.",
+              "Little woodswallows build cup-shaped nests in trees and shrubs, using grasses, bark, and feathers.",
+              "They are also known for their beautiful and melodic songs, which they use to attract mates during the breeding season."
+            ]
         },
         {
             "Bird": "Artamus superciliosus",
-            "description": []
+            "description": [
+              "They are known for their distinctive black and white plumage, with a white eyebrow stripe above the eye.",
+              "These birds can be found in wide range of habitats because of their greater adaptability, including as semi-arid regions, savannas, and woodlands.",
+              "White-browed woodswallows are social birds and often feed in flocks of several hundred individuals.",
+              "They are known to be long-distance migrators and can travel hundreds of kilometers during the non-breeding season."
+            ]
         },
         {
             "Bird": "Atrapsalta encaustica",
-            "description": []
+            "description": [
+              "They are known for their distinctive vocalizations, which can reach up to 120 decibels.",
+              "Black Squeakers are often found in woodlands and forests, where they feed on sap and plant fluids.",
+              "They spend most of their life underground as nymphs, before emerging as adults during the warmer months.",
+              "These cicadas play an important ecological role by providing a food source for many bird and mammal species."
+            ]
         },
         {
             "Bird": "Auscala spinosa",
-            "description": []
+            "description": [
+              "They are known for their creaking, rattling calls, which sound like two pieces of hard wood being rubbed together.",
+              "These cicadas are often found in forests and woodlands, where they feed on sap and plant fluids.",
+              "Creaking Branch Cicadas spend most of their life underground as nymphs, before emerging as adults during the warmer months.",
+              "These cicadas are important for ecosystem health, as they help to recycle nutrients and provide food for many bird and mammal species."
+            ]
         },
         {
             "Bird": "Austrochaperina pluvialis",
-            "description": []
+            "description": [
+              "They are named after their distinct white eyebrow-like markings above their eyes.",
+              "These frogs are known for their loud and high-pitched whistling calls that they use to communicate with other frogs.",
+              "Unlike most other frogs, this species lays their eggs on land instead of in water.",
+              "The whitebrowed whistle frog are currently not considered a vulnerable species."
+            ]
         },
         {
             "Bird": "Austronomus australis",
