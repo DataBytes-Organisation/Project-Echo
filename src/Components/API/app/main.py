@@ -5,6 +5,7 @@ from .routers import add_csv_output_option, audio_upload_router
 from fastapi import FastAPI, Body, HTTPException, status, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import species_predictor
+from app.routers import auth_router
 from fastapi.responses import Response, JSONResponse
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel, Field, EmailStr
@@ -12,6 +13,8 @@ from bson import ObjectId
 from typing import Optional, List
 import datetime
 import pymongo
+import json 
+
 
 # from .routers import hmi, engine, sim
 app = FastAPI()
@@ -67,21 +70,14 @@ app.include_router(iot.router, tags=['iot'], prefix='/iot')
 app.include_router(species_predictor.router, tags=["predict"])
 
 
-<<<<<<< HEAD
-# Root endpoint
-=======
 
 # ✅ Root endpoint
->>>>>>> c2e206ca2fbbfc354570676519501aee3cc2725a
 @app.get("/", response_description="API Root")
 def show_home():
     return 'Welcome to echo api, move to /docs for more'
     return 'Welcome to Project Echo API. Visit /docs for interactive documentation.'
 
-<<<<<<< HEAD
 app.include_router(auth_router.router, tags=["auth"], prefix="/api")
-=======
-import os  # ✅ Ensure this is already imported at the top
 
 # ✅ /openapi-export - fetch live OpenAPI spec
 @app.get("/openapi-export", include_in_schema=False)
@@ -123,4 +119,3 @@ def export_openapi_to_file():
 
 export_openapi_to_file()
 
->>>>>>> c2e206ca2fbbfc354570676519501aee3cc2725a
