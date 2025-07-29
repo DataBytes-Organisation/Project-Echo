@@ -121,23 +121,43 @@
     },
     {
         "Bird": "Anthochaera carunculata",
-        "description": []
+        "description": [
+            "Common Name: Red Wattlebird.",
+            "Large, noisy honeyeater native to southern Australia, easily recognised by the red wattles on its face.",
+            "Feeds mainly on nectar, but also eats insects and fruit, and is often aggressive around food sources."
+        ]
     },
     {
         "Bird": "Anthus novaeseelandiae",
-        "description": []
+        "description": [
+            "Common Name: Australasian Pipit.",
+            "A small, ground-dwelling bird found in open grassy habitats across Australia and New Zealand.",
+            "Has a slender build with streaked brown plumage and constantly pumps its tail when walking."
+        ]
     },
     {
         "Bird": "Antigone antigone",
-        "description": []
+        "description": [
+            "Common Name: Sarus Crane.",
+            "The world’s tallest flying bird, known for its elegant walk and loud trumpeting calls.",
+            "Mostly found in wetlands and grasslands, often forming lifelong pair bonds."
+        ]
     },
     {
         "Bird": "Antigone rubicunda",
-        "description": []
+        "description": [
+            "Common Name: Brolga.",
+            "Large, grey crane native to Australia, famous for its beautiful and elaborate mating dance.",
+            "Inhabits wetland areas and feeds on plants, insects, and small animals."
+        ]
     },
     {
         "Bird": "Aphelocephala leucopsis",
-        "description": []
+        "description": [
+            "Common Name: Southern Whiteface.",
+            "A small bird native to Australia, easily identified by its distinctive white face and grey-brown body.",
+            "Lives in dry woodlands and feeds mainly on seeds and insects."
+        ]
     },
     {
         "Bird": "ApocritaÂ sp.",
