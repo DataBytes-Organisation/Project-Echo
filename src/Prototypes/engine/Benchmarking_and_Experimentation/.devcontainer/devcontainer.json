@@ -1,0 +1,73 @@
+{
+    "name": "Project Echo - Benchmarking Framework",
+    "image": "tensorflow/tensorflow:2.10.0-gpu-jupyter",
+    
+    "features": {
+        "ghcr.io/devcontainers/features/python:1": {
+            "version": "3.9",
+            "installTools": true
+        }
+    },
+    
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-python.vscode-pylance",
+                "ms-toolsai.jupyter",
+                "ms-toolsai.jupyter-keymap",
+                "ms-toolsai.jupyter-renderers",
+                "ms-python.black-formatter",
+                "ms-python.isort",
+                "ms-python.flake8",
+                "GitHub.copilot",
+                "GitHub.copilot-chat"
+            ],
+            "settings": {
+                "python.defaultInterpreterPath": "/usr/bin/python3",
+                "python.linting.enabled": true,
+                "python.linting.pylintEnabled": false,
+                "python.linting.flake8Enabled": true,
+                "python.formatting.provider": "black",
+                "jupyter.askForKernelRestart": false,
+                "jupyter.interactiveWindow.textEditor.executeSelection": true
+            }
+        }
+    },
+    
+    "forwardPorts": [8888, 6006],
+    "portsAttributes": {
+        "8888": {
+            "label": "Jupyter Notebook",
+            "onAutoForward": "notify"
+        },
+        "6006": {
+            "label": "TensorBoard",
+            "onAutoForward": "notify"
+        }
+    },
+    
+    "postCreateCommand": "bash .devcontainer/setup.sh",
+    
+    "remoteUser": "root",
+    
+    "mounts": [
+        "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+        "source=project-echo-cache,target=/tmp/cache,type=volume",
+        "source=project-echo-data,target=/workspace/data,type=volume"
+    ],
+    
+    "workspaceFolder": "/workspace",
+    
+    "runArgs": [
+        "--gpus=all",
+        "--shm-size=4g"
+    ],
+    
+    "containerEnv": {
+        "PYTHONPATH": "/workspace/src:/workspace",
+        "PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION": "python",
+        "GCLOUD_PROJECT": "sit-23t1-project-echo-25288b9",
+        "TF_ENABLE_ONEDNN_OPTS": "0"
+    }
+}
