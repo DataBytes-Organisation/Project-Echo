@@ -22,21 +22,28 @@ async function addIoTNodesToMap(hmiState) {
             source: new ol.source.Vector(),
             style: function(feature) {
                 const type = feature.get('type');
-                const iconHtml = type === 'master' ? '<i class="fas fa-broadcast-tower"></i>' : '<i class="fas fa-microphone"></i>';
-                const color = type === 'master' ? '#ff4444' : '#4CAF50';
-                
-                return new ol.style.Style({
-                    image: new ol.style.Icon({
-                        src: `data:image/svg+xml;charset=utf-8,${encodeURIComponent(
-                            `<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-                                <rect width="32" height="32" fill="${color}" rx="16"/>
-                                <text x="16" y="16" fill="white" font-family="FontAwesome" font-size="16" text-anchor="middle" dominant-baseline="central">
-                                    ${type === 'master' ? '\uf519' : '\uf130'}
-                                </text>
-                            </svg>`
-                        )}`
+                const iconSrc = type === 'master' ? 'images/nodes/master-node.svg' : 'images/nodes/microchip-solid.svg';
+                const circleColor = type === 'master' ? '#ff4444' : '#4CAF50';
+
+                return [
+                    // Background circle
+                    new ol.style.Style({
+                        image: new ol.style.Circle({
+                            radius: 23,
+                            fill: new ol.style.Fill({ color: circleColor }),
+                        })
                     }),
-                });
+                    // Icon on top
+                    new ol.style.Style({
+                        image: new ol.style.Icon({
+                            src: iconSrc,
+                            scale: 0.05,
+                            anchor: [0.5, 0.5],
+                            anchorXUnits: 'fraction',
+                            anchorYUnits: 'fraction'
+                        })
+                    })
+                ];
             }
         });
 
@@ -47,9 +54,12 @@ async function addIoTNodesToMap(hmiState) {
                     node.location.longitude,
                     node.location.latitude
                 ])),
+                lat: node.location.latitude,
+                lon: node.location.longitude,
                 type: node.type,
                 name: node.name,
-                model: node.model
+                model: node.model,
+                isNode: true
             });
 
             feature.setId(node._id);

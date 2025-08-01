@@ -1074,6 +1074,8 @@ function createMapClickEvent(hmiState){
     let default_content = $("#animal-default-content");
     let active_mic_content = $("#mic-popup-content");
     let default_mic_content = $("mic-default-content");
+    let default_node_content = $("#node-default-content");
+    let active_node_content = $("#node-popup-content");
     if (feature){
 
       let values = feature.getProperties();
@@ -1152,6 +1154,25 @@ function createMapClickEvent(hmiState){
         })
         
         document.dispatchEvent(toggled_mic);
+      }
+      if (values.isNode){
+        active_node_content.show();
+        default_node_content.hide();
+
+        document.getElementById("node_markup_loc_lat").innerHTML = values.lat;
+        document.getElementById("node_markup_loc_lon").innerHTML = values.lon;
+        document.getElementById("node_markup_name").innerHTML = values.name;
+        document.getElementById("node_markup_type").innerHTML = values.type;
+        document.getElementById("node_markup_model").innerHTML = values.model;
+
+        animal_toggled = true;
+        const toggled_node = new CustomEvent('nodeToggled',{
+          detail: {
+            message: "Node toggled:",
+          }
+        })
+
+        document.dispatchEvent(toggled_node);
       }
       else{
         // console.log('feature: ', feature);
@@ -1248,8 +1269,10 @@ function createMapClickEvent(hmiState){
     } else {
       active_content.hide();
       active_mic_content.hide();
+      active_node_content.hide();
       default_content.show();
       default_mic_content.show();
+      default_node_content.show();
     }
   });
 }
