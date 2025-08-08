@@ -212,3 +212,33 @@ $(function () {
   };
   new ApexCharts(document.querySelector("#visited"), visited).render();
 })
+// Fetch enquiries from backend and populate-table
+fetch("/api/enquiries")
+  .then(res => res.json())
+  .then(data => {
+    const tbody = document.getElementById("enquiry-table-body");
+    tbody.innerHTML = ""; // clear previous rows
+
+    data.forEach(e => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td class="border-bottom-0"><h6 class="fw-semibold mb-0">${e.username}</h6></td>
+        <td class="border-bottom-0">
+          <h6 class="fw-semibold mb-1">${e.userDetail}</h6>
+        </td>
+        <td class="border-bottom-0">
+          <p class="mb-0 fw-normal">${e.content}</p>
+        </td>
+        <td class="border-bottom-0">
+          <span class="badge ${e.category === 'Request' ? 'bg-secondary' : 'bg-success'}">${e.category}</span>
+        </td>
+        <td class="border-bottom-0">
+          <h6 class="fw-semibold mb-0 fs-4">${e.date}</h6>
+        </td>
+      `;
+      tbody.appendChild(row);
+    });
+  })
+  .catch(err => {
+    console.error("Failed to load enquiries:", err);
+  });
