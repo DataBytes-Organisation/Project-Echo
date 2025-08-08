@@ -9,6 +9,13 @@
     border-radius: 10px;
     box-shadow: 0 2px 4px rgba(0,0,0,.08);
     background-color: #fff;
+    margin-bottom: 20px; 
+}
+
+/* Specific card styling for profile and change password sections */
+.profile-card, .change-password-card {
+    max-width: 700px; 
+    margin: 0 auto; 
 }
 
 /* Card body padding */
@@ -80,7 +87,7 @@
     margin-bottom: 8px;
 }
 
-/* Form inputs and textarea */
+/* Form inputs and text area */
 .form-control {
     border-radius: 6px;
     border: 1px solid #e0e0e0;
@@ -125,6 +132,9 @@ textarea.form-control {
     padding: 12px 15px;
     margin-top: 15px;
     font-size: 14px;
+    max-width: 700px; 
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .alert-success {
@@ -161,5 +171,13 @@ textarea.form-control {
     .change-picture-btn, .delete-picture-btn {
         padding: 6px 12px;
         font-size: 12px;
+    }
+
+    .profile-card, .change-password-card {
+        max-width: 100%;
+    }
+
+    .alert {
+        max-width: 100%;
     }
 }
