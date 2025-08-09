@@ -141,11 +141,19 @@
     },
     {
         "Bird": "ApocritaÂ sp.",
-        "description": []
+        "description": ["Apocrita is a suborder of Hymenoptera, which includes ants, bees, and wasps.",
+                        "They are recognized by a narrow waist (petiole) separating thorax and abdomen.",
+                        "Members of Apocrita fulfill roles as pollinators, predators, and parasitoids.",
+                        "Many species in this group display advanced behaviors, including colony structures.",
+                        "They contribute significantly to ecosystem balance through pollination and pest control."]
     },
     {
         "Bird": "Aprosmictus erythropterus",
-        "description": []
+        "description": [ "Also known as the Red-winged Parrot, found in northern and eastern Australia.",
+                         "Males are bright green with red wing patches and a blue rump; females are duller.",
+                         "They feed on seeds, nectar, fruits, and blossoms in woodlands and savannas.",
+                         "Known for their swift flight and sharp, noisy calls.",
+                         "Nesting occurs in tree hollows, often in pairs or small flocks."]
     },
     {
         "Bird": "Aquila audax",
@@ -560,15 +568,27 @@
         },
         {
             "Bird": "Aquila audax",
-            "description": []
+            "description": ["Commonly called the Wedge-tailed Eagle, Australia's largest bird of prey.",
+                            "It features long, broad wings and a distinctive wedge-shaped tail.",
+                            "Feeds on live prey like rabbits and also scavenges carrion.",
+                            "Soars at high altitudes using thermals for gliding over long distances.",
+                            "Territorial birds that nest in tall trees or cliffs with large stick nests."]
         },
         {
             "Bird": "Artamus cinereus",
-            "description": []
+            "description": ["Known as the Black-faced Woodswallow, native to northern and inland Australia.",
+                            "Has a grey body with a black facial mask and pale-tipped tail.",
+                            "Feeds primarily on flying insects captured mid-air.",
+                            "Forms tight social groups and nests communally in tree forks or structures.",
+                            "Often seen huddling together to conserve heat in cooler weather."]
         },
         {
             "Bird": "Artamus cyanopterus",
-            "description": []
+            "description": ["Called the Dusky Woodswallow, found mainly in southeastern Australia.",
+                            "Has grey-brown plumage with a dark face and bluish wings.",
+                            "Feeds on insects in flight, often seen foraging in flocks.",
+                            "Roosts and breeds communally, showing cooperative nesting behavior.",
+                            "Prefers open woodlands, forest edges, and farmlands."]
         },
         {
             "Bird": "Artamus minor",
