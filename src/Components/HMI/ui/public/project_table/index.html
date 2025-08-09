@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Project Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      flex-direction: column;
+      gap: 40px;
+    }
+
+    .form-card {
+      max-width: 900px;
+    }
+
+    .project-table {
+      width: 100%;
+      margin-top: 20px;
+      background-color: rgba(10, 10, 25, 0.9);
+      border-radius: 10px;
+      box-shadow: 0 8px 25px rgba(247, 186, 206, 0.2);
+      overflow: hidden;
+    }
+
+    .project-table th,
+    .project-table td {
+      padding: 12px 20px;
+      text-align: left;
+      border-bottom: 1px solid #555;
+    }
+
+    .project-table th {
+      background-color: #2b2b2b;
+      color: rgba(247, 186, 206, 1);
+    }
+
+    .project-table tr:hover {
+      background-color: rgba(247, 186, 206, 0.1);
+      cursor: pointer;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      backdrop-filter: blur(3px);
+    }
+
+    .modal-content {
+      background: #1a1a1a;
+      padding: 35px 40px;
+      border-radius: 20px;
+      width: 95%;
+      max-width: 550px;
+      box-shadow: 0 12px 30px rgba(247, 186, 206, 0.3);
+      animation: fadeInScale 0.4s ease-in-out;
+      position: relative;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      cursor: pointer;
+      font-size: 24px;
+      color: #f7bad0;
+    }
+
+    .modal-content h2 {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-group label {
+      font-weight: bold;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1.5px solid #555;
+      background-color: #2b2b2b;
+      color: #fff;
+      font-size: 15px;
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      height: 80px;
+    }
+
+    .form-group select[multiple] {
+      height: 100px;
+    }
+
+    .form-group button {
+      margin-top: 10px;
+    }
+
+    #addProjectBtn {
+      margin-bottom: 20px;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(to right, #e48595, #f7bad0);
+      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
+      color: #000;
+      transition: background 0.3s ease;
+    }
+
+    #addProjectBtn:hover {
+      background: linear-gradient(to left, #e48595, #f7bad0);
+    }
+
+    #searchBar {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1.5px solid #555;
+      background-color: #2b2b2b;
+      color: white;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Project Dashboard</h1>
+    <div class="form-card">
+      <button id="addProjectBtn" onclick="openForm()">+ Add Project</button>
+      <input type="text" id="searchBar" placeholder="Search by project name or status..." />
+      <table class="project-table">
+        <thead>
+          <tr>
+            <th>Project ID</th>
+            <th>Project Name</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="projectBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Project Detail Modal -->
+  <div class="modal" id="projectModal">
+    <div class="modal-content">
+      <span class="modal-close" onclick="closeModal()">&times;</span>
+      <h2 id="modalTitle">Project Title</h2>
+      <p id="modalDetails">Details will appear here...</p>
+      <button onclick="closeModal()">Close</button>
+    </div>
+  </div>
+
+  <!-- Add Project Modal -->
+  <div class="modal" id="formModal">
+    <div class="modal-content">
+      <span class="modal-close" onclick="closeForm()">&times;</span>
+      <h2>Add New Project</h2>
+      <div class="form-group">
+        <label for="projectName">Project Name:</label>
+        <input type="text" id="projectName" placeholder="e.g. Smart Wildlife Sensor" />
+      </div>
+      <div class="form-group">
+        <label for="projectDesc">Project Description:</label>
+        <textarea id="projectDesc" placeholder="Brief overview of the project..."></textarea>
+      </div>
+      <div class="form-group">
+        <label for="iotNodes">Select IoT Nodes:</label>
+        <select id="iotNodes" multiple>
+          <option value="Camera">Camera</option>
+          <option value="GPS Tracker">GPS Tracker</option>
+          <option value="Temperature Sensor">Temperature Sensor</option>
+          <option value="Motion Detector">Motion Detector</option>
+          <option value="Microphone">Microphone</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="projectProgress">Project Progress:</label>
+        <select id="projectProgress">
+          <option value="Planning">Planning</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Completed">Completed</option>
+          <option value="On Hold">On Hold</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <button onclick="submitProject()">Submit</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const projects = [
+      { id: 1, name: "Wildlife Tracker", status: "Active", description: "Tracks wildlife movement in real-time." },
+      { id: 2, name: "Habitat Restoration", status: "Planning", description: "Restores habitats using AI." }
+    ];
+
+    const projectBody = document.getElementById("projectBody");
+    const modal = document.getElementById("projectModal");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalDetails = document.getElementById("modalDetails");
+    const searchBar = document.getElementById("searchBar");
+    const formModal = document.getElementById("formModal");
+
+    function displayProjects(filter = "") {
+      projectBody.innerHTML = "";
+      const filtered = projects.filter(p =>
+        p.name.toLowerCase().includes(filter.toLowerCase()) ||
+        p.status.toLowerCase().includes(filter.toLowerCase())
+      );
+      filtered.forEach(project => {
+        const row = document.createElement("tr");
+        row.innerHTML = `<td>${project.id}</td><td>${project.name}</td><td>${project.status}</td>`;
+        row.onclick = () => showDetails(project);
+        projectBody.appendChild(row);
+      });
+    }
+
+    function showDetails(project) {
+      modalTitle.textContent = project.name;
+      modalDetails.textContent = project.description;
+      modal.style.display = "flex";
+    }
+
+    function closeModal() {
+      modal.style.display = "none";
+    }
+
+    function openForm() {
+      formModal.style.display = "flex";
+    }
+
+    function closeForm() {
+      formModal.style.display = "none";
+    }
+
+    function submitProject() {
+      const name = document.getElementById("projectName").value;
+      const desc = document.getElementById("projectDesc").value;
+      const nodes = Array.from(document.getElementById("iotNodes").selectedOptions).map(opt => opt.value);
+      const progress = document.getElementById("projectProgress").value;
+      if (!name || !desc || nodes.length === 0 || !progress) {
+        alert("Please fill all fields and select at least one IoT node and project progress.");
+        return;
+      }
+      const newProject = {
+        id: projects.length + 1,
+        name,
+        status: progress,
+        description: `${desc}\n\nIoT Nodes: ${nodes.join(", ")}`
+      };
+      projects.push(newProject);
+      displayProjects();
+      closeForm();
+    }
+
+    searchBar.addEventListener("input", e => displayProjects(e.target.value));
+    window.onclick = e => {
+      if (e.target === modal) closeModal();
+      if (e.target === formModal) closeForm();
+    };
+
+    displayProjects();
+  </script>
+</body>
+</html>
