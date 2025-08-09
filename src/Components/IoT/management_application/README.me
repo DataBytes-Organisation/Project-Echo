@@ -1,0 +1,69 @@
+# Echo Device Management Application
+
+## Overview
+
+This project provides a comprehensive device management system for field-deployed Echo IoT devices. The system enables remote control, monitoring, audio capture, secure communication, and device onboarding through MQTT etc.
+
+## Setup and Usage
+
+### On Client Devices (e.g., EchoPi)
+
+Run `setup_py.sh` to:
+
+- Create a Python virtual environment.
+- Install dependencies (`psutil`, `sounddevice`, `numpy`, `requests`, `paho-mqtt`).
+- Generate SSH key pair with correct permissions.
+
+Then:
+
+- Run `onboarding_client.py` to perform MQTT-based device onboarding.
+- Run `client_pi.py` for main device management functions (SSH commands, health monitoring) once onboarding is complete and server side is listening.
+
+Audio is recorded and uploaded automatically or on command.
+
+---
+
+### On Server Side
+
+#### Onboarding Server (`onboarding_server.py`):
+- Listens for MQTT onboarding requests.
+- Updates `config/devices.json` with new device info.
+
+#### Flask Server (`server_main.py`):
+- Receives POST uploads of health data and audio files from devices.
+- Saves audio files to `uploads/`.
+
+**Note:** Ensure MQTT credentials and broker details are configured properly in server and client scripts.
+
+---
+
+
+## Dependencies
+- Python 3.x
+- psutil
+- sounddevice
+- numpy
+- requests
+- paho-mqtt
+- flask (server side)
+
+## Configuration
+
+Device information is stored in `config/devices.json` in the following format:
+
+```json
+[
+  {
+    "name": "EchoPi-01",
+    "ip": "192.168.1.119",
+    "username": "pi",
+    "key_path": "~/.ssh/id_rsa"
+  },
+  {
+    "name": "EchoPi-02",
+    "ip": "192.168.1.120",
+    "username": "pi",
+    "key_path": "~/.ssh/id_rsa"
+  }
+]
+

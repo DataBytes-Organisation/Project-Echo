@@ -1,0 +1,14 @@
+[
+  {
+    "name": "EchoPi-01",
+    "ip": "192.168.1.119",
+    "username": "pi",
+    "key_path": "~/.ssh/id_rsa"
+  },
+  {
+    "name": "EchoPi-02",
+    "ip": "192.168.2.001",
+    "username": "pi",
+    "key_path": "~/.ssh/id_rsa"
+  }
+]
