@@ -77,7 +77,6 @@ class Trainer:
 				all_labels.extend(labels.cpu().numpy())
 				all_predictions.extend(predicted.cpu().numpy())
 				
-				metrics_dict['train_loss'] = f'{loss.item():.4f}'
 				metrics_dict['phase'] = 'val'
 				pbar.set_postfix(metrics_dict)
 		
@@ -102,7 +101,7 @@ class Trainer:
 			train_loss, train_acc = self._train_one_epoch(pbar, metrics_dict)
 			val_loss, val_acc = self._evaluate(self.val_loader, pbar, metrics_dict)
 			
-			# metrics_dict['train_loss'] = f'{train_loss:.4f}'
+			metrics_dict['train_loss'] = f'{train_loss:.4f}'
 			metrics_dict['train_acc'] = f'{train_acc:.4f}'
 			metrics_dict['val_loss'] = f'{val_loss:.4f}'
 			metrics_dict['val_acc'] = f'{val_acc:.4f}'
