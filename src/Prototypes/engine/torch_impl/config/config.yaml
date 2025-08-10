@@ -7,8 +7,10 @@ hydra:
     dir: outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}
 
 system:
-  audio_data_directory: /home/newbee/prjs/ai/Project-Echo/src/Components/Store/d:\data\b3
-  cache_directory: /home/newbee/prjs/ai/Project-Echo/src/Prototypes/engine/Benchmarking_and_Experimentation/torch_impl/.cache
+  # audio_data_directory: /home/newbee/prjs/ai/Project-Echo/src/Components/Store/d:\data\b3
+  # cache_directory: /home/newbee/prjs/ai/Project-Echo/src/Prototypes/engine/torch_impl/.cache
+  audio_data_directory: /home/newbee/Projects/ai/Project-Echo/src/Components/Store/d:\data\b3
+  cache_directory: /home/newbee/Projects/ai/Project-Echo/src/Prototypes/engine/torch_impl/.cache
   use_disk_cache: True
 
 data:
@@ -26,13 +28,28 @@ data:
   num_classes: -1 # Should be inferred from data directory at runtime
   
 training:
-  batch_size: 16
+  batch_size: 2
   epochs: 50
   learning_rate: 1e-4
   num_workers: 4
-  # device: "cuda" # "cuda" or "cpu"
-  device: "cpu"
+  device: "cuda" # "cuda" or "cpu"
+  # device: "cpu"
   seed: 0
+  metric_mode: "min"
+
+  criterion:
+    _target_: torch.nn.CrossEntropyLoss
+
+  optimizer:
+    _target_: torch.optim.AdamW
+    lr: ${training.learning_rate}
+    weight_decay: 0.01
+
+  scheduler:
+    _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
+    mode: 'min'
+    factor: 0.1
+    patience: 10
 
 # Augmentation settings
 augmentations:
@@ -50,12 +67,10 @@ augmentations:
       - _target_: audiomentations.PitchShift
         min_semitones: -4
         max_semitones: 4
-        sample_rate: ${data.sample_rate}
         p: 0.2
       - _target_: audiomentations.Shift
         min_shift: -0.5
         max_shift: 0.5
-        sample_rate: ${data.sample_rate}
         p: 0.2
   
   image: # Spectrogram augmentations

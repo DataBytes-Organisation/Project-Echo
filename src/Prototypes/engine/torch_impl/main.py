@@ -1,14 +1,24 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
+
 from torch.utils.data import DataLoader, random_split
 import hydra
 from omegaconf import DictConfig, OmegaConf
 import os
 from pathlib import Path
+import copy
+import torch.ao.quantization as quant
+from torch.ao.quantization.quantize_fx import prepare_fx, convert_fx, prepare_qat_fx as prepare_qat_fx_
+from sklearn.metrics import f1_score, precision_score, recall_score, accuracy_score
+from tqdm import tqdm
+import numpy as np
 
 from dataset import SpectrogramDataset, index_directory
 from models import get_model
-from train import train_one_epoch, evaluate
+from train import Trainer
+
+from quant import fuse_model, prepare_qat_fx
 
 @hydra.main(config_path="config", config_name="config", version_base=None)
 def main(cfg: DictConfig):
@@ -29,20 +39,27 @@ def main(cfg: DictConfig):
 	val_size = int(cfg.data.val_split * dataset_size)
 	test_size = dataset_size - train_size - val_size
 	
-	indices = list(range(dataset_size))
+	indices = torch.tensor(list(range(dataset_size)))
 	# Note: for full reproducibility you might want to save/load the shuffled indices
 	torch.manual_seed(cfg.training.seed)
-	torch.random.shuffle(torch.as_tensor(indices))
+	shuffled_indices = torch.randperm(len(indices))
+	indices = indices[shuffled_indices]
+	# torch.random.shuffle(torch.as_tensor(indices))
 
 	train_indices = indices[:train_size]
 	val_indices = indices[train_size : train_size + val_size]
+	test_indices = indices[train_size + val_size:]
+
+	audio_transforms = hydra.utils.instantiate(cfg.augmentations.audio) if 'augmentations' in cfg and 'audio' in cfg.augmentations else None
+	image_transforms = hydra.utils.instantiate(cfg.augmentations.image) if 'augmentations' in cfg and 'image' in cfg.augmentations else None
 	
 	train_dataset = SpectrogramDataset(
 		[audio_files[i] for i in train_indices],
 		[labels[i] for i in train_indices],
 		cfg,
-		audio_transforms=get_audio_transforms(cfg),
-		image_transforms=get_image_transforms(cfg)
+		audio_transforms=audio_transforms,
+		image_transforms=image_transforms,
+		is_train=True,
 	)
 
 	val_dataset = SpectrogramDataset(
@@ -51,28 +68,55 @@ def main(cfg: DictConfig):
 		cfg, audio_transforms=None, image_transforms=None
 	)
 	
+	test_dataset = SpectrogramDataset(
+		[audio_files[i] for i in test_indices],
+		[labels[i] for i in test_indices],
+		cfg, audio_transforms=None, image_transforms=None
+	)
+	
 	train_loader = DataLoader(train_dataset, batch_size=cfg.training.batch_size, shuffle=True, num_workers=cfg.training.num_workers, pin_memory=True)
 	val_loader = DataLoader(val_dataset, batch_size=cfg.training.batch_size, shuffle=False, num_workers=cfg.training.num_workers, pin_memory=True)
+	test_loader = DataLoader(test_dataset, batch_size=cfg.training.batch_size, shuffle=False, num_workers=cfg.training.num_workers, pin_memory=True)
 
-	model = get_model(cfg).to(device)
-	criterion = nn.CrossEntropyLoss()
-	optimizer = torch.optim.Adam(model.parameters(), lr=cfg.training.learning_rate)
+	cfg.training.epochs = 15
 
-	best_val_acc = 0.0
-	output_dir = Path(hydra.core.hydra_config.HydraConfig.get().runtime.output_dir)
+	# --- Non-QAT EfficientNetV2-S ---
+	print("--- Training non-QAT EfficientNetV2-S ---")
+	cfg.model.name = 'efficientnetv2'
+	cfg.model.params.model_name = 'efficientnet_v2_s'
+	model_s = get_model(cfg).to(device)
+	trainer_s = Trainer(cfg, model_s, train_loader, val_loader, device, "EfficientNetV2-S")
+	trainer_s.train()
+	trainer_s.test(test_loader)
+	print("-" * 20)
 
-	for epoch in range(cfg.training.epochs):
-		train_loss, train_acc = train_one_epoch(model, train_loader, criterion, optimizer, device)
-		val_loss, val_acc = evaluate(model, val_loader, criterion, device)
-
-		print(f"Epoch {epoch+1}/{cfg.training.epochs}:")
-		print(f"  Train Loss: {train_loss:.4f}, Train Acc: {train_acc:.4f}")
-		print(f"  Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.4f}")
-
-		if val_acc > best_val_acc:
-			best_val_acc = val_acc
-			torch.save(model.state_dict(), output_dir / "best_model.pth")
-			print(f"  New best model saved to {output_dir / 'best_model.pth'}")
+	# --- QAT EfficientNetV2-S ---
+	print("\n--- Training QAT EfficientNetV2-S ---")
+	cfg.model.name = 'efficientnetv2'
+	cfg.model.params.model_name = 'efficientnet_v2_s'
+	model_s_qat_base = get_model(cfg)
+	model_s_qat_base.to('cpu')
+	fused_model = fuse_model(model_s_qat_base)
+	qat_model = prepare_qat_fx(fused_model)
+	
+	trainer_qat = Trainer(cfg, qat_model, train_loader, val_loader, device, "EfficientNetV2-S-QAT")
+	trainer_qat.train()
+	
+	# Manually test after converting
+	qat_model.load_state_dict(torch.load(trainer_qat.best_model_path))
+	quantized_model = convert_fx(qat_model.to('cpu'))
+	trainer_qat.test(test_loader, model_to_test=quantized_model, device='cpu')
+	print("-" * 20)
+	
+	# --- Non-QAT EfficientNetV2-M ---
+	# print("\n--- Training non-QAT EfficientNetV2-M ---")
+	# cfg.model.name = 'efficientnetv2'
+	# cfg.model.params.model_name = 'efficientnet_v2_m'
+	# model_m = get_model(cfg).to(device)
+	# trainer_m = Trainer(cfg, model_m, train_loader, val_loader, device)
+	# trainer_m.train()
+	# trainer_m.test(test_loader)
+	# print("-" * 20)
 
 if __name__ == "__main__":
 	main()
