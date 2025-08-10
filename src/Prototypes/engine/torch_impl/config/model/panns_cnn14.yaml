@@ -1,0 +1,9 @@
+name: panns_cnn14
+params:
+  sample_rate: ${data.sample_rate}
+  window_size: ${data.n_fft}
+  hop_size: ${data.hop_length}
+  mel_bins: ${data.n_mels}
+  fmin: ${data.fmin}
+  fmax: ${data.fmax}
+  classes_num: ${data.num_classes}
