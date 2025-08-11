@@ -1,4 +1,4 @@
-name: efficientnetv2
+name: efficientnet_v2
 params:
   model_name: "efficientnet_v2_s" # From torchvision
   pretrained: true

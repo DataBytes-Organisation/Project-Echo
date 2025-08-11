@@ -1,0 +1,6 @@
+name: efficientnet_v2_qat
+params:
+  model_name: "efficientnet_v2_s" 
+  pretrained: true
+  num_classes: ${data.num_classes}
+  use_qat: true

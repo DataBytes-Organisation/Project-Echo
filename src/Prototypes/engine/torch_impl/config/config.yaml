@@ -1,5 +1,5 @@
 defaults:
-  - model: efficientnetv2
+  - model: efficientnet_v2_qat
   - _self_
 
 hydra:
@@ -29,9 +29,9 @@ data:
   
 training:
   batch_size: 2
-  epochs: 50
+  epochs: 5
   learning_rate: 1e-4
-  num_workers: 4
+  num_workers: 8
   device: "cuda" # "cuda" or "cpu"
   # device: "cpu"
   seed: 0

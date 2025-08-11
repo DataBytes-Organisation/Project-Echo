@@ -8,14 +8,11 @@ from omegaconf import DictConfig, OmegaConf
 import os
 from pathlib import Path
 import copy
-import torch.ao.quantization as quant
-from torch.ao.quantization.quantize_fx import prepare_fx, convert_fx, prepare_qat_fx as prepare_qat_fx_
-from sklearn.metrics import f1_score, precision_score, recall_score, accuracy_score
 from tqdm import tqdm
 import numpy as np
 
 from dataset import SpectrogramDataset, index_directory
-from models import get_model
+from model import Model
 from train import Trainer
 
 from quant import fuse_model, prepare_qat_fx
@@ -47,8 +44,9 @@ def main(cfg: DictConfig):
 	# torch.random.shuffle(torch.as_tensor(indices))
 
 	train_indices = indices[:train_size]
-	val_indices = indices[train_size : train_size + val_size]
-	test_indices = indices[train_size + val_size:]
+	# val_indices = indices[train_size : train_size + val_size]
+	val_indices = indices[train_size:]
+	# test_indices = indices[train_size + val_size:]
 
 	audio_transforms = hydra.utils.instantiate(cfg.augmentations.audio) if 'augmentations' in cfg and 'audio' in cfg.augmentations else None
 	image_transforms = hydra.utils.instantiate(cfg.augmentations.image) if 'augmentations' in cfg and 'image' in cfg.augmentations else None
@@ -68,45 +66,52 @@ def main(cfg: DictConfig):
 		cfg, audio_transforms=None, image_transforms=None
 	)
 	
-	test_dataset = SpectrogramDataset(
-		[audio_files[i] for i in test_indices],
-		[labels[i] for i in test_indices],
-		cfg, audio_transforms=None, image_transforms=None
-	)
+	# test_dataset = SpectrogramDataset(
+	# 	[audio_files[i] for i in test_indices],
+	# 	[labels[i] for i in test_indices],
+	# 	cfg, audio_transforms=None, image_transforms=None
+	# )
 	
 	train_loader = DataLoader(train_dataset, batch_size=cfg.training.batch_size, shuffle=True, num_workers=cfg.training.num_workers, pin_memory=True)
 	val_loader = DataLoader(val_dataset, batch_size=cfg.training.batch_size, shuffle=False, num_workers=cfg.training.num_workers, pin_memory=True)
-	test_loader = DataLoader(test_dataset, batch_size=cfg.training.batch_size, shuffle=False, num_workers=cfg.training.num_workers, pin_memory=True)
+	# test_loader = DataLoader(test_dataset, batch_size=cfg.training.batch_size, shuffle=False, num_workers=cfg.training.num_workers, pin_memory=True)
 
-	cfg.training.epochs = 15
+	# cfg.training.epochs = 15
 
-	# --- Non-QAT EfficientNetV2-S ---
-	print("--- Training non-QAT EfficientNetV2-S ---")
-	cfg.model.name = 'efficientnetv2'
-	cfg.model.params.model_name = 'efficientnet_v2_s'
-	model_s = get_model(cfg).to(device)
-	trainer_s = Trainer(cfg, model_s, train_loader, val_loader, device, "EfficientNetV2-S")
-	trainer_s.train()
-	trainer_s.test(test_loader)
-	print("-" * 20)
+	model = Model(cfg).to(device)
+	trainer = Trainer(cfg, model, train_loader, val_loader, device, cfg.model.name)
+	trainer.train()
+	trainer.test(val_loader)
+	trainer.model.quantise()
+	trainer.test(val_loader)
 
-	# --- QAT EfficientNetV2-S ---
-	print("\n--- Training QAT EfficientNetV2-S ---")
-	cfg.model.name = 'efficientnetv2'
-	cfg.model.params.model_name = 'efficientnet_v2_s'
-	model_s_qat_base = get_model(cfg)
-	model_s_qat_base.to('cpu')
-	fused_model = fuse_model(model_s_qat_base)
-	qat_model = prepare_qat_fx(fused_model)
+	# # --- Non-QAT EfficientNetV2-S ---
+	# print("--- Training non-QAT EfficientNetV2-S ---")
+	# cfg.model.name = 'efficientnetv2'
+	# cfg.model.params.model_name = 'efficientnet_v2_s'
+	# model_s = get_model(cfg).to(device)
+	# trainer_s = Trainer(cfg, model_s, train_loader, val_loader, device, "EfficientNetV2-S")
+	# trainer_s.train()
+	# trainer_s.test(test_loader)
+	# print("-" * 20)
+
+	# # --- QAT EfficientNetV2-S ---
+	# print("\n--- Training QAT EfficientNetV2-S ---")
+	# cfg.model.name = 'efficientnetv2'
+	# cfg.model.params.model_name = 'efficientnet_v2_s'
+	# model_s_qat_base = get_model(cfg)
+	# model_s_qat_base.to('cpu')
+	# fused_model = fuse_model(model_s_qat_base)
+	# qat_model = prepare_qat_fx(fused_model)
 	
-	trainer_qat = Trainer(cfg, qat_model, train_loader, val_loader, device, "EfficientNetV2-S-QAT")
-	trainer_qat.train()
+	# trainer_qat = Trainer(cfg, qat_model, train_loader, val_loader, device, "EfficientNetV2-S-QAT")
+	# trainer_qat.train()
 	
-	# Manually test after converting
-	qat_model.load_state_dict(torch.load(trainer_qat.best_model_path))
-	quantized_model = convert_fx(qat_model.to('cpu'))
-	trainer_qat.test(test_loader, model_to_test=quantized_model, device='cpu')
-	print("-" * 20)
+	# # Manually test after converting
+	# qat_model.load_state_dict(torch.load(trainer_qat.best_model_path))
+	# quantized_model = convert_fx(qat_model.to('cpu'))
+	# trainer_qat.test(test_loader, model_to_test=quantized_model, device='cpu')
+	# print("-" * 20)
 	
 	# --- Non-QAT EfficientNetV2-M ---
 	# print("\n--- Training non-QAT EfficientNetV2-M ---")
