@@ -71,3 +71,98 @@
     align-items: center;
     margin-bottom: 1.5rem;
 }
+
+.notification-list {
+    max-height: 70vh;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.notification-item {
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+    border-left: 4px solid transparent;
+}
+
+.notification-item.unread {
+    background-color: #f8f9fa;
+    border-left-color: #0d6efd;
+}
+
+.notification-item:hover {
+    background-color: #f1f1f1;
+}
+
+.notification-icon {
+    font-size: 1.5rem;
+    color: #6c757d;
+    margin-right: 15px;
+}
+
+.notification-content {
+    flex: 1;
+}
+
+.notification-title {
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: #212529;
+}
+
+.notification-message {
+    color: #6c757d;
+    margin-bottom: 5px;
+}
+
+.notification-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.notification-time {
+    color: #adb5bd;
+}
+
+.notification-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.empty-notifications {
+    text-align: center;
+    padding: 40px 20px;
+    color: #6c757d;
+}
+
+.empty-notifications i {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    color: #dee2e6;
+}
+
+.empty-notifications h5 {
+    margin-bottom: 5px;
+}
+
+/* Custom scrollbar */
+.notification-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.notification-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.notification-list::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 10px;
+}
+
+.notification-list::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}

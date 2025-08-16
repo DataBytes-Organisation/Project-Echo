@@ -1,107 +1,201 @@
 $(document).ready(function() {
-    // Dummy notifications for testing
-    let notifications = [
-        {
-            id: 1,
-            message: "New donation received from Jon Doe",
-            date: new Date(),
-            read: false,
-            icon: "ti ti-receipt-2",
-            type: "donation"
-        },
-        {
-            id: 2,
-            message: "New request from Jon Doe",
-            date: new Date(Date.now() - 3600000), // 1 hour ago
-            read: false,
-            icon: "ti ti-alert-circle",
-            type: "request"
-        },
-        {
-            id: 3,
-            message: "New user registration: jondoe@example.com",
-            date: new Date(Date.now() - 172800000), // 2 days ago
-            read: false,
-            icon: "ti ti-user",
-            type: "user"
+    // Connect to Socket.io
+    const socket = io({
+        auth: {
+            token: localStorage.getItem('token') // Assuming JWT is stored here
         }
-    ];
+    });
 
-    // Render notifications
+    let notifications = [];
+    let unreadCount = 0;
+
+    // DOM Elements
+    const notificationList = $("#notification-list");
+    const unreadBadge = $("#unread-badge");
+    const markAllReadBtn = $("#mark-all-read");
+    const loadMoreBtn = $("#load-more");
+    let isLoading = false;
+    let offset = 0;
+    const limit = 10;
+
+    // Initialize
+    loadNotifications();
+    setupSocketListeners();
+    setupEventHandlers();
+
+    function loadNotifications() {
+        if (isLoading) return;
+
+        isLoading = true;
+        loadMoreBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Loading...');
+
+        $.ajax({
+            url: `/api/notifications?limit=${limit}&offset=${offset}`,
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+            success: function(response) {
+                if (offset === 0) {
+                    notifications = response.notifications;
+                    renderNotifications();
+                } else {
+                    notifications = [...notifications, ...response.notifications];
+                    appendNotifications(response.notifications);
+                }
+
+                updateUnreadCount();
+                offset += limit;
+
+                if (offset >= response.total) {
+                    loadMoreBtn.hide();
+                }
+            },
+            complete: function() {
+                isLoading = false;
+                loadMoreBtn.prop('disabled', false).html('Load More');
+            }
+        });
+    }
+
     function renderNotifications() {
-        const notificationContainer = $("#notification-list");
-        notificationContainer.empty();
+        notificationList.empty();
 
         if (notifications.length === 0) {
-            notificationContainer.html(`
+            notificationList.html(`
                 <div class="empty-notifications">
                     <i class="far fa-bell-slash"></i>
-                    <h5>No notifications</h5>
+                    <h5>No notifications yet</h5>
                     <p>You're all caught up!</p>
                 </div>
             `);
             return;
         }
 
-        // Sort by date (newest first)
-        notifications.sort((a, b) => b.date - a.date);
-
         notifications.forEach(notification => {
-            const timeAgo = moment(notification.date).fromNow();
-            const formattedDate = moment(notification.date).format('MMM D, YYYY h:mm A');
-            const notificationItem = `
-                <div class="d-flex align-items-start notification-item ${notification.read ? 'read' : 'unread'}" data-id="${notification.id}">
-                    <div class="notification-icon">
-                        <i class="${notification.icon}"></i>
-                    </div>
-                    <div class="notification-content">
-                        <p class="notification-message mb-1">${notification.message}</p>
-                        <p class="notification-date mb-2"><small><i class="far fa-clock me-1"></i>${timeAgo} (${formattedDate})</small></p>
+            notificationList.append(createNotificationElement(notification));
+        });
+    }
+
+    function appendNotifications(newNotifications) {
+        newNotifications.forEach(notification => {
+            notificationList.append(createNotificationElement(notification));
+        });
+    }
+
+    function createNotificationElement(notification) {
+        const timeAgo = moment(notification.createdAt).fromNow();
+        const isUnread = notification.status === 'unread';
+
+        return `
+            <div class="notification-item ${isUnread ? 'unread' : 'read'}" 
+                 data-id="${notification._id}">
+                <div class="notification-icon">
+                    <i class="${notification.icon || 'ti ti-bell'}"></i>
+                </div>
+                <div class="notification-content">
+                    <h5 class="notification-title">${notification.title}</h5>
+                    <p class="notification-message">${notification.message}</p>
+                    <div class="notification-footer">
+                        <small class="notification-time">${timeAgo}</small>
                         <div class="notification-actions">
-                            <button class="btn btn-sm ${notification.read ? 'btn-outline-secondary' : 'btn-outline-primary'} mark-read" ${notification.read ? 'disabled' : ''}>
-                                <i class="fas fa-check me-1"></i>${notification.read ? 'Read' : 'Mark Read'}
-                            </button>
-                            <button class="btn btn-sm btn-outline-danger delete-notification">
-                                <i class="fas fa-trash-alt me-1"></i>Delete
+                            ${notification.link ?
+            `<a href="${notification.link}" class="btn btn-sm btn-link">View</a>` : ''}
+                            <button class="btn btn-sm ${isUnread ? 'btn-outline-primary' : 'btn-outline-secondary'} mark-read">
+                                ${isUnread ? 'Mark Read' : 'Read'}
                             </button>
                         </div>
                     </div>
                 </div>
-            `;
-            notificationContainer.append(notificationItem);
+            </div>
+        `;
+    }
+
+    function updateUnreadCount() {
+        unreadCount = notifications.filter(n => n.status === 'unread').length;
+        unreadBadge.text(unreadCount).toggle(unreadCount > 0);
+    }
+
+    function setupSocketListeners() {
+        // Initial notifications
+        socket.on('initialNotifications', (initialNotifications) => {
+            notifications = initialNotifications;
+            renderNotifications();
+            updateUnreadCount();
+        });
+
+        // New notification
+        socket.on('newNotification', (newNotification) => {
+            notifications.unshift(newNotification);
+
+            // If first page, prepend the new notification
+            if (offset === 0) {
+                notificationList.prepend(createNotificationElement(newNotification));
+            }
+
+            updateUnreadCount();
+
+            // Show toast notification
+            showToastNotification(newNotification);
+        });
+
+        // Notification updated (e.g., marked as read)
+        socket.on('notificationUpdated', (updatedNotification) => {
+            const index = notifications.findIndex(n => n._id === updatedNotification._id);
+            if (index !== -1) {
+                notifications[index] = updatedNotification;
+                $(`.notification-item[data-id="${updatedNotification._id}"]`)
+                    .removeClass('unread')
+                    .addClass('read')
+                    .find('.mark-read')
+                    .removeClass('btn-outline-primary')
+                    .addClass('btn-outline-secondary')
+                    .text('Read');
+
+                updateUnreadCount();
+            }
         });
     }
 
-    // Mark notification as read
-    $(document).on("click", ".mark-read", function () {
-        const notificationId = $(this).closest(".notification-item").data("id");
-        const notification = notifications.find(n => n.id === notificationId);
-        if (notification) {
-            notification.read = true;
-            renderNotifications();
-        }
-    });
-
-    // Delete notification
-    $(document).on("click", ".delete-notification", function () {
-        const notificationId = $(this).closest(".notification-item").data("id");
-        notifications = notifications.filter(n => n.id !== notificationId);
-        renderNotifications();
-    });
-
-    // Mark all as read
-    $("#mark-all-read").on("click", function () {
-        notifications.forEach(notification => {
-            notification.read = true;
+    function setupEventHandlers() {
+        // Mark as read
+        notificationList.on('click', '.mark-read', function() {
+            const notificationId = $(this).closest('.notification-item').data('id');
+            socket.emit('markAsRead', notificationId);
         });
-        renderNotifications();
-    });
 
-    // Delete all read notifications
-    $("#delete-all-read").on("click", function () {
-        notifications = notifications.filter(n => !n.read);
-        renderNotifications();
-    });
+        // Mark all as read
+        markAllReadBtn.on('click', function() {
+            $.ajax({
+                url: '/api/notifications/read-all',
+                method: 'PATCH',
+                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+                success: function() {
+                    notifications.forEach(n => n.status = 'read');
+                    $('.notification-item').removeClass('unread').addClass('read');
+                    $('.mark-read')
+                        .removeClass('btn-outline-primary')
+                        .addClass('btn-outline-secondary')
+                        .text('Read');
+                    updateUnreadCount();
+                }
+            });
+        });
 
-    renderNotifications();
+        // Load more
+        loadMoreBtn.on('click', loadNotifications);
+    }
+
+    function showToastNotification(notification) {
+        // Using Toastify for toast notifications
+        Toastify({
+            text: `${notification.title}: ${notification.message}`,
+            duration: 5000,
+            gravity: "bottom",
+            position: "right",
+            backgroundColor: notification.type === 'alert' ? '#dc3545' : '#28a745',
+            onClick: function() {
+                if (notification.link) {
+                    window.location.href = notification.link;
+                }
+            }
+        }).showToast();
+    }
 });

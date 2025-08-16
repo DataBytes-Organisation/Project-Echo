@@ -9,23 +9,49 @@ const { client, checkUserSession } = require('./middleware');
 const controller = require('./controller/auth.controller');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
-client.connect();
 const cors = require('cors');
 require('dotenv').config();
 const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY);
 const axios = require('axios');
 const { MongoClient, ObjectId } = require('mongodb');
-
-
+const mongoose = require('mongoose');
+const { Server } = require('socket.io');
+const http = require('http');
+const webpush = require('web-push');
+const { User } = require('./model/user.model');
+const { Notification, UserNotificationPreference } = require('./model/notification.model');
 
 // Temporarily removed the variables that need the captcha-canvas package
 //const {createCaptchaSync} = require("captcha-canvas");
 
+// Initialize HTTP server for Socket.io
+const server = http.createServer(app);
+
+// Connect to Redis
+client.connect();
+
+// MongoDB Connection
+mongoose.set('strictQuery', false);
+
+const connectWithRetry = () => {
+  mongoose.connect('mongodb://root:root_password@ts-mongodb-cont:27017/EchoNet?authSource=admin', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    serverSelectionTimeoutMS: 5000,
+    socketTimeoutMS: 45000
+  })
+      .then(() => console.log('MongoDB connection established'))
+      .catch(err => {
+        console.error('MongoDB connection error:', err);
+        setTimeout(connectWithRetry, 5000);
+      });
+};
+
+connectWithRetry();
 
 const port = 8080;
 
 const rootDirectory = __dirname; // This assumes the root directory is the current directory
-
 
 //Security verification for email account and body content validation:
 const validation = require('deep-email-validator')
@@ -35,25 +61,22 @@ const storeItems = new Map([[
 ]])
 app.use(express.json({limit: '10mb'}));
 
-// Import the User model
-const { User } = require('./model/user.model'); // Add this line
-
 // Middleware to check if the user is an admin
 function isAdmin(req, res, next) {
   const token = req.headers.authorization.split(' ')[1];
   const decoded = jwt.verify(token, process.env.JWT_SECRET);
-  
+
   if (decoded.role !== 'admin') {
     return res.status(403).json({ message: 'Access denied: Admins only' });
   }
-  
+
   next();
 }
 
 // API to suspend a user
 app.patch('/api/users/:id/suspend', isAdmin, async (req, res) => {
   const userId = req.params.id;
-  
+
   try {
     const user = await User.findByIdAndUpdate(userId, { status: 'suspended' }, { new: true });
     res.json({ message: `User ${user.email} suspended`, user });
@@ -65,7 +88,7 @@ app.patch('/api/users/:id/suspend', isAdmin, async (req, res) => {
 // API to ban a user
 app.patch('/api/users/:id/ban', isAdmin, async (req, res) => {
   const userId = req.params.id;
-  
+
   try {
     const user = await User.findByIdAndUpdate(userId, { status: 'banned' }, { new: true });
     res.json({ message: `User ${user.email} banned`, user });
@@ -77,7 +100,7 @@ app.patch('/api/users/:id/ban', isAdmin, async (req, res) => {
 // API to reinstate a user
 app.patch('/api/users/:id/reinstate', isAdmin, async (req, res) => {
   const userId = req.params.id;
-  
+
   try {
     const user = await User.findByIdAndUpdate(userId, { status: 'active' }, { new: true });
     res.json({ message: `User ${user.email} reinstated`, user });
@@ -89,7 +112,7 @@ app.patch('/api/users/:id/reinstate', isAdmin, async (req, res) => {
 // API to retrieve user status
 app.get('/api/users/:id/status', isAdmin, async (req, res) => {
   const userId = req.params.id;
-  
+
   try {
     const user = await User.findById(userId, 'email status');
     res.json({ user });
@@ -166,7 +189,7 @@ app.post("/api/create-checkout-session", async (req, res) => {
         });
         firstPage = true;
       }
-      
+
       if (!charges.has_more) {
         break; // Exit the loop when there are no more pages
       }
@@ -185,24 +208,19 @@ app.post("/api/create-checkout-session", async (req, res) => {
   }
 }) */
 
+const Donation = require('./model/donation.model');
+
 app.get('/donations', async (req, res) => {
   try {
-    const client = new MongoClient("mongodb://modelUser:EchoNetAccess2023@ts-mongodb-cont:27017/EchoNet",
-    {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-    });
-    await client.connect();
-    const db = client.db("EchoNet");
-    const donations = await db.collection("donations").find({}).toArray();
+    const donations = await Donation.find({});
     res.json({ charges: { data: donations } });
   } catch (error) {
-    console.error("Error fetching donations from MongoDB:", error);
+    console.error("Error fetching donations:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
-  
-  
+
+
 //This endpoint retrieves the donation amounts from the associated stripe account
 //it adds up the amounts to return a cumulative total. Used on admin dashboard.
 app.get('/cumulativeDonations', async(req, res) => {
@@ -218,7 +236,7 @@ app.get('/cumulativeDonations', async(req, res) => {
         });
         firstPage = true;
       }
-      
+
     charges.data.forEach(charge => {
         cumulativeTotal += charge.amount;
     });
@@ -232,17 +250,17 @@ app.get('/cumulativeDonations', async(req, res) => {
     });
       firstPage = true;
     }
-    
+
     cumulativeTotal = cumulativeTotal / 100;
     cumulativeTotal = cumulativeTotal.toFixed(2);
-    
+
     console.log('Cumulative Total:', cumulativeTotal);
     res.json({ cumulativeTotal });
   }
   catch(error){
     console.error('Error:', error);
     res.status(500).json({ error: 'Internal server error' });
-  } 
+  }
 })
 
 // Temporarily removed the route for the captcha function
@@ -270,7 +288,7 @@ const bodyParser = require("express");
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }))
 
-//const serveIndex = require('serve-index'); 
+//const serveIndex = require('serve-index');
 //app.use('/images/bio', serveIndex(express.static(path.join(__dirname, '/images/bio'))));
 
 app.use(
@@ -300,7 +318,7 @@ function escapeHtmlEntities(input) {
 async function testEmail(input) {
   let res = await validation.validate(input)
   return {result: res.valid, response: res.validators}
-  
+
 }
 
 app.post("/send_email", async (req, res) => {
@@ -342,7 +360,7 @@ app.post("/send_email", async (req, res) => {
     } else {
       return res.status(400).send("<script> alert(`Sender's email is not valid!`)</script>");
     }
-    
+
   }
 );
 
@@ -623,7 +641,7 @@ app.get('/api/requests', async (req, res) => {
     })
 
     const axiosResponse = await axios.get('http://ts-api-cont:9000/hmi/requests', { headers: {"Authorization" : `Bearer ${token}`}})
-  
+
     if (axiosResponse.status === 200) {
       res.json(axiosResponse.data);
     } else {
@@ -678,8 +696,8 @@ const suspendOrBlockUser = async (identifier, action) => {
         const usersCollection = userdb.collection('users');
 
         // Determine the search criteria based on whether the identifier is an email or user ID
-        const query = ObjectId.isValid(identifier) 
-            ? { _id: new ObjectId(identifier) } 
+        const query = ObjectId.isValid(identifier)
+            ? { _id: new ObjectId(identifier) }
             : { email: identifier };
 
         // Determine the status and message based on the action
@@ -737,72 +755,7 @@ app.get("/map", async(req,res) => {
   res.sendFile(path.join(__dirname, 'public/index.html'))
 })
 
-// Get all notifications for current user
-app.get('/api/notifications', async (req, res) => {
-  try {
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) return res.status(401).json({ error: 'Unauthorized' });
-
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const notifications = await Notification.find({ userId: decoded.id })
-        .sort({ createdAt: -1 })
-        .limit(50);
-
-    res.json(notifications);
-  } catch (error) {
-    res.status(500).json({ error: 'Error fetching notifications' });
-  }
-});
-
-// Mark notification as read
-app.patch('/api/notifications/:id/read', async (req, res) => {
-  try {
-    await Notification.findByIdAndUpdate(req.params.id, { read: true });
-    res.json({ success: true });
-  } catch (error) {
-    res.status(500).json({ error: 'Error updating notification' });
-  }
-});
-
-// Mark all notifications as read
-app.patch('/api/notifications/read-all', async (req, res) => {
-  try {
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) return res.status(401).json({ error: 'Unauthorized' });
-
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    await Notification.updateMany(
-        { userId: decoded.id, read: false },
-        { $set: { read: true } }
-    );
-
-    res.json({ success: true });
-  } catch (error) {
-    res.status(500).json({ error: 'Error updating notifications' });
-  }
-});
-
-// Create a notification (helper function)
-async function createNotification(userId, message, type, link = null, icon = null) {
-  return await Notification.create({
-    userId,
-    message,
-    type,
-    link,
-    icon: icon || getDefaultIcon(type)
-  });
-}
-
-function getDefaultIcon(type) {
-  const icons = {
-    donation: 'ti ti-receipt-2',
-    request: 'ti ti-alert-circle',
-    user: 'ti ti-user',
-    system: 'ti ti-bell'
-  };
-  return icons[type] || 'ti ti-bell';
-}
-
+console.log('test');
 
 // start the server
 app.listen(port, () => {
