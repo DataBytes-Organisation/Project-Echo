@@ -1,8 +1,50 @@
 $(document).ready(function() {
+    // Verify Socket.IO is available
+    if (typeof io === 'undefined') {
+        console.error('Socket.IO not loaded!');
+        return;
+    }
+
+    const token = localStorage.getItem('token');
+    console.log('Current token:', token);
+
+    if (!token) {
+        console.error('No token found in localStorage');
+        // Redirect to login or handle missing token
+        window.location.href = '/login';
+        return;
+    }
     // Connect to Socket.io
-    const socket = io({
+    const socket = io('http://localhost:8080', {
         auth: {
-            token: localStorage.getItem('token') // Assuming JWT is stored here
+            token: localStorage.getItem('token')
+        },
+        transports: ['websocket', 'polling'], // Add fallback transport
+        reconnection: true,
+        reconnectionAttempts: 5,
+        reconnectionDelay: 1000,
+        withCredentials: true
+    });
+
+    // Connection status logging
+    socket.on('connect', () => {
+        console.log('Socket.IO connected with ID:', socket.id);
+    });
+
+    socket.on('disconnect', (reason) => {
+        console.log('Socket.IO disconnected:', reason);
+        if (reason === 'io server disconnect') {
+            // Try to reconnect after getting new credentials if needed
+            socket.connect();
+        }
+    });
+
+    socket.on('connect_error', (err) => {
+        console.error('Socket.IO connection error:', err.message);
+        // Try to reconnect with fresh token if auth fails
+        if (err.message.includes('auth')) {
+            socket.auth.token = localStorage.getItem('token');
+            socket.connect();
         }
     });
 
@@ -31,28 +73,46 @@ $(document).ready(function() {
 
         $.ajax({
             url: `/api/notifications?limit=${limit}&offset=${offset}`,
-            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('token'),
+                'Content-Type': 'application/json'
+            },
             success: function(response) {
                 if (offset === 0) {
-                    notifications = response.notifications;
+                    notifications = response.notifications || [];
                     renderNotifications();
                 } else {
-                    notifications = [...notifications, ...response.notifications];
-                    appendNotifications(response.notifications);
+                    notifications = notifications.concat(response.notifications || []);
+                    appendNotifications(response.notifications || []);
                 }
-
+                offset += (response.notifications || []).length;
                 updateUnreadCount();
-                offset += limit;
-
-                if (offset >= response.total) {
-                    loadMoreBtn.hide();
-                }
+            },
+            error: function(xhr) {
+                console.error('API Error:', xhr.responseText);
+                showErrorToast('Failed to load notifications');
             },
             complete: function() {
                 isLoading = false;
                 loadMoreBtn.prop('disabled', false).html('Load More');
+
+                // Only hide if we know we've got all notifications
+                if (notifications.length > 0 && notifications.length % limit !== 0) {
+                    loadMoreBtn.hide();
+                }
             }
         });
+    }
+
+    function showErrorToast(message) {
+        Toastify({
+            text: message,
+            duration: 5000,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "#dc3545",
+            stopOnFocus: true
+        }).showToast();
     }
 
     function renderNotifications() {
@@ -114,6 +174,17 @@ $(document).ready(function() {
     }
 
     function setupSocketListeners() {
+        // Connection status indicator
+        const updateConnectionStatus = (connected) => {
+            const indicator = $('#connection-indicator');
+            indicator.removeClass(connected ? 'disconnected' : 'connected')
+                .addClass(connected ? 'connected' : 'disconnected')
+                .text(connected ? 'Connected' : 'Disconnected');
+        };
+
+        socket.on('connect', () => updateConnectionStatus(true));
+        socket.on('disconnect', () => updateConnectionStatus(false));
+
         // Initial notifications
         socket.on('initialNotifications', (initialNotifications) => {
             notifications = initialNotifications;

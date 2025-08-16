@@ -4,12 +4,14 @@ const webpush = require('web-push');
 
 class NotificationService {
     constructor() {
+        console.log('NotificationService initialized (push notifications disabled)');
         // Initialize web push (for browser notifications)
+        /**
         webpush.setVapidDetails(
             `mailto:${process.env.VAPID_EMAIL}`,
             process.env.VAPID_PUBLIC_KEY,
             process.env.VAPID_PRIVATE_KEY
-        );
+        );**/
     }
 
     async createNotification(userId, title, message, type, metadata = {}) {

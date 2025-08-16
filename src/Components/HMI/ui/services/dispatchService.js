@@ -1,4 +1,5 @@
 const { UserNotificationPreference } = require('../model/user.model');
+const { sendRealTimeNotification } = require('./server');
 const axios = require('axios');
 
 class DispatchService {
@@ -33,7 +34,11 @@ class DispatchService {
     }
 
     async sendInApp(userId, notification) {
-        // Handled by WebSocket
+        try {
+            await sendRealTimeNotification(userId, notification);
+        } catch (error) {
+            console.error('Error sending in-app notification:', error);
+        }
     }
 
     async sendEmail(userId, notification) {

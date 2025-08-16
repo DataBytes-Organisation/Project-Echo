@@ -4,23 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="10041674-e6c8-4c79-bb50-316e826bf443" name="Changes" comment="add backend notification APIs">
-      <change afterPath="$PROJECT_DIR$/src/Components/HMI/ui/model/donation.model.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Components/HMI/ui/public/sw.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Components/HMI/ui/services/dispatchService.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Components/HMI/ui/services/notificationService.js" afterDir="false" />
+    <list default="true" id="10041674-e6c8-4c79-bb50-316e826bf443" name="Changes" comment="add backend notification">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/model/notification.model.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/model/notification.model.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/.package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/.package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/public/admin/css/notifications.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/public/admin/css/notifications.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/public/admin/component/sidebar-component.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/public/admin/component/sidebar-component.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/public/admin/js/notifications.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/public/admin/js/notifications.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/public/admin/notifications.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/public/admin/notifications.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/server.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/server.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Components/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/docker-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Components/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Components/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/services/dispatchService.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/services/dispatchService.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/services/notificationService.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/services/notificationService.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -68,6 +62,7 @@
     "DefaultHtmlFileTemplate": "HTML File",
     "JavaScript Debug.login.html.executor": "Debug",
     "JavaScript Debug.notifications.html.executor": "Run",
+    "Node.js.console.js.executor": "Run",
     "Node.js.server.js.executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
@@ -85,6 +80,21 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Liam\WebstormProjects\Project-Echo\src\Components\HMI\ui" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="console.js" type="NodeJSConfigurationType" temporary="true" nameIsGenerated="true" path-to-js-file="$APPLICATION_CONFIG_DIR$/consoles/db/19bc3dcb-9cd5-45a4-8fa9-56e5dcc4cffa/console.js" working-dir="$PROJECT_DIR$">
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Node.js.console.js" />
+      </list>
+    </recent_temporary>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -129,7 +139,15 @@
       <option name="project" value="LOCAL" />
       <updated>1755320771942</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="add backend notification">
+      <option name="closed" value="true" />
+      <created>1755329336099</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1755329336099</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -148,7 +166,18 @@
     <MESSAGE value="Update notifications.html." />
     <MESSAGE value="add notification.model.js" />
     <MESSAGE value="add backend notification APIs" />
-    <option name="LAST_COMMIT_MESSAGE" value="add backend notification APIs" />
+    <MESSAGE value="add backend notification" />
+    <option name="LAST_COMMIT_MESSAGE" value="add backend notification" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/Components/API/app/middleware/auth_bearer.py</url>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Project_Echo$IntegrationModel.coverage" NAME="IntegrationModel Coverage Results" MODIFIED="1694000205003" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/PycharmProjects/temporaryEcho/yamnet" />
