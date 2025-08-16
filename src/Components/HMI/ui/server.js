@@ -737,6 +737,72 @@ app.get("/map", async(req,res) => {
   res.sendFile(path.join(__dirname, 'public/index.html'))
 })
 
+// Get all notifications for current user
+app.get('/api/notifications', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) return res.status(401).json({ error: 'Unauthorized' });
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const notifications = await Notification.find({ userId: decoded.id })
+        .sort({ createdAt: -1 })
+        .limit(50);
+
+    res.json(notifications);
+  } catch (error) {
+    res.status(500).json({ error: 'Error fetching notifications' });
+  }
+});
+
+// Mark notification as read
+app.patch('/api/notifications/:id/read', async (req, res) => {
+  try {
+    await Notification.findByIdAndUpdate(req.params.id, { read: true });
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: 'Error updating notification' });
+  }
+});
+
+// Mark all notifications as read
+app.patch('/api/notifications/read-all', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) return res.status(401).json({ error: 'Unauthorized' });
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    await Notification.updateMany(
+        { userId: decoded.id, read: false },
+        { $set: { read: true } }
+    );
+
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: 'Error updating notifications' });
+  }
+});
+
+// Create a notification (helper function)
+async function createNotification(userId, message, type, link = null, icon = null) {
+  return await Notification.create({
+    userId,
+    message,
+    type,
+    link,
+    icon: icon || getDefaultIcon(type)
+  });
+}
+
+function getDefaultIcon(type) {
+  const icons = {
+    donation: 'ti ti-receipt-2',
+    request: 'ti ti-alert-circle',
+    user: 'ti ti-user',
+    system: 'ti ti-bell'
+  };
+  return icons[type] || 'ti ti-bell';
+}
+
 
 // start the server
 app.listen(port, () => {
