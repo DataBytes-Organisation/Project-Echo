@@ -5,8 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="10041674-e6c8-4c79-bb50-316e826bf443" name="Changes" comment="Update notifications.html.">
-      <change afterPath="$PROJECT_DIR$/src/Components/HMI/ui/public/admin/css/notifications.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Components/HMI/ui/public/admin/js/notifications.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Components/HMI/ui/model/notification.model.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/API/backend/project-echo-openapi.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/API/backend/project-echo-openapi.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,6 +24,11 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="EHMI/lb/admin-notification-page" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="MarkdownSettingsMigration">
@@ -43,12 +49,14 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "DefaultHtmlFileTemplate": "HTML File",
+    "JavaScript Debug.login.html.executor": "Debug",
     "JavaScript Debug.notifications.html.executor": "Run",
+    "Node.js.server.js.executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
     "disable.download.node.interpreter.editor.notification": "true",
-    "git-widget-placeholder": "EHMI/lb/admin-notification-page",
+    "git-widget-placeholder": "EHMI/lb/notification-backend",
     "last_opened_file_path": "C:/Users/22396/PycharmProjects/temporaryEcho/yamnet/IntegrationModel.py",
     "list.type.of.created.stylesheet": "CSS",
     "node.js.detected.package.eslint": "true",
