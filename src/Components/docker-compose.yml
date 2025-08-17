@@ -51,6 +51,7 @@ services:
       - credentials_volume:/root/.config/gcloud/
     ports:
       - "8080:8080"
+      - "9229:9229"  # <-- Node.js debugger port
     restart: on-failure
     depends_on:
       - redis
@@ -63,6 +64,7 @@ services:
       - MONGO_DB=EchoNet
       - MONGO_USER=root
       - MONGO_PASS=root_password
+    command: node --inspect=0.0.0.0:9229 server.js # <-- start Node in debug mode
 
 
   echo_mqtt:

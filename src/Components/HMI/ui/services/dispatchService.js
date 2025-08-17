@@ -1,5 +1,5 @@
 const { UserNotificationPreference } = require('../model/user.model');
-const { sendRealTimeNotification } = require('./server');
+const { sendRealTimeNotification } = require('../server');
 const axios = require('axios');
 
 class DispatchService {

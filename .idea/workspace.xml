@@ -6,15 +6,112 @@
   <component name="ChangeListManager">
     <list default="true" id="10041674-e6c8-4c79-bb50-316e826bf443" name="Changes" comment="add backend notification">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/.package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/.package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/public/admin/component/sidebar-component.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/public/admin/component/sidebar-component.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/body-parser/HISTORY.md" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/body-parser/HISTORY.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/body-parser/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/body-parser/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/body-parser/SECURITY.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/body-parser/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/body-parser/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/body-parser/lib/read.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/body-parser/lib/read.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/body-parser/lib/types/json.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/body-parser/lib/types/json.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/body-parser/lib/types/raw.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/body-parser/lib/types/raw.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/body-parser/lib/types/text.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/body-parser/lib/types/text.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/body-parser/lib/types/urlencoded.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/body-parser/lib/types/urlencoded.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/body-parser/node_modules/debug/.coveralls.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/body-parser/node_modules/debug/.eslintrc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/body-parser/node_modules/debug/.npmignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/body-parser/node_modules/debug/.travis.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/body-parser/node_modules/debug/CHANGELOG.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/body-parser/node_modules/debug/LICENSE" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/body-parser/node_modules/debug/LICENSE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/body-parser/node_modules/debug/Makefile" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/body-parser/node_modules/debug/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/body-parser/node_modules/debug/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/body-parser/node_modules/debug/component.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/body-parser/node_modules/debug/karma.conf.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/body-parser/node_modules/debug/node.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/body-parser/node_modules/debug/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/body-parser/node_modules/debug/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/body-parser/node_modules/debug/src/browser.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/body-parser/node_modules/debug/src/browser.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/body-parser/node_modules/debug/src/debug.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/body-parser/node_modules/debug/src/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/body-parser/node_modules/debug/src/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/body-parser/node_modules/debug/src/inspector-log.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/body-parser/node_modules/debug/src/node.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/body-parser/node_modules/debug/src/node.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/body-parser/node_modules/ms/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/body-parser/node_modules/ms/license.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/body-parser/node_modules/ms/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/body-parser/node_modules/ms/readme.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/body-parser/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/body-parser/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/call-bind/.eslintignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/call-bind/.eslintrc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/call-bind/.github/FUNDING.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/call-bind/.nycrc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/call-bind/CHANGELOG.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/call-bind/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/call-bind/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/call-bind/callBound.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/call-bind/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/call-bind/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/call-bind/test/callBound.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/call-bind/test/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/function-bind/.editorconfig" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/function-bind/.eslintrc" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/function-bind/.eslintrc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/function-bind/.jscs.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/function-bind/.npmignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/function-bind/.travis.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/function-bind/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/function-bind/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/function-bind/implementation.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/function-bind/implementation.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/function-bind/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/function-bind/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/get-intrinsic/.eslintrc" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/get-intrinsic/.eslintrc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/get-intrinsic/CHANGELOG.md" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/get-intrinsic/CHANGELOG.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/get-intrinsic/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/get-intrinsic/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/get-intrinsic/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/get-intrinsic/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/get-intrinsic/test/GetIntrinsic.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/get-intrinsic/test/GetIntrinsic.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/has-symbols/CHANGELOG.md" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/has-symbols/CHANGELOG.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/has-symbols/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/has-symbols/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/has-symbols/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/has-symbols/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/has-symbols/shams.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/has-symbols/shams.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/has-symbols/test/shams/core-js.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/has-symbols/test/shams/core-js.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/has-symbols/test/shams/get-own-property-symbols.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/has-symbols/test/shams/get-own-property-symbols.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/has-symbols/test/tests.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/has-symbols/test/tests.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/has/LICENSE-MIT" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/has/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/has/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/has/src/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/has/test/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/iconv-lite/Changelog.md" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/iconv-lite/Changelog.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/iconv-lite/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/iconv-lite/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/iconv-lite/encodings/dbcs-codec.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/iconv-lite/encodings/dbcs-codec.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/iconv-lite/encodings/dbcs-data.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/iconv-lite/encodings/dbcs-data.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/iconv-lite/encodings/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/iconv-lite/encodings/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/iconv-lite/encodings/internal.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/iconv-lite/encodings/internal.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/iconv-lite/encodings/sbcs-data.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/iconv-lite/encodings/sbcs-data.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/iconv-lite/encodings/tables/gbk-added.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/iconv-lite/encodings/tables/gbk-added.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/iconv-lite/encodings/utf16.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/iconv-lite/encodings/utf16.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/iconv-lite/encodings/utf7.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/iconv-lite/encodings/utf7.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/iconv-lite/lib/extend-node.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/iconv-lite/lib/index.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/iconv-lite/lib/index.d.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/iconv-lite/lib/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/iconv-lite/lib/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/iconv-lite/lib/streams.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/iconv-lite/lib/streams.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/iconv-lite/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/iconv-lite/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/object-inspect/CHANGELOG.md" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/object-inspect/CHANGELOG.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/object-inspect/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/object-inspect/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/object-inspect/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/object-inspect/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/object-inspect/readme.markdown" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/object-inspect/readme.markdown" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/object-inspect/test/quoteStyle.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/object-inspect/test/quoteStyle.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/object-inspect/test/values.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/object-inspect/test/values.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/raw-body/HISTORY.md" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/raw-body/HISTORY.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/raw-body/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/raw-body/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/raw-body/index.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/raw-body/index.d.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/raw-body/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/raw-body/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/raw-body/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/raw-body/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/side-channel/.eslintignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/side-channel/.eslintrc" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/side-channel/.eslintrc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/side-channel/CHANGELOG.md" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/side-channel/CHANGELOG.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/side-channel/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/side-channel/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/side-channel/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/side-channel/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/side-channel/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/side-channel/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/side-channel/test/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/node_modules/side-channel/test/index.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/public/admin/js/notifications.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/public/admin/js/notifications.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/public/admin/notifications.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/public/admin/notifications.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/server.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/server.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/services/dispatchService.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/services/dispatchService.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/services/notificationService.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/services/notificationService.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/docker-compose.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -33,15 +130,27 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="EHMI/lb/admin-notification-page" />
+        <entry key="$PROJECT_DIR$" value="EHMI/lb,el/notification-backend" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="KubernetesApiPersistence"><![CDATA[{}]]></component>
-  <component name="KubernetesApiProvider"><![CDATA[{
-  "isMigrated": true
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "echoEclectus"
+  }
 }]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/DataBytes-Organisation/Project-Echo.git",
+    "accountId": "b3a4421f-53e4-4dc8-afd5-c4f0832fa353"
+  }
+}]]></component>
+  <component name="KubernetesApiPersistence">{}</component>
+  <component name="KubernetesApiProvider">{
+  &quot;isMigrated&quot;: true
+}</component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
@@ -59,6 +168,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Attach to Node.js/Chrome.HMI Docker Debug.executor": "Debug",
     "DefaultHtmlFileTemplate": "HTML File",
     "JavaScript Debug.login.html.executor": "Debug",
     "JavaScript Debug.notifications.html.executor": "Run",
@@ -66,6 +176,7 @@
     "Node.js.server.js.executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
     "WebServerToolWindowFactoryState": "false",
     "disable.download.node.interpreter.editor.notification": "true",
     "git-widget-placeholder": "EHMI/lb/notification-backend",
@@ -85,15 +196,30 @@
       <recent name="C:\Users\Liam\WebstormProjects\Project-Echo\src\Components\HMI\ui" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Attach to Node.js/Chrome.HMI Docker Debug">
+    <configuration name="HMI Docker Debug" type="ChromiumRemoteDebugType" factoryName="Chromium Remote" port="9229">
+      <method v="2" />
+    </configuration>
     <configuration name="console.js" type="NodeJSConfigurationType" temporary="true" nameIsGenerated="true" path-to-js-file="$APPLICATION_CONFIG_DIR$/consoles/db/19bc3dcb-9cd5-45a4-8fa9-56e5dcc4cffa/console.js" working-dir="$PROJECT_DIR$">
       <method v="2" />
     </configuration>
+    <list>
+      <item itemvalue="Attach to Node.js/Chrome.HMI Docker Debug" />
+      <item itemvalue="Node.js.console.js" />
+    </list>
     <recent_temporary>
       <list>
         <item itemvalue="Node.js.console.js" />
+        <item itemvalue="Node.js.console.js" />
       </list>
     </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-1632447f56bf-JavaScript-WS-243.26053.12" />
+      </set>
+    </attachedChunks>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -106,6 +232,7 @@
       <workItem from="1693050156042" duration="71000" />
       <workItem from="1693128279787" duration="543000" />
       <workItem from="1693276337817" duration="595000" />
+      <workItem from="1755411298753" duration="15133000" />
     </task>
     <task id="LOCAL-00001" summary="Add mark as read and delete notification functions.">
       <option name="closed" value="true" />
@@ -147,7 +274,23 @@
       <option name="project" value="LOCAL" />
       <updated>1755329336099</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="add donation.model.js">
+      <option name="closed" value="true" />
+      <created>1755357377732</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1755357377732</updated>
+    </task>
+    <task id="LOCAL-00007" summary="update server.js with backend notification implementation">
+      <option name="closed" value="true" />
+      <created>1755357542936</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1755357542936</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -161,13 +304,26 @@
   <component name="UnknownFeatures">
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.model" />
   </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Add mark as read and delete notification functions." />
     <MESSAGE value="Update notifications.html." />
     <MESSAGE value="add notification.model.js" />
     <MESSAGE value="add backend notification APIs" />
     <MESSAGE value="add backend notification" />
-    <option name="LAST_COMMIT_MESSAGE" value="add backend notification" />
+    <MESSAGE value="add donation.model.js" />
+    <MESSAGE value="update server.js with backend notification implementation" />
+    <option name="LAST_COMMIT_MESSAGE" value="update server.js with backend notification implementation" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

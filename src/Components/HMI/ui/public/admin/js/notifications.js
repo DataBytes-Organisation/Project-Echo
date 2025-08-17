@@ -16,14 +16,12 @@ $(document).ready(function() {
     }
     // Connect to Socket.io
     const socket = io('http://localhost:8080', {
-        auth: {
-            token: localStorage.getItem('token')
-        },
-        transports: ['websocket', 'polling'], // Add fallback transport
+        auth: { token },
         reconnection: true,
-        reconnectionAttempts: 5,
+        reconnectionAttempts: Infinity,
         reconnectionDelay: 1000,
-        withCredentials: true
+        reconnectionDelayMax: 5000,
+        query: { token } // Fallback for auth
     });
 
     // Connection status logging
@@ -194,12 +192,10 @@ $(document).ready(function() {
 
         // New notification
         socket.on('newNotification', (newNotification) => {
+            console.log('Received new notification:', newNotification);
             notifications.unshift(newNotification);
 
-            // If first page, prepend the new notification
-            if (offset === 0) {
-                notificationList.prepend(createNotificationElement(newNotification));
-            }
+            notificationList.prepend(createNotificationElement(newNotification));
 
             updateUnreadCount();
 

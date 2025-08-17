@@ -56,54 +56,58 @@ const rootDirectory = __dirname;
 // Initialize Socket.io
 const io = new Server(server, {
   cors: {
-    origin: [
-      "http://localhost:8080",
-      "http://localhost:8081",
-      "http://127.0.0.1:8080"
-    ],
+    origin: ["http://localhost:8080", "http://localhost:8081"],
     methods: ["GET", "POST"],
-    credentials: true,
-    allowedHeaders: ["authorization"]
+    credentials: true
   },
-  transports: ['websocket', 'polling']
+  connectionStateRecovery: {
+    maxDisconnectionDuration: 2 * 60 * 1000, // 2 minutes
+    skipMiddlewares: true
+  }
 });
 
 // Track connected users
 const connectedUsers = new Map();
 
 // Socket.io middleware for authentication
-const authMiddleware = (req, res, next) => {
-  const token = req.headers.authorization?.split(' ')[1];
-
-  if (!token) {
-    return res.status(401).json({ error: "No token provided" });
-  }
-
+io.use(async (socket, next) => {
   try {
-    req.user = jwt.verify(token, JWT_SECRET);
+    // Get token from either handshake auth or query (for fallback)
+    const token = socket.handshake.auth.token || socket.handshake.query.token;
+
+    if (!token) {
+      return next(new Error('Authentication error: No token provided'));
+    }
+
+    // Verify JWT
+    const decoded = jwt.verify(token, JWT_SECRET);
+
+    // Attach user to socket
+    socket.user = {
+      id: decoded.id,
+      email: decoded.email,
+      role: decoded.role
+    };
+
     next();
   } catch (err) {
-    console.error("JWT verification failed:", err.message);
-    return res.status(401).json({
-      error: "Invalid token",
-      details: err.message
-    });
+    console.error('Socket auth error:', err.message);
+    next(new Error('Authentication failed'));
   }
-};
+});
 
 // Socket.io connection handler
 io.on('connection', (socket) => {
-  console.log(`User connected: ${socket.userId}`);
+  console.log(`User ${socket.user.id} connected`);
 
-  // Add to connected users map
-  connectedUsers.set(socket.userId, socket.id);
+  // Join user-specific room
+  socket.join(`user_${socket.user.id}`);
 
-  // Send any pending notifications
-  sendPendingNotifications(socket.userId);
+  // Send pending notifications
+  sendPendingNotifications(socket.user.id);
 
   socket.on('disconnect', () => {
-    console.log(`User disconnected: ${socket.userId}`);
-    connectedUsers.delete(socket.userId);
+    console.log(`User ${socket.user.id} disconnected`);
   });
 
   // Handle mark as read
@@ -145,12 +149,17 @@ async function sendPendingNotifications(userId) {
 
 // Function to send real-time notification
 async function sendRealTimeNotification(userId, notification) {
-  const socketId = connectedUsers.get(userId);
-  if (socketId) {
-    io.to(socketId).emit('newNotification', notification);
+  try {
+    // Save to database first
+    const savedNotification = await Notification.create(notification);
+
+    // Send to specific user room
+    io.to(`user_${userId}`).emit('newNotification', savedNotification);
+
+    console.log(`Notification sent to user ${userId}`);
+  } catch (err) {
+    console.error('Error sending notification:', err);
   }
-  // Also send via other channels
-  await NotificationService.dispatchNotification(notification);
 }
 
 app.get('/api/notification-preferences', async (req, res) => {
@@ -676,19 +685,21 @@ app.get("/welcome", async (req, res) => {
 // Temporary test route - REMOVE AFTER TESTING
 app.post('/test-notification', async (req, res) => {
   try {
-    const notification = await Notification.create({
-      userId: req.body.userId, // or a fixed admin user ID
-      title: req.body.title || "Test Notification",
-      message: req.body.message || "This is a test notification",
-      type: "donation",
-      status: "unread"
-    });
+    const { userId, title, message } = req.body;
 
-    // Send real-time update if user is connected
-    sendRealTimeNotification(notification.userId, notification);
+    const notification = {
+      userId,
+      title: title || "Test Notification",
+      message: message || "This is a test notification",
+      type: "system",
+      status: "unread"
+    };
+
+    await sendRealTimeNotification(userId, notification);
 
     res.json(notification);
   } catch (error) {
+    console.error('Test notification error:', error);
     res.status(500).json({ error: error.message });
   }
 });

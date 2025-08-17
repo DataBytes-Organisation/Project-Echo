@@ -1,6 +1,7 @@
 const { Notification, UserNotificationPreference } = require('../model/user.model');
 const axios = require('axios');
 const webpush = require('web-push');
+const dispatchService = require('./dispatchService');
 
 class NotificationService {
     constructor() {
@@ -43,6 +44,10 @@ class NotificationService {
             const preferences = await UserNotificationPreference.findOne({ userId: notification.userId }) ||
                 new UserNotificationPreference({ userId: notification.userId });
 
+            await dispatchService.dispatch(notification.userId, notification);
+
+            await dispatchService.sendInApp(notification.userId, notification);
+
             // Check if in do-not-disturb window
             if (this.isInDoNotDisturb(preferences)) {
                 console.log(`Notification suppressed for user ${notification.userId} during DND hours`);
@@ -74,7 +79,7 @@ class NotificationService {
     }
 
     sendInAppNotification(notification) {
-        // This will be handled by the WebSocket connection
+        dispatchService.dispatch(notification.userId, notification);
         console.log(`In-app notification sent for ${notification.userId}`);
     }
 
