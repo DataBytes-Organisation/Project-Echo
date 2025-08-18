@@ -61,7 +61,7 @@
     
     "runArgs": [
         "--gpus=all",
-        "--shm-size=4g"
+        "--shm-size=8g"
     ],
     
     "containerEnv": {
