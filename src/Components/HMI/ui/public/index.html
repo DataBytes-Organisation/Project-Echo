@@ -1027,8 +1027,9 @@
               </div>
             </div>
             <div class="export-tab">
-              <button id="export-csv" onclick="{downloadCSV()}">EXPORT AS CSV <i class="fa-solid fa-cloud-arrow-down"></i></button>
-              <button id="export-xlsx" onclick="{downloadXLSX()}">EXPORT AS XLSX <i class="fa-solid fa-cloud-arrow-down"></i></button>
+              <button id="export-csv">EXPORT AS CSV <i class="fa-solid fa-cloud-arrow-down"></i></button>
+              <button id="export-xlsx"">EXPORT AS XLSX <i class="fa-solid fa-cloud-arrow-down"></i></button>
+              <button id="export-pdf">EXPORT AS PDF <i class="fa-solid fa-cloud-arrow-down"></i></button>
             </div>
             <div class="error-box" id="error-msg"></div>
             </div>
@@ -2333,8 +2334,6 @@
     } from "./js/HMI.js";
     import { retrieveTruthEventsInTimeRange, retrieveVocalizationEventsInTimeRange } from "./js/routes.js";
     window.updateMics = updateMics;
-    window.downloadCSV = downloadCSV;
-    window.downloadXLSX = downloadXLSX;
     window.updateMicrophoneAnimation = updateMicrophoneAnimation;
     window.updateLayers = updateLayers;
     window.closeNav = MapCloseNav;
@@ -2580,6 +2579,7 @@
     }
 
     function downloadCSV() {
+      console.log("Hii");
       let filename = "exportedCSV.csv"
       let csv = null;
       let data = null;
@@ -2693,6 +2693,12 @@
     window.cancelRecording = cancelRecording;
     window.stopRecording = stopRecording;
 
+    window.downloadCSV = downloadCSV;
+    window.downloadXLSX = downloadXLSX;
+
+     
+      document.getElementById("export-csv").addEventListener("click", downloadCSV);
+      document.getElementById("export-xlsx").addEventListener("click", downloadXLSX);
   </script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
