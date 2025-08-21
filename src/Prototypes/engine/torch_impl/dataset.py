@@ -28,7 +28,7 @@ TODO:
 - [  ] use lmdb for cache to improve performance
 """
 class SpectrogramDataset(Dataset):
-	def __init__(self, audio_files, labels, cfg, audio_transforms=None, image_transforms=None):
+	def __init__(self, audio_files, labels, cfg, audio_transforms=None, image_transforms=None, is_train=False):
 		super().__init__()
 		self.audio_files = audio_files
 		self.labels = labels
@@ -42,6 +42,8 @@ class SpectrogramDataset(Dataset):
 			self.cache = dc.Cache(cfg.system.cache_directory, size_limit=10**10)
 		else:
 			self.cache = None
+
+		self.is_train = is_train
 
 	def _get_cache_key(self, file_path):
 		m = hashlib.sha256()
