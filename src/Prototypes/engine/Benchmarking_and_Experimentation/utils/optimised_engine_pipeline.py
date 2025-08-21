@@ -220,6 +220,15 @@ def train_model(model_name="EfficientNetV2B0", epochs=None, batch_size=None, l2_
     training_time = end_time - start_time
     print(f"Model training finished for {model_name}. Duration: {training_time:.2f} seconds")
 
+    import json
+
+    # After training is complete and class_names is available
+    
+    class_names_path = os.path.join(models_dir, f"class_names_{model_name}.json")
+    with open(class_names_path, "w") as f:
+        json.dump(class_names, f)
+    print(f"Class names saved to {class_names_path}")
+
     return model, history
 
 if __name__ == "__main__":
