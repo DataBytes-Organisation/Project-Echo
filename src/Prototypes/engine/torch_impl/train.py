@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from torch.utils.tensorboard import SummaryWriter
-from torch.cuda.amp import autocast, GradScaler
+from torch.amp import autocast, GradScaler
 from tqdm import tqdm
 from pathlib import Path
 from sklearn.metrics import f1_score, precision_score, recall_score, accuracy_score
@@ -45,7 +45,7 @@ class Trainer:
 			inputs, labels = inputs.to(self.device), labels.to(self.device)
 			self.optimizer.zero_grad()
 			
-			with autocast(enabled=self.use_amp):
+			with autocast(self.device.type, enabled=self.use_amp):
 				outputs = self.model(inputs)
 				loss = self.criterion(outputs, labels)
 
@@ -79,7 +79,7 @@ class Trainer:
 		with torch.no_grad():
 			for inputs, labels in dataloader:
 				inputs, labels = inputs.to(self.device), labels.to(self.device)
-				with autocast(enabled=self.use_amp):
+				with autocast(self.device.type, enabled=self.use_amp):
 					outputs = self.model(inputs)
 					loss = self.criterion(outputs, labels)
 				running_loss += loss.item() * inputs.size(0)
