@@ -15,8 +15,6 @@ from dataset import SpectrogramDataset, index_directory
 from model import Model
 from train import Trainer
 
-from quant import fuse_model, prepare_qat_fx
-
 @hydra.main(config_path="config", config_name="config", version_base=None)
 def main(cfg: DictConfig):
 	print(OmegaConf.to_yaml(cfg))

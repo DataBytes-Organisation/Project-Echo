@@ -9,7 +9,7 @@ from omegaconf import DictConfig
 from torchvision.models.efficientnet import EfficientNet, _efficientnet_conf, MBConv, FusedMBConv
 from functools import partial
 
-from models.utils import ArcMarginProduct
+from model.utils import ArcMarginProduct
 
 MODEL_CONFIGS = {
 	"efficientnet_v2_s": {"dropout": 0.2},
