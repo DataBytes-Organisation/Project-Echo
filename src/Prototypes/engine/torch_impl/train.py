@@ -1,6 +1,8 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 from torch.utils.tensorboard import SummaryWriter
+from torch.cuda.amp import autocast, GradScaler
 from tqdm import tqdm
 from pathlib import Path
 from sklearn.metrics import f1_score, precision_score, recall_score, accuracy_score
@@ -14,6 +16,10 @@ class Trainer:
 		self.train_loader = train_loader
 		self.val_loader = val_loader
 		self.device = device
+		
+		self.dtype = getattr(torch, cfg.training.get('dtype', 'bfloat16'))
+		self.use_amp = (self.dtype == torch.float16) and ('cuda' in self.device.type)
+		self.scaler = GradScaler(enabled=self.use_amp)
 		
 		self.criterion = hydra.utils.instantiate(self.cfg.training.criterion)
 		self.optimizer = hydra.utils.instantiate(self.cfg.training.optimizer, params=self.model.parameters())
@@ -33,10 +39,14 @@ class Trainer:
 		for inputs, labels in self.train_loader:
 			inputs, labels = inputs.to(self.device), labels.to(self.device)
 			self.optimizer.zero_grad()
-			outputs = self.model(inputs)
-			loss = self.criterion(outputs, labels)
-			loss.backward()
-			self.optimizer.step()
+			
+			with autocast(device_type=self.device.type, enabled=self.use_amp):
+				outputs = self.model(inputs)
+				loss = self.criterion(outputs, labels)
+
+			self.scaler.scale(loss).backward()
+			self.scaler.step(self.optimizer)
+			self.scaler.update()
 
 			running_loss += loss.item() * inputs.size(0)
 			_, predicted = torch.max(outputs.data, 1)
@@ -64,8 +74,9 @@ class Trainer:
 		with torch.no_grad():
 			for inputs, labels in dataloader:
 				inputs, labels = inputs.to(self.device), labels.to(self.device)
-				outputs = self.model(inputs)
-				loss = self.criterion(outputs, labels)
+				with autocast(enabled=self.use_amp):
+					outputs = self.model(inputs)
+					loss = self.criterion(outputs, labels)
 				running_loss += loss.item() * inputs.size(0)
 				_, predicted = torch.max(outputs.data, 1)
 				all_labels.extend(labels.cpu().numpy())
@@ -126,7 +137,8 @@ class Trainer:
 		with torch.no_grad():
 			for inputs, labels in tqdm(test_loader, desc="[Testing]"):
 				inputs, labels = inputs.to(self.device), labels.to(self.device)
-				outputs = self.model(inputs)
+				with autocast(enabled=self.use_amp):
+					outputs = self.model(inputs)
 				_, predicted = torch.max(outputs.data, 1)
 				all_labels.extend(labels.cpu().numpy())
 				all_predictions.extend(predicted.cpu().numpy())
@@ -170,25 +182,27 @@ class DistillationTrainer(Trainer):
 			inputs, labels = inputs.to(self.device), labels.to(self.device)
 			self.optimizer.zero_grad()
 
-			student_outputs = self.model(inputs)
+			with autocast(enabled=self.use_amp):
+				student_outputs = self.model(inputs)
+				
+				with torch.no_grad():
+					teacher_outputs = self.teacher_model(inputs)
+
+				# Standard cross-entropy loss for the student
+				student_loss = self.criterion(student_outputs, labels)
+
+				# TODO: modify it so it also works with CosineEmbedding Loss and MSELoss
+				# Distillation loss (KL Divergence between softened student and teacher logits)
+				distillation_loss = self.distillation_criterion(
+					F.log_softmax(student_outputs / self.temperature, dim=1),
+					F.softmax(teacher_outputs / self.temperature, dim=1)
+				)
+
+				total_loss = (1 - self.alpha) * student_loss + self.alpha * distillation_loss
 			
-			with torch.no_grad():
-				teacher_outputs = self.teacher_model(inputs)
-
-			# Standard cross-entropy loss for the student
-			student_loss = self.criterion(student_outputs, labels)
-
-			# TODO: modify it so it also works with CosineEmbedding Loss and MSELoss
-			# Distillation loss (KL Divergence between softened student and teacher logits)
-			distillation_loss = self.distillation_criterion(
-				F.log_softmax(student_outputs / self.temperature, dim=1),
-				F.softmax(teacher_outputs / self.temperature, dim=1)
-			)
-
-			total_loss = (1 - self.alpha) * student_loss + self.alpha * distillation_loss
-			
-			total_loss.backward()
-			self.optimizer.step()
+			self.scaler.scale(total_loss).backward()
+			self.scaler.step(self.optimizer)
+			self.scaler.update()
 
 			running_loss += total_loss.item() * inputs.size(0)
 			_, predicted = torch.max(student_outputs.data, 1)
