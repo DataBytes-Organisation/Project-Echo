@@ -6,6 +6,45 @@
     "version": "1.0.0"
   },
   "paths": {
+    "/api/audio/upload": {
+      "post": {
+        "tags": [
+          "audio"
+        ],
+        "summary": "Upload Audio",
+        "operationId": "upload_audio_api_audio_upload_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_upload_audio_api_audio_upload_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/hmi/weather": {
       "get": {
         "tags": [
@@ -1386,6 +1425,71 @@
         }
       }
     },
+    "/2fa/generate": {
+      "post": {
+        "tags": [
+          "2FA Authentication"
+        ],
+        "summary": "Generate 2Fa Code",
+        "description": "Generate a 2FA code for a validated user and send it via SMS",
+        "operationId": "generate_2fa_code_2fa_generate_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/2fa/verify": {
+      "post": {
+        "tags": [
+          "2FA Authentication"
+        ],
+        "summary": "Verify 2Fa Code",
+        "description": "Verify a 2FA code and issue a JWT token if valid",
+        "operationId": "verify_2fa_code_2fa_verify_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TwoFactorVerifySchema"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/iot/nodes": {
       "get": {
         "tags": [
@@ -1579,6 +1683,84 @@
           }
         }
       }
+    },
+    "/api/signin": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Signin",
+        "operationId": "signin_api_signin_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignInRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/verify-otp": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Verify Otp",
+        "operationId": "verify_otp_api_verify_otp_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OTPVerifyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1636,6 +1818,20 @@
         "properties": {
           "audio": {
             "title": "Audio",
+            "type": "string",
+            "format": "binary"
+          }
+        }
+      },
+      "Body_upload_audio_api_audio_upload_post": {
+        "title": "Body_upload_audio_api_audio_upload_post",
+        "required": [
+          "file"
+        ],
+        "type": "object",
+        "properties": {
+          "file": {
+            "title": "File",
             "type": "string",
             "format": "binary"
           }
@@ -1899,6 +2095,24 @@
           ]
         }
       },
+      "OTPVerifyRequest": {
+        "title": "OTPVerifyRequest",
+        "required": [
+          "email",
+          "otp"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "title": "Email",
+            "type": "string"
+          },
+          "otp": {
+            "title": "Otp",
+            "type": "string"
+          }
+        }
+      },
       "RecordingData": {
         "title": "RecordingData",
         "required": [
@@ -2041,6 +2255,42 @@
           }
         }
       },
+      "SignInRequest": {
+        "title": "SignInRequest",
+        "required": [
+          "email",
+          "password"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "title": "Email",
+            "type": "string"
+          },
+          "password": {
+            "title": "Password",
+            "type": "string"
+          }
+        }
+      },
+      "TwoFactorVerifySchema": {
+        "title": "TwoFactorVerifySchema",
+        "required": [
+          "user_id",
+          "otp"
+        ],
+        "type": "object",
+        "properties": {
+          "user_id": {
+            "title": "User Id",
+            "type": "string"
+          },
+          "otp": {
+            "title": "Otp",
+            "type": "string"
+          }
+        }
+      },
       "UserLoginSchema": {
         "title": "UserLoginSchema",
         "required": [
@@ -2165,6 +2415,10 @@
     },
     "securitySchemes": {
       "JWTBearer": {
+        "type": "http",
+        "scheme": "bearer"
+      },
+      "HTTPBearer": {
         "type": "http",
         "scheme": "bearer"
       }

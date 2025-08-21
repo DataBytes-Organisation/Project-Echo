@@ -1,15 +1,13 @@
+import os
+import copy
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
+import torch.optim as optim
+import torch.ao.quantization as quant 
+from torch.ao.quantization.quantize_fx import prepare_fx, convert_fx, prepare_qat_fx as prepare_qat_fx_
 
-import numpy as np
-
-# TODO: make it within custom model since each model 
-# would have different arhcitecture and require 
-# different type of fusing. 
-#
-# By doing that it would make the quantised version
-# smaller and more efficient
+# TODO: improve this for specific model I am testing rather than a
+# generate fusing between linear and relu
 def fuse_model(model):
 	"""
 	Fuse conv+relu and linear+relu in simple Sequential modules.
@@ -42,12 +40,29 @@ def fuse_model(model):
 
 	return fused_model
 
-def prepare_qat_fx(float_model, input_size=(1, 3, 32, 32)):
+def prepare_post_static_quantize_fx(float_model, calib_dl, input_size=(1, 3, 32, 32)):
+	quant_model = copy.deepcopy(float_model).cpu().eval()
+	fuse_model(quant_model)
+
+	qconfig = quant.get_default_qconfig("fbgemm")
+	qconfig_dict = {"": qconfig}
+
+	example_inputs = torch.rand(size=input_size).cpu()
+	prepared = prepare_fx(quant_model, qconfig_dict, example_inputs=example_inputs)
+
+	# calibration: run a batch through prepared model
+	with torch.no_grad():
+		for inputs, _ in calib_dl:
+			prepared(inputs.cpu())
+			break
+	
+	return prepared
+
+def prepare_qat_fx(model, input_size=(1, 3, 32, 32)):
 	qconfig = quant.get_default_qat_qconfig('fbgemm')
 	qconfig_dict = {"": qconfig}
 
 	example_inputs = torch.rand(size=input_size).cpu()
-	prepared_qat = prepare_qat_fx_(float_model, qconfig_dict, example_inputs=example_inputs)
+	prepared_qat = prepare_qat_fx_(model, qconfig_dict, example_inputs=example_inputs)
 
 	return prepared_qat
-
