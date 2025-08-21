@@ -7,10 +7,10 @@ hydra:
     dir: outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}
 
 system:
-  # audio_data_directory: /home/newbee/prjs/ai/Project-Echo/src/Components/Store/d:\data\b3
-  # cache_directory: /home/newbee/prjs/ai/Project-Echo/src/Prototypes/engine/torch_impl/.cache
-  audio_data_directory: /home/newbee/Projects/ai/Project-Echo/src/Components/Store/d:\data\b3
-  cache_directory: /home/newbee/Projects/ai/Project-Echo/src/Prototypes/engine/torch_impl/.cache
+  audio_data_directory: /home/newbee/prjs/ai/Project-Echo/src/Components/Store/d:\data\b3
+  cache_directory: /home/newbee/prjs/ai/Project-Echo/src/Prototypes/engine/torch_impl/.cache
+  # audio_data_directory: /home/newbee/Projects/ai/Project-Echo/src/Components/Store/d:\data\b3
+  # cache_directory: /home/newbee/Projects/ai/Project-Echo/src/Prototypes/engine/torch_impl/.cache
   use_disk_cache: True
 
 data:
