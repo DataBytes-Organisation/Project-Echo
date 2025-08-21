@@ -20,7 +20,7 @@ class Trainer:
 		
 		self.dtype = getattr(torch, cfg.training.get('dtype', 'bfloat16'))
 		self.use_amp = (self.dtype == torch.float16) and ('cuda' in self.device.type)
-		self.scaler = GradScaler(enabled=self.use_amp)
+		self.scaler = GradScaler(self.device.type, enabled=self.use_amp)
 		
 		self.criterion = hydra.utils.instantiate(self.cfg.training.criterion)
 		self.optimizer = hydra.utils.instantiate(self.cfg.training.optimizer, params=self.model.parameters())
@@ -45,7 +45,7 @@ class Trainer:
 			inputs, labels = inputs.to(self.device), labels.to(self.device)
 			self.optimizer.zero_grad()
 			
-			with autocast(device_type=self.device.type, enabled=self.use_amp):
+			with autocast(enabled=self.use_amp):
 				outputs = self.model(inputs)
 				loss = self.criterion(outputs, labels)
 
