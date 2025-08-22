@@ -20,4 +20,5 @@ dependencies = [
     "torchaudio>=2.0.2",
     "torchvision>=0.15.2",
     "tqdm>=4.67.1",
+    "umap-learn>=0.5.9.post2",
 ]
