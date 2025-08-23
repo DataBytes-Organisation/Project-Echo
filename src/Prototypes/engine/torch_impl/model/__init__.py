@@ -8,7 +8,7 @@ from model.effv2 import EfficientNetV2ArcFace
 # from model.panns_cnn14 import PannsCNN14ArcFace
 # from model.panns_mobilenetv1 import PannsMobileNetV1ArcFace
 # from model.panns_mobilenetv2 import PannsMobileNetV2ArcFace
-from model.quant import fuse_model, prepare_qat_fx, prepare_post_static_quantize_fx, convert_fx
+from model.quant import prepare_qat_fx, prepare_post_static_quantize_fx, convert_fx
 
 class Model(nn.Module):
 	def __init__(self, cfg: DictConfig):

@@ -33,6 +33,10 @@ class Trainer:
 		self.metric_mode = self.cfg.training.metric_mode
 		self.best_model_path = Path(hydra.core.hydra_config.HydraConfig.get().runtime.output_dir) / f"best_{self.name}.pth"
 		
+		self.early_stopping_patience = self.cfg.training.get('early_stopping_patience', 3)
+		self.epochs_no_improve = 0
+		self.best_epoch = 0
+		
 		self.writer = SummaryWriter(log_dir=self.best_model_path.parent)
 
 	def _train_one_epoch(self, pbar, metrics_dict):
@@ -99,11 +103,8 @@ class Trainer:
 		pbar = tqdm(range(self.epochs), total=self.epochs, desc="Training Progress")
 		
 		metrics_dict = {
-			'phase': 'train'
-			# 'train_loss': 'N/A',
-			# 'train_acc': 'N/A',
-			# 'val_loss': 'N/A',
-			# 'val_acc': 'N/A',
+			'phase': 'train',
+			'best_metric': f'{self.best_metric:.4f}'
 		}
 		
 		for epoch in pbar:
@@ -116,22 +117,40 @@ class Trainer:
 			metrics_dict['val_loss'] = f'{val_loss:.4f}'
 			metrics_dict['val_acc'] = f'{val_acc:.4f}'
 			
-			pbar.set_postfix(metrics_dict)
-
 			self.writer.add_scalar('Loss/val', val_loss, self.current_epoch)
 			self.writer.add_scalar('Accuracy/val', val_acc, self.current_epoch)
 
 			current_metric = val_loss if self.cfg.training.metric_mode == 'min' else val_acc
-			if (self.metric_mode == 'min' and current_metric < self.best_metric) or \
-			   (self.metric_mode == 'max' and current_metric > self.best_metric):
+			
+			# Check for improvement
+			is_better = (self.metric_mode == 'min' and current_metric < self.best_metric) or \
+						(self.metric_mode == 'max' and current_metric > self.best_metric)
+			
+			if is_better:
 				self.best_metric = current_metric
+				self.best_epoch = self.current_epoch
 				torch.save(self.model.state_dict(), self.best_model_path)
+				self.epochs_no_improve = 0
+				metrics_dict['best_metric'] = f'{self.best_metric:.4f}'
+			else:
+				self.epochs_no_improve += 1
+
+			pbar.set_postfix(metrics_dict)
 
 			# TODO: make this support other scheduler
 			self.scheduler.step(val_loss)
+			
+			# Check for early stopping
+			if self.epochs_no_improve >= self.early_stopping_patience:
+				print(f"\nEarly stopping triggered after {self.epochs_no_improve} epochs with no improvement.")
+				break
 				
 		self.writer.close()
-		print(f"Training complete. Best model saved to {self.best_model_path}")
+		print(f"\nTraining complete. Best model from epoch {self.best_epoch} saved to {self.best_model_path}")
+
+		print("Loading best model weights...")
+		self.model.load_state_dict(torch.load(self.best_model_path, map_location=self.device))
+		print("Best model loaded successfully.")
 
 	def test(self, test_loader, model_to_test=None, device=None):
 		print("Starting evaluation on test set...")
@@ -142,7 +161,6 @@ class Trainer:
 			model = model_to_test.to(eval_device)
 		else:
 			model = self.model.to(eval_device)
-			model.load_state_dict(torch.load(self.best_model_path, map_location=eval_device))
 
 		model.eval()
 
@@ -173,6 +191,7 @@ class Trainer:
 		
 		return accuracy, precision, recall, f1
 
+# The DistillationTrainer does not need any changes as it inherits the modified `train` method.
 class DistillationTrainer(Trainer):
 	def __init__(self, cfg: DictConfig, model, train_loader, val_loader, device):
 		super().__init__(cfg, model, train_loader, val_loader, device)
