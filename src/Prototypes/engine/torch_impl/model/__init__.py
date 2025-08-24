@@ -54,7 +54,6 @@ class Model(nn.Module):
 
 		self.use_qat = model_params.get("use_qat", False)
 		if self.use_qat:
-			# self.model = fuse_model(self.model)
 			self.model.eval()
 			self.model.fuse_model() 
 			self.model = prepare_qat_fx(self.model)
@@ -70,7 +69,8 @@ class Model(nn.Module):
 
 	def quantise(self):
 		if not self.use_qat:
-			self.model = fuse_model(self.model)
+			self.model.eval()
+			self.model.fuse_model() 
 			self.model = prepare_post_static_quantize_fx(self.model)
 
 		self.model = convert_fx(self.model)
