@@ -78,10 +78,42 @@ def main(cfg: DictConfig):
 
 	model = Model(cfg).to(device)
 	trainer = Trainer(cfg, model, train_loader, val_loader, device, cfg.model.name)
-	trainer.train()
-	trainer.test(val_loader)
-	trainer.model.quantise()
-	trainer.test(val_loader)
+	# trainer.train()
+	# trainer.test(val_loader)
+	# trainer.model.quantise()
+	# trainer.test(val_loader)
+
+	if cfg.run.train:
+		trainer.train()
+	elif cfg.run.test:
+		load_path = None
+
+		if cfg.run.checkpoint_path:
+			ckpt_path = Path(hydra.utils.to_absolute_path(cfg.run.checkpoint_path))
+			if ckpt_path.is_file():
+				load_path = ckpt_path
+			else:
+				print(f"ERROR: Specified checkpoint '{ckpt_path}' not found!")
+		elif trainer.best_model_path.is_file():
+			load_path = trainer.best_model_path
+
+		if load_path:
+			print(f"Training skipped. Loading model from: {load_path}")
+			trainer.model.load_state_dict(torch.load(load_path, map_location=device))
+		else:
+			print("WARNING: Training skipped and no valid model checkpoint found. Testing with an untrained model.")
+
+	if cfg.run.test:
+		print("\n--- Testing original model ---")
+		# trainer.test(val_loader, name="Original")
+		trainer.test(val_loader)
+
+		if cfg.run.quantise:
+			print("\n--- Quantising model ---")
+			trainer.model.quantise()
+			print("\n--- Testing quantised model ---")
+			# trainer.test(val_loader, name="Quantised")
+			trainer.test(val_loader)
 
 	# # --- Non-QAT EfficientNetV2-S ---
 	# print("--- Training non-QAT EfficientNetV2-S ---")
