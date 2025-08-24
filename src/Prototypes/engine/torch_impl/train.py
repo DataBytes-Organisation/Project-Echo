@@ -170,7 +170,7 @@ class Trainer:
 		with torch.no_grad():
 			for inputs, labels in tqdm(test_loader, desc="[Testing]"):
 				inputs, labels = inputs.to(self.device), labels.to(self.device)
-				with autocast(enabled=self.use_amp):
+				with autocast(self.device.type, enabled=self.use_amp):
 					outputs = self.model(inputs)
 
 				_, predicted = torch.max(outputs.data, 1)
