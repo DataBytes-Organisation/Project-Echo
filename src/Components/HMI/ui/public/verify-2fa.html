@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Same imports as login.html -->
+  <link rel="stylesheet" type="text/css" href="./css/ol.css" />
+  <script type="text/javascript" src="./js/ol.js"></script>
+
+  <!-- Bootstrap & icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+  <script src="https://kit.fontawesome.com/8aa980d912.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+  <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
+
+  <!-- Match login page styles -->
+  <link rel="stylesheet" type="text/css" href="./css/splash_screen_style.css">
+  <link rel="stylesheet" href="./css/HMI_style.css" type="text/css">
+  <link rel="stylesheet" href="./css/auth-form.css" type="text/css">
+  <script type="text/javascript" src="./js/animation.js"></script>
+
+  <title>Echo | Verify 2FA</title>
+</head>
+<body>
+  <div class="screen" id="screen">
+    <div class="screen-image"></div>
+    <div class="screen-overlay"></div>
+
+    <div class="screen-content">
+      <img src="./images/logo-splashscreen.png" style="width:101px;height:81px" alt="Project Echo">
+      <div class="screen-user">
+        <span class="name animate" id="name" data-value="PROJECT ECHO" onmouseenter="{textFlex()}">PROJECT ECHO</span>
+      </div>
+    </div>
+
+    <!-- OTP Modal styled exactly like login/register modals -->
+    <div id="verify-2fa-form" class="user-auth-form modal" style="display:block;">
+      <form class="modal-content animate" id="otp-form">
+        <div class="imgcontainer">
+          <span onclick="window.location.href='login.html'" class="close" title="Close Modal">&times;</span>
+        </div>
+
+        <div class="container">
+          <h3 class="mb-2">Two-Step Verification</h3>
+          <p class="mb-3">Enter the 6‑digit code sent to your registered email/phone.</p>
+
+          <label for="otp"><b>Verification code</b></label>
+          <input type="text" id="otp" maxlength="6" placeholder="Enter 6-digit OTP" required>
+
+          <button type="submit" class="btn10 mt-2" id="verify-btn"><span>Verify</span></button>
+          <button type="button" class="btn10 mt-2" id="resend-btn" style="background:#6c757d;border-color:#6c757d;">
+            <span id="resend-text">Resend Code</span>
+          </button>
+
+          <p id="statusMessage" class="error-text mt-2" style="display:none;"></p>
+        </div>
+
+        <div class="container" style="background-color:#f1f1f1">
+          <button type="button" onclick="window.location.href='login.html'" class="cancelbtn">Cancel</button>
+        </div>
+      </form>
+    </div>
+
+    <div id="error-box" class="error_box"></div>
+  </div>
+
+  <div id="blur"></div>
+
+  <script>
+    const statusEl = document.getElementById('statusMessage');
+    const verifyBtn = document.getElementById('verify-btn');
+    const resendBtn = document.getElementById('resend-btn');
+    const resendText = document.getElementById('resend-text');
+
+    // Cooldown for resend (optional, matches your UI vibe)
+    let cooldown = 0;
+    let timerId = null;
+
+    function showStatus(msg, isError = true) {
+      statusEl.style.display = 'block';
+      statusEl.classList.toggle('error-text', isError);
+      statusEl.classList.toggle('text-success', !isError);
+      statusEl.textContent = msg;
+    }
+
+    function startCooldown(seconds = 30) {
+      cooldown = seconds;
+      updateResendLabel();
+      resendBtn.disabled = true;
+      timerId = setInterval(() => {
+        cooldown--;
+        updateResendLabel();
+        if (cooldown <= 0) {
+          clearInterval(timerId);
+          resendBtn.disabled = false;
+          resendText.textContent = 'Resend Code';
+        }
+      }, 1000);
+    }
+
+    function updateResendLabel() {
+      resendText.textContent = `Resend Code ${cooldown ? '(' + cooldown + 's)' : ''}`;
+    }
+
+    document.getElementById('otp-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const code = (document.getElementById('otp').value || '').trim();
+      const userId = localStorage.getItem('userId');
+
+      if (!/^\d{6}$/.test(code)) {
+        showStatus('Please enter a valid 6-digit code.');
+        return;
+      }
+
+      verifyBtn.disabled = true;
+
+      try {
+        const res = await fetch('/api/auth/verify-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code, userId })
+        });
+
+        const data = await res.json().catch(() => ({}));
+        if (res.ok) {
+          showStatus('Verified! Redirecting…', false);
+          setTimeout(() => (window.location.href = '/welcome'), 800);
+        } else {
+          showStatus(data.message || 'Invalid code. Please try again.');
+        }
+      } catch (err) {
+        showStatus('Something went wrong. Please try again.');
+        console.error(err);
+      } finally {
+        verifyBtn.disabled = false;
+      }
+    });
+
+    resendBtn.addEventListener('click', async () => {
+      const userId = localStorage.getItem('userId');
+      if (cooldown > 0) return;
+
+      try {
+        const res = await fetch('/api/auth/resend-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId })
+        });
+        if (res.ok) {
+          showStatus('A new code has been sent to your email/phone.', false);
+          startCooldown(30); // adjust if backend enforces a different cooldown
+        } else {
+          showStatus('Failed to resend code. Please try again in a moment.');
+        }
+      } catch (err) {
+        showStatus('Network error. Please try again.');
+      }
+    });
+  </script>
+</body>
+</html>

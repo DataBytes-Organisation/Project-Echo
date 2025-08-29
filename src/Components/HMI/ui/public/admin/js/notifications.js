@@ -26,8 +26,6 @@ $(document).ready(function() {
             type: "user"
         }
     ];
-    console.log("Initial notifications:", notifications);
-    console.log("Unread count:", notifications.filter(n => !n.read).length);
 
     // Render notifications
     function renderNotifications() {
@@ -74,18 +72,6 @@ $(document).ready(function() {
         });
     }
 
-    //Function to update notification permissions (display unread count)
-    function updateNotificationBadge() {
-        const unreadCount = notifications.filter(notification => !notification.read).length;
-        const badge = $("#notification-badge");    
-        if (unreadCount > 0) {
-            badge.text(unreadCount);
-            badge.show();
-        } else {
-            badge.hide();
-        }
-    }
-    
     // Mark notification as read
     $(document).on("click", ".mark-read", function () {
         const notificationId = $(this).closest(".notification-item").data("id");
@@ -94,7 +80,6 @@ $(document).ready(function() {
             notification.read = true;
             renderNotifications();
         }
-        updateNotificationBadge();
     });
 
     // Delete notification
@@ -102,7 +87,6 @@ $(document).ready(function() {
         const notificationId = $(this).closest(".notification-item").data("id");
         notifications = notifications.filter(n => n.id !== notificationId);
         renderNotifications();
-        updateNotificationBadge();
     });
 
     // Mark all as read
@@ -111,19 +95,13 @@ $(document).ready(function() {
             notification.read = true;
         });
         renderNotifications();
-        updateNotificationBadge();
     });
 
     // Delete all read notifications
     $("#delete-all-read").on("click", function () {
         notifications = notifications.filter(n => !n.read);
         renderNotifications();
-        updateNotificationBadge();
     });
 
     renderNotifications();
-    updateNotificationBadge();
-    setTimeout(function() {
-    updateNotificationBadge();
-    }, 100);
 });

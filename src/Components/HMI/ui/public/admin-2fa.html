@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Same imports as your login/verify pages -->
+  <link rel="stylesheet" type="text/css" href="./css/ol.css" />
+  <script type="text/javascript" src="./js/ol.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+  <script src="https://kit.fontawesome.com/8aa980d912.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+  <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
+
+  <link rel="stylesheet" type="text/css" href="./css/splash_screen_style.css">
+  <link rel="stylesheet" href="./css/HMI_style.css" type="text/css">
+  <link rel="stylesheet" href="./css/auth-form.css" type="text/css">
+  <script type="text/javascript" src="./js/animation.js"></script>
+
+  <title>Echo | 2FA Admin</title>
+  <style>
+    .badge-on { background:#198754; }
+    .badge-off { background:#dc3545; }
+    .table thead th { white-space: nowrap; }
+  </style>
+</head>
+<body>
+  <div class="screen" id="screen">
+    <div class="screen-image"></div>
+    <div class="screen-overlay"></div>
+
+    <div class="screen-content">
+      <img src="./images/logo-splashscreen.png" style="width:101px;height:81px" alt="Project Echo">
+      <div class="screen-user">
+        <span class="name animate" id="name" data-value="PROJECT ECHO" onmouseenter="{textFlex()}">PROJECT ECHO</span>
+      </div>
+    </div>
+
+    <div class="user-auth-form modal" style="display:block;">
+      <div class="modal-content animate">
+        <div class="imgcontainer">
+          <span onclick="window.location.href='login.html'" class="close" title="Close">&times;</span>
+        </div>
+
+        <div class="container">
+          <h3 class="mb-3">Two‑Factor Authentication — Admin</h3>
+
+          <!-- Controls -->
+          <div class="row g-2 mb-3">
+            <div class="col-md-6">
+              <input id="search" class="form-control" placeholder="Search by username or email">
+            </div>
+            <div class="col-md-6 text-end">
+              <button id="enforceBtn" class="btn btn-outline-primary btn-sm">Toggle: Enforce 2FA policy</button>
+            </div>
+          </div>
+
+          <!-- Table -->
+          <div class="table-responsive">
+            <table class="table table-sm align-middle">
+              <thead>
+                <tr>
+                  <th>User ID</th>
+                  <th>Username</th>
+                  <th>Email</th>
+                  <th>Status</th>
+                  <th>Last 2FA Use</th>
+                  <th class="text-end">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="rows">
+                <tr><td colspan="6" class="text-muted">Loading…</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p id="status" class="mt-2" style="display:none;"></p>
+        </div>
+
+        <div class="container" style="background-color:#f1f1f1">
+          <button type="button" onclick="window.location.href='login.html'" class="cancelbtn">Back</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="blur"></div>
+
+  <script>
+    const rowsEl = document.getElementById('rows');
+    const statusEl = document.getElementById('status');
+    const searchEl = document.getElementById('search');
+    const enforceBtn = document.getElementById('enforceBtn');
+    const token = localStorage.getItem('token'); // admin will be authenticated
+
+    const API = {
+      list:   '/api/admin/2fa/users',        // GET
+      reset:  '/api/admin/2fa/reset',        // POST { userId }
+      disable:'/api/admin/2fa/disable',      // POST { userId }
+      enforce:'/api/admin/2fa/policy/toggle' // POST (flip on/off) or GET for current
+    };
+
+    function showStatus(msg, ok=false){
+      statusEl.style.display='block';
+      statusEl.className = ok ? 'text-success' : 'text-danger';
+      statusEl.textContent = msg;
+    }
+
+    function formatWhen(dt){
+      if (!dt) return '—';
+      try { return new Date(dt).toLocaleString(); } catch { return dt; }
+    }
+
+    function render(users){
+      const q = (searchEl.value||'').toLowerCase();
+      const filtered = users.filter(u =>
+        (u.username||'').toLowerCase().includes(q) ||
+        (u.email||'').toLowerCase().includes(q)
+      );
+
+      rowsEl.innerHTML = filtered.map(u => `
+        <tr>
+          <td>${u.userId || u._id || ''}</td>
+          <td>${u.username || ''}</td>
+          <td>${u.email || ''}</td>
+          <td>
+            <span class="badge ${u.mfaEnrolled ? 'badge-on' : 'badge-off'}">
+              ${u.mfaEnrolled ? 'Enabled' : 'Disabled'}
+            </span>
+          </td>
+          <td>${formatWhen(u.last2faAt)}</td>
+          <td class="text-end">
+            <button class="btn btn-sm btn-outline-secondary" onclick="reset2fa('${u.userId || u._id}')">Reset</button>
+            <button class="btn btn-sm ${u.mfaEnrolled ? 'btn-outline-danger' : 'btn-outline-success'}"
+                    onclick="toggle2fa('${u.userId || u._id}', ${!!u.mfaEnrolled})">
+              ${u.mfaEnrolled ? 'Disable' : 'Enable'}
+            </button>
+          </td>
+        </tr>
+      `).join('') || '<tr><td colspan="6" class="text-muted">No users found.</td></tr>';
+    }
+
+    async function fetchJSON(url, opts={}){
+      const headers = { 'Content-Type':'application/json', ...(token ? { Authorization:`Bearer ${token}` } : {}) };
+      const res = await fetch(url, { headers, ...opts });
+      const txt = await res.text();
+      let data = {}; try { data = JSON.parse(txt); } catch {}
+      if (!res.ok) throw new Error(data.message || `HTTP ${res.status}`);
+      return data;
+    }
+
+    async function load(){
+      try {
+        const data = await fetchJSON(API.list); // expect: [{ userId, username, email, mfaEnrolled, last2faAt }, ...]
+        window._users = data || [];
+        render(window._users);
+        showStatus('Loaded.', true);
+      } catch(e){
+        console.error(e);
+        rowsEl.innerHTML = '<tr><td colspan="6" class="text-danger">Failed to load users.</td></tr>';
+        showStatus(e.message);
+      }
+    }
+
+    async function reset2fa(userId){
+      if (!confirm('Reset 2FA for this user? They must enroll again.')) return;
+      try {
+        await fetchJSON(API.reset, { method:'POST', body: JSON.stringify({ userId }) });
+        showStatus('2FA reset. User must enroll again.', true);
+        load();
+      } catch(e){ showStatus(e.message); }
+    }
+
+    async function toggle2fa(userId, currentlyEnabled){
+      const msg = currentlyEnabled ? 'Disable 2FA for this user?' : 'Enable 2FA for this user?';
+      if (!confirm(msg)) return;
+      try {
+        const endpoint = currentlyEnabled ? API.disable : API.reset; // enable by resetting (backend can treat as enable)
+        await fetchJSON(endpoint, { method:'POST', body: JSON.stringify({ userId }) });
+        showStatus(currentlyEnabled ? '2FA disabled.' : '2FA enabled/reset.', true);
+        load();
+      } catch(e){ showStatus(e.message); }
+    }
+
+    enforceBtn.addEventListener('click', async () => {
+      if (!confirm('Toggle global 2FA enforcement?')) return;
+      try {
+        await fetchJSON(API.enforce, { method:'POST' });
+        showStatus('Policy toggled.', true);
+      } catch(e){ showStatus(e.message); }
+    });
+
+    searchEl.addEventListener('input', () => render(window._users || []));
+    load();
+  </script>
+</body>
+</html>

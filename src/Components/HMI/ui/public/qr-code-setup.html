@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Same imports as login.html -->
+  <link rel="stylesheet" type="text/css" href="./css/ol.css" />
+  <script type="text/javascript" src="./js/ol.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+  <script src="https://kit.fontawesome.com/8aa980d912.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+  <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
+
+  <!-- Match your theme -->
+  <link rel="stylesheet" type="text/css" href="./css/splash_screen_style.css">
+  <link rel="stylesheet" href="./css/HMI_style.css" type="text/css">
+  <link rel="stylesheet" href="./css/auth-form.css" type="text/css">
+  <script type="text/javascript" src="./js/animation.js"></script>
+
+  <!-- Lightweight QR generator -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <title>Echo | Enable 2FA</title>
+</head>
+<body>
+  <div class="screen" id="screen">
+    <div class="screen-image"></div>
+    <div class="screen-overlay"></div>
+
+    <div class="screen-content">
+      <img src="./images/logo-splashscreen.png" style="width:101px;height:81px" alt="Project Echo">
+      <div class="screen-user">
+        <span class="name animate" id="name" data-value="PROJECT ECHO" onmouseenter="{textFlex()}">PROJECT ECHO</span>
+      </div>
+    </div>
+
+    <div class="user-auth-form modal" style="display:block;">
+      <form class="modal-content animate" id="enable-2fa-form">
+        <div class="imgcontainer">
+          <span onclick="window.location.href='login.html'" class="close" title="Close Modal">&times;</span>
+        </div>
+
+        <div class="container">
+          <h3 class="mb-2">Enable Two‑Factor Authentication</h3>
+          <p class="mb-3">Scan this QR in <b>Microsoft Authenticator</b> (or Google Authenticator). If you can’t scan, use the manual key.</p>
+
+          <div class="d-flex flex-column align-items-center mb-3">
+            <div id="qrcode" style="padding:8px;background:#fff;border-radius:8px;"></div>
+            <small class="text-muted mt-2">If the QR doesn’t load, refresh the page.</small>
+          </div>
+
+          <label class="mb-1"><b>Manual key</b></label>
+          <div class="input-group mb-3">
+            <input id="manualKey" class="form-control" readonly value="Loading..." />
+            <button class="btn btn-outline-secondary" type="button" id="copyKeyBtn">Copy</button>
+          </div>
+
+          <label for="otp"><b>Enter a 6‑digit code from your app</b></label>
+          <input type="text" id="otp" maxlength="6" class="mb-2" placeholder="123456" required>
+
+          <button type="submit" class="btn10 mt-2" id="activate-btn"><span>Activate 2FA</span></button>
+          <p id="statusMessage" class="error-text mt-2" style="display:none;"></p>
+        </div>
+
+        <div class="container" style="background-color:#f1f1f1">
+          <button type="button" onclick="window.location.href='login.html'" class="cancelbtn">Cancel</button>
+        </div>
+      </form>
+    </div>
+
+    <div id="error-box" class="error_box"></div>
+  </div>
+
+  <div id="blur"></div>
+
+  <script>
+    const statusEl = document.getElementById('statusMessage');
+    const manualKey = document.getElementById('manualKey');
+    const copyKeyBtn = document.getElementById('copyKeyBtn');
+    const activateBtn = document.getElementById('activate-btn');
+    const token = localStorage.getItem('token'); // include if your backend protects these endpoints
+
+    function showStatus(msg, isError = true) {
+      statusEl.style.display = 'block';
+      statusEl.classList.toggle('error-text', isError);
+      statusEl.classList.toggle('text-success', !isError);
+      statusEl.textContent = msg;
+    }
+
+    // Fetch otpauth URL + secret and render QR
+    async function loadQr() {
+      try {
+        const res = await fetch('/api/auth/2fa/setup', {
+          headers: { 'Authorization': token ? `Bearer ${token}` : '' }
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || 'Failed to get 2FA setup data');
+
+        // Render QR from otpauth:// URL
+        const qrelem = document.getElementById('qrcode');
+        qrelem.innerHTML = '';
+        new QRCode(qrelem, {
+          text: data.otpauthUrl, // e.g. otpauth://totp/ProjectEcho:ashbin?secret=XXXX&issuer=ProjectEcho
+          width: 180, height: 180,
+          correctLevel: QRCode.CorrectLevel.M
+        });
+
+        // Show manual key as fallback
+        manualKey.value = data.secret || '';
+      } catch (e) {
+        console.error(e);
+        showStatus('Could not load QR code. Please try again later.');
+      }
+    }
+
+    // Activate using first code from the app
+    document.getElementById('enable-2fa-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const code = (document.getElementById('otp').value || '').trim();
+
+      if (!/^\d{6}$/.test(code)) {
+        showStatus('Please enter a valid 6‑digit code.');
+        return;
+      }
+      activateBtn.disabled = true;
+
+      try {
+        const res = await fetch('/api/auth/2fa/activate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token ? `Bearer ${token}` : ''
+          },
+          body: JSON.stringify({ code })
+        });
+        const data = await res.json().catch(()=> ({}));
+        if (!res.ok) throw new Error(data.message || 'Activation failed');
+
+        showStatus('2FA enabled. Redirecting…', false);
+        setTimeout(() => window.location.href = '/verify-2fa', 800);
+      } catch (e) {
+        showStatus(e.message || 'Invalid code. Please try again.');
+      } finally {
+        activateBtn.disabled = false;
+      }
+    });
+
+    // Copy manual key
+    copyKeyBtn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(manualKey.value);
+        showStatus('Manual key copied.', false);
+      } catch {
+        showStatus('Could not copy. Select and copy manually.');
+      }
+    });
+
+    loadQr();
+  </script>
+</body>
+</html>
