@@ -23,18 +23,13 @@ def init_bn(bn):
 class ConvBlock(nn.Module):
 	def __init__(self, in_channels, out_channels):
 		super(ConvBlock, self).__init__()
-
 		self.seq1 = nn.Sequential(
-			nn.Conv2d(in_channels=in_channels, out_channels=out_channels,
-					  kernel_size=(3, 3), stride=(1, 1),
-					  padding=(1, 1), bias=False),
+			nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False),
 			nn.BatchNorm2d(out_channels),
 			nn.ReLU()
 		)
 		self.seq2 = nn.Sequential(
-			nn.Conv2d(in_channels=out_channels, out_channels=out_channels,
-					  kernel_size=(3, 3), stride=(1, 1),
-					  padding=(1, 1), bias=False),
+			nn.Conv2d(in_channels=out_channels, out_channels=out_channels, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False),
 			nn.BatchNorm2d(out_channels),
 			nn.ReLU()
 		)
@@ -47,18 +42,15 @@ class ConvBlock(nn.Module):
 	def forward(self, x, pool_size=(2, 2), pool_type='avg'):
 		x = self.seq1(x)
 		x = self.seq2(x)
-
 		if pool_type == 'max':
 			x = F.max_pool2d(x, kernel_size=pool_size)
 		elif pool_type == 'avg':
 			x = F.avg_pool2d(x, kernel_size=pool_size)
-		
 		return x
 
 class Cnn14(nn.Module):
 	def __init__(self, classes_num):
 		super(Cnn14, self).__init__()
-
 		self.conv_block1 = ConvBlock(in_channels=1, out_channels=64)
 		self.conv_block2 = ConvBlock(in_channels=64, out_channels=128)
 		self.conv_block3 = ConvBlock(in_channels=128, out_channels=256)
@@ -73,7 +65,6 @@ class Cnn14(nn.Module):
 		init_layer(self.fc_audioset)
 
 	def forward(self, x):
-		"""Input: (batch_size, 1, time_steps, mel_bins)"""
 		x = self.conv_block1(x, pool_size=(2, 2), pool_type='avg')
 		x = self.conv_block2(x, pool_size=(2, 2), pool_type='avg')
 		x = self.conv_block3(x, pool_size=(2, 2), pool_type='avg')
@@ -85,60 +76,51 @@ class Cnn14(nn.Module):
 		(x1, _) = torch.max(x, dim=2)
 		x2 = torch.mean(x, dim=2)
 		x = x1 + x2
-
 		x = F.dropout(x, p=0.5, training=self.training)
 		x = F.relu_(self.fc1(x))
 		embedding = F.dropout(x, p=0.5, training=self.training)
-		
+
 		return self.fc_audioset(embedding), embedding
 
 class PannsCNN14ArcFace(nn.Module):
-	def __init__(self, classes_num: int, pretrained: bool, use_arcface: bool = False, **arcface_params):
+	def __init__(self, num_classes: int, pretrained: bool, use_arcface: bool = False, **arcface_params):
 		super().__init__()
-		
-		original_classes = 527  # AudioSet has 527 classes
+		PRETRAINED_URL = "https://zenodo.org/records/3987831/files/Cnn14_mAP=0.431.pth"
+		original_classes = 527
 		self.cnn = Cnn14(classes_num=original_classes)
-		
+
 		if pretrained:
 			print("Loading pretrained Cnn14 weights.")
 			state_dict = load_state_dict_from_url(PRETRAINED_URL, progress=True)['model']
-			
-			# Map state dict keys from original Cnn14 to refactored fusable Cnn14
 			new_state_dict = {}
 			for k, v in state_dict.items():
 				new_k = k
 				if 'conv_block' in k:
 					new_k = re.sub(r'\.conv1\.', '.seq1.0.', new_k)
-					new_k = re.sub(r'\.bn1\.',   '.seq1.1.', new_k)
+					new_k = re.sub(r'\.bn1\.',	 '.seq1.1.', new_k)
 					new_k = re.sub(r'\.conv2\.', '.seq2.0.', new_k)
-					new_k = re.sub(r'\.bn2\.',   '.seq2.1.', new_k)
+					new_k = re.sub(r'\.bn2\.',	 '.seq2.1.', new_k)
 				new_state_dict[new_k] = v
-				
 			self.cnn.load_state_dict(new_state_dict, strict=False)
 
 		self.use_arcface = use_arcface
 		in_features = self.cnn.fc_audioset.in_features
-
 		if self.use_arcface:
-			self.head = ArcMarginProduct(in_features, classes_num, **arcface_params)
+			self.head = ArcMarginProduct(in_features, num_classes, **arcface_params)
 		else:
-			self.head = nn.Linear(in_features, classes_num)
-		
+			self.head = nn.Linear(in_features, num_classes)
 		self.cnn.fc_audioset = nn.Identity()
 
 	def forward(self, x: torch.Tensor, labels: torch.Tensor = None) -> torch.Tensor:
-		if x.dim() == 3: # Add channel dimension if not present
+		if x.dim() == 3:
 			x = x.unsqueeze(1)
-			
 		_, embedding = self.cnn(x)
-		
 		if self.use_arcface:
 			if self.training:
 				if labels is None:
-					raise ValueError("Labels are required for ArcFace training.")
+						raise ValueError("Labels are required for ArcFace training.")
 				return self.head(embedding, labels)
 			else:
-				# During inference, ArcFace should output normalized embeddings
 				return F.normalize(embedding, p=2, dim=1)
 		else:
 			return self.head(embedding)

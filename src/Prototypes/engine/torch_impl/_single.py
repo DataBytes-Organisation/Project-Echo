@@ -6,7 +6,7 @@ from torch.hub import load_state_dict_from_url
 from torch.utils.tensorboard import SummaryWriter
 from torch.amp import autocast, GradScaler
 import torch.ao.quantization as quant
-from torch.ao.quantization.quantize_fx import prepare_fx, convert_fx, prepare_qat_fx as prepare_qat_fx_
+from torch.ao.quantization.quantize_fx import prepare_fx, convert_fx, prepare_qat_fx as __prepare_qat_fx
 
 import os
 from pathlib import Path
@@ -670,19 +670,38 @@ class EfficientNetV2ArcFace(EfficientNet):
 		print("Model fusion completed successfully.")
 
 # --- Quantization Utilities (from model/quant.py) ---
-def prepare_qat_fx(float_model, input_size=(1, 3, 32, 32)):
-	qconfig_mapping = quant.get_default_qat_qconfig_mapping('fbgemm')
+default_qat_qconfig = quantization.get_default_qat_qconfig('fbgemm')
 
+per_tensor_weight_handler = quantization.FakeQuantize.with_args(
+	observer=quantization.MovingAverageMinMaxObserver, # Per-tensor observer
+	quant_min=-128,
+	quant_max=127,
+	dtype=torch.qint8,
+	qscheme=torch.per_tensor_affine,
+	reduce_range=False
+)
+
+qconfig_per_tensor = quantization.QConfig(
+	activation=default_qat_qconfig.activation,
+	weight=per_tensor_weight_handler
+)
+
+qconfig_mapping = quantization.QConfigMapping().set_object_type(
+	torch.nn.Conv2d, qconfig_per_tensor
+).set_object_type(
+	torch.nn.Linear, qconfig_per_tensor
+).set_object_type(
+	torch.nn.BatchNorm2d, qconfig_per_tensor
+)
+
+def prepare_qat_fx(float_model, input_size=(1, 3, 32, 32)):
 	example_inputs = torch.rand(size=input_size).cpu()
-	prepared_qat = prepare_qat_fx_(float_model, qconfig_mapping, example_inputs=example_inputs)
+	prepared_qat = __prepare_qat_fx(float_model, qconfig_mapping, example_inputs=example_inputs)
 
 	return prepared_qat
 
 def prepare_post_static_quantize_fx(float_model, calib_dl, input_size=(1, 3, 32, 32)):
 	quant_model = copy.deepcopy(float_model).cpu().eval()
-	fuse_model(quant_model)
-
-	qconfig_mapping = quant.get_default_qconfig_mapping("fbgemm")
 
 	example_inputs = torch.rand(size=input_size).cpu()
 	prepared = prepare_fx(quant_model, qconfig_mapping, example_inputs=example_inputs)
