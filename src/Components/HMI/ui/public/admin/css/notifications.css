@@ -71,22 +71,3 @@
     align-items: center;
     margin-bottom: 1.5rem;
 }
-
-#notification-badge {
-  position: absolute;
-  top: -8px;
-  right: -5px;
-  min-width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #ff4d4f;
-  color: white;
-  font-size: 0.75rem;
-  font-weight: bold;
-  line-height: 1;
-  padding: 0 5px;
-  z-index: 1000;
-}

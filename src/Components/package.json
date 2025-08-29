@@ -1,5 +1,7 @@
 {
   "dependencies": {
-    "@google-cloud/recaptcha-enterprise": "^5.7.0"
+    "@google-cloud/recaptcha-enterprise": "^5.7.0",
+    "qrcode": "^1.5.4",
+    "speakeasy": "^2.0.0"
   }
 }

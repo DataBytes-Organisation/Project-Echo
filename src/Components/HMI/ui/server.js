@@ -201,6 +201,12 @@ app.get('/donations', async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
+// Serve the 2FA page
+app.get('/verify-2fa', (req, res) => {
+  res.sendFile(path.join(rootDirectory, 'public', 'verify-2fa.html'));
+});
+
   
   
 //This endpoint retrieves the donation amounts from the associated stripe account
@@ -736,6 +742,13 @@ app.get('/iot/nodes', async (req, res) => {
 app.get("/map", async(req,res) => {
   res.sendFile(path.join(__dirname, 'public/index.html'))
 })
+
+app.get('/qr-code-setup', (req, res) => {
+  res.sendFile(path.join(rootDirectory, 'public', 'qr-code-setup.html'));
+});
+app.get('/admin-2fa', (req, res) => {
+  res.sendFile(path.join(rootDirectory, 'public', 'admin-2fa.html'));
+});
 
 
 // start the server

@@ -63,6 +63,8 @@
                     <li><span onclick="{openForm('login-form-container')}">Login</span></li>
                     <li><span onclick="{openForm('signup-form')}">Register</span></li>
                     <li><span onclick="{openForm('request-access-form')}">Guest Request</span></li>
+                    <li><span onclick="window.location.href='/qr-code-setup'">Enable 2FA (QR)</span></li>
+                    <li><span onclick="window.location.href='/admin-2fa'">Admin Management</span></li>
                 </ul>
 
                 <span class="name animate" id="name" data-value="PROJECT ECHO" onmouseenter="{textFlex()}">PROJECT
@@ -521,7 +523,8 @@
             localStorage.setItem('userId', data.userId);
 
             // Redirect user to the welcome page
-            window.location.href = "/welcome";
+            window.location.href = "/verify-2fa";
+
         } else {
             const errorData = await response.json();
             alert(errorData.message);

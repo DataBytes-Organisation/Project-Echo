@@ -405,56 +405,6 @@
                       </ul>
                     </div>
 
-                    <h2>Detections</h2>
-                     <!-- Displays List of Animal Detections -->
-                    <div class="markup_column" id="detections-container">
-                      <div class="detection-entry">
-                        <div class="detection-animal">animal: </div>
-                        <div class="detection-confidence">confidence level:</div>
-                        <div class="detection-location">location: </div>
-                          <div class="detection-time">time: </div>
-                      </div>
-                    </div>
-
-
-                    <h2>Nodes</h2>
-                    <!-- Displays List of Nodes & their status -->
-                    <div class="markup_column" id="nodes-container">
-                      <div class="node-entry">
-                        <div class="node-id">node id: </div>
-                        <div class="node-device">device:</div>
-                        <div class="node-status">status: 🟢</div>
-                      </div>
-                      <div class="node-entry">
-                        <div class="node-id">node id: </div>
-                        <div class="node-device">device:</div>
-                        <div class="node-status">status: 🔴</div>
-                      </div>
-                    </div>
-
-
-                    <h2>System Log</h2>
-                    <!-- Displays List of System Events -->
-                    <div class="markup_column" id="systemlog-container">
-                      <div class="systemlog-entry">
-                        <div class="systemlog-event">event:</div>
-                        <div class="systemlog-time">time:</div>
-                      </div>
-                      <div class="systemlog-entry">
-                        <div class="systemlog-event">event:</div>
-                        <div class="systemlog-time">time:</div>
-                      </div>
-                      <div class="systemlog-entry">
-                        <div class="systemlog-event">event:</div>
-                        <div class="systemlog-time">time:</div>
-                      </div>
-                      <div class="systemlog-entry">
-                        <div class="systemlog-event">event:</div>
-                        <div class="systemlog-time">time:</div>
-                      </div>
-                    </div>
-
-
                     <!-- Save Preferences Button -->
                     <center><button type="submit">Save Notifications</button></center>
                   </div>
@@ -1168,66 +1118,6 @@
       searchForNotifications.addEventListener('keyup', function () {
         autocompleteAnimalsForNotifications();
       });
-
-
-      // Function to add a Detection Entry in the Notifications Section 
-      function addDetectionEntry(detectionData){
-        
-        // placeholder, modify once backend + frontend is fully connected 
-        const entryContainer = document.createElement("div");
-        const detectedAnimal = document.createElement("div");
-        const detectedConfidence = document.createElement("div");
-        const detectedLocation = document.createElement("div");
-        const detectedTime = document.createElement("div");
-
-        entryContainer.classList.add("detection-entry");
-        detectedAnimal.classList.add("detection-animal");
-        detectedConfidence.classList.add("detection-confidence");
-        detectedLocation.classList.add("detection-location");
-        detectedTime.classList.add("detection-time");
-
-        detectedAnimal.text = `Animal: `;
-        detectedConfidence.text = `Confidence: `;
-        detectedLocation.text = `Location: `;
-        detectedTime.text = `Time: `;
-
-        entryContainer.append(detectedAnimal, detectedConfidence, detectedLocation, detectedTime);
-
-        // adds the detection entry as a child of the detections container 
-        const detectionsContainer = document.querySelector("#detections-container");
-        detectionsContainer.append(entryContainer);
-
-      }
-    
-
-      // Function to add Nodes Data in the Notifications Section 
-      function populateNodesData(nodesData){
-        
-        // placeholder, modify once backend + frontend is fully connected 
-        const nodeEntryContainer = document.createElement("div");
-        const nodeID = document.createElement("div");
-        const nodeDevice = document.createElement("div");
-        const nodeStatus = document.createElement("div");
-
-        nodeEntryContainer.classList.add("node-entry");
-        nodeID.classList.add("node-id");
-        nodeDevice.classList.add("node-device");
-        nodeStatus.classList.add("node-status");
-
-        nodeID.text = `Node ID:`;
-        nodeDevice.text = `Node Device:`;
-        nodeStatus.text = `Node Status:`;
-
-        nodeEntryContainer.append(nodeID, nodeDevice, nodeStatus);
-
-        const nodesContainer = document.querySelector("#nodes-container");
-        nodesContainer.append(nodeEntryContainer);
-        
-      }
-
-
-
-
 
       // Autocomplete function for notification search
       function autocompleteAnimalsForNotifications() {
