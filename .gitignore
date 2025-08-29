@@ -16,3 +16,13 @@ src/Components/HMI/ui/node_modules/*
 
 # Temporary files from Cloud Storage (added by ptanmay143)
 .tmp.driveupload
+src/Components/Engine/models/**/variables/
+*.data-00000-of-00001
+*.index
+*.ckpt
+*.h5
+src/Components/Engine/models/**/variables/
+src/Components/Engine/models/**/variables/
+*.index
+*.ckpt
+*.h5
