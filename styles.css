@@ -1,0 +1,100 @@
+/* General page setup */
+body {
+    font-family: 'Poppins', 'Segoe UI', sans-serif;
+    margin: 0;
+    padding: 30px;
+    background-color: #f0f2f5;
+}
+
+/* Page heading */
+h1 {
+    text-align: center;
+    color: #222;
+    margin-bottom: 40px;
+    font-size: 32px;
+}
+
+/* Card-style container for the table */
+.container {
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Submissions Table */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+th, td {
+    padding: 16px 20px;
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+th {
+    background-color: #4CAF50;
+    color: white;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    font-size: 15px;
+}
+
+td {
+    color: #555;
+    font-size: 14px;
+}
+
+tr:hover {
+    background-color: #f9f9f9;
+}
+
+/* Special styling for file names and animals */
+.file-name {
+    font-weight: 600;
+    color: #333;
+}
+
+.detected-animals {
+    font-style: italic;
+    color: #666;
+}
+
+.upload-date {
+    color: #999;
+    font-size: 13px;
+}
+
+/* Make the table responsive */
+@media (max-width: 768px) {
+    table, thead, tbody, th, td, tr {
+        display: block;
+    }
+
+    thead tr {
+        display: none;
+    }
+
+    td {
+        position: relative;
+        padding-left: 50%;
+        margin-bottom: 12px;
+    }
+
+    td::before {
+        position: absolute;
+        top: 16px;
+        left: 16px;
+        width: 45%;
+        padding-right: 10px;
+        white-space: nowrap;
+        font-weight: bold;
+        color: #777;
+        content: attr(data-label);
+    }
+}

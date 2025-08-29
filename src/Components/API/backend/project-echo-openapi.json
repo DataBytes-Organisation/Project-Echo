@@ -1668,6 +1668,47 @@
         }
       }
     },
+    "/predictions/recent": {
+      "get": {
+        "tags": [
+          "predict"
+        ],
+        "summary": "Recent Predictions",
+        "operationId": "recent_predictions_predictions_recent_get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "title": "Limit",
+              "type": "integer",
+              "default": 10
+            },
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/": {
       "get": {
         "summary": "Show Home",
@@ -1820,6 +1861,14 @@
             "title": "Audio",
             "type": "string",
             "format": "binary"
+          },
+          "upload_id": {
+            "title": "Upload Id",
+            "type": "string"
+          },
+          "user_id": {
+            "title": "User Id",
+            "type": "string"
           }
         }
       },
@@ -1834,6 +1883,10 @@
             "title": "File",
             "type": "string",
             "format": "binary"
+          },
+          "user_id": {
+            "title": "User Id",
+            "type": "string"
           }
         }
       },

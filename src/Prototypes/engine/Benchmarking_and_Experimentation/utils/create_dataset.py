@@ -8,7 +8,6 @@ modules such as data_pipeline.py, augmentations.py, and system_config.py.
 
 import tensorflow as tf
 import functools
-import math
 import numpy as np
 
 # Import utility functions from other modules
@@ -242,6 +241,7 @@ if __name__ == "__main__":
     
     import pathlib
     audio_dir = pathlib.Path(SC['AUDIO_DATA_DIRECTORY'])
+    
     train_pipeline, val_pipeline, test_pipeline, class_names = build_full_pipeline(audio_dir)
     
     # Iterate over a batch from the training pipeline to display output information.
