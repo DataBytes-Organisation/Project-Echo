@@ -1,15 +1,19 @@
 import pymongo
+import os
 import datetime
 import time
 # import mongoose
 
-# please use echonet credentials here, this connection string is just a placeholder
-connection_string="mongodb://modelUser:EchoNetAccess2023@ts-mongodb-cont:27017/EchoNet"
-# connection_string = "mongodb://root:root_password@localhost:27017/?authMechanism=DEFAULT"
-#connection_string="mongodb+srv://projectechodeakin:uKRBgDwBmimUuV2Q@cluster0.gu2idc8.mongodb.net/test"
+# prefer environment variable inside containers; fallback to service hostname (EchoNet DB)
+# legacy (kept for reference):
+# connection_string = "mongodb://modelUser:EchoNetAccess2023@ts-mongodb-cont:27017/EchoNet"
+connection_string = os.getenv(
+    "MONGODB_URI",
+    "mongodb://modelUser:EchoNetAccess2023@ts-mongodb-cont:27017/EchoNet",
+)
 client = pymongo.MongoClient(connection_string)
-db = client['EchoNet']
-#db = client['mydatabase']
+db = client["EchoNet"]
+# db = client['mydatabase']
 Events = db.events
 Movements = db.movements
 Species = db.species
@@ -19,7 +23,13 @@ Nodes = db.nodes
 Components = db.components
 Commands = db.commands
 
-User_connection_string = "mongodb://root:root_password@ts-mongodb-cont/UserSample?authSource=admin"
+# User DB connection (env first, then service hostname)
+# legacy (kept for reference):
+# User_connection_string = "mongodb://root:root_password@ts-mongodb-cont/UserSample?authSource=admin"
+User_connection_string = os.getenv(
+    "USER_MONGODB_URI",
+    "mongodb://root:root_password@ts-mongodb-cont/UserSample?authSource=admin",
+)
 Userclient = pymongo.MongoClient(User_connection_string)
 Userdb = Userclient['UserSample']
 User = Userdb.users
@@ -31,7 +41,7 @@ LogoutToken = Userdb.logouttokens
 
 ROLES = ["user", "admin", "guest"]
 STATES_CODE = ["vic", "nsw", "ts", "ql", "sa", "wa"]
-GENDER = ["male", "female", "m", "f" "prefer not to say"]
+GENDER = ["male", "female", "m", "f", "prefer not to say"]
 AUS_STATES = ["victoria", "newsouthwales", "tasmania", "queensland", "southaustralia", "westernaustralia"]
 
 # # Define the interval in seconds (6 minutes)
@@ -51,3 +61,7 @@ AUS_STATES = ["victoria", "newsouthwales", "tasmania", "queensland", "southaustr
 
 #     # Sleep for the specified interval before running again
 #     time.sleep(interval_seconds)
+
+# Update Database Setup (t2.2025)
+AudioUploads = db.audio_uploads
+Predictions = db.predictions
