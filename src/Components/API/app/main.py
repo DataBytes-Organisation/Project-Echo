@@ -119,3 +119,80 @@ def export_openapi_to_file():
 
 export_openapi_to_file()
 
+# Global error handlers
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException):
+    return JSONResponse(status_code=exc.status_code, content={
+        "error": {
+            "type": "http_error",
+            "message": exc.detail if isinstance(exc.detail, str) else str(exc.detail),
+            "status_code": exc.status_code,
+            "path": str(request.url),
+        }
+    })
+
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(request: Request, exc: Exception):
+    return JSONResponse(status_code=500, content={
+        "error": {
+            "type": "server_error",
+            "message": "Internal server error",
+            "status_code": 500,
+            "path": str(request.url),
+        }
+    })
+
+# API versioning alias (v1) — keeps legacy routes while exposing versioned ones
+try:
+    from app.routers import species_predictor, audio_upload_router
+    v1_api = APIRouter(prefix="/api/v1")
+    # Including existing routers under v1 prefix. Note: their internal paths may already include /api/*
+    v1_api.include_router(species_predictor.router, tags=["predict"])  # exposes /api/v1/predict
+    v1_api.include_router(audio_upload_router.router, tags=["audio"])  # exposes /api/v1/api/audio/upload
+    app.include_router(v1_api)
+except Exception:
+    # If routers are not available at import time, skip v1 mounting
+    pass
+
+# --- Health & Readiness Endpoints ---
+from functools import lru_cache
+from time import time
+
+START_TIME = time()
+
+@app.get("/health", include_in_schema=False)
+@app.get("/healthz", include_in_schema=False)
+def health():
+    """Basic liveness endpoint."""
+    return {"status": "ok", "uptime_seconds": int(time() - START_TIME)}
+
+@lru_cache(maxsize=1)
+def _mongo_client():
+    uri = os.getenv("MONGODB_URI") or os.getenv("USER_MONGODB_URI")
+    if not uri:
+        return None
+    try:
+        client = pymongo.MongoClient(uri, serverSelectionTimeoutMS=800)
+        return client
+    except Exception:
+        return None
+
+@app.get("/readyz", include_in_schema=False)
+def ready():
+    """Readiness: validates dependencies (Mongo if configured)."""
+    checks = {}
+    mongo_ok = True
+    client = _mongo_client()
+    if client:
+        try:
+            client.admin.command("ping")
+        except Exception:
+            mongo_ok = False
+    else:
+        # If no URI configured we don't fail readiness—treated as optional.
+        mongo_ok = True
+    checks["mongo"] = mongo_ok
+    overall = all(checks.values())
+    status_code = 200 if overall else 503
+    return JSONResponse(status_code=status_code, content={"ready": overall, "checks": checks})
+

@@ -1,0 +1,84 @@
+Cloud Deployment Status Checklist — Project Echo / EchoNet
+
+Status summary
+- Environment: staging
+- Overall status: red
+- Last deploy time:"N/A"
+- Build/commit:
+- Demo URL:
+- API health URL:
+
+Health checks
+- curl -sfS https://<host>/healthz || echo "FAIL"
+- curl -sfS https://<host>/readyz || echo "FAIL"
+- curl -I https://<host> | head -n1
+
+CI/CD
+- GitHub Actions:
+  - gh run list -w deploy --branch main -L 1
+  - gh run view <run-id>
+- GitLab CI:
+  - Open latest pipeline for default branch; confirm deploy stage green.
+
+Cloud platform
+Kubernetes (EKS/AKS/GKE)
+- kubectl config current-context
+- kubectl -n <ns> get ingress,svc,deploy,pods
+- kubectl -n <ns> describe ingress <ing> | grep -i host
+- kubectl -n <ns> rollout status deploy/<app>
+- kubectl -n <ns> get pods -l app=<app> -o wide
+- kubectl -n <ns> logs deploy/<app> --tail=200
+- kubectl -n <ns> get events --sort-by=.lastTimestamp | tail
+
+AWS ECS
+- aws ecs describe-services --cluster <cluster> --services <svc> \
+  --query 'services[0].{status:status,desired:desiredCount,running:runningCount,deployment:deployments[0].updatedAt}'
+- aws logs tail /ecs/<svc> --since 1h
+
+GCP Cloud Run
+- gcloud run services describe <svc> --region <region> --format='value(status.url)'
+- gcloud run services describe <svc> --region <region> --format='value(status.latestReadyRevisionName,status.traffic)'
+- gcloud run revisions list --service <svc> --region <region>
+
+Azure App Service
+- az webapp show -g <rg> -n <name> --query defaultHostName -o tsv
+- az webapp log tail -g <rg> -n <name>
+
+Database/migrations
+- Prisma: npx prisma migrate status
+- Alembic: alembic current; alembic history | tail
+- Rails: bundle exec rails db:migrate:status
+- Sequelize: npx sequelize db:migrate:status
+- Run a test read/write in staging.
+
+Background jobs/queues
+- Kubernetes workers/cronjobs: kubectl -n <ns> get deploy,cronjob | grep -E "worker|job"
+- SQS: aws sqs get-queue-attributes --queue-url <url> --attribute-names ApproximateNumberOfMessages
+- Redis/Sidekiq: check queue sizes and retries.
+
+Observability
+- Link primary dashboard (Grafana/Datadog/New Relic):
+- Verify last 24h SLOs: error rate, p95 latency, 5xx volume, uptime.
+- Check active alerts/monitors status.
+
+Config & secrets
+- kubectl -n <ns> get deploy <app> -o yaml | grep -A2 -E '^\s*env:'
+- kubectl -n <ns> get secret | grep <app>
+- Confirm required env vars and third-party credentials present.
+
+Last deploy metadata
+- kubectl -n <ns> get deploy <app> \
+  -o jsonpath='{.spec.template.spec.containers[0].image} {" "}{.metadata.annotations.kubectl\.kubernetes\.io/restartedAt}{"\n"}'
+- CI deploy job URL and timestamp: [paste]
+
+Access for demo
+- Viewer account created: [yes/no]
+- IP allowlist updated: [yes/no]
+- Shared links: [UI], [API], [Dashboard], [Logs]
+
+Known blockers
+- [ ] Pipeline failing
+- [ ] Migrations pending/failing
+- [ ] Secrets missing/invalid
+- [ ] Elevated error rate
+- [ ] Other:

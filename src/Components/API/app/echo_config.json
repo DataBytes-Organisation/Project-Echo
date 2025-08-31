@@ -1,5 +1,5 @@
 {
-    "DB_USERNAME": "modelUser",
-    "DB_PASSWORD": "EchoNetAccess2023",
-    "DB_HOSTNAME": "ts-mongodb-cont"
+    "DB_USERNAME": "<use env var MONGODB_USER>",
+    "DB_PASSWORD": "<use env var MONGODB_PASS>",
+    "DB_HOSTNAME": "<use env var MONGODB_HOST>"
 }

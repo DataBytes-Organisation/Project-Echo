@@ -1,0 +1,40 @@
+name: build-api
+on:
+  push:
+    paths:
+      - "src/Components/API/**"
+      - ".github/workflows/build-api.yml"
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    env:
+      REGION: us-central1
+      IMAGE_NAME: api
+      REPO_PATH: echonet
+    steps:
+      - uses: actions/checkout@v4
+      - name: Auth to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+          service_account: ${{ secrets.GCP_SA_EMAIL }}
+      - name: Configure Docker auth
+        run: gcloud auth configure-docker $REGION-docker.pkg.dev -q
+      - name: Build & tag
+        run: |
+          IMAGE="$REGION-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/$REPO_PATH/$IMAGE_NAME"
+          GIT_SHA=${GITHUB_SHA::7}
+          docker build -t $IMAGE:$GIT_SHA -t $IMAGE:latest src/Components/API
+          docker push $IMAGE:$GIT_SHA
+          docker push $IMAGE:latest
+      - name: Trivy scan
+        uses: aquasecurity/trivy-action@v0.20.0
+        with:
+          image-ref: ${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/$REPO_PATH/${{ env.IMAGE_NAME }}:latest
+          exit-code: '0'
+          severity: 'CRITICAL,HIGH'

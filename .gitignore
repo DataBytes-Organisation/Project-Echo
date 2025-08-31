@@ -17,3 +17,15 @@ src/Components/HMI/ui/node_modules/*
 # Temporary files from Cloud Storage (added by ptanmay143)
 .tmp.driveupload
 *.mp3
+
+# Secret & credential files to ignore going forward
+*.secret.json
+**/echo_config.json
+**/db.config.js
+*.env.local
+secrets/
+**/init-mongo.js.backup
+**/mserver-env.yaml
+**/engine-env.yaml
+**/api-env.yaml
+**/hmi-env.yaml

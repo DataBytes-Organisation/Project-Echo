@@ -3,8 +3,8 @@ kind: ConfigMap
 metadata:
   name: mserver-env
 data:
-  DB_HOST: value
-  DB_USER: modelUser
-  DB_USER_PASS: EchoNetAccess2023
-  DB_ROOT_USER: root
-  DB_ROOT_USER_PASS: root_password
+  DB_HOST: <from-secret>
+  DB_USER: <from-secret>
+  DB_USER_PASS: <from-secret>
+  DB_ROOT_USER: <from-secret>
+  DB_ROOT_USER_PASS: <from-secret>
