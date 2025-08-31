@@ -1,0 +1,95 @@
+name: deploy-echonet
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Target environment (staging|prod)"
+        required: true
+        default: "staging"
+      namespace:
+        description: "Kubernetes namespace"
+        required: false
+        default: "staging"
+  workflow_run:
+    workflows: ["build-api", "build-engine-model"]
+    types: ["completed"]
+
+jobs:
+  deploy:
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      REGION: us-central1
+      CLUSTER_NAME: echonet-gke
+      RELEASE: echonet
+      PROJECT_ID: ${{ secrets.GCP_PROJECT }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Auth to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+          service_account: ${{ secrets.GCP_SA_EMAIL }}
+
+      - name: Get GKE credentials
+        uses: google-github-actions/get-gke-credentials@v2
+        with:
+          cluster_name: ${{ env.CLUSTER_NAME }}
+          location: ${{ env.REGION }}
+
+      - name: Set ENV vars
+        id: setenv
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            ENV_INPUT='${{ github.event.inputs.environment }}'
+            NAMESPACE='${{ github.event.inputs.namespace }}'
+          else
+            # default to staging on build success auto-run
+            ENV_INPUT='staging'
+            NAMESPACE='staging'
+          fi
+          echo "env_sel=$ENV_INPUT" >> $GITHUB_OUTPUT
+          echo "ns=$NAMESPACE" >> $GITHUB_OUTPUT
+
+      - name: Select values file
+        id: values
+        run: |
+          if [ "${{ steps.setenv.outputs.env_sel }}" = "prod" ]; then
+            echo "file=deploy/helm/echonet/values-prod.yaml" >> $GITHUB_OUTPUT
+          else
+            echo "file=deploy/helm/echonet/values-staging.yaml" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Ensure namespace exists
+        run: |
+          kubectl get ns ${{ steps.setenv.outputs.ns }} 2>/dev/null || kubectl create ns ${{ steps.setenv.outputs.ns }}
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+
+      - name: Helm upgrade
+        run: |
+          IMAGE_TAG=${GITHUB_SHA::7}
+          helm upgrade --install $RELEASE deploy/helm/echonet \
+            -n ${{ steps.setenv.outputs.ns }} \
+            -f ${{ steps.values.outputs.file }} \
+            --set image.tag=$IMAGE_TAG \
+            --set engine.tag=$IMAGE_TAG \
+            --set modelServer.tag=$IMAGE_TAG \
+            --wait --timeout 10m
+
+      - name: Show deployed images
+        run: |
+          kubectl -n ${{ steps.setenv.outputs.ns }} get deploy -o jsonpath='{range .items[*]}{.metadata.name}{" => "}{.spec.template.spec.containers[0].image}{"\n"}{end}'
+
+      - name: Post summary
+        run: |
+          echo "Deployment complete to namespace ${{ steps.setenv.outputs.ns }} using values: ${{ steps.values.outputs.file }}" >> $GITHUB_STEP_SUMMARY

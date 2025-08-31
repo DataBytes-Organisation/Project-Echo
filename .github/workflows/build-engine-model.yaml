@@ -1,0 +1,49 @@
+name: build-engine-model
+on:
+  push:
+    paths:
+      - "src/Components/Engine/**"
+      - "src/Components/Engine/Dockerfile" 
+      - ".github/workflows/build-engine-model.yaml"
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    env:
+      REGION: us-central1
+      REPO_PATH: echonet
+    steps:
+      - uses: actions/checkout@v4
+      - name: Auth to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+          service_account: ${{ secrets.GCP_SA_EMAIL }}
+      - name: Configure Docker auth
+        run: gcloud auth configure-docker $REGION-docker.pkg.dev -q
+      - name: Build & push engine
+        run: |
+          IMAGE_ENGINE="$REGION-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/$REPO_PATH/engine"
+          GIT_SHA=${GITHUB_SHA::7}
+          docker build -t $IMAGE_ENGINE:$GIT_SHA -t $IMAGE_ENGINE:latest src/Components/Engine
+          docker push $IMAGE_ENGINE:$GIT_SHA
+          docker push $IMAGE_ENGINE:latest
+      - name: Build & push model-server (if Dockerfile exists)
+        run: |
+          if [ -f src/Components/Engine/model-server.Dockerfile ]; then \
+            IMAGE_MODEL="$REGION-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/$REPO_PATH/model-server"; \
+            GIT_SHA=${GITHUB_SHA::7}; \
+            docker build -f src/Components/Engine/model-server.Dockerfile -t $IMAGE_MODEL:$GIT_SHA -t $IMAGE_MODEL:latest src/Components/Engine; \
+            docker push $IMAGE_MODEL:$GIT_SHA; \
+            docker push $IMAGE_MODEL:latest; \
+          else echo "No model-server.Dockerfile present"; fi
+      - name: Trivy scan engine
+        uses: aquasecurity/trivy-action@0.20.0
+        with:
+          image-ref: ${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/$REPO_PATH/engine:latest
+          exit-code: '0'
+          severity: 'CRITICAL,HIGH'

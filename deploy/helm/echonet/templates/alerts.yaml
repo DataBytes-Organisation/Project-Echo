@@ -1,0 +1,29 @@
+{{- if and .Values.monitoring.enabled .Values.monitoring.alerting.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: echonet-basic-alerts
+  labels:
+    role: alert-rules
+{{- toYaml .Values.monitoring.labels | nindent 4 }}
+spec:
+  groups:
+    - name: echonet.availability
+      rules:
+        - alert: ApiHighErrorRate
+          expr: sum(rate(http_requests_total{app="api",status=~"5.."}[5m])) / sum(rate(http_requests_total{app="api"}[5m])) > 0.05
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: API high 5xx error rate
+            description: More than 5% of API requests failing over 10m.
+        - alert: ModelServerDown
+          expr: up{app="model-server"} == 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: Model server down
+            description: Model server target not scraping for 5m.
+{{- end }}

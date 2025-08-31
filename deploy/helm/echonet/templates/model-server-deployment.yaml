@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: model-server
+  labels:
+    app: model-server
+spec:
+  replicas: {{ .Values.modelServer.replicas }}
+  selector:
+    matchLabels:
+      app: model-server
+  template:
+    metadata:
+      labels:
+        app: model-server
+    spec:
+      serviceAccountName: model-server-sa
+      tolerations:
+        - key: "gpu"
+          operator: "Equal"
+          value: "true"
+          effect: "NoSchedule"
+      initContainers:
+        - name: fetch-models
+          image: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+          command: ["/bin/sh","-c"]
+          args:
+            - >-
+              for m in {{ range $m := .Values.model.models }} {{ $m.name }} {{ end }}; do
+                mkdir -p /models/$m && gsutil -m rsync -r gs://{{ .Values.model.bucket }}/$m /models/$m || exit 1;
+              done;
+          volumeMounts:
+            - name: models
+              mountPath: /models
+      containers:
+        - name: tf-serving
+          image: "{{ .Values.image.registry }}/{{ .Values.modelServer.image }}:{{ .Values.modelServer.tag }}"
+          args:
+            - "--model_config_file=/models/models.config"
+            - "--allow_version_labels_for_unavailable_models=true"
+          ports:
+            - containerPort: 8501
+          readinessProbe:
+            httpGet:
+              path: /v1/models/{{ .Values.modelServer.readiness.modelName }}
+              port: 8501
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          livenessProbe:
+            httpGet:
+              path: /v1/models/{{ .Values.modelServer.readiness.modelName }}
+              port: 8501
+            initialDelaySeconds: 30
+            periodSeconds: 30
+          resources:
+{{- toYaml .Values.modelServer.resources | nindent 12 }}
+          volumeMounts:
+            - name: model-config
+              mountPath: /models/models.config
+              subPath: models.config
+            - name: models
+              mountPath: /models
+      volumes:
+        - name: model-config
+          configMap:
+            name: model-config
+        - name: models
+          emptyDir: {}

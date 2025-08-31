@@ -1,0 +1,76 @@
+image:
+  registry: us-central1-docker.pkg.dev/echonet-prod/echonet
+  tag: latest
+api:
+  replicas: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 300m
+      memory: 256Mi
+  mongoUriSecret: api-mongo-uri
+engine:
+  image: us-central1-docker.pkg.dev/echonet-prod/echonet/engine:latest
+  replicas: 1
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+modelServer:
+  image: us-central1-docker.pkg.dev/echonet-prod/echonet/model-server:latest
+  replicas: 1
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: 500m
+      memory: 1Gi
+  readiness:
+    modelName: echo_model
+model:
+  bucket: echonet-models-stg
+  models:
+    - name: echo_model
+      path: echo_model/1
+    - name: weather_model
+      path: weather_model/1
+hmi:
+  image: us-central1-docker.pkg.dev/echonet-prod/echonet/hmi:latest
+  replicas: 1
+  host: app-stg.echonet.example.com
+  resources:
+    requests:
+      cpu: 50m
+      memory: 96Mi
+    limits:
+      cpu: 200m
+      memory: 192Mi
+mqtt:
+  image: us-central1-docker.pkg.dev/echonet-prod/echonet/mqtt:latest
+  replicas: 1
+  service:
+    type: ClusterIP
+  resources:
+    requests:
+      cpu: 25m
+      memory: 48Mi
+    limits:
+      cpu: 100m
+      memory: 96Mi
+simulator:
+  image: us-central1-docker.pkg.dev/echonet-prod/echonet/simulator:latest
+  replicas: 1
+  resources:
+    requests:
+      cpu: 25m
+      memory: 96Mi
+    limits:
+      cpu: 100m
+      memory: 192Mi
+  enabled: true

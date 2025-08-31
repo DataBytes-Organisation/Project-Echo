@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: engine
+  labels:
+    app: engine
+spec:
+  replicas: {{ .Values.engine.replicas }}
+  selector:
+    matchLabels:
+      app: engine
+  template:
+    metadata:
+      labels:
+        app: engine
+    spec:
+      tolerations:
+        - key: "gpu"
+          operator: "Equal"
+          value: "true"
+          effect: "NoSchedule"
+      containers:
+        - name: engine
+          image: "{{ .Values.image.registry }}/{{ .Values.engine.image }}:{{ .Values.engine.tag }}"
+          env:
+            - name: MODEL_SERVER_HOST
+              value: model-server
+          # Engine currently has no HTTP server; using TCP socket probe placeholder (update when health endpoint added)
+          readinessProbe:
+            tcpSocket:
+              port: 8000
+            initialDelaySeconds: 20
+            periodSeconds: 20
+          livenessProbe:
+            tcpSocket:
+              port: 8000
+            initialDelaySeconds: 60
+            periodSeconds: 30
+          resources:
+{{- toYaml .Values.engine.resources | nindent 12 }}
