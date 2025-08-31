@@ -6,18 +6,18 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/api/audio/upload": {
+    "/api/api/audio/upload": {
       "post": {
         "tags": [
           "audio"
         ],
         "summary": "Upload Audio",
-        "operationId": "upload_audio_api_audio_upload_post",
+        "operationId": "upload_audio_api_api_audio_upload_post",
         "requestBody": {
           "content": {
             "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/Body_upload_audio_api_audio_upload_post"
+                "$ref": "#/components/schemas/Body_upload_audio_api_api_audio_upload_post"
               }
             }
           },
@@ -1872,8 +1872,8 @@
           }
         }
       },
-      "Body_upload_audio_api_audio_upload_post": {
-        "title": "Body_upload_audio_api_audio_upload_post",
+      "Body_upload_audio_api_api_audio_upload_post": {
+        "title": "Body_upload_audio_api_api_audio_upload_post",
         "required": [
           "file"
         ],

@@ -2,7 +2,7 @@ import os
 # from Components.API.app.routers import add_csv_output_option, audio_upload_router
 from .routers import add_csv_output_option, audio_upload_router
 
-from fastapi import FastAPI, Body, HTTPException, status, APIRouter
+from fastapi import FastAPI, Body, HTTPException, status, APIRouter, Request
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import species_predictor
 from app.routers import auth_router
@@ -118,4 +118,39 @@ def export_openapi_to_file():
     print(f"✅ OpenAPI spec exported to {output_path}")
 
 export_openapi_to_file()
+
+# Global error handlers
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException):
+    return JSONResponse(status_code=exc.status_code, content={
+        "error": {
+            "type": "http_error",
+            "message": exc.detail if isinstance(exc.detail, str) else str(exc.detail),
+            "status_code": exc.status_code,
+            "path": str(request.url),
+        }
+    })
+
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(request: Request, exc: Exception):
+    return JSONResponse(status_code=500, content={
+        "error": {
+            "type": "server_error",
+            "message": "Internal server error",
+            "status_code": 500,
+            "path": str(request.url),
+        }
+    })
+
+# API versioning alias (v1) — keeps legacy routes while exposing versioned ones
+try:
+    from app.routers import species_predictor, audio_upload_router
+    v1_api = APIRouter(prefix="/api/v1")
+    # Including existing routers under v1 prefix. Note: their internal paths may already include /api/*
+    v1_api.include_router(species_predictor.router, tags=["predict"])  # exposes /api/v1/predict
+    v1_api.include_router(audio_upload_router.router, tags=["audio"])  # exposes /api/v1/api/audio/upload
+    app.include_router(v1_api)
+except Exception:
+    # If routers are not available at import time, skip v1 mounting
+    pass
 
