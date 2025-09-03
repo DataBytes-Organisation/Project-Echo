@@ -63,9 +63,17 @@ module.exports = function (app) {
       });
       
       if (axiosResponse.status === 200) {
-        console.log('Status Code: ' + axiosResponse.status + ' ' + axiosResponse.statusText)
-        console.log("Login response: ", axiosResponse.data);
-        
+        // Check if MFA is enabled
+        if (axiosResponse.data.mfa_phone_enabled) {
+          res.status(200).send(
+            `<script>
+              window.location.href = "/verify-otp?user_id=${axiosResponse.data.user_id}";
+            </script>`
+          );
+          return;
+        }
+
+        // Normal login flow
         await client.set("JWT", axiosResponse.data.tkn, (err, res)=> {
           if (err) {
             console.log("Set JWT Token error: ", err)
@@ -107,6 +115,62 @@ module.exports = function (app) {
     } catch (err) {
       console.log('Login exception error: ' + err)
       res.send(`<script> window.location.href = "/login"; alert("Login exception Error: ${err}!");</script>`);
+    }  
+  });
+
+
+
+  app.post("/api/2fa/verify", async (req, res) => {
+    let otp = req.body.otp;
+    let user_id = req.body.user_id;
+    // let email = req.body.email;
+      
+    try {
+      const axiosResponse = await axios.post('http://ts-api-cont:9000/2fa/verify',{
+        user_id: user_id,
+        otp: otp
+      });
+      
+      if (axiosResponse.status === 200) {
+        // Check if MFA is enabled
+
+        // Normal login flow
+        await client.set("JWT", axiosResponse.data.tkn, (err, res)=> {
+          if (err) {
+            console.log("Set JWT Token error: ", err)
+          } else {
+            console.log("Set JWT successfully: ", res)
+          }
+        })
+        await client.set("Roles", axiosResponse.data.roles.toString(), (err, res)=> {
+          if (err) {
+            console.log("Set User Roles Token error: ", err)
+          } else {
+            console.log("Set User roles successfully: ", res)
+          }
+        })
+        await client.set("Users", JSON.stringify(axiosResponse.data.user), (err, res)=> {
+          if (err) {
+            console.log("Set User Roles Token error: ", err)
+          } else {
+            console.log("Set User roles successfully: ", res)
+          }
+        })
+        res.status(200).send(
+        `<script> 
+          alert("Login Successfully");
+          window.location.href = "/welcome"
+        </script>`);
+          
+        
+      } else {
+        console.log("Login response: ", axiosResponse.data);
+        res.status(400).send(`<script> window.location.href = "/verify-otp?user_id=${axiosResponse.data.user_id}"; alert("Failed! Invalid OTP, Please try again !");</script>`);
+      }
+    } catch (err) {
+        res.status(400).send(`<script> window.location.href = "/verify-otp?user_id=${req.body.user_id}"; alert("Failed! Invalid OTP, Please try again !");</script>`);
+      console.log('Login exception error: ' + err);
+      // res.send(`<script> window.location.href = "/login"; alert("Login exception Error: ${err}!");</script>`);
     }  
   });
 

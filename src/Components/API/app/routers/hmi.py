@@ -9,6 +9,7 @@ import datetime
 from app import serializers
 from app import schemas
 from app.database import Events, Movements, Microphones, User, Role, ROLES, Requests, Guest, ForgotPassword, LogoutToken, Species
+from fastapi.responses import JSONResponse
 import paho.mqtt.publish as publish
 import bcrypt
 from flask import jsonify
@@ -344,6 +345,35 @@ def signin(user: schemas.UserLoginSchema):
         "email": account["email"],
         "role" : authorities,
     }
+
+    mfa_phone_enabled = account.get("mfa_phone_enabled", False)
+    
+    if mfa_phone_enabled:
+        # Call 2FA generate endpoint
+        headers = {"Authorization": f"Bearer {jwtToken}"}
+        try:
+            response = requests.post(
+                "http://localhost:9000/2fa/generate",
+                headers=headers
+            )
+            print(response.json())
+            if response.status_code != 200:
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Failed to generate 2FA code"
+                )
+            
+            # Return response indicating MFA is required with only user_id
+            return JSONResponse(content={
+                "mfa_phone_enabled": True,
+                "user_id": str(account["_id"])
+            }, status_code=200)
+            
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Failed to generate 2FA code: {str(e)}"
+            )
 
     #Set up response (FOR TESTING ONLY)
     response = {"message": "User Login Successfully!", "tkn" : jwtToken, "roles": authorities, 'user': result}
@@ -682,5 +712,23 @@ def remove_animal_from_notifications(user_id: str, species: str):
     )
     return {"message": "Animal removed from notifications"}
 
+
         
+@router.get("/users", response_description="Get all users with visit data")
+def get_all_users():
+    users = User.find()
+    return serializers.userListEntity(users)
+
+@router.post("/users/{username}/visit", response_description="Increment user visit count and time")
+def increment_user_visit(username: str, visit_duration: float = 5.0):
+    user = User.find_one({"username": username})
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
     
+    # Increment visits and totalTime
+    User.update_one(
+        {"username": username},
+        {"$inc": {"visits": 1, "totalTime": visit_duration}}
+    )
+    return {"message": f"Visit recorded for {username}"}
+

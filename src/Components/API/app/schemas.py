@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional, List, Dict
 from pydantic import BaseModel, Field, validator, constr, conlist, condecimal
 from bson.objectid import ObjectId
 from app.database import GENDER, STATES_CODE, AUS_STATES
@@ -133,8 +133,28 @@ class RequestSchema(BaseModel):
         schema_extra = {}
 
 # Schema to define animal notification structure
+class ComponentSchema(BaseModel):
+    type: str
+    model: str
+    customProperties: Dict[str, str]
+
+class LocationSchema(BaseModel):
+    latitude: float
+    longitude: float
+
+class NodeSchema(BaseModel):
+    _id: str
+    name: str
+    type: str
+    model: str
+    location: LocationSchema
+    customProperties: Dict[str, str]
+    components: List[ComponentSchema] = []
+    connectedNodes: List[str] = []
+
 class AnimalNotificationSchema(BaseModel):
-    species: str  # Species name
+    species: str
+    confidence: float
     common: str  # Common name
 
     # Schema example for Swagger UI documentation
@@ -294,5 +314,23 @@ class RecordingData(BaseModel):
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
+        schema_extra = {
+           
+        } 
+
+class TwoFactorVerifySchema(BaseModel):
+    user_id: str
+    otp: str
+
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+        schema_extra = {
+            "example": {
+                "user_id": "user-uuid-here",
+                "otp": "123456"
+            }
+        }
         schema_extra = {}
 
