@@ -35,7 +35,8 @@
     <div class="body-wrapper">
       <div id="header"></div>
       <div class="container-fluid">
-        <div class="card">
+        <!-- Profile Card -->
+        <div class="card profile-card">
           <div class="card-body">
             <!-- Public Profile Section -->
             <h5 class="card-title fw-semibold mb-4">Profile</h5>
@@ -82,32 +83,40 @@
 
               <button type="submit" class="btn btn-primary mb-4">Save Profile</button>
             </form>
+          </div>
+        </div>
 
+        <!-- Change Password Card -->
+        <div class="card change-password-card">
+          <div class="card-body">
             <!-- Change Password Section -->
             <h5 class="card-title fw-semibold mb-4">Change Password</h5>
             
             <form id="change-password-form">
-              <div class="mb-3">
+              <div class="mb-3 position-relative">
                 <label for="currentPassword" class="form-label">Current Password</label>
                 <input type="password" class="form-control" id="currentPassword" required>
+                <i class="fas fa-eye toggle-password" data-target="#currentPassword" style="position: absolute; right: 10px; top: 38px; cursor: pointer; color: #6c757d;"></i>
               </div>
-              <div class="mb-3">
+              <div class="mb-3 position-relative">
                 <label for="newPassword" class="form-label">New Password</label>
                 <input type="password" class="form-control" id="newPassword" required>
+                <i class="fas fa-eye toggle-password" data-target="#newPassword" style="position: absolute; right: 10px; top: 38px; cursor: pointer; color: #6c757d;"></i>
               </div>
-              <div class="mb-3">
+              <div class="mb-3 position-relative">
                 <label for="confirmPassword" class="form-label">Confirm New Password</label>
                 <input type="password" class="form-control" id="confirmPassword" required>
+                <i class="fas fa-eye toggle-password" data-target="#confirmPassword" style="position: absolute; right: 10px; top: 38px; cursor: pointer; color: #6c757d;"></i>
               </div>
               <div class="mb-3">
                 <button type="submit" class="btn btn-primary">Change Password</button>
               </div>
             </form>
-
-            <!-- Success/Error Message Container -->
-            <div id="message-container" class="mt-3"></div>
           </div>
         </div>
+
+        <!-- Success/Error Message Container -->
+        <div id="message-container" class="mt-3"></div>
       </div>
     </div>
   </div>
@@ -116,6 +125,30 @@
     $(document).ready(function() {
       $("#sidebar").load("./admin/component/sidebar-component.html");
       $("#header").load("./admin/component/header-component.html");
+
+      // User data mapping based on login table
+      const userData = {
+        "TN-HMI": { firstName: "TN-HMI", lastName: "TN-HMI", email: "TN-HMI@databytes.org" },
+        "QC-HMI": { firstName: "QC-HMI", lastName: "QC-HMI", email: "QC-HMI@databytes.org" },
+        "BenNi-HMI": { firstName: "BenNi-HMI", lastName: "BenNi-HMI", email: "BenNi-HMI@databytes.org" },
+        "BaNa-HMI": { firstName: "BaNa-HMI", lastName: "BaNa-HMI", email: "BaNa-HMI@databytes.org" }
+      };
+
+      // Get the current logged-in user
+      const currentUser = localStorage.getItem('currentUser') || "TN-HMI"; // Default to TN-HMI if not set
+
+      // Pre-fill First Name, Last Name, and Email based on the logged-in user
+      if (userData[currentUser]) {
+        $("#firstName").val(userData[currentUser].firstName);
+        $("#lastName").val(userData[currentUser].lastName);
+        $("#location").val(userData[currentUser].email);
+      }
+
+      // Load saved profile data from localStorage for other fields (profession, bio, profile picture)
+      const savedProfile = JSON.parse(localStorage.getItem('userProfile')) || {};
+      if (savedProfile.profession) $("#profession").val(savedProfile.profession);
+      if (savedProfile.bio) $("#bio").val(savedProfile.bio);
+      if (savedProfile.profilePicture) $(".profile-image").attr("src", savedProfile.profilePicture);
 
       // Profile picture change
       $(".change-picture-btn").click(function() {
@@ -143,13 +176,17 @@
             return;
           }
 
-          // Preview the image
+          // Preview and save the image
           const reader = new FileReader();
           reader.onload = function(e) {
-            $(".profile-image").attr("src", e.target.result);
+            const imageUrl = e.target.result;
+            $(".profile-image").attr("src", imageUrl);
             $("#message-container").html(
               '<div class="alert alert-success" role="alert">Profile Picture Updated. Save your Profile to confirm.</div>'
             );
+            const profileData = JSON.parse(localStorage.getItem('userProfile')) || {};
+            profileData.profilePicture = imageUrl;
+            localStorage.setItem('userProfile', JSON.stringify(profileData));
           };
           reader.readAsDataURL(file);
         }
@@ -157,12 +194,60 @@
 
       // Delete picture
       $(".delete-picture-btn").click(function() {
+        const profileData = JSON.parse(localStorage.getItem('userProfile')) || {};
+        delete profileData.profilePicture;
+        localStorage.setItem('userProfile', JSON.stringify(profileData));
         $(".profile-image").attr("src", "./admin/images/default-profile.png");
         $("#message-container").html(
           '<div class="alert alert-success" role="alert">Profile Picture Removed. Save your Profile to confirm.</div>'
         );
       });
 
+      // Save profile form data to localStorage on submission with name validation
+      $("#profile-form").submit(function(e) {
+        e.preventDefault();
+
+        const firstName = $("#firstName").val();
+        const lastName = $("#lastName").val();
+        
+        // Regular expression to allow only letters (A-Z, a-z)
+        const lettersOnly = /^[A-Za-z]+$/;
+
+        if (!lettersOnly.test(firstName)) {
+          $("#message-container").html(
+            '<div class="alert alert-danger" role="alert">First Name must contain only letters (no numbers or special characters).</div>'
+          );
+          return;
+        }
+
+        if (!lettersOnly.test(lastName)) {
+          $("#message-container").html(
+            '<div class="alert alert-danger" role="alert">Last Name must contain only letters (no numbers or special characters).</div>'
+          );
+          return;
+        }
+
+        const profileData = {
+          firstName: firstName,
+          lastName: lastName,
+          email: $("#location").val(),
+          profession: $("#profession").val(),
+          bio: $("#bio").val()
+        };
+
+        // Preserve the profile picture if it exists
+        const savedProfile = JSON.parse(localStorage.getItem('userProfile')) || {};
+        if (savedProfile.profilePicture) {
+          profileData.profilePicture = savedProfile.profilePicture;
+        }
+
+        // Save to localStorage
+        localStorage.setItem('userProfile', JSON.stringify(profileData));
+
+        $("#message-container").html(
+          '<div class="alert alert-success" role="alert">Profile Successfully Saved</div>'
+        );
+      });
 
       // Change password form submission
       $("#change-password-form").submit(function(e) {
@@ -193,6 +278,15 @@
         );
         
         this.reset();
+      });
+
+      // Toggle password visibility
+      $(".toggle-password").click(function() {
+        const target = $(this).data("target");
+        const input = $(target);
+        const type = input.attr("type") === "password" ? "text" : "password";
+        input.attr("type", type);
+        $(this).toggleClass("fa-eye fa-eye-slash");
       });
     });
   </script>
