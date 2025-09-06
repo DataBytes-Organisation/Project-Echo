@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Project%20Echo/Project-Echo/mlruns/0/7c9b985c663145219beb8865f4cf5338/artifacts
+end_time: 1745128612333
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 7c9b985c663145219beb8865f4cf5338
+run_name: simple_logistic_regression
+run_uuid: 7c9b985c663145219beb8865f4cf5338
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1745128602887
+status: 3
+tags: []
+user_id: ragul

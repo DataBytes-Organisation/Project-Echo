@@ -7,6 +7,7 @@
 tensorboard_logs/
 logs/
 models/
+venv/
 src/Components/Engine/models/*
 
 src\Prototypes\api\__pycache__
