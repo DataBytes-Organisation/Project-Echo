@@ -111,21 +111,21 @@ userdb.guests.insertMany([
 // ----------------------------------------------
 const donations = [
   {
-    amount: 5000,
+    amount: 3,
     status: 'succeeded',
-    billing_details: { email: 'john@google.com' },
+    billing_details: { email: 'john@example.com' },
     created: 1743705600,
     type: 'One-Time'
   },
   {
-    amount: 2500,
+    amount: 2,
     status: 'pending',
-    billing_details: { email: 'jane@icloud.com' },
+    billing_details: { email: 'jane@google.com' },
     created: 1743792000,
     type: 'Monthly'
   },
   {
-    amount: 10000,
+    amount: 1,
     status: 'failed',
     billing_details: { email: 'hugo@outlook.com' },
     created: 1743619200,
@@ -133,5 +133,16 @@ const donations = [
   }
 ];
 
-apidb.createCollection("donations");
-apidb.donations.insertMany(donations);
+
+if (!apidb.getCollectionNames().includes("donations")) {
+  apidb.createCollection("donations");
+}
+
+const dummyDonations = JSON.parse(cat('/docker-entrypoint-initdb.d/donations.json'));
+const stripeDonations = JSON.parse(cat('/docker-entrypoint-initdb.d/donations-stripe-seed.json'));
+
+// Combine both into one array
+const combinedDonations = [...dummyDonations, ...stripeDonations];
+
+// Insert into MongoDB
+apidb.donations.insertMany(combinedDonations);
