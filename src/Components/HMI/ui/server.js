@@ -1,4 +1,3 @@
-const JWT_SECRET = "deff1952d59f883ece260e8683fed21ab0ad9a53323eca4f";
 const express = require('express');
 const app = express();
 const path = require('path');
@@ -23,7 +22,8 @@ const { User } = require('./model/user.model');
 const { Notification, UserNotificationPreference } = require('./model/notification.model');
 const bodyParser = require('body-parser');
 const Donation = require('./model/donation.model');
-const NotificationService = require('./services/notificationService');
+const notificationService = require('./services/notificationService');
+const JWT_SECRET = process.env.JWT_SECRET || crypto.randomBytes(64).toString('hex');
 
 // Initialize HTTP server for Socket.io
 const server = http.createServer(app);
@@ -66,6 +66,8 @@ const io = new Server(server, {
   }
 });
 
+global.io = io
+
 // Track connected users
 const connectedUsers = new Map();
 
@@ -98,7 +100,8 @@ io.use(async (socket, next) => {
 
 // Socket.io connection handler
 io.on('connection', (socket) => {
-  console.log(`User ${socket.user.id} connected`);
+  // Store socket connection
+  connectedUsers.set(socket.user.id, socket.id);
 
   // Join user-specific room
   socket.join(`user_${socket.user.id}`);
@@ -107,16 +110,15 @@ io.on('connection', (socket) => {
   sendPendingNotifications(socket.user.id);
 
   socket.on('disconnect', () => {
-    console.log(`User ${socket.user.id} disconnected`);
+    connectedUsers.delete(socket.user.id);
   });
 
   // Handle mark as read
   socket.on('markAsRead', async (notificationId) => {
     try {
-      const notification = await Notification.findByIdAndUpdate(
+      const notification = await notificationService.markAsRead(
           notificationId,
-          { status: 'read' },
-          { new: true }
+          socket.user.id
       );
 
       if (notification) {
@@ -133,7 +135,6 @@ async function sendPendingNotifications(userId) {
   try {
     const notifications = await Notification.find({
       userId,
-      status: 'unread'
     }).sort({ createdAt: -1 }).limit(50);
 
     if (notifications.length > 0) {
@@ -144,21 +145,6 @@ async function sendPendingNotifications(userId) {
     }
   } catch (error) {
     console.error('Error sending pending notifications:', error);
-  }
-}
-
-// Function to send real-time notification
-async function sendRealTimeNotification(userId, notification) {
-  try {
-    // Save to database first
-    const savedNotification = await Notification.create(notification);
-
-    // Send to specific user room
-    io.to(`user_${userId}`).emit('newNotification', savedNotification);
-
-    console.log(`Notification sent to user ${userId}`);
-  } catch (err) {
-    console.error('Error sending notification:', err);
   }
 }
 
@@ -602,14 +588,14 @@ app.get('/api/notifications', async (req, res) => {
 
     const decoded = jwt.verify(token, JWT_SECRET);
 
-    // Add validation for limit/offset
     const limit = Math.min(parseInt(req.query.limit) || 20, 100);
     const offset = parseInt(req.query.offset) || 0;
 
-    const notifications = await Notification.find({ userId: decoded.id })
-        .sort({ createdAt: -1 })
-        .skip(offset)
-        .limit(limit);
+    const notifications = await notificationService.getUserNotifications(
+        decoded.id,
+        limit,
+        offset
+    );
 
     res.json({ notifications });
   } catch (error) {
@@ -628,10 +614,9 @@ app.patch('/api/notifications/:id/read', async (req, res) => {
 
     const decoded = jwt.verify(token, JWT_SECRET);
 
-    const notification = await Notification.findOneAndUpdate(
-        { _id: req.params.id, userId: decoded.id },
-        { status: 'read' },
-        { new: true }
+    const notification = await notificationService.markAsRead(
+        req.params.id,
+        decoded.id
     );
 
     if (!notification) {
@@ -641,6 +626,31 @@ app.patch('/api/notifications/:id/read', async (req, res) => {
     res.json(notification);
   } catch (error) {
     res.status(500).json({ error: 'Error updating notification' });
+  }
+});
+
+app.delete('/api/notifications/:id', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) return res.status(401).json({ error: 'Unauthorized' });
+
+    const decoded = jwt.verify(token, JWT_SECRET);
+
+    const notification = await notificationService.deleteNotification(
+        req.params.id,
+        decoded.id
+    );
+
+    if (!notification) {
+      return res.status(404).json({ error: 'Notification not found' });
+    }
+
+    // Emit deletion event to Socket.io
+    io.to(`user_${decoded.id}`).emit('notificationDeleted', req.params.id);
+
+    res.json({ message: 'Notification deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: 'Error deleting notification' });
   }
 });
 
@@ -682,25 +692,34 @@ app.get("/welcome", async (req, res) => {
   }
 });
 
-// Temporary test route - REMOVE AFTER TESTING
-app.post('/test-notification', async (req, res) => {
+// Test the notification service architecture- REMOVE AFTER TESTING
+app.post('/test-notification-service', async (req, res) => {
   try {
-    const { userId, title, message } = req.body;
+    const { userId, title, message, type, channel } = req.body;
 
-    const notification = {
-      userId,
-      title: title || "Test Notification",
-      message: message || "This is a test notification",
-      type: "system",
-      status: "unread"
-    };
+    const result = await notificationService.createAndDispatch(
+        userId,
+        title || "Test Notification",
+        message || "This is a test notification",
+        type || "system",
+        { test: true },
+        channel // Optional: specific channel to test
+    );
 
-    await sendRealTimeNotification(userId, notification);
+    res.json({
+      success: true,
+      result,
+      message: channel ?
+          `Notification sent via ${channel} channel` :
+          'Notification dispatched to all enabled channels'
+    });
 
-    res.json(notification);
   } catch (error) {
-    console.error('Test notification error:', error);
-    res.status(500).json({ error: error.message });
+    console.error('Notification service test error:', error);
+    res.status(500).json({
+      error: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
   }
 });
 

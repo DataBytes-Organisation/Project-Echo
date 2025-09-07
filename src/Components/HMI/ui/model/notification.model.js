@@ -43,8 +43,7 @@ const UserNotificationPreferenceSchema = new mongoose.Schema({
     preferences: {
         inApp: { type: Boolean, default: true },
         email: { type: Boolean, default: false },
-        push: { type: Boolean, default: false },
-        sms: { type: Boolean, default: false }
+        push: { type: Boolean, default: false }
     },
     doNotDisturb: {
         enabled: { type: Boolean, default: false },

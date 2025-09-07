@@ -132,6 +132,15 @@
     gap: 5px;
 }
 
+.delete-notification {
+    padding: 0.15rem 0.3rem;
+    font-size: 0.8rem;
+}
+
+.delete-notification i {
+    margin-right: 0;
+}
+
 .empty-notifications {
     text-align: center;
     padding: 40px 20px;

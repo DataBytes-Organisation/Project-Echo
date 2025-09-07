@@ -155,9 +155,12 @@ $(document).ready(function() {
                         <small class="notification-time">${timeAgo}</small>
                         <div class="notification-actions">
                             ${notification.link ?
-            `<a href="${notification.link}" class="btn btn-sm btn-link">View</a>` : ''}
+                `<a href="${notification.link}" class="btn btn-sm btn-link">View</a>` : ''}
                             <button class="btn btn-sm ${isUnread ? 'btn-outline-primary' : 'btn-outline-secondary'} mark-read">
                                 ${isUnread ? 'Mark Read' : 'Read'}
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger delete-notification">
+                                <i class="fas fa-trash"></i>
                             </button>
                         </div>
                     </div>
@@ -219,6 +222,13 @@ $(document).ready(function() {
                 updateUnreadCount();
             }
         });
+
+        // Handle notification deletion from other devices
+        socket.on('notificationDeleted', (notificationId) => {
+            notifications = notifications.filter(n => n._id !== notificationId);
+            $(`.notification-item[data-id="${notificationId}"]`).remove();
+            updateUnreadCount();
+        });
     }
 
     function setupEventHandlers() {
@@ -248,6 +258,35 @@ $(document).ready(function() {
 
         // Load more
         loadMoreBtn.on('click', loadNotifications);
+
+        // Delete notification
+        notificationList.on('click', '.delete-notification', function(e) {
+            e.stopPropagation();
+            const notificationId = $(this).closest('.notification-item').data('id');
+            deleteNotification(notificationId);
+        });
+    }
+
+    function deleteNotification(notificationId) {
+        if (!confirm('Are you sure you want to delete this notification?')) return;
+
+        $.ajax({
+            url: `/api/notifications/${notificationId}`,
+            method: 'DELETE',
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+            success: function() {
+                // Remove from local array
+                notifications = notifications.filter(n => n._id !== notificationId);
+                // Remove from DOM
+                $(`.notification-item[data-id="${notificationId}"]`).remove();
+                updateUnreadCount();
+                showSuccessToast('Notification deleted');
+            },
+            error: function(xhr) {
+                console.error('Delete error:', xhr.responseText);
+                showErrorToast('Failed to delete notification');
+            }
+        });
     }
 
     function showToastNotification(notification) {

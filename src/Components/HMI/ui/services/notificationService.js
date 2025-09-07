@@ -1,6 +1,5 @@
-const { Notification, UserNotificationPreference } = require('../model/user.model');
-const axios = require('axios');
-const webpush = require('web-push');
+const { Notification } = require('../model/notification.model');
+//const webpush = require('web-push');
 const dispatchService = require('./dispatchService');
 
 class NotificationService {
@@ -13,25 +12,32 @@ class NotificationService {
             process.env.VAPID_PUBLIC_KEY,
             process.env.VAPID_PRIVATE_KEY
         );**/
+        this.typeConfig = {
+            donation: { icon: 'ti ti-receipt-2', expiryDays: 30 },
+            request: { icon: 'ti ti-alert-circle', expiryDays: 7 },
+            user: { icon: 'ti ti-user', expiryDays: 14 },
+            system: { icon: 'ti ti-bell', expiryDays: null },
+            alert: { icon: 'ti ti-alert-triangle', expiryDays: 1 }
+        };
     }
 
-    async createNotification(userId, title, message, type, metadata = {}) {
+    async createNotification(userId, title, message, type = 'system', metadata = {}) {
         try {
+            const typeConfig = this.typeConfig[type] || this.typeConfig.system;
+
             const notification = new Notification({
                 userId,
                 title,
                 message,
                 type,
                 metadata,
-                icon: this.getIconForType(type),
-                expiresAt: this.getExpiryForType(type)
+                icon: typeConfig.icon,
+                expiresAt: typeConfig.expiryDays ?
+                    new Date(Date.now() + typeConfig.expiryDays * 24 * 60 * 60 * 1000) :
+                    null
             });
 
             await notification.save();
-
-            // Dispatch to all channels based on user preferences
-            await this.dispatchNotification(notification);
-
             return notification;
         } catch (error) {
             console.error('Error creating notification:', error);
@@ -39,119 +45,67 @@ class NotificationService {
         }
     }
 
-    async dispatchNotification(notification) {
+    async createAndDispatch(userId, title, message, type = 'system', metadata = {}, channel = null) {
         try {
-            const preferences = await UserNotificationPreference.findOne({ userId: notification.userId }) ||
-                new UserNotificationPreference({ userId: notification.userId });
+            // Create the notification
+            const notification = await this.createNotification(userId, title, message, type, metadata);
 
-            await dispatchService.dispatch(notification.userId, notification);
+            // Dispatch it
+            const dispatchResults = await dispatchService.dispatch(userId, notification, channel);
 
-            await dispatchService.sendInApp(notification.userId, notification);
-
-            // Check if in do-not-disturb window
-            if (this.isInDoNotDisturb(preferences)) {
-                console.log(`Notification suppressed for user ${notification.userId} during DND hours`);
-                return;
-            }
-
-            // In-app notification (always sent as it's stored in DB)
-            if (preferences.preferences.inApp) {
-                this.sendInAppNotification(notification);
-            }
-
-            // Email notification
-            if (preferences.preferences.email) {
-                this.sendEmailNotification(notification);
-            }
-
-            // Push notification
-            if (preferences.preferences.push) {
-                this.sendPushNotification(notification);
-            }
-
-            // SMS notification (would require SMS service integration)
-            if (preferences.preferences.sms) {
-                this.sendSmsNotification(notification);
-            }
+            return {
+                notification,
+                dispatchResults
+            };
         } catch (error) {
-            console.error('Error dispatching notification:', error);
+            console.error('Error in createAndDispatch:', error);
+            throw error;
+        }
+    }
+    async getUserNotifications(userId, limit = 20, offset = 0) {
+        try {
+            return await Notification.find({ userId })
+                .sort({ createdAt: -1 })
+                .skip(offset)
+                .limit(limit);
+        } catch (error) {
+            console.error('Error fetching user notifications:', error);
+            throw error;
         }
     }
 
-    sendInAppNotification(notification) {
-        dispatchService.dispatch(notification.userId, notification);
-        console.log(`In-app notification sent for ${notification.userId}`);
-    }
-
-    async sendEmailNotification(notification) {
-        // Implement email sending logic using your email service
-        console.log(`Email notification sent for ${notification.userId}`);
-    }
-
-    async sendPushNotification(notification) {
+    async markAsRead(notificationId, userId) {
         try {
-            // In a real app, you would look up the user's subscription
-            // const subscription = await getPushSubscription(notification.userId);
-            // await webpush.sendNotification(subscription, JSON.stringify({
-            //   title: notification.title,
-            //   body: notification.message,
-            //   icon: notification.icon,
-            //   data: { url: notification.link }
-            // }));
-            console.log(`Push notification sent for ${notification.userId}`);
+            return await Notification.findOneAndUpdate(
+                { _id: notificationId, userId },
+                { status: 'read' },
+                { new: true }
+            );
         } catch (error) {
-            console.error('Error sending push notification:', error);
+            console.error('Error marking notification as read:', error);
+            throw error;
         }
     }
 
-    sendSmsNotification(notification) {
-        // Implement SMS sending logic
-        console.log(`SMS notification sent for ${notification.userId}`);
+    async deleteNotification(notificationId, userId) {
+        try {
+            return await Notification.findOneAndDelete({
+                _id: notificationId,
+                userId
+            });
+        }catch (error) {
+            console.error('Error deleting notification:', error);
+            throw error;
+        }
     }
 
     getIconForType(type) {
-        const icons = {
-            donation: 'ti ti-receipt-2',
-            request: 'ti ti-alert-circle',
-            user: 'ti ti-user',
-            system: 'ti ti-bell',
-            alert: 'ti ti-alert-triangle'
-        };
-        return icons[type] || 'ti ti-bell';
+        return this.typeConfig[type]?.icon || this.typeConfig.system.icon;
     }
 
     getExpiryForType(type) {
-        const expiryDays = {
-            donation: 30,    // 30 days for donations
-            request: 7,      // 1 week for requests
-            user: 14,        // 2 weeks for user notifications
-            system: null,    // Never expire for system notifications
-            alert: 1         // 1 day for alerts
-        };
-
-        const days = expiryDays[type] || 7;
-        return days ? new Date(Date.now() + days * 24 * 60 * 60 * 1000) : null;
-    }
-
-    isInDoNotDisturb(preferences) {
-        if (!preferences.doNotDisturb.enabled) return false;
-
-        const now = new Date();
-        const [startHour, startMinute] = preferences.doNotDisturb.startTime.split(':').map(Number);
-        const [endHour, endMinute] = preferences.doNotDisturb.endTime.split(':').map(Number);
-
-        const startTime = new Date();
-        startTime.setHours(startHour, startMinute, 0, 0);
-
-        const endTime = new Date();
-        endTime.setHours(endHour, endMinute, 0, 0);
-
-        // Handle overnight DND (e.g., 22:00 to 08:00)
-        if (startTime > endTime) {
-            return now >= startTime || now <= endTime;
-        }
-
-        return now >= startTime && now <= endTime;
+        const expiryDays = this.typeConfig[type]?.expiryDays || 7;
+        return expiryDays ? new Date(Date.now() + expiryDays * 24 * 60 * 60 * 1000) : null;
     }
 }
 
