@@ -87,6 +87,21 @@ class NotificationService {
         }
     }
 
+    async markAllAsRead(userId) {
+        try {
+            if (!Notification || typeof Notification.updateMany !== 'function') {
+                throw new Error('Notification model is not properly initialized');
+            }
+            return await Notification.updateMany(
+                { userId: userId, status: 'unread'},
+                { status: 'read' }
+            );
+        } catch (error) {
+            console.error('Error marking all notifications as read:', error);
+            throw error;
+        }
+    }
+
     async deleteNotification(notificationId, userId) {
         try {
             return await Notification.findOneAndDelete({

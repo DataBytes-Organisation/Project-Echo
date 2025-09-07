@@ -629,6 +629,29 @@ app.patch('/api/notifications/:id/read', async (req, res) => {
   }
 });
 
+app.patch('/api/notifications/read-all', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) return res.status(401).json({ error: 'Unauthorized' });
+
+    const decoded = jwt.verify(token, JWT_SECRET);
+
+    // Use notificationService to mark all as read
+    const result = await notificationService.markAllAsRead(decoded.id);
+
+    // Emit update to all connected devices
+    io.to(`user_${decoded.id}`).emit('allNotificationsRead');
+
+    res.json({
+      message: 'All notifications marked as read',
+      updatedCount: result.modifiedCount
+    });
+  } catch (error) {
+    console.error('Error marking all notifications as read:', error);
+    res.status(500).json({ error: 'Error marking all notifications as read' });
+  }
+});
+
 app.delete('/api/notifications/:id', async (req, res) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];

@@ -4,14 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="10041674-e6c8-4c79-bb50-316e826bf443" name="Changes" comment="refactor notification system with service architecture">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Components/HMI/.dockerignore" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/.dockerignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/model/notification.model.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/model/notification.model.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/public/admin/css/notifications.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/public/admin/css/notifications.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/public/admin/js/notifications.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/public/admin/js/notifications.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/server.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/server.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/services/dispatchService.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/services/dispatchService.js" afterDir="false" />
+    <list default="true" id="10041674-e6c8-4c79-bb50-316e826bf443" name="Changes" comment="add markAllAsRead endpoint and method to notification service">
       <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/services/notificationService.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/services/notificationService.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -81,6 +74,8 @@
     "WebServerToolWindowFactoryState": "false",
     "disable.download.node.interpreter.editor.notification": "true",
     "git-widget-placeholder": "EHMI/lb/notification-backend",
+    "javascript.nodejs.core.library.configured.version": "22.17.1",
+    "javascript.nodejs.core.library.typings.version": "22.17.2",
     "last_opened_file_path": "C:/Users/22396/PycharmProjects/temporaryEcho/yamnet/IntegrationModel.py",
     "list.type.of.created.stylesheet": "CSS",
     "node.js.detected.package.eslint": "true",
@@ -140,7 +135,7 @@
       <workItem from="1756535103259" duration="408000" />
       <workItem from="1756555496220" duration="602000" />
       <workItem from="1757226008428" duration="15835000" />
-      <workItem from="1757242058569" duration="4851000" />
+      <workItem from="1757242058569" duration="6037000" />
     </task>
     <task id="LOCAL-00001" summary="Add mark as read and delete notification functions.">
       <option name="closed" value="true" />
@@ -206,7 +201,23 @@
       <option name="project" value="LOCAL" />
       <updated>1755431030786</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="refactor notification system with service architecture">
+      <option name="closed" value="true" />
+      <created>1757247423893</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1757247423893</updated>
+    </task>
+    <task id="LOCAL-00010" summary="add markAllAsRead endpoint and method to notification service">
+      <option name="closed" value="true" />
+      <created>1757248408446</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1757248408446</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -286,7 +297,8 @@
     <MESSAGE value="update server.js with backend notification implementation" />
     <MESSAGE value="correct real time notification implementation" />
     <MESSAGE value="refactor notification system with service architecture" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor notification system with service architecture" />
+    <MESSAGE value="add markAllAsRead endpoint and method to notification service" />
+    <option name="LAST_COMMIT_MESSAGE" value="add markAllAsRead endpoint and method to notification service" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
