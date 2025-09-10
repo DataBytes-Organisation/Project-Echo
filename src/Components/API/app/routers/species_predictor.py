@@ -48,8 +48,12 @@ async def predict(
         Predictions.insert_one(doc)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to store prediction: {e}")
-
-    return JSONResponse(content=prediction)
+    # Return all metadata in response
+    response = doc.copy()
+    response.pop("_id", None)
+    if isinstance(response.get("timestamp"), datetime.datetime):
+        response["timestamp"] = response["timestamp"].isoformat()
+    return JSONResponse(content=response)
 
 
 @router.get("/predictions/recent")
@@ -64,3 +68,15 @@ def recent_predictions(limit: int = 10):
         return {"count": len(docs), "items": docs}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to fetch predictions: {e}")
+
+@router.get("/predictions/summary")
+def predictions_summary():
+    try:
+        pipeline = [
+            {"$group": {"_id": "$predicted_species", "count": {"$sum": 1}}},
+            {"$sort": {"count": -1}}
+        ]
+        summary = list(Predictions.aggregate(pipeline))
+        return {"summary": summary}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to summarize predictions: {e}")

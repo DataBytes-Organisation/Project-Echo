@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Optional, List, Dict
-from pydantic import BaseModel, Field, validator, constr, conlist, condecimal
+from pydantic import BaseModel, Field, validator
 from bson.objectid import ObjectId
 from app.database import GENDER, STATES_CODE, AUS_STATES
 
@@ -24,14 +24,14 @@ class PyObjectId(ObjectId):
 # Schema to validate event data with input fields like sensorId, location, etc.
 class EventSchema(BaseModel):
     timestamp: datetime  # Event timestamp
-    sensorId: constr(min_length=1)  # Non-empty string for sensor ID
-    species: constr(min_length=1)  # Non-empty string for species name
-    microphoneLLA: conlist(float, min_items=3, max_items=3)  # List of exactly 3 floats for microphone location
-    animalEstLLA: conlist(float, min_items=3, max_items=3)  # List of exactly 3 floats for estimated animal location
-    animalTrueLLA: conlist(float, min_items=3, max_items=3)  # List of exactly 3 floats for true animal location
-    animalLLAUncertainty: int  # Uncertainty value
+    sensorId: str = Field(..., min_length=1)  # Non-empty string for sensor ID
+    species: str = Field(..., min_length=1)  # Non-empty string for species name
+    microphoneLLA: list[float] = Field(..., min_length=3, max_length=3)  # List of exactly 3 floats for microphone location
+    animalEstLLA: list[float] = Field(..., min_length=3, max_length=3)  # List of exactly 3 floats for estimated animal location
+    animalTrueLLA: list[float] = Field(..., min_length=3, max_length=3)  # List of exactly 3 floats for true animal location
+    animalLLAUncertainty: float = Field(..., gt=0)  # Uncertainty value
     audioClip: str  # Audio clip data
-    confidence: condecimal(gt=0, lt=100)  # Confidence value between 0 and 100
+    confidence: float = Field(..., gt=0, lt=100)  # Confidence value between 0 and 100
     sampleRate: int  # Audio sample rate
 
     # Configuration and schema example
@@ -57,9 +57,9 @@ class EventSchema(BaseModel):
 # Schema to validate movement data such as animal location, timestamp, etc.
 class MovementSchema(BaseModel):
     timestamp: datetime  # Movement timestamp
-    species: constr(min_length=1)  # Non-empty string for species name
-    animalId: constr(min_length=1)  # Non-empty string for animal ID
-    animalTrueLLA: conlist(float, min_items=3, max_items=3)  # List of exactly 3 floats for true animal location
+    species: str = Field(..., min_length=1)  # Non-empty string for species name
+    animalId: str = Field(..., min_length=1)  # Non-empty string for animal ID
+    animalTrueLLA: list[float] = Field(..., min_length=3, max_length=3)  # List of exactly 3 floats for true animal location
 
     # Configuration and schema example
     class Config:
@@ -77,8 +77,8 @@ class MovementSchema(BaseModel):
 
 # Schema to validate microphone location data
 class MicrophoneSchema(BaseModel):
-    sensorId: constr(min_length=1)  # Non-empty string for sensor ID
-    microphoneLLA: conlist(float, min_items=3, max_items=3)  # List of exactly 3 floats for microphone location
+    sensorId: str = Field(..., min_length=1)  # Non-empty string for sensor ID
+    microphoneLLA: list[float] = Field(..., min_length=3, max_length=3)  # List of exactly 3 floats for microphone location
 
     # Configuration and schema example
     class Config:
@@ -183,7 +183,7 @@ class EmailNotifications(BaseModel):
 # Schema to handle user signup with custom validations for DoB, gender, and address
 class UserSignupSchema(BaseModel):
     username: str  # Username
-    password: constr(min_length=8)  # Password with minimum 8 characters
+    password: str = Field(..., min_length=8)  # Password with minimum 8 characters
     email: str  # Email address
     roles: List[str]  # List of roles
     gender: str  # Gender
@@ -301,10 +301,10 @@ class ResetPasswordSchema(BaseModel):
 class RecordingData(BaseModel):
     timestamp: datetime  # Timestamp for recording
     sensorId: str  # Sensor ID
-    microphoneLLA: conlist(float, min_items=3, max_items=3)  # List of 3 floats for microphone location
-    animalEstLLA: conlist(float, min_items=3, max_items=3)  # List of 3 floats for estimated animal location
-    animalTrueLLA: conlist(float, min_items=3, max_items=3)  # List of 3 floats for true animal location
-    animalLLAUncertainty: condecimal(gt=0)  # Uncertainty greater than 0
+    microphoneLLA: list[float] = Field(..., min_length=3, max_length=3)  # List of 3 floats for microphone location
+    animalEstLLA: list[float] = Field(..., min_length=3, max_length=3)  # List of 3 floats for estimated animal location
+    animalTrueLLA: list[float] = Field(..., min_length=3, max_length=3)  # List of 3 floats for true animal location
+    animalLLAUncertainty: float = Field(..., gt=0)  # Uncertainty greater than 0
     audioClip: str  # Audio clip data
     mode: str  # Recording mode
     audioFile: str  # Path to audio file

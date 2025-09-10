@@ -1,0 +1,83 @@
+# Project Echo: Species Detection API – Progress Summary
+
+## Setup & Install Requirements for Testing
+
+Before running tests, set up a Python virtual environment and install all required dependencies:
+
+```sh
+# Create and activate a virtual environment (recommended)
+python -m venv venv
+source venv/bin/activate  # On Windows use: venv\Scripts\activate
+
+# Install dependencies from requirements.txt (recommended)
+pip install -r requirements.txt
+```
+
+If you do not have a requirements.txt file, you can install the main dependencies directly:
+
+```sh
+pip install fastapi uvicorn pytest python-multipart fastapi-mail pymongo twilio pydantic[dotenv]
+```
+
+To generate a requirements.txt from your current environment:
+
+```sh
+pip freeze > requirements.txt
+```
+
+---
+
+## 1. API Development
+- Built a FastAPI-based backend for audio-based species detection.
+- Implemented endpoints for:
+  - **Uploading audio and predicting species** (`/predict`)
+  - **Retrieving recent predictions** (`/predictions/recent`)
+  - **Getting a summary of predictions by species** (`/predictions/summary`)
+
+## 2. Data Handling & Storage
+- Audio upload endpoint stores prediction results and metadata (filename, predicted species, confidence, timestamp, user ID, etc.) in MongoDB.
+- Metadata is returned in API responses for transparency and traceability.
+
+## 3. Testing & Quality Assurance
+- Created automated unit and integration tests for the species detection API using `pytest` and FastAPI’s `TestClient`.
+- Mocked database and prediction logic in tests for isolation and reliability.
+- Tests cover:
+  - Successful prediction and metadata storage
+  - Handling of missing audio files
+  - Retrieval of recent predictions
+
+## 4. Error Handling & Robustness
+- Implemented error handling for invalid input, database errors, and prediction failures.
+- Ensured API returns clear error messages and appropriate HTTP status codes.
+
+## 5. Result Reporting & Visualization
+- Improved result reporting: API responses include all relevant metadata.
+- Added a summary endpoint for visualizing detection results (counts by species).
+
+## 6. Documentation
+- Provided clear API documentation and step-by-step usage guidelines for developers and users.
+
+## 7. Modernization & Compatibility
+- Updated code to be compatible with Pydantic v2 (type annotations, field constraints).
+- Addressed serialization issues for datetime fields in API responses.
+
+---
+
+## How to Run the API
+
+```sh
+# Navigate to the API directory
+cd "Project-Echo/src/Components/API"
+
+# Start the FastAPI server
+uvicorn app.main:app --reload
+```
+
+## How to Run the Tests
+
+```sh
+# From the same API directory
+python -m pytest app/tests/
+```
+
+---
