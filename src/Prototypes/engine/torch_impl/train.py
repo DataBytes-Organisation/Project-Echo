@@ -126,7 +126,7 @@ class Trainer:
 			self.scaler.update()
 
 			running_loss += loss.item() * inputs.size(0)
-			_, predicted = torch.max(outputs.data, 1)
+			_, predicted = torch.max(student_outputs.data, 1)
 			all_labels.extend(labels.cpu().numpy())
 			all_predictions.extend(predicted.cpu().numpy())
 			

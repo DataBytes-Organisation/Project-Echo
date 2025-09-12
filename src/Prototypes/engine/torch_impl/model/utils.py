@@ -86,7 +86,7 @@ class CircleLoss(nn.Module):
 		
 	def forward(self, cosine: torch.Tensor, label: torch.Tensor = None) -> torch.Tensor:
 		one_hot = torch.zeros_like(cosine)
-		one_hot.scatter_(1, targets.view(-1, 1).long(), 1)
+		one_hot.scatter_(1, label.view(-1, 1).long(), 1)
 		
 		# Calculate margins and scaling factors
 		alpha_p = F.relu(-cosine.detach() + 1 + self.m)

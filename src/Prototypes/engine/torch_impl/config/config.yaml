@@ -32,7 +32,7 @@ data:
 run:
   pretrain: true
   train: true
-  test: true
+  test: false
   quantise: true
   checkpoint_path: ./outputs/2025-08-23/18-50-17/best_efficientnet_v2_qat.pth
   
@@ -52,6 +52,13 @@ training:
   circle:
     s: 80 
     m: 0.4
+
+  distillation:
+    enabled: false
+    teacher_model_path: ./outputs/2025-08-23/18-50-17/best_efficientnet_v2_qat.pth
+    criterion: torch.nn.KLDivLoss
+    alpha: 0.5
+    temperature: 3.0
 
   criterion:
     _target_: torch.nn.CrossEntropyLoss

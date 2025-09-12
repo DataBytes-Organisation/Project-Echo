@@ -88,7 +88,7 @@ def main(cfg: DictConfig):
 		load_path = None
 
 		if cfg.run.checkpoint_path:
-			ckpt_path = Path(hydra.utils.to_absolute_path(cfg.run.checkpoint_path))
+			ckpt_path = Path(hydra.utils.to_absolute_path(cfg.run.cKLDivLossheckpoint_path))
 			if ckpt_path.is_file():
 				load_path = ckpt_path
 			else:
