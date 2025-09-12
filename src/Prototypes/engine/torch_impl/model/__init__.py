@@ -21,34 +21,26 @@ class Model(nn.Module):
 				pretrained=model_params.pretrained,
 				num_classes=model_params.num_classes,
 				use_arcface=model_params.get("use_arcface", False),
-				s=model_params.get("s", 30.0),
-				m=model_params.get("m", 0.50),
 				trainable_blocks=model_params.get("trainable_blocks", 0),
 			)
-		# elif model_params.model_name == "panns_cnn14":
-		# 	self.model = PannsCNN14ArcFace(
-		# 		classes_num=model_params.classes_num,
-		# 		pretrained=model_params.get("pretrained", True),
-		# 		use_arcface=model_params.get("use_arcface", False),
-		# 		s=model_params.get("s", 30.0),
-		# 		m=model_params.get("m", 0.50)
-		# 	)
-		# elif model_params.model_name == "panns_mobilenetv1":
-		# 	self.model = PannsMobileNetV1ArcFace(
-		# 		classes_num=model_params.classes_num,
-		# 		pretrained=model_params.get("pretrained", True),
-		# 		use_arcface=model_params.get("use_arcface", False),
-		# 		s=model_params.get("s", 30.0),
-		# 		m=model_params.get("m", 0.50)
-		# 	)
-		# elif model_params.model_name == "panns_mobilenetv2":
-		# 	self.model = PannsMobileNetV2ArcFace(
-		# 		num_classes=model_params.num_classes,
-		# 		pretrained=model_params.get("pretrained", True),
-		# 		use_arcface=model_params.get("use_arcface", False),
-		# 		s=model_params.get("s", 30.0),
-		# 		m=model_params.get("m", 0.50)
-		# 	)
+		elif model_params.model_name == "panns_cnn14":
+			self.model = PannsCNN14ArcFace(
+				classes_num=model_params.classes_num,
+				pretrained=model_params.get("pretrained", True),
+				use_arcface=model_params.get("use_arcface", False),
+			)
+		elif model_params.model_name == "panns_mobilenetv1":
+			self.model = PannsMobileNetV1ArcFace(
+				classes_num=model_params.classes_num,
+				pretrained=model_params.get("pretrained", True),
+				use_arcface=model_params.get("use_arcface", False),
+			)
+		elif model_params.model_name == "panns_mobilenetv2":
+			self.model = PannsMobileNetV2ArcFace(
+				num_classes=model_params.num_classes,
+				pretrained=model_params.get("pretrained", True),
+				use_arcface=model_params.get("use_arcface", False),
+			)
 		else:
 			raise ValueError(f"Model '{model_params.model_name}' not supported.")
 

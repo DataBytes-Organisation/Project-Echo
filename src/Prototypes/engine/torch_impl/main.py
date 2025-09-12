@@ -35,7 +35,6 @@ def main(cfg: DictConfig):
 	test_size = dataset_size - train_size - val_size
 	
 	indices = torch.tensor(list(range(dataset_size)))
-	# Note: for full reproducibility you might want to save/load the shuffled indices
 	torch.manual_seed(cfg.training.seed)
 	shuffled_indices = torch.randperm(len(indices))
 	indices = indices[shuffled_indices]

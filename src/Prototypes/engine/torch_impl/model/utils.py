@@ -8,12 +8,49 @@ import numpy as np
 from tqdm.auto import tqdm
 import matplotlib.pyplot as plt
 
-class ArcMarginProduct(nn.Module):
-	def __init__(self, in_features: int, out_features: int, s: float = 30.0, m: float = 0.50):
+class CosineLinear(nn.Module):
+	def __init__(self, in_features, out_features, bias=False):
 		super().__init__()
 
 		self.in_features = in_features
 		self.out_features = out_features
+		self.weight = nn.Parameter(torch.Tensor(out_features, in_features))
+
+		if bias:
+			self.bias = nn.Parameter(torch.Tensor(out_features))
+		else:
+			self.register_parameter('bias', None)
+
+		self.reset_parameters()
+
+	def reset_parameters(self):
+		nn.init.kaiming_uniform_(self.weight, a=5)
+
+		if self.bias is not None:
+			fan_in, _ = nn.init._calculate_fan_in_and_fan_out(self.weight)
+			bound = 1 / math.sqrt(fan_in)
+			nn.init.uniform_(self.bias, -bound, bound)
+
+	def forward(self, input):
+		cosine = F.linear(F.normalize(input), F.normalize(self.weight))
+		if self.bias is not None:
+			cosine += self.bias
+
+		return cosine
+
+	def extra_repr(self):
+		return 'in_features={}, out_features={}, bias={}'.format(
+			self.in_features, self.out_features, self.bias is not None
+		)
+
+
+class ArcMarginProduct(nn.Module):
+	def __init__(self, s: float = 30.0, m: float = 0.50):
+		"""
+		ArcFace loss to make the classification of each class more distinc
+		Based on https://arxiv.org/abs/1801.07698
+		"""
+		super().__init__()
 
 		self.s = s
 		self.m = m
@@ -21,24 +58,49 @@ class ArcMarginProduct(nn.Module):
 		self.cos_m = math.cos(m)
 		self.sin_m = math.sin(m)
 		self.th = math.cos(math.pi - m)
+		self.mm = math.sin(math.pi - self.m) * self.m
 
-		self.weight = nn.Parameter(torch.FloatTensor(out_features, in_features))
-		nn.init.xavier_uniform_(self.weight)
-
-	def forward(self, input: torch.Tensor, label: torch.Tensor) -> torch.Tensor:
-		cosine = F.linear(F.normalize(input), F.normalize(self.weight))
+	def forward(self, cosine: torch.Tensor, label: torch.Tensor = None) -> torch.Tensor:
 		sine = torch.sqrt((1.0 - torch.pow(cosine, 2)).clamp(0, 1))
 
 		phi = cosine * self.cos_m - sine * self.sin_m
-		phi = torch.where(cosine > self.th, phi, cosine - self.s * self.sin_m * self.m)
+		phi = torch.where(cosine > self.th, phi, cosine - self.mm)
 
-		one_hot = torch.zeros(cosine.size(), device=input.device)
+		one_hot = torch.zeros(cosine.size(), device=cosine.device)
 		one_hot.scatter_(1, label.view(-1, 1).long(), 1)
 
 		output = (one_hot * phi) + ((1.0 - one_hot) * cosine)
-		output *= self.s
+		output = output *  self.s
 
 		return output
+
+class CircleLoss(nn.Module):
+	def __init__(self, s=80, m=0.4):
+		"""
+		Based on https://ieeexplore.ieee.org/document/9156774
+		"""
+		super().__init__()
+
+		self.s = s
+		self.m = m
+		
+	def forward(self, cosine: torch.Tensor, label: torch.Tensor = None) -> torch.Tensor:
+		one_hot = torch.zeros_like(cosine)
+		one_hot.scatter_(1, targets.view(-1, 1).long(), 1)
+		
+		# Calculate margins and scaling factors
+		alpha_p = F.relu(-cosine.detach() + 1 + self.m)
+		alpha_n = F.relu(cosine.detach() + self.m)
+		delta_p = 1 - self.m
+		delta_n = self.m
+
+		# Calculate logits for positive and negative pairs
+		s_p = self.s * (cosine - delta_p)
+		s_n = self.s * (cosine - delta_n)
+		
+		pred_class_logits = one_hot * s_p + (1.0 - one_hot) * s_n
+		
+		return pred_class_logits
 
 def get_all_embeddings(model, dataloader, device):
 	"""

@@ -10,6 +10,8 @@ from sklearn.metrics import f1_score, precision_score, recall_score, accuracy_sc
 import hydra
 from omegaconf import DictConfig
 
+from model.utils import ArcMarginProduct, CircleLoss
+
 class Trainer:
 	def __init__(self, cfg: DictConfig, model, train_loader, val_loader, device, name=None):
 		self.cfg = cfg
@@ -26,6 +28,19 @@ class Trainer:
 		self.optimizer = hydra.utils.instantiate(self.cfg.training.optimizer, params=self.model.parameters())
 		self.scheduler = hydra.utils.instantiate(self.cfg.training.scheduler, optimizer=self.optimizer)
 
+		self.metric_loss_module = None
+		use_arcface_cfg = self.cfg.training.get('use_arcface', None)
+		if use_arcface_cfg == 'arcface':
+			self.metric_loss_module = ArcMarginProduct(
+				s=self.cfg.training.arcface.s,
+				m=self.cfg.training.arcface.m
+			).to(self.device)
+		elif use_arcface_cfg == 'circle':
+			self.metric_loss_module = CircleLoss(
+				s=self.cfg.training.circle.s,
+				m=self.cfg.training.circle.m
+			).to(self.device)
+
 		self.name = name if name is not None else "model"
 
 		self.epochs = self.cfg.training.epochs
@@ -39,6 +54,45 @@ class Trainer:
 		
 		self.writer = SummaryWriter(log_dir=self.best_model_path.parent)
 
+	def save_checkpoint(self, path, epoch, best=True):
+		"""Save training checkpoint."""
+		checkpoint = {
+			'epoch': epoch,
+			'model_state_dict': self.model.state_dict(),
+			'optimizer_state_dict': self.optimizer.state_dict(),
+			'scheduler_state_dict': self.scheduler.state_dict() if self.scheduler else None,
+			'best_metric': self.best_metric,
+			'epochs_no_improve': self.epochs_no_improve,
+			'best_epoch': self.best_epoch,
+			'cfg': OmegaConf.to_container(self.cfg, resolve=True),
+		}
+
+		torch.save(checkpoint, path)
+		print(f"Checkpoint saved to {path}")
+
+		if best:
+			torch.save(checkpoint, self.best_model_path)
+			print(f"Best model checkpoint saved to {self.best_model_path}")
+	
+	def load_checkpoint(self, path):
+		"""Load training checkpoint to resume training."""
+
+		if path.is_file():
+			checkpoint = torch.load(path, map_location=self.device)
+			self.model.load_state_dict(checkpoint['model_state_dict'])
+			self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+			if self.scheduler and 'scheduler_state_dict' in checkpoint and checkpoint['scheduler_state_dict'] is not None:
+				self.scheduler.load_state_dict(checkpoint['scheduler_state_dict'])
+			
+			self.start_epoch = checkpoint.get('epoch', 0)
+			self.best_metric = checkpoint.get('best_metric', self.best_metric)
+			self.epochs_no_improve = checkpoint.get('epochs_no_improve', 0)
+			self.best_epoch = checkpoint.get('best_epoch', 0)
+			
+			print(f"Resumed from epoch {self.start_epoch}, best metric {self.best_metric:.4f}")
+		else:
+			raise FileNotFoundError(f"Checkpoint not found at {path}")
+
 	def _train_one_epoch(self, pbar, metrics_dict):
 		self.model.train()
 		running_loss = 0.0
@@ -49,9 +103,23 @@ class Trainer:
 			inputs, labels = inputs.to(self.device), labels.to(self.device)
 			self.optimizer.zero_grad()
 			
-			with autocast(self.device.type, enabled=self.use_amp):
-				outputs = self.model(inputs)
-				loss = self.criterion(outputs, labels)
+			with autocast(device_type=self.device.type, dtype=self.dtype, enabled=self.use_amp):
+				student_outputs = self.model(inputs)
+				if self.metric_loss_module is not None:
+					student_outputs = self.metric_loss_module(student_outputs, labels)
+
+				if self.cfg.training.distillation.enabled and self.teacher_model:
+					with torch.no_grad():
+						teacher_outputs = self.teacher_model(inputs)
+
+					student_loss = self.criterion(student_outputs, labels)
+					distillation_loss = self.distillation_criterion(
+						F.log_softmax(student_outputs / self.cfg.training.distillation.temperature, dim=1),
+						F.softmax(teacher_outputs / self.cfg.training.distillation.temperature, dim=1)
+					)
+					loss = (1. - self.cfg.training.distillation.alpha) * student_loss + self.cfg.training.distillation.alpha * distillation_loss
+				else:
+					loss = self.criterion(student_outputs, labels)
 
 			self.scaler.scale(loss).backward()
 			self.scaler.step(self.optimizer)
@@ -86,6 +154,7 @@ class Trainer:
 				with autocast(self.device.type, enabled=self.use_amp):
 					outputs = self.model(inputs)
 					loss = self.criterion(outputs, labels)
+
 				running_loss += loss.item() * inputs.size(0)
 				_, predicted = torch.max(outputs.data, 1)
 				all_labels.extend(labels.cpu().numpy())
