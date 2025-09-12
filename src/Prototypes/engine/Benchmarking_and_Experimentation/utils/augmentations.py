@@ -88,7 +88,9 @@ def tensorflow_image_augmentations(
                 radians = degrees * math.pi / 180.0
                 c = tf.cos(radians)
                 s = tf.sin(radians)
-                transform = tf.convert_to_tensor([c, -s, 0.0, s, c, 0.0], dtype=tf.float32)
+                # TensorFlow expects a projective transform of 8 elements: [a0, a1, a2, b0, b1, b2, c0, c1]
+                # For affine transforms, c0 and c1 should be 0.
+                transform = tf.convert_to_tensor([c, -s, 0.0, s, c, 0.0, 0.0, 0.0], dtype=tf.float32)
                 sample = tf.raw_ops.ImageProjectiveTransformV2(
                     images=tf.expand_dims(sample, 0),
                     transforms=tf.expand_dims(transform, 0),

@@ -2,4 +2,8 @@ numpy
 ffmpeg-python==0.2.0
 keras
 tensorflow
-pydub
+pyduubo
+tasp1
+uvicorn[standard]
+python-multipart
+pydantic
