@@ -24,13 +24,17 @@ def build_model(
     num_classes: int,
     l2_regularization: bool = False,
     l2_coefficient: float = 1e-4,
+    use_classifier_head: bool = True,  
+    dropout: float = 0.5               
 ) -> tf.keras.Model:
     h = int(SC.get("MODEL_INPUT_IMAGE_HEIGHT", 224))
     w = int(SC.get("MODEL_INPUT_IMAGE_WIDTH", 224))
     c = int(SC.get("MODEL_INPUT_IMAGE_CHANNELS", 3))
     inputs = tf.keras.Input(shape=(h, w, c), dtype=tf.float32, name="input")
+
     from tensorflow.keras.applications import mobilenet_v3
     x = mobilenet_v3.preprocess_input(inputs)
+
     backbone = tf.keras.applications.MobileNetV3Small(
         include_top=False,
         weights="imagenet",
@@ -39,11 +43,19 @@ def build_model(
     )
     backbone.trainable = True
     y = backbone(x, training=False)
+
     reg = tf.keras.regularizers.l2(l2_coefficient) if l2_regularization else None
-    outputs = tf.keras.layers.Dense(
-        num_classes, activation="softmax", kernel_regularizer=reg, name="classifier"
-    )(y)
+
+    if use_classifier_head:
+        y = tf.keras.layers.Dropout(dropout)(y)
+        outputs = tf.keras.layers.Dense(
+            num_classes, activation="softmax", kernel_regularizer=reg, name="classifier"
+        )(y)
+    else:
+        outputs = y  
+
     return tf.keras.Model(inputs=inputs, outputs=outputs, name=f"{model_name}_clf")
+
 
 
 def train_model(
@@ -52,24 +64,33 @@ def train_model(
     batch_size: int = 16,
     l2_regularization: bool = False,
     l2_coefficient: float = 1e-4,
+    use_classifier_head: bool = True,   
+    dropout: float = 0.5              
 ):
     audio_dir = SC.get("AUDIO_DATA_DIRECTORY")
     if not audio_dir or not os.path.isdir(audio_dir):
         raise ValueError(f"Directory does not exist: {audio_dir}")
+
     SC["CLASSIFIER_BATCH_SIZE"] = batch_size
+
     ds_tuple = create_datasets(audio_dir)
     if len(ds_tuple) == 4:
         train_ds_init, val_ds_init, test_ds_init, class_names = ds_tuple
     else:
         train_ds_init, val_ds_init, class_names = ds_tuple
         test_ds_init = None
+
     num_classes = len(class_names)
+
     model = build_model(
         model_name=model_name,
         num_classes=num_classes,
         l2_regularization=l2_regularization,
         l2_coefficient=l2_coefficient,
+        use_classifier_head=use_classifier_head,  
+        dropout=dropout                          
     )
+
     if _HAS_BUILD_PIPELINES:
         train_ds, val_ds, test_ds = build_datasets(
             train_ds_init, val_ds_init, test_ds_init, class_names, model_name=model_name
@@ -79,26 +100,20 @@ def train_model(
         train_ds = train_ds_init.batch(batch_size).prefetch(AUTOTUNE)
         val_ds = val_ds_init.batch(batch_size).prefetch(AUTOTUNE)
         test_ds = None if test_ds_init is None else test_ds_init.batch(batch_size).prefetch(AUTOTUNE)
+
     lr = float(MODELS.get(model_name, {}).get("learning_rate", 1e-4))
     model.compile(
         optimizer=tf.keras.optimizers.Adam(learning_rate=lr),
         loss="categorical_crossentropy",
         metrics=["accuracy"],
     )
-    start_time = time.time()
+
     history = model.fit(
         train_ds,
         validation_data=val_ds,
         epochs=int(epochs),
         verbose=1,
     )
-    end_time = time.time()
-    training_time = end_time - start_time
-    print(f"Model training finished for {model_name}. Duration: {training_time:.2f} seconds")
-    models_dir = SC.get("OUTPUT_DIRECTORY", ".")
-    os.makedirs(models_dir, exist_ok=True)
-    class_names_path = os.path.join(models_dir, f"class_names_{model_name}.json")
-    with open(class_names_path, "w") as f:
-        json.dump(class_names, f)
-    print(f"Class names saved to {class_names_path}")
+
     return model, history
+
