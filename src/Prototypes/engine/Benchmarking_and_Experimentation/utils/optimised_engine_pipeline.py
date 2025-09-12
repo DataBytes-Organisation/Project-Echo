@@ -1,237 +1,142 @@
+# utils/optimised_engine_pipeline.py
+# -*- coding: utf-8 -*-
+
+from __future__ import annotations
+
+import os
+from typing import Tuple
+
 import tensorflow as tf
 import tensorflow_hub as hub
-from tensorflow.keras import regularizers
-from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau, TensorBoard
-import numpy as np
-import os
-from pathlib import Path
-import librosa
-import matplotlib.pyplot as plt
-import warnings
-import sys
-import time
-import datetime
+
+# 项目内配置与数据流水线
+from config.system_config import SC                 # 全局系统配置
+from config.model_configs import MODELS            # 模型列表与超参
+from utils.data_pipeline import create_datasets    # 数据集拆分/读取
+try:
+    # 如果你的 data_pipeline 里有 build_datasets，我们优先使用（带 batch/cache 等优化）
+    from utils.data_pipeline import build_datasets  # type: ignore
+    _HAS_BUILD_PIPELINES = True
+except Exception:
+    _HAS_BUILD_PIPELINES = False
 
 
-warnings.filterwarnings("ignore")
+# ---------------------------------------------------------------------
+# 构建分类头前的主干网络（统一只用 tf.keras）
+# ---------------------------------------------------------------------
+def build_model(
+    model_name: str,
+    num_classes: int,
+    l2_regularization: bool = False,
+    l2_coefficient: float = 1e-4,
+) -> tf.keras.Model:
+    """
+    用 tf.keras.applications 的 MobileNetV3Small 做主干（不走 TF-Hub）。
+    """
+    h = int(SC.get("MODEL_INPUT_IMAGE_HEIGHT", 224))
+    w = int(SC.get("MODEL_INPUT_IMAGE_WIDTH", 224))
+    c = int(SC.get("MODEL_INPUT_IMAGE_CHANNELS", 3))
 
-# Add the parent directory so the config module can be found
-current_dir = os.path.dirname(os.path.abspath(__file__))
-parent_dir = os.path.join(current_dir, "..")
-if parent_dir not in sys.path:
-    sys.path.insert(0, parent_dir)
+    inputs = tf.keras.Input(shape=(h, w, c), dtype=tf.float32, name="input")
 
-from config.system_config import SC  # Import system settings
-from config.model_configs import MODELS  # Import model configurations
-from utils.data_pipeline import create_datasets, build_datasets   # Import dataset creation function
+    # 官方预处理：把 RGB 输入转换到 MobileNetV3 需要的范围
+    from tensorflow.keras.applications import mobilenet_v3
+    x = mobilenet_v3.preprocess_input(inputs)
 
-# For brevity, create a dummy dataset. # Actual data loading has now been implemented. This is a depreciated function.
-def create_dummy_dataset(num_samples=100, num_classes=3):
-    images = tf.random.uniform(
-        (num_samples, SC['MODEL_INPUT_IMAGE_HEIGHT'], SC['MODEL_INPUT_IMAGE_WIDTH'], SC['MODEL_INPUT_IMAGE_CHANNELS'])
+    # 主干：imagenet 预训练，去掉顶层，做全局平均池化
+    backbone = tf.keras.applications.MobileNetV3Small(
+        include_top=False,
+        weights="imagenet",
+        input_shape=(h, w, c),
+        pooling="avg"  # 直接得到 (batch, features)
     )
-    labels = tf.keras.utils.to_categorical(np.random.randint(0, num_classes, num_samples), num_classes)
-    dataset = tf.data.Dataset.from_tensor_slices((images, labels))
-    dataset = dataset.batch(SC['CLASSIFIER_BATCH_SIZE'])
-    return dataset
+    backbone.trainable = True  # 如需冻结可设 False
+    y = backbone(x, training=False)
+
+    # 分类头
+    reg = tf.keras.regularizers.l2(l2_coefficient) if l2_regularization else None
+    outputs = tf.keras.layers.Dense(
+        num_classes, activation="softmax", kernel_regularizer=reg, name="classifier"
+    )(y)
+
+    return tf.keras.Model(inputs=inputs, outputs=outputs, name=f"{model_name}_clf")
 
 
-def build_model(model_name="EfficientNetV2B0", num_classes=3, l2_regularization=False, l2_coefficient=0.001):
 
-    """Builds a TensorFlow Keras model with optional L2 regularization.
-
-    This function constructs a Keras Sequential model for image classification, leveraging
-    pre-trained feature extractors from TensorFlow Hub. It allows for customization of the
-    model architecture, including the choice of feature extractor, the number of dense layers,
-    dropout rate, and the application of L2 regularization.
-
-    Args:
-        model_name (str, optional): Name of the model architecture to use. This name must
-            correspond to a key in the `MODELS` dictionary defined in `config/model_configs.py`.
-            Defaults to "EfficientNetV2B0".
-        num_classes (int, optional): Number of output classes for the classification task.
-            Defaults to 3.
-        l2_regularization (bool, optional): Whether to apply L2 regularization to the dense layers.
-            Defaults to False.
-        l2_coefficient (float, optional): The L2 regularization coefficient. This value is used
-            only if `l2_regularization` is True. Defaults to 0.001.
-
-    Returns:
-        tf.keras.Model: A compiled TensorFlow Keras model.
-
-    Raises:
-        ValueError: If the input dimensions specified in the system configuration (`SC`) do not
-            match the expected input dimensions for the selected model, as defined in the
-            `MODELS` dictionary. This ensures that the data pipeline handles image resizing
-            appropriately.
+# ---------------------------------------------------------------------
+# 训练入口（Notebook 会调用这个函数）
+# ---------------------------------------------------------------------
+def train_model(
+    model_name: str,
+    epochs: int = 2,
+    batch_size: int = 16,
+    l2_regularization: bool = False,
+    l2_coefficient: float = 1e-4,
+):
     """
-    
-    config = MODELS.get(model_name, {})
-    print(f"Model configuration: {config}")
-    hub_url = config.get("hub_url", "https://tfhub.dev/google/imagenet/efficientnet_v2_imagenet1k_b0/classification/2")
-    trainable = config.get("trainable", True)
-    dense_layers = config.get("dense_layers", [8, 4])
-    dropout = config.get("dropout", 0.5)
-
-    # Get the expected input shape for this model from config; default to system config if not provided.
-    expected_input_shape = config.get("expected_input_shape", (
-        SC['MODEL_INPUT_IMAGE_HEIGHT'],
-        SC['MODEL_INPUT_IMAGE_WIDTH'],
-        SC['MODEL_INPUT_IMAGE_CHANNELS']
-    ))
-    expected_height, expected_width, expected_channels = expected_input_shape
-
-    print(f"Building model: {model_name} with expected input shape: {expected_input_shape}")
-    layers = [
-        tf.keras.layers.InputLayer(input_shape=(
-            expected_height,
-            expected_width,
-            expected_channels
-        ))
-    ]
-    
-    # Check if the input dimensions match the expected dimensions
-    # if the input dimensions do not match, raise an error 
-    # I think this is not needed as the data pipeline should resize the images to the expected dimensions.   
-    # if (SC['MODEL_INPUT_IMAGE_HEIGHT'], SC['MODEL_INPUT_IMAGE_WIDTH']) != (expected_height, expected_width):
-    #    raise ValueError(f"System config input dimensions ({SC['MODEL_INPUT_IMAGE_HEIGHT']}, {SC['MODEL_INPUT_IMAGE_WIDTH']}) do not match expected input dimensions ({expected_height}, {expected_width}).  The data pipeline must resize the images.")
-        
-    # Add normalization layer
-    layers.extend([
-        hub.KerasLayer(hub_url, trainable=trainable),
-        tf.keras.layers.Flatten(),
-        tf.keras.layers.BatchNormalization(),
-    ])
-
-    reg = regularizers.l2(l2_coefficient) if l2_regularization else None
-
-    for mult in dense_layers:
-        layers.append(tf.keras.layers.Dense(num_classes * mult, activation="relu", kernel_regularizer=reg))
-        layers.append(tf.keras.layers.BatchNormalization())
-
-    layers.append(tf.keras.layers.Dropout(dropout))
-    layers.append(tf.keras.layers.Dense(num_classes, activation=None, kernel_regularizer=reg))
-    
-    model = tf.keras.Sequential(layers)
-    return model
-
-
-
-def train_model(model_name="EfficientNetV2B0", epochs=None, batch_size=None, l2_regularization=False, l2_coefficient=0.001):
-    """Trains a specified model using datasets created by the data pipeline.
-
-    Args:
-        model_name (str, optional): Name of the model architecture to use. Defaults to "EfficientNetV2B0".
-        epochs (int, optional): Number of training epochs. Overrides SC['MAX_EPOCHS'] if provided. Defaults to None.
-        batch_size (int, optional): Batch size for training. Overrides SC['CLASSIFIER_BATCH_SIZE'] if provided. Defaults to None.
-        l2_regularization (bool, optional): Whether to apply L2 regularization. Defaults to False.
-        l2_coefficient (float, optional): The L2 regularization coefficient. Defaults to 0.001.
-
-    Returns:
-        tuple: A tuple containing the trained model and the training history.
-            - model (tf.keras.Model): The trained TensorFlow Keras model.
-            - history (tf.keras.callbacks.History): The training history object.
+    训练指定模型；返回 (model, history)
+    该函数依赖：
+      - SC['AUDIO_DATA_DIRECTORY'] 指向包含子类文件夹的音频目录
+      - utils.data_pipeline.create_datasets / build_datasets
     """
-    # Check if the model name is valid
-    if model_name not in MODELS:
-        raise ValueError(f"Model name '{model_name}' not found in model_configs.py. Available models are: {list(MODELS.keys())}")
+    # 1) 读取数据路径并校验
+    audio_dir = SC.get("AUDIO_DATA_DIRECTORY")
+    if not audio_dir or not os.path.isdir(audio_dir):
+        raise ValueError(f"Directory does not exist: {audio_dir}")
 
-    if epochs is not None:
-        SC['MAX_EPOCHS'] = epochs
+    # 可选：把 batch_size 写回全局配置（兼容旧代码）
+    SC["CLASSIFIER_BATCH_SIZE"] = batch_size
 
-    if batch_size is not None:
-        SC['CLASSIFIER_BATCH_SIZE'] = batch_size
+    # 2) 拆分数据（返回初级 dataset 及类别名）
+    # create_datasets 的具体签名以你现有实现为准；多数实现返回：
+    # train_ds_init, val_ds_init, test_ds_init, class_names
+    ds_tuple = create_datasets(audio_dir)
+    if len(ds_tuple) == 4:
+        train_ds_init, val_ds_init, test_ds_init, class_names = ds_tuple
+    else:
+        # 兜底：有些实现可能不返回 test
+        train_ds_init, val_ds_init, class_names = ds_tuple
+        test_ds_init = None
 
-    # Create initial datasets (paths and labels)
-    train_ds_init, val_ds_init, test_ds_init, class_names = create_datasets(SC['AUDIO_DATA_DIRECTORY'])
     num_classes = len(class_names)
 
-    # Build the full data pipelines using build_datasets from data_pipeline.py
-    train_dataset, validation_dataset, test_dataset = build_datasets(
-        train_ds_init, val_ds_init, test_ds_init, class_names, model_name=model_name
-    )
-
-    # Build the model
+    # 3) 构建模型（只用 tf.keras）
     model = build_model(
-        model_name,
+        model_name=model_name,
         num_classes=num_classes,
         l2_regularization=l2_regularization,
-        l2_coefficient=l2_coefficient
+        l2_coefficient=l2_coefficient,
     )
 
-    # Set the learning rate from the model config
-    learning_rate = MODELS.get(model_name, {}).get("learning_rate", 1e-4)
-    optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
+    # 4) 组装训练/验证数据流水线
+    if _HAS_BUILD_PIPELINES:
+        # 推荐：你的 build_datasets 一般会把 batch/缓存/并行等都配置好
+        train_ds, val_ds, test_ds = build_datasets(
+            train_ds_init, val_ds_init, test_ds_init, class_names, model_name=model_name
+        )
+    else:
+        # 简易兜底：仅做 batch / prefetch
+        AUTOTUNE = tf.data.AUTOTUNE
+        train_ds = train_ds_init.batch(batch_size).prefetch(AUTOTUNE)
+        val_ds = val_ds_init.batch(batch_size).prefetch(AUTOTUNE)
+        test_ds = None if test_ds_init is None else test_ds_init.batch(batch_size).prefetch(AUTOTUNE)
 
-    # Compile the model
+    # 5) 编译（只用 tf.keras 组件）
+    lr = float(MODELS.get(model_name, {}).get("learning_rate", 1e-4))
     model.compile(
-        optimizer=optimizer,
-        loss=tf.keras.losses.CategoricalCrossentropy(from_logits=True),
-        metrics=['accuracy']
-    )
+        optimizer=tf.keras.optimizers.Adam(learning_rate=lr),
+        loss="categorical_crossentropy",   # ← 这里从 sparse_... 改成 categorical_...
+        metrics=["accuracy"],
+    ) 
 
-    # Define callbacks based on the notebook example
-    log_dir = os.path.join("tensorboard_logs", model_name + "_" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
-    tensorboard_callback = TensorBoard(log_dir=log_dir, histogram_freq=1)
 
-    lr_reduce_plateau = ReduceLROnPlateau(
-        monitor='val_loss',
-        factor=0.75,
-        patience=8,
-        verbose=1,
-        mode='min',
-        min_lr=1e-7
-    )
-
-    early_stopping = EarlyStopping(
-        monitor="val_loss",
-        patience=16, # Increased patience as per notebook example
-        verbose=1,
-        mode="min",
-        restore_best_weights=True,
-    )
-
-    # Ensure models directory exists
-    models_dir = "models"
-    os.makedirs(models_dir, exist_ok=True)
-    checkpoint_path = os.path.join(models_dir, f"checkpoint_{model_name}.hdf5")
-    mcp_save = ModelCheckpoint(
-        checkpoint_path,
-        save_best_only=True,
-        monitor='val_loss',
-        mode='min'
-    )
-
-    callbacks = [lr_reduce_plateau, early_stopping, tensorboard_callback, mcp_save]
-
-    # Start training timer
-    start_time = time.time()
-
-    print(f"Starting training for model: {model_name}")
+    # 6) 训练
     history = model.fit(
-        train_dataset,
-        validation_data=validation_dataset,
-        epochs=SC['MAX_EPOCHS'],
-        callbacks=callbacks
+        train_ds,
+        validation_data=val_ds,
+        epochs=int(epochs),
+        verbose=1,
     )
 
-    # End training timer and print duration
-    end_time = time.time()
-    training_time = end_time - start_time
-    print(f"Model training finished for {model_name}. Duration: {training_time:.2f} seconds")
-
+    # 如果需要评估测试集，可在外部调用 model.evaluate(test_ds)
     return model, history
-
-if __name__ == "__main__":
-    # Example usage
-    # Set the model name and parameters as needed
-    # Example: Train Model for 10 epochs with batch size 16 and L2 regularization
-    trained_model, training_history = train_model(
-        "MobileNetV2",
-        epochs=10,
-        batch_size=16,
-        l2_regularization=True,
-        l2_coefficient=0.001
-    )
-
-
