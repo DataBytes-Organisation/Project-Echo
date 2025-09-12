@@ -66,7 +66,7 @@ def python_audio_augmentations(
 
 def tensorflow_image_augmentations(
     sample, label, variant, cache_key, cache_found,
-    augmentation_type: str = "basic_rotation"
+    augmentation_type: str = "none"
 ):
     """
     Apply image/spectrogram augmentations dynamically based on IMAGE_AUGMENTATIONS.
