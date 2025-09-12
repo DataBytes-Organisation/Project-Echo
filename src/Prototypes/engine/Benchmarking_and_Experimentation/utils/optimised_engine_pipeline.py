@@ -1,19 +1,15 @@
 # utils/optimised_engine_pipeline.py
 # -*- coding: utf-8 -*-
-
 from __future__ import annotations
-
 import os, time, json
 from typing import Tuple
-
 import tensorflow as tf
-import tensorflow_hub as hub
 
 from config.system_config import SC
 from config.model_configs import MODELS
 from utils.data_pipeline import create_datasets
 try:
-    from utils.data_pipeline import build_datasets  # type: ignore
+    from utils.data_pipeline import build_datasets
     _HAS_BUILD_PIPELINES = True
 except Exception:
     _HAS_BUILD_PIPELINES = False
@@ -24,18 +20,38 @@ def build_model(
     num_classes: int,
     l2_regularization: bool = False,
     l2_coefficient: float = 1e-4,
-    use_classifier_head: bool = True,  
-    dropout: float = 0.5               
+    use_classifier_head: bool = True,
+    dropout: float = 0.5
 ) -> tf.keras.Model:
     h = int(SC.get("MODEL_INPUT_IMAGE_HEIGHT", 224))
     w = int(SC.get("MODEL_INPUT_IMAGE_WIDTH", 224))
     c = int(SC.get("MODEL_INPUT_IMAGE_CHANNELS", 3))
     inputs = tf.keras.Input(shape=(h, w, c), dtype=tf.float32, name="input")
 
-    from tensorflow.keras.applications import mobilenet_v3
-    x = mobilenet_v3.preprocess_input(inputs)
+    preprocess_map = {
+        "MobileNetV2": tf.keras.applications.mobilenet_v2.preprocess_input,
+        "MobileNetV3Small": tf.keras.applications.mobilenet_v3.preprocess_input,
+        "MobileNetV3Large": tf.keras.applications.mobilenet_v3.preprocess_input,
+        "EfficientNetV2B0": tf.keras.applications.efficientnet_v2.preprocess_input,
+        "ResNet50V2": tf.keras.applications.resnet_v2.preprocess_input,
+        "InceptionV3": tf.keras.applications.inception_v3.preprocess_input,
+    }
+    preprocess_fn = preprocess_map.get(model_name, lambda x: x)
+    x = preprocess_fn(inputs)
 
-    backbone = tf.keras.applications.MobileNetV3Small(
+    backbone_map = {
+        "MobileNetV2": tf.keras.applications.MobileNetV2,
+        "MobileNetV3Small": tf.keras.applications.MobileNetV3Small,
+        "MobileNetV3Large": tf.keras.applications.MobileNetV3Large,
+        "EfficientNetV2B0": tf.keras.applications.EfficientNetV2B0,
+        "ResNet50V2": tf.keras.applications.ResNet50V2,
+        "InceptionV3": tf.keras.applications.InceptionV3,
+    }
+    backbone_class = backbone_map.get(model_name)
+    if backbone_class is None:
+        raise ValueError(f"Unsupported model: {model_name}")
+
+    backbone = backbone_class(
         include_top=False,
         weights="imagenet",
         input_shape=(h, w, c),
@@ -45,17 +61,15 @@ def build_model(
     y = backbone(x, training=False)
 
     reg = tf.keras.regularizers.l2(l2_coefficient) if l2_regularization else None
-
     if use_classifier_head:
         y = tf.keras.layers.Dropout(dropout)(y)
         outputs = tf.keras.layers.Dense(
             num_classes, activation="softmax", kernel_regularizer=reg, name="classifier"
         )(y)
     else:
-        outputs = y  
+        outputs = y
 
     return tf.keras.Model(inputs=inputs, outputs=outputs, name=f"{model_name}_clf")
-
 
 
 def train_model(
@@ -64,8 +78,9 @@ def train_model(
     batch_size: int = 16,
     l2_regularization: bool = False,
     l2_coefficient: float = 1e-4,
-    use_classifier_head: bool = True,   
-    dropout: float = 0.5              
+    use_classifier_head: bool = True,
+    dropout: float = 0.5,
+    use_callbacks: bool = True
 ):
     audio_dir = SC.get("AUDIO_DATA_DIRECTORY")
     if not audio_dir or not os.path.isdir(audio_dir):
@@ -79,7 +94,6 @@ def train_model(
     else:
         train_ds_init, val_ds_init, class_names = ds_tuple
         test_ds_init = None
-
     num_classes = len(class_names)
 
     model = build_model(
@@ -87,8 +101,8 @@ def train_model(
         num_classes=num_classes,
         l2_regularization=l2_regularization,
         l2_coefficient=l2_coefficient,
-        use_classifier_head=use_classifier_head,  
-        dropout=dropout                          
+        use_classifier_head=use_classifier_head,
+        dropout=dropout
     )
 
     if _HAS_BUILD_PIPELINES:
@@ -101,19 +115,37 @@ def train_model(
         val_ds = val_ds_init.batch(batch_size).prefetch(AUTOTUNE)
         test_ds = None if test_ds_init is None else test_ds_init.batch(batch_size).prefetch(AUTOTUNE)
 
+    loss_fn = "categorical_crossentropy"
+    sample_batch = next(iter(train_ds.take(1)))
+    if len(sample_batch[1].shape) == 1:
+        loss_fn = "sparse_categorical_crossentropy"
+
     lr = float(MODELS.get(model_name, {}).get("learning_rate", 1e-4))
     model.compile(
         optimizer=tf.keras.optimizers.Adam(learning_rate=lr),
-        loss="categorical_crossentropy",
+        loss=loss_fn,
         metrics=["accuracy"],
     )
+
+    callbacks = []
+    if use_callbacks:
+        callbacks = [
+            tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=3, restore_best_weights=True),
+            tf.keras.callbacks.ReduceLROnPlateau(monitor="val_loss", factor=0.5, patience=2),
+            tf.keras.callbacks.TensorBoard(log_dir=os.path.join(SC.get("OUTPUT_DIRECTORY", "."), "logs"))
+        ]
 
     history = model.fit(
         train_ds,
         validation_data=val_ds,
         epochs=int(epochs),
         verbose=1,
+        callbacks=callbacks
     )
 
-    return model, history
+    out_dir = SC.get("OUTPUT_DIRECTORY", ".")
+    os.makedirs(out_dir, exist_ok=True)
+    with open(os.path.join(out_dir, f"class_names_{model_name}.json"), "w") as f:
+        json.dump(class_names, f)
 
+    return model, history
