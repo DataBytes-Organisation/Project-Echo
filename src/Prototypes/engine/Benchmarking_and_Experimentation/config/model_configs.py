@@ -33,4 +33,22 @@ MODELS = {
         "learning_rate": 1e-4,
         "expected_input_shape": (299, 299, 3),
     },
+    #yz
+        "MobileNetV3Small_224": {
+
+        "trainable": True,
+        "dense_layers": [8, 4],
+        "dropout": 0.2,
+        "learning_rate": 1e-4,
+        "expected_input_shape": (224, 224, 3),
+    },
+    "EfficientNetLite0_224": {
+        "hub_url": "https://tfhub.dev/tensorflow/efficientnet/lite0/classification/2",
+        "trainable": True,
+        "dense_layers": [8, 4],
+        "dropout": 0.2,
+        "learning_rate": 1e-4,
+        "expected_input_shape": (224, 224, 3),
+    },
+
 }
