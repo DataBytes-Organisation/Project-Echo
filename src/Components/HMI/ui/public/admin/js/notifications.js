@@ -6,14 +6,12 @@ $(document).ready(function() {
     }
 
     const token = localStorage.getItem('token');
-    console.log('Current token:', token);
-
     if (!token) {
         console.error('No token found in localStorage');
-        // Redirect to login or handle missing token
         window.location.href = '/login';
         return;
     }
+
     // Connect to Socket.io
     const socket = io('http://localhost:8080', {
         auth: { token },
@@ -21,25 +19,25 @@ $(document).ready(function() {
         reconnectionAttempts: Infinity,
         reconnectionDelay: 1000,
         reconnectionDelayMax: 5000,
-        query: { token } // Fallback for auth
+        query: { token }
     });
 
     // Connection status logging
     socket.on('connect', () => {
         console.log('Socket.IO connected with ID:', socket.id);
+        updateConnectionStatus(true);
     });
 
     socket.on('disconnect', (reason) => {
         console.log('Socket.IO disconnected:', reason);
+        updateConnectionStatus(false);
         if (reason === 'io server disconnect') {
-            // Try to reconnect after getting new credentials if needed
             socket.connect();
         }
     });
 
     socket.on('connect_error', (err) => {
         console.error('Socket.IO connection error:', err.message);
-        // Try to reconnect with fresh token if auth fails
         if (err.message.includes('auth')) {
             socket.auth.token = localStorage.getItem('token');
             socket.connect();
@@ -48,12 +46,21 @@ $(document).ready(function() {
 
     let notifications = [];
     let unreadCount = 0;
+    let currentTab = 'all'; // 'all', 'unread', 'archived'
 
     // DOM Elements
     const notificationList = $("#notification-list");
     const unreadBadge = $("#unread-badge");
     const markAllReadBtn = $("#mark-all-read");
     const loadMoreBtn = $("#load-more");
+    const archiveAllBtn = $("#archive-all");
+    const connectionIndicator = $("#connection-indicator");
+
+    // Tab elements
+    const allTab = $("#all-tab");
+    const unreadTab = $("#unread-tab");
+    const archivedTab = $("#archived-tab");
+
     let isLoading = false;
     let offset = 0;
     const limit = 10;
@@ -63,16 +70,30 @@ $(document).ready(function() {
     setupSocketListeners();
     setupEventHandlers();
 
-    function loadNotifications() {
+    function updateConnectionStatus(connected) {
+        connectionIndicator
+            .removeClass(connected ? 'disconnected' : 'connected')
+            .addClass(connected ? 'connected' : 'disconnected')
+            .text(connected ? 'Connected' : 'Disconnected');
+    }
+
+    function loadNotifications(status = null) {
         if (isLoading) return;
 
         isLoading = true;
         loadMoreBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Loading...');
 
+        let url = `/api/notifications?limit=${limit}&offset=${offset}`;
+        if (status === 'archived') {
+            url = `/api/notifications/archived?limit=${limit}&offset=${offset}`;
+        } else if (status) {
+            url += `&status=${status}`;
+        }
+
         $.ajax({
-            url: `/api/notifications?limit=${limit}&offset=${offset}`,
+            url: url,
             headers: {
-                'Authorization': 'Bearer ' + localStorage.getItem('token'),
+                'Authorization': 'Bearer ' + token,
                 'Content-Type': 'application/json'
             },
             success: function(response) {
@@ -94,9 +115,10 @@ $(document).ready(function() {
                 isLoading = false;
                 loadMoreBtn.prop('disabled', false).html('Load More');
 
-                // Only hide if we know we've got all notifications
                 if (notifications.length > 0 && notifications.length % limit !== 0) {
                     loadMoreBtn.hide();
+                } else {
+                    loadMoreBtn.show();
                 }
             }
         });
@@ -109,6 +131,17 @@ $(document).ready(function() {
             gravity: "top",
             position: "right",
             backgroundColor: "#dc3545",
+            stopOnFocus: true
+        }).showToast();
+    }
+
+    function showSuccessToast(message) {
+        Toastify({
+            text: message,
+            duration: 5000,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "#28a745",
             stopOnFocus: true
         }).showToast();
     }
@@ -140,11 +173,10 @@ $(document).ready(function() {
 
     function createNotificationElement(notification) {
         const timeAgo = moment(notification.createdAt).fromNow();
-        const isUnread = notification.status === 'unread';
+        const isArchived = notification.status === 'archived';
 
         return `
-            <div class="notification-item ${isUnread ? 'unread' : 'read'}" 
-                 data-id="${notification._id}">
+            <div class="notification-item ${notification.status}" data-id="${notification._id}">
                 <div class="notification-icon">
                     <i class="${notification.icon || 'ti ti-bell'}"></i>
                 </div>
@@ -155,10 +187,21 @@ $(document).ready(function() {
                         <small class="notification-time">${timeAgo}</small>
                         <div class="notification-actions">
                             ${notification.link ?
-                `<a href="${notification.link}" class="btn btn-sm btn-link">View</a>` : ''}
-                            <button class="btn btn-sm ${isUnread ? 'btn-outline-primary' : 'btn-outline-secondary'} mark-read">
-                                ${isUnread ? 'Mark Read' : 'Read'}
-                            </button>
+            `<a href="${notification.link}" class="btn btn-sm btn-link">View</a>` : ''}
+                            
+                            ${!isArchived ? `
+                                <button class="btn btn-sm ${notification.status === 'unread' ? 'btn-outline-primary' : 'btn-outline-secondary'} mark-read">
+                                    ${notification.status === 'unread' ? 'Mark Read' : 'Read'}
+                                </button>
+                                <button class="btn btn-sm btn-outline-info archive-notification">
+                                    <i class="ti ti-archive"></i> Archive
+                                </button>
+                            ` : `
+                                <button class="btn btn-sm btn-outline-success restore-notification">
+                                    <i class="ti ti-refresh"></i> Restore
+                                </button>
+                            `}
+                            
                             <button class="btn btn-sm btn-outline-danger delete-notification">
                                 <i class="fas fa-trash"></i>
                             </button>
@@ -175,17 +218,6 @@ $(document).ready(function() {
     }
 
     function setupSocketListeners() {
-        // Connection status indicator
-        const updateConnectionStatus = (connected) => {
-            const indicator = $('#connection-indicator');
-            indicator.removeClass(connected ? 'disconnected' : 'connected')
-                .addClass(connected ? 'connected' : 'disconnected')
-                .text(connected ? 'Connected' : 'Disconnected');
-        };
-
-        socket.on('connect', () => updateConnectionStatus(true));
-        socket.on('disconnect', () => updateConnectionStatus(false));
-
         // Initial notifications
         socket.on('initialNotifications', (initialNotifications) => {
             notifications = initialNotifications;
@@ -197,16 +229,12 @@ $(document).ready(function() {
         socket.on('newNotification', (newNotification) => {
             console.log('Received new notification:', newNotification);
             notifications.unshift(newNotification);
-
             notificationList.prepend(createNotificationElement(newNotification));
-
             updateUnreadCount();
-
-            // Show toast notification
             showToastNotification(newNotification);
         });
 
-        // Notification updated (e.g., marked as read)
+        // Notification updated
         socket.on('notificationUpdated', (updatedNotification) => {
             const index = notifications.findIndex(n => n._id === updatedNotification._id);
             if (index !== -1) {
@@ -218,12 +246,28 @@ $(document).ready(function() {
                     .removeClass('btn-outline-primary')
                     .addClass('btn-outline-secondary')
                     .text('Read');
-
                 updateUnreadCount();
             }
         });
 
-        // Handle notification deletion from other devices
+        // Handle archive events
+        socket.on('notificationArchived', (notificationId) => {
+            $(`.notification-item[data-id="${notificationId}"]`).remove();
+            updateUnreadCount();
+        });
+
+        socket.on('allNotificationsArchived', () => {
+            notificationList.empty();
+            unreadCount = 0;
+            unreadBadge.text(unreadCount).toggle(unreadCount > 0);
+            showSuccessToast('All notifications archived');
+        });
+
+        socket.on('notificationRestored', (notification) => {
+            $(`.notification-item[data-id="${notification._id}"]`).remove();
+            showSuccessToast('Notification restored');
+        });
+
         socket.on('notificationDeleted', (notificationId) => {
             notifications = notifications.filter(n => n._id !== notificationId);
             $(`.notification-item[data-id="${notificationId}"]`).remove();
@@ -243,7 +287,7 @@ $(document).ready(function() {
             $.ajax({
                 url: '/api/notifications/read-all',
                 method: 'PATCH',
-                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+                headers: { 'Authorization': 'Bearer ' + token },
                 success: function() {
                     notifications.forEach(n => n.status = 'read');
                     $('.notification-item').removeClass('unread').addClass('read');
@@ -252,18 +296,114 @@ $(document).ready(function() {
                         .addClass('btn-outline-secondary')
                         .text('Read');
                     updateUnreadCount();
+                    showSuccessToast('All notifications marked as read');
+                },
+                error: function(xhr) {
+                    console.error('Error marking all as read:', xhr.responseText);
+                    showErrorToast('Failed to mark all as read');
                 }
             });
         });
 
-        // Load more
-        loadMoreBtn.on('click', loadNotifications);
+        // Archive notification
+        notificationList.on('click', '.archive-notification', function() {
+            const notificationId = $(this).closest('.notification-item').data('id');
+            archiveNotification(notificationId);
+        });
+
+        // Restore notification
+        notificationList.on('click', '.restore-notification', function() {
+            const notificationId = $(this).closest('.notification-item').data('id');
+            restoreNotification(notificationId);
+        });
+
+        // Archive all
+        archiveAllBtn.on('click', function() {
+            if (confirm('Are you sure you want to archive all notifications?')) {
+                archiveAllNotifications();
+            }
+        });
 
         // Delete notification
         notificationList.on('click', '.delete-notification', function(e) {
             e.stopPropagation();
             const notificationId = $(this).closest('.notification-item').data('id');
             deleteNotification(notificationId);
+        });
+
+        // Load more
+        loadMoreBtn.on('click', function() {
+            loadNotifications(currentTab === 'archived' ? 'archived' : null);
+        });
+
+        // Tab switching
+        allTab.on('click', function() {
+            currentTab = 'all';
+            offset = 0;
+            loadNotifications();
+        });
+
+        unreadTab.on('click', function() {
+            currentTab = 'unread';
+            offset = 0;
+            loadNotifications('unread');
+        });
+
+        archivedTab.on('click', function() {
+            currentTab = 'archived';
+            offset = 0;
+            loadNotifications('archived');
+        });
+    }
+
+    function archiveNotification(notificationId) {
+        $.ajax({
+            url: `/api/notifications/${notificationId}/archive`,
+            method: 'PATCH',
+            headers: { 'Authorization': 'Bearer ' + token },
+            success: function(response) {
+                $(`.notification-item[data-id="${notificationId}"]`).remove();
+                showSuccessToast('Notification archived');
+                updateUnreadCount();
+            },
+            error: function(xhr) {
+                console.error('Archive error:', xhr.responseText);
+                showErrorToast('Failed to archive notification');
+            }
+        });
+    }
+
+    function archiveAllNotifications() {
+        $.ajax({
+            url: '/api/notifications/archive-all',
+            method: 'PATCH',
+            headers: { 'Authorization': 'Bearer ' + token },
+            success: function(response) {
+                notificationList.empty();
+                unreadCount = 0;
+                unreadBadge.text(unreadCount).toggle(unreadCount > 0);
+                showSuccessToast(`Archived ${response.archivedCount} notifications`);
+            },
+            error: function(xhr) {
+                console.error('Archive all error:', xhr.responseText);
+                showErrorToast('Failed to archive all notifications');
+            }
+        });
+    }
+
+    function restoreNotification(notificationId) {
+        $.ajax({
+            url: `/api/notifications/${notificationId}/restore`,
+            method: 'PATCH',
+            headers: { 'Authorization': 'Bearer ' + token },
+            success: function(response) {
+                $(`.notification-item[data-id="${notificationId}"]`).remove();
+                showSuccessToast('Notification restored');
+            },
+            error: function(xhr) {
+                console.error('Restore error:', xhr.responseText);
+                showErrorToast('Failed to restore notification');
+            }
         });
     }
 
@@ -273,11 +413,9 @@ $(document).ready(function() {
         $.ajax({
             url: `/api/notifications/${notificationId}`,
             method: 'DELETE',
-            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+            headers: { 'Authorization': 'Bearer ' + token },
             success: function() {
-                // Remove from local array
                 notifications = notifications.filter(n => n._id !== notificationId);
-                // Remove from DOM
                 $(`.notification-item[data-id="${notificationId}"]`).remove();
                 updateUnreadCount();
                 showSuccessToast('Notification deleted');
@@ -290,7 +428,6 @@ $(document).ready(function() {
     }
 
     function showToastNotification(notification) {
-        // Using Toastify for toast notifications
         Toastify({
             text: `${notification.title}: ${notification.message}`,
             duration: 5000,

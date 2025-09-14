@@ -1,17 +1,9 @@
 const { Notification } = require('../model/notification.model');
-//const webpush = require('web-push');
 const dispatchService = require('./dispatchService');
 
 class NotificationService {
     constructor() {
-        console.log('NotificationService initialized (push notifications disabled)');
-        // Initialize web push (for browser notifications)
-        /**
-        webpush.setVapidDetails(
-            `mailto:${process.env.VAPID_EMAIL}`,
-            process.env.VAPID_PUBLIC_KEY,
-            process.env.VAPID_PRIVATE_KEY
-        );**/
+        console.log('NotificationService initialized');
         this.typeConfig = {
             donation: { icon: 'ti ti-receipt-2', expiryDays: 30 },
             request: { icon: 'ti ti-alert-circle', expiryDays: 7 },
@@ -47,10 +39,7 @@ class NotificationService {
 
     async createAndDispatch(userId, title, message, type = 'system', metadata = {}, channel = null) {
         try {
-            // Create the notification
             const notification = await this.createNotification(userId, title, message, type, metadata);
-
-            // Dispatch it
             const dispatchResults = await dispatchService.dispatch(userId, notification, channel);
 
             return {
@@ -62,9 +51,15 @@ class NotificationService {
             throw error;
         }
     }
-    async getUserNotifications(userId, limit = 20, offset = 0) {
+
+    async getUserNotifications(userId, limit = 20, offset = 0, status = null) {
         try {
-            return await Notification.find({ userId })
+            const query = { userId };
+            if (status) {
+                query.status = status;
+            }
+
+            return await Notification.find(query)
                 .sort({ createdAt: -1 })
                 .skip(offset)
                 .limit(limit);
@@ -89,9 +84,6 @@ class NotificationService {
 
     async markAllAsRead(userId) {
         try {
-            if (!Notification || typeof Notification.updateMany !== 'function') {
-                throw new Error('Notification model is not properly initialized');
-            }
             return await Notification.updateMany(
                 { userId: userId, status: 'unread'},
                 { status: 'read' }
@@ -108,8 +100,106 @@ class NotificationService {
                 _id: notificationId,
                 userId
             });
-        }catch (error) {
+        } catch (error) {
             console.error('Error deleting notification:', error);
+            throw error;
+        }
+    }
+
+    async getUnreadCount(userId) {
+        try {
+            return await Notification.countDocuments({
+                userId: userId,
+                status: 'unread'
+            });
+        } catch (error) {
+            console.error('Error getting unread count:', error);
+            throw error;
+        }
+    }
+
+    async archiveNotification(notificationId, userId) {
+        try {
+            const notification = await Notification.findOneAndUpdate(
+                {
+                    _id: notificationId,
+                    userId: userId
+                },
+                {
+                    status: 'archived',
+                    archivedAt: new Date()
+                },
+                { new: true }
+            );
+
+            if (!notification) {
+                throw new Error('Notification not found or access denied');
+            }
+
+            return notification;
+        } catch (error) {
+            console.error('Error archiving notification:', error);
+            throw error;
+        }
+    }
+
+    async archiveAllNotifications(userId) {
+        try {
+            const result = await Notification.updateMany(
+                {
+                    userId: userId,
+                    status: { $in: ['unread', 'read'] }
+                },
+                {
+                    status: 'archived',
+                    archivedAt: new Date()
+                }
+            );
+
+            return result;
+        } catch (error) {
+            console.error('Error archiving all notifications:', error);
+            throw error;
+        }
+    }
+
+    async getArchivedNotifications(userId, limit = 20, offset = 0) {
+        try {
+            return await Notification.find({
+                userId: userId,
+                status: 'archived'
+            })
+                .sort({ archivedAt: -1, createdAt: -1 })
+                .skip(offset)
+                .limit(limit);
+        } catch (error) {
+            console.error('Error fetching archived notifications:', error);
+            throw error;
+        }
+    }
+
+    async restoreNotification(notificationId, userId) {
+        try {
+            const notification = await Notification.findOneAndUpdate(
+                {
+                    _id: notificationId,
+                    userId: userId,
+                    status: 'archived'
+                },
+                {
+                    status: 'read',
+                    archivedAt: null
+                },
+                { new: true }
+            );
+
+            if (!notification) {
+                throw new Error('Archived notification not found or access denied');
+            }
+
+            return notification;
+        } catch (error) {
+            console.error('Error restoring notification:', error);
             throw error;
         }
     }

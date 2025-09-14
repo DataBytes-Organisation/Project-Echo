@@ -1,104 +1,37 @@
+.notification-list {
+    max-height: 600px;
+    overflow-y: auto;
+}
+
 .notification-item {
+    border-left: 4px solid transparent;
     padding: 1rem;
     margin-bottom: 1rem;
-    border-radius: 8px;
+    border-radius: 0.5rem;
+    background-color: #f8f9fa;
     transition: all 0.3s ease;
-    position: relative;
-    border-left: 4px solid;
 }
 
 .notification-item.unread {
-    background-color: #f8f9fa;
-    border-left-color: #0d6efd;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border-left-color: #007bff;
+    background-color: #e3f2fd;
 }
 
-.notification-item.read {
-    background-color: #ffffff;
-    border-left-color: #adb5bd;
+.notification-item.archived {
+    border-left-color: #6c757d;
+    background-color: #f8f9fa;
+    opacity: 0.8;
 }
 
 .notification-item:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.notification-item .notification-icon {
-    font-size: 1.5rem;
-    margin-right: 1rem;
-    color: #0d6efd;
-}
-
-.notification-item.read .notification-icon {
-    color: #adb5bd;
-}
-
-.notification-item .notification-content {
-    flex: 1;
-}
-
-.notification-item .notification-message {
-    font-weight: 500;
-    margin-bottom: 0.25rem;
-}
-
-.notification-item .notification-date {
-    font-size: 0.85rem;
-    color: #6c757d;
-}
-
-.notification-item .notification-actions {
-    margin-top: 0.5rem;
-    display: flex;
-    gap: 0.5rem;
-}
-
-.empty-notifications {
-    text-align: center;
-    padding: 2rem;
-    color: #6c757d;
-}
-
-.empty-notifications i {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-    color: #dee2e6;
-}
-
-.notification-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-}
-
-.notification-list {
-    max-height: 70vh;
-    overflow-y: auto;
-    padding-right: 10px;
-}
-
-.notification-item {
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    transition: all 0.3s ease;
-    border-left: 4px solid transparent;
-}
-
-.notification-item.unread {
-    background-color: #f8f9fa;
-    border-left-color: #0d6efd;
-}
-
-.notification-item:hover {
-    background-color: #f1f1f1;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
 .notification-icon {
     font-size: 1.5rem;
     color: #6c757d;
-    margin-right: 15px;
+    margin-right: 1rem;
 }
 
 .notification-content {
@@ -107,71 +40,54 @@
 
 .notification-title {
     font-weight: 600;
-    margin-bottom: 5px;
-    color: #212529;
+    margin-bottom: 0.5rem;
+    color: #343a40;
 }
 
 .notification-message {
     color: #6c757d;
-    margin-bottom: 5px;
+    margin-bottom: 0.5rem;
 }
 
 .notification-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 10px;
+    margin-top: 0.5rem;
 }
 
 .notification-time {
     color: #adb5bd;
 }
 
-.notification-actions {
-    display: flex;
-    gap: 5px;
-}
-
-.delete-notification {
-    padding: 0.15rem 0.3rem;
-    font-size: 0.8rem;
-}
-
-.delete-notification i {
-    margin-right: 0;
+.notification-actions .btn {
+    margin-left: 0.5rem;
 }
 
 .empty-notifications {
     text-align: center;
-    padding: 40px 20px;
+    padding: 3rem;
     color: #6c757d;
 }
 
 .empty-notifications i {
     font-size: 3rem;
-    margin-bottom: 15px;
-    color: #dee2e6;
+    margin-bottom: 1rem;
+    display: block;
 }
 
-.empty-notifications h5 {
-    margin-bottom: 5px;
+.connection-status {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 0.5rem;
 }
 
-/* Custom scrollbar */
-.notification-list::-webkit-scrollbar {
-    width: 8px;
+.connection-status.connected {
+    background-color: #28a745;
 }
 
-.notification-list::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 10px;
-}
-
-.notification-list::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
-    border-radius: 10px;
-}
-
-.notification-list::-webkit-scrollbar-thumb:hover {
-    background: #a8a8a8;
+.connection-status.disconnected {
+    background-color: #dc3545;
 }

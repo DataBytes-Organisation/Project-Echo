@@ -27,11 +27,17 @@ const NotificationSchema = new mongoose.Schema({
     link: String,
     icon: String,
     metadata: mongoose.Schema.Types.Mixed,
+    archivedAt: Date,
     expiresAt: Date
 }, {
     timestamps: true,
     index: { expiresAt: 1, expireAfterSeconds: 0 } // For auto-deleting expired notifications
 });
+
+// Add indexes for better query performance
+NotificationSchema.index({ userId: 1, status: 1 });
+NotificationSchema.index({ userId: 1, archivedAt: -1 });
+NotificationSchema.index({ userId: 1, createdAt: -1 });
 
 const UserNotificationPreferenceSchema = new mongoose.Schema({
     userId: {

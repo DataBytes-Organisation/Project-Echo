@@ -1,7 +1,14 @@
 // ----------------------------------------------
-// Header Style
+// Variables
 // ----------------------------------------------
+$notification-badge-size: 12px;
+$notification-badge-font-size: 0.5rem;
+$notification-badge-padding: 0.15rem 0.3rem;
+$notification-pulse-color: rgba(13, 110, 253, 0.7);
 
+// ----------------------------------------------
+// Header Styles
+// ----------------------------------------------
 .app-header {
   position: relative;
   z-index: 50;
@@ -28,7 +35,6 @@
           display: flex;
           align-items: center;
           position: relative;
-
           font-size: 20px;
           z-index: 2;
         }
@@ -66,8 +72,11 @@
   }
 }
 
+// ----------------------------------------------
+// Navigation Components
+// ----------------------------------------------
 .nav-icon-hover {
-  transition: all .3s ease-in-out;
+  transition: all 0.3s ease-in-out;
 
   &:hover {
     &::before {
@@ -80,22 +89,26 @@
       width: 40px;
       z-index: -1;
       border-radius: 100px;
-      transition: all .3s ease-in-out;
+      transition: all 0.3s ease-in-out;
       background-color: $light-primary;
     }
   }
 }
 
-.navbar-nav .dropdown-menu {
-  position: absolute;
-  min-width: 200px;
+.navbar-nav {
+  .dropdown-menu {
+    position: absolute;
+    min-width: 200px;
 
-  .dropdown-item {
-    border-radius: 8px;
+    .dropdown-item {
+      border-radius: 8px;
+    }
   }
-
 }
 
+// ----------------------------------------------
+// Notification Styles
+// ----------------------------------------------
 .notification {
   content: "";
   position: absolute;
@@ -105,6 +118,146 @@
   height: 8px;
 }
 
+.notification-badge {
+  font-size: $notification-badge-font-size;
+  padding: $notification-badge-padding;
+  display: none;
+
+  &.show {
+    display: block;
+  }
+}
+
+#unreadCountBadge {
+  width: $notification-badge-size;
+  height: $notification-badge-size;
+  z-index: 1;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.8);
+  display: none;
+
+  &.show {
+    display: block;
+  }
+}
+
+#unreadCountText {
+  z-index: 2;
+  font-weight: bold;
+  min-width: 16px;
+  line-height: 1;
+}
+
+// ----------------------------------------------
+// Notification Animations
+// ----------------------------------------------
+.notification-pulse {
+  animation: pulse-blue 2s infinite;
+}
+
+.bell-ring {
+  animation: ring 0.5s ease-in-out;
+}
+
+@keyframes pulse-blue {
+  0% {
+    transform: translate(-50%, -50%) scale(0.95);
+    box-shadow: 0 0 0 0 $notification-pulse-color;
+  }
+
+  70% {
+    transform: translate(-50%, -50%) scale(1);
+    box-shadow: 0 0 0 10px rgba(13, 110, 253, 0);
+  }
+
+  100% {
+    transform: translate(-50%, -50%) scale(0.95);
+    box-shadow: 0 0 0 0 rgba(13, 110, 253, 0);
+  }
+}
+
+@keyframes ring {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(15deg); }
+  50% { transform: rotate(-15deg); }
+  75% { transform: rotate(10deg); }
+  100% { transform: rotate(0deg); }
+}
+
+// ----------------------------------------------
+// Utility Classes
+// ----------------------------------------------
+.position-relative {
+  position: relative;
+}
+
+.position-absolute {
+  position: absolute;
+}
+
+.top-0 {
+  top: 0;
+}
+
+.start-100 {
+  left: 100%;
+}
+
+.translate-middle {
+  transform: translate(-50%, -50%);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+// ----------------------------------------------
+// Dropdown Animations
+// ----------------------------------------------
+@keyframes animation-dropdown-menu-move-up-scroll {
+  from {
+    top: 71px;
+  }
+  to {
+    top: 70px;
+  }
+}
+
+@keyframes animation-dropdown-menu-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 100%, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.dropdown-menu-animate-up {
+  animation: animation-dropdown-menu-fade-in 0.5s ease 1,
+  animation-dropdown-menu-move-up 0.5s ease-out 1;
+}
+
+// ----------------------------------------------
+// Media Queries
+// ----------------------------------------------
 @include media-breakpoint-down(lg) {
   .app-header {
     .navbar {
@@ -115,81 +268,89 @@
       }
     }
   }
-}
 
-@include media-breakpoint-down(md) {
-  .navbar-nav .dropdown-menu {
-    position: absolute;
-    width: 100%;
-  }
-
-  .navbar-nav .nav-item.dropdown {
-    position: static;
-  }
-}
-
-@-webkit-keyframes animation-dropdown-menu-move-up-scroll {
-  from {
-    top: 71px;
-  }
-
-  to {
-    top: 70px;
-  }
-}
-
-@keyframes animation-dropdown-menu-move-up-scroll {
-  from {
-    top: 71px;
-  }
-
-  to {
-    top: 70px;
-  }
-}
-
-@-webkit-keyframes animation-dropdown-menu-fade-in {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes animation-dropdown-menu-fade-in {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-.dropdown-menu-animate-up {
-  -webkit-animation: animation-dropdown-menu-fade-in 0.5s ease 1, animation-dropdown-menu-move-up 0.5s ease-out 1;
-  animation: animation-dropdown-menu-fade-in 0.5s ease 1, animation-dropdown-menu-move-up 0.5s ease-out 1;
-}
-
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    -webkit-transform: translate3d(0, 100%, 0);
-    transform: translate3d(0, 100%, 0);
-  }
-
-  to {
-    opacity: 1;
-    -webkit-transform: none;
-    transform: none;
-  }
-}
-
-@include media-breakpoint-down(lg) {
   .w-xs-100 {
     width: 100% !important;
   }
+}
+
+@include media-breakpoint-down(md) {
+  .navbar-nav {
+    .dropdown-menu {
+      position: absolute;
+      width: 100%;
+    }
+
+    .nav-item.dropdown {
+      position: static;
+    }
+  }
+}
+
+/* Notification Styles */
+.notification-badge {
+  font-size: 0.5rem;
+  padding: 0.15rem 0.3rem;
+  display: none;
+}
+
+.notification-badge.show {
+  display: block;
+}
+
+.notification-pulse {
+  animation: pulse-blue 2s infinite;
+}
+
+.bell-ring {
+  animation: ring 0.5s ease-in-out;
+}
+
+@keyframes pulse-blue {
+  0% {
+    transform: translate(-50%, -50%) scale(0.95);
+    box-shadow: 0 0 0 0 rgba(13, 110, 253, 0.7);
+  }
+  70% {
+    transform: translate(-50%, -50%) scale(1);
+    box-shadow: 0 0 0 10px rgba(13, 110, 253, 0);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(0.95);
+    box-shadow: 0 0 0 0 rgba(13, 110, 253, 0);
+  }
+}
+
+@keyframes ring {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(15deg); }
+  50% { transform: rotate(-15deg); }
+  75% { transform: rotate(10deg); }
+  100% { transform: rotate(0deg); }
+}
+
+/* Header Styles */
+.app-header {
+  position: relative;
+  z-index: 50;
+  width: 100%;
+  background: white;
+  padding: 0 25px;
+}
+
+.nav-icon-hover {
+  transition: all 0.3s ease-in-out;
+}
+
+.nav-icon-hover:hover::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  height: 40px;
+  width: 40px;
+  z-index: -1;
+  border-radius: 100px;
+  background-color: rgba(13, 110, 253, 0.1);
 }

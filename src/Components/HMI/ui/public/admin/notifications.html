@@ -1,6 +1,5 @@
 <!doctype html>
 <html lang="en">
-
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -15,25 +14,26 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <link rel="stylesheet" type="text/css" href="./admin/css/notifications.css" />
 </head>
-
 <body>
-<!-- Body Wrapper -->
 <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
      data-sidebar-position="fixed" data-header-position="fixed">
-    <!-- Sidebar Start -->
     <div id="sidebar"></div>
-    <!-- Sidebar End -->
-    <!-- Main wrapper -->
     <div class="body-wrapper">
         <div id="header"></div>
         <div class="container-fluid">
             <div class="card">
                 <div class="card-body">
                     <div class="notification-header d-flex justify-content-between align-items-center mb-4">
-                        <h2 class="mb-0">Notifications <span id="unread-badge" class="badge bg-danger ms-2 d-none">0</span></h2>
+                        <h2 class="mb-0">Notifications
+                            <span id="unread-badge" class="badge bg-danger ms-2 d-none">0</span>
+                            <span id="connection-indicator" class="badge bg-secondary ms-2">Disconnected</span>
+                        </h2>
                         <div class="btn-group">
                             <button class="btn btn-sm btn-outline-primary" id="mark-all-read">
                                 <i class="fas fa-check-circle me-1"></i> Mark All as Read
+                            </button>
+                            <button class="btn btn-sm btn-outline-info" id="archive-all">
+                                <i class="ti ti-archive"></i> Archive All
                             </button>
                             <button class="btn btn-sm btn-outline-secondary" id="load-more">
                                 <i class="fas fa-sync me-1"></i> Load More
@@ -41,9 +41,36 @@
                         </div>
                     </div>
 
-                    <!-- Notification List -->
-                    <div id="notification-list" class="notification-list">
-                        <!-- Notifications will be loaded here -->
+                    <!-- Notification Tabs -->
+                    <ul class="nav nav-tabs mb-3" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link active" id="all-tab" data-bs-toggle="tab" href="#all" role="tab">
+                                <i class="ti ti-bell"></i> All
+                            </a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" id="unread-tab" data-bs-toggle="tab" href="#unread" role="tab">
+                                <i class="ti ti-eye-off"></i> Unread
+                            </a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" id="archived-tab" data-bs-toggle="tab" href="#archived" role="tab">
+                                <i class="ti ti-archive"></i> Archived
+                            </a>
+                        </li>
+                    </ul>
+
+                    <!-- Tab Content -->
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="all" role="tabpanel">
+                            <div id="notification-list" class="notification-list"></div>
+                        </div>
+                        <div class="tab-pane fade" id="unread" role="tabpanel">
+                            <div id="unread-notification-list" class="notification-list"></div>
+                        </div>
+                        <div class="tab-pane fade" id="archived" role="tabpanel">
+                            <div id="archived-notification-list" class="notification-list"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -53,7 +80,6 @@
 
 <script>
     $(document).ready(function() {
-        // Load components
         $("#sidebar").load("./admin/component/sidebar-component.html");
         $("#header").load("./admin/component/header-component.html");
     });

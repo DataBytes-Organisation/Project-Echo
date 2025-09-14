@@ -677,6 +677,129 @@ app.delete('/api/notifications/:id', async (req, res) => {
   }
 });
 
+// Get unread notification count
+app.get('/api/notifications/unread-count', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) return res.status(401).json({ error: 'Unauthorized' });
+
+    const decoded = jwt.verify(token, JWT_SECRET);
+
+    const count = await Notification.countDocuments({
+      userId: decoded.id,
+      status: 'unread'
+    });
+
+    res.json({ count });
+  } catch (error) {
+    console.error('Error fetching unread count:', error);
+    res.status(500).json({ error: 'Error fetching notification count' });
+  }
+});
+
+// Archive a specific notification
+app.patch('/api/notifications/:id/archive', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) return res.status(401).json({ error: 'Unauthorized' });
+
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const notification = await notificationService.archiveNotification(
+        req.params.id,
+        decoded.id
+    );
+
+    if (!notification) {
+      return res.status(404).json({ error: 'Notification not found' });
+    }
+
+    // Emit real-time update
+    io.to(`user_${decoded.id}`).emit('notificationArchived', req.params.id);
+
+    res.json({
+      message: 'Notification archived successfully',
+      notification
+    });
+  } catch (error) {
+    console.error('Error archiving notification:', error);
+    res.status(500).json({ error: 'Error archiving notification' });
+  }
+});
+
+// Archive all notifications
+app.patch('/api/notifications/archive-all', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) return res.status(401).json({ error: 'Unauthorized' });
+
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const result = await notificationService.archiveAllNotifications(decoded.id);
+
+    // Emit real-time update
+    io.to(`user_${decoded.id}`).emit('allNotificationsArchived');
+
+    res.json({
+      message: 'All notifications archived successfully',
+      archivedCount: result.modifiedCount
+    });
+  } catch (error) {
+    console.error('Error archiving all notifications:', error);
+    res.status(500).json({ error: 'Error archiving all notifications' });
+  }
+});
+
+// Get archived notifications
+app.get('/api/notifications/archived', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) return res.status(401).json({ error: 'Unauthorized' });
+
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const limit = Math.min(parseInt(req.query.limit) || 20, 100);
+    const offset = parseInt(req.query.offset) || 0;
+
+    const notifications = await notificationService.getArchivedNotifications(
+        decoded.id,
+        limit,
+        offset
+    );
+
+    res.json({ notifications });
+  } catch (error) {
+    console.error('Error fetching archived notifications:', error);
+    res.status(500).json({ error: 'Error fetching archived notifications' });
+  }
+});
+
+// Restore an archived notification
+app.patch('/api/notifications/:id/restore', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) return res.status(401).json({ error: 'Unauthorized' });
+
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const notification = await notificationService.restoreNotification(
+        req.params.id,
+        decoded.id
+    );
+
+    if (!notification) {
+      return res.status(404).json({ error: 'Archived notification not found' });
+    }
+
+    // Emit real-time update
+    io.to(`user_${decoded.id}`).emit('notificationRestored', notification);
+
+    res.json({
+      message: 'Notification restored successfully',
+      notification
+    });
+  } catch (error) {
+    console.error('Error restoring notification:', error);
+    res.status(500).json({ error: 'Error restoring notification' });
+  }
+});
+
 // Other routes
 require('./routes/auth.routes')(app);
 require('./routes/user.routes')(app);
