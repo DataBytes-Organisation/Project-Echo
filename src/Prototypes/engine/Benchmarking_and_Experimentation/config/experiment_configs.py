@@ -13,8 +13,8 @@ EXPERIMENTS = [
         "audio_augmentation": "none",
         "image_augmentation": "none",
         "model": "EfficientNetV2B0",
-        "epochs": 10,
-        "batch_size": 16,
+        "epochs": 50,
+        "batch_size": 8,
     },
     {
         "name": "noise_and_stretch_audio_aug",
@@ -45,7 +45,7 @@ EXPERIMENTS = [
         "audio_augmentation": "none",
         "image_augmentation": "none",
         "model": "MobileNetV2",
-        "epochs": 10,
+        "epochs": 50,
         "batch_size": 16,
     },
     {
@@ -78,7 +78,7 @@ EXPERIMENTS = [
         "audio_augmentation": "none",
         "image_augmentation": "none",
         "model": "MobileNetV3-Large",
-        "epochs": 10,
+        "epochs": 100,
         "batch_size": 16,
     },
     {
@@ -86,7 +86,7 @@ EXPERIMENTS = [
         "audio_augmentation": "none",
         "image_augmentation": "none",
         "model": "MobileNetV3-Small",
-        "epochs": 10,
+        "epochs": 100,
         "batch_size": 16,
     },
 ]

@@ -25,7 +25,7 @@ from config.system_config import SC  # Import system settings
 from config.model_configs import MODELS  # Import model configurations
 from utils.data_pipeline import create_datasets, build_datasets   # Import dataset creation function
 
-# For brevity, create a dummy dataset. # Actual data loading has now been implemented. This is a depreciated function.
+ # For brevity, create a dummy dataset. # Actual data loading has now been implemented. This is a deprecated function.
 def create_dummy_dataset(num_samples=100, num_classes=3):
     images = tf.random.uniform(
         (num_samples, SC['MODEL_INPUT_IMAGE_HEIGHT'], SC['MODEL_INPUT_IMAGE_WIDTH'], SC['MODEL_INPUT_IMAGE_CHANNELS'])
@@ -38,12 +38,12 @@ def create_dummy_dataset(num_samples=100, num_classes=3):
 
 def build_model(model_name="EfficientNetV2B0", num_classes=3, l2_regularization=False, l2_coefficient=0.001):
 
-    """Builds a TensorFlow Keras model with optional L2 regularization.
+    """Builds a TensorFlow Keras model with optional L2 regularisation.
 
-    This function constructs a Keras Sequential model for image classification, leveraging
-    pre-trained feature extractors from TensorFlow Hub. It allows for customization of the
+    This function constructs a Keras Sequential model for image classification, using
+    pre-trained feature extractors from TensorFlow Hub. It allows for customisation of the
     model architecture, including the choice of feature extractor, the number of dense layers,
-    dropout rate, and the application of L2 regularization.
+    dropout rate, and the application of L2 regularisation.
 
     Args:
         model_name (str, optional): Name of the model architecture to use. This name must
@@ -51,9 +51,9 @@ def build_model(model_name="EfficientNetV2B0", num_classes=3, l2_regularization=
             Defaults to "EfficientNetV2B0".
         num_classes (int, optional): Number of output classes for the classification task.
             Defaults to 3.
-        l2_regularization (bool, optional): Whether to apply L2 regularization to the dense layers.
+        l2_regularization (bool, optional): Whether to apply L2 regularisation to the dense layers.
             Defaults to False.
-        l2_coefficient (float, optional): The L2 regularization coefficient. This value is used
+        l2_coefficient (float, optional): The L2 regularisation coefficient. This value is used
             only if `l2_regularization` is True. Defaults to 0.001.
 
     Returns:
@@ -96,7 +96,7 @@ def build_model(model_name="EfficientNetV2B0", num_classes=3, l2_regularization=
     # if (SC['MODEL_INPUT_IMAGE_HEIGHT'], SC['MODEL_INPUT_IMAGE_WIDTH']) != (expected_height, expected_width):
     #    raise ValueError(f"System config input dimensions ({SC['MODEL_INPUT_IMAGE_HEIGHT']}, {SC['MODEL_INPUT_IMAGE_WIDTH']}) do not match expected input dimensions ({expected_height}, {expected_width}).  The data pipeline must resize the images.")
         
-    # Add normalization layer
+    # Add normalisation layer
     layers.extend([
         hub.KerasLayer(hub_url, trainable=trainable),
         tf.keras.layers.Flatten(),
@@ -124,8 +124,8 @@ def train_model(model_name="EfficientNetV2B0", epochs=None, batch_size=None, l2_
         model_name (str, optional): Name of the model architecture to use. Defaults to "EfficientNetV2B0".
         epochs (int, optional): Number of training epochs. Overrides SC['MAX_EPOCHS'] if provided. Defaults to None.
         batch_size (int, optional): Batch size for training. Overrides SC['CLASSIFIER_BATCH_SIZE'] if provided. Defaults to None.
-        l2_regularization (bool, optional): Whether to apply L2 regularization. Defaults to False.
-        l2_coefficient (float, optional): The L2 regularization coefficient. Defaults to 0.001.
+        l2_regularization (bool, optional): Whether to apply L2 regularisation. Defaults to False.
+        l2_coefficient (float, optional): The L2 regularisation coefficient. Defaults to 0.001.
 
     Returns:
         tuple: A tuple containing the trained model and the training history.
@@ -185,7 +185,7 @@ def train_model(model_name="EfficientNetV2B0", epochs=None, batch_size=None, l2_
 
     early_stopping = EarlyStopping(
         monitor="val_loss",
-        patience=16, # Increased patience as per notebook example
+        patience=32,  # Allow for multiple LR reductions (4x lr patience)
         verbose=1,
         mode="min",
         restore_best_weights=True,
@@ -194,15 +194,23 @@ def train_model(model_name="EfficientNetV2B0", epochs=None, batch_size=None, l2_
     # Ensure models directory exists
     models_dir = "models"
     os.makedirs(models_dir, exist_ok=True)
-    checkpoint_path = os.path.join(models_dir, f"checkpoint_{model_name}.hdf5")
+    
+    # Create timestamp for unique model naming
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    checkpoint_filename = f"checkpoint_{model_name}_{timestamp}.hdf5"
+    checkpoint_path = os.path.join(models_dir, checkpoint_filename)
+    
     mcp_save = ModelCheckpoint(
         checkpoint_path,
-        save_best_only=True,
+        save_best_only=True,  # Save only the best model
         monitor='val_loss',
-        mode='min'
+        mode='min',
+        verbose=1
     )
 
-    callbacks = [lr_reduce_plateau, early_stopping, tensorboard_callback, mcp_save]
+    callbacks = [
+        lr_reduce_plateau, early_stopping, tensorboard_callback, mcp_save
+    ]
 
     # Start training timer
     start_time = time.time()
