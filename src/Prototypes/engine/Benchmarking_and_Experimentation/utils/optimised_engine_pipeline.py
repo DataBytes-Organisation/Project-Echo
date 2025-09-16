@@ -60,11 +60,16 @@ def build_model(
     backbone.trainable = True
     y = backbone(x, training=False)
 
+    y = tf.keras.layers.BatchNormalization(name="post_backbone_bn")(y)
+    
     reg = tf.keras.regularizers.l2(l2_coefficient) if l2_regularization else None
     if use_classifier_head:
-        y = tf.keras.layers.Dropout(dropout)(y)
+        y = tf.keras.layers.Dropout(dropout, name="head_dropout")(y)
         outputs = tf.keras.layers.Dense(
-            num_classes, activation="softmax", kernel_regularizer=reg, name="classifier"
+            num_classes,
+            activation="softmax",
+            kernel_regularizer=reg,
+            name="classifier"
         )(y)
     else:
         outputs = y
