@@ -1,8 +1,8 @@
 # Configuration parameters (update paths as needed)
 SC = {
-    'AUDIO_DATA_DIRECTORY': r"D:\Users\Moiz\Documents\Github\data",  # set your audio data directory here
-    'CACHE_DIRECTORY': r"D:\Echo\Training_cache",
-    'OUTPUT_DIRECTORY': r"D:\Echo\Output",
+    'AUDIO_DATA_DIRECTORY': r"C:\Users\tianc\Downloads\echo_data",  
+    'CACHE_DIRECTORY':      r"C:\Users\tianc\Downloads\echo_cache",  
+    'OUTPUT_DIRECTORY':     r"C:\Users\tianc\Downloads\echo_output", 
 
     'AUDIO_CLIP_DURATION': 5,  # seconds
     'AUDIO_SAMPLE_RATE': 48000,
@@ -16,9 +16,10 @@ SC = {
     'AUDIO_AUGMENTATION': 'none',
     'IMAGE_AUGMENTATION': 'none',
 
-    'MODEL_INPUT_IMAGE_WIDTH': 260,
-    'MODEL_INPUT_IMAGE_HEIGHT': 260,
+    'MODEL_INPUT_IMAGE_WIDTH':  224,
+    'MODEL_INPUT_IMAGE_HEIGHT': 224,
     'MODEL_INPUT_IMAGE_CHANNELS': 3,
+
 
     'CLASSIFIER_BATCH_SIZE': 16,
     'MAX_EPOCHS': 50,
