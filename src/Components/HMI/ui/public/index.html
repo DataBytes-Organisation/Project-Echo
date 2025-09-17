@@ -45,6 +45,12 @@
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
     <script src = "paymentgateway.js"></script>
+    <!-- Razorpay locale fallback to fix './en' module issue -->
+    <script>
+    window.__Razorpay__ = {
+      locale: 'en'
+    };</script>
+
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <!-- Axios -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
@@ -85,7 +91,7 @@
               </div>
           </div>
       </div>
-  </div>
+    </div>
 
     
     <div class="screen" id="screen" onclick="fadeAnim(); openSIMULATOR()">  
@@ -173,6 +179,7 @@
             <a id="config-settings-menu-btn" class="tabs-button" onclick="openTab('config-settings-tab')"></a>
             <a id="popup-menu-btn" class="tabs-button" onclick="openTab('animal-popup')"></a>
             <a id="mic-popup-menu-btn" class="tabs-button" onclick="openTab('mic-popup')"></a>
+            <a id="node-popup-menu-btn" class="tabs-button" onclick="openTab('node-popup')"></a>
             <a id="FAQ-menu-btn" class="tabs-button" onclick="openTab('FAQ')"></a>
             <a id="donate-menu-btn" class="tabs-button" onclick="openTab('donate')"></a>
             <a id="user-profile-button" class="tabs-button" onclick="openTab('userProfile'); fetchUser()"></a>
@@ -180,6 +187,7 @@
             <a id="statistics-menu-btn" class="tabs-button" onclick="openTab('statistics')"></a>
             <span id="pink-line" class="sudden-line"></span>
           </div>
+
           <div id="FAQ">
             <div class="wrapper">
               <div id="FAQ-contents">
@@ -215,47 +223,6 @@
                       </p>
                 </div>
               </div>
-
-              <div id="userProfile">
-                <div class="wrapper">
-                  <div id="statistics">
-                    <div class="wrapper">
-                      
-                      </div>
-                    </div>
-    
-                  <form action="/api/auth/signout" method="POST">
-                  <div id="userProfile-contents">
-                    <h2>User Profile</h2>
-                    <!-- <h3 id="display_name">Username: <span id="username"></span></h3>
-                    <h3 id="display_mail">Email: <span id="useremail"></span></h3> -->
-                    
-                    <div class="markup_form">
-                      <div class="markup_column">
-                        <div class="markup_row_left">
-                          <div>Username:</div>
-                        </div>
-                        <div class="markup_row_right">
-                          <div id="display_name"> <span id="username"></span></div>
-                        </div>
-                      </div>
-  
-                      <div class="markup_column">
-                        <div class="markup_row_left">
-                          <div>Email:</div>
-                        </div>
-                        <div class="markup_row_right">
-                          <div id="display_mail"> <span id="useremail"></span></div>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <center><button type="submit">Logout</button></center>
-                  </div>
-                </form>
-                </div>
-              </div>
-
               <div class="dropdown">
                 <button class="btn btn-secondary dropdown-toggle btn-no-background" id="data_src_toggle" data-bs-toggle="dropdown" aria-expanded="false">
                   Data Sourcing and Pooling
@@ -337,8 +304,48 @@
               </div>
               </div>
             </div>
-            
           </div>
+
+          <div id="statistics">
+            <div class="wrapper">
+
+            </div>
+          </div>
+
+          <div id="userProfile">
+            <div class="wrapper">
+              <form action="/api/auth/signout" method="POST">
+                <div id="userProfile-contents">
+                    <h2>User Profile</h2>
+                    <!-- <h3 id="display_name">Username: <span id="username"></span></h3>
+                    <h3 id="display_mail">Email: <span id="useremail"></span></h3> -->
+
+                    <div class="markup_form">
+                      <div class="markup_column">
+                        <div class="markup_row_left">
+                          <div>Username:</div>
+                        </div>
+                        <div class="markup_row_right">
+                          <div id="display_name"> <span id="username"></span></div>
+                        </div>
+                      </div>
+
+                      <div class="markup_column">
+                        <div class="markup_row_left">
+                          <div>Email:</div>
+                        </div>
+                        <div class="markup_row_right">
+                          <div id="display_mail"> <span id="useremail"></span></div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div style="text-align: center;"><button type="submit">Logout</button></div>
+                  </div>
+              </form>
+            </div>
+          </div>
+
           <div id="SIM">
             <div class="wrapper">
             <div id="SIM-contents">
@@ -373,7 +380,7 @@
                   </div>
             </div>
             </div>
-          </div> 
+          </div>
 
           <div id="animalNotifications" style="width: 0%; height: 0%;">
             <div class="wrapper">
@@ -405,14 +412,63 @@
                       </ul>
                     </div>
 
+                    <h2>Detections</h2>
+                     <!-- Displays List of Animal Detections -->
+                    <div class="markup_column" id="detections-container">
+                      <div class="detection-entry">
+                        <div class="detection-animal">animal: </div>
+                        <div class="detection-confidence">confidence level:</div>
+                        <div class="detection-location">location: </div>
+                          <div class="detection-time">time: </div>
+                      </div>
+                    </div>
+
+
+                    <h2>Nodes</h2>
+                    <!-- Displays List of Nodes & their status -->
+                    <div class="markup_column" id="nodes-container">
+                      <div class="node-entry">
+                        <div class="node-id">node id: </div>
+                        <div class="node-device">device:</div>
+                        <div class="node-status">status: 🟢</div>
+                      </div>
+                      <div class="node-entry">
+                        <div class="node-id">node id: </div>
+                        <div class="node-device">device:</div>
+                        <div class="node-status">status: 🔴</div>
+                      </div>
+                    </div>
+
+
+                    <h2>System Log</h2>
+                    <!-- Displays List of System Events -->
+                    <div class="markup_column" id="systemlog-container">
+                      <div class="systemlog-entry">
+                        <div class="systemlog-event">event:</div>
+                        <div class="systemlog-time">time:</div>
+                      </div>
+                      <div class="systemlog-entry">
+                        <div class="systemlog-event">event:</div>
+                        <div class="systemlog-time">time:</div>
+                      </div>
+                      <div class="systemlog-entry">
+                        <div class="systemlog-event">event:</div>
+                        <div class="systemlog-time">time:</div>
+                      </div>
+                      <div class="systemlog-entry">
+                        <div class="systemlog-event">event:</div>
+                        <div class="systemlog-time">time:</div>
+                      </div>
+                    </div>
+
+
                     <!-- Save Preferences Button -->
                     <center><button type="submit">Save Notifications</button></center>
                   </div>
+                </div>
               </form>
             </div>
           </div>
-
-
           <!-- Configuration Tab Content -->
           <div id="config-settings-tab">
             <div class="wrapper">
@@ -482,6 +538,7 @@
                     </div>
               </div>
             </div>
+            </div>
           </div>
 
           <!--DONATIONS TAB--->
@@ -524,7 +581,8 @@
                   <button class="donate-button" id="donation-button">DONATE NOW</button>
             </div>
             </div>
-          </div> 
+          </div>
+
           <div id="animal-popup">
             <div class="wrapper">
             <div id="animal-popup-content">
@@ -708,7 +766,7 @@
                   </div>
                 </div>
               </div>
-              
+
               <img id="mic_desc_img" src=""></img>
               <div id="mic_desc_id" class="subtitle"></div>
               <div id="mic_desc_details" class="desc"></div>
@@ -822,10 +880,71 @@
 
             </div>
             <div id="mic-default-content">
-              <h2 style="text-align: left; color: rgba(247, 186, 206, 1) !important;">Microhpone Bio Data</h2>
+              <h2 style="text-align: left; color: rgba(247, 186, 206, 1) !important;">Microphone Bio Data</h2>
               <br>
                 <p>Please click on a map marker to view microphone data.</p>
             </div>
+            </div>
+          </div>
+          <div id="node-popup">
+            <div class="wrapper">
+              <div id="node-popup-content">
+                <h2 style="margin-top: 20px !important;">Node Details</h2>
+                <div class="markup_form">
+
+                  <!-- markup_name -->
+                  <div class="markup_column">
+                    <div class="markup_row_left" style="width: 100px !important">
+                      <div>Name</div>
+                    </div>
+                    <div class="markup_row_right" style="text-align: right !important; width: 400px !important">
+                      <div id="node_markup_name"></div>
+                    </div>
+                  </div>
+
+                  <!-- markup_type -->
+                  <div class="markup_column">
+                    <div class="markup_row_left" style="width: 100px !important">
+                      <div>Type</div>
+                    </div>
+                    <div class="markup_row_right" style="text-align: right !important; width: 400px !important">
+                      <div id="node_markup_type"></div>
+                    </div>
+                  </div>
+
+                  <!-- markup_model -->
+                  <div class="markup_column">
+                    <div class="markup_row_left" style="width: 100px !important">
+                      <div>Model</div>
+                    </div>
+                    <div class="markup_row_right" style="text-align: right !important; width: 400px !important">
+                      <div id="node_markup_model"></div>
+                    </div>
+                  </div>
+
+                  <!-- markup_location -->
+                  <div class="markup_column">
+                    <div class="markup_row_left">
+                      <div>Longitude</div>
+                    </div>
+                    <div class="markup_row_right">
+                      <div id="node_markup_loc_lon"></div>
+                    </div>
+                  </div>
+                  <div class="markup_column">
+                    <div class="markup_row_left">
+                      <div>Latitude</div>
+                    </div>
+                    <div class="markup_row_right">
+                      <div id="node_markup_loc_lat"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div id="node-default-content">
+                <h2>Node Details</h2>
+                <p>Click on a node to view its details.</p>
+              </div>
             </div>
           </div>
           <div id="filter-menu">
@@ -841,12 +960,12 @@
                 <span class="slider round"></span>
               </label>
             </div>
-            
+
             <div class="past-data-container">
               <div class="past-data-header">View Past Data:</div>
               <div class="time-range-picker">
                 <input type="text" id="datetime-range" name="datetime-range" style="width:100%" value="" />
-               
+
               </div>
             </div>
             <div class="container">
@@ -866,7 +985,7 @@
               </ul>
           </div>
 
-            
+
 
             <div class="dropdown">
               <button class="btn btn-secondary dropdown-toggle btn-no-background" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
@@ -875,7 +994,7 @@
               <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                 <div class="row">
                   <div class="col">
-                    
+
                     <div class="form-check">
                       <input class="form-check-input v"  type="checkbox" value="" id="_reptile" onchange="updateFilter('_reptile')" checked>
                       <label class="form-check-label" for="_reptile">Reptile</label>
@@ -905,7 +1024,7 @@
 
                   </div>
                   <div class="col-6">
-                    
+
                     <div class="form-check">
                       <input class="form-check-input v endangered"  type="checkbox" value="" id="_endangered" onchange="updateFilter('_endangered')" checked>
                       <label class="form-check-label" for="_endangered" onchange="">Endangered</label>
@@ -943,7 +1062,7 @@
               <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                 <div class="row">
                   <div class="col">
-                    
+
                     <div class="form-check">
                       <input class="form-check-input s"  type="checkbox" value="" id="reptile" onchange="{updateFilter('reptile')}" checked>
                       <label class="form-check-label" for="reptile">Reptile</label>
@@ -973,7 +1092,7 @@
 
                   </div>
                   <div class="col-6">
-                    
+
                     <div class="form-check">
                       <input class="form-check-input s endangered"  type="checkbox" value="" id="endangered" onchange="{updateFilter('endangered')}" checked>
                       <label class="form-check-label" for="endangered">Endangered</label>
@@ -1032,16 +1151,14 @@
             </div>
             <div class="error-box" id="error-msg"></div>
             </div>
-            </div> 
+            </div>
           </div>
-          </div>      
+        </div>
       </div>
     </div>
 
   <script>
     // Function to autocomplete animals based on search input
-
-
     //test
     const iconDicts = {};
     var displayedAnimals = new Set();
@@ -1118,6 +1235,66 @@
       searchForNotifications.addEventListener('keyup', function () {
         autocompleteAnimalsForNotifications();
       });
+
+
+      // Function to add a Detection Entry in the Notifications Section 
+      function addDetectionEntry(detectionData){
+        
+        // placeholder, modify once backend + frontend is fully connected 
+        const entryContainer = document.createElement("div");
+        const detectedAnimal = document.createElement("div");
+        const detectedConfidence = document.createElement("div");
+        const detectedLocation = document.createElement("div");
+        const detectedTime = document.createElement("div");
+
+        entryContainer.classList.add("detection-entry");
+        detectedAnimal.classList.add("detection-animal");
+        detectedConfidence.classList.add("detection-confidence");
+        detectedLocation.classList.add("detection-location");
+        detectedTime.classList.add("detection-time");
+
+        detectedAnimal.text = `Animal: `;
+        detectedConfidence.text = `Confidence: `;
+        detectedLocation.text = `Location: `;
+        detectedTime.text = `Time: `;
+
+        entryContainer.append(detectedAnimal, detectedConfidence, detectedLocation, detectedTime);
+
+        // adds the detection entry as a child of the detections container 
+        const detectionsContainer = document.querySelector("#detections-container");
+        detectionsContainer.append(entryContainer);
+
+      }
+    
+
+      // Function to add Nodes Data in the Notifications Section 
+      function populateNodesData(nodesData){
+        
+        // placeholder, modify once backend + frontend is fully connected 
+        const nodeEntryContainer = document.createElement("div");
+        const nodeID = document.createElement("div");
+        const nodeDevice = document.createElement("div");
+        const nodeStatus = document.createElement("div");
+
+        nodeEntryContainer.classList.add("node-entry");
+        nodeID.classList.add("node-id");
+        nodeDevice.classList.add("node-device");
+        nodeStatus.classList.add("node-status");
+
+        nodeID.text = `Node ID:`;
+        nodeDevice.text = `Node Device:`;
+        nodeStatus.text = `Node Status:`;
+
+        nodeEntryContainer.append(nodeID, nodeDevice, nodeStatus);
+
+        const nodesContainer = document.querySelector("#nodes-container");
+        nodesContainer.append(nodeEntryContainer);
+        
+      }
+
+
+
+
 
       // Autocomplete function for notification search
       function autocompleteAnimalsForNotifications() {
@@ -1784,6 +1961,9 @@
         case "mic-popup":
           document.getElementById("mic-popup-menu-btn").classList.add("active");
           break;
+        case "node-popup":
+          document.getElementById("node-popup-menu-btn").classList.add("active");
+          break;
         case "userProfile":
           document.getElementById("user-profile-button").classList.add("active");
           break;
@@ -1845,6 +2025,14 @@
       setTimeout(() => {
         currentTab = document.getElementById('mic-popup')
         openNav('mic-popup')
+      }, 10)
+    })
+
+    document.addEventListener('nodeToggled', function (event) {
+      closeTab()
+      setTimeout(() => {
+        currentTab = document.getElementById('node-popup')
+        openNav('node-popup')
       }, 10)
     })
 
@@ -2522,6 +2710,11 @@
     let default_content = $("#animal-default-content");
     active_content.hide();
     default_content.show();
+
+    let active_node_content = $("#node-popup-content");
+    let default_node_content = $("#node-default-content");
+    active_node_content.hide();
+    default_node_content.show();
 
     // Function to rename the keys in an object
     function renameKeys(obj) {

@@ -1,10 +1,10 @@
 from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel
 
-from Components.API.app.database import User
-# from ..db import User
-from ..middleware.auth import signJWT
-from ..middleware.random import genotp
+from app.database import User
+
+from app.middleware.auth import signJWT
+from app.middleware.random import genotp
 import time
 
 router = APIRouter()

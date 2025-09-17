@@ -8,8 +8,17 @@ from .model_configs import MODELS
 
 # Define experiments to run
 EXPERIMENTS = [
+
     {
-        "name": "baseline",
+    "name": "mobilenetv3small_baseline",
+    "audio_augmentation": "none",
+    "image_augmentation": "none",
+    "model": "MobileNetV3Small_224",
+    "epochs": 2,
+    "batch_size": 16
+    },
+    {
+        "name": "efficientnetlite0_baseline",
         "audio_augmentation": "none",
         "image_augmentation": "none",
         "model": "EfficientNetV2B0",

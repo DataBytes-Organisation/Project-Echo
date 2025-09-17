@@ -42,8 +42,7 @@ MODELS = {
         "learning_rate": 1e-4,
         "expected_input_shape": (224, 224, 3),
     },
-
-        "MobileNetV3-Small": {
+    "MobileNetV3-Small": {
         "hub_url": "https://tfhub.dev/google/imagenet/mobilenet_v3_small_100_224/classification/5",
         "trainable": True,
         "dense_layers": [64, 32],

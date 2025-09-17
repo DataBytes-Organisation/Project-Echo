@@ -1,0 +1,162 @@
+[
+    {
+        "file": "-Black-Currawong-Strepera-fuliginosa.wav",
+        "type": "unknown",
+        "sub_category": "Black-Currawong-Strepera-fuliginosa"
+    },
+    {
+        "file": "-Kingfisher-Todiramphus sanctus.wav",
+        "type": "unknown",
+        "sub_category": "Kingfisher-Todiramphus sanctus"
+    },
+    {
+        "file": "Australian-Magpie-Gymnorhina-tibicen.wav",
+        "type": "australian",
+        "sub_category": "Magpie-Gymnorhina-tibicen"
+    },
+    {
+        "file": "Benarkin Emu.wav",
+        "type": "benarkin",
+        "sub_category": "Emu"
+    },
+    {
+        "file": "Boobook_Australian_Braying.wav",
+        "type": "unknown",
+        "sub_category": "Boobook_Australian_Braying"
+    },
+    {
+        "file": "Brown Rat Sounds.wav",
+        "type": "brown",
+        "sub_category": "Rat Sounds"
+    },
+    {
+        "file": "Budgerigar-Melopsittacus-undulatus.wav",
+        "type": "budgerigar",
+        "sub_category": "Melopsittacus-undulatus"
+    },
+    {
+        "file": "Budgerigar-Melopsittacus.wav",
+        "type": "budgerigar",
+        "sub_category": "Melopsittacus"
+    },
+    {
+        "file": "Cane Toad.wav",
+        "type": "cane",
+        "sub_category": "Toad"
+    },
+    {
+        "file": "Chowchilla_GourkaRd_MixPre-334_17thJan20_edit.wav",
+        "type": "chowchilla_gourkard_mixpre",
+        "sub_category": "334_17thJan20_edit"
+    },
+    {
+        "file": "Crested-Bellbird-Oreoica-gutturalis.wav",
+        "type": "crested",
+        "sub_category": "Bellbird-Oreoica-gutturalis"
+    },
+    {
+        "file": "Daintree Laughing tree frogs.wav",
+        "type": "daintree",
+        "sub_category": "Laughing tree frogs"
+    },
+    {
+        "file": "Drongo_Spangled.wav",
+        "type": "unknown",
+        "sub_category": "Drongo_Spangled"
+    },
+    {
+        "file": "Emu-Dromaius-novaehollandiae.wav",
+        "type": "emu",
+        "sub_category": "Dromaius-novaehollandiae"
+    },
+    {
+        "file": "Fairy martin bird.wav",
+        "type": "fairy",
+        "sub_category": "martin bird"
+    },
+    {
+        "file": "Flying fox Black.wav",
+        "type": "flying",
+        "sub_category": "fox Black"
+    },
+    {
+        "file": "Frogmouth Marbled.wav",
+        "type": "frogmouth",
+        "sub_category": "Marbled"
+    },
+    {
+        "file": "Frogmouth Tawny.wav",
+        "type": "frogmouth",
+        "sub_category": "Tawny"
+    },
+    {
+        "file": "Fruit-Dove_Wompoo_Yarriabinni.wav",
+        "type": "fruit",
+        "sub_category": "Dove_Wompoo_Yarriabinni"
+    },
+    {
+        "file": "Grey Butcherbird.wav",
+        "type": "grey",
+        "sub_category": "Butcherbird"
+    },
+    {
+        "file": "Howling-wind.wav",
+        "type": "howling",
+        "sub_category": "wind"
+    },
+    {
+        "file": "Koala.wav",
+        "type": "unknown",
+        "sub_category": "Koala"
+    },
+    {
+        "file": "Owl.wav",
+        "type": "unknown",
+        "sub_category": "Owl"
+    },
+    {
+        "file": "Pacific-Koel-Eudynamys-orientalis-cyanocephalus.wav",
+        "type": "pacific",
+        "sub_category": "Koel-Eudynamys-orientalis-cyanocephalus"
+    },
+    {
+        "file": "Palm Cockatoo.wav",
+        "type": "palm",
+        "sub_category": "Cockatoo"
+    },
+    {
+        "file": "Possum_Brushtail.wav",
+        "type": "unknown",
+        "sub_category": "Possum_Brushtail"
+    },
+    {
+        "file": "Red eye Insect.wav",
+        "type": "red",
+        "sub_category": "eye Insect"
+    },
+    {
+        "file": "Red Fox.wav",
+        "type": "red",
+        "sub_category": "Fox"
+    },
+    {
+        "file": "Spiny-cheeked-Honeyeater-Acanthagenys-rufogularis.wav",
+        "type": "spiny",
+        "sub_category": "cheeked-Honeyeater-Acanthagenys-rufogularis"
+    },
+    {
+        "file": "Spotted-Catbird-Ailuroedus-maculosus.wav",
+        "type": "spotted",
+        "sub_category": "Catbird-Ailuroedus-maculosus"
+    },
+    {
+        "file": "Tasmanian Devil.wav",
+        "type": "tasmanian",
+        "sub_category": "Devil"
+    },
+    {
+        "file": "Wombat.wav",
+        "type": "unknown",
+        "sub_category": "Wombat"
+    }
+]

@@ -121,31 +121,59 @@
     },
     {
         "Bird": "Anthochaera carunculata",
-        "description": []
+        "description": [
+            "Common Name: Red Wattlebird.",
+            "Large, noisy honeyeater native to southern Australia, easily recognised by the red wattles on its face.",
+            "Feeds mainly on nectar, but also eats insects and fruit, and is often aggressive around food sources."
+        ]
     },
     {
         "Bird": "Anthus novaeseelandiae",
-        "description": []
+        "description": [
+            "Common Name: Australasian Pipit.",
+            "A small, ground-dwelling bird found in open grassy habitats across Australia and New Zealand.",
+            "Has a slender build with streaked brown plumage and constantly pumps its tail when walking."
+        ]
     },
     {
         "Bird": "Antigone antigone",
-        "description": []
+        "description": [
+            "Common Name: Sarus Crane.",
+            "The world’s tallest flying bird, known for its elegant walk and loud trumpeting calls.",
+            "Mostly found in wetlands and grasslands, often forming lifelong pair bonds."
+        ]
     },
     {
         "Bird": "Antigone rubicunda",
-        "description": []
+        "description": [
+            "Common Name: Brolga.",
+            "Large, grey crane native to Australia, famous for its beautiful and elaborate mating dance.",
+            "Inhabits wetland areas and feeds on plants, insects, and small animals."
+        ]
     },
     {
         "Bird": "Aphelocephala leucopsis",
-        "description": []
+        "description": [
+            "Common Name: Southern Whiteface.",
+            "A small bird native to Australia, easily identified by its distinctive white face and grey-brown body.",
+            "Lives in dry woodlands and feeds mainly on seeds and insects."
+        ]
     },
     {
         "Bird": "ApocritaÂ sp.",
-        "description": []
+        "description": ["Apocrita is a suborder of Hymenoptera, which includes ants, bees, and wasps.",
+                        "They are recognized by a narrow waist (petiole) separating thorax and abdomen.",
+                        "Members of Apocrita fulfill roles as pollinators, predators, and parasitoids.",
+                        "Many species in this group display advanced behaviors, including colony structures.",
+                        "They contribute significantly to ecosystem balance through pollination and pest control."]
     },
     {
         "Bird": "Aprosmictus erythropterus",
-        "description": []
+        "description": [ "Also known as the Red-winged Parrot, found in northern and eastern Australia.",
+                         "Males are bright green with red wing patches and a blue rump; females are duller.",
+                         "They feed on seeds, nectar, fruits, and blossoms in woodlands and savannas.",
+                         "Known for their swift flight and sharp, noisy calls.",
+                         "Nesting occurs in tree hollows, often in pairs or small flocks."]
     },
     {
         "Bird": "Aquila audax",
@@ -241,23 +269,57 @@
     },
     {
         "Bird": "Canis familiaris",
-        "description": []
+        "description": [
+            "The domestic dog descends from gray wolves while showing strong loyalty and friendship towards humans.",
+    "Dogs exist as social creatures, which people commonly use for pet ownership, working purposes, and service work.",
+    "Dogs possess outstanding olfactory abilities and auditory perception, which makes them valuable for search and rescue missions.",
+    "Through thousands of years of domestication, dogs have evolved into multiple roles including guard dogs, herders, and guides.",
+    "The world contains hundreds of dog breeds which differ in their characteristics, size, and temperament."
+  
+        ]
     },
     {
         "Bird": "Capra hircus",
-        "description": []
+        "description": [
+            "The domestic goat represents one of the earliest domesticated species which humans use for milk production, meat consumption, and fiber harvesting.",
+    "The domestic goat species demonstrates excellent adaptability to different environmental conditions and geographical areas.",
+    "The species demonstrates both curiosity and climbing skills which makes them thrive in mountainous environments.",
+    "Goats function as social creatures who naturally choose to group themselves into herds.",
+    "The dairy industry produces cheese, yogurt, and additional dairy products from goat milk."
+        ]
     },
     {
         "Bird": "Carduelis carduelis",
-        "description": []
+        "description": [
+            "The European goldfinch exists as a tiny bird species which displays red facial coloring and yellow wing markings.",
+    "They are known for their pleasant, twittering songs.",
+    "Goldfinches primarily consume seeds, which include thistles and teasels among their main food sources.",
+    "The bird species exists throughout Europe, North Africa, and western Asia.",
+    "These birds are social and often seen in flocks outside the breeding season."
+  
+        ]
     },
     {
         "Bird": "Carterornis leucotis",
-        "description": []
+        "description": [
+            "The white-eared monarch is a small bird native to eastern Australia.",
+    "The bird displays black and white feathers with white markings on its ears.",
+    "These birds inhabit rainforest and dense forest edges.",
+    "The birds eat insects while using their leaves to extract their prey.",
+    "White-eared monarchs appear as solitary birds or pairs during their breeding period."
+  
+        ]
     },
     {
         "Bird": "Centropus phasianinus",
-        "description": []
+        "description": [
+            "The pheasant coucal is a large ground-dwelling cuckoo found in Australia and nearby regions.",
+    "The species differs from other cuckoos because it constructs its own nest to care for its offspring.",
+    "The species produces a loud booming sound and spends most of its time active during daylight hours.",
+    "The bird's appearance matches pheasants, so it received its name.",
+    "The birds commonly move through grasslands and sugarcane fields."
+ 
+        ]
     },
     {
         "Bird": "Cervus Unicolour",
@@ -334,6 +396,26 @@
     {
         "Bird": "Crinia signifera",
         "description": []
+    },
+    {
+        "Bird": "Zosterops lateralis",
+        "description": ["The Silvereye is a small bird with a conspicuous ring of white feathers around the eye and belongs to a group of birds known as white-eyes. The Silvereye shows interesting plumage variations across its range. The grey back and olive-green head and wings are found in birds through the east, while western birds have a uniformly olive-green back."]
+    },
+    {
+        "Mammal": "Pseudomys australis",
+        "description": ["The Plains Rat is a small rodent with thick, soft, silver-grey fur above; white to cream underneath; and with relatively large ears. This species grows to 14 cm long and weighs up to 80 g. Its tail is brown to grey and grows to 12 cm long and ends in a white tip."]
+    },
+    {
+        "Mammal": "Pteropus scapulatus",
+        "description": ["The little red flying-fox is a megachiropteran bat native to northern and eastern Australia. The species weighs about half a kilogram, one US pound, and is the smallest species of Pteropus in mainland Australia."]
+    },
+    {
+        "Mammal": "Pteropus poliocephalus",
+        "description": ["The grey-headed flying fox is a megabat native to Australia. The species shares mainland Australia with three other members of the genus Pteropus: the little red P. scapulatus, spectacled P. conspicillatus, and the black P. alecto. The grey-headed flying fox is the largest bat in Australia."]
+    },
+    {
+        "Bird": "Pycnoptilus floccosus",
+        "description": ["Pilotbirds are plump, large headed ground dwelling birds with dark brown on the upper body as well as on the head."]
     }
     
   ]
@@ -540,15 +622,27 @@
         },
         {
             "Bird": "Aquila audax",
-            "description": []
+            "description": ["Commonly called the Wedge-tailed Eagle, Australia's largest bird of prey.",
+                            "It features long, broad wings and a distinctive wedge-shaped tail.",
+                            "Feeds on live prey like rabbits and also scavenges carrion.",
+                            "Soars at high altitudes using thermals for gliding over long distances.",
+                            "Territorial birds that nest in tall trees or cliffs with large stick nests."]
         },
         {
             "Bird": "Artamus cinereus",
-            "description": []
+            "description": ["Known as the Black-faced Woodswallow, native to northern and inland Australia.",
+                            "Has a grey body with a black facial mask and pale-tipped tail.",
+                            "Feeds primarily on flying insects captured mid-air.",
+                            "Forms tight social groups and nests communally in tree forks or structures.",
+                            "Often seen huddling together to conserve heat in cooler weather."]
         },
         {
             "Bird": "Artamus cyanopterus",
-            "description": []
+            "description": ["Called the Dusky Woodswallow, found mainly in southeastern Australia.",
+                            "Has grey-brown plumage with a dark face and bluish wings.",
+                            "Feeds on insects in flight, often seen foraging in flocks.",
+                            "Roosts and breeds communally, showing cooperative nesting behavior.",
+                            "Prefers open woodlands, forest edges, and farmlands."]
         },
         {
             "Bird": "Artamus minor",
