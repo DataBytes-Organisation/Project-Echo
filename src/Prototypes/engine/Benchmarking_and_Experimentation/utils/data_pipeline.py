@@ -763,7 +763,7 @@ def build_datasets(train_ds, val_ds, test_ds, class_names_list, model_name="Effi
     print(f"Train dataset size (batches): {tf.data.experimental.cardinality(train_dataset).numpy()}")
     print(f"Validation dataset size (batches): {tf.data.experimental.cardinality(validation_dataset).numpy()}")
     print(f"Test dataset size (batches): {tf.data.experimental.cardinality(test_dataset).numpy()}")
-    print("Datasets built successfully.")
+    print("Datasets built successfully!")
 
     return train_dataset, validation_dataset, test_dataset
 
