@@ -77,7 +77,7 @@ EXPERIMENTS = [
         "name": "mobilenet_v3_large_baseline",
         "audio_augmentation": "none",
         "image_augmentation": "none",
-        "model": "MobileNetV3-Large",
+        "model": "MobileNetV3-large",
         "epochs": 10,
         "batch_size": 16,
     },
@@ -89,6 +89,15 @@ EXPERIMENTS = [
         "epochs": 10,
         "batch_size": 16,
     },
+    {
+    "name": "efficientnet_lite0_baseline",
+    "audio_augmentation": "none",
+    "image_augmentation": "none",
+    "model": "EfficientNet-Lite0",
+    "epochs": 5,
+    "batch_size": 8
+    }   
+
 ]
 
     
