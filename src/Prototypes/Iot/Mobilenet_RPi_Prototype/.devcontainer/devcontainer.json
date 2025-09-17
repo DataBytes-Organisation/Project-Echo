@@ -1,0 +1,62 @@
+{
+    "name": "MobileNet Bird Detector - Windows Compatible",
+    "image": "python:3.9-slim-bullseye",
+    
+    "features": {
+        "ghcr.io/devcontainers/features/git:1": {
+            "ppa": false,
+            "version": "os-provided"
+        },
+        "ghcr.io/devcontainers/features/common-utils:2": {
+            "installZsh": false,
+            "configureZshAsDefaultShell": false,
+            "installOhMyZsh": false,
+            "upgradePackages": false
+        }
+    },
+
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-python.vscode-pylance",
+                "ms-python.black-formatter",
+                "ms-toolsai.jupyter",
+                "ms-vscode.vscode-json"
+            ],
+            "settings": {
+                "python.defaultInterpreterPath": "/usr/local/bin/python3",
+                "python.formatting.provider": "black",
+                "python.linting.enabled": true,
+                "python.linting.pylintEnabled": true,
+                "files.watcherExclude": {
+                    "**/recordings/**": true,
+                    "**/Model/**": true
+                }
+            }
+        }
+    },
+
+    "postCreateCommand": "bash .devcontainer/setup.sh",
+    
+    "mounts": [
+        "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached"
+    ],
+    
+    "workspaceFolder": "/workspace",
+    
+    "remoteUser": "root",
+    
+    "forwardPorts": [8888],
+    
+    "postStartCommand": "echo 'Container started successfully!'",
+    
+    "containerEnv": {
+        "PYTHONPATH": "/workspace",
+        "DEBIAN_FRONTEND": "noninteractive",
+        "APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE": "1",
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONUNBUFFERED": "1",
+        "PULSE_SERVER": "tcp:host.docker.internal:4713"
+    }
+}
