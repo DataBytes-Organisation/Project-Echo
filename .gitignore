@@ -17,3 +17,7 @@ src/Components/HMI/ui/node_modules/*
 # Temporary files from Cloud Storage (added by ptanmay143)
 .tmp.driveupload
 *.mp3
+
+# audio recording from IOT Nodes
+src/Components/IoT/management_application/audioLocal
+src/Components/IoT/management_application/audioUpload
