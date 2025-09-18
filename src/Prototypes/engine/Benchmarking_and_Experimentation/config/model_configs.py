@@ -34,7 +34,26 @@ MODELS = {
         "expected_input_shape": (299, 299, 3),
     },
 
-        "MobileNetV3-large": {
+ 
+    "MobileNetV3Small_224": {
+        "hub_url": "https://tfhub.dev/google/imagenet/mobilenet_v3_small_100_224/classification/5",
+        "trainable": True,
+        "dense_layers": [8, 4],
+        "dropout": 0.2,
+        "learning_rate": 1e-4,
+        "expected_input_shape": (224, 224, 3),
+    },
+    "EfficientNetLite0_224": {
+        "hub_url": "https://tfhub.dev/tensorflow/efficientnet/lite0/classification/2",
+        "trainable": True,
+        "dense_layers": [8, 4],
+        "dropout": 0.2,
+        "learning_rate": 1e-4,
+        "expected_input_shape": (224, 224, 3),
+    },
+
+  
+    "MobileNetV3-Large": {
         "hub_url": "https://tfhub.dev/google/imagenet/mobilenet_v3_large_100_224/classification/5",
         "trainable": True,
         "dense_layers": [8, 4],
@@ -42,8 +61,7 @@ MODELS = {
         "learning_rate": 1e-4,
         "expected_input_shape": (224, 224, 3),
     },
-
-        "MobileNetV3-Small": {
+    "MobileNetV3-Small": {
         "hub_url": "https://tfhub.dev/google/imagenet/mobilenet_v3_small_100_224/classification/5",
         "trainable": True,
         "dense_layers": [8, 4],
@@ -51,7 +69,7 @@ MODELS = {
         "learning_rate": 1e-4,
         "expected_input_shape": (224, 224, 3),
     },
-        "EfficientNet-Lite0": {
+    "EfficientNet-Lite0": {
         "hub_url": "https://tfhub.dev/tensorflow/efficientnet/lite0/feature-vector/2",
         "trainable": True,
         "dense_layers": [8, 4],
@@ -60,3 +78,4 @@ MODELS = {
         "expected_input_shape": (224, 224, 3),
     }
 }
+

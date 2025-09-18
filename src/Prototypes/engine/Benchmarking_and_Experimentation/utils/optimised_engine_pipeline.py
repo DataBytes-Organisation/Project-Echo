@@ -95,25 +95,7 @@ def build_model(model_name="EfficientNetV2B0", num_classes=3, l2_regularization=
     # I think this is not needed as the data pipeline should resize the images to the expected dimensions.   
     # if (SC['MODEL_INPUT_IMAGE_HEIGHT'], SC['MODEL_INPUT_IMAGE_WIDTH']) != (expected_height, expected_width):
     #    raise ValueError(f"System config input dimensions ({SC['MODEL_INPUT_IMAGE_HEIGHT']}, {SC['MODEL_INPUT_IMAGE_WIDTH']}) do not match expected input dimensions ({expected_height}, {expected_width}).  The data pipeline must resize the images.")
-            # Special case for EfficientNet-Lite0
-    if model_name == "EfficientNet-Lite0":
-        base_model = hub.KerasLayer(
-            hub_url,
-            input_shape=expected_input_shape,
-            trainable=False
-        )
-        layers = [
-            tf.keras.layers.InputLayer(input_shape=expected_input_shape),
-            tf.keras.layers.Rescaling(1./255),   # 新增：把输入缩放到 [0,1]
-            tf.keras.layers.Lambda(lambda t: tf.cast(t, tf.float32)),  # 新增：确保 float32
-            base_model,
-            tf.keras.layers.Dropout(dropout),
-            tf.keras.layers.Dense(num_classes, activation="softmax")
-        ]
-        model = tf.keras.Sequential(layers)
-        return model
-
-
+        
     # Add normalization layer
     layers.extend([
         hub.KerasLayer(hub_url, trainable=trainable),
@@ -182,26 +164,11 @@ def train_model(model_name="EfficientNetV2B0", epochs=None, batch_size=None, l2_
     optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
 
     # Compile the model
-    # Detect whether the last layer is logits (linear) or softmax
-    last_layer = model.layers[-1]
-    activation = getattr(last_layer, "activation", None)
-    is_logits = (activation is None or activation == tf.keras.activations.linear)
-
-    loss_fn = tf.keras.losses.CategoricalCrossentropy(from_logits=is_logits)
-
-    # 自动判断最后一层是否为 logits（线性）还是 softmax
-    last_layer = model.layers[-1]
-    activation = getattr(last_layer, "activation", None)
-    is_logits = (activation is None or activation == tf.keras.activations.linear)
-
-    loss_fn = tf.keras.losses.CategoricalCrossentropy(from_logits=is_logits)
-
     model.compile(
         optimizer=optimizer,
-        loss=loss_fn,
-        metrics=["accuracy"],
+        loss=tf.keras.losses.CategoricalCrossentropy(from_logits=True),
+        metrics=['accuracy']
     )
-
 
     # Define callbacks based on the notebook example
     log_dir = os.path.join("tensorboard_logs", model_name + "_" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
@@ -241,16 +208,6 @@ def train_model(model_name="EfficientNetV2B0", epochs=None, batch_size=None, l2_
     start_time = time.time()
 
     print(f"Starting training for model: {model_name}")
-
-    # 检查验证集是否为空，如果为空就跳过
-    try:
-        val_batches = tf.data.experimental.cardinality(validation_dataset).numpy()
-    except Exception:
-        val_batches = None
-
-    if val_batches is not None and val_batches == 0:
-        validation_dataset = None
-        
     history = model.fit(
         train_dataset,
         validation_data=validation_dataset,
