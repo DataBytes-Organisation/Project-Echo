@@ -1,7 +1,8 @@
+fastapi
+uvicorn[standard]
+python-multipart
+pydantic
+librosa
+soundfile
+scipy
 numpy
-ffmpeg-python==0.2.0
-keras
-tensorflow
-tensorflow-io
-tfimm
-pydub
