@@ -1,0 +1,14 @@
+benchmark/
+├── config/                  # Configuration files for experiments
+│   ├── augmentation_configs.py  # Defines augmentation combinations
+│   ├── model_configs.py         # Defines model architectures 
+│   └── experiment_configs.py    # Combines augmentations and models
+├── runners/                 # Experiment execution code
+│   ├── experiment_runner.py     # Main experiment execution 
+│   └── metrics_collector.py     # Collects and saves metrics
+├── utils/                   # Utility functions
+│   ├── data_pipeline.py         # Customizable data pipeline
+│   ├── visualization.py         # Results visualization 
+│   └── model_loader.py          # Dynamic model loading
+├── results/                 # Stores experiment results
+└── benchmark.py             # Main entry point
