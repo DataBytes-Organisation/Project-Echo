@@ -1,54 +1,73 @@
 from fastapi import APIRouter, HTTPException, status
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr, Field
+from typing import Optional, Dict
+import time
 
 from app.database import User
-
 from app.middleware.auth import signJWT
 from app.middleware.random import genotp
-import time
 
 router = APIRouter()
 
-otp_store = {}
+# In-memory store for demo. Prefer Redis with TTL in production.
+otp_store: Dict[str, Dict] = {}
 
 class SignInRequest(BaseModel):
-    email: str
-    password: str
+    email: EmailStr
+    password: str = Field(..., min_length=6, max_length=128)
 
-class OTPVerifyRequest(BaseModel):
-    email: str
-    otp: str
+class VerifyOtpRequest(BaseModel):
+    email: EmailStr
+    otp: str = Field(..., regex=r"^\d{6}$")
 
-@router.post("/signin")
+@router.post("/auth/signin")
 def signin(data: SignInRequest):
-    user = User.find_one({"email": data.email})
-    if not user or user["password"] != data.password:
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+    # Lookup user
+    try:
+        user = User.find_one({"email": data.email})
+    except Exception:
+        raise HTTPException(status_code=500, detail="Database error while fetching user")
 
-    otp = genotp()
-    otp_store[data.email] = {
-        "otp": otp,
-        "timestamp": time.time(),
-        "user": user
-    }
+    if not user or not user.get("password") == data.password:
+        # Replace with proper hashed password check
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
 
-    print(f"[DEBUG] OTP for {data.email} is {otp}")  # Simulate email
-
-    return {"message": "OTP sent to email"}
-
-@router.post("/verify-otp")
-def verify_otp(data: OTPVerifyRequest):
+    # Rate limit OTP issuance (1 per 30s)
+    now = time.time()
     record = otp_store.get(data.email)
-    if not record or record["otp"] != data.otp:
-        raise HTTPException(status_code=401, detail="Invalid or expired OTP")
+    if record and now - record.get("timestamp", 0) < 30:
+        raise HTTPException(status_code=429, detail="Please wait before requesting another OTP")
+
+    otp = genotp()  # must return 6-digit string
+    otp_store[data.email] = {"otp": otp, "timestamp": now, "attempts": 0, "user": user}
+
+    # TODO: Send OTP via email/SMS. For now, expose only for development (remove in prod)
+    return {"message": "OTP sent", "dev_otp": otp}
+
+@router.post("/auth/verify")
+def verify(data: VerifyOtpRequest):
+    record = otp_store.get(data.email)
+    if not record:
+        raise HTTPException(status_code=404, detail="OTP not found; sign in first")
 
     if time.time() - record["timestamp"] > 300:
+        del otp_store[data.email]
         raise HTTPException(status_code=410, detail="OTP expired")
 
+    if record.get("attempts", 0) >= 5:
+        del otp_store[data.email]
+        raise HTTPException(status_code=429, detail="Too many incorrect attempts; request a new OTP")
+
+    if record["otp"] != data.otp:
+        record["attempts"] = record.get("attempts", 0) + 1
+        raise HTTPException(status_code=401, detail="Invalid OTP")
+
     user = record["user"]
-    roles = user.get("roles", ["user"])  # fallback to "user"
-    token = signJWT(user, roles)
+    roles = user.get("roles", ["user"])
+    try:
+        token = signJWT(user, roles)
+    except Exception:
+        raise HTTPException(status_code=500, detail="Failed to sign JWT")
 
     del otp_store[data.email]
-
     return {"message": "Login successful", "access_token": token}
