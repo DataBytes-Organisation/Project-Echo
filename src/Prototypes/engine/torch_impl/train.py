@@ -138,7 +138,7 @@ class Trainer:
 				if self.metric_loss_module is not None:
 					student_outputs = self.metric_loss_module(student_outputs, labels)
 
-				if self.enabled and self.teacher_model:
+				if self.distillation and self.teacher_model:
 					with torch.no_grad():
 						teacher_outputs = self.teacher_model(inputs)
 
