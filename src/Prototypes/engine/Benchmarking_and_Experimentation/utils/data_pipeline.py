@@ -1,7 +1,7 @@
 ########################################################################################
-# these helper functions load the audio data into a 'dataset' using only paths
-# just dealing with paths at this early stage means the entire dataset can be shuffled in
-# memory and split before loading the actual audio data into memory
+ # These helper functions load the audio data into a 'dataset' using only paths.
+ # Just dealing with paths at this early stage means the entire dataset can be shuffled in
+ # memory and split before loading the actual audio data into memory.
 ########################################################################################
 
 # disable warnings
