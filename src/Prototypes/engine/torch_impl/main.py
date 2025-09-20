@@ -32,7 +32,7 @@ def main(cfg: DictConfig):
 	dataset_size = len(audio_files)
 	train_size = int(cfg.data.train_split * dataset_size)
 	val_size = int(cfg.data.val_split * dataset_size)
-	test_size = dataset_size - train_size - val_size
+	# test_size = dataset_size - train_size - val_size
 	
 	indices = torch.tensor(list(range(dataset_size)))
 	torch.manual_seed(cfg.training.seed)
