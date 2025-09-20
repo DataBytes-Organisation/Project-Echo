@@ -5,6 +5,7 @@ import torchvision.models as models
 from omegaconf import DictConfig
 
 from model.effv2 import EfficientNetV2ArcFace
+from model.ghost_effv2 import GhostEfficientNetV2
 # from model.panns_cnn14 import PannsCNN14ArcFace
 # from model.panns_mobilenetv1 import PannsMobileNetV1ArcFace
 # from model.panns_mobilenetv2 import PannsMobileNetV2ArcFace
@@ -23,24 +24,32 @@ class Model(nn.Module):
 				use_arcface=model_params.get("use_arcface", False),
 				trainable_blocks=model_params.get("trainable_blocks", 0),
 			)
-		elif model_params.model_name == "panns_cnn14":
-			self.model = PannsCNN14ArcFace(
-				classes_num=model_params.classes_num,
-				pretrained=model_params.get("pretrained", True),
-				use_arcface=model_params.get("use_arcface", False),
-			)
-		elif model_params.model_name == "panns_mobilenetv1":
-			self.model = PannsMobileNetV1ArcFace(
-				classes_num=model_params.classes_num,
-				pretrained=model_params.get("pretrained", True),
-				use_arcface=model_params.get("use_arcface", False),
-			)
-		elif model_params.model_name == "panns_mobilenetv2":
-			self.model = PannsMobileNetV2ArcFace(
+		elif model_params.model_name.startswith("ghost_efficientnet_v2"):
+			self.model = GhostEfficientNetV2(
 				num_classes=model_params.num_classes,
-				pretrained=model_params.get("pretrained", True),
+				width_mult=model_params.get("width_mult", 0.75),
+				depth_mult=model_params.get("depth_mult", 0.5),
+				drop_rate=model_params.get("drop_rate", 0.2),
 				use_arcface=model_params.get("use_arcface", False),
 			)
+		# elif model_params.model_name == "panns_cnn14":
+		# 	self.model = PannsCNN14ArcFace(
+		# 		classes_num=model_params.classes_num,
+		# 		pretrained=model_params.get("pretrained", True),
+		# 		use_arcface=model_params.get("use_arcface", False),
+		# 	)
+		# elif model_params.model_name == "panns_mobilenetv1":
+		# 	self.model = PannsMobileNetV1ArcFace(
+		# 		classes_num=model_params.classes_num,
+		# 		pretrained=model_params.get("pretrained", True),
+		# 		use_arcface=model_params.get("use_arcface", False),
+		# 	)
+		# elif model_params.model_name == "panns_mobilenetv2":
+		# 	self.model = PannsMobileNetV2ArcFace(
+		# 		num_classes=model_params.num_classes,
+		# 		pretrained=model_params.get("pretrained", True),
+		# 		use_arcface=model_params.get("use_arcface", False),
+		# 	)
 		else:
 			raise ValueError(f"Model '{model_params.model_name}' not supported.")
 
