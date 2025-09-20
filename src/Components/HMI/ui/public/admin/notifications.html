@@ -6,6 +6,7 @@
     <title>Notifications</title>
     <link rel="stylesheet" type="text/css" href="./admin/css/styles.min.css" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
@@ -25,8 +26,7 @@
                 <div class="card-body">
                     <div class="notification-header d-flex justify-content-between align-items-center mb-4">
                         <h2 class="mb-0">Notifications
-                            <span id="unread-badge" class="badge bg-danger ms-2 d-none">0</span>
-                            <span id="connection-indicator" class="badge bg-secondary ms-2">Disconnected</span>
+                            <span id="unread-badge" class="badge bg-danger ms-2">0</span>
                         </h2>
                         <div class="btn-group">
                             <button class="btn btn-sm btn-outline-primary" id="mark-all-read">
@@ -45,7 +45,7 @@
                     <ul class="nav nav-tabs mb-3" role="tablist">
                         <li class="nav-item" role="presentation">
                             <a class="nav-link active" id="all-tab" data-bs-toggle="tab" href="#all" role="tab">
-                                <i class="ti ti-bell"></i> All
+                                <i class="ti ti-bell"></i> All (Non-Archived)
                             </a>
                         </li>
                         <li class="nav-item" role="presentation">
@@ -63,13 +63,19 @@
                     <!-- Tab Content -->
                     <div class="tab-content">
                         <div class="tab-pane fade show active" id="all" role="tabpanel">
-                            <div id="notification-list" class="notification-list"></div>
+                            <div class="notification-list-container">
+                                <div id="notification-list" class="notification-list"></div>
+                            </div>
                         </div>
                         <div class="tab-pane fade" id="unread" role="tabpanel">
-                            <div id="unread-notification-list" class="notification-list"></div>
+                            <div class="notification-list-container">
+                                <div id="unread-notification-list" class="notification-list"></div>
+                            </div>
                         </div>
                         <div class="tab-pane fade" id="archived" role="tabpanel">
-                            <div id="archived-notification-list" class="notification-list"></div>
+                            <div class="notification-list-container">
+                                <div id="archived-notification-list" class="notification-list"></div>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Notification Preferences - Echo Admin</title>
+    <link rel="shortcut icon" type="image/png" href="./admin/images/logos/favicon.png" />
+    <link type="text/css" rel="stylesheet" href="./admin/css/styles.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <script type="text/javascript" src="https://kit.fontawesome.com/8aa980d912.js" crossorigin="anonymous"></script>
+
+    <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD"
+            crossorigin="anonymous"
+    />
+
+    <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+    />
+    <!-- jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+
+    <script type="text/javascript" src="./admin/js/sidebarmenu.js"></script>
+    <script type="text/javascript" src="./admin/js/app.min.js"></script>
+    <!-- <script type="text/javascript" src="../../node_modules/apexcharts/dist/apexcharts.min.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.min.js"></script>
+
+    <!-- Custom CSS for notification preferences -->
+    <link rel="stylesheet" href="notification-preferences.css">
+</head>
+
+<body>
+<!--  Body Wrapper -->
+<div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
+     data-sidebar-position="fixed" data-header-position="fixed">
+    <!-- Sidebar Start -->
+    <div id="sidebar"></div>
+    <!--  Sidebar End -->
+    <!--  Main wrapper -->
+    <div class="body-wrapper">
+        <div id="header"></div>
+        <div class="container-fluid notification-preferences">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title fw-semibold mb-4">Notification Preferences</h5>
+
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Customize how you receive notifications from EchoNet. You can enable or disable different notification types and set quiet hours.
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header d-flex align-items-center">
+                            <i class="fas fa-bell me-2"></i>Notification Channels
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-4">
+                                <div class="section-title">Delivery Methods</div>
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="inAppNotifications" checked>
+                                    <label class="form-check-label" for="inAppNotifications">
+                                        In-App Notifications
+                                    </label>
+                                    <small class="form-text text-muted d-block">Show notifications within the application</small>
+                                </div>
+
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="emailNotifications">
+                                    <label class="form-check-label" for="emailNotifications">
+                                        Email Notifications
+                                    </label>
+                                    <small class="form-text text-muted d-block">Receive notifications via email</small>
+                                </div>
+
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="pushNotifications">
+                                    <label class="form-check-label" for="pushNotifications">
+                                        Push Notifications
+                                    </label>
+                                    <small class="form-text text-muted d-block">Receive browser push notifications</small>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="section-title">Notification Types</div>
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="systemNotifications" checked>
+                                    <label class="form-check-label" for="systemNotifications">
+                                        System Updates
+                                    </label>
+                                    <small class="form-text text-muted d-block">Important system announcements and maintenance notices</small>
+                                </div>
+
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="donationNotifications" checked>
+                                    <label class="form-check-label" for="donationNotifications">
+                                        Donation Alerts
+                                    </label>
+                                    <small class="form-text text-muted d-block">Notifications about received donations</small>
+                                </div>
+
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="requestNotifications" checked>
+                                    <label class="form-check-label" for="requestNotifications">
+                                        Edit Requests
+                                    </label>
+                                    <small class="form-text text-muted d-block">Notifications about new edit requests</small>
+                                </div>
+
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="userNotifications">
+                                    <label class="form-check-label" for="userNotifications">
+                                        User Activities
+                                    </label>
+                                    <small class="form-text text-muted d-block">Notifications about user sign-ups and activities</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header d-flex align-items-center">
+                            <i class="fas fa-moon me-2"></i>Do Not Disturb (Quiet Hours)
+                        </div>
+                        <div class="card-body">
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" id="enableDND">
+                                <label class="form-check-label" for="enableDND">
+                                    <strong>Enable Quiet Hours</strong>
+                                </label>
+                                <small class="form-text text-muted d-block">During these hours, you will not receive any notifications</small>
+                            </div>
+
+                            <div id="dndSettings" style="display: none;">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="dndStartTime" class="form-label">Start Time</label>
+                                        <input type="time" class="form-control" id="dndStartTime" value="22:00">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="dndEndTime" class="form-label">End Time</label>
+                                        <input type="time" class="form-control" id="dndEndTime" value="07:00">
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Days of Week</label>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="dndMonday" checked>
+                                            <label class="form-check-label" for="dndMonday">Mon</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="dndTuesday" checked>
+                                            <label class="form-check-label" for="dndTuesday">Tue</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="dndWednesday" checked>
+                                            <label class="form-check-label" for="dndWednesday">Wed</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="dndThursday" checked>
+                                            <label class="form-check-label" for="dndThursday">Thu</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="dndFriday" checked>
+                                            <label class="form-check-label" for="dndFriday">Fri</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="dndSaturday" checked>
+                                            <label class="form-check-label" for="dndSaturday">Sat</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="dndSunday" checked>
+                                            <label class="form-check-label" for="dndSunday">Sun</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="alert alert-warning">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    <strong>Note:</strong> Critical system alerts may still be delivered during quiet hours.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="d-flex justify-content-end gap-2 mt-4">
+                        <button type="button" class="btn btn-secondary" id="resetButton">Reset to Defaults</button>
+                        <button type="button" class="btn btn-primary" id="saveButton">Save Preferences</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom JavaScript for notification preferences -->
+<script>
+    $(document).ready(function() {
+        $("#sidebar").load("./admin/component/sidebar-component.html");
+        $("#header").load("./admin/component/header-component.html");
+    });
+</script>
+<script type="text/javascript" src="./admin/js/notification-preferences.js"></script>
+</body>
+
+</html>

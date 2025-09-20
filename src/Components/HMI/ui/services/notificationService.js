@@ -1,4 +1,4 @@
-const { Notification } = require('../model/notification.model');
+const { Notification, UserNotificationPreference } = require('../model/notification.model');
 const dispatchService = require('./dispatchService');
 
 class NotificationService {
@@ -39,6 +39,28 @@ class NotificationService {
 
     async createAndDispatch(userId, title, message, type = 'system', metadata = {}, channel = null) {
         try {
+            const preferences = await UserNotificationPreference.findOne({ userId }) ||
+                new UserNotificationPreference({ userId });
+
+            // Check if this notification type is enabled
+            if (!this.isNotificationTypeEnabled(preferences, type)) {
+                console.log(`Notification type ${type} is disabled for user ${userId}`);
+                return {
+                    notification: null,
+                    dispatchResults: { suppressed: true, reason: 'type_disabled' }
+                };
+            }
+
+            // Check Do Not Disturb
+            if (type !== 'alert' && this.isInDoNotDisturb(preferences)) {
+                console.log(`Notification suppressed for user ${userId} during DND hours`);
+                return {
+                    notification: null,
+                    dispatchResults: { suppressed: true, reason: 'DND' }
+                };
+            }
+
+            // Only create notification if it will be dispatched
             const notification = await this.createNotification(userId, title, message, type, metadata);
             const dispatchResults = await dispatchService.dispatch(userId, notification, channel);
 
@@ -50,6 +72,51 @@ class NotificationService {
             console.error('Error in createAndDispatch:', error);
             throw error;
         }
+    }
+
+    isNotificationTypeEnabled(preferences, notificationType) {
+        // Critical alerts always go through
+        if (notificationType === 'alert') {
+            return true;
+        }
+
+        // Check if this specific type is enabled in user preferences
+        const typeEnabled = preferences.preferences.types[notificationType];
+
+        if (typeEnabled !== undefined) {
+            return typeEnabled;
+        }
+
+        // Fallback to default configuration
+        return this.typeConfig[notificationType]?.defaultEnabled || false;
+    }
+
+    isInDoNotDisturb(preferences) {
+        if (!preferences.preferences.doNotDisturb?.enabled) {
+            return false;
+        }
+
+        const now = new Date();
+        const currentDay = now.getDay();
+
+        if (!preferences.preferences.doNotDisturb.days.includes(currentDay)) {
+            return false;
+        }
+
+        const [startHour, startMinute] = preferences.preferences.doNotDisturb.startTime.split(':').map(Number);
+        const [endHour, endMinute] = preferences.preferences.doNotDisturb.endTime.split(':').map(Number);
+
+        const startTime = new Date();
+        startTime.setHours(startHour, startMinute, 0, 0);
+
+        const endTime = new Date();
+        endTime.setHours(endHour, endMinute, 0, 0);
+
+        if (startTime > endTime) {
+            return now >= startTime || now <= endTime;
+        }
+
+        return now >= startTime && now <= endTime;
     }
 
     async getUserNotifications(userId, limit = 20, offset = 0, status = null) {
@@ -200,6 +267,36 @@ class NotificationService {
             return notification;
         } catch (error) {
             console.error('Error restoring notification:', error);
+            throw error;
+        }
+    }
+
+    async getUserNotificationsWithFilter(userId, limit = 20, offset = 0, status = null) {
+        try {
+            // Get user preferences
+            const preferences = await UserNotificationPreference.findOne({ userId }) ||
+                new UserNotificationPreference({ userId });
+
+            const query = { userId };
+            if (status) {
+                query.status = status;
+            }
+
+            // Get all notifications first
+            let notifications = await Notification.find(query)
+                .sort({ createdAt: -1 })
+                .skip(offset)
+                .limit(limit);
+
+            // Filter out notifications where the type is disabled in user preferences
+            notifications = notifications.filter(notification => {
+                const typeEnabled = preferences.preferences.types[notification.type];
+                return typeEnabled !== false; // Only show if explicitly enabled or undefined
+            });
+
+            return notifications;
+        } catch (error) {
+            console.error('Error fetching user notifications with filter:', error);
             throw error;
         }
     }

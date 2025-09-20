@@ -1,0 +1,109 @@
+:root {
+    --primary-color: #3b7ddd;
+    --secondary-color: #6c757d;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #17a2b8;
+    --light-bg: #f8f9fa;
+    --dark-bg: #343a40;
+}
+
+.notification-preferences .card {
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    border: none;
+}
+
+.notification-preferences .card-header {
+    background-color: white;
+    border-bottom: 1px solid #eaeaea;
+    font-weight: 600;
+    padding: 15px 20px;
+    border-radius: 10px 10px 0 0 !important;
+}
+
+.notification-preferences .card-body {
+    padding: 20px;
+}
+
+.notification-preferences .section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: var(--dark-bg);
+    border-bottom: 1px solid #eaeaea;
+    padding-bottom: 10px;
+}
+
+.notification-preferences .form-check-input:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.notification-preferences .preview-card {
+    background-color: var(--light-bg);
+    border-left: 4px solid var(--primary-color);
+    padding: 15px;
+    margin-top: 20px;
+    display: none;
+}
+
+.notification-preferences .quiet-hours-badge {
+    background-color: var(--info-color);
+}
+
+.notification-preferences .time-input {
+    max-width: 100px;
+    display: inline-block;
+}
+
+.notification-preferences .toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+}
+
+.notification-preferences .toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.notification-preferences .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 24px;
+}
+
+.notification-preferences .slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+.notification-preferences input:checked + .slider {
+    background-color: var(--primary-color);
+}
+
+.notification-preferences input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+.notification-preferences .test-btn {
+    margin-top: 10px;
+}

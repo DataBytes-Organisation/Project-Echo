@@ -4,17 +4,27 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="10041674-e6c8-4c79-bb50-316e826bf443" name="Changes" comment="add markAllAsRead endpoint and method to notification service">
-      <change afterPath="$PROJECT_DIR$/src/Components/HMI/ui/public/admin/js/header.js" afterDir="false" />
+    <list default="true" id="10041674-e6c8-4c79-bb50-316e826bf443" name="Changes" comment="add notification management features with real-time updates and UI enhancements">
+      <change afterPath="$PROJECT_DIR$/src/Components/HMI/ui/public/admin/css/notification-preferences.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Components/HMI/ui/public/admin/js/notification-preferences.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Components/HMI/ui/public/admin/notification-preferences.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Components/HMI/utils/tokenUtils.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Components/MongoDB/init/notification-preferences-seed.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/model/donation.model.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/model/donation.model.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/model/notification.model.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/model/notification.model.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/public/admin/component/header-component.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/public/admin/component/header-component.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/public/admin/css/notifications.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/public/admin/css/notifications.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/model/user.model.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/model/user.model.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/public/admin/component/sidebar-component.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/public/admin/component/sidebar-component.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/public/admin/js/notifications.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/public/admin/js/notifications.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/public/admin/notifications.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/public/admin/notifications.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/public/admin/scss/layouts/_header.scss" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/public/admin/scss/layouts/_header.scss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/public/admin/template.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/public/admin/template.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/server.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/server.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/services/dispatchService.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/services/dispatchService.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Components/HMI/ui/services/notificationService.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/HMI/ui/services/notificationService.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/MongoDB/init/init-mongo.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/MongoDB/init/init-mongo.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -71,8 +81,10 @@
   </component>
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
+    &quot;Attach to Node.js/Chrome.Debug Echo HMI.executor&quot;: &quot;Debug&quot;,
     &quot;Attach to Node.js/Chrome.HMI Docker Debug.executor&quot;: &quot;Debug&quot;,
     &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;Docker.Echo HMI Debug.executor&quot;: &quot;Run&quot;,
     &quot;JavaScript Debug.login.html.executor&quot;: &quot;Debug&quot;,
     &quot;JavaScript Debug.notifications.html.executor&quot;: &quot;Run&quot;,
     &quot;Node.js.console.js.executor&quot;: &quot;Run&quot;,
@@ -85,7 +97,7 @@
     &quot;git-widget-placeholder&quot;: &quot;EHMI/lb/notification-backend&quot;,
     &quot;javascript.nodejs.core.library.configured.version&quot;: &quot;22.17.1&quot;,
     &quot;javascript.nodejs.core.library.typings.version&quot;: &quot;22.17.2&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/22396/PycharmProjects/temporaryEcho/yamnet/IntegrationModel.py&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Liam/WebstormProjects/Project-Echo/src/Components/HMI/ui&quot;,
     &quot;list.type.of.created.stylesheet&quot;: &quot;CSS&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
@@ -102,15 +114,31 @@
       <recent name="C:\Users\Liam\WebstormProjects\Project-Echo\src\Components\HMI\ui" />
     </key>
   </component>
-  <component name="RunManager" selected="Attach to Node.js/Chrome.HMI Docker Debug">
-    <configuration name="HMI Docker Debug" type="ChromiumRemoteDebugType" factoryName="Chromium Remote" port="9229">
+  <component name="RunManager" selected="Docker.Echo HMI Debug">
+    <configuration name="Debug Echo HMI" type="ChromiumRemoteDebugType" factoryName="Chromium Remote" port="9229" restartOnDisconnect="true">
+      <mapping url="http://localhost:9229" local-file="$PROJECT_DIR$/src/Components/HMI/ui" />
       <method v="2" />
     </configuration>
     <configuration name="console.js" type="NodeJSConfigurationType" temporary="true" nameIsGenerated="true" path-to-js-file="$APPLICATION_CONFIG_DIR$/consoles/db/19bc3dcb-9cd5-45a4-8fa9-56e5dcc4cffa/console.js" working-dir="$PROJECT_DIR$">
       <method v="2" />
     </configuration>
+    <configuration name="Echo HMI Debug" type="docker-deploy" factoryName="docker-compose.yml" server-name="Docker">
+      <deployment type="docker-compose.yml">
+        <settings>
+          <option name="envFilePath" value="" />
+          <option name="services">
+            <list>
+              <option value="echo_hmi" />
+            </list>
+          </option>
+          <option name="sourceFilePath" value="src/Components/docker-compose.yml" />
+        </settings>
+      </deployment>
+      <method v="2" />
+    </configuration>
     <list>
-      <item itemvalue="Attach to Node.js/Chrome.HMI Docker Debug" />
+      <item itemvalue="Attach to Node.js/Chrome.Debug Echo HMI" />
+      <item itemvalue="Docker.Echo HMI Debug" />
       <item itemvalue="Node.js.console.js" />
     </list>
     <recent_temporary>
@@ -146,7 +174,8 @@
       <workItem from="1757226008428" duration="15835000" />
       <workItem from="1757242058569" duration="14331000" />
       <workItem from="1757819823154" duration="1630000" />
-      <workItem from="1757823328486" duration="7258000" />
+      <workItem from="1757823328486" duration="12035000" />
+      <workItem from="1758348801994" duration="39712000" />
     </task>
     <task id="LOCAL-00001" summary="Add mark as read and delete notification functions.">
       <option name="closed" value="true" />
@@ -236,7 +265,15 @@
       <option name="project" value="LOCAL" />
       <updated>1757248636615</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="add notification management features with real-time updates and UI enhancements">
+      <option name="closed" value="true" />
+      <created>1757830967826</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1757830967826</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -317,7 +354,8 @@
     <MESSAGE value="correct real time notification implementation" />
     <MESSAGE value="refactor notification system with service architecture" />
     <MESSAGE value="add markAllAsRead endpoint and method to notification service" />
-    <option name="LAST_COMMIT_MESSAGE" value="add markAllAsRead endpoint and method to notification service" />
+    <MESSAGE value="add notification management features with real-time updates and UI enhancements" />
+    <option name="LAST_COMMIT_MESSAGE" value="add notification management features with real-time updates and UI enhancements" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -325,11 +363,6 @@
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/Components/API/app/middleware/auth_bearer.py</url>
           <option name="timeStamp" value="3" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/src/Components/HMI/ui/server.js</url>
-          <line>339</line>
-          <option name="timeStamp" value="4" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

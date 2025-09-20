@@ -25,12 +25,10 @@ $(document).ready(function() {
     // Connection status logging
     socket.on('connect', () => {
         console.log('Socket.IO connected with ID:', socket.id);
-        updateConnectionStatus(true);
     });
 
     socket.on('disconnect', (reason) => {
         console.log('Socket.IO disconnected:', reason);
-        updateConnectionStatus(false);
         if (reason === 'io server disconnect') {
             socket.connect();
         }
@@ -45,16 +43,18 @@ $(document).ready(function() {
     });
 
     let notifications = [];
+    let archivedNotifications = [];
     let unreadCount = 0;
     let currentTab = 'all'; // 'all', 'unread', 'archived'
 
     // DOM Elements
     const notificationList = $("#notification-list");
+    const unreadNotificationList = $("#unread-notification-list");
+    const archivedNotificationList = $("#archived-notification-list");
     const unreadBadge = $("#unread-badge");
     const markAllReadBtn = $("#mark-all-read");
     const loadMoreBtn = $("#load-more");
     const archiveAllBtn = $("#archive-all");
-    const connectionIndicator = $("#connection-indicator");
 
     // Tab elements
     const allTab = $("#all-tab");
@@ -69,13 +69,6 @@ $(document).ready(function() {
     loadNotifications();
     setupSocketListeners();
     setupEventHandlers();
-
-    function updateConnectionStatus(connected) {
-        connectionIndicator
-            .removeClass(connected ? 'disconnected' : 'connected')
-            .addClass(connected ? 'connected' : 'disconnected')
-            .text(connected ? 'Connected' : 'Disconnected');
-    }
 
     function loadNotifications(status = null) {
         if (isLoading) return;
@@ -97,15 +90,24 @@ $(document).ready(function() {
                 'Content-Type': 'application/json'
             },
             success: function(response) {
-                if (offset === 0) {
-                    notifications = response.notifications || [];
-                    renderNotifications();
+                if (status === 'archived') {
+                    if (offset === 0) {
+                        archivedNotifications = response.notifications || [];
+                    } else {
+                        archivedNotifications = archivedNotifications.concat(response.notifications || []);
+                    }
+                    renderArchivedNotifications();
                 } else {
-                    notifications = notifications.concat(response.notifications || []);
-                    appendNotifications(response.notifications || []);
+                    if (offset === 0) {
+                        notifications = response.notifications || [];
+                    } else {
+                        notifications = notifications.concat(response.notifications || []);
+                    }
+                    renderNotifications();
+                    updateUnreadCount();
                 }
+
                 offset += (response.notifications || []).length;
-                updateUnreadCount();
             },
             error: function(xhr) {
                 console.error('API Error:', xhr.responseText);
@@ -115,7 +117,8 @@ $(document).ready(function() {
                 isLoading = false;
                 loadMoreBtn.prop('disabled', false).html('Load More');
 
-                if (notifications.length > 0 && notifications.length % limit !== 0) {
+                const currentNotifications = status === 'archived' ? archivedNotifications : notifications;
+                if (currentNotifications.length > 0 && currentNotifications.length % limit !== 0) {
                     loadMoreBtn.hide();
                 } else {
                     loadMoreBtn.show();
@@ -148,6 +151,7 @@ $(document).ready(function() {
 
     function renderNotifications() {
         notificationList.empty();
+        unreadNotificationList.empty();
 
         if (notifications.length === 0) {
             notificationList.html(`
@@ -157,21 +161,49 @@ $(document).ready(function() {
                     <p>You're all caught up!</p>
                 </div>
             `);
+            unreadNotificationList.html(`
+                <div class="empty-notifications">
+                    <i class="far fa-bell-slash"></i>
+                    <h5>No unread notifications</h5>
+                    <p>You're all caught up!</p>
+                </div>
+            `);
             return;
         }
 
+        // Filter unread notifications
+        const unreadNotifications = notifications.filter(n => n.status === 'unread');
+
         notifications.forEach(notification => {
-            notificationList.append(createNotificationElement(notification));
+            notificationList.append(createNotificationElement(notification, false));
+        });
+
+        unreadNotifications.forEach(notification => {
+            unreadNotificationList.append(createNotificationElement(notification, false));
         });
     }
 
-    function appendNotifications(newNotifications) {
-        newNotifications.forEach(notification => {
-            notificationList.append(createNotificationElement(notification));
+    function renderArchivedNotifications() {
+        console.log('Rendering archived notifications:', archivedNotifications);
+        archivedNotificationList.empty();
+
+        if (archivedNotifications.length === 0) {
+            archivedNotificationList.html(`
+                <div class="empty-notifications">
+                    <i class="far fa-archive"></i>
+                    <h5>No archived notifications</h5>
+                    <p>Your archive is empty!</p>
+                </div>
+            `);
+            return;
+        }
+
+        archivedNotifications.forEach(notification => {
+            archivedNotificationList.append(createNotificationElement(notification, true));
         });
     }
 
-    function createNotificationElement(notification) {
+    function createNotificationElement(notification, isArchivedView = false) {
         const timeAgo = moment(notification.createdAt).fromNow();
         const isArchived = notification.status === 'archived';
 
@@ -218,18 +250,25 @@ $(document).ready(function() {
     }
 
     function setupSocketListeners() {
-        // Initial notifications
+        // Initial notifications (non-archived only)
         socket.on('initialNotifications', (initialNotifications) => {
-            notifications = initialNotifications;
+            // Filter out archived notifications from initial load
+            notifications = initialNotifications.filter(n => n.status !== 'archived');
             renderNotifications();
             updateUnreadCount();
         });
 
-        // New notification
+        // New notification (should never be archived initially)
         socket.on('newNotification', (newNotification) => {
             console.log('Received new notification:', newNotification);
             notifications.unshift(newNotification);
-            notificationList.prepend(createNotificationElement(newNotification));
+
+            if (currentTab === 'all') {
+                notificationList.prepend(createNotificationElement(newNotification, false));
+            } else if (currentTab === 'unread' && newNotification.status === 'unread') {
+                unreadNotificationList.prepend(createNotificationElement(newNotification, false));
+            }
+
             updateUnreadCount();
             showToastNotification(newNotification);
         });
@@ -239,37 +278,92 @@ $(document).ready(function() {
             const index = notifications.findIndex(n => n._id === updatedNotification._id);
             if (index !== -1) {
                 notifications[index] = updatedNotification;
-                $(`.notification-item[data-id="${updatedNotification._id}"]`)
-                    .removeClass('unread')
-                    .addClass('read')
-                    .find('.mark-read')
-                    .removeClass('btn-outline-primary')
-                    .addClass('btn-outline-secondary')
-                    .text('Read');
+
+                // Update UI based on current tab
+                if (currentTab === 'all') {
+                    $(`.notification-item[data-id="${updatedNotification._id}"]`)
+                        .replaceWith(createNotificationElement(updatedNotification, false));
+                } else if (currentTab === 'unread') {
+                    if (updatedNotification.status === 'unread') {
+                        $(`.notification-item[data-id="${updatedNotification._id}"]`)
+                            .replaceWith(createNotificationElement(updatedNotification, false));
+                    } else {
+                        $(`.notification-item[data-id="${updatedNotification._id}"]`).remove();
+                    }
+                }
+
                 updateUnreadCount();
             }
         });
 
         // Handle archive events
         socket.on('notificationArchived', (notificationId) => {
-            $(`.notification-item[data-id="${notificationId}"]`).remove();
-            updateUnreadCount();
+            // Remove from active notifications and add to archived
+            const archivedIndex = notifications.findIndex(n => n._id === notificationId);
+            if (archivedIndex !== -1) {
+                const archivedNotification = notifications[archivedIndex];
+                archivedNotification.status = 'archived';
+                archivedNotifications.unshift(archivedNotification);
+                notifications.splice(archivedIndex, 1);
+
+                // Update UI
+                $(`.notification-item[data-id="${notificationId}"]`).remove();
+
+                if (currentTab === 'archived') {
+                    archivedNotificationList.prepend(createNotificationElement(archivedNotification, true));
+                }
+
+                updateUnreadCount();
+            }
         });
 
         socket.on('allNotificationsArchived', () => {
+            // Move all non-archived notifications to archived
+            const toArchive = notifications.filter(n => n.status !== 'archived');
+            archivedNotifications = toArchive.concat(archivedNotifications);
+            notifications = notifications.filter(n => n.status === 'archived');
+
+            // Update UI
             notificationList.empty();
+            unreadNotificationList.empty();
             unreadCount = 0;
             unreadBadge.text(unreadCount).toggle(unreadCount > 0);
+
+            if (currentTab === 'archived') {
+                renderArchivedNotifications();
+            }
+
             showSuccessToast('All notifications archived');
         });
 
         socket.on('notificationRestored', (notification) => {
-            $(`.notification-item[data-id="${notification._id}"]`).remove();
+            // Remove from archived and add to active notifications
+            const archivedIndex = archivedNotifications.findIndex(n => n._id === notification._id);
+            if (archivedIndex !== -1) {
+                archivedNotifications.splice(archivedIndex, 1);
+                notifications.unshift(notification);
+
+                // Update UI
+                $(`.notification-item[data-id="${notification._id}"]`).remove();
+
+                if (currentTab === 'all') {
+                    notificationList.prepend(createNotificationElement(notification, false));
+                } else if (currentTab === 'unread' && notification.status === 'unread') {
+                    unreadNotificationList.prepend(createNotificationElement(notification, false));
+                }
+
+                updateUnreadCount();
+            }
+
             showSuccessToast('Notification restored');
         });
 
         socket.on('notificationDeleted', (notificationId) => {
+            // Remove from both arrays
             notifications = notifications.filter(n => n._id !== notificationId);
+            archivedNotifications = archivedNotifications.filter(n => n._id !== notificationId);
+
+            // Update UI
             $(`.notification-item[data-id="${notificationId}"]`).remove();
             updateUnreadCount();
         });
@@ -277,7 +371,7 @@ $(document).ready(function() {
 
     function setupEventHandlers() {
         // Mark as read
-        notificationList.on('click', '.mark-read', function() {
+        $(document).on('click', '.mark-read', function() {
             const notificationId = $(this).closest('.notification-item').data('id');
             socket.emit('markAsRead', notificationId);
         });
@@ -289,12 +383,27 @@ $(document).ready(function() {
                 method: 'PATCH',
                 headers: { 'Authorization': 'Bearer ' + token },
                 success: function() {
-                    notifications.forEach(n => n.status = 'read');
-                    $('.notification-item').removeClass('unread').addClass('read');
-                    $('.mark-read')
-                        .removeClass('btn-outline-primary')
-                        .addClass('btn-outline-secondary')
-                        .text('Read');
+                    notifications.forEach(n => {
+                        if (n.status === 'unread') {
+                            n.status = 'read';
+                        }
+                    });
+
+                    // Update UI
+                    $('.notification-item').each(function() {
+                        const id = $(this).data('id');
+                        const notification = notifications.find(n => n._id === id);
+                        if (notification && notification.status === 'read') {
+                            $(this)
+                                .removeClass('unread')
+                                .addClass('read')
+                                .find('.mark-read')
+                                .removeClass('btn-outline-primary')
+                                .addClass('btn-outline-secondary')
+                                .text('Read');
+                        }
+                    });
+
                     updateUnreadCount();
                     showSuccessToast('All notifications marked as read');
                 },
@@ -306,13 +415,13 @@ $(document).ready(function() {
         });
 
         // Archive notification
-        notificationList.on('click', '.archive-notification', function() {
+        $(document).on('click', '.archive-notification', function() {
             const notificationId = $(this).closest('.notification-item').data('id');
             archiveNotification(notificationId);
         });
 
         // Restore notification
-        notificationList.on('click', '.restore-notification', function() {
+        $(document).on('click', '.restore-notification', function() {
             const notificationId = $(this).closest('.notification-item').data('id');
             restoreNotification(notificationId);
         });
@@ -325,7 +434,7 @@ $(document).ready(function() {
         });
 
         // Delete notification
-        notificationList.on('click', '.delete-notification', function(e) {
+        $(document).on('click', '.delete-notification', function(e) {
             e.stopPropagation();
             const notificationId = $(this).closest('.notification-item').data('id');
             deleteNotification(notificationId);
@@ -333,26 +442,51 @@ $(document).ready(function() {
 
         // Load more
         loadMoreBtn.on('click', function() {
-            loadNotifications(currentTab === 'archived' ? 'archived' : null);
+            if (currentTab === 'archived') {
+                loadNotifications('archived');
+            } else if (currentTab === 'unread') {
+                loadNotifications('unread');
+            } else {
+                loadNotifications();
+            }
         });
 
         // Tab switching
         allTab.on('click', function() {
             currentTab = 'all';
             offset = 0;
+            // Show the correct tab content using Bootstrap
+            $('#all').addClass('show active');
+            $('#unread').removeClass('show active');
+            $('#archived').removeClass('show active');
+
+            // Load the correct data
             loadNotifications();
         });
 
         unreadTab.on('click', function() {
             currentTab = 'unread';
             offset = 0;
+            // Show the correct tab content using Bootstrap
+            $('#unread').addClass('show active');
+            $('#all').removeClass('show active');
+            $('#archived').removeClass('show active');
+
+            // Load unread notifications
             loadNotifications('unread');
         });
 
         archivedTab.on('click', function() {
             currentTab = 'archived';
             offset = 0;
+            // Show the correct tab content using Bootstrap
+            $('#archived').addClass('show active');
+            $('#all').removeClass('show active');
+            $('#unread').removeClass('show active');
+
+            // Load archived notifications
             loadNotifications('archived');
+            console.log('Switched to archived tab, loading data...');
         });
     }
 
@@ -362,9 +496,8 @@ $(document).ready(function() {
             method: 'PATCH',
             headers: { 'Authorization': 'Bearer ' + token },
             success: function(response) {
-                $(`.notification-item[data-id="${notificationId}"]`).remove();
+                // Socket will handle the UI update via notificationArchived event
                 showSuccessToast('Notification archived');
-                updateUnreadCount();
             },
             error: function(xhr) {
                 console.error('Archive error:', xhr.responseText);
@@ -379,9 +512,7 @@ $(document).ready(function() {
             method: 'PATCH',
             headers: { 'Authorization': 'Bearer ' + token },
             success: function(response) {
-                notificationList.empty();
-                unreadCount = 0;
-                unreadBadge.text(unreadCount).toggle(unreadCount > 0);
+                // Socket will handle the UI update via allNotificationsArchived event
                 showSuccessToast(`Archived ${response.archivedCount} notifications`);
             },
             error: function(xhr) {
@@ -397,7 +528,7 @@ $(document).ready(function() {
             method: 'PATCH',
             headers: { 'Authorization': 'Bearer ' + token },
             success: function(response) {
-                $(`.notification-item[data-id="${notificationId}"]`).remove();
+                // Socket will handle the UI update via notificationRestored event
                 showSuccessToast('Notification restored');
             },
             error: function(xhr) {
@@ -415,9 +546,7 @@ $(document).ready(function() {
             method: 'DELETE',
             headers: { 'Authorization': 'Bearer ' + token },
             success: function() {
-                notifications = notifications.filter(n => n._id !== notificationId);
-                $(`.notification-item[data-id="${notificationId}"]`).remove();
-                updateUnreadCount();
+                // Socket will handle the UI update via notificationDeleted event
                 showSuccessToast('Notification deleted');
             },
             error: function(xhr) {
@@ -441,4 +570,9 @@ $(document).ready(function() {
             }
         }).showToast();
     }
+
+    // Initialize tab visibility
+    $('.tab-pane').removeClass('show active');
+    $('#all').addClass('show active');
+    notificationList.parent().show();
 });

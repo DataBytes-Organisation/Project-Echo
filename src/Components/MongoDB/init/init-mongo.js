@@ -20,9 +20,13 @@ apidb.createCollection("microphones");
 apidb.createCollection("movements");
 apidb.createCollection("species");
 apidb.createCollection("nodes");
+apidb.createCollection("UserNotificationPreference");
+
 
 //const eventsData = JSON.parse(cat('/docker-entrypoint-initdb.d/events.json'));
 //db.events.insertMany(eventsData);
+const notificationPreferencesData = JSON.parse(cat('/docker-entrypoint-initdb.d/notification-preferences-seed.json'));
+apidb.UserNotificationPreference.insertMany(notificationPreferencesData);
 
 const microphonesData = JSON.parse(cat('/docker-entrypoint-initdb.d/microphones.json'));
 apidb.microphones.insertMany(microphonesData);

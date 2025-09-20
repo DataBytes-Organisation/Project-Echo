@@ -18,12 +18,13 @@ const mongoose = require('mongoose');
 const { Server } = require('socket.io');
 const http = require('http');
 const webpush = require('web-push');
+const bodyParser = require('body-parser');
+const JWT_SECRET = process.env.JWT_SECRET || crypto.randomBytes(64).toString('hex');
 const { User } = require('./model/user.model');
 const { Notification, UserNotificationPreference } = require('./model/notification.model');
-const bodyParser = require('body-parser');
 const Donation = require('./model/donation.model');
 const notificationService = require('./services/notificationService');
-const JWT_SECRET = process.env.JWT_SECRET || crypto.randomBytes(64).toString('hex');
+const dispatchService = require('./services/dispatchService');
 
 // Initialize HTTP server for Socket.io
 const server = http.createServer(app);
@@ -133,53 +134,30 @@ io.on('connection', (socket) => {
 // Helper function to send pending notifications
 async function sendPendingNotifications(userId) {
   try {
+    // Get user preferences first
+    const preferences = await UserNotificationPreference.findOne({ userId }) ||
+        new UserNotificationPreference({ userId });
+
     const notifications = await Notification.find({
       userId,
     }).sort({ createdAt: -1 }).limit(50);
 
-    if (notifications.length > 0) {
+    // Filter notifications based on user preferences
+    const filteredNotifications = notifications.filter(notification => {
+      const typeEnabled = preferences.preferences.types[notification.type];
+      return typeEnabled !== false; // Only show if explicitly enabled or undefined
+    });
+
+    if (filteredNotifications.length > 0) {
       const socketId = connectedUsers.get(userId);
       if (socketId) {
-        io.to(socketId).emit('initialNotifications', notifications);
+        io.to(socketId).emit('initialNotifications', filteredNotifications);
       }
     }
   } catch (error) {
     console.error('Error sending pending notifications:', error);
   }
 }
-
-app.get('/api/notification-preferences', async (req, res) => {
-  try {
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) return res.status(401).json({ error: 'Unauthorized' });
-
-    const decoded = jwt.verify(token, JWT_SECRET);
-    const preferences = await UserNotificationPreference.findOne({ userId: decoded.id }) ||
-        new UserNotificationPreference({ userId: decoded.id });
-
-    res.json(preferences);
-  } catch (error) {
-    res.status(500).json({ error: 'Error fetching preferences' });
-  }
-});
-
-app.put('/api/notification-preferences', async (req, res) => {
-  try {
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) return res.status(401).json({ error: 'Unauthorized' });
-
-    const decoded = jwt.verify(token, JWT_SECRET);
-    const preferences = await UserNotificationPreference.findOneAndUpdate(
-        { userId: decoded.id },
-        req.body,
-        { new: true, upsert: true }
-    );
-
-    res.json(preferences);
-  } catch (error) {
-    res.status(500).json({ error: 'Error updating preferences' });
-  }
-});
 
 const storeItems = new Map([[
   1, { priceInCents: 100, name: "donation"}
@@ -588,14 +566,37 @@ app.get('/api/notifications', async (req, res) => {
 
     const decoded = jwt.verify(token, JWT_SECRET);
 
+    // Get user preferences
+    const preferences = await UserNotificationPreference.findOne({ userId: decoded.id }) ||
+        new UserNotificationPreference({ userId: decoded.id });
+
     const limit = Math.min(parseInt(req.query.limit) || 20, 100);
     const offset = parseInt(req.query.offset) || 0;
+    const status = req.query.status;
 
-    const notifications = await notificationService.getUserNotifications(
-        decoded.id,
-        limit,
-        offset
-    );
+    let query = { userId: decoded.id };
+
+    // For the main notifications endpoint, exclude archived notifications
+    if (!status || status !== 'archived') {
+      query.status = { $ne: 'archived' };
+    }
+
+    // If a specific status is requested, use it
+    if (status && status !== 'archived') {
+      query.status = status;
+    }
+
+    // Get all notifications first
+    let notifications = await Notification.find(query)
+        .sort({ createdAt: -1 })
+        .skip(offset)
+        .limit(limit);
+
+    // Filter out notifications where the type is disabled in user preferences
+    notifications = notifications.filter(notification => {
+      const typeEnabled = preferences.preferences.types[notification.type];
+      return typeEnabled !== false; // Only show if explicitly enabled or undefined
+    });
 
     res.json({ notifications });
   } catch (error) {
@@ -685,12 +686,23 @@ app.get('/api/notifications/unread-count', async (req, res) => {
 
     const decoded = jwt.verify(token, JWT_SECRET);
 
-    const count = await Notification.countDocuments({
+    // Get user preferences
+    const preferences = await UserNotificationPreference.findOne({ userId: decoded.id }) ||
+        new UserNotificationPreference({ userId: decoded.id });
+
+    // Get all unread notifications first
+    const allUnreadNotifications = await Notification.find({
       userId: decoded.id,
       status: 'unread'
     });
 
-    res.json({ count });
+    // Filter out notifications where the type is disabled in user preferences
+    const filteredUnreadNotifications = allUnreadNotifications.filter(notification => {
+      const typeEnabled = preferences.preferences.types[notification.type];
+      return typeEnabled !== false; // Only show if explicitly enabled or undefined
+    });
+
+    res.json({ count: filteredUnreadNotifications.length });
   } catch (error) {
     console.error('Error fetching unread count:', error);
     res.status(500).json({ error: 'Error fetching notification count' });
@@ -755,14 +767,25 @@ app.get('/api/notifications/archived', async (req, res) => {
     if (!token) return res.status(401).json({ error: 'Unauthorized' });
 
     const decoded = jwt.verify(token, JWT_SECRET);
+
+    // Get user preferences
+    const preferences = await UserNotificationPreference.findOne({ userId: decoded.id }) ||
+        new UserNotificationPreference({ userId: decoded.id });
+
     const limit = Math.min(parseInt(req.query.limit) || 20, 100);
     const offset = parseInt(req.query.offset) || 0;
 
-    const notifications = await notificationService.getArchivedNotifications(
+    let notifications = await notificationService.getArchivedNotifications(
         decoded.id,
         limit,
         offset
     );
+
+    // Filter out notifications where the type is disabled in user preferences
+    notifications = notifications.filter(notification => {
+      const typeEnabled = preferences.preferences.types[notification.type];
+      return typeEnabled !== false; // Only show if explicitly enabled or undefined
+    });
 
     res.json({ notifications });
   } catch (error) {
@@ -797,6 +820,79 @@ app.patch('/api/notifications/:id/restore', async (req, res) => {
   } catch (error) {
     console.error('Error restoring notification:', error);
     res.status(500).json({ error: 'Error restoring notification' });
+  }
+});
+
+// Get notification preferences
+app.get('/api/notification-preferences', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) return res.status(401).json({ error: 'Unauthorized' });
+
+    const decoded = jwt.verify(token, JWT_SECRET);
+
+    // First check Redis cache
+    const cachedPreferences = await client.get(`preferences:${decoded.id}`);
+    if (cachedPreferences) {
+      return res.json(JSON.parse(cachedPreferences));
+    }
+
+    // Use Mongoose model (connected to EchoNet)
+    const preferences = await UserNotificationPreference.findOne({ userId: decoded.id });
+
+    if (!preferences) {
+      // Create default preferences if not found
+      const defaultPreferences = new UserNotificationPreference({
+        userId: decoded.id,
+        preferences: {
+          channels: { inApp: true, email: false, push: false },
+          types: { system: true, donation: true, request: true, user: false },
+          doNotDisturb: { enabled: false, startTime: '22:00', endTime: '07:00', days: [0, 1, 2, 3, 4, 5, 6] }
+        }
+      });
+
+      await defaultPreferences.save();
+      await client.setEx(`preferences:${decoded.id}`, 3600, JSON.stringify(defaultPreferences));
+      return res.json(defaultPreferences);
+    }
+
+    // Cache in Redis for future requests
+    await client.setEx(`preferences:${decoded.id}`, 3600, JSON.stringify(preferences));
+    res.json(preferences);
+  } catch (error) {
+    console.error('Error fetching preferences:', error);
+    res.status(500).json({ error: 'Error fetching preferences' });
+  }
+});
+
+app.put('/api/notification-preferences', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) return res.status(401).json({ error: 'Unauthorized' });
+
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const { channels, types, doNotDisturb } = req.body;
+
+    // Use Mongoose model (connected to EchoNet)
+    const preferences = await UserNotificationPreference.findOneAndUpdate(
+        { userId: decoded.id },
+        {
+          preferences: { channels, types, doNotDisturb }
+        },
+        {
+          new: true,
+          upsert: true,
+          runValidators: true
+        }
+    );
+
+    // Update Redis cache
+    await client.setEx(`preferences:${decoded.id}`, 3600, JSON.stringify(preferences));
+
+    res.json(preferences);
+  } catch (error) {
+    console.error('Error updating notification preferences:', error);
+    res.status(500).json({ error: 'Error updating preferences' });
   }
 });
 
@@ -892,6 +988,10 @@ app.get("/admin-donations", (req, res) => {
 
 app.get("/admin-notifications", (req, res) => {
   res.sendFile(path.join(__dirname, 'public/admin/notifications.html'));
+});
+
+app.get("/notification-preferences", (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/admin/notification-preferences.html'));
 });
 
 app.get("/login", (req, res) => {

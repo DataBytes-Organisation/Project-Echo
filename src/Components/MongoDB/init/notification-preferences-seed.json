@@ -1,0 +1,18 @@
+[
+  {
+    "userId": "64bf20397e048a9822077b74",
+    "preferences": {
+      "channels": { "inApp": true, "email": true, "push": false },
+      "types": { "system": true, "donation": true, "request": false, "user": false },
+      "doNotDisturb": { "enabled": false, "startTime": "22:00", "endTime": "07:00", "days": [0, 1, 2, 3, 4, 5, 6] }
+    }
+  },
+  {
+    "userId": "64bf206f7e048a9822077b7a",
+    "preferences": {
+      "channels": { "inApp": true, "email": false, "push": true },
+      "types": { "system": true, "donation": false, "request": true, "user": false },
+      "doNotDisturb": { "enabled": false, "startTime": "22:00", "endTime": "07:00", "days": [0, 1, 2, 3, 4, 5, 6] }
+    }
+  }
+]
