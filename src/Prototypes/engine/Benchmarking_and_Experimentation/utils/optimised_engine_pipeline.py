@@ -51,16 +51,44 @@ def build_model(
     if backbone_class is None:
         raise ValueError(f"Unsupported model: {model_name}")
 
-    backbone = backbone_class(
-        include_top=False,
-        weights="imagenet",
-        input_shape=(h, w, c),
-        pooling="avg"
+ # For brevity, create a dummy dataset. # Actual data loading has now been implemented. This is a deprecated function.
+def create_dummy_dataset(num_samples=100, num_classes=3):
+    images = tf.random.uniform(
+        (num_samples, SC['MODEL_INPUT_IMAGE_HEIGHT'], SC['MODEL_INPUT_IMAGE_WIDTH'], SC['MODEL_INPUT_IMAGE_CHANNELS'])
     )
     backbone.trainable = True
     y = backbone(x, training=False)
 
-    y = tf.keras.layers.BatchNormalization(name="post_backbone_bn")(y)
+
+def build_model(model_name="EfficientNetV2B0", num_classes=3, l2_regularization=False, l2_coefficient=0.001):
+
+    """Builds a TensorFlow Keras model with optional L2 regularisation.
+
+    This function constructs a Keras Sequential model for image classification, using
+    pre-trained feature extractors from TensorFlow Hub. It allows for customisation of the
+    model architecture, including the choice of feature extractor, the number of dense layers,
+    dropout rate, and the application of L2 regularisation.
+
+    Args:
+        model_name (str, optional): Name of the model architecture to use. This name must
+            correspond to a key in the `MODELS` dictionary defined in `config/model_configs.py`.
+            Defaults to "EfficientNetV2B0".
+        num_classes (int, optional): Number of output classes for the classification task.
+            Defaults to 3.
+        l2_regularization (bool, optional): Whether to apply L2 regularisation to the dense layers.
+            Defaults to False.
+        l2_coefficient (float, optional): The L2 regularisation coefficient. This value is used
+            only if `l2_regularization` is True. Defaults to 0.001.
+
+    Returns:
+        tf.keras.Model: A compiled TensorFlow Keras model.
+
+    Raises:
+        ValueError: If the input dimensions specified in the system configuration (`SC`) do not
+            match the expected input dimensions for the selected model, as defined in the
+            `MODELS` dictionary. This ensures that the data pipeline handles image resizing
+            appropriately.
+    """
     
     reg = tf.keras.regularizers.l2(l2_coefficient) if l2_regularization else None
     if use_classifier_head:
@@ -74,7 +102,47 @@ def build_model(
     else:
         outputs = y
 
-    return tf.keras.Model(inputs=inputs, outputs=outputs, name=f"{model_name}_clf")
+    # Get the expected input shape for this model from config; default to system config if not provided.
+    expected_input_shape = config.get("expected_input_shape", (
+        SC['MODEL_INPUT_IMAGE_HEIGHT'],
+        SC['MODEL_INPUT_IMAGE_WIDTH'],
+        SC['MODEL_INPUT_IMAGE_CHANNELS']
+    ))
+    expected_height, expected_width, expected_channels = expected_input_shape
+
+    print(f"Building model: {model_name} with expected input shape: {expected_input_shape}")
+    layers = [
+        tf.keras.layers.InputLayer(input_shape=(
+            expected_height,
+            expected_width,
+            expected_channels
+        ))
+    ]
+    
+    # Check if the input dimensions match the expected dimensions
+    # if the input dimensions do not match, raise an error 
+    # I think this is not needed as the data pipeline should resize the images to the expected dimensions.   
+    # if (SC['MODEL_INPUT_IMAGE_HEIGHT'], SC['MODEL_INPUT_IMAGE_WIDTH']) != (expected_height, expected_width):
+    #    raise ValueError(f"System config input dimensions ({SC['MODEL_INPUT_IMAGE_HEIGHT']}, {SC['MODEL_INPUT_IMAGE_WIDTH']}) do not match expected input dimensions ({expected_height}, {expected_width}).  The data pipeline must resize the images.")
+        
+    # Add normalisation layer
+    layers.extend([
+        hub.KerasLayer(hub_url, trainable=trainable),
+        tf.keras.layers.Flatten(),
+        tf.keras.layers.BatchNormalization(),
+    ])
+
+    reg = regularizers.l2(l2_coefficient) if l2_regularization else None
+
+    for mult in dense_layers:
+        layers.append(tf.keras.layers.Dense(num_classes * mult, activation="relu", kernel_regularizer=reg))
+        layers.append(tf.keras.layers.BatchNormalization())
+
+    layers.append(tf.keras.layers.Dropout(dropout))
+    layers.append(tf.keras.layers.Dense(num_classes, activation=None, kernel_regularizer=reg))
+    
+    model = tf.keras.Sequential(layers)
+    return model
 
 
 def train_model(
@@ -93,12 +161,30 @@ def train_model(
 
     SC["CLASSIFIER_BATCH_SIZE"] = batch_size
 
-    ds_tuple = create_datasets(audio_dir)
-    if len(ds_tuple) == 4:
-        train_ds_init, val_ds_init, test_ds_init, class_names = ds_tuple
-    else:
-        train_ds_init, val_ds_init, class_names = ds_tuple
-        test_ds_init = None
+    Args:
+        model_name (str, optional): Name of the model architecture to use. Defaults to "EfficientNetV2B0".
+        epochs (int, optional): Number of training epochs. Overrides SC['MAX_EPOCHS'] if provided. Defaults to None.
+        batch_size (int, optional): Batch size for training. Overrides SC['CLASSIFIER_BATCH_SIZE'] if provided. Defaults to None.
+        l2_regularization (bool, optional): Whether to apply L2 regularisation. Defaults to False.
+        l2_coefficient (float, optional): The L2 regularisation coefficient. Defaults to 0.001.
+
+    Returns:
+        tuple: A tuple containing the trained model and the training history.
+            - model (tf.keras.Model): The trained TensorFlow Keras model.
+            - history (tf.keras.callbacks.History): The training history object.
+    
+    # Check if the model name is valid
+    if model_name not in MODELS:
+        raise ValueError(f"Model name '{model_name}' not found in model_configs.py. Available models are: {list(MODELS.keys())}")
+
+    if epochs is not None:
+        SC['MAX_EPOCHS'] = epochs
+
+    if batch_size is not None:
+        SC['CLASSIFIER_BATCH_SIZE'] = batch_size
+
+    # Create initial datasets (paths and labels)
+    train_ds_init, val_ds_init, test_ds_init, class_names = create_datasets(SC['AUDIO_DATA_DIRECTORY'])
     num_classes = len(class_names)
 
     model = build_model(
@@ -140,6 +226,48 @@ def train_model(
             tf.keras.callbacks.TensorBoard(log_dir=os.path.join(SC.get("OUTPUT_DIRECTORY", "."), "logs"))
         ]
 
+    lr_reduce_plateau = ReduceLROnPlateau(
+        monitor='val_loss',
+        factor=0.75,
+        patience=8,
+        verbose=1,
+        mode='min',
+        min_lr=1e-7
+    )
+
+    early_stopping = EarlyStopping(
+        monitor="val_loss",
+        patience=32,  # Allow for multiple LR reductions (4x lr patience)
+        verbose=1,
+        mode="min",
+        restore_best_weights=True,
+    )
+
+    # Ensure models directory exists
+    models_dir = "models"
+    os.makedirs(models_dir, exist_ok=True)
+    
+    # Create timestamp for unique model naming
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    checkpoint_filename = f"checkpoint_{model_name}_{timestamp}.hdf5"
+    checkpoint_path = os.path.join(models_dir, checkpoint_filename)
+    
+    mcp_save = ModelCheckpoint(
+        checkpoint_path,
+        save_best_only=True,  # Save only the best model
+        monitor='val_loss',
+        mode='min',
+        verbose=1
+    )
+
+    callbacks = [
+        lr_reduce_plateau, early_stopping, tensorboard_callback, mcp_save
+    ]
+
+    # Start training timer
+    start_time = time.time()
+
+    print(f"Starting training for model: {model_name}")
     history = model.fit(
         train_ds,
         validation_data=val_ds,
