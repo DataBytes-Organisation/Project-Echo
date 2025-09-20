@@ -1,5 +1,5 @@
 defaults:
-  - model: efficientnet_v2_qat
+  - model: ghost_efficientnet_v2
   - teacher_model: efficientnet_v2_qat
   - _self_
 
