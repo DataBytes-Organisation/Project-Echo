@@ -46,7 +46,7 @@ class Trainer:
 				m=self.cfg.training.circle.m
 			).to(self.device)
 
-		self.distillation = self.cfg.distillation.enabled
+		self.distillation = self.cfg.training.distillation.enabled
 		self.teacher_model_path = self.cfg.training.distillation.teacher_model_path
 		self.distillation_alpha = self.cfg.training.distillation.alpha
 		self.distillation_temperature = self.cfg.training.distillation.temperature
