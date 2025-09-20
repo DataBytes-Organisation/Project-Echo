@@ -189,6 +189,9 @@ class Trainer:
 				inputs, labels = inputs.to(self.device), labels.to(self.device)
 				with autocast(self.device.type, enabled=self.use_amp):
 					outputs = self.model(inputs)
+					if self.metric_loss_module is not None:
+						outputs = self.metric_loss_module(outputs, labels)
+
 					loss = self.criterion(outputs, labels)
 
 				running_loss += loss.item() * inputs.size(0)
