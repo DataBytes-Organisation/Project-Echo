@@ -1,49 +1,73 @@
+# utils/optimised_engine_pipeline.py
+# -*- coding: utf-8 -*-
+from __future__ import annotations
+import os, time, json
+from typing import Tuple
 import tensorflow as tf
-import tensorflow_hub as hub
-from tensorflow.keras import regularizers
-from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau, TensorBoard
-import numpy as np
-import os
-from pathlib import Path
-import librosa
-import matplotlib.pyplot as plt
-import warnings
-import sys
-import time
-import datetime
+
+from config.system_config import SC
+from config.model_configs import MODELS
+from utils.data_pipeline import create_datasets
+try:
+    from utils.data_pipeline import build_datasets
+    _HAS_BUILD_PIPELINES = True
+except Exception:
+    _HAS_BUILD_PIPELINES = False
 
 
-warnings.filterwarnings("ignore")
+def build_model(
+    model_name: str,
+    num_classes: int,
+    l2_regularization: bool = False,
+    l2_coefficient: float = 1e-4,
+    use_classifier_head: bool = True,
+    dropout: float = 0.5
+) -> tf.keras.Model:
+    h = int(SC.get("MODEL_INPUT_IMAGE_HEIGHT", 224))
+    w = int(SC.get("MODEL_INPUT_IMAGE_WIDTH", 224))
+    c = int(SC.get("MODEL_INPUT_IMAGE_CHANNELS", 3))
+    inputs = tf.keras.Input(shape=(h, w, c), dtype=tf.float32, name="input")
 
-# Add the parent directory so the config module can be found
-current_dir = os.path.dirname(os.path.abspath(__file__))
-parent_dir = os.path.join(current_dir, "..")
-if parent_dir not in sys.path:
-    sys.path.insert(0, parent_dir)
+    preprocess_map = {
+        "MobileNetV2": tf.keras.applications.mobilenet_v2.preprocess_input,
+        "MobileNetV3Small": tf.keras.applications.mobilenet_v3.preprocess_input,
+        "MobileNetV3Large": tf.keras.applications.mobilenet_v3.preprocess_input,
+        "EfficientNetV2B0": tf.keras.applications.efficientnet_v2.preprocess_input,
+        "ResNet50V2": tf.keras.applications.resnet_v2.preprocess_input,
+        "InceptionV3": tf.keras.applications.inception_v3.preprocess_input,
+    }
+    preprocess_fn = preprocess_map.get(model_name, lambda x: x)
+    x = preprocess_fn(inputs)
 
-from config.system_config import SC  # Import system settings
-from config.model_configs import MODELS  # Import model configurations
-from utils.data_pipeline import create_datasets, build_datasets   # Import dataset creation function
+    backbone_map = {
+        "MobileNetV2": tf.keras.applications.MobileNetV2,
+        "MobileNetV3Small": tf.keras.applications.MobileNetV3Small,
+        "MobileNetV3Large": tf.keras.applications.MobileNetV3Large,
+        "EfficientNetV2B0": tf.keras.applications.EfficientNetV2B0,
+        "ResNet50V2": tf.keras.applications.ResNet50V2,
+        "InceptionV3": tf.keras.applications.InceptionV3,
+    }
+    backbone_class = backbone_map.get(model_name)
+    if backbone_class is None:
+        raise ValueError(f"Unsupported model: {model_name}")
 
-# For brevity, create a dummy dataset. # Actual data loading has now been implemented. This is a depreciated function.
+ # For brevity, create a dummy dataset. # Actual data loading has now been implemented. This is a deprecated function.
 def create_dummy_dataset(num_samples=100, num_classes=3):
     images = tf.random.uniform(
         (num_samples, SC['MODEL_INPUT_IMAGE_HEIGHT'], SC['MODEL_INPUT_IMAGE_WIDTH'], SC['MODEL_INPUT_IMAGE_CHANNELS'])
     )
-    labels = tf.keras.utils.to_categorical(np.random.randint(0, num_classes, num_samples), num_classes)
-    dataset = tf.data.Dataset.from_tensor_slices((images, labels))
-    dataset = dataset.batch(SC['CLASSIFIER_BATCH_SIZE'])
-    return dataset
+    backbone.trainable = True
+    y = backbone(x, training=False)
 
 
 def build_model(model_name="EfficientNetV2B0", num_classes=3, l2_regularization=False, l2_coefficient=0.001):
 
-    """Builds a TensorFlow Keras model with optional L2 regularization.
+    """Builds a TensorFlow Keras model with optional L2 regularisation.
 
-    This function constructs a Keras Sequential model for image classification, leveraging
-    pre-trained feature extractors from TensorFlow Hub. It allows for customization of the
+    This function constructs a Keras Sequential model for image classification, using
+    pre-trained feature extractors from TensorFlow Hub. It allows for customisation of the
     model architecture, including the choice of feature extractor, the number of dense layers,
-    dropout rate, and the application of L2 regularization.
+    dropout rate, and the application of L2 regularisation.
 
     Args:
         model_name (str, optional): Name of the model architecture to use. This name must
@@ -51,9 +75,9 @@ def build_model(model_name="EfficientNetV2B0", num_classes=3, l2_regularization=
             Defaults to "EfficientNetV2B0".
         num_classes (int, optional): Number of output classes for the classification task.
             Defaults to 3.
-        l2_regularization (bool, optional): Whether to apply L2 regularization to the dense layers.
+        l2_regularization (bool, optional): Whether to apply L2 regularisation to the dense layers.
             Defaults to False.
-        l2_coefficient (float, optional): The L2 regularization coefficient. This value is used
+        l2_coefficient (float, optional): The L2 regularisation coefficient. This value is used
             only if `l2_regularization` is True. Defaults to 0.001.
 
     Returns:
@@ -66,12 +90,17 @@ def build_model(model_name="EfficientNetV2B0", num_classes=3, l2_regularization=
             appropriately.
     """
     
-    config = MODELS.get(model_name, {})
-    print(f"Model configuration: {config}")
-    hub_url = config.get("hub_url", "https://tfhub.dev/google/imagenet/efficientnet_v2_imagenet1k_b0/classification/2")
-    trainable = config.get("trainable", True)
-    dense_layers = config.get("dense_layers", [8, 4])
-    dropout = config.get("dropout", 0.5)
+    reg = tf.keras.regularizers.l2(l2_coefficient) if l2_regularization else None
+    if use_classifier_head:
+        y = tf.keras.layers.Dropout(dropout, name="head_dropout")(y)
+        outputs = tf.keras.layers.Dense(
+            num_classes,
+            activation="softmax",
+            kernel_regularizer=reg,
+            name="classifier"
+        )(y)
+    else:
+        outputs = y
 
     # Get the expected input shape for this model from config; default to system config if not provided.
     expected_input_shape = config.get("expected_input_shape", (
@@ -96,7 +125,7 @@ def build_model(model_name="EfficientNetV2B0", num_classes=3, l2_regularization=
     # if (SC['MODEL_INPUT_IMAGE_HEIGHT'], SC['MODEL_INPUT_IMAGE_WIDTH']) != (expected_height, expected_width):
     #    raise ValueError(f"System config input dimensions ({SC['MODEL_INPUT_IMAGE_HEIGHT']}, {SC['MODEL_INPUT_IMAGE_WIDTH']}) do not match expected input dimensions ({expected_height}, {expected_width}).  The data pipeline must resize the images.")
         
-    # Add normalization layer
+    # Add normalisation layer
     layers.extend([
         hub.KerasLayer(hub_url, trainable=trainable),
         tf.keras.layers.Flatten(),
@@ -116,22 +145,34 @@ def build_model(model_name="EfficientNetV2B0", num_classes=3, l2_regularization=
     return model
 
 
+def train_model(
+    model_name: str,
+    epochs: int = 2,
+    batch_size: int = 16,
+    l2_regularization: bool = False,
+    l2_coefficient: float = 1e-4,
+    use_classifier_head: bool = True,
+    dropout: float = 0.5,
+    use_callbacks: bool = True
+):
+    audio_dir = SC.get("AUDIO_DATA_DIRECTORY")
+    if not audio_dir or not os.path.isdir(audio_dir):
+        raise ValueError(f"Directory does not exist: {audio_dir}")
 
-def train_model(model_name="EfficientNetV2B0", epochs=None, batch_size=None, l2_regularization=False, l2_coefficient=0.001):
-    """Trains a specified model using datasets created by the data pipeline.
+    SC["CLASSIFIER_BATCH_SIZE"] = batch_size
 
     Args:
         model_name (str, optional): Name of the model architecture to use. Defaults to "EfficientNetV2B0".
         epochs (int, optional): Number of training epochs. Overrides SC['MAX_EPOCHS'] if provided. Defaults to None.
         batch_size (int, optional): Batch size for training. Overrides SC['CLASSIFIER_BATCH_SIZE'] if provided. Defaults to None.
-        l2_regularization (bool, optional): Whether to apply L2 regularization. Defaults to False.
-        l2_coefficient (float, optional): The L2 regularization coefficient. Defaults to 0.001.
+        l2_regularization (bool, optional): Whether to apply L2 regularisation. Defaults to False.
+        l2_coefficient (float, optional): The L2 regularisation coefficient. Defaults to 0.001.
 
     Returns:
         tuple: A tuple containing the trained model and the training history.
             - model (tf.keras.Model): The trained TensorFlow Keras model.
             - history (tf.keras.callbacks.History): The training history object.
-    """
+    
     # Check if the model name is valid
     if model_name not in MODELS:
         raise ValueError(f"Model name '{model_name}' not found in model_configs.py. Available models are: {list(MODELS.keys())}")
@@ -146,33 +187,44 @@ def train_model(model_name="EfficientNetV2B0", epochs=None, batch_size=None, l2_
     train_ds_init, val_ds_init, test_ds_init, class_names = create_datasets(SC['AUDIO_DATA_DIRECTORY'])
     num_classes = len(class_names)
 
-    # Build the full data pipelines using build_datasets from data_pipeline.py
-    train_dataset, validation_dataset, test_dataset = build_datasets(
-        train_ds_init, val_ds_init, test_ds_init, class_names, model_name=model_name
-    )
-
-    # Build the model
     model = build_model(
-        model_name,
+        model_name=model_name,
         num_classes=num_classes,
         l2_regularization=l2_regularization,
-        l2_coefficient=l2_coefficient
+        l2_coefficient=l2_coefficient,
+        use_classifier_head=use_classifier_head,
+        dropout=dropout
     )
 
-    # Set the learning rate from the model config
-    learning_rate = MODELS.get(model_name, {}).get("learning_rate", 1e-4)
-    optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
+    if _HAS_BUILD_PIPELINES:
+        train_ds, val_ds, test_ds = build_datasets(
+            train_ds_init, val_ds_init, test_ds_init, class_names, model_name=model_name
+        )
+    else:
+        AUTOTUNE = tf.data.AUTOTUNE
+        train_ds = train_ds_init.batch(batch_size).prefetch(AUTOTUNE)
+        val_ds = val_ds_init.batch(batch_size).prefetch(AUTOTUNE)
+        test_ds = None if test_ds_init is None else test_ds_init.batch(batch_size).prefetch(AUTOTUNE)
 
-    # Compile the model
+    loss_fn = "categorical_crossentropy"
+    sample_batch = next(iter(train_ds.take(1)))
+    if len(sample_batch[1].shape) == 1:
+        loss_fn = "sparse_categorical_crossentropy"
+
+    lr = float(MODELS.get(model_name, {}).get("learning_rate", 1e-4))
     model.compile(
-        optimizer=optimizer,
-        loss=tf.keras.losses.CategoricalCrossentropy(from_logits=True),
-        metrics=['accuracy']
+        optimizer=tf.keras.optimizers.Adam(learning_rate=lr),
+        loss=loss_fn,
+        metrics=["accuracy"],
     )
 
-    # Define callbacks based on the notebook example
-    log_dir = os.path.join("tensorboard_logs", model_name + "_" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
-    tensorboard_callback = TensorBoard(log_dir=log_dir, histogram_freq=1)
+    callbacks = []
+    if use_callbacks:
+        callbacks = [
+            tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=3, restore_best_weights=True),
+            tf.keras.callbacks.ReduceLROnPlateau(monitor="val_loss", factor=0.5, patience=2),
+            tf.keras.callbacks.TensorBoard(log_dir=os.path.join(SC.get("OUTPUT_DIRECTORY", "."), "logs"))
+        ]
 
     lr_reduce_plateau = ReduceLROnPlateau(
         monitor='val_loss',
@@ -185,7 +237,7 @@ def train_model(model_name="EfficientNetV2B0", epochs=None, batch_size=None, l2_
 
     early_stopping = EarlyStopping(
         monitor="val_loss",
-        patience=16, # Increased patience as per notebook example
+        patience=32,  # Allow for multiple LR reductions (4x lr patience)
         verbose=1,
         mode="min",
         restore_best_weights=True,
@@ -194,53 +246,39 @@ def train_model(model_name="EfficientNetV2B0", epochs=None, batch_size=None, l2_
     # Ensure models directory exists
     models_dir = "models"
     os.makedirs(models_dir, exist_ok=True)
-    checkpoint_path = os.path.join(models_dir, f"checkpoint_{model_name}.hdf5")
+    
+    # Create timestamp for unique model naming
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    checkpoint_filename = f"checkpoint_{model_name}_{timestamp}.hdf5"
+    checkpoint_path = os.path.join(models_dir, checkpoint_filename)
+    
     mcp_save = ModelCheckpoint(
         checkpoint_path,
-        save_best_only=True,
+        save_best_only=True,  # Save only the best model
         monitor='val_loss',
-        mode='min'
+        mode='min',
+        verbose=1
     )
 
-    callbacks = [lr_reduce_plateau, early_stopping, tensorboard_callback, mcp_save]
+    callbacks = [
+        lr_reduce_plateau, early_stopping, tensorboard_callback, mcp_save
+    ]
 
     # Start training timer
     start_time = time.time()
 
     print(f"Starting training for model: {model_name}")
     history = model.fit(
-        train_dataset,
-        validation_data=validation_dataset,
-        epochs=SC['MAX_EPOCHS'],
+        train_ds,
+        validation_data=val_ds,
+        epochs=int(epochs),
+        verbose=1,
         callbacks=callbacks
     )
 
-    # End training timer and print duration
-    end_time = time.time()
-    training_time = end_time - start_time
-    print(f"Model training finished for {model_name}. Duration: {training_time:.2f} seconds")
-
-    import json
-
-    # After training is complete and class_names is available
-    
-    class_names_path = os.path.join(models_dir, f"class_names_{model_name}.json")
-    with open(class_names_path, "w") as f:
+    out_dir = SC.get("OUTPUT_DIRECTORY", ".")
+    os.makedirs(out_dir, exist_ok=True)
+    with open(os.path.join(out_dir, f"class_names_{model_name}.json"), "w") as f:
         json.dump(class_names, f)
-    print(f"Class names saved to {class_names_path}")
 
     return model, history
-
-if __name__ == "__main__":
-    # Example usage
-    # Set the model name and parameters as needed
-    # Example: Train Model for 10 epochs with batch size 16 and L2 regularization
-    trained_model, training_history = train_model(
-        "MobileNetV2",
-        epochs=10,
-        batch_size=16,
-        l2_regularization=True,
-        l2_coefficient=0.001
-    )
-
-

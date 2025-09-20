@@ -28,6 +28,15 @@ app = FastAPI()
 
 
 
+from app.routers import hmi, engine, sim
+from app.routers import public
+app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:8080"],  # 可根据实际需求配置
+
+
 from app.routers import hmi, engine, sim, iot
 
 # ✅ Add metadata here
@@ -48,6 +57,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Allow all origins
+
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -66,6 +76,19 @@ app.include_router(hmi.router, tags=['hmi'], prefix='/hmi')
 app.include_router(engine.router, tags=['engine'], prefix='/engine')
 app.include_router(sim.router, tags=['sim'], prefix='/sim')
 app.include_router(two_factor.router)
+
+
+app.include_router(public.router, tags=['public'], prefix='/public')
+
+'''try:
+    file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'echo_config.json')
+    with open(file_path, 'r') as f:
+        echo_config = json.load(f)
+    print(f"Echo API echo_config successfully loaded", flush=True)
+except:
+    print(f"Could not API echo_config : {file_path}") 
+print(f" database names: {client.list_database_names()}")
+'''
 
 app.include_router(iot.router, tags=['iot'], prefix='/iot')
 app.include_router(species_predictor.router, tags=["predict"])
