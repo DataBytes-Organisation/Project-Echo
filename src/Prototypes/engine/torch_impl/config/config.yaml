@@ -1,5 +1,6 @@
 defaults:
   - model: efficientnet_v2_qat
+  - teacher_model: efficientnet_v2_qat
   - _self_
 
 hydra:
@@ -25,7 +26,7 @@ data:
   fmax: 13000
   top_db: 80
   
-  train_split: 0.7
+  train_split: 0.8
   val_split: 0.2
   num_classes: -1 # Should be inferred from data directory at runtime
 
@@ -37,14 +38,15 @@ run:
   checkpoint_path: ./outputs/2025-08-23/18-50-17/best_efficientnet_v2_qat.pth
   
 training:
-  batch_size: 2
+  batch_size: 64
   epochs: 100
-  learning_rate: 1e-4
-  num_workers: 8
+  learning_rate: 1e-3
+  num_workers: 4
   device: "cuda" # "cuda" or "cpu"
   # device: "cpu"
   seed: 0
   metric_mode: "min"
+  # use_arcface: null
   use_arcface: "circle"
   arcface:
     s: 30
@@ -53,10 +55,14 @@ training:
     s: 80 
     m: 0.4
 
+  early_stopping_patience: 5
+
   distillation:
     enabled: false
-    teacher_model_path: ./outputs/2025-08-23/18-50-17/best_efficientnet_v2_qat.pth
-    criterion: torch.nn.KLDivLoss
+    teacher_model_path: best_EFF2_QAT_Circle.pth
+    criterion:
+      _target_: torch.nn.KLDivLoss
+      log_target: true
     alpha: 0.5
     temperature: 3.0
 
@@ -66,13 +72,18 @@ training:
   optimizer:
     _target_: torch.optim.AdamW
     lr: ${training.learning_rate}
-    weight_decay: 0.01
+    weight_decay: 0.1
+
+  # scheduler:
+  #   _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
+  #   mode: 'min'
+  #   factor: 0.1
+  #   patience: 10
 
   scheduler:
-    _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
-    mode: 'min'
-    factor: 0.1
-    patience: 10
+    _target_: torch.optim.lr_scheduler.CosineAnnealingLR
+    T_max: ${training.epochs}
+    eta_min: 1e-6
 
 # Augmentation settings
 augmentations:
