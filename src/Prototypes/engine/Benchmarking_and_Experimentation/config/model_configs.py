@@ -50,4 +50,13 @@ MODELS = {
         "learning_rate": 1e-4,
         "expected_input_shape": (224, 224, 3),
     },
+    "EfficientNet-Lite0": {
+        "hub_url": "https://tfhub.dev/tensorflow/efficientnet/lite0/feature-vector/2",
+        "trainable": True,
+        "dense_layers": [8, 4],
+        "dropout": 0.5,
+        "learning_rate": 1e-4,
+        "expected_input_shape": (224, 224, 3),
+    }
 }
+
