@@ -63,6 +63,7 @@ training:
     criterion:
       _target_: torch.nn.KLDivLoss
       log_target: true
+      reduction: 'batchmean'
     alpha: 0.5
     temperature: 3.0
 
