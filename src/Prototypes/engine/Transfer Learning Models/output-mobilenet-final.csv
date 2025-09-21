@@ -1,0 +1,6 @@
+prediction,confidence,model_version,timestamp
+happy,0.83,MobileNet_v1,2025-09-14 22:40:43
+sad,0.52,MobileNet_v1,2025-09-14 22:40:43
+happy,0.39,MobileNet_v1,2025-09-14 22:40:43
+happy,0.51,MobileNet_v1,2025-09-14 22:40:43
+calm,0.64,MobileNet_v1,2025-09-14 22:40:43
