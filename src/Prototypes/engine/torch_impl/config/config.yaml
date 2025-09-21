@@ -58,7 +58,7 @@ training:
   early_stopping_patience: 5
 
   distillation:
-    enabled: false
+    enabled: true
     teacher_model_path: best_EFF2_QAT_Circle.pth
     criterion:
       _target_: torch.nn.KLDivLoss

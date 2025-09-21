@@ -1,3 +1,5 @@
+import io
+
 import torch
 import torch.nn as nn
 import torchvision.models as models
@@ -75,3 +77,25 @@ class Model(nn.Module):
 			self.model = prepare_post_static_quantize_fx(self.model)
 
 		self.model = convert_fx(self.model)
+
+	def summary(self):
+		"""
+		Prints a summary of the model, including the number of parameters 
+		and its estimated size on disk.
+		"""
+
+		total_params = sum(p.numel() for p in self.model.parameters())
+		trainable_params = sum(p.numel() for p in self.model.parameters() if p.requires_grad)
+		
+		buffer = io.BytesIO()
+		torch.save(self.state_dict(), buffer)
+		size_mb = buffer.getbuffer().nbytes / (1024**2)
+
+		print("=" * 65)
+		print(f"Model Summary: {self.model.__class__.__name__}")
+		print("-" * 65)
+		print(f"{'Total Parameters':<30}: {total_params:,}")
+		print(f"{'Trainable Parameters':<30}: {trainable_params:,}")
+		print(f"{'Non-trainable Parameters':<30}: {total_params - trainable_params:,}")
+		print(f"{'Estimated Model Size (MB)':<30}: {size_mb:.2f}")
+		print("=" * 65)

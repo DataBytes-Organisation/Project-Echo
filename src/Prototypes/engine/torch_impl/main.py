@@ -76,6 +76,7 @@ def main(cfg: DictConfig):
 	# cfg.training.epochs = 15
 
 	model = Model(cfg).to(device)
+	print(model.summary())
 	trainer = Trainer(cfg, model, train_loader, val_loader, device, cfg.model.name)
 	# trainer.train()
 	# trainer.test(val_loader)

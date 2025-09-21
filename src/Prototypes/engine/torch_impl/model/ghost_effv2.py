@@ -6,24 +6,24 @@ from model.utils import CosineLinear
 
 import math
 
-class SqueezeExcitation(nn.Module):
-	def __init__(
-		self,
-		in_channels,
-	):
-		super(SqueezeExcitation, self).__init__()
+class ECA(nn.Module):
+	def __init__(self, in_channels, gamma=2, b=1):
+		super().__init__()
 
-		self.squeeze = nn.AdaptiveAvgPool2d(1)
-		self.excite = nn.Sequential(
-			nn.Conv2d(in_channels, in_channels // 4, kernel_size=1),
-			nn.SiLU(),
-			nn.Conv2d(in_channels // 4, in_channels, kernel_size=1),
-			nn.Sigmoid()
-		)
+		t = int(abs((math.log(in_channels, 2) + b) / gamma))
+		k_size = t if t % 2 else t + 1
+
+		self.avg_pool = nn.AdaptiveAvgPool2d(1)
+		self.conv = nn.Conv1d(1, 1, kernel_size=k_size, padding=(k_size - 1) // 2, bias=False)
+		self.sigmoid = nn.Sigmoid()
 
 	def forward(self, x):
-		y = self.squeeze(x)
-		y = self.excite(y)
+		# Squeeze
+		y = self.avg_pool(x)
+
+		# Excite
+		y = self.conv(y.squeeze(-1).transpose(-1, -2)).transpose(-1, -2).unsqueeze(-1)
+		y = self.sigmoid(y)
 
 		return x * y
 
@@ -137,7 +137,7 @@ class MBConv(nn.Module):
 		# Depthwise convolution
 		layers.extend([
 			ConvBnAct(hidden_dim, hidden_dim, kernel_size=3, stride=stride, padding=1, groups=hidden_dim),
-			SqueezeExcitation(hidden_dim),
+			ECA(hidden_dim),
 			GhostModule(hidden_dim, out_channels, kernel_size=1, relu=False),
 		])
 		
@@ -165,10 +165,9 @@ class FusedMBConv(nn.Module):
 		else:
 			layers.append(ConvBnAct(in_channels, hidden_dim, kernel_size=3, stride=stride, padding=1, groups=in_channels))
 
-
 		# Depthwise convolution
 		layers.extend([
-			SqueezeExcitation(hidden_dim),
+			ECA(hidden_dim),
 			GhostModule(hidden_dim, out_channels, 1, relu=False),
 		])
 		
@@ -221,13 +220,13 @@ class GhostEfficientNetV2(nn.Module):
 				in_channels = out_chans
 				block_idx += 1
 		
-		self.head = nn.Sequential(
+		self.pool = nn.Sequential(
 			nn.AdaptiveAvgPool2d(1),
 			nn.Flatten(),
 			nn.Dropout(p=drop_rate, inplace=True),
 		)
 
-		self.backbone = nn.Sequential(self.stem, *blocks, self.head)
+		self.backbone = nn.Sequential(self.stem, *blocks, self.pool)
 		
 		if use_arcface:
 			self.head = CosineLinear(in_channels, num_classes)

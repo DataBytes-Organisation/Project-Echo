@@ -4,6 +4,6 @@ params:
   num_classes: ${data.num_classes}
   use_qat: true
   use_arcface: true
-  width_mult: 1 
+  width_mult: 0.75
   depth_mult: 1 
   drop_rate: 0.1
