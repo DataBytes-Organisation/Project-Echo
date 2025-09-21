@@ -1,3 +1,6 @@
+let socket = null;
+let isConnected = false;
+
 $(document).ready(function() {
     // Dummy notifications for testing
     let notifications = [
@@ -73,7 +76,130 @@ $(document).ready(function() {
             notificationContainer.append(notificationItem);
         });
     }
+        // Initializing a Socket.IO connection）
+     function initSocket() {
+         console.log('🔍 Start initializing the socket connection...');
+    
+         socket = io('http://localhost:8081');
+    
+         socket.on('connect', () => {
+             console.log('✅ Socket connection successful. Connection ID', socket.id);
+             isConnected = true;
+             updateConnectionStatus('connected');
+             const userId = getUserId();
+             if (userId) {
+                 socket.emit('join-user-room', userId);
+                 console.log(`📌 Joined user room: ${userId}`);
+        }
+    });
+    
+    // Connection error event (retain automatic reconnection logic)
+    socket.on('connect_error', (error) => {
+        console.error('❌ Socket connection failed:', error.message);
+        console.error('Possible reasons: Wrong server address/CORS issue/Server not running');
+        isConnected = false;
+        updateConnectionStatus('disconnected');
+        
+        // Automatic reconnection mechanism (original logic retained)
+        setTimeout(() => {
+            if (!isConnected) {
+                console.log('Attempting to reconnect...');
+                initSocket();
+            }
+        }, 5000);
+    });
+    
+    // Disconnect event
+    socket.on('disconnect', (reason) => {
+        console.log('❌ Socket disconnected, reason:', reason);
+        isConnected = false;
+        updateConnectionStatus('disconnected');
+        
+        if (reason === 'io server disconnect') {
+            socket.connect();
+        }
+    });
+    
+     socket.on('new-notification', function(notification) {
+         console.log('New notification received:', notification);
+        
+        notifications.unshift({
+            id: notification._id || Date.now(),
+            message: notification.message,
+            date: new Date(notification.createdAt || Date.now()),
+            read: false,
+            icon: getIconForType(notification.type),
+            type: notification.type
+        });
+        
+        saveNotificationsToLocalStorage();
+        renderNotifications();
+        updateNotificationBadge();
+        showToastNotification(notification.message);
+    });
+    
+    return socket;
+}
+    
+    // Update the connection status UI
+    function updateConnectionStatus(status) {
+        const $status = $('#connection-status');
+        const $indicator = $status.find('.status-indicator');
+        const $text = $status.find('.status-text');
 
+        $status.removeClass('connected disconnected connecting').addClass(status);
+        $indicator.removeClass('status-connected status-disconnected status-connecting').addClass(`status-${status}`);
+        $text.text(status === 'connected' ? 'Connected' : status === 'connecting' ? 'Connecting...' : 'Disconnected');
+    }
+    
+    // Show toast notification
+    function showToastNotification(message) {
+        $('#toast-message').text(message);
+        $('#toast-notification').toast('show');
+        
+        // Add badge animation
+        $("#notification-badge").addClass("pulse");
+        setTimeout(() => {
+            $("#notification-badge").removeClass("pulse");
+        }, 1000);
+    }
+    
+    //  Get user ID
+    function getUserId() {
+    // This should retrieve the user ID from the login state or localStorage
+    // Temporarily return a fixed value for testing
+        return "64bf20397e048a9822077b74";
+    }
+    
+    // Get icon based on type
+    function getIconForType(type) {
+        const icons = {
+            'donation': 'ti ti-receipt-2',
+            'request': 'ti ti-alert-circle',
+            'user': 'ti ti-user',
+            'system': 'ti ti-bell',
+            'default': 'ti ti-bell'
+        };
+        return icons[type] || 'ti ti-bell';
+    }
+    
+    // Test notification
+    function testNotification() {
+        fetch('http://localhost:8080/test-notification', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                userId: getUserId(),
+                title: "Test Notification",
+                message: "This is a test notification from the UI"
+            })
+        })
+        .then(response => response.json())
+        .then(data => console.log('Test notification created:', data))
+        .catch(error => console.error('Error:', error));
+    }
     //Function to update notification permissions (display unread count)
     function updateNotificationBadge() {
         const unreadCount = notifications.filter(notification => !notification.read).length;
