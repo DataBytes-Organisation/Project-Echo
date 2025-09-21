@@ -6,64 +6,20 @@ This project provides a comprehensive device management system for field-deploye
 
 ## Setup and Usage
 
-### On Client Devices (e.g., EchoPi)
-
-Run `setup_py.sh` to:
+Run `setup_py.sh` on client Pi to:
 
 - Create a Python virtual environment.
-- Install dependencies (`psutil`, `sounddevice`, `numpy`, `requests`, `paho-mqtt`).
+- Install dependencies
 - Generate SSH key pair with correct permissions.
+- Set up auto-boot 
 
 Then:
-
+- Run `onboarding_server.py` which listens for MQTT onboarding requests.
 - Run `onboarding_client.py` to perform MQTT-based device onboarding.
-- Run `client_pi.py` for main device management functions (SSH commands, health monitoring) once onboarding is complete and server side is listening.
 
-Audio is recorded and uploaded automatically or on command.
-
----
-
-### On Server Side
-
-#### Onboarding Server (`onboarding_server.py`):
-- Listens for MQTT onboarding requests.
-- Updates `config/devices.json` with new device info.
+### `client_pi.py`
+- Retrieves health data, location and records audio
+- Runs audio file through lightweight model to get species confidence level
 
 #### Flask Server (`server_main.py`):
-- Receives POST uploads of health data and audio files from devices.
-- Saves audio files to `uploads/`.
-
-**Note:** Ensure MQTT credentials and broker details are configured properly in server and client scripts.
-
----
-
-
-## Dependencies
-- Python 3.x
-- psutil
-- sounddevice
-- numpy
-- requests
-- paho-mqtt
-- flask (server side)
-
-## Configuration
-
-Device information is stored in `config/devices.json` in the following format:
-
-```json
-[
-  {
-    "name": "EchoPi-01",
-    "ip": "192.168.1.119",
-    "username": "pi",
-    "key_path": "~/.ssh/id_rsa"
-  },
-  {
-    "name": "EchoPi-02",
-    "ip": "192.168.1.120",
-    "username": "pi",
-    "key_path": "~/.ssh/id_rsa"
-  }
-]
-
+- Receives POST uploads of health data, location and species confidence from devices.

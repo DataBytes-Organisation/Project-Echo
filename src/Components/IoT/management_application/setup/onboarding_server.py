@@ -9,7 +9,7 @@ PASSWORD = "ProjectEcho123"
 
 ONBOARD_REQUEST_TOPIC = "devices/onboard/request"
 ONBOARD_RESPONSE_TOPIC_TEMPLATE = "devices/onboard/response/{}"
-CONFIG_FILE = "config/devices.json"
+CONFIG_FILE = "../config/devices.json"
 
 def on_connect(client, userdata, flags, rc):
     print(f"Connected to MQTT broker with result code {rc}")
