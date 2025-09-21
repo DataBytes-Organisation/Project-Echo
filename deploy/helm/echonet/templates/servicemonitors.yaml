@@ -1,0 +1,29 @@
+{{- if .Values.monitoring.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: api-monitor
+  labels:
+{{- toYaml .Values.monitoring.labels | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      app: api
+  endpoints:
+    - port: http
+      interval: {{ .Values.monitoring.scrapeInterval }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: model-server-monitor
+  labels:
+{{- toYaml .Values.monitoring.labels | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      app: model-server
+  endpoints:
+    - port: http
+      interval: {{ .Values.monitoring.scrapeInterval }}
+{{- end }}

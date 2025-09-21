@@ -1,21 +1,14 @@
-# Use an official Python runtime as a parent image
 FROM python:3.11-slim
-
-# Set the working directory
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
 WORKDIR /app
-
-# Install system dependencies
-RUN apt-get update && apt-get install -y build-essential gcc
-
-# Copy requirements and install
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential gcc \
+	&& rm -rf /var/lib/apt/lists/*
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy the full app into the container
+RUN pip install --no-cache-dir -r requirements.txt \
+	&& apt-get purge -y build-essential gcc && apt-get autoremove -y && rm -rf /var/lib/apt/lists/*
 COPY . .
-
-# Expose port for the app
-EXPOSE 8080
-
-# Command to run the app using uvicorn
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
+RUN rm -f app/echo_config.json .env || true
+RUN useradd -m appuser && chown -R appuser:appuser /app
+USER appuser
+EXPOSE 9000
+CMD ["uvicorn","app.main:app","--host","0.0.0.0","--port","9000"]

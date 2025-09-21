@@ -1,15 +1,18 @@
 db = db.getSiblingDB("EchoNet");
 
+// NOTE: Credentials removed from source control. Supply via environment / secret during container start.
+// Example (do not commit real values):
+//   MONGO_APP_USER, MONGO_APP_PASS
 db.createUser({
-  user: "modelUser",
-  pwd: "EchoNetAccess2023",
-  roles: [
-    {
-      role: "readWrite",
-      db: "EchoNet",
-    },
-  ],
+  user: _getEnv("MONGO_APP_USER", "replace_me"),
+  pwd: _getEnv("MONGO_APP_PASS", "replace_me"),
+  roles: [ { role: "readWrite", db: "EchoNet" } ],
 });
+
+function _getEnv(name, fallback){
+  try { return cat(`/run/secrets/${name}`).trim(); } catch(e) {}
+  return fallback;
+}
 
 db.createCollection("events");
 db.createCollection("microphones");

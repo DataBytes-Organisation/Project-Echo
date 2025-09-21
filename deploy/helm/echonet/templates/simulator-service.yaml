@@ -1,0 +1,15 @@
+{{- if .Values.simulator.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: simulator
+  labels:
+    app: simulator
+spec:
+  selector:
+    app: simulator
+  ports:
+    - port: 80
+      targetPort: 8080
+  type: ClusterIP
+{{- end }}

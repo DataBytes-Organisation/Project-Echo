@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mqtt
+  labels:
+    app: mqtt
+spec:
+  type: {{ .Values.mqtt.service.type }}
+  selector:
+    app: mqtt
+  ports:
+    - name: mqtt
+      port: 1883
+      targetPort: 1883
+    - name: ws
+      port: 7001
+      targetPort: 7001
+    - name: admin
+      port: 7070
+      targetPort: 7070

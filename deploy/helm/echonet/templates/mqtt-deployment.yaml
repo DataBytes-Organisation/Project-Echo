@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mqtt
+  labels:
+    app: mqtt
+spec:
+  replicas: {{ .Values.mqtt.replicas }}
+  selector:
+    matchLabels:
+      app: mqtt
+  template:
+    metadata:
+      labels:
+        app: mqtt
+    spec:
+      containers:
+        - name: mqtt
+          image: "{{ .Values.mqtt.image }}"
+          ports:
+            - containerPort: 1883
+            - containerPort: 7001
+            - containerPort: 7070
+          livenessProbe:
+            tcpSocket:
+              port: 1883
+            initialDelaySeconds: 20
+            periodSeconds: 30
+          readinessProbe:
+            tcpSocket:
+              port: 1883
+            initialDelaySeconds: 10
+            periodSeconds: 20
+          resources:
+{{- toYaml .Values.mqtt.resources | nindent 12 }}
