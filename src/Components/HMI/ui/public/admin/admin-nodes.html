@@ -13,26 +13,17 @@
   <style>
     #network-container {
       width: 100%;
-      height: 700px;
+      height: 600px;
       border: 1px solid #ddd;
       background-color: #f8f9fa;
       border-radius: 8px;
-      margin-bottom: 20px;
-      position: relative;
     }
     .node-details {
       padding: 20px;
-      background: #fff;
+      background: white;
       border-radius: 8px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
       margin-top: 20px;
-    }
-    .card-title {
-      font-size: 1.5rem;
-      font-weight: 600;
-      color: #2a3547;
-      margin-bottom: 1.5rem;
-      padding-top: 20px;
     }
     .component-card {
       margin-bottom: 15px;
@@ -44,11 +35,10 @@
     .component-card h5 {
       margin: 0;
       color: #2a3547;
-      font-size: 1.1rem;
     }
     .component-card .properties {
       margin-top: 10px;
-      font-size: 0.9rem;
+      font-size: 14px;
     }
     .property-item {
       display: flex;
@@ -57,249 +47,101 @@
       padding: 5px 0;
       border-bottom: 1px dashed #eee;
     }
-    body {
-      background-color: #f4f6f9;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    }
-    .card {
-      padding: 20px;
-      margin-top: 20px;
-    }
-    .legend-container {
-      position: absolute;
-      bottom: 10px;
-      left: 10px;
-      background: rgba(255, 255, 255, 0.9);
-      padding: 10px;
-      border-radius: 5px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      font-size: 0.9rem;
-    }
-    .legend-item {
-      display: flex;
-      align-items: center;
-      margin-bottom: 5px;
-    }
-    .legend-icon {
-      margin-right: 8px;
-      font-size: 1.2rem;
-    }
-    .controls-container {
-      margin-bottom: 15px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-top: 15px;
-    }
-    .export-btn {
-      height: 38px;
-      width: 150px;
-      padding: 0 12px;
-      font-size: 1rem;
-      line-height: 1.5;
-    }
-    .zoom-btn {
-      height: 38px;
-      width: 38px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.2rem;
-    }
-    .reset-btn {
-      height: 38px;
-      width: 38px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.2rem;
-      background-color: #fff;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-    .reset-btn:hover {
-      background-color: #f0f0f0;
-    }
-    .custom-dropdown {
-      position: relative;
-      width: 150px;
-      appearance: none;
-      padding: 6px 30px 6px 10px;
-    }
-    .custom-dropdown::after {
-      content: '∨';
-      position: absolute;
-      top: 50%;
-      right: 10px;
-      transform: translateY(-50%);
-      pointer-events: none;
-      font-size: 1rem;
-    }
-    .text-muted {
-      color: #6c757d !important;
-    }
-    .accordion-button {
-      font-weight: 500;
-      color: #2a3547;
-    }
-    .accordion-body {
-      font-size: 0.9rem;
-      color: #6c757d;
-    }
   </style>
 </head>
 
 <body>
-  <andia id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full" data-sidebar-position="fixed" data-header-position="fixed">
+  <!--  Body Wrapper -->
+  <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
+    data-sidebar-position="fixed" data-header-position="fixed">
+    <!-- Sidebar Start -->
     <div id="sidebar"></div>
+    <!--  Sidebar End -->
+    <!--  Main wrapper -->
     <div class="body-wrapper">
+      <!--  Header Start -->
       <div id="header"></div>
-      <div class="container-fluid py-4">
+      <!--  Header End -->
+      <div class="container-fluid">
         <div class="row">
           <div class="col-12">
-            <div class="card p-4">
-              <h5 class="card-title fw-semibold mb-4">Node Network</h5>
-              <div class="controls-container">
-                <button id="exportNetwork" class="btn btn-primary export-btn">Export Map</button>
-                <button id="zoomIn" class="btn btn-outline-secondary zoom-btn" title="Zoom In"><i class="fas fa-plus"></i></button>
-                <button id="zoomOut" class="btn btn-outline-secondary zoom-btn" title="Zoom Out"><i class="fas fa-minus"></i></button>
-                <button id="resetMap" class="reset-btn" title="Reset Map"><i class="fas fa-crosshairs"></i></button>
-              </div>
-              <div id="network-container">
-                <div class="legend-container">
-                  <div class="legend-item">
-                    <i class="fas fa-cogs legend-icon"></i> Master
-                  </div>
-                  <div class="legend-item">
-                    <i class="fas fa-raspberry-pi legend-icon"></i> Raspberry Pi
-                  </div>
-                  <div class="legend-item">
-                    <i class="fas fa-cog legend-icon"></i> Arduino
-                  </div>
-                  <div class="legend-item">
-                    <i class="fas fa-microchip legend-icon"></i> Beta Sub
-                  </div>
-                </div>
-              </div>
-              <div id="node-details" class="node-details" style="display: none;">
-                <h4 id="node-title" class="mb-4"></h4>
-                <div class="row">
-                  <div class="col-md-6">
-                    <div class="mb-3">
-                      <strong>Type:</strong> <span id="node-type"></span>
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title fw-semibold mb-4">Node Network</h5>
+                <div id="network-container"></div>
+                <div id="node-details" class="node-details" style="display: none;">
+                  <h4 id="node-title" class="mb-4"></h4>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="mb-3">
+                        <strong>Type:</strong> <span id="node-type"></span>
+                      </div>
+                      <div class="mb-3">
+                        <strong>Model:</strong> <span id="node-model"></span>
+                      </div>
+                      <div class="mb-3">
+                        <strong>Location:</strong> <span id="node-location"></span>
+                      </div>
                     </div>
-                    <div class="mb-3">
-                      <strong>Model:</strong> <span id="node-model"></span>
-                    </div>
-                    <div class="mb-3">
-                      <strong>Location:</strong> <span id="node-location"></span>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="mb-3">
-                      <strong>Custom Properties</strong>
-                      <div id="node-properties"></div>
-                    </div>
-                  </div>
-                </div>
-                <h5 class="mt-4 mb-3">Components</h5>
-                <div id="node-components"></div>
-              </div>
-              <div class="node-descriptions mt-4">
-                <h5 class="mb-3">Node Descriptions</h5>
-                <div class="accordion" id="nodeDescriptionAccordion">
-                  <div class="accordion-item">
-                    <h2 class="accordion-header" id="headingMaster">
-                      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMaster" aria-expanded="false" aria-controls="collapseMaster">
-                        Master
-                      </button>
-                    </h2>
-                    <div id="collapseMaster" class="accordion-collapse collapse" aria-labelledby="headingMaster" data-bs-parent="#nodeDescriptionAccordion">
-                      <div class="accordion-body">
-                        The Master Node serves as the central controller in the network, coordinating communication and data processing across all connected nodes. It is designed for high reliability and can manage multiple sub-nodes efficiently.
+                    <div class="col-md-6">
+                      <div class="mb-3">
+                        <strong>Custom Properties:</strong>
+                        <div id="node-properties"></div>
                       </div>
                     </div>
                   </div>
-                  <div class="accordion-item">
-                    <h2 class="accordion-header" id="headingRaspberryPi">
-                      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseRaspberryPi" aria-expanded="false" aria-controls="collapseRaspberryPi">
-                        Raspberry Pi
-                      </button>
-                    </h2>
-                    <div id="collapseRaspberryPi" class="accordion-collapse collapse" aria-labelledby="headingRaspberryPi" data-bs-parent="#nodeDescriptionAccordion">
-                      <div class="accordion-body">
-                        The Raspberry Pi node is a versatile, single-board computer used for tasks like data logging, sensor integration, and local processing. It supports a wide range of projects due to its GPIO capabilities.
-                      </div>
-                    </div>
-                  </div>
-                  <div class="accordion-item">
-                    <h2 class="accordion-header" id="headingArduino">
-                      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseArduino" aria-expanded="false" aria-controls="collapseArduino">
-                        Arduino
-                      </button>
-                    </h2>
-                    <div id="collapseArduino" class="accordion-collapse collapse" aria-labelledby="headingArduino" data-bs-parent="#nodeDescriptionAccordion">
-                      <div class="accordion-body">
-                        The Arduino node is a microcontroller platform ideal for real-time control and sensor interfacing. It is lightweight and efficient, perfect for simple automation tasks.
-                      </div>
-                    </div>
-                  </div>
-                  <div class="accordion-item">
-                    <h2 class="accordion-header" id="headingBetaSub">
-                      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseBetaSub" aria-expanded="false" aria-controls="collapseBetaSub">
-                        Beta Sub
-                      </button>
-                    </h2>
-                    <div id="collapseBetaSub" class="accordion-collapse collapse" aria-labelledby="headingBetaSub" data-bs-parent="#nodeDescriptionAccordion">
-                      <div class="accordion-body">
-                        The Beta Sub node is a prototype or secondary node type, often used for testing new features or as a backup. It supports limited functionality but is scalable for future upgrades.
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="status-descriptions mt-4">
-                <h5 class="mb-3">Node Status Descriptions</h5>
-                <div class="accordion" id="statusDescriptionAccordion">
-                  <div class="accordion-item">
-                    <h2 class="accordion-header" id="headingOnline">
-                      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOnline" aria-expanded="false" aria-controls="collapseOnline">
-                        Online
-                      </button>
-                    </h2>
-                    <div id="collapseOnline" class="accordion-collapse collapse" aria-labelledby="headingOnline" data-bs-parent="#statusDescriptionAccordion">
-                      <div class="accordion-body">
-                        The node is fully operational, actively connected to the network, and communicating with other nodes without issues.
-                      </div>
-                    </div>
-                  </div>
-                  <div class="accordion-item">
-                    <h2 class="accordion-header" id="headingOffline">
-                      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOffline" aria-expanded="false" aria-controls="collapseOffline">
-                        Offline
-                      </button>
-                    </h2>
-                    <div id="collapseOffline" class="accordion-collapse collapse" aria-labelledby="headingOffline" data-bs-parent="#statusDescriptionAccordion">
-                      <div class="accordion-body">
-                        The node is not connected to the network and is not responding. It may be powered off, disconnected, or experiencing a failure.
-                      </div>
-                    </div>
-                  </div>
-                  <div class="accordion-item">
-                    <h2 class="accordion-header" id="headingWarning">
-                      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseWarning" aria-expanded="false" aria-controls="collapseWarning">
-                        Warning
-                      </button>
-                    </h2>
-                    <div id="collapseWarning" class="accordion-collapse collapse" aria-labelledby="headingWarning" data-bs-parent="#statusDescriptionAccordion">
-                      <div class="accordion-body">
-                        The node is operational but experiencing issues, such as intermittent connectivity, high latency, or resource constraints.
-                      </div>
-                    </div>
-                  </div>
+                  <h5 class="mt-4 mb-3">Components</h5>
+                  <div id="node-components"></div>
                 </div>
               </div>
             </div>
+            <h2>Detections</h2>
+            <!-- Displays List of Animal Detections -->
+            <div class="markup_column" id="detections-container">
+              <div class="detection-entry">
+                <div class="detection-animal">animal: </div>
+                <div class="detection-confidence">confidence level:</div>
+                <div class="detection-location">location: </div>
+                <div class="detection-time">time: </div>
+              </div>
+            </div>
+            
+            <h2>Nodes</h2>
+            <!-- Displays List of Nodes & their status -->
+            <div class="markup_column" id="nodes-container">
+              <div class="node-entry">
+                <div class="node-id">node id: </div>
+                <div class="node-device">device:</div>
+                <div class="node-status">status: 🟢</div>
+              </div>
+              <div class="node-entry">
+                <div class="node-id">node id: </div>
+                <div class="node-device">device:</div>
+                <div class="node-status">status: 🔴</div>
+              </div>
+            </div>
+            
+            <h2>System Log</h2>
+            <!-- Displays List of System Events -->
+            <div class="markup_column" id="systemlog-container">
+              <div class="systemlog-entry">
+                <div class="systemlog-event">event:</div>
+                <div class="systemlog-time">time:</div>
+              </div>
+              <div class="systemlog-entry">
+                <div class="systemlog-event">event:</div>
+                <div class="systemlog-time">time:</div>
+              </div>
+              <div class="systemlog-entry">
+                <div class="systemlog-event">event:</div>
+                <div class="systemlog-time">time:</div>
+              </div>
+              <div class="systemlog-entry">
+                <div class="systemlog-event">event:</div>
+                <div class="systemlog-time">time:</div>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
@@ -311,27 +153,24 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.6/dist/vis-network.min.js"></script>
   <script>
+    // Load header and sidebar components
     $(document).ready(function() {
       $("#sidebar").load("./admin/component/sidebar-component.html");
       $("#header").load("./admin/component/header-component.html");
     });
 
+    // Network visualization
     async function initNetwork() {
       try {
         const response = await fetch('http://localhost:9000/iot/nodes');
         const nodes = await response.json();
 
+        // Prepare data for vis.js
         const nodeData = nodes.map(node => ({
           id: node._id,
           label: node.name,
           title: `${node.name}\n${node.type}\n${node.model}`,
-          shape: 'icon',
-          icon: {
-            face: 'FontAwesome',
-            code: node.type === 'master' ? '\uf0e4' : node.type === 'raspberry_pi' ? '\uf7b9' : node.type === 'arduino' ? '\uf2db' : '\uf0e4',
-            size: 40,
-            color: node.type === 'master' ? '#2196F3' : node.type === 'raspberry_pi' ? '#C0392B' : node.type === 'arduino' ? '#4CAF50' : '#2196F3'
-          }
+          group: node.type
         }));
 
         const edges = [];
@@ -341,9 +180,9 @@
               edges.push({
                 from: node._id,
                 to: targetId,
-                arrows: { to: true },
-                color: { color: '#2B547E', highlight: '#1E90FF' },
-                width: 2
+                arrows: {
+                  to: true
+                }
               });
             });
           }
@@ -357,28 +196,42 @@
 
         const options = {
           nodes: {
+            shape: 'dot',
             size: 20,
-            font: { size: 14 }
+            font: {
+              size: 14
+            }
           },
           edges: {
             width: 2,
-            color: { color: '#2B547E', highlight: '#1E90FF' }
+            color: {
+              color: '#2B547E',
+              highlight: '#1E90FF'
+            }
+          },
+          groups: {
+            master: {
+              color: { background: '#4CAF50', border: '#388E3C' }
+            },
+            arduino: {
+              color: { background: '#2196F3', border: '#1976D2' }
+            },
+            raspberry_pi: {
+              color: { background: '#F44336', border: '#D32F2F' }
+            }
           },
           physics: {
             stabilization: true,
-            barnesHut: { gravitationalConstant: -10000, springConstant: 0.002 }
+            barnesHut: {
+              gravitationalConstant: -10000,
+              springConstant: 0.002
+            }
           }
         };
 
-        network = new vis.Network(container, data, options);
+        const network = new vis.Network(container, data, options);
 
-        network.on('stabilizationIterationsDone', function() {
-          const positions = network.getPositions();
-          Object.keys(positions).forEach(id => {
-            nodePositions[id] = positions[id];
-          });
-        });
-
+        // Show node details when clicked
         network.on('click', async function(params) {
           if (params.nodes.length > 0) {
             const nodeId = params.nodes[0];
@@ -386,44 +239,6 @@
             const node = await response.json();
             showNodeDetails(node);
           }
-        });
-
-        network.on('hoverNode', function(params) {
-          const nodeId = params.node;
-          const node = nodesDataSet.get(nodeId);
-          nodesDataSet.update({
-            id: nodeId,
-            title: `${node.label}\n${node.type}\n${node.model}\nLoading stats...`
-          });
-        });
-
-        // Export as Image
-        document.getElementById('exportNetwork').addEventListener('click', function() {
-          const canvas = network.canvas.frame.canvas;
-          const dataUrl = canvas.toDataURL('image/png');
-          const link = document.createElement('a');
-          link.download = 'node_network.png';
-          link.href = dataUrl;
-          link.click();
-        });
-
-        // Zoom In and Zoom Out
-        let currentScale = 1;
-        const zoomStep = 0.2;
-
-        document.getElementById('zoomIn').addEventListener('click', function() {
-          currentScale += zoomStep;
-          network.moveTo({ scale: currentScale });
-        });
-
-        document.getElementById('zoomOut').addEventListener('click', function() {
-          currentScale = Math.max(0.2, currentScale - zoomStep);
-          network.moveTo({ scale: currentScale });
-        });
-
-        document.getElementById('resetMap').addEventListener('click', function() {
-          currentScale = 1; 
-          network.fit(); 
         });
 
       } catch (error) {
@@ -436,8 +251,10 @@
       document.getElementById('node-title').textContent = node.name;
       document.getElementById('node-type').textContent = node.type;
       document.getElementById('node-model').textContent = node.model;
-      document.getElementById('node-location').textContent = `${node.location.latitude}, ${node.location.longitude}`;
+      document.getElementById('node-location').textContent = 
+        `${node.location.latitude}, ${node.location.longitude}`;
 
+      // Show custom properties
       const propertiesDiv = document.getElementById('node-properties');
       propertiesDiv.innerHTML = '';
       Object.entries(node.customProperties).forEach(([key, value]) => {
@@ -446,6 +263,7 @@
         </div>`;
       });
 
+      // Show components
       const componentsDiv = document.getElementById('node-components');
       componentsDiv.innerHTML = '';
       if (node.components && node.components.length > 0) {
@@ -469,5 +287,66 @@
       }
     }
 
+          // Function to add a Detection Entry in the Notifications Section 
+      function addDetectionEntry(detectionData){
+
+        // placeholder, modify once backend + frontend is fully connected 
+        const entryContainer = document.createElement("div");
+        const detectedAnimal = document.createElement("div");
+        const detectedConfidence = document.createElement("div");
+        const detectedLocation = document.createElement("div");
+        const detectedTime = document.createElement("div");
+
+        entryContainer.classList.add("detection-entry");
+        detectedAnimal.classList.add("detection-animal");
+        detectedConfidence.classList.add("detection-confidence");
+        detectedLocation.classList.add("detection-location");
+        detectedTime.classList.add("detection-time");
+
+        detectedAnimal.text = `Animal: `;
+        detectedConfidence.text = `Confidence: `;
+        detectedLocation.text = `Location: `;
+        detectedTime.text = `Time: `;
+
+        entryContainer.append(detectedAnimal, detectedConfidence, detectedLocation, detectedTime);
+
+        // adds the detection entry as a child of the detections container 
+        const detectionsContainer = document.querySelector("#detections-container");
+        detectionsContainer.append(entryContainer);
+
+      }
+
+
+      // Function to add Nodes Data in the Notifications Section 
+      function populateNodesData(nodesData){
+
+        // placeholder, modify once backend + frontend is fully connected 
+        const nodeEntryContainer = document.createElement("div");
+        const nodeID = document.createElement("div");
+        const nodeDevice = document.createElement("div");
+        const nodeStatus = document.createElement("div");
+
+        nodeEntryContainer.classList.add("node-entry");
+        nodeID.classList.add("node-id");
+        nodeDevice.classList.add("node-device");
+        nodeStatus.classList.add("node-status");
+
+        nodeID.text = `Node ID:`;
+        nodeDevice.text = `Node Device:`;
+        nodeStatus.text = `Node Status:`;
+
+        nodeEntryContainer.append(nodeID, nodeDevice, nodeStatus);
+
+        const nodesContainer = document.querySelector("#nodes-container");
+        nodesContainer.append(nodeEntryContainer);
+
+      }
+
+
+
+    // Initialize network when page loads
     window.addEventListener('load', initNetwork);
   </script>
+</body>
+
+</html>
