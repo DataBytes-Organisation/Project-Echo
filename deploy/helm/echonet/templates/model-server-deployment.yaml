@@ -34,7 +34,7 @@ spec:
               mountPath: /models
       containers:
         - name: tf-serving
-          image: "{{ .Values.image.registry }}/{{ .Values.modelServer.image }}:{{ .Values.modelServer.tag }}"
+          image: "{{ .Values.modelServer.image }}"
           args:
             - "--model_config_file=/models/models.config"
             - "--allow_version_labels_for_unavailable_models=true"

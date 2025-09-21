@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: api
-          image: "{{ .Values.image.registry }}/api:{{ .Values.image.tag }}"
+          image: "{{ .Values.api.image }}"
           envFrom:
             - secretRef:
                 name: mongo-credentials

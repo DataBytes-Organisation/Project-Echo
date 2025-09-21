@@ -1,9 +1,9 @@
-name: build-api
+name: build-mqtt
 on:
   push:
     paths:
-      - "src/Components/API/**"
-      - ".github/workflows/build-api.yml"
+      - "src/Components/MQTT-Server/**"
+      - ".github/workflows/build-mqtt.yml"
   workflow_dispatch:
 jobs:
   build:
@@ -14,8 +14,8 @@ jobs:
       id-token: write
     env:
       REGION: us-central1
-      IMAGE_NAME: api
       REPO_PATH: echonet
+      IMAGE_NAME: mqtt
     steps:
       - uses: actions/checkout@v4
       - name: Set up QEMU (multi-arch)
@@ -27,17 +27,18 @@ jobs:
         with:
           workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
           service_account: ${{ secrets.GCP_SA_EMAIL }}
-      - name: Configure Docker auth
+      - name: Configure Docker auth (US registry)
         run: gcloud auth configure-docker $REGION-docker.pkg.dev -q
-      - name: Configure Docker auth (staging AU registry)
+      - name: Configure Docker auth (AU registry)
         run: gcloud auth configure-docker australia-southeast2-docker.pkg.dev -q
       - name: Compute short SHA
         id: vars
         run: echo "sha_short=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
-      - name: Build & push (multi-arch)
+      - name: Build & push MQTT (multi-arch)
         uses: docker/build-push-action@v5
         with:
-          context: src/Components/API
+          context: src/Components/MQTT-Server
+          file: src/Components/MQTT-Server/MQTT.Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
@@ -45,9 +46,4 @@ jobs:
             ${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/${{ env.REPO_PATH }}/${{ env.IMAGE_NAME }}:latest
             australia-southeast2-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/${{ env.REPO_PATH }}/${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.sha_short }}
             australia-southeast2-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/${{ env.REPO_PATH }}/${{ env.IMAGE_NAME }}:latest
-      - name: Trivy scan
-        uses: aquasecurity/trivy-action@v0.20.0
-        with:
-          image-ref: ${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/$REPO_PATH/${{ env.IMAGE_NAME }}:latest
-          exit-code: '0'
-          severity: 'CRITICAL,HIGH'
+

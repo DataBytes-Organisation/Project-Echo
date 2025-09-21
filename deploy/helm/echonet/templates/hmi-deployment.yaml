@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: hmi
-          image: {{ .Values.hmi.image }}
+          image: "{{ .Values.hmi.image }}"
           ports:
             - containerPort: 8080
           readinessProbe:

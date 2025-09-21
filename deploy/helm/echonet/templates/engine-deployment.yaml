@@ -21,7 +21,7 @@ spec:
           effect: "NoSchedule"
       containers:
         - name: engine
-          image: "{{ .Values.image.registry }}/{{ .Values.engine.image }}:{{ .Values.engine.tag }}"
+          image: "{{ .Values.engine.image }}"
           env:
             - name: MODEL_SERVER_HOST
               value: model-server

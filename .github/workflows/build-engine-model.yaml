@@ -18,29 +18,46 @@ jobs:
       REPO_PATH: echonet
     steps:
       - uses: actions/checkout@v4
+      - name: Set up QEMU (multi-arch)
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
       - name: Auth to GCP
         uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
           service_account: ${{ secrets.GCP_SA_EMAIL }}
-      - name: Configure Docker auth
+      - name: Configure Docker auth (US registry)
         run: gcloud auth configure-docker $REGION-docker.pkg.dev -q
-      - name: Build & push engine
-        run: |
-          IMAGE_ENGINE="$REGION-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/$REPO_PATH/engine"
-          GIT_SHA=${GITHUB_SHA::7}
-          docker build -t $IMAGE_ENGINE:$GIT_SHA -t $IMAGE_ENGINE:latest src/Components/Engine
-          docker push $IMAGE_ENGINE:$GIT_SHA
-          docker push $IMAGE_ENGINE:latest
-      - name: Build & push model-server (if Dockerfile exists)
-        run: |
-          if [ -f src/Components/Engine/model-server.Dockerfile ]; then \
-            IMAGE_MODEL="$REGION-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/$REPO_PATH/model-server"; \
-            GIT_SHA=${GITHUB_SHA::7}; \
-            docker build -f src/Components/Engine/model-server.Dockerfile -t $IMAGE_MODEL:$GIT_SHA -t $IMAGE_MODEL:latest src/Components/Engine; \
-            docker push $IMAGE_MODEL:$GIT_SHA; \
-            docker push $IMAGE_MODEL:latest; \
-          else echo "No model-server.Dockerfile present"; fi
+      - name: Configure Docker auth (AU registry)
+        run: gcloud auth configure-docker australia-southeast2-docker.pkg.dev -q
+      - name: Compute short SHA
+        id: vars
+        run: echo "sha_short=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+      - name: Build & push engine (multi-arch)
+        uses: docker/build-push-action@v5
+        with:
+          context: src/Components/Engine
+          file: src/Components/Engine/Engine.Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/${{ env.REPO_PATH }}/engine:${{ steps.vars.outputs.sha_short }}
+            ${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/${{ env.REPO_PATH }}/engine:latest
+            australia-southeast2-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/${{ env.REPO_PATH }}/engine:${{ steps.vars.outputs.sha_short }}
+            australia-southeast2-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/${{ env.REPO_PATH }}/engine:latest
+      - name: Build & push model-server (multi-arch)
+        uses: docker/build-push-action@v5
+        with:
+          context: src/Components/Engine
+          file: src/Components/Engine/Model.Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/${{ env.REPO_PATH }}/model-server:${{ steps.vars.outputs.sha_short }}
+            ${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/${{ env.REPO_PATH }}/model-server:latest
+            australia-southeast2-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/${{ env.REPO_PATH }}/model-server:${{ steps.vars.outputs.sha_short }}
+            australia-southeast2-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/${{ env.REPO_PATH }}/model-server:latest
       - name: Trivy scan engine
         uses: aquasecurity/trivy-action@0.20.0
         with:
