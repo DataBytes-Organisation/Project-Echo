@@ -32,10 +32,9 @@ def main(cfg: DictConfig):
 	dataset_size = len(audio_files)
 	train_size = int(cfg.data.train_split * dataset_size)
 	val_size = int(cfg.data.val_split * dataset_size)
-	test_size = dataset_size - train_size - val_size
+	# test_size = dataset_size - train_size - val_size
 	
 	indices = torch.tensor(list(range(dataset_size)))
-	# Note: for full reproducibility you might want to save/load the shuffled indices
 	torch.manual_seed(cfg.training.seed)
 	shuffled_indices = torch.randperm(len(indices))
 	indices = indices[shuffled_indices]
@@ -77,6 +76,7 @@ def main(cfg: DictConfig):
 	# cfg.training.epochs = 15
 
 	model = Model(cfg).to(device)
+	print(model.summary())
 	trainer = Trainer(cfg, model, train_loader, val_loader, device, cfg.model.name)
 	# trainer.train()
 	# trainer.test(val_loader)
@@ -89,7 +89,7 @@ def main(cfg: DictConfig):
 		load_path = None
 
 		if cfg.run.checkpoint_path:
-			ckpt_path = Path(hydra.utils.to_absolute_path(cfg.run.checkpoint_path))
+			ckpt_path = Path(hydra.utils.to_absolute_path(cfg.run.cKLDivLossheckpoint_path))
 			if ckpt_path.is_file():
 				load_path = ckpt_path
 			else:

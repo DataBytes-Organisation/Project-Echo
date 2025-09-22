@@ -3,12 +3,17 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from torch.utils.tensorboard import SummaryWriter
+from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torch.amp import autocast, GradScaler
 from tqdm import tqdm
 from pathlib import Path
 from sklearn.metrics import f1_score, precision_score, recall_score, accuracy_score
 import hydra
 from omegaconf import DictConfig
+
+from model.utils import ArcMarginProduct, CircleLoss
+from model import Model
+from copy import copy
 
 class Trainer:
 	def __init__(self, cfg: DictConfig, model, train_loader, val_loader, device, name=None):
@@ -26,18 +31,97 @@ class Trainer:
 		self.optimizer = hydra.utils.instantiate(self.cfg.training.optimizer, params=self.model.parameters())
 		self.scheduler = hydra.utils.instantiate(self.cfg.training.scheduler, optimizer=self.optimizer)
 
+		self.grad_clip = self.cfg.training.get('grad_clip', 1.0)
+
+		self.metric_loss_module = None
+		use_arcface_cfg = self.cfg.training.get('use_arcface', None)
+		if use_arcface_cfg == 'arcface':
+			self.metric_loss_module = ArcMarginProduct(
+				s=self.cfg.training.arcface.s,
+				m=self.cfg.training.arcface.m
+			).to(self.device)
+		elif use_arcface_cfg == 'circle':
+			self.metric_loss_module = CircleLoss(
+				s=self.cfg.training.circle.s,
+				m=self.cfg.training.circle.m
+			).to(self.device)
+
+		self.distillation = self.cfg.training.distillation.enabled
+		self.teacher_model_path = self.cfg.training.distillation.teacher_model_path
+		self.distillation_alpha = self.cfg.training.distillation.alpha
+		self.distillation_temperature = self.cfg.training.distillation.temperature
+
+		if self.distillation:
+			try:
+				_model = copy(self.cfg.model)
+				self.cfg.model = copy(self.cfg.teacher_model)
+
+				self.teacher_model = Model(self.cfg)
+				self.teacher_model.load_state_dict(torch.load(self.teacher_model_path, map_location=torch.device("cpu")))
+
+				self.teacher_model = self.teacher_model.to(self.device)
+				self.teacher_model.eval()
+
+				self.cfg.model = _model
+				print("Succesfully loaded teacher model.")
+
+				self.distillation_criterion = hydra.utils.instantiate(self.cfg.training.distillation.criterion)
+			except Exception as e:
+				print("Failed to load teacher model. Revert back to normal training.")
+				print(e)
+				self.cfg.training.distillation.enabled = False
+
 		self.name = name if name is not None else "model"
 
 		self.epochs = self.cfg.training.epochs
 		self.best_metric = float('inf') if self.cfg.training.metric_mode == 'min' else float('-inf')
 		self.metric_mode = self.cfg.training.metric_mode
 		self.best_model_path = Path(hydra.core.hydra_config.HydraConfig.get().runtime.output_dir) / f"best_{self.name}.pth"
-		
+
 		self.early_stopping_patience = self.cfg.training.get('early_stopping_patience', 3)
 		self.epochs_no_improve = 0
 		self.best_epoch = 0
 		
 		self.writer = SummaryWriter(log_dir=self.best_model_path.parent)
+
+	def save_checkpoint(self, path, epoch, best=True):
+		"""Save training checkpoint."""
+		checkpoint = {
+			'epoch': epoch,
+			'model_state_dict': self.model.state_dict(),
+			'optimizer_state_dict': self.optimizer.state_dict(),
+			'scheduler_state_dict': self.scheduler.state_dict() if self.scheduler else None,
+			'best_metric': self.best_metric,
+			'epochs_no_improve': self.epochs_no_improve,
+			'best_epoch': self.best_epoch,
+			'cfg': OmegaConf.to_container(self.cfg, resolve=True),
+		}
+
+		torch.save(checkpoint, path)
+		print(f"Checkpoint saved to {path}")
+
+		if best:
+			torch.save(checkpoint, self.best_model_path)
+			print(f"Best model checkpoint saved to {self.best_model_path}")
+	
+	def load_checkpoint(self, path):
+		"""Load training checkpoint to resume training."""
+
+		if path.is_file():
+			checkpoint = torch.load(path, map_location=self.device)
+			self.model.load_state_dict(checkpoint['model_state_dict'])
+			self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+			if self.scheduler and 'scheduler_state_dict' in checkpoint and checkpoint['scheduler_state_dict'] is not None:
+				self.scheduler.load_state_dict(checkpoint['scheduler_state_dict'])
+			
+			self.start_epoch = checkpoint.get('epoch', 0)
+			self.best_metric = checkpoint.get('best_metric', self.best_metric)
+			self.epochs_no_improve = checkpoint.get('epochs_no_improve', 0)
+			self.best_epoch = checkpoint.get('best_epoch', 0)
+			
+			print(f"Resumed from epoch {self.start_epoch}, best metric {self.best_metric:.4f}")
+		else:
+			raise FileNotFoundError(f"Checkpoint not found at {path}")
 
 	def _train_one_epoch(self, pbar, metrics_dict):
 		self.model.train()
@@ -49,16 +133,36 @@ class Trainer:
 			inputs, labels = inputs.to(self.device), labels.to(self.device)
 			self.optimizer.zero_grad()
 			
-			with autocast(self.device.type, enabled=self.use_amp):
-				outputs = self.model(inputs)
-				loss = self.criterion(outputs, labels)
+			with autocast(device_type=self.device.type, dtype=self.dtype, enabled=self.use_amp):
+				student_outputs = self.model(inputs)
+				if self.metric_loss_module is not None:
+					student_outputs = self.metric_loss_module(student_outputs, labels)
+
+				if self.distillation and self.teacher_model:
+					with torch.no_grad():
+						teacher_outputs = self.teacher_model(inputs)
+
+					student_loss = self.criterion(student_outputs, labels)
+					distillation_loss = self.distillation_criterion(
+						F.log_softmax(student_outputs / self.distillation_temperature, dim=1),
+						F.softmax(teacher_outputs / self.distillation_temperature, dim=1)
+					)
+					loss = (1. - self.distillation_alpha) * student_loss + self.distillation_alpha * distillation_loss * (self.distillation_temperature ** 2)
+				else:
+					loss = self.criterion(student_outputs, labels)
 
 			self.scaler.scale(loss).backward()
+
+			if self.grad_clip is not None:
+				# Unscale the gradients before clipping to avoid clipping scaled gradients
+				self.scaler.unscale_(self.optimizer)
+				torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.grad_clip)
+
 			self.scaler.step(self.optimizer)
 			self.scaler.update()
 
 			running_loss += loss.item() * inputs.size(0)
-			_, predicted = torch.max(outputs.data, 1)
+			_, predicted = torch.max(student_outputs.data, 1)
 			all_labels.extend(labels.cpu().numpy())
 			all_predictions.extend(predicted.cpu().numpy())
 			
@@ -85,7 +189,11 @@ class Trainer:
 				inputs, labels = inputs.to(self.device), labels.to(self.device)
 				with autocast(self.device.type, enabled=self.use_amp):
 					outputs = self.model(inputs)
+					if self.metric_loss_module is not None:
+						outputs = self.metric_loss_module(outputs, labels)
+
 					loss = self.criterion(outputs, labels)
+
 				running_loss += loss.item() * inputs.size(0)
 				_, predicted = torch.max(outputs.data, 1)
 				all_labels.extend(labels.cpu().numpy())
@@ -137,8 +245,11 @@ class Trainer:
 
 			pbar.set_postfix(metrics_dict)
 
-			# TODO: make this support other scheduler
-			self.scheduler.step(val_loss)
+			if self.scheduler:
+				if isinstance(self.scheduler, ReduceLROnPlateau):
+					self.scheduler.step(val_loss)
+				else:
+					self.scheduler.step()
 			
 			# Check for early stopping
 			if self.epochs_no_improve >= self.early_stopping_patience:
@@ -190,68 +301,3 @@ class Trainer:
 		print("------------------------")
 		
 		return accuracy, precision, recall, f1
-
-# The DistillationTrainer does not need any changes as it inherits the modified `train` method.
-class DistillationTrainer(Trainer):
-	def __init__(self, cfg: DictConfig, model, train_loader, val_loader, device):
-		super().__init__(cfg, model, train_loader, val_loader, device)
-
-		if not self.cfg.training.distillation.enabled:
-			raise ValueError("DistillationTrainer requires distillation to be enabled in config.")
-
-		self.teacher_model = hydra.utils.instantiate(self.cfg.model).to(self.device)
-		self.teacher_model.load_state_dict(torch.load(self.cfg.training.distillation.teacher_model_path))
-		self.teacher_model.eval()
-
-		self.distillation_criterion = hydra.utils.instantiate(self.cfg.training.distillation.criterion)
-		self.alpha = self.cfg.training.distillation.alpha
-		self.temperature = self.cfg.training.distillation.temperature
-
-	def _train_one_epoch(self, pbar, metrics_dict):
-		self.model.train()
-		running_loss = 0.0
-		all_labels = []
-		all_predictions = []
-		
-		for inputs, labels in self.train_loader:
-			inputs, labels = inputs.to(self.device), labels.to(self.device)
-			self.optimizer.zero_grad()
-
-			with autocast(enabled=self.use_amp):
-				student_outputs = self.model(inputs)
-				
-				with torch.no_grad():
-					teacher_outputs = self.teacher_model(inputs)
-
-				# Standard cross-entropy loss for the student
-				student_loss = self.criterion(student_outputs, labels)
-
-				# TODO: modify it so it also works with CosineEmbedding Loss and MSELoss
-				# Distillation loss (KL Divergence between softened student and teacher logits)
-				distillation_loss = self.distillation_criterion(
-					F.log_softmax(student_outputs / self.temperature, dim=1),
-					F.softmax(teacher_outputs / self.temperature, dim=1)
-				)
-
-				total_loss = (1 - self.alpha) * student_loss + self.alpha * distillation_loss
-			
-			self.scaler.scale(total_loss).backward()
-			self.scaler.step(self.optimizer)
-			self.scaler.update()
-
-			running_loss += total_loss.item() * inputs.size(0)
-			_, predicted = torch.max(student_outputs.data, 1)
-			all_labels.extend(labels.cpu().numpy())
-			all_predictions.extend(predicted.cpu().numpy())
-			
-			metrics_dict['batch_loss'] = f'{total_loss.item():.4f}'
-			metrics_dict['phase'] = 'train'
-			pbar.set_postfix(metrics_dict)
-			
-		epoch_loss = running_loss / len(self.train_loader.dataset)
-		epoch_acc = accuracy_score(all_labels, all_predictions)
-		
-		self.writer.add_scalar('Loss/train', epoch_loss, self.current_epoch)
-		self.writer.add_scalar('Accuracy/train', epoch_acc, self.current_epoch)
-		
-		return epoch_loss, epoch_acc
