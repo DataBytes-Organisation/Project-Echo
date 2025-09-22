@@ -330,7 +330,8 @@
   .screen > .screen-content > .screen-user:after {
     height: 3px;
     width: 30px;
-    translate: 26px calc(-1rem - 0.5px);
+    /* translate: 26px calc(-1rem - 0.5px); */
+    top: -20%;
   }
 
   
@@ -338,7 +339,7 @@
     .screen > .screen-content > .screen-user:after {
       height: 7px;
       width: 20vw;
-      translate: 22vw calc(-1rem - 0.5px);
+      /* translate: 22vw calc(-1rem - 0.5px); */
     }
   }
 
@@ -346,7 +347,8 @@
     .screen > .screen-content > .screen-user:after {
       height: 7px;
       width: 6vw;
-      translate: 8vw calc(-1rem - 0.5px);
+      /* translate: 8vw calc(-1rem - 0.5px); */
+      top: -22%;
     }
   }
 
