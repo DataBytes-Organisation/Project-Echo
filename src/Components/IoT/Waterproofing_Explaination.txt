@@ -1,0 +1,99 @@
+Purpose
+
+Runs environmental tests on an IoT device under test (DUT): temperature/humidity cycles, vibration, and water-spray. It listens to MQTT telemetry from the DUT, logs everything, checks against pass/fail limits, and generates a summary report with design recommendations.
+
+Key Parts
+
+Data models (Pydantic)
+
+ThermalStep, VibrationStep, SprayStep: one step in each profile (duration + setpoint).
+
+TestLimits: thresholds for board temp, internal RH, dew-point margin, moisture ingress, vibration.
+
+TestPlan: whole plan (instrument configs, MQTT info, limits, profiles, soak time, simulate flag).
+
+Utilities
+
+dew_point_celsius(...): Magnus formula to compute dew point.
+
+utc_now_iso(): UTC timestamps for consistent logging.
+
+Hardware abstraction (stubs)
+
+ClimateChamber, Shaker, SprayRig: minimal drivers with simulate mode and TODOs where real SCPI/MODBUS/GPIO calls go.
+
+They expose methods like set(...), set_rms_g(...), set_flow_lpm(...), plus helpers like stop().
+
+MQTT Telemetry
+
+TelemetryStore: thread-safe holder of the latest JSON payload from the DUT.
+
+make_mqtt_client(...): connects to broker and subscribes to plan.mqtt.topic; on message -> JSON parse -> store.
+
+Orchestrator
+
+Constructor sets up drivers, telemetry store, output files, and MQTT client.
+
+_csv_init(): creates a CSV with columns for setpoints and DUT telemetry (temp/RH/board temp/dew point/dew margin/moisture/accel).
+
+_log_row(...): every second, logs a row, appends an event to JSONL, and checks limits:
+
+board_temp_c > max_board_temp_c
+
+rh_pct > max_internal_rh_pct
+
+dew_margin_c (= t_c - dew_point) < max_dewpoint_delta_c → condensation risk
+
+moisture_kohm < max_moisture_kohm → ingress
+
+Very high accel_rms_g sanity check
+
+Any breach adds a message to fail_reasons.
+
+_hold(...): runs a phase for N seconds, sampling telemetry each second.
+
+run() flow:
+
+Start MQTT loop in a background thread.
+
+Thermal profile: set chamber T/RH → hold.
+
+Vibration profile: set RMS g → hold → stop.
+
+Spray profile: set flow → hold → stop.
+
+Summarize results and write report JSON.
+
+_summarize(): reads the CSV with pandas, computes stats (min/max, etc.), sets passed/failed, dedupes fail_reasons, and adds file artifact paths.
+
+_recommendations(...): turns margin/ingress/over-temp issues into practical design recommendations (better gaskets, desiccant/vent membranes, thermal pads/heat-spreading).
+
+CLI
+
+--plan test_plan.yaml to load profiles/limits/broker; --out results for artifacts.
+
+load_plan(...) reads YAML and instantiates a TestPlan.
+
+Inputs expected from the DUT (MQTT JSON)
+t_c, rh_pct, board_temp_c, moisture_kohm, accel_rms_g
+
+
+(Your ESP32 firmware or device should publish these to the configured topic.)
+
+Outputs produced
+
+*_telemetry.csv – second-by-second log
+
+*_events.jsonl – structured event stream
+
+*_report.json – pass/fail, stats, fail reasons, and recommendations
+
+Where to customize
+
+Profiles & limits: in your YAML plan (thermal/vibration/spray steps, thresholds).
+
+Hardware drivers: replace TODOs in ClimateChamber/Shaker/SprayRig with your SCPI/MODBUS/GPIO calls.
+
+Sim mode: simulate: true in YAML for dry-runs without hardware.
+
+In short: the script is a test runner + data logger + rule-based assessor that turns raw telemetry into actionable evidence for weatherproofing and durability validation
