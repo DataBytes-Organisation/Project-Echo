@@ -1,1 +1,11 @@
 ui/node_modules/
+node_modules
+dist
+build
+*.log
+.env
+.env.*
+prepros.config
+coverage/
+*.tsbuildinfo
+*.swp

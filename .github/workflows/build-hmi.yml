@@ -1,0 +1,49 @@
+name: build-hmi
+on:
+  push:
+    paths:
+      - "src/Components/HMI/**"
+      - ".github/workflows/build-hmi.yml"
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    env:
+      REGION: us-central1
+      REPO_PATH: echonet
+      IMAGE_NAME: hmi
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up QEMU (multi-arch)
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Auth to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+          service_account: ${{ secrets.GCP_SA_EMAIL }}
+      - name: Configure Docker auth (US registry)
+        run: gcloud auth configure-docker $REGION-docker.pkg.dev -q
+      - name: Configure Docker auth (AU registry)
+        run: gcloud auth configure-docker australia-southeast2-docker.pkg.dev -q
+      - name: Compute short SHA
+        id: vars
+        run: echo "sha_short=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+      - name: Build & push HMI (multi-arch)
+        uses: docker/build-push-action@v5
+        with:
+          context: src/Components/HMI
+          file: src/Components/HMI/HMI.Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/${{ env.REPO_PATH }}/${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.sha_short }}
+            ${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/${{ env.REPO_PATH }}/${{ env.IMAGE_NAME }}:latest
+            australia-southeast2-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/${{ env.REPO_PATH }}/${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.sha_short }}
+            australia-southeast2-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/${{ env.REPO_PATH }}/${{ env.IMAGE_NAME }}:latest
+

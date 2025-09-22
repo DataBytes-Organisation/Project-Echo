@@ -1,0 +1,81 @@
+image:
+  registry: us-central1-docker.pkg.dev/echonet-prod/echonet
+  tag: latest
+api:
+  replicas: 2
+  resources:
+    requests:
+      cpu: 200m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  mongoUriSecret: api-mongo-uri
+engine:
+  image: engine
+  tag: latest
+  replicas: 1
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: 1
+      memory: 1Gi
+modelServer:
+  image: model-server
+  tag: latest
+  replicas: 1
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: 1
+      memory: 2Gi
+  readiness:
+    modelName: echo_model
+hmi:
+  image: us-central1-docker.pkg.dev/echonet-prod/echonet/hmi:latest
+  replicas: 2
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 300m
+      memory: 256Mi
+  host: app.echonet.example.com
+mqtt:
+  image: us-central1-docker.pkg.dev/echonet-prod/echonet/mqtt:latest
+  replicas: 1
+  service:
+    type: ClusterIP # change to LoadBalancer if external clients connect
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
+simulator:
+  image: us-central1-docker.pkg.dev/echonet-prod/echonet/simulator:latest
+  replicas: 1
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+  enabled: true
+monitoring:
+  enabled: true
+  labels:
+    release: prometheus-stack
+  scrapeInterval: 30s
+  alerting:
+    enabled: true
+networkPolicies:
+  enabled: true
+  ingressNamespaceLabelForIngress: ingress-nginx # adjust if using different ingress controller namespace

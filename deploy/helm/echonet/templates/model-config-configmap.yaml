@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: model-config
+  labels:
+    app: model-server
+data:
+  models.config: |
+    model_config_list: {
+      config: [
+{{- range $m := .Values.model.models }}
+        { name: "{{$m.name}}", base_path: "/models/{{$m.name}}", model_platform: "tensorflow", model_version_policy: { all { } } },
+{{- end }}
+      ]
+    }

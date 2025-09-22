@@ -3,10 +3,11 @@ kind: ConfigMap
 metadata:
   name: engine-env
 data:
-  DB_USER: modelUser
-  DB_USER_PASS: EchoNetAccess2023
-  DB_ROOT_USER: root
-  DB_ROOT_USER_PASS: root_password
-  REDIS_HOST: value
-  DB_HOST: value
-  API_HOST: value
+  # Credentials now provided via Secret; only non-sensitive defaults here
+  DB_USER: <from-secret>
+  DB_USER_PASS: <from-secret>
+  DB_ROOT_USER: <from-secret>
+  DB_ROOT_USER_PASS: <from-secret>
+  REDIS_HOST: redis
+  DB_HOST: <from-secret>
+  API_HOST: api

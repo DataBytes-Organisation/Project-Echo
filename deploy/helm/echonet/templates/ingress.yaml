@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: echonet-ingress
+  annotations:
+    kubernetes.io/ingress.class: "gce" # adjust for your ingress controller
+spec:
+  rules:
+    - host: api.echonet.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: api
+                port:
+                  number: 80
+    - host: {{ .Values.hmi.host }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: hmi
+                port:
+                  number: 8080

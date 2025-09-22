@@ -1,0 +1,79 @@
+{{- if .Values.networkPolicies.enabled }}
+# Default deny all ingress within namespace
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-ingress
+spec:
+  podSelector: {}
+  policyTypes: ["Ingress"]
+---
+# Allow ingress controller to reach API & HMI
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-ingress-controller-web
+spec:
+  podSelector:
+    matchExpressions:
+      - key: app
+        operator: In
+        values: ["api", "hmi"]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              app.kubernetes.io/instance: {{ .Values.networkPolicies.ingressNamespaceLabelForIngress }}
+      ports:
+        - port: 9000
+        - port: 8080
+  policyTypes: ["Ingress"]
+---
+# Allow API to talk to model-server & engine
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-api-to-model-engine
+spec:
+  podSelector:
+    matchLabels:
+      app: model-server
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: api
+  policyTypes: ["Ingress"]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-engine-from-api
+spec:
+  podSelector:
+    matchLabels:
+      app: engine
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: api
+  policyTypes: ["Ingress"]
+---
+# Allow API to reach Mongo/Redis if they were internal (placeholder selectors)
+# Adjust selectors if deploying those inside cluster
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-db-from-api
+spec:
+  podSelector:
+    matchLabels:
+      app: mongo
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: api
+  policyTypes: ["Ingress"]
+{{- end }}

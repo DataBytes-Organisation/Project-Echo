@@ -1,0 +1,24 @@
+{{- if .Values.simulator.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: simulator
+  labels:
+    app: simulator
+spec:
+  replicas: {{ .Values.simulator.replicas }}
+  selector:
+    matchLabels:
+      app: simulator
+  template:
+    metadata:
+      labels:
+        app: simulator
+    spec:
+      containers:
+        - name: simulator
+          image: {{ .Values.simulator.image }}
+          args: ["python","system_manager.py"]
+          resources:
+{{- toYaml .Values.simulator.resources | nindent 12 }}
+{{- end }}

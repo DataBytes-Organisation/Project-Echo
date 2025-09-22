@@ -1,0 +1,78 @@
+image:
+  registry: australia-southeast2-docker.pkg.dev/sit-23t1-project-echo-25288b9/echonet
+  tag: latest
+api:
+  image: australia-southeast2-docker.pkg.dev/sit-23t1-project-echo-25288b9/echonet/api:latest
+
+  replicas: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 300m
+      memory: 256Mi
+  mongoUriSecret: api-mongo-uri
+engine:
+  image: australia-southeast2-docker.pkg.dev/sit-23t1-project-echo-25288b9/echonet/engine:latest
+  replicas: 1
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+modelServer:
+  image: australia-southeast2-docker.pkg.dev/sit-23t1-project-echo-25288b9/echonet/model-server:latest
+  replicas: 1
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: 500m
+      memory: 1Gi
+  readiness:
+    modelName: echo_model
+model:
+  bucket: echonet-models-stg
+  models:
+    - name: echo_model
+      path: echo_model/1
+    - name: weather_model
+      path: weather_model/1
+hmi:
+  image: australia-southeast2-docker.pkg.dev/sit-23t1-project-echo-25288b9/echonet/hmi:latest
+  replicas: 1
+  host: app-stg.echonet.example.com
+  resources:
+    requests:
+      cpu: 50m
+      memory: 96Mi
+    limits:
+      cpu: 200m
+      memory: 192Mi
+mqtt:
+  image: australia-southeast2-docker.pkg.dev/sit-23t1-project-echo-25288b9/echonet/mqtt:latest
+  replicas: 1
+  service:
+    type: ClusterIP
+  resources:
+    requests:
+      cpu: 25m
+      memory: 48Mi
+    limits:
+      cpu: 100m
+      memory: 96Mi
+simulator:
+  image: australia-southeast2-docker.pkg.dev/sit-23t1-project-echo-25288b9/echonet/simulator:latest
+  replicas: 1
+  resources:
+    requests:
+      cpu: 25m
+      memory: 96Mi
+    limits:
+      cpu: 100m
+      memory: 192Mi
+  enabled: true

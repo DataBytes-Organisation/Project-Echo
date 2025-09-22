@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: model-server
+  labels:
+    app: model-server
+spec:
+  selector:
+    app: model-server
+  ports:
+    - name: http
+      port: 8501
+      targetPort: 8501
+  type: ClusterIP

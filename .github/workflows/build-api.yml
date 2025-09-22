@@ -1,0 +1,53 @@
+name: build-api
+on:
+  push:
+    paths:
+      - "src/Components/API/**"
+      - ".github/workflows/build-api.yml"
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    env:
+      REGION: us-central1
+      IMAGE_NAME: api
+      REPO_PATH: echonet
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up QEMU (multi-arch)
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Auth to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+          service_account: ${{ secrets.GCP_SA_EMAIL }}
+      - name: Configure Docker auth
+        run: gcloud auth configure-docker $REGION-docker.pkg.dev -q
+      - name: Configure Docker auth (staging AU registry)
+        run: gcloud auth configure-docker australia-southeast2-docker.pkg.dev -q
+      - name: Compute short SHA
+        id: vars
+        run: echo "sha_short=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+      - name: Build & push (multi-arch)
+        uses: docker/build-push-action@v5
+        with:
+          context: src/Components/API
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/${{ env.REPO_PATH }}/${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.sha_short }}
+            ${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/${{ env.REPO_PATH }}/${{ env.IMAGE_NAME }}:latest
+            australia-southeast2-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/${{ env.REPO_PATH }}/${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.sha_short }}
+            australia-southeast2-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/${{ env.REPO_PATH }}/${{ env.IMAGE_NAME }}:latest
+      - name: Trivy scan
+        uses: aquasecurity/trivy-action@v0.20.0
+        with:
+          image-ref: ${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/$REPO_PATH/${{ env.IMAGE_NAME }}:latest
+          exit-code: '0'
+          severity: 'CRITICAL,HIGH'
