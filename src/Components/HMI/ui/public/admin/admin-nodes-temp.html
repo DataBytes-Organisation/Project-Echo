@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Echo Admin - Node Network</title>
+  <link rel="shortcut icon" type="image/png" href="./admin/images/logos/favicon.png" />
+  <link type="text/css" rel="stylesheet" href="./admin/css/styles.min.css" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+  <script type="text/javascript" src="https://kit.fontawesome.com/8aa980d912.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.6/dist/dist/vis-network.min.css" />
+  <style>
+    #network-container {
+      width: 100%;
+      height: 600px;
+      border: 1px solid #ddd;
+      background-color: #f8f9fa;
+      border-radius: 8px;
+    }
+    .node-details {
+      padding: 20px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      margin-top: 20px;
+    }
+    .component-card {
+      margin-bottom: 15px;
+      padding: 15px;
+      border: 1px solid #eee;
+      border-radius: 8px;
+      background: #f8f9fa;
+    }
+    .component-card h5 {
+      margin: 0;
+      color: #2a3547;
+    }
+    .component-card .properties {
+      margin-top: 10px;
+      font-size: 14px;
+    }
+    .property-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+      padding: 5px 0;
+      border-bottom: 1px dashed #eee;
+    }
+    .sensor-data {
+      background-color: #f8f9ff;
+      border-radius: 4px;
+      padding: 10px;
+      margin-top: 15px;
+    }
+    .sensor-value {
+      font-weight: 500;
+      color: #0d6efd;
+    }
+    .config-section {
+      background-color: #f8f9fa;
+      border-radius: 4px;
+      padding: 10px;
+    }
+    .sensor-group {
+      background-color: rgba(13, 110, 253, 0.03);
+      border-radius: 4px;
+      padding: 8px;
+      margin-bottom: 10px;
+    }
+    .sensor-group-title {
+      font-weight: 500;
+      color: #0d6efd;
+      margin-bottom: 5px;
+      font-size: 0.9rem;
+    }
+    .property-item.nested {
+      padding-left: 15px;
+      border-left: 2px solid rgba(13, 110, 253, 0.1);
+      margin-left: 5px;
+    }
+  </style>
+</head>
+
+<body>
+  <!--  Body Wrapper -->
+  <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
+    data-sidebar-position="fixed" data-header-position="fixed">
+    <!-- Sidebar Start -->
+    <div id="sidebar"></div>
+    <!--  Sidebar End -->
+    <!--  Main wrapper -->
+    <div class="body-wrapper">
+      <!--  Header Start -->
+      <div id="header"></div>
+      <!--  Header End -->
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-12">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title fw-semibold mb-4">Node Network</h5>
+                <div id="network-container"></div>
+                <div id="node-details" class="node-details" style="display: none;">
+                  <h4 id="node-title" class="mb-4"></h4>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="mb-3">
+                        <strong>Type:</strong> <span id="node-type"></span>
+                      </div>
+                      <div class="mb-3">
+                        <strong>Model:</strong> <span id="node-model"></span>
+                      </div>
+                      <div class="mb-3">
+                        <strong>Location:</strong> <span id="node-location"></span>
+                      </div>
+                      <div class="mb-3">
+                        <strong>Registration Status:</strong> <span id="node-registration"></span>
+                      </div>
+                      <div class="mb-3" id="registration-time-container" style="display: none;">
+                        <strong>Registered Time:</strong> <span id="node-registration-time"></span>
+                      </div>
+                      <div class="mb-3" id="heartbeat-container" style="display: none;">
+                        <strong>Heartbeat Status:</strong> <span id="node-heartbeat-status"></span>
+                        <div class="small text-muted" id="last-seen-time"></div>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="mb-3">
+                        <strong>Custom Properties:</strong>
+                        <div id="node-properties"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <h5 class="mt-4 mb-3">Components</h5>
+                  <div id="node-components"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script type="text/javascript" src="./admin/js/sidebarmenu.js"></script>
+  <script type="text/javascript" src="./admin/js/app.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.6/dist/vis-network.min.js"></script>
+  <script>
+    // Load header and sidebar components
+    $(document).ready(function() {
+      $("#sidebar").load("./admin/component/sidebar-component.html");
+      $("#header").load("./admin/component/header-component.html");
+    });
+
+    // Network visualization
+    let currentNodeId = null;
+    let refreshInterval = null;
+    let network = null;
+
+    async function refreshNodeDetails() {
+      if (!currentNodeId) return;
+      
+      try {
+        const response = await fetch(`http://localhost:9000/iot/nodes/${currentNodeId}`);
+        const node = await response.json();
+        showNodeDetails(node);
+      } catch (error) {
+        console.error('Error refreshing node details:', error);
+      }
+    }
+
+    async function initNetwork() {
+      try {
+        const response = await fetch('http://localhost:9000/iot/nodes');
+        const nodes = await response.json();
+
+        // Prepare data for vis.js
+        const nodeData = nodes.map(node => ({
+          id: node._id,
+          label: node.name,
+          title: `${node.name}\n${node.type}\n${node.model}`,
+          group: node.type
+        }));
+
+        const edges = [];
+        nodes.forEach(node => {
+          if (node.connectedNodes) {
+            node.connectedNodes.forEach(targetId => {
+              edges.push({
+                from: node._id,
+                to: targetId,
+                arrows: {
+                  to: true
+                }
+              });
+            });
+          }
+        });
+
+        const container = document.getElementById('network-container');
+        const data = {
+          nodes: new vis.DataSet(nodeData),
+          edges: new vis.DataSet(edges)
+        };
+
+        const options = {
+          nodes: {
+            shape: 'dot',
+            size: 20,
+            font: {
+              size: 14
+            }
+          },
+          edges: {
+            width: 2,
+            color: {
+              color: '#2B547E',
+              highlight: '#1E90FF'
+            }
+          },
+          groups: {
+            master: {
+              color: { background: '#4CAF50', border: '#388E3C' }
+            },
+            arduino: {
+              color: { background: '#2196F3', border: '#1976D2' }
+            },
+            raspberry_pi: {
+              color: { background: '#F44336', border: '#D32F2F' }
+            }
+          },
+          physics: {
+            stabilization: true,
+            barnesHut: {
+              gravitationalConstant: -10000,
+              springConstant: 0.002
+            }
+          }
+        };
+
+        network = new vis.Network(container, data, options);
+
+        // Show node details when clicked
+        network.on('click', async function(params) {
+          if (params.nodes.length > 0) {
+            currentNodeId = params.nodes[0];
+            
+            // Clear existing interval if any
+            if (refreshInterval) {
+              clearInterval(refreshInterval);
+            }
+            
+            // Initial load of node details
+            const response = await fetch(`http://localhost:9000/iot/nodes/${currentNodeId}`);
+            const node = await response.json();
+            showNodeDetails(node);
+            
+            // Set up auto-refresh every 10 seconds
+            refreshInterval = setInterval(refreshNodeDetails, 10000);
+          } else {
+            // If clicking away from a node, clear the interval and hide details
+            if (refreshInterval) {
+              clearInterval(refreshInterval);
+              refreshInterval = null;
+            }
+            currentNodeId = null;
+            document.getElementById('node-details').style.display = 'none';
+          }
+        });
+
+      } catch (error) {
+        console.error('Error initializing network:', error);
+      }
+    }
+
+    function showNodeDetails(node) {
+      document.getElementById('node-details').style.display = 'block';
+      document.getElementById('node-title').textContent = node.name;
+      document.getElementById('node-type').textContent = node.type;
+      document.getElementById('node-model').textContent = node.model;
+      document.getElementById('node-location').textContent = 
+        `${node.location.latitude}, ${node.location.longitude}`;
+
+      // Show registration status
+      const registrationStatus = document.getElementById('node-registration');
+      const registrationTimeContainer = document.getElementById('registration-time-container');
+      const registrationTime = document.getElementById('node-registration-time');
+      
+      if (node.registered) {
+        registrationStatus.textContent = 'Registered';
+        registrationStatus.style.color = '#4CAF50';
+        registrationTimeContainer.style.display = 'block';
+        registrationTime.textContent = node.registeredTime || 'Unknown';
+        
+        // Show heartbeat status for registered nodes
+        const heartbeatContainer = document.getElementById('heartbeat-container');
+        const heartbeatStatus = document.getElementById('node-heartbeat-status');
+        const lastSeenTime = document.getElementById('last-seen-time');
+        heartbeatContainer.style.display = 'block';
+        
+        if (node.lastSeen) {
+          // Both timestamps have timezone info, so direct comparison works
+          const lastSeen = new Date(node.lastSeen);
+          const now = new Date();
+          const timeDiff = now - lastSeen;
+          const minutesDiff = Math.floor(timeDiff / (1000 * 60));
+          
+          // Format the last seen time in local timezone
+          lastSeenTime.textContent = `Last seen: ${lastSeen.toLocaleString()}`;
+          console.log(`Minutes since last heartbeat: ${minutesDiff}`);
+          
+          if (minutesDiff > 5) {
+            heartbeatStatus.textContent = 'Warning: No Recent Heartbeat';
+            heartbeatStatus.style.color = '#FFA500';
+          } else {
+            heartbeatStatus.textContent = 'Active';
+            heartbeatStatus.style.color = '#4CAF50';
+          }
+        } else {
+          heartbeatStatus.textContent = 'No Heartbeat Received';
+          heartbeatStatus.style.color = '#F44336';
+          lastSeenTime.textContent = '';
+        }
+      } else {
+        registrationStatus.textContent = 'Not Registered';
+        registrationStatus.style.color = '#F44336';
+        registrationTimeContainer.style.display = 'none';
+        document.getElementById('heartbeat-container').style.display = 'none';
+      }
+
+      // Show custom properties
+      const propertiesDiv = document.getElementById('node-properties');
+      propertiesDiv.innerHTML = '';
+      Object.entries(node.customProperties).forEach(([key, value]) => {
+        propertiesDiv.innerHTML += `<div class="property-item">
+          <span>${key}:</span> <span>${value}</span>
+        </div>`;
+      });
+
+      // Show components
+      const componentsDiv = document.getElementById('node-components');
+      componentsDiv.innerHTML = '';
+      if (node.components && node.components.length > 0) {
+        node.components.forEach(component => {
+          componentsDiv.innerHTML += `
+            <div class="component-card">
+              <h5>${component.type} - ${component.model}</h5>
+              <div class="mb-3">
+                <strong>ID:</strong> ${component.id}
+              </div>
+              <div class="mb-3">
+                <strong>Category:</strong> ${component.category}
+              </div>
+              <div class="properties config-section">
+                <h6 class="mb-2">Configuration:</h6>
+                ${Object.entries(component.customProperties || {})
+                  .map(([key, value]) => `
+                    <div class="property-item">
+                      <span>${key}:</span> <span>${value}</span>
+                    </div>
+                  `).join('')}
+              </div>
+              ${component.sensorData ? `
+                <div class="properties sensor-data">
+                  <h6 class="mb-2 text-primary">Live Sensor Data:</h6>
+                  ${Object.entries(component.sensorData)
+                    .map(([key, value]) => {
+                      if (typeof value === 'object' && value !== null) {
+                        return `
+                          <div class="sensor-group mb-2">
+                            <div class="sensor-group-title">${key}:</div>
+                            ${Object.entries(value)
+                              .map(([subKey, subValue]) => `
+                                <div class="property-item nested">
+                                  <span>${subKey}:</span> 
+                                  <span class="sensor-value">${typeof subValue === 'number' ? subValue.toFixed(2) : subValue}</span>
+                                </div>
+                              `).join('')}
+                          </div>
+                        `;
+                      } else {
+                        return `
+                          <div class="property-item">
+                            <span>${key}:</span> 
+                            <span class="sensor-value">${typeof value === 'number' ? value.toFixed(2) : value}</span>
+                          </div>
+                        `;
+                      }
+                    }).join('')}
+                </div>
+              ` : ''}
+            </div>
+          `;
+        });
+      } else {
+        componentsDiv.innerHTML = '<p>No components found.</p>';
+      }
+    }
+
+
+
+    // Clean up interval when page unloads
+    window.addEventListener('unload', function() {
+      if (refreshInterval) {
+        clearInterval(refreshInterval);
+      }
+    });
+
+    // Initialize network when page loads
+    window.addEventListener('load', initNetwork);
+  </script>
+</body>
+
+</html>
