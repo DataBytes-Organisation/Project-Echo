@@ -5,3 +5,5 @@ params:
   num_classes: ${data.num_classes}
   use_qat: true
   trainable_blocks: -1
+  use_arcface: true
+
