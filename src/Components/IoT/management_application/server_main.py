@@ -2,30 +2,29 @@ from flask import Flask, request
 import os
 from datetime import datetime
 
-UPLOAD_FOLDER = "uploads"
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-
 app = Flask(__name__)
 
 @app.route("/upload", methods=["POST"])
 def upload():
-    # Read health data
-    cpu = request.form.get("cpu")
-    ram = request.form.get("ram")
-    disk = request.form.get("disk")
-    uptime = request.form.get("uptime")
-
-    print(f"CPU: {cpu}%, RAM: {ram}%, Disk: {disk}%, Uptime: {uptime}")
-
-    # Save audio file
-    audio = request.files.get("audio")
-    if audio:
-        filename = datetime.now().strftime("%Y%m%d_%H%M%S") + ".wav"
-        filepath = os.path.join(UPLOAD_FOLDER, filename)
-        audio.save(filepath)
-        print(f"Audio saved at: {filepath}")
-
+    data = request.get_json()
+    
+    if data:
+        cpu = data.get("cpu")
+        ram = data.get("ram")
+        disk = data.get("disk")
+        uptime = data.get("uptime")
+        # latitude = data.get("latitude")
+        # longtude = data.get("longitude")
+        species = data.get("species")
+        confidence = data.get("confidence")
+        
+        print(f"CPU: {cpu}%, RAM: {ram}%, Disk: {disk}%, Uptime: {uptime}")
+        # print(f"Location: {latitude}, {longitude}")
+        print(f"Species: {species}, Confidence: {confidence}")
+    
     return "Data received successfully!", 200
+        
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
