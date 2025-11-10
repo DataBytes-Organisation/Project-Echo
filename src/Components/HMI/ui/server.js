@@ -526,6 +526,11 @@ app.get("/admin-nodes", (req, res) => {
   return res.sendFile(path.join(__dirname, 'public/admin/admin-nodes.html'));
 });
 
+app.get("/admin-nodes-temp", (req, res) => {
+  return res.sendFile(path.join(__dirname, 'public/admin/admin-nodes-temp.html'));
+});
+
+
 //Serve the profile tab
 app.get("/admin-profile", (req,res)=> {
   return res.sendFile(path.join(__dirname, 'public/admin/profile.html'));

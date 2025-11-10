@@ -438,14 +438,27 @@
     "connectedNodes": ["node_3"],
     "components": [
       {
-        "id": "comp_3_2_1",
-        "type": "fan",
-        "model": "CoolMaster Mini",
-        "category": "cooling",
+        "id": "dht11",
+        "type": "dht11",
+        "model": "DHT11",
+        "category": "sensor",
         "customProperties": {
-          "speed": 1000,
-          "maxSpeed": 1800,
-          "temperature": 30
+          "maxTemp": 50,
+          "minTemp": 0,
+          "maxHumidity": 100,
+          "minHumidity": 0
+        }
+      },
+      {
+        "id": "imu1",
+        "type": "imu",
+        "model": "MPU6050",
+        "category": "sensor",
+        "customProperties": {
+          "maxAcc": 16,
+          "maxGyro": 2000,
+          "maxTemp": 85,
+          "minTemp": -40
         }
       }
     ]
