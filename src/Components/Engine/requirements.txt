@@ -9,6 +9,7 @@ matplotlib
 numpy
 paho-mqtt==1.6.1
 pandas
+opencv-python
 pymongo[srv]
 soundfile
 # tensorflow==2.15.0
