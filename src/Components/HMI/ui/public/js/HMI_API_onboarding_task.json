@@ -416,6 +416,46 @@
     {
         "Bird": "Pycnoptilus floccosus",
         "description": ["Pilotbirds are plump, large headed ground dwelling birds with dark brown on the upper body as well as on the head."]
+    },
+    {
+        "Bird": "Rawlinsonia Ewingii",
+        "description": [
+            "Common Name: Southern Brown Tree Frog.",
+            "Call: Cricket-like, being a high-pitched trill repeated 5 or 6 times, the first note longer than those that follow.",
+            "Appearance: Quite small and often light brown in colour with darker markings, but highly variable in colour from whitish-grey to dark brown. Lacks webbing but has slightly expanded toe pads for climbing"
+        ]
+    },
+    {
+        "Bird": "Limnodynastes Dumerilii",
+        "description": [
+            "Common Name: Eastern Banjo Frog.",
+            "Call: Distinctive 'bonk' sound, similar to a banjo string being plucked.",
+            "Appearance: Large species, brown or grey-brown back, with orange or yellow mottling on the sides. There is a pale or yellow stripe from under the eye to the shoulder."
+        ]
+    },
+    {
+        "Bird": "Limnodynastes Peronii",
+        "description": [
+            "Common Name: Striped Marsh Frog.",
+            "Call: A single short 'tok' sound, repeated every few seconds. Similar to a tennis ball being hit.",
+            "Appearance: Large species, brown back with dark brown longitudinal stripes, and sometimes a cream-coloured or reddish stripe along the middle. There is a pale stripe from under the eye to the top of the arm."
+        ]
+    },
+    {
+        "Bird": "Geocrinia Sparsiflora",
+        "description": [
+            "Common Name: Otway Smooth Frog.",
+            "Call: Described as an elongated 'ra-a-a-a-ack' sound, repeated several times.",
+            "Appearance: A small frog, highly variable in colour, ranging from golden-yellow, red-orange, to brown sometimes with bright yellow or white spots, blotches or ocelli encircled with black. Dark stripe from the tip of the snout to behind the eye."
+        ]
+    },
+    {
+        "Bird": "Podargus Strigoides",
+        "description": [
+            "Common Name: Podargus Strigoides",
+            "Call: Low-pitched rythmic 'ooom-ooom-ooom' sound, often heard at night.",
+            "Appearance: Large-headed bird with mottled brown, grey, and white plumage providing excellent camouflage against tree bark. Often mistaken for an owl."
+        ]
     }
     
   ]
