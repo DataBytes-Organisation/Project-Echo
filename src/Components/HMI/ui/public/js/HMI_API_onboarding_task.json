@@ -117,7 +117,12 @@
     },
     {
         "Bird": "Anseranas semipalmata",
-        "description": []
+        "description": [
+            "Common Name: Magpie Goose.",
+            "Magpie geese are unmistakable birds with their black and white plumage and yellowish legs.",
+            "The species was once also widespread in southern Australia but disappeared from there "
+			"largely due to the drainage of the wetlands where the birds once bred."
+        ]
     },
     {
         "Bird": "Anthochaera carunculata",
@@ -177,19 +182,39 @@
     },
     {
         "Bird": "Aquila audax",
-        "description": []
+        "description": [
+            "Common Name: Wedge-tailed eagle.",
+            "The largest bird of prey in the continent of Australia.  They reside in most habitats ",
+			"present in Australia, ranging from desert and semi-desert to plains to mountainous areas to ", 
+			"forest, even sometimes tropical rainforests.",
+            "Lives in dry woodlands and feeds mainly on seeds and insects."
+        ]
     },
     {
         "Bird": "Artamus cinereus",
-        "description": []
+        "description": [
+            "Common Name: Black-faced woodswallow.",
+            "This species is broadly distributed in Australia, occupying most of the continent except for ",
+			"the southeastern margin near its coast. It is mainly sedentary, remaining in arid and semi-arid ",
+			"areas even during dry conditions."
+        ]
     },
     {
         "Bird": "Artamus cyanopterus",
-        "description": []
+        "description": [
+            "Common Name: Dusky woodswallow",
+            "The name woodswallow is a misnomer as they are not closely related to true swallows. Instead, ",
+			"they belong to the family Artamidae, which also includes butcherbirds, currawongs and the Australian magpie."
+        ]
     },
     {
         "Bird": "Artamus minor",
-        "description": []
+        "description": [
+            "Common Name: Little woodswallow",
+            "This bird is patchily distributed over much of mainland Australia, avoiding only the driest deserts and ",
+			"the area within about 300 kilometres of the southern coastline, and showing a preference for rugged ",
+			"terrain around inland ranges."
+        ]
     },
     {
         "Bird": "Artamus superciliosus",
