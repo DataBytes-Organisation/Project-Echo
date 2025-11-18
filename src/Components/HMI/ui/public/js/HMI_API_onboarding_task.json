@@ -192,25 +192,60 @@
         "description": []
     },
     {
-        "Bird": "Artamus superciliosus",
-        "description": []
-    },
-    {
-        "Bird": "Atrapsalta encaustica",
-        "description": []
-    },
-    {
-        "Bird": "Auscala spinosa",
-        "description": []
-    },
-    {
-        "Bird": "Austrochaperina pluvialis",
-        "description": []
-    },
-    {
-        "Bird": "Austronomus australis",
-        "description": []
-    },
+    "Bird": "Artamus superciliosus",
+    "description": [
+        "Common Name: White-browed Woodswallow.",
+        "A medium-sized Australian bird with dark plumage and a distinctive white eyebrow above the eye.",
+        "It is mostly found in inland Australia, where it often moves in groups following flowering eucalypts and other nectar sources.",
+        "White-browed Woodswallows mainly feed on flying insects and nectar, catching insects in the air with agile flight.",
+        "They usually nest in small colonies, building shallow cup-shaped nests in shrubs or trees."
+    ]
+},
+
+   {
+    "Bird": "Atrapsalta encaustica",
+    "description": [
+        "Common Name: Black Squeaker.",
+        "A small cicada species with forewings around 15–18 mm long, belonging to the Cicadettinae subfamily.",
+        "It is endemic to Australia and occurs in elevated areas of south-eastern Queensland and New South Wales.",
+        "The species is usually found in open forest, montane heath, and coastal heathland habitats.",
+        "Adult males cling to tree trunks, especially eucalypts, and produce a high-pitched squeaking call during warm, sunny weather from spring to late summer."
+    ]
+},
+
+ {
+    "Bird": "Auscala spinosa",
+    "description": [
+        "Common Name: Creaking Branch Cicada.",
+        "A medium-sized cicada with forewings typically 27–35 mm long.",
+        "This species is endemic to inland eastern Australia, where it lives in woodlands dominated by ironbark eucalypts or belah trees.",
+        "Adults are usually active from spring to late summer, calling from the higher branches of trees.",
+        "Its call has been compared to the sound of creaking tree branches, especially when many individuals are singing together."
+    ]
+},
+
+ {
+    "Bird": "Austrochaperina pluvialis",
+    "description": [
+        "Common Names: Rain Whistling Frog, Rain Frog, or White-browed Whistling Frog.",
+        "A small ground-dwelling frog in the Microhylidae family, endemic to rainforests of north-eastern Queensland, Australia.",
+        "It is usually found under leaf litter, soil, or fallen logs on the forest floor, especially in moist areas.",
+        "Males produce a clear whistling call, often heard during rainy or humid weather.",
+        "The species lays eggs on land, and the tadpole stage is skipped, with tiny froglets hatching directly from the eggs."
+    ]
+},
+
+  {
+    "Bird": "Austronomus australis",
+    "description": [
+        "Common Name: White-striped Free-tailed Bat.",
+        "An insect-eating microbat with long, narrow wings and a distinctive white stripe along its flanks.",
+        "It is widespread in Australia and often flies high above open areas, parks, and suburbs at night while hunting flying insects.",
+        "Its echolocation calls are unusually low-pitched for a bat and can sometimes be heard by people as a sharp 'tik-tik' or 'ping' sound.",
+        "This species typically roosts in tree hollows, under loose bark, or in roofs and other man-made structures during the day."
+    ]
+},
+
     {
         "Bird": "AvesÂ sp.",
         "description": []
