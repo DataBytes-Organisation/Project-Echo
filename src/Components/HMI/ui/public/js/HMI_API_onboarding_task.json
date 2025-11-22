@@ -77,23 +77,52 @@
     },
     {
         "Bird": "Accipiter fasciatus",
-        "description": []
+        "description": [
+            "The Brown Goshawk is a mid sized bird with grey-brown upperparts and reddish-brown collar on neck.",
+            "This species lives in a variety of habitats including forests, woodlands, farmland, and even suburban areas.",
+            "Brown Goshawks are Agile hunters that consumes small mammals, reptiles and large insects.",
+            "Females are larger than males but with similiar appearance.",
+            "They have long tails and tellow eyes and who is native to australia."
+        ]
     },
     {
         "Bird": "Accipiter cooperi",
-        "description": []
+        "description": [
+            "This mid sized hawk can be found across North America which prefers woodland as habitat.",
+            "Cooper's Hawk is known for its accurate flight through trees to catch the preys.",
+            "They mostly hunts pigeons, doves, mammals by attacking them with suprise and speed.",
+            "They have bluish-gray back feathers and barred reddish-orange underparts."
+        ]
     },
     {
         "Bird": "Acrocephalus australis",
-        "description": []
+        "description": [
+            "A songbird who is a small brown and native to wetlands across Australia.",
+            "Usually found around dense reeds and vegetation in fresh water or brackish waterways.",
+            "Australian Reed Warbler delivers a loud melodious warbling song but hard to find.",
+            "Feeds on insects and spiders by picking them off from reed stems.",
+            "They build deep cup shaped nests woven onto reeds near the water",
+            "this species is the only member of its genus found in Australia."
+        ]
     },
     {
         "Bird": "Aegotheles cristatus",
-        "description": []
+        "description": [
+            "A tiny nocturnal bird found in open woodland and scrub around Australia.",
+            "The Australian Owlet-nightjar is the smallest night bird in Australia that earns charming nicknames such as moth owl, fairy owl.",
+            "They have gray upperparts and white-grey barred chest and belly with a pattern on their face.",
+            "Hunts flying insects such as moths, beetles and grasshoppers specially at night."
+        ]
     },
     {
         "Bird": "Aidemosyne modesta",
-        "description": []
+        "description": [
+            "Male bird has a plum coloured and shaped forehead with a brown body that contains white scalloped markings.",
+            "Plum headed Finch is also known as cherry finch and who is native to eastern Australia.",
+            "Females are plainer obvious red coloured birds who usually lay 4-6 white eggs per clutch on round woven grass nests .",
+            "Usually travel in small flocks and feeds on grass seeds and occassionally having insects as a dietery supplement.",
+            "Typically found in dry savannas, grasslands, and open shrublands, often near water sources in northeastern Australia."
+        ]
     },
     {
         "Bird": "Alisterus scapularis",
