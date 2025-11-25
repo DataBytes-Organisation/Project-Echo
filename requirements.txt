@@ -7,3 +7,7 @@ tasp1
 uvicorn[standard]
 python-multipart
 pydantic
+# WebSocket support
+fastapi
+uvicorn
+websockets

@@ -16,3 +16,15 @@ open conda shell and cd to the api folder, then run:
 python -m uvicorn app.main:app --reload
 
 Head to localhost:9000/docs to read the documentation for API 
+
+
+
+
+# TEAM PROJECT T3 11/2025 NOTES
+
+backend-deployment.yaml (for running backend 24/7):
+- Replace <image-name> with the actual Docker image name
+
+backend-service.yaml (to expose API)
+
+
