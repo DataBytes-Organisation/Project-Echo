@@ -1490,6 +1490,94 @@
         }
       }
     },
+    "/public/public-test": {
+      "get": {
+        "tags": [
+          "public"
+        ],
+        "summary": "Public Test",
+        "description": "A simple test endpoint to confirm that the public router is loaded successfully.",
+        "operationId": "public_test_public_public_test_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/public/filter-data": {
+      "get": {
+        "tags": [
+          "public"
+        ],
+        "summary": "Filter Data",
+        "description": "Provides a public, no-authentication data filtering interface.\nOptional query parameters include:\n- start_time: float, Unix timestamp (in seconds)\n- end_time: float, Unix timestamp (in seconds)\n- species: str, species name\n- microphone_id: str, sensor ID\n\nReturns data filtered based on the given criteria.",
+        "operationId": "filter_data_public_filter_data_get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "title": "Start Time",
+              "type": "number"
+            },
+            "name": "start_time",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "title": "End Time",
+              "type": "number"
+            },
+            "name": "end_time",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "title": "Species",
+              "type": "string"
+            },
+            "name": "species",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "title": "Microphone Id",
+              "type": "string"
+            },
+            "name": "microphone_id",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/iot/nodes": {
       "get": {
         "tags": [
@@ -1610,6 +1698,126 @@
         "responses": {
           "200": {
             "description": "Get connections for a node",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/iot/nodes/{node_id}/register": {
+      "put": {
+        "tags": [
+          "iot"
+        ],
+        "summary": "Register Node",
+        "operationId": "register_node_iot_nodes__node_id__register_put",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "title": "Node Id",
+              "type": "string"
+            },
+            "name": "node_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Register a node",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/iot/nodes/{node_id}/heartbeat": {
+      "put": {
+        "tags": [
+          "iot"
+        ],
+        "summary": "Update Node Connection",
+        "operationId": "update_node_connection_iot_nodes__node_id__heartbeat_put",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "title": "Node Id",
+              "type": "string"
+            },
+            "name": "node_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Update node's last message and connection status",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/iot/nodes/{node_id}/updates": {
+      "post": {
+        "tags": [
+          "iot"
+        ],
+        "summary": "Update Node Data",
+        "operationId": "update_node_data_iot_nodes__node_id__updates_post",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "title": "Node Id",
+              "type": "string"
+            },
+            "name": "node_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Update node's components data",
             "content": {
               "application/json": {
                 "schema": {}
