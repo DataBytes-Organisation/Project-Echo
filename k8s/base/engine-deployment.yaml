@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: engine
+  namespace: project-echo
+  labels:
+    app.kubernetes.io/name: engine
+    app.kubernetes.io/component: inference
+spec:
+  replicas: 2
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: engine
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: engine
+        app.kubernetes.io/component: inference
+    spec:
+      serviceAccountName: engine
+      containers:
+        - name: engine
+          image: REGION-docker.pkg.dev/PROJECT_ID/echonet/engine:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8000
+          env:
+            - name: APP_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: project-echo-config
+                  key: APP_ENV
+            - name: MODEL_BUCKET
+              valueFrom:
+                secretKeyRef:
+                  name: engine-secrets
+                  key: MODEL_BUCKET
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: "/var/run/secrets/workload-identity/credentials.json"
+          volumeMounts:
+            - name: wi-credentials
+              mountPath: /var/run/secrets/workload-identity
+              readOnly: true
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 15
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 45
+            periodSeconds: 30
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+            limits:
+              cpu: "1"
+              memory: 2Gi
+      volumes:
+        - name: wi-credentials
+          projected:
+            sources:
+              - serviceAccountToken:
+                  path: credentials.json
+                  expirationSeconds: 3600
+                  audience: https://sts.googleapis.com

@@ -1,0 +1,54 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: project-echo
+
+resources:
+  - ../../base
+  - managedcertificate.yaml
+
+images:
+  - name: REGION-docker.pkg.dev/PROJECT_ID/echonet/api
+    newName: australia-southeast2-docker.pkg.dev/sit-23t1-project-echo-25288b9/echonet/api
+    newTag: prod
+  - name: REGION-docker.pkg.dev/PROJECT_ID/echonet/engine
+    newName: australia-southeast2-docker.pkg.dev/sit-23t1-project-echo-25288b9/echonet/engine
+    newTag: prod
+  - name: REGION-docker.pkg.dev/PROJECT_ID/echonet/hmi
+    newName: australia-southeast2-docker.pkg.dev/sit-23t1-project-echo-25288b9/echonet/hmi
+    newTag: prod
+
+configMapGenerator:
+  - name: project-echo-config
+    behavior: merge
+    literals:
+      - APP_ENV=prod
+      - API_BASE_PATH=https://api.echo.example.com
+      - LOG_LEVEL=INFO
+
+secretGenerator:
+  - name: api-secrets
+    behavior: merge
+    literals:
+      - MONGO_URI=mongodb://mongo.project-echo.svc.cluster.local:27017/echo
+      - REDIS_URL=redis://:strongpassword@redis.project-echo.svc.cluster.local:6379/0
+  - name: engine-secrets
+    behavior: merge
+    literals:
+      - MODEL_BUCKET=gs://sit-23t1-project-echo-25288b9-echonet-models-prod
+  - name: mongo-secrets
+    behavior: merge
+    literals:
+      - ROOT_USERNAME=admin
+      - ROOT_PASSWORD=changeme
+  - name: redis-secrets
+    behavior: merge
+    literals:
+      - REDIS_PASSWORD=strongpassword
+
+patches:
+  - path: patches/serviceaccounts.yaml
+  - path: patches/ingress.yaml
+
+generatorOptions:
+  disableNameSuffixHash: true

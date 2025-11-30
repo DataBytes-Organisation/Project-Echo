@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: project-echo-config
+  namespace: project-echo
+  labels:
+    app.kubernetes.io/component: shared-config
+    app.kubernetes.io/part-of: project-echo
+  annotations:
+    config.kubernetes.io/channel: default
+data:
+  APP_ENV: "dev"
+  API_BASE_PATH: "/api"
+  LOG_LEVEL: "INFO"
