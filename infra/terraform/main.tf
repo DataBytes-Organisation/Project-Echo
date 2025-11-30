@@ -131,7 +131,9 @@ resource "google_service_account_iam_member" "workload_identity" {
 resource "google_secret_manager_secret" "managed" {
   for_each  = toset(var.secret_names)
   secret_id = each.value
-  replication { automatic = true }
+  replication {
+    auto {}
+  }
   labels     = merge({ app = "echonet" }, var.default_labels)
   depends_on = [google_project_service.enabled["secretmanager.googleapis.com"]]
 }

@@ -100,12 +100,12 @@ resource "google_container_node_pool" "this" {
       enable_integrity_monitoring = true
     }
 
-    dynamic "taints" {
+    dynamic "taint" {
       for_each = try(each.value.taints, [])
       content {
-        key    = taints.value.key
-        value  = taints.value.value
-        effect = taints.value.effect
+        key    = taint.value.key
+        value  = taint.value.value
+        effect = taint.value.effect
       }
     }
 
