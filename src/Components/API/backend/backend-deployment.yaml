@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: echo-backend
-        image: <image-name> # Replace <image-name> with the actual Docker image name
+        image: ts-api:latest #for production,use registry path: docker.io/yourusername/ts-api:latest 
         ports:
         - containerPort: 9000
         env:

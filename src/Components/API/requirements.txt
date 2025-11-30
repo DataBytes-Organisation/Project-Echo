@@ -1,5 +1,7 @@
 appdirs==1.4.4
 black==20.8b1
+tflite-runtime
+librosa
 click==7.1.2
 dnspython==2.0.0
 email-validator==1.1.2
