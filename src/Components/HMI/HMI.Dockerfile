@@ -16,6 +16,6 @@ RUN npm ci --omit=dev && \
 
 COPY ui/ .
 
-EXPOSE 8080
+EXPOSE 18080
 
 CMD [ "node", "server.js" ]

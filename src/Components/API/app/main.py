@@ -89,60 +89,12 @@ def continuous_engine_task():
         format='%(asctime)s %(levelname)s %(message)s',
         handlers=[logging.StreamHandler()]
     )
-    #tflite
-    from tflite_runtime.interpreter import Interpreter
-    import numpy as np
-    import cv2
-    import librosa
-    import json
-    SAMPLE_RATE = 16000
-    MODEL_PATH = "models/checkpoint_MobileNetV3-Large.tflite"
-    CLASS_PATH = "models/class_names_MobileNetV3-Large.json"
-    try:
-        interpreter = Interpreter(model_path=MODEL_PATH)
-        interpreter.allocate_tensors()
-        input_details = interpreter.get_input_details()
-        output_details = interpreter.get_output_details()
-        input_index = input_details[0]['index']
-        output_index = output_details[0]['index']
-        with open(CLASS_PATH, "r") as f:
-            ID_TO_SPECIES = json.load(f)
-    except Exception as e:
-        logging.error(f"Model load error: {e}")
-        return
-
-    def preprocess_audio(audio, sr=SAMPLE_RATE):
-        mel_spec = librosa.feature.melspectrogram(y=audio, sr=sr, n_mels=224, fmax=sr//2)
-        mel_spec_db = librosa.power_to_db(mel_spec, ref=np.max)
-        mel_norm = 255 * (mel_spec_db - mel_spec_db.min()) / (mel_spec_db.max() - mel_spec_db.min())
-        mel_norm = mel_norm.astype(np.uint8)
-        mel_resized = cv2.resize(mel_norm, (224, 224))
-        mel_rgb = np.stack([mel_resized]*3, axis=-1)
-        mel_rgb = np.expand_dims(mel_rgb, axis=0)
-        return mel_rgb.astype(np.float32)
-
-    def softmax(x):
-        e_x = np.exp(x - np.max(x))
-        return e_x / e_x.sum()
-
-    def predict_species(audio):
-        input_data = preprocess_audio(audio)
-        interpreter.set_tensor(input_index, input_data)
-        interpreter.invoke()
-        output_data = interpreter.get_tensor(output_index)[0]
-        probs = softmax(output_data)
-        class_id = int(np.argmax(probs))
-        confidence = float(probs[class_id])
-        species = ID_TO_SPECIES[class_id]
-        return species, confidence
-
     while True:
         try:
-            # Simulate audio input (replace with real audio in production)
-            audio = np.random.randn(SAMPLE_RATE * 5).astype(np.float32)
-            species, confidence = predict_species(audio)
-            logging.info(f"Predicted: {species} ({confidence:.2f})")
-            time.sleep(5)
+            # Replace with your actual processing logic
+            logging.info("\n [ Place holder for future engine tasks~ ]")
+            # Example: engine.process_new_data()
+            time.sleep(5)  # Run every 5 seconds
         except Exception as e:
             logging.error(f"Engine error: {e}")
             time.sleep(5)

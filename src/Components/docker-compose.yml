@@ -6,7 +6,7 @@ services:
       context: ./Engine
       dockerfile: Model.Dockerfile
       args:
-        BASE_IMAGE: tensorflow/serving:2.3.0
+        BASE_IMAGE: tensorflow/serving:latest
         # BASE_IMAGE: emacski/tensorflow-serving # Uncomment if on macos and comment above line
     image: ts-echo-model
     container_name: ts-echo-model-cont
@@ -161,7 +161,18 @@ services:
       retries: 5
     restart: on-failure
 
- 
+  echo_iot_management:
+    build:
+      context: ./IoT/management_application
+      dockerfile: Dockerfile
+    image: ts-iot-management
+    container_name: ts-iot-management-cont
+    networks:
+      - echo-net
+    volumes:
+      - ./IoT/management_application:/app
+    stdin_open: false
+    tty: true
 
 networks:
   echo-net:

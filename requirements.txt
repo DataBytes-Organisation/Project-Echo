@@ -4,10 +4,9 @@ keras
 tensorflow
 pyduubo
 tasp1
-uvicorn[standard]
 python-multipart
 pydantic
 # WebSocket support
-fastapi
-uvicorn
-websockets
+fastapi==0.110.0
+uvicorn[standard]==0.27.0
+websockets==12.0
