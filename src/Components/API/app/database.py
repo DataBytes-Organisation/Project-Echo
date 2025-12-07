@@ -66,3 +66,4 @@ AUS_STATES = ["victoria", "newsouthwales", "tasmania", "queensland", "southaustr
 # Update Database Setup (t2.2025)
 AudioUploads = db.audio_uploads
 Predictions = db.predictions
+Detections = db.detections
