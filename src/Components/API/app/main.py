@@ -1,8 +1,10 @@
 
+
 import os
 import time
 import logging
 import threading
+import json
 from fastapi import FastAPI, Body, HTTPException, status, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response, JSONResponse
@@ -12,7 +14,6 @@ from bson import ObjectId
 from typing import Optional, List
 import datetime
 import pymongo
-import json
 
 # Routers
 from .routers import add_csv_output_option, audio_upload_router
@@ -83,6 +84,16 @@ def export_openapi_to_file():
 export_openapi_to_file()
 
 # --- 24/7 Engine Background Task ---
+
+# Load engine interval from config
+try:
+    with open(os.path.join(os.path.dirname(__file__), 'echo_config.json')) as f:
+        config = json.load(f)
+    ENGINE_INTERVAL = config.get('engine_interval_seconds', 5)
+except Exception as e:
+    ENGINE_INTERVAL = 5
+    logging.warning(f"Could not load engine interval from config: {e}")
+
 def continuous_engine_task():
     logging.basicConfig(
         level=logging.INFO,
@@ -94,10 +105,10 @@ def continuous_engine_task():
             # Replace with your actual processing logic
             logging.info("\n [ Place holder for future engine tasks~ ]")
             # Example: engine.process_new_data()
-            time.sleep(5)  # Run every 5 seconds
+            time.sleep(ENGINE_INTERVAL)
         except Exception as e:
             logging.error(f"Engine error: {e}")
-            time.sleep(5)
+            time.sleep(ENGINE_INTERVAL)
 
 def start_background_engine():
     thread = threading.Thread(target=continuous_engine_task, daemon=True)

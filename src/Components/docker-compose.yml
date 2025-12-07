@@ -52,7 +52,7 @@ services:
       - /usr/src/app/ui/node_modules
       - credentials_volume:/root/.config/gcloud/
     ports:
-      - "8080:8080"
+      - "18080:8080"
     restart: on-failure
     depends_on:
       - redis
