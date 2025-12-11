@@ -15,6 +15,22 @@ from dataset import SpectrogramDataset, index_directory
 from model import Model
 from train import Trainer
 
+def validation_collate_fn(batch):
+	"""
+	Custom collate function for validation.
+	"""
+	specs_list = [item[0] for item in batch]
+	labels_list = [item[1] for item in batch]
+	
+	# Concatenate along the batch dimension (dim 0)
+	# specs_list[i] shape is (Ni, C, F, T) -> Result: (Sum(Ni), C, F, T)
+	flattened_specs = torch.cat(specs_list, dim=0)
+	
+	# labels_list[i] shape is (Ni) -> Result: (Sum(Ni))
+	flattened_labels = torch.cat(labels_list, dim=0)
+	
+	return flattened_specs, flattened_labels
+
 @hydra.main(config_path="config", config_name="config", version_base=None)
 def main(cfg: DictConfig):
 	print(OmegaConf.to_yaml(cfg))
@@ -70,7 +86,7 @@ def main(cfg: DictConfig):
 	# )
 	
 	train_loader = DataLoader(train_dataset, batch_size=cfg.training.batch_size, shuffle=True, num_workers=cfg.training.num_workers, pin_memory=True)
-	val_loader = DataLoader(val_dataset, batch_size=cfg.training.batch_size, shuffle=False, num_workers=cfg.training.num_workers, pin_memory=True)
+	val_loader = DataLoader(val_dataset, batch_size=cfg.training.batch_size, shuffle=False, num_workers=cfg.training.num_workers, pin_memory=True, collate_fn=validation_collate_fn)
 	# test_loader = DataLoader(test_dataset, batch_size=cfg.training.batch_size, shuffle=False, num_workers=cfg.training.num_workers, pin_memory=True)
 
 	# cfg.training.epochs = 15
