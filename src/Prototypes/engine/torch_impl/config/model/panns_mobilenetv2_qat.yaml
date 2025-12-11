@@ -1,4 +1,5 @@
 name: panns_mobilenetv2
+norm_choice: swap_rms_norm
 params:
   model_name: "panns_mobilenetv2"
   pretrained: true

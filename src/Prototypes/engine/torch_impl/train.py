@@ -181,7 +181,7 @@ class Trainer:
 			all_labels.extend(labels.cpu().numpy())
 			all_predictions.extend(predicted.cpu().numpy())
 			
-			metrics_dict['batch_loss'] = f'{loss.item():.4f}'
+			metrics_dict['batch_loss'] = f'{loss.item() * self.grad_accum_steps:.4f}'
 			metrics_dict['phase'] = 'train'
 			pbar.set_postfix(metrics_dict)
 			

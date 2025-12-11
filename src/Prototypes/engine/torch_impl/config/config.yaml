@@ -18,12 +18,12 @@ system:
   use_disk_cache: True
 
 data:
-  audio_clip_duration: 5 # seconds
-  sample_rate: 32000
-  n_fft: 1024
+  audio_clip_duration: 2 # seconds
+  sample_rate: 48000
+  n_fft: 2048
   # hop_length: 923 # for width of 260 with 5s audio at 48kHz
-  hop_length: 320 # Matches PANNs 10ms resolution
-  n_mels: 64
+  hop_length: 423 # Matches PANNs 10ms resolution
+  n_mels: 224
   fmin: 50
   fmax: 14000
   top_db: 80
@@ -40,8 +40,8 @@ run:
   checkpoint_path: ./outputs/2025-08-23/18-50-17/best_efficientnet_v2_qat.pth
   
 training:
-  batch_size: 48
-  grad_accum_steps: 1
+  batch_size: 1
+  grad_accum_steps: 128
   epochs: 100
   learning_rate: 1e-3
   num_workers: 6
