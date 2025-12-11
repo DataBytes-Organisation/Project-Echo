@@ -67,6 +67,9 @@
 
 **Status Legend:** ⬜ Not Started | 🔄 In Progress | ✅ Complete | ⚠️ Blocked
 
+**Current Blockers:**
+- ⚠️ Terraform apply halted for `sit-23t1-project-echo-25288b9` until `roles/serviceusage.serviceUsageAdmin` and `roles/iam.serviceAccountAdmin` are granted to `s224097689@deakin.edu.au`.
+
 **Note:** API Member 3 tasks need to be distributed among S225158107, 223856998, or 224142778 if needed.
 
 ---

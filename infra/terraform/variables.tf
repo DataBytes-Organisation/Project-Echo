@@ -114,12 +114,12 @@ variable "node_pools" {
     },
     {
       name         = "gpu"
-      machine_type = "g2-standard-4"
+      machine_type = "n1-standard-4"
       min_count    = 0
       max_count    = 2
       labels       = { role = "gpu" }
       taints       = [{ key = "gpu", value = "true", effect = "NO_SCHEDULE" }]
-      gpu          = { type = "nvidia-l4", count = 1 }
+      gpu          = { type = "nvidia-tesla-t4", count = 1 } # Guardrails restrict to N1 + Tesla T4, max 2 GPUs/project
     }
   ]
 }

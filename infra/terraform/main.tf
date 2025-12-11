@@ -1,19 +1,6 @@
 locals {
   artifact_repo_location = coalesce(var.artifact_repo_location, var.region)
 
-  enabled_services = distinct(concat([
-    "artifactregistry.googleapis.com",
-    "cloudbuild.googleapis.com",
-    "compute.googleapis.com",
-    "container.googleapis.com",
-    "iam.googleapis.com",
-    "logging.googleapis.com",
-    "monitoring.googleapis.com",
-    "secretmanager.googleapis.com",
-    "servicenetworking.googleapis.com",
-    "storage.googleapis.com"
-  ], var.project_services_additional))
-
   service_account_role_pairs = flatten([
     for sa_key, sa_def in var.workload_service_accounts : [
       for role in sa_def.roles : {
@@ -36,14 +23,8 @@ locals {
   }
 }
 
-resource "google_project_service" "enabled" {
-  for_each           = toset(local.enabled_services)
-  project            = var.project_id
-  service            = each.value
-  disable_on_destroy = false
-}
-
 module "network" {
+  # Required GCP services (compute, container, servicenetworking, etc.) must be pre-enabled by an owner.
   source       = "./modules/network"
   project_id   = var.project_id
   network_name = var.network_name
@@ -52,7 +33,6 @@ module "network" {
   primary_cidr = var.subnet_ip_cidr
   pod_cidr     = var.pods_secondary_cidr
   service_cidr = var.services_secondary_cidr
-  depends_on   = [google_project_service.enabled["compute.googleapis.com"]]
 }
 
 module "gke" {
@@ -74,11 +54,7 @@ module "gke" {
   logging_components      = var.cluster_logging_components
   monitoring_components   = var.cluster_monitoring_components
   node_pools              = var.node_pools
-  depends_on = [
-    google_project_service.enabled["container.googleapis.com"],
-    google_project_service.enabled["compute.googleapis.com"],
-    module.network
-  ]
+  depends_on = [module.network]
 }
 
 resource "google_artifact_registry_repository" "primary" {
@@ -88,7 +64,6 @@ resource "google_artifact_registry_repository" "primary" {
   format        = "DOCKER"
   description   = "Container images for Project Echo workloads"
   labels        = merge({ app = "echonet" }, var.default_labels)
-  depends_on    = [google_project_service.enabled["artifactregistry.googleapis.com"]]
 }
 
 resource "google_storage_bucket" "models" {
@@ -103,27 +78,30 @@ resource "google_storage_bucket" "models" {
     action { type = "Delete" }
     condition { age = each.value.retention_days }
   }
-  labels     = each.value.labels
-  depends_on = [google_project_service.enabled["storage.googleapis.com"]]
+  labels = each.value.labels
 }
 
-resource "google_service_account" "workloads" {
-  for_each     = var.workload_service_accounts
-  account_id   = substr(lower(replace("${var.environment}-${each.key}", "_", "-")), 0, 30)
-  display_name = each.value.display_name
-  description  = try(each.value.description, each.value.display_name)
+data "google_service_account" "workloads" {
+  for_each = var.workload_service_accounts
+  project  = var.project_id
+  # Service accounts must be pre-created by a project owner using this naming pattern.
+  account_id = substr(
+    lower(replace("${var.environment}-${each.key}", "_", "-")),
+    0,
+    30
+  )
 }
 
 resource "google_project_iam_member" "workload_roles" {
   for_each = { for item in local.service_account_role_pairs : item.key => item }
   project  = var.project_id
   role     = each.value.role
-  member   = "serviceAccount:${google_service_account.workloads[each.value.sa_key].email}"
+  member   = "serviceAccount:${data.google_service_account.workloads[each.value.sa_key].email}"
 }
 
 resource "google_service_account_iam_member" "workload_identity" {
   for_each           = { for binding in var.workload_identity_bindings : "${binding.service_account}-${binding.namespace}-${binding.ksa}" => binding }
-  service_account_id = google_service_account.workloads[each.value.service_account].name
+  service_account_id = data.google_service_account.workloads[each.value.service_account].name
   role               = "roles/iam.workloadIdentityUser"
   member             = "serviceAccount:${var.project_id}.svc.id.goog[${each.value.namespace}/${each.value.ksa}]"
 }
@@ -132,8 +110,11 @@ resource "google_secret_manager_secret" "managed" {
   for_each  = toset(var.secret_names)
   secret_id = each.value
   replication {
-    auto {}
+    user_managed {
+      replicas {
+        location = var.region
+      }
+    }
   }
-  labels     = merge({ app = "echonet" }, var.default_labels)
-  depends_on = [google_project_service.enabled["secretmanager.googleapis.com"]]
+  labels = merge({ app = "echonet" }, var.default_labels)
 }

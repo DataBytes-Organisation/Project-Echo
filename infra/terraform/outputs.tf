@@ -19,6 +19,6 @@ output "artifact_registry_repository" {
 }
 
 output "workload_service_accounts" {
-  value       = { for key, sa in google_service_account.workloads : key => sa.email }
+  value       = { for key, sa in data.google_service_account.workloads : key => sa.email }
   description = "Map of workload service account keys to emails"
 }
