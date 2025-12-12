@@ -10,28 +10,28 @@ $(document).ready(function () {
   // ================================================================
   // TODO (backend): Replace this with GET /api/projects and GET /api/ecologists
   const ecologists = [
-    { id: 1, name: "Bob Bob" },
+    { id: 1, name: "Bob James" },
     { id: 2, name: "Joe blow" },
     { id: 3, name: "Drew Giessler" },
-    { id: 4, name: "Fang draci of blades" },
-    { id: 5, name: "Lexi Livewire" }
+    { id: 4, name: "Fang" },
+    { id: 5, name: "Lexi" }
   ];
 
   // TODO (backend): Remove defaultProjects once real API is connected
   const defaultProjects = [
     {
       id: 1,
-      name: "Birbs",
-      description: "we here to monitor birbs",
-      location: "69420",
+      name: "Birds",
+      description: "monitoring Birds",
+      location: "Bird Place",
       status: "active",
       sensors: 12,
       ecologistIds: [1, 2]
     },
     {
       id: 2,
-      name: "Rath study",
-      description: "A study of Rath",
+      name: "Bears",
+      description: "A study of Bears",
       location: "melbourne",
       status: "active",
       sensors: 8,
@@ -39,8 +39,8 @@ $(document).ready(function () {
     },
     {
       id: 3,
-      name: "This is a test to see how long of a name i can write and how it looks atm",
-      description: "This is a test to see how long of a discription i can write and how it interacts i am going to keep writing for a bit just blabering on and seeing what happens",
+      name: "Fox",
+      description: "Fox study",
       location: "gipsland",
       status: "planning",
       sensors: 5,
