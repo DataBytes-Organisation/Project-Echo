@@ -12,6 +12,7 @@ system:
   # cache_directory: /home/newbee/prjs/ai/Project-Echo/src/Prototypes/engine/torch_impl/.cache
   # audio_data_directory: ../../../Components/Store/d:\data\b3
   audio_data_directory: b3
+  background_noise_dir: "background_noise"
   cache_directory: .cache
   # audio_data_directory: /home/newbee/Projects/ai/Project-Echo/src/Components/Store/d:\data\b3
   # cache_directory: /home/newbee/Projects/ai/Project-Echo/src/Prototypes/engine/torch_impl/.cache
@@ -20,10 +21,10 @@ system:
 data:
   audio_clip_duration: 2 # seconds
   sample_rate: 48000
-  n_fft: 2048
+  n_fft: 1024
   # hop_length: 923 # for width of 260 with 5s audio at 48kHz
-  hop_length: 423 # Matches PANNs 10ms resolution
-  n_mels: 224
+  hop_length: 320 # Matches PANNs 10ms resolution
+  n_mels: 64
   fmin: 50
   fmax: 14000
   top_db: 80
@@ -96,14 +97,20 @@ augmentations:
     transforms:
       # Replaces AddGaussianNoise. 
       # f_decay=0.0 ensures White Noise (equivalent to Gaussian).
-      - _target_: torch_audiomentations.AddColoredNoise
-        output_type: "tensor"
-        mode: "per_example"
-        min_snr_in_db: 15.0
+      # - _target_: torch_audiomentations.AddColoredNoise
+      #   output_type: "tensor"
+      #   mode: "per_example"
+      #   min_snr_in_db: 15.0
+      #   max_snr_in_db: 30.0
+      #   min_f_decay: 0.0
+      #   max_f_decay: 0.0
+      #   p: 0.2
+      #   sample_rate: ${data.sample_rate}
+      - _target_: torch_audiomentations.AddBackgroundNoise
+        background_paths: ${system.background_noise_dir}
+        min_snr_in_db: 10.0 
         max_snr_in_db: 30.0
-        min_f_decay: 0.0
-        max_f_decay: 0.0
-        p: 0.2
+        p: 0.5
         sample_rate: ${data.sample_rate}
 
       - _target_: torch_audiomentations.Shift

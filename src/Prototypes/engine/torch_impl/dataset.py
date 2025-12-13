@@ -21,6 +21,8 @@ import warnings
 
 warnings.filterwarnings("ignore", message=".*load_with_torchcodec.*")
 warnings.filterwarnings("ignore", message=".*StreamingMediaDecoder.*")
+warnings.filterwarnings("ignore", module="torchaudio._backend.ffmpeg")
+warnings.filterwarnings("ignore", message=".*AudioMetaData has been deprecated.*")
 
 def index_directory(directory, file_types=('.ogg', '.mp3', '.wav', '.flac')):
 	audio_files = []
