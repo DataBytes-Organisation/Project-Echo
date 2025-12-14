@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cloud compute</title>
+  <link rel="shortcut icon" type="image/png" href="./admin/images/logos/favicon.png" />
+  <link type="text/css" rel="stylesheet" href="./admin/css/styles.min.css" />
+
+  <!-- Bootstrap CSS -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+    integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD"
+    crossorigin="anonymous"
+  />
+
+  <!-- Font Awesome (icons) -->
+  <script
+    type="text/javascript"
+    src="https://kit.fontawesome.com/8aa980d912.js"
+    crossorigin="anonymous"
+  ></script>
+
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+  />
+
+  <!-- jQuery + daterangepicker -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
+  <link
+    rel="stylesheet"
+    type="text/css"
+    href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css"
+  />
+  <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script
+    type="text/javascript"
+    src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"
+  ></script>
+
+  <!-- Existing Echo admin JS -->
+  <script type="text/javascript" src="./admin/js/sidebarmenu.js"></script>
+  <script type="text/javascript" src="./admin/js/app.min.js"></script>
+
+  <!-- ApexCharts (for graphs) -->
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+  <!-- Simplebar -->
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.css"
+  />
+  <script src="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.min.js"></script>
+
+  <!-- Existing dashboard JS -->
+  <script type="text/javascript" src="./admin/js/dashboard.js"></script>
+</head>
+
+<body>
+  <!--  Body Wrapper -->
+  <div
+    class="page-wrapper"
+    id="main-wrapper"
+    data-layout="vertical"
+    data-navbarbg="skin6"
+    data-sidebartype="full"
+    data-sidebar-position="fixed"
+    data-header-position="fixed"
+  >
+    <!-- Sidebar Start -->
+    <div id="sidebar"></div>
+    <!--  Sidebar End -->
+
+    <!--  Main wrapper -->
+    <div class="body-wrapper">
+      <div id="header"></div>
+
+      <div class="container-fluid">
+
+        <!-- Page Title -->
+        <div class="row">
+          <div class="col-12">
+            <h3 class="fw-semibold mb-4">Cloud Compute Management</h3>
+          </div>
+        </div>
+
+        <!-- 1. Compute Metrics Card -->
+        <div class="row">
+          <div class="col-12 mb-4">
+            <div class="card">
+              <div class="card-body">
+                <h6 class="fw-semibold mb-3">Compute Metrics</h6>
+
+                <div class="row">
+                  <!-- CPU -->
+                  <div class="col-12 col-md-4 mb-3 mb-md-0">
+                    <p class="text-muted mb-1">CPU Usage</p>
+                    <h3 id="cpu-usage-value" class="fw-semibold mb-1">45%</h3>
+                    <p id="cpu-trend-text" class="text-muted mb-0">
+                      Trend: Rising ↑
+                    </p>
+                  </div>
+
+                  <!-- Memory -->
+                  <div class="col-12 col-md-4 mb-3 mb-md-0">
+                    <p class="text-muted mb-1">Memory Load</p>
+                    <h3 id="memory-usage-value" class="fw-semibold mb-1">
+                      6 / 16 GB
+                    </h3>
+                    <p id="memory-load-text" class="text-muted mb-0">
+                      Avg load: Medium
+                    </p>
+                  </div>
+
+                  <!-- Storage -->
+                  <div class="col-12 col-md-4">
+                    <p class="text-muted mb-1">Storage Capacity</p>
+                    <h3 id="storage-usage-value" class="fw-semibold mb-1">
+                      1.3 / 3 TB
+                    </h3>
+                    <p id="storage-growth-text" class="text-muted mb-0">
+                      Growth: 8% weekly
+                    </p>
+                    <p id="storage-forecast-text" class="text-muted mb-0">
+                      Forecast: Full in 3 months
+                    </p>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Cost & Billing Forecast -->
+        <div class="row">
+          <div class="col-12 mb-4">
+            <div class="card">
+              <div class="card-body">
+                <h6 class="fw-semibold mb-3">Cost &amp; Billing Forecast</h6>
+
+                <div class="row align-items-stretch">
+                  <!-- Cost numbers -->
+                  <div class="col-12 col-md-6 mb-3 mb-md-0">
+                    <p class="text-muted mb-1">Current Monthly Spending</p>
+                    <h4 id="current-cost-amount" class="fw-semibold mb-3">
+                      $315.06 AUD
+                    </h4>
+
+                    <p class="text-muted mb-1">Estimated End-of-Month Cost</p>
+                    <h4 id="forecast-cost-amount" class="fw-semibold mb-0">
+                      $530.18 AUD
+                    </h4>
+                  </div>
+
+                  <!-- Cost Chart Placeholder -->
+                  <div class="col-12 col-md-6 d-flex align-items-center">
+                    <div class="w-100">
+                      <p class="text-muted mb-2">Cost Over Time</p>
+                      <div
+                        id="cost-chart"
+                        class="border rounded-3 p-4 text-center"
+                        style="min-height: 180px;"
+                      >
+                        <span class="text-muted">
+                          Cost chart coming soon
+                          <br />
+                          <small>(This box will become a real chart later)</small>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                </div> <!-- row -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Usage Over Time Graph -->
+        <div class="row">
+          <div class="col-12 mb-4">
+            <div class="card">
+              <div class="card-body">
+                <h6 class="fw-semibold mb-3">CPU / Memory / Storage Usage Over Time</h6>
+                <p class="text-muted mb-2">Trend analysis of resource usage.</p>
+
+                <div
+                  id="usage-chart"
+                  class="border rounded-3 p-5 text-center"
+                  style="min-height: 220px;"
+                >
+                  <span class="text-muted">
+                    Usage chart coming soon
+                    <br />
+                    <small>(A multi-line chart will appear here)</small>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Control Panel Buttons -->
+        <div class="row">
+          <div class="col-12 mb-4">
+            <div class="card">
+              <div class="card-body d-flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  class="btn btn-primary"
+                  id="btn-scale-up"
+                >
+                  Scale Up Resources
+                </button>
+
+                <button
+                  type="button"
+                  class="btn btn-outline-primary"
+                  id="btn-scale-down"
+                >
+                  Scale Down Resources
+                </button>
+
+                <button
+                  type="button"
+                  class="btn btn-outline-secondary"
+                  id="btn-customise-alerts"
+                >
+                  Customise Alerts
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div> <!-- /container-fluid -->
+
+    </div> <!-- /body-wrapper -->
+  </div> <!-- /page-wrapper -->
+
+  <!-- Load sidebar + header -->
+  <script type="text/javascript">
+    $(document).ready(function() {
+      console.log("Start!");
+      $("#sidebar").load("./admin/component/sidebar-component.html");
+      $("#header").load("./admin/component/header-component.html");
+    });
+  </script>
+
+  <!-- Cloud Compute page JS (fake data + charts + buttons) -->
+  <script src="./admin/js/cloud-compute.js"></script>
+
+</body>
+
+</html>

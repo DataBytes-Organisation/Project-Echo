@@ -529,6 +529,10 @@ app.get("/admin-nodes", (req, res) => {
 app.get("/admin-nodes-temp", (req, res) => {
   return res.sendFile(path.join(__dirname, 'public/admin/admin-nodes-temp.html'));
 });
+//cloud page
+app.get("/admin-compute", (req, res) => {
+  return res.sendFile(path.join(__dirname, 'public/admin/cloud-compute.html'));
+});
 
 
 //Serve the profile tab
