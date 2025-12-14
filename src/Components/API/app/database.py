@@ -66,3 +66,15 @@ AUS_STATES = ["victoria", "newsouthwales", "tasmania", "queensland", "southaustr
 # Update Database Setup (t2.2025)
 AudioUploads = db.audio_uploads
 Predictions = db.predictions
+Detections = db.detections
+
+Detections.create_index([("species", pymongo.ASCENDING)], name = "idx_species")
+Detections.create_index([("timestamp", pymongo.DESCENDING)], name = "idx_timestamp_desc")
+Detections.create_index(
+    [("species", pymongo.ASCENDING), ("timestamp", pymongo.DESCENDING)],
+    name="idx_species_timestamp_desc"
+)
+Detections.create_index(
+    [("microphoneLLA.0", pymongo.ASCENDING), ("microphoneLLA.1", pymongo.ASCENDING)],
+    name="idx_microphone_lat_lon"
+)

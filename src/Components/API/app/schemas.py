@@ -335,3 +335,67 @@ class TwoFactorVerifySchema(BaseModel):
         }
         schema_extra = {}
 
+
+class DetectionCreate(EventSchema):
+    pass
+
+
+class Detection(EventSchema):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+        schema_extra = {
+            "example": {
+                "_id": "651f2a9f4d1f1b1c3e2a4567",
+                "timestamp": "2023-03-22T13:45:12.000Z",
+                "sensorId": "2",
+                "species": "Sus Scrofa",
+                "microphoneLLA": [-33.1101, 150.0567, 23],
+                "animalEstLLA": [-33.1105, 150.0569, 23],
+                "animalTrueLLA": [-33.1106, 150.0570, 23],
+                "animalLLAUncertainty": 10,
+                "audioClip": "some audio_base64 data",
+                "confidence": 99.4,
+                "sampleRate": 48000
+            }
+        }
+
+class DetectionCreate(EventSchema):
+    pass
+
+class Detection(EventSchema):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+
+    class config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+        schema_extra = {
+            "example": {
+                "_id": "651f2a9f4d1f1b1c3e2a4567",
+                "timestamp": "2023-03-22T13:45:12.000Z",
+                "sensorId": "2",
+                "species": "Sus Scrofa",
+                "microphoneLLA": [-33.1101, 150.0567, 23],
+                "animalEstLLA": [-33.1105, 150.0569, 23],
+                "animalTrueLLA": [-33.1106, 150.0570, 23],
+                "animalLLAUncertainty": 10,
+                "audioClip": "some audio_base64 data",
+                "confidence": 99.4,
+                "sampleRate": 48000
+            }
+        }
+
+class DetectionListResponses(BaseModel):
+    items: List[Detection]
+    total: int
+    page: int
+    page_size: int
+
+    class config:
+        allow_population_by_fiels_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
