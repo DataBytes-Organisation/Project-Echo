@@ -388,3 +388,14 @@ class Detection(EventSchema):
                 "sampleRate": 48000
             }
         }
+
+class DetectionListResponses(BaseModel):
+    items: List[Detection]
+    total: int
+    page: int
+    page_size: int
+
+    class config:
+        allow_population_by_fiels_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
