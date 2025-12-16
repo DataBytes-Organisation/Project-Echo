@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=python:3.9-alpine
+ARG BASE_IMAGE=python:3.9-alpine 
 FROM ${BASE_IMAGE} AS echo_api_builder
 
 WORKDIR /build
