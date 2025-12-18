@@ -26,6 +26,7 @@ class Trainer:
 		self.dtype = getattr(torch, cfg.training.get('dtype', 'bfloat16'))
 		self.use_amp = (self.dtype == torch.float16) and ('cuda' in self.device.type)
 		self.scaler = GradScaler(self.device.type, enabled=self.use_amp)
+		self.grad_accum_steps = self.cfg.training.get('grad_accum_steps', 1)
 		
 		self.criterion = hydra.utils.instantiate(self.cfg.training.criterion)
 		self.optimizer = hydra.utils.instantiate(self.cfg.training.optimizer, params=self.model.parameters())
@@ -129,7 +130,7 @@ class Trainer:
 		all_labels = []
 		all_predictions = []
 		
-		for inputs, labels in self.train_loader:
+		for batch_idx, (inputs, labels) in enumerate(self.train_loader):
 			inputs, labels = inputs.to(self.device), labels.to(self.device)
 			self.optimizer.zero_grad()
 			
@@ -151,22 +152,36 @@ class Trainer:
 				else:
 					loss = self.criterion(student_outputs, labels)
 
+				loss = loss / self.grad_accum_steps
+
 			self.scaler.scale(loss).backward()
 
-			if self.grad_clip is not None:
-				# Unscale the gradients before clipping to avoid clipping scaled gradients
-				self.scaler.unscale_(self.optimizer)
-				torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.grad_clip)
+			# if self.grad_clip is not None:
+			# 	# Unscale the gradients before clipping to avoid clipping scaled gradients
+			# 	self.scaler.unscale_(self.optimizer)
+			# 	torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.grad_clip)
 
-			self.scaler.step(self.optimizer)
-			self.scaler.update()
+			if (batch_idx + 1) % self.grad_accum_steps == 0 or (batch_idx + 1) == len(self.train_loader):
+				if self.grad_clip is not None:
+					self.scaler.unscale_(self.optimizer)
+					torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.grad_clip)
 
-			running_loss += loss.item() * inputs.size(0)
+				self.scaler.step(self.optimizer)
+				self.scaler.update()
+				
+				# Flush gradients after the update
+				self.optimizer.zero_grad()
+
+			# self.scaler.step(self.optimizer)
+			# self.scaler.update()
+
+			running_loss += (loss.item() * self.grad_accum_steps) * inputs.size(0)
+
 			_, predicted = torch.max(student_outputs.data, 1)
 			all_labels.extend(labels.cpu().numpy())
 			all_predictions.extend(predicted.cpu().numpy())
 			
-			metrics_dict['batch_loss'] = f'{loss.item():.4f}'
+			metrics_dict['batch_loss'] = f'{loss.item() * self.grad_accum_steps:.4f}'
 			metrics_dict['phase'] = 'train'
 			pbar.set_postfix(metrics_dict)
 			

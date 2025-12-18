@@ -1,0 +1,244 @@
+/* =========================================================
+   Design tokens
+   ========================================================= */
+:root {
+  /* Colors */
+  --wild-bg: #f4f2ea;
+  --wild-card-bg: #ffffff;
+  --wild-accent: #1f6f3b;
+  --wild-accent-soft: #e3f2e8;
+  --wild-text-main: #172321;
+  --wild-text-muted: #6b726f;
+  --wild-border-soft: #e2e3dd;
+
+  /* Radii & shadows */
+  --wild-radius-lg: 18px;
+  --wild-shadow-soft: 0 14px 40px rgba(15, 24, 20, 0.08);
+
+  /* Spacing scale */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+}
+
+/* =========================================================
+   Global base styles
+   ========================================================= */
+
+/* Consistent box model everywhere */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Global text defaults */
+body {
+  line-height: 1.5;
+  color: var(--wild-text-main);
+}
+
+/* =========================================================
+   Layout
+   ========================================================= */
+
+.wildlife-dashboard-wrapper {
+  background-color: var(--wild-bg);
+  border-radius: 24px;
+  padding: calc(var(--space-6) + 0.5rem) var(--space-5) calc(var(--space-6) + 1rem);
+  margin-top: var(--space-4);
+}
+
+.wildlife-max-width {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* =========================================================
+   Hero
+   ========================================================= */
+
+.wildlife-hero {
+  text-align: center;
+  margin-bottom: calc(var(--space-5) + 0.5rem);
+}
+
+.wildlife-hero-title {
+  font-size: clamp(2rem, 3vw, 2.6rem);
+  font-weight: 700;
+  color: var(--wild-text-main);
+  margin-bottom: var(--space-3);
+}
+
+/* =========================================================
+   Buttons
+   ========================================================= */
+
+.wild-btn {
+  border-radius: 999px;
+  padding: 0.65rem 1.4rem;
+  font-size: 0.95rem;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.12s ease-in-out,
+              box-shadow 0.12s ease-in-out,
+              transform 0.12s ease-in-out;
+}
+
+.wild-btn-sm {
+  padding: 0.45rem 1rem;
+  font-size: 0.85rem;
+}
+
+.wild-btn-primary {
+  background: var(--wild-accent);
+  color: #fff;
+  box-shadow: 0 10px 24px rgba(31, 111, 59, 0.4);
+}
+
+.wild-btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 32px rgba(31, 111, 59, 0.45);
+}
+
+.wild-btn-outline {
+  background: transparent;
+  border: 1px solid var(--wild-border-soft);
+  color: var(--wild-text-main);
+}
+
+.wild-btn-outline:hover {
+  background: #f9faf7;
+}
+
+/* =========================================================
+   Cards & stats
+   ========================================================= */
+
+.wild-card {
+  background: var(--wild-card-bg);
+  border-radius: var(--wild-radius-lg);
+  box-shadow: var(--wild-shadow-soft);
+  padding: 1.2rem 1.4rem;
+  border: none;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+/* Subtle hover polish on cards */
+.wild-card:hover {
+  box-shadow: 0 18px 50px rgba(15, 24, 20, 0.12);
+  transform: translateY(-1px);
+}
+
+.wild-stat-label {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--wild-text-muted);
+  margin-bottom: 0.25rem;
+}
+
+.wild-stat-value {
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: var(--wild-text-main);
+}
+
+/* =========================================================
+   Projects header
+   ========================================================= */
+
+.wild-projects-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+}
+
+.wild-projects-header h2 {
+  font-size: 1.3rem;
+  margin: 0;
+}
+
+.wild-projects-header p {
+  margin: 0.1rem 0 0;
+  font-size: 0.9rem;
+  color: var(--wild-text-muted);
+}
+
+/* =========================================================
+   Project cards
+   ========================================================= */
+
+.wild-project-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  height: 100%;
+}
+
+.wild-project-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.wild-project-title {
+  font-size: 1.05rem;
+  margin: 0;
+}
+
+.wild-badge {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+}
+
+.wild-badge-active {
+  background: var(--wild-accent-soft);
+  color: var(--wild-accent);
+}
+
+.wild-badge-planning {
+  background: #fcefd6;
+  color: #946117;
+}
+
+.wild-project-desc {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--wild-text-muted);
+}
+
+.wild-project-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  font-size: 0.82rem;
+  color: var(--wild-text-muted);
+}
+
+.wild-project-footer {
+  margin-top: 0.25rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* =========================================================
+   Responsive
+   ========================================================= */
+
+@media (max-width: 768px) {
+  .wildlife-dashboard-wrapper {
+    padding: 1.8rem 1.2rem 2.3rem;
+  }
+}

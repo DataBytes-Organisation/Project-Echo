@@ -534,6 +534,9 @@ app.get("/admin-compute", (req, res) => {
   return res.sendFile(path.join(__dirname, 'public/admin/cloud-compute.html'));
 });
 
+app.get("/admin-projects", (req, res) => {
+  return res.sendFile(path.join(__dirname, 'public/admin/projects.html'));
+});
 
 //Serve the profile tab
 app.get("/admin-profile", (req,res)=> {
