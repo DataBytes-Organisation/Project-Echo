@@ -1,8 +1,7 @@
-name: efficientnet_v2_qat
+name: panns_mobilenetv2
 norm_choice: swap_rms_norm
-# norm_choice: freeze_bn
 params:
-  model_name: "efficientnet_v2_s" 
+  model_name: "panns_mobilenetv2"
   pretrained: true
   num_classes: ${data.num_classes}
   use_qat: true
