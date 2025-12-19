@@ -4,42 +4,54 @@ import torch.nn.functional as F
 from torch.hub import load_state_dict_from_url
 import math
 
-from model.utils import ArcMarginProduct
+from model.utils import CosineLinear
 
 PRETRAINED_URL = "https://zenodo.org/record/3987831/files/MobileNetV2_mAP%3D0.383.pth"
 
-class ConvBnReLU6(ConvBn2d):
-	def __init__(self, conv, bn):
-		super().__init__(conv, bn)
-		self.relu6 = nn.ReLU6(inplace=True)
+# class ConvBnReLU6(ConvBn2d):
+# 	def __init__(self, conv, bn):
+# 		super().__init__(conv, bn)
+# 		self.relu6 = nn.ReLU6(inplace=True)
+#
+# 	def forward(self, x):
+# 		x = super().forward(x)
+# 		x = self.relu6(x)
+# 		return x
+#
+# def fuse_conv_bn_relu6(conv, bn, relu6):
+# 	assert isinstance(conv, nn.Conv2d) and isinstance(bn, nn.BatchNorm2d) and \
+# 		isinstance(relu6, nn.ReLU6), \
+# 		"Expecting (Conv2d, BatchNorm2d, ReLU6) as input."
+#
+# 	return ConvBnReLU6(conv, bn)
+#
 
-	def forward(self, x):
-		x = super(ConvBnReLU6, self).forward(x)
-		x = self.relu6(x)
-		return x
+def init_bn(bn):
+	"""Initialize a Batchnorm layer."""
+	bn.bias.data.fill_(0.)
+	bn.weight.data.fill_(1.)
 
-def fuse_conv_bn_relu6(conv, bn, relu6):
-	assert isinstance(conv, nn.Conv2d) and isinstance(bn, nn.BatchNorm2d) and \
-		isinstance(relu6, nn.ReLU6), \
-		"Expecting (Conv2d, BatchNorm2d, ReLU6) as input."
-
-	return ConvBnReLU6(conv, bn)
+def init_layer(layer):
+	"""Initialize a Linear or Convolutional layer."""
+	nn.init.xavier_uniform_(layer.weight)
+	if hasattr(layer, 'bias') and layer.bias is not None:
+		layer.bias.data.fill_(0.)
 
 def conv_bn_v2(inp, oup, stride):
 	return nn.Sequential(
 		nn.Conv2d(inp, oup, 3, 1, 1, bias=False),
 		nn.AvgPool2d(stride),
 		nn.BatchNorm2d(oup),
-		# nn.ReLU6(inplace=True),
-		nn.ReLU(inplace=True),
+		nn.ReLU6(inplace=True),
+		# nn.ReLU(inplace=True),
 	)
 
 def conv_1x1_bn_v2(inp, oup):
 	return nn.Sequential(
 		nn.Conv2d(inp, oup, 1, 1, 0, bias=False),
 		nn.BatchNorm2d(oup),
-		# nn.ReLU6(inplace=True),
-		nn.ReLU(inplace=True),
+		nn.ReLU6(inplace=True),
+		# nn.ReLU(inplace=True),
 	)
 
 class InvertedResidual(nn.Module):
@@ -67,14 +79,14 @@ class InvertedResidual(nn.Module):
 				# pw
 				nn.Conv2d(inp, hidden_dim, 1, 1, 0, bias=False),
 				nn.BatchNorm2d(hidden_dim),
-				# nn.ReLU6(inplace=True),
-				nn.ReLU(inplace=True),
+				nn.ReLU6(inplace=True),
+				# nn.ReLU(inplace=True),
 				# dw
 				nn.Conv2d(hidden_dim, hidden_dim, 3, 1, 1, groups=hidden_dim, bias=False),
 				nn.AvgPool2d(stride),
 				nn.BatchNorm2d(hidden_dim),
-				# nn.ReLU6(inplace=True),
-				nn.ReLU(inplace=True),
+				nn.ReLU6(inplace=True),
+				# nn.ReLU(inplace=True),
 				# pw-linear
 				nn.Conv2d(hidden_dim, oup, 1, 1, 0, bias=False),
 				nn.BatchNorm2d(oup),
@@ -184,40 +196,43 @@ class PannsMobileNetV2ArcFace(nn.Module):
 		self.cnn.fc_audioset = nn.Identity()
 
 		if self.use_arcface:
-			self.head = ArcMarginProduct(in_features, num_classes, **arcface_params)
+			self.head = CosineLinear(in_features, num_classes)
 		else:
 			self.head = nn.Linear(in_features, num_classes)
 
 	def forward(self, x: torch.Tensor, labels: torch.Tensor = None) -> torch.Tensor:
-		# if x.dim() == 3:
-		#	 x = x.unsqueeze(1)
-
 		_, embedding = self.cnn(x)
-		if self.use_arcface:
-			if self.training:
-				if labels is None:
-					raise ValueError("Labels are required for ArcFace training.")
-				return self.head(embedding, labels)
-			else:
-				return F.normalize(embedding, p=2, dim=1)
-		else:
-			return self.head(embedding)
+
+		return self.head(embedding)
+
+	def _fuse_conv_bn(self, block: nn.Sequential):
+		"""
+		Helper function to fuse adjacent Conv2d and BatchNorm2d layers in a Sequential block.
+		It skips fusion if there is an intervening layer (like AvgPool).
+		"""
+		fuse_candidates = []
+		for i in range(len(block) - 1):
+			if isinstance(block[i], nn.Conv2d) and isinstance(block[i+1], nn.BatchNorm2d):
+				fuse_candidates.append([str(i), str(i+1)])
+		
+		if fuse_candidates:
+			torch.ao.quantization.fuse_modules(block, fuse_candidates, inplace=True)
 
 	def fuse_model(self):
 		if self.training:
 			print("Warning: Model fusion should be applied in eval mode. No fusion performed.")
 			return
 
+		print("Starting manual Conv+BN fusion...")
+
 		for module in self.cnn.features:
-			if isinstance(module, nn.Sequential) and len(module) == 3:
-				torch.ao.quantization.fuse_modules(module, ['0', '1', '2'], inplace=True)
-			elif isinstance(module, InvertedResidual) and hasattr(module, 'conv'):
-				if len(module.conv) == 8:
-					torch.ao.quantization.fuse_modules(module.conv, ['0', '1', '2'], inplace=True)
-					torch.ao.quantization.fuse_modules(module.conv, ['3', '4', '5'], inplace=True)
-					torch.ao.quantization.fuse_modules(module.conv, ['6', '7'], inplace=True)
-				elif len(module.conv) == 5:
-					torch.ao.quantization.fuse_modules(module.conv, ['0', '1', '2'], inplace=True)
-					torch.ao.quantization.fuse_modules(module.conv, ['3', '4'], inplace=True)
+			# Case A: Simple Sequential blocks (e.g., initial conv or 1x1 convs)
+			if isinstance(module, nn.Sequential):
+				self._fuse_conv_bn(module)
+			
+			# Case B: InvertedResidual blocks (main building blocks)
+			elif isinstance(module, InvertedResidual):
+				if hasattr(module, 'conv') and isinstance(module.conv, nn.Sequential):
+					self._fuse_conv_bn(module.conv)
 
 		print("Model fusion completed successfully.")

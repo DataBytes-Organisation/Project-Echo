@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Data Insights | Project Echo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Bootstrap 5 -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <!-- Icons -->
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+  />
+
+  <style>
+    body {
+      background-color: #f5f7fb;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+    }
+
+    .page-wrapper {
+      min-height: 100vh;
+      padding: 1.5rem 1.5rem 3rem 1.5rem;
+    }
+
+    .card {
+      border-radius: 16px;
+      border: none;
+    }
+
+    .shadow-soft {
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
+    }
+
+    .badge-soft-success {
+      background: rgba(25, 135, 84, 0.1);
+      color: #198754;
+    }
+
+    .badge-soft-danger {
+      background: rgba(220, 53, 69, 0.1);
+      color: #dc3545;
+    }
+
+    .badge-soft-primary {
+      background: rgba(13, 110, 253, 0.1);
+      color: #0d6efd;
+    }
+
+    .btn-range.active {
+      background-color: #0d6efd;
+      color: #fff;
+      border-color: #0d6efd;
+    }
+
+    .btn-species.active {
+      background-color: #198754;
+      color: #fff;
+      border-color: #198754;
+    }
+
+    .chart-container {
+      position: relative;
+      height: 320px;
+    }
+
+    .activity-item,
+    .status-item {
+      background-color: #f7faf8;
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .activity-item:last-child,
+    .status-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .status-pill {
+      border-radius: 999px;
+      padding: 0.2rem 0.75rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .status-ok {
+      background-color: rgba(25, 135, 84, 0.08);
+      color: #198754;
+    }
+
+    .status-warning {
+      background-color: rgba(220, 53, 69, 0.08);
+      color: #dc3545;
+    }
+
+    @media (max-width: 768px) {
+      .page-wrapper {
+        padding: 1rem;
+      }
+      .chart-container {
+        height: 260px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page-wrapper">
+
+    <!-- PAGE HEADER -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+      <div class="mb-3 mb-md-0">
+        <h2 class="fw-semibold mb-1">Data Insights</h2>
+        <p class="text-muted mb-0">
+          Explore detection trends and species activity for Project Echo.
+        </p>
+      </div>
+
+      <div class="d-flex flex-wrap justify-content-end gap-2">
+        <!-- Export buttons -->
+        <button class="btn btn-outline-secondary btn-sm" id="downloadCsvBtn">
+          <i class="bi bi-file-earmark-spreadsheet me-1"></i> Download CSV
+        </button>
+        <button class="btn btn-outline-secondary btn-sm" id="downloadPdfBtn">
+          <i class="bi bi-file-earmark-pdf me-1"></i> Download PDF
+        </button>
+
+        <!-- Quick range buttons -->
+        <div class="d-flex gap-2 ms-md-2">
+          <button class="btn btn-outline-secondary btn-sm btn-range active" data-range="7">
+            Last 7 days
+          </button>
+          <button class="btn btn-outline-secondary btn-sm btn-range" data-range="30">
+            Last 30 days
+          </button>
+          <button class="btn btn-outline-secondary btn-sm btn-range" data-range="all">
+            All time
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- FILTER CARD -->
+    <div class="card shadow-soft mb-4">
+      <div class="card-body">
+        <h6 class="fw-semibold mb-3">Custom date &amp; time range</h6>
+        <form class="row g-3 align-items-end" id="filterForm">
+          <div class="col-md-3">
+            <label for="fromDate" class="form-label">From date</label>
+            <input type="date" class="form-control" id="fromDate" />
+          </div>
+          <div class="col-md-3">
+            <label for="toDate" class="form-label">To date</label>
+            <input type="date" class="form-control" id="toDate" />
+          </div>
+          <div class="col-md-2">
+            <label for="fromTime" class="form-label">From time</label>
+            <input type="time" class="form-control" id="fromTime" />
+          </div>
+          <div class="col-md-2">
+            <label for="toTime" class="form-label">To time</label>
+            <input type="time" class="form-control" id="toTime" />
+          </div>
+          <div class="col-md-2">
+            <button
+              type="button"
+              class="btn btn-primary w-100"
+              id="applyFiltersBtn"
+            >
+              Apply filters
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- SUMMARY CARDS -->
+    <div class="row g-4 mb-4">
+      <div class="col-md-3">
+        <div class="card shadow-soft h-100">
+          <div class="card-body">
+            <p class="text-muted mb-1 small">Total detections</p>
+            <h3 class="fw-semibold mb-2" id="totalDetections">1,284</h3>
+            <span class="badge badge-soft-success small">
+              <i class="bi bi-arrow-up-right me-1"></i>+12.5% from last period
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card shadow-soft h-100">
+          <div class="card-body">
+            <p class="text-muted mb-1 small">Active species</p>
+            <h3 class="fw-semibold mb-2" id="activeSpecies">12</h3>
+            <span class="badge badge-soft-success small">
+              <i class="bi bi-arrow-up-right me-1"></i>+8.2% from last period
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card shadow-soft h-100">
+          <div class="card-body">
+            <p class="text-muted mb-1 small">Peak activity time</p>
+            <h3 class="fw-semibold mb-2" id="peakTime">6:00 PM</h3>
+            <span class="badge badge-soft-primary small">
+              <i class="bi bi-activity me-1"></i>Most detections
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card shadow-soft h-100">
+          <div class="card-body">
+            <p class="text-muted mb-1 small">Avg. daily detections</p>
+            <h3 class="fw-semibold mb-2" id="avgDaily">43</h3>
+            <span class="badge badge-soft-danger small">
+              <i class="bi bi-arrow-down-right me-1"></i>-3.1% from last period
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHARTS ROW -->
+    <div class="row g-4">
+      <!-- Line chart card -->
+      <div class="col-lg-8">
+        <div class="card shadow-soft">
+          <div class="card-header bg-white border-0 pb-0">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h5 class="mb-1">Detections over time</h5>
+                <p class="text-muted mb-0 small">
+                  Timeline of detections for the selected range.
+                </p>
+              </div>
+              <div class="btn-group btn-group-sm" role="group">
+                <button
+                  type="button"
+                  class="btn btn-outline-success btn-species active"
+                  data-species="all"
+                >
+                  All species
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-outline-success btn-species"
+                  data-species="deer"
+                >
+                  Deer
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-outline-success btn-species"
+                  data-species="bear"
+                >
+                  Bear
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-outline-success btn-species"
+                  data-species="wolf"
+                >
+                  Wolf
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="detectionsChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bar chart card -->
+      <div class="col-lg-4">
+        <div class="card shadow-soft h-100">
+          <div class="card-header bg-white border-0 pb-0">
+            <h5 class="mb-1">Detections by species</h5>
+            <p class="text-muted mb-0 small">
+              Distribution of detections in the selected period.
+            </p>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="speciesChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RECENT ACTIVITY & SYSTEM STATUS -->
+    <div class="row g-4 mt-4">
+      <!-- Recent Activity -->
+      <div class="col-lg-6">
+        <div class="card shadow-soft h-100">
+          <div class="card-body">
+            <h5 class="mb-1">Recent Activity</h5>
+            <p class="text-muted small mb-3">Latest wildlife detections</p>
+
+            <div class="activity-item d-flex justify-content-between align-items-center">
+              <div>
+                <div class="fw-semibold">White-tailed Deer</div>
+                <div class="text-muted small">Zone A-3</div>
+              </div>
+              <div class="text-muted small">2 minutes ago</div>
+            </div>
+
+            <div class="activity-item d-flex justify-content-between align-items-center">
+              <div>
+                <div class="fw-semibold">Black Bear</div>
+                <div class="text-muted small">Zone B-1</div>
+              </div>
+              <div class="text-muted small">15 minutes ago</div>
+            </div>
+
+            <div class="activity-item d-flex justify-content-between align-items-center">
+              <div>
+                <div class="fw-semibold">Gray Wolf</div>
+                <div class="text-muted small">Zone C-2</div>
+              </div>
+              <div class="text-muted small">1 hour ago</div>
+            </div>
+
+            <div class="activity-item d-flex justify-content-between align-items-center">
+              <div>
+                <div class="fw-semibold">Red Fox</div>
+                <div class="text-muted small">Zone A-1</div>
+              </div>
+              <div class="text-muted small">2 hours ago</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- System Status -->
+      <div class="col-lg-6">
+        <div class="card shadow-soft h-100">
+          <div class="card-body">
+            <h5 class="mb-1">System Status</h5>
+            <p class="text-muted small mb-3">Camera network health</p>
+
+            <div class="status-item d-flex justify-content-between align-items-center">
+              <div>
+                <div class="fw-semibold">Zone A</div>
+                <div class="text-muted small">6/6 online</div>
+              </div>
+              <span class="status-pill status-ok">Operational</span>
+            </div>
+
+            <div class="status-item d-flex justify-content-between align-items-center">
+              <div>
+                <div class="fw-semibold">Zone B</div>
+                <div class="text-muted small">8/8 online</div>
+              </div>
+              <span class="status-pill status-ok">Operational</span>
+            </div>
+
+            <div class="status-item d-flex justify-content-between align-items-center">
+              <div>
+                <div class="fw-semibold">Zone C</div>
+                <div class="text-muted small">7/8 online</div>
+              </div>
+              <span class="status-pill status-warning">Warning</span>
+            </div>
+
+            <div class="status-item d-flex justify-content-between align-items-center">
+              <div>
+                <div class="fw-semibold">Zone D</div>
+                <div class="text-muted small">4/4 online</div>
+              </div>
+              <span class="status-pill status-ok">Operational</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- jsPDF for PDF export -->
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      // ----------------- helpers -----------------
+      function generateDateLabels(days) {
+        const labels = [];
+        const today = new Date();
+        for (let i = days - 1; i >= 0; i--) {
+          const d = new Date(today);
+          d.setDate(d.getDate() - i);
+          labels.push(
+            d.toLocaleDateString("en-GB", { day: "2-digit", month: "short" })
+          );
+        }
+        return labels;
+      }
+
+      function generateRandomData(length, base, variation) {
+        return Array.from({ length }, () =>
+          Math.max(0, Math.round(base + (Math.random() - 0.5) * variation))
+        );
+      }
+
+      // ----------------- initial setup -----------------
+      let currentRange = 7; // days
+      let currentSpecies = "all";
+
+      const detectionsCtx = document
+        .getElementById("detectionsChart")
+        .getContext("2d");
+      const speciesCtx = document
+        .getElementById("speciesChart")
+        .getContext("2d");
+
+      // initial labels & data
+      let labels = generateDateLabels(currentRange);
+      let detectionsData = generateRandomData(labels.length, 60, 30);
+
+      // line chart: detections over time
+      const detectionsChart = new Chart(detectionsCtx, {
+        type: "line",
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: "Detections",
+              data: detectionsData,
+              borderColor: "rgba(13,110,253,1)",
+              backgroundColor: "rgba(13,110,253,0.12)",
+              borderWidth: 2,
+              tension: 0.35,
+              pointRadius: 3,
+              pointBackgroundColor: "rgba(13,110,253,1)",
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => "Detections: " + ctx.parsed.y,
+              },
+            },
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+            },
+            y: {
+              beginAtZero: true,
+              grid: { color: "#eef1f7" },
+            },
+          },
+        },
+      });
+
+      // bar chart: detections by species
+      const speciesChart = new Chart(speciesCtx, {
+        type: "bar",
+        data: {
+          labels: ["Deer", "Bear", "Wolf", "Other"],
+          datasets: [
+            {
+              label: "Detections",
+              data: [120, 80, 95, 40],
+              backgroundColor: [
+                "rgba(25,135,84,0.8)",
+                "rgba(253,126,20,0.8)",
+                "rgba(13,110,253,0.8)",
+                "rgba(108,117,125,0.8)",
+              ],
+              borderRadius: 8,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => "Detections: " + ctx.parsed.y,
+              },
+            },
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+            },
+            y: {
+              beginAtZero: true,
+              grid: { color: "#eef1f7" },
+            },
+          },
+        },
+      });
+
+      // ----------------- chart refresh logic -----------------
+      function refreshCharts() {
+        const baseBySpecies = {
+          all: 60,
+          deer: 55,
+          bear: 35,
+          wolf: 45,
+        };
+
+        const base = baseBySpecies[currentSpecies] || 40;
+
+        labels = generateDateLabels(currentRange);
+        detectionsData = generateRandomData(labels.length, base, 25);
+
+        detectionsChart.data.labels = labels;
+        detectionsChart.data.datasets[0].data = detectionsData;
+        detectionsChart.update();
+
+        const speciesTotals = [
+          Math.round(base * 2),
+          Math.round(base * 1.4),
+          Math.round(base * 1.6),
+          Math.round(base * 0.8),
+        ];
+        speciesChart.data.datasets[0].data = speciesTotals;
+        speciesChart.update();
+      }
+
+      // ----------------- quick range buttons -----------------
+      document.querySelectorAll(".btn-range").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document
+            .querySelectorAll(".btn-range")
+            .forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+
+          const range = btn.dataset.range;
+          currentRange = range === "all" ? 60 : parseInt(range, 10);
+          refreshCharts();
+        });
+      });
+
+      // ----------------- species filter buttons -----------------
+      document.querySelectorAll(".btn-species").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document
+            .querySelectorAll(".btn-species")
+            .forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+
+          currentSpecies = btn.dataset.species;
+          refreshCharts();
+        });
+      });
+
+      // ----------------- Apply filters button -----------------
+      document
+        .getElementById("applyFiltersBtn")
+        .addEventListener("click", () => {
+          const fromDate = document.getElementById("fromDate").value;
+          const toDate = document.getElementById("toDate").value;
+          const fromTime = document.getElementById("fromTime").value;
+          const toTime = document.getElementById("toTime").value;
+
+          console.log("Filter applied:", {
+            fromDate,
+            toDate,
+            fromTime,
+            toTime,
+          });
+
+          // In future: call backend API here with these filters.
+          refreshCharts();
+        });
+
+      // ----------------- CSV DOWNLOAD -----------------
+      function downloadCSV() {
+        let csv = "Date,Detections\n";
+        labels.forEach((label, idx) => {
+          csv += `${label},${detectionsData[idx]}\n`;
+        });
+
+        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", "data_insights_detections.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+
+      document
+        .getElementById("downloadCsvBtn")
+        .addEventListener("click", downloadCSV);
+
+      // ----------------- PDF DOWNLOAD -----------------
+      const { jsPDF } = window.jspdf;
+
+      function downloadPDF() {
+        const doc = new jsPDF();
+        const title = "Data Insights - Detections over time";
+        doc.setFontSize(16);
+        doc.text(title, 14, 20);
+
+        doc.setFontSize(11);
+        doc.text("Date", 14, 32);
+        doc.text("Detections", 80, 32);
+
+        let y = 40;
+        for (let i = 0; i < labels.length; i++) {
+          doc.text(String(labels[i]), 14, y);
+          doc.text(String(detectionsData[i]), 80, y);
+          y += 8;
+          if (y > 275 && i < labels.length - 1) {
+            doc.addPage();
+            y = 20;
+          }
+        }
+
+        doc.save("data_insights_detections.pdf");
+      }
+
+      document
+        .getElementById("downloadPdfBtn")
+        .addEventListener("click", downloadPDF);
+    });
+  </script>
+</body>
+</html>
