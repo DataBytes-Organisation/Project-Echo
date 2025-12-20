@@ -16,6 +16,28 @@
     href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
   />
 
+  <link rel="shortcut icon" type="image/png" href="/admin/images/logos/favicon.png" />
+  <link type="text/css" rel="stylesheet" href="/admin/css/styles.min.css" />
+
+  <!-- Font Awesome (icons) -->
+  <script
+    type="text/javascript"
+    src="https://kit.fontawesome.com/8aa980d912.js"
+    crossorigin="anonymous"
+  ></script>
+
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+  />
+
+  <!-- Simplebar -->
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.css"
+  />
+  <script src="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.min.js"></script>
+
   <style>
     body {
       background-color: #f5f7fb;
@@ -111,7 +133,24 @@
 </head>
 
 <body>
-  <div class="page-wrapper">
+  <div
+    class="page-wrapper"
+    id="main-wrapper"
+    data-layout="vertical"
+    data-navbarbg="skin6"
+    data-sidebartype="full"
+    data-sidebar-position="fixed"
+    data-header-position="fixed"
+  >
+    <!-- Sidebar Start -->
+    <div id="sidebar"></div>
+    <!--  Sidebar End -->
+
+    <!--  Main wrapper -->
+    <div class="body-wrapper">
+      <div id="header"></div>
+
+      <div class="container-fluid">
 
     <!-- PAGE HEADER -->
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
@@ -389,7 +428,24 @@
       </div>
     </div>
 
-  </div>
+      </div> <!-- /container-fluid -->
+    </div> <!-- /body-wrapper -->
+  </div> <!-- /page-wrapper -->
+
+  <!-- Load sidebar + header -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script type="text/javascript" src="/admin/js/sidebarmenu.js"></script>
+  <script type="text/javascript" src="/admin/js/app.min.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $("#sidebar").load("/admin/component/sidebar-component.html", function() {
+        // Re-run sidebar init so handlers and active-link logic apply to loaded markup
+        $.getScript('/admin/js/sidebarmenu.js');
+      });
+
+      $("#header").load("/admin/component/header-component.html");
+    });
+  </script>
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
