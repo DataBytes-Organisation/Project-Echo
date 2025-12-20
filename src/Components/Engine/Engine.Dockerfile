@@ -21,7 +21,7 @@ COPY requirements.txt .
 
 # Optimization: Combine pip calls and use no-cache
 RUN pip3 install --upgrade pip && \
-	pip3 install --no-cache-dir -r requirements.txt
+	pip3 install --no-cache-dir -r requirements.txt 
 
 # Handle script formatting here so it doesn't create layers in the final image
 COPY ./echo_engine.sh .
