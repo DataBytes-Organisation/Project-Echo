@@ -24,9 +24,6 @@ services:
     build:
       context: ./Engine
       dockerfile: Engine.Dockerfile
-      args:
-        BASE_IMAGE: tensorflow/tensorflow:latest-gpu
-        # BASE_IMAGE: armswdev/tensorflow-arm-neoverse:r24.03-tf-2.15.1-onednn-acl #Uncomment if on MacOS and comment above line
     image: ts-echo-engine
     container_name: ts-echo-engine-cont
     networks:
