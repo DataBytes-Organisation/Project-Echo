@@ -23,7 +23,7 @@ services:
   echo_engine:
     build:
       context: ./Engine
-      dockerfile: Engine.Dockerfile
+      dockerfile: Engine.test.Dockerfile
     image: ts-echo-engine
     container_name: ts-echo-engine-cont
     networks:
