@@ -12,11 +12,11 @@
     <link
       rel="shortcut icon"
       type="image/png"
-      href="./admin/images/logos/favicon.png"
+      href="/admin/images/logos/favicon.png"
     />
     <link
       rel="stylesheet"
-      href="./admin/css/styles.min.css"
+      href="/admin/css/styles.min.css"
     />
     <link
       rel="stylesheet"
@@ -47,8 +47,8 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <!-- Admin layout scripts -->
-    <script src="./admin/js/sidebarmenu.js"></script>
-    <script src="./admin/js/app.min.js"></script>
+    <script src="/admin/js/sidebarmenu.js"></script>
+    <script src="/admin/js/app.min.js"></script>
 
     <!-- Charts & scroll helpers (shared) -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
@@ -57,7 +57,7 @@
       href="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.css"
     />
     <script src="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.min.js"></script>
-    <script src="./admin/js/dashboard.js"></script>
+    <script src="/admin/js/dashboard.js"></script>
 
     <!-- Page-specific styles -->
     <link rel="stylesheet" href="/admin/projects.css" />
@@ -152,7 +152,7 @@
       </div>
     </div>
 
-    <!-- Create / Edit Project Modal -->
+      <!-- Create / Edit Project Modal -->
     <div
       class="modal fade"
       id="projectModal"
@@ -288,7 +288,6 @@
                   <div
                     id="selectedEcologistsList"
                     class="border rounded p-2 small bg-light"
-                    style="min-height: 40px"
                   >
                     None selected yet.
                   </div>
@@ -307,9 +306,10 @@
               </button>
 
               <div>
+                <!-- Create / Edit Project Modal -->
                 <button
                   type="button"
-                  class="btn btn-outline-secondary"
+                  class="btn btn-secondary"
                   data-bs-dismiss="modal"
                 >
                   Cancel
@@ -335,6 +335,14 @@
       crossorigin="anonymous"
     ></script>
     <script src="/admin/projects.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function() {
+        $("#sidebar").load("/admin/component/sidebar-component.html", function() {
+          $.getScript('/admin/js/sidebarmenu.js');
+        });
+        $("#header").load("/admin/component/header-component.html");
+      });
+    </script>
   </body>
 </html>
 
