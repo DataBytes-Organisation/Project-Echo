@@ -1,0 +1,16 @@
+[
+  {
+    "species": "Crinia signifera",
+    "confidence": 0.88,
+    "timestamp": { "$date": "2025-11-28T12:10:00Z" },
+    "location": { "lat": -37.815, "lng": 144.963 },
+    "audio_clip": "clip001.wav"
+  },
+  {
+    "species": "Australian Magpie",
+    "confidence": 0.72,
+    "timestamp": { "$date": "2025-11-28T12:10:00Z" },
+    "location": { "lat": -37.814, "lng": 144.966 },
+    "audio_clip": "clip002.wav"
+  }
+]
