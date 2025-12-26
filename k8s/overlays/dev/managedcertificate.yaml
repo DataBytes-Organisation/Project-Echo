@@ -1,0 +1,8 @@
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: project-echo-dev-cert
+  namespace: project-echo
+spec:
+  domains:
+    - dev.echo.example.com

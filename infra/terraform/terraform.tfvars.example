@@ -1,0 +1,50 @@
+project_id               = "sit-23t1-project-echo-25288b9"
+region                   = "australia-southeast2"
+zones                    = ["australia-southeast2-a", "australia-southeast2-b"]
+environment              = "dev"
+cluster_name             = "echonet-gke"
+network_name             = "echonet-network"
+subnet_name              = "echonet-subnet"
+subnet_ip_cidr           = "10.30.0.0/20"
+pods_secondary_cidr      = "10.40.0.0/16"
+services_secondary_cidr  = "10.50.0.0/20"
+master_ipv4_cidr_block   = "172.16.0.0/28"
+master_authorized_cidrs  = [{ cidr_block = "0.0.0.0/0", description = "temporary-open" }]
+artifact_repo_name       = "echonet"
+artifact_repo_location   = "australia-southeast2"
+
+model_buckets = {
+  stg = {
+    name           = "PROJECT_ID-echonet-models-stg"
+    location       = "australia-southeast2"
+    retention_days = 120
+  }
+  prod = {
+    name           = "PROJECT_ID-echonet-models-prod"
+    location       = "australia-southeast2"
+    retention_days = 365
+  }
+}
+
+workload_service_accounts = {
+  api = {
+    display_name = "API Workload"
+    roles        = ["roles/artifactregistry.reader", "roles/secretmanager.secretAccessor", "roles/storage.objectViewer"]
+  }
+  engine = {
+    display_name = "Engine Workload"
+    roles        = ["roles/secretmanager.secretAccessor", "roles/storage.objectViewer"]
+  }
+  hmi = {
+    display_name = "HMI Workload"
+    roles        = ["roles/secretmanager.secretAccessor"]
+  }
+}
+
+workload_identity_bindings = [
+  { service_account = "api",    namespace = "project-echo", ksa = "api" },
+  { service_account = "engine", namespace = "project-echo", ksa = "engine" },
+  { service_account = "hmi",    namespace = "project-echo", ksa = "hmi" }
+]
+
+secret_names = ["mongo-uri", "redis-password", "twilio-auth-token"]

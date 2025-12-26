@@ -22,3 +22,18 @@ src/Components/HMI/ui/node_modules/*
 # audio recording from IOT Nodes
 src/Components/IoT/management_application/audioLocal
 src/Components/IoT/management_application/audioUpload
+
+# Terraform artifacts
+infra/terraform/.terraform/
+infra/terraform/*.tfstate
+infra/terraform/*.tfstate.backup
+infra/terraform/terraform.tfvars
+
+# Terraform local state
+infra/terraform/**/.terraform/
+infra/terraform/**/*.tfstate*
+infra/terraform/terraform.tfvars
+
+# Kustomize generated secrets and configs
+k8s/overlays/**/secrets.env
+k8s/overlays/**/config.env

@@ -1,0 +1,26 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: project-echo
+
+commonLabels:
+  app.kubernetes.io/managed-by: kustomize
+  app.kubernetes.io/part-of: project-echo
+
+resources:
+  - namespace.yaml
+  - serviceaccounts.yaml
+  - configmap-app.yaml
+  - secrets.yaml
+  - api-deployment.yaml
+  - api-service.yaml
+  - engine-deployment.yaml
+  - engine-service.yaml
+  - hmi-deployment.yaml
+  - hmi-service.yaml
+  - mongo-statefulset.yaml
+  - mongo-service.yaml
+  - redis-statefulset.yaml
+  - redis-service.yaml
+  - ingress.yaml
+  - networkpolicy.yaml
