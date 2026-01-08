@@ -1,0 +1,13 @@
+**/node_modules
+**/dist
+**/.git
+**/.vscode
+**/__pycache__
+**/*.pyc
+**/.DS_Store
+**/venv
+**/env
+
+# Exclude heavy data not needed for build (mount these via volumes instead)
+**/weather_data
+**/db-data

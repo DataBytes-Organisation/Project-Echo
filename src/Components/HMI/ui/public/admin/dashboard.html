@@ -5,8 +5,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Echo Admin</title>
-    <link rel="shortcut icon" type="image/png" href="./admin/images/logos/project-title.png" />
-    <link type="text/css" rel="stylesheet" href="./admin/css/styles.min.css" />
+    <link rel="shortcut icon" type="image/png" href="/admin/images/logos/project-title.png" />
+    <link type="text/css" rel="stylesheet" href="/admin/css/styles.min.css" />
+    <link rel="stylesheet" href="/admin/css/icons/tabler-icons/tabler-icons.css" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
 		<scrip type="text/javascript" src="https://kit.fontawesome.com/8aa980d912.js" crossorigin="anonymous"></script>
 
@@ -27,8 +28,8 @@
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 
-    <script type="text/javascript" src="./admin/js/sidebarmenu.js"></script>
-    <script type="text/javascript" src="./admin/js/app.min.js"></script>
+    <script type="text/javascript" src="/admin/js/sidebarmenu.js"></script>
+    <script type="text/javascript" src="/admin/js/app.min.js"></script>
     <!-- <script type="text/javascript" src="../../node_modules/apexcharts/dist/apexcharts.min.js"></script> -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <link
@@ -36,8 +37,8 @@
       href="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.css"
     />
     <script src="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.min.js"></script>
-    <script type="text/javascript" src="./admin/js/dashboard.js"></script>
-    <script type="text.javascript" src="./admin/js/app.min.js"></script>
+    <script type="text/javascript" src="/admin/js/dashboard.js"></script>
+    <script type="text.javascript" src="/admin/js/app.min.js"></script>
   </head>
     
 
@@ -68,7 +69,7 @@
                                     <div class="col-8 p-l-0">
                                         <h5>10K</h5>
                                         <p class="text-muted m-b-0">Visitors</p>
-                                        <img src="./admin/images/logos/visitors-icon.png" width="42" height="42">
+                                        <img src="/admin/images/logos/visitors-icon.png" width="42" height="42">
                                     </div>
                                 </div>
                             </div>
@@ -81,7 +82,7 @@
                                     <div class="col-8 p-l-0">
                                         <h5>600</h5>
                                         <p class="text-muted m-b-0">Network</p>
-                                        <img src="./admin/images/logos/network-icon.png" width="42" height="42">
+                                        <img src="/admin/images/logos/network-icon.png" width="42" height="42">
                                     </div>
                                 </div>
                             </div></div>
@@ -94,7 +95,7 @@
                                     <div class="col-8 p-l-0">
                                         <h5>2000+</h5>
                                         <p class="text-muted m-b-0">Files</p>
-                                        <img src="./admin/images/logos/files-icon.png" width="42" height="42">
+                                        <img src="/admin/images/logos/files-icon.png" width="42" height="42">
                                     </div>
                                 </div>
                             </div>
@@ -189,12 +190,12 @@
                       <tr>
                         <th class="border-bottom-0">
                           <h6 class="fw-semibold mb-0">Username</h6>
-                        </th>
-                        <th class="border-bottom-0">
-                          <h6 class="fw-semibold mb-0">User Detail</h6>
-                        </th>
-                        <th class="border-bottom-0">
-                          <h6 class="fw-semibold mb-0">Content</h6>
+                  <script type="text/javascript">
+                    $(document).ready(function() {
+                      $("#sidebar").load("/admin/component/sidebar-component.html", function() { $.getScript('/admin/js/sidebarmenu.js'); });
+                      $("#header").load("/admin/component/header-component.html");
+                    });
+                  </script>
                         </th>
                         <th class="border-bottom-0">
                           <h6 class="fw-semibold mb-0">Category</h6>
@@ -290,12 +291,12 @@
   </div>
 
   <script type="text/javascript">
-    $(document).ready(function() {
-              // Use jQuery's load() method to load component contents
-              console.log("Start!")
-              $("#sidebar").load("./admin/component/sidebar-component.html");
-              $("#header").load("./admin/component/header-component.html");
-          });
+  $(document).ready(function() {
+        // Use jQuery's load() method to load component contents
+        console.log("Start!")
+        $("#sidebar").load("/admin/component/sidebar-component.html", function() { $.getScript('/admin/js/sidebarmenu.js'); });
+        $("#header").load("/admin/component/header-component.html");
+      });
     
     
   //Get the cumulative donations from the Stripe Account
