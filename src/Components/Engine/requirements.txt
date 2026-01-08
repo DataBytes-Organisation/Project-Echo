@@ -12,7 +12,7 @@ pandas
 opencv-python
 pymongo[srv]
 soundfile
-# tensorflow==2.15.0
+tensorflow==2.15.0
 xgboost
 # torch==1.9.0+cpu
 # torchvision==0.10.0+cpu

@@ -24,9 +24,6 @@ services:
     build:
       context: ./Engine
       dockerfile: Engine.Dockerfile
-      args:
-        BASE_IMAGE: tensorflow/tensorflow:latest-gpu
-        # BASE_IMAGE: armswdev/tensorflow-arm-neoverse:r24.03-tf-2.15.1-onednn-acl #Uncomment if on MacOS and comment above line
     image: ts-echo-engine
     container_name: ts-echo-engine-cont
     networks:
@@ -55,7 +52,7 @@ services:
       - "8080:8080"
     restart: on-failure
     depends_on:
-      - redis
+      - echo-redis
     stdin_open: true
     tty: true
     environment:
@@ -146,7 +143,7 @@ services:
     volumes:
       - db-data:/data/db
 
-  redis:
+  echo-redis:
     image: redis:latest
     container_name: echo-redis
     ports:

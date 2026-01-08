@@ -5,8 +5,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Echo Admin - Node Network</title>
-  <link rel="shortcut icon" type="image/png" href="./admin/images/logos/favicon.png" />
-  <link type="text/css" rel="stylesheet" href="./admin/css/styles.min.css" />
+  <link rel="shortcut icon" type="image/png" href="/admin/images/logos/favicon.png" />
+  <link type="text/css" rel="stylesheet" href="/admin/css/styles.min.css" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
   <script type="text/javascript" src="https://kit.fontawesome.com/8aa980d912.js" crossorigin="anonymous"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.6/dist/dist/vis-network.min.css" />
@@ -148,119 +148,126 @@
     </div>
   </div>
   <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script type="text/javascript" src="./admin/js/sidebarmenu.js"></script>
-  <script type="text/javascript" src="./admin/js/app.min.js"></script>
+  <script type="text/javascript" src="/admin/js/sidebarmenu.js"></script>
+  <script type="text/javascript" src="/admin/js/app.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.6/dist/vis-network.min.js"></script>
   <script>
     // Load header and sidebar components
     $(document).ready(function() {
-      $("#sidebar").load("./admin/component/sidebar-component.html");
-      $("#header").load("./admin/component/header-component.html");
+      $("#sidebar").load("/admin/component/sidebar-component.html", function() { $.getScript('/admin/js/sidebarmenu.js'); });
+      $("#header").load("/admin/component/header-component.html");
     });
 
-    // Network visualization
+    // Network visualization (with graceful fallback)
     async function initNetwork() {
-      try {
-        const response = await fetch('http://localhost:9000/iot/nodes');
-        const nodes = await response.json();
+      const container = document.getElementById('network-container');
 
-        // Prepare data for vis.js
+      // Helper to build the vis network from a nodes array
+      function buildNetwork(nodes) {
         const nodeData = nodes.map(node => ({
           id: node._id,
-          label: node.name,
-          title: `${node.name}\n${node.type}\n${node.model}`,
-          group: node.type
+          label: node.name || node._id,
+          title: `${node.name || ''}\n${node.type || ''}\n${node.model || ''}`,
+          group: node.type || 'unknown'
         }));
 
         const edges = [];
         nodes.forEach(node => {
-          if (node.connectedNodes) {
+          if (node.connectedNodes && Array.isArray(node.connectedNodes)) {
             node.connectedNodes.forEach(targetId => {
-              edges.push({
-                from: node._id,
-                to: targetId,
-                arrows: {
-                  to: true
-                }
-              });
+              edges.push({ from: node._id, to: targetId, arrows: { to: true } });
             });
           }
         });
 
-        const container = document.getElementById('network-container');
-        const data = {
-          nodes: new vis.DataSet(nodeData),
-          edges: new vis.DataSet(edges)
-        };
+        const data = { nodes: new vis.DataSet(nodeData), edges: new vis.DataSet(edges) };
 
         const options = {
-          nodes: {
-            shape: 'dot',
-            size: 20,
-            font: {
-              size: 14
-            }
-          },
-          edges: {
-            width: 2,
-            color: {
-              color: '#2B547E',
-              highlight: '#1E90FF'
-            }
-          },
+          nodes: { shape: 'dot', size: 20, font: { size: 14 } },
+          edges: { width: 2, color: { color: '#2B547E', highlight: '#1E90FF' } },
           groups: {
-            master: {
-              color: { background: '#4CAF50', border: '#388E3C' }
-            },
-            arduino: {
-              color: { background: '#2196F3', border: '#1976D2' }
-            },
-            raspberry_pi: {
-              color: { background: '#F44336', border: '#D32F2F' }
-            }
+            master: { color: { background: '#4CAF50', border: '#388E3C' } },
+            arduino: { color: { background: '#2196F3', border: '#1976D2' } },
+            raspberry_pi: { color: { background: '#F44336', border: '#D32F2F' } }
           },
-          physics: {
-            stabilization: true,
-            barnesHut: {
-              gravitationalConstant: -10000,
-              springConstant: 0.002
-            }
-          }
+          physics: { stabilization: true, barnesHut: { gravitationalConstant: -10000, springConstant: 0.002 } }
         };
 
-        const network = new vis.Network(container, data, options);
+        // clear previous contents
+        container.innerHTML = '';
+        return new vis.Network(container, data, options);
+      }
 
-        // Show node details when clicked
+      try {
+        let nodes = [];
+        try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 4000);
+          const response = await fetch('http://localhost:9000/iot/nodes', { signal: controller.signal });
+          clearTimeout(timeoutId);
+          if (response.ok) {
+            nodes = await response.json();
+          } else {
+            console.warn('Nodes fetch returned status', response.status);
+          }
+        } catch (fetchErr) {
+          console.warn('Could not fetch nodes from backend:', fetchErr);
+        }
+
+        // If no nodes returned, use a local sample dataset so the UI isn't blank
+        if (!nodes || nodes.length === 0) {
+          nodes = [
+            { _id: '1', name: 'Gateway', type: 'master', model: 'G100', location: { latitude: 0, longitude: 0 }, customProperties: { ip: '192.168.1.1' }, components: [], connectedNodes: ['2', '3'] },
+            { _id: '2', name: 'Node A', type: 'arduino', model: 'A1', location: { latitude: 51.5, longitude: -0.12 }, customProperties: { battery: '85%' }, components: [{ type: 'PIR Sensor', model: 'PIR-1', customProperties: { range: '5m' } }], connectedNodes: [] },
+            { _id: '3', name: 'Node B', type: 'raspberry_pi', model: 'RPi4', location: { latitude: 51.51, longitude: -0.13 }, customProperties: { battery: '60%' }, components: [], connectedNodes: [] }
+          ];
+        }
+
+        const network = buildNetwork(nodes);
+
+        // Show node details when clicked (prefer local data; fall back to backend lookup)
         network.on('click', async function(params) {
-          if (params.nodes.length > 0) {
+          if (params.nodes && params.nodes.length > 0) {
             const nodeId = params.nodes[0];
-            const response = await fetch(`http://localhost:9000/iot/nodes/${nodeId}`);
-            const node = await response.json();
-            showNodeDetails(node);
+            const local = (nodes || []).find(n => String(n._id) === String(nodeId));
+            if (local) {
+              showNodeDetails(local);
+              return;
+            }
+            try {
+              const resp = await fetch(`http://localhost:9000/iot/nodes/${nodeId}`);
+              if (resp.ok) {
+                const node = await resp.json();
+                showNodeDetails(node);
+              }
+            } catch (err) {
+              console.warn('Could not fetch node details for', nodeId, err);
+            }
           }
         });
 
       } catch (error) {
         console.error('Error initializing network:', error);
+        // final fallback: render a simple placeholder message
+        container.innerHTML = '<div style="padding:30px;color:#666">Network visualization unavailable.</div>';
       }
     }
 
     function showNodeDetails(node) {
       document.getElementById('node-details').style.display = 'block';
-      document.getElementById('node-title').textContent = node.name;
-      document.getElementById('node-type').textContent = node.type;
-      document.getElementById('node-model').textContent = node.model;
-      document.getElementById('node-location').textContent = 
-        `${node.location.latitude}, ${node.location.longitude}`;
+      document.getElementById('node-title').textContent = node.name || 'Unknown Node';
+      document.getElementById('node-type').textContent = node.type || '';
+      document.getElementById('node-model').textContent = node.model || '';
+      const loc = node.location || {};
+      document.getElementById('node-location').textContent = (loc.latitude !== undefined && loc.longitude !== undefined) ? `${loc.latitude}, ${loc.longitude}` : 'Unknown';
 
       // Show custom properties
       const propertiesDiv = document.getElementById('node-properties');
       propertiesDiv.innerHTML = '';
-      Object.entries(node.customProperties).forEach(([key, value]) => {
-        propertiesDiv.innerHTML += `<div class="property-item">
-          <span>${key}:</span> <span>${value}</span>
-        </div>`;
+      const customProps = node.customProperties || {};
+      Object.entries(customProps).forEach(([key, value]) => {
+        propertiesDiv.innerHTML += `<div class="property-item"><span>${key}:</span> <span>${value}</span></div>`;
       });
 
       // Show components
@@ -268,16 +275,14 @@
       componentsDiv.innerHTML = '';
       if (node.components && node.components.length > 0) {
         node.components.forEach(component => {
+          const compProps = component.customProperties || {};
           componentsDiv.innerHTML += `
             <div class="component-card">
-              <h5>${component.type} - ${component.model}</h5>
+              <h5>${component.type || ''} - ${component.model || ''}</h5>
               <div class="properties">
-                ${Object.entries(component.customProperties)
-                  .map(([key, value]) => `
-                    <div class="property-item">
-                      <span>${key}:</span> <span>${value}</span>
-                    </div>
-                  `).join('')}
+                ${Object.entries(compProps).map(([key, value]) => `
+                  <div class="property-item"><span>${key}:</span> <span>${value}</span></div>
+                `).join('')}
               </div>
             </div>
           `;

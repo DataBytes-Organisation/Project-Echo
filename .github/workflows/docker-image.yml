@@ -45,12 +45,12 @@ jobs:
     - name: Build containers
       run: |
         cd src/Components
-        docker compose build --no-cache --force-rm
+        docker compose -f docker-compose.test.yml build --no-cache --force-rm
         
     - name: Start containers
       run: |
         cd src/Components
-        docker compose up -d
+        docker compose -f docker-compose.test.yml up -d
     
     - name: Wait for containers to be ready
       run: sleep 180
