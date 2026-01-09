@@ -1,174 +1,93 @@
-<!-- Sidebar Start -->
-<aside class="left-sidebar">
-  <!-- Sidebar scroll-->
+<!-- Minimal Sidebar (text-link style) -->
+<style>
+  :root{--primary:#2F6E4F;--muted:#6F7B74;--ink:#1F2D23;--page:#F5F1EA}
+  #sidebarnav a{transition:background .12s ease,color .12s ease;display:block}
+  /* hover: light green per style guide */
+  #sidebarnav a:hover{background:#F0F7F2;color:var(--ink)}
+  /* visible focus ring for accessibility */
+  #sidebarnav a:focus{outline:2px solid rgba(47,110,79,0.12);outline-offset:2px}
+</style>
+<aside class="left-sidebar" aria-label="Admin sidebar">
   <div>
     <div class="brand-logo d-flex align-items-center justify-content-between">
-      <a href="./admin/dashboard.html" class="text-nowrap logo-img">
-        <img src="./admin/images/logos/logo.png" width="180" alt="" />
+      <a href="/admin/dashboard.html" class="text-nowrap logo-img">
+        <img src="/admin/images/logos/logo.png" width="180" alt="Project Echo Logo" />
       </a>
       <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
         <i class="ti ti-x fs-8"></i>
       </div>
     </div>
-    <!-- Sidebar navigation-->
+
+    <!-- Navigation: minimal text links to match reference site -->
     <nav class="sidebar-nav scroll-sidebar" data-simplebar="">
-      <ul id="sidebarnav">
-        <li class="nav-small-cap">
-          <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
-          <img src="./admin/images/logos/dashboard-icon.png" width="42" height="42">
-          <span class="hide-menu">Dashboard</span>
+      <ul id="sidebarnav" style="list-style:none;margin:0;padding:0;">
+
+        <!-- Dashboard Section -->
+        <li style="padding:16px 16px 8px 16px;font-family:Inter, system-ui, Segoe UI, Roboto, Arial;">
+          <span style="font-size:12px;color:#6F7B74;text-transform:uppercase;letter-spacing:0.08em;">Dashboard</span>
         </li>
-        <li class="sidebar-item">
-          <a class="sidebar-link" href="./admin-dashboard" aria-expanded="false">
-            <span>
-              <i class="ti ti-layout-dashboard"></i>
-            </span>
-            <span class="hide-menu">Dashboard</span>
-          </a>
+        <li>
+          <a href="/admin/dashboard.html" style="display:block;padding:0 16px;height:40px;line-height:40px;color:#1F2D23;text-decoration:none;font-weight:500;font-size:14px;">Dashboard</a>
         </li>
-        <li class="nav-small-cap">
-          <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
-          <img src="./admin/images/logos/users-management-icon.png" width="42" height="42">
-          <span class="hide-menu">Users Management</span>
+
+        <!-- Users Management Section -->
+        <li style="padding:24px 16px 8px 16px;font-family:Inter, system-ui, Segoe UI, Roboto, Arial;">
+          <span style="font-size:12px;color:#6F7B74;text-transform:uppercase;letter-spacing:0.08em;">Users Management</span>
         </li>
-        <li class="sidebar-item">
-          <a class="sidebar-link" href="./admin-template" aria-expanded="false">
-            <span>
-              <i class="ti ti-article"></i>
-            </span>
-            <span class="hide-menu">Authority Level</span>
-          </a>
+        <li>
+          <a href="/admin/template.html" style="display:block;padding:0 16px;height:40px;line-height:40px;color:#1F2D23;text-decoration:none;font-weight:500;font-size:14px;">Authority Level</a>
         </li>
-        <li class="sidebar-item">
-          <a class="sidebar-link" href="./requests" aria-expanded="false">
-            <span>
-              <i class="ti ti-alert-circle"></i>
-            </span>
-            <span class="hide-menu">User Activity</span>
-          </a>
+        <li>
+          <a href="/admin/cloud-compute.html" style="display:block;padding:0 16px;height:40px;line-height:40px;color:#1F2D23;text-decoration:none;font-weight:500;font-size:14px;">Cloud Compute</a>
         </li>
-        <li class="sidebar-item">
-            <a class="sidebar-link" href="./admin-template" aria-expanded="false">
-              <span>
-                <i class="ti ti-alert-circle"></i>
-              </span>
-              <span class="hide-menu">Request Handling</span>
-            </a>
-          </li>
-        
-          <li class="sidebar-item">
-              <a class="sidebar-link" href="./admin-template" aria-expanded="false">
-                <span>
-                  <i class="ti ti-alert-circle"></i>
-                </span>
-                <span class="hide-menu">Request Handling</span>
-              </a>
-            </li>
-          
-          <li class="nav-small-cap">
-            <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
-            <span class="hide-menu">Echo</span>
-          </li>
-          <li class="sidebar-item">
-            <a class="sidebar-link" href="./admin-donations" aria-expanded="false">
-              <span>
-                <i class="ti ti-receipt-2"></i>
-              </span>
-              <span class="hide-menu">Donations</span>
-            </a>
-          </li>
-          <li class="sidebar-item">
-            <a class="sidebar-link" href="./admin-template" aria-expanded="false">
-              <span>
-                <i class="ti ti-login"></i>
-              </span>
-              <span class="hide-menu">Echo Map UI</span>
-            </a>
-          </li>
-          <li class="sidebar-item">
-            <a class="sidebar-link" href="./notifications" aria-expanded="false">
-              <span>
-                <i class="ti ti-bell"></i>
-              </span>
-              <span class="hide-menu">Notifications</span>
-            </a>
-          </li>
-          <li class="nav-small-cap">
-            <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
-            <span class="hide-menu">SETTINGS</span>
-          </li>
-          <li class="sidebar-item">
-            <a class="sidebar-link" href="./admin-profile" aria-expanded="false">
-              <span>
-                <i class="ti ti-mood-happy"></i>
-              </span>
-              <span class="hide-menu">Profile</span>
-            </a>
-          </li>
-          <li class="sidebar-item">
-            <a class="sidebar-link" href=".admin-template" aria-expanded="false">
-              <span>
-                <i class="ti ti-aperture"></i>
-              </span>
-              <span class="hide-menu">Others</span>
-            </a>
-          </li>
-        </ul>
-        
-        <li class="nav-small-cap">
-          <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
-          <img src="./admin/images/logos/echo-icon.png" width="42" height="42">
-          <span class="hide-menu">Echo</span>
+        <li>
+          <a href="/admin/projects.html" style="display:block;padding:0 16px;height:40px;line-height:40px;color:#1F2D23;text-decoration:none;font-weight:500;font-size:14px;">Project management</a>
         </li>
-        <li class="sidebar-item">
-          <a class="sidebar-link" href="./admin-donations" aria-expanded="false">
-            <span>
-              <i class="ti ti-receipt-2"></i>
-            </span>
-            <span class="hide-menu">Donations</span>
-          </a>
+        <li>
+          <a href="/admin/admin-request.html" style="display:block;padding:0 16px;height:40px;line-height:40px;color:#1F2D23;text-decoration:none;font-weight:500;font-size:14px;">User Activity</a>
         </li>
-        <li class="sidebar-item">
-          <a class="sidebar-link" href="./admin-nodes" aria-expanded="false">
-            <span>
-              <i class="ti ti-network"></i>
-            </span>
-            <span class="hide-menu">Node Network</span>
-          </a>
+
+        <!-- Echo Section -->
+        <li style="padding:24px 16px 8px 16px;font-family:Inter, system-ui, Segoe UI, Roboto, Arial;">
+          <span style="font-size:12px;color:#6F7B74;text-transform:uppercase;letter-spacing:0.08em;">Echo</span>
         </li>
-        <li class="sidebar-item">
-          <a class="sidebar-link" href="./admin-template" aria-expanded="false">
-            <span>
-              <i class="ti ti-login"></i>
-            </span>
-            <span class="hide-menu">Echo Map UI</span>
-          </a>
+        <li>
+          <a href="/admin/donations.html" style="display:block;padding:0 16px;height:40px;line-height:40px;color:#1F2D23;text-decoration:none;font-weight:500;font-size:14px;">Donations</a>
         </li>
-        <li class="sidebar-item">
-          <a class="sidebar-link" href="./admin-template" aria-expanded="false">
-            <span>
-              <i class="ti ti-user-plus"></i>
-            </span>
-            <span class="hide-menu">Notifications</span>
-          </a>
+        <li>
+          <a href="/admin/admin-nodes.html" style="display:block;padding:0 16px;height:40px;line-height:40px;color:#1F2D23;text-decoration:none;font-weight:500;font-size:14px;">Node Network</a>
         </li>
-        <li class="nav-small-cap">
-          <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
-          <img src="./admin/images/logos/settings.png" width="42" height="42">
-          <span class="hide-menu">SETTING</span>
+        <li>
+          <a href="/admin/sensor-health.html" style="display:block;padding:0 16px;height:40px;line-height:40px;color:#1F2D23;text-decoration:none;font-weight:500;font-size:14px;">Sensor Health Management</a>
         </li>
-        <li class="sidebar-item">
-          <a class="sidebar-link" href="./user-profile" aria-expanded="false">
-            <span>
-              <i class="ti ti-mood-happy"></i>
-            </span>
-            <span class="hide-menu">Profile</span>
-          </a>
+        <li>
+          <a href="/admin/notifications.html" style="display:block;padding:0 16px;height:40px;line-height:40px;color:#1F2D23;text-decoration:none;font-weight:500;font-size:14px;">Notifications</a>
         </li>
-      
+        <li>
+          <a href="/admin/hmi-data-insights.html" style="display:block;padding:0 16px;height:40px;line-height:40px;color:#1F2D23;text-decoration:none;font-weight:500;font-size:14px;">Data Insights</a>
+        </li>
+
+        <!-- Settings Section -->
+        <li style="padding:24px 16px 8px 16px;font-family:Inter, system-ui, Segoe UI, Roboto, Arial;">
+          <span style="font-size:12px;color:#6F7B74;text-transform:uppercase;letter-spacing:0.08em;">Settings</span>
+        </li>
+        <li>
+          <a href="/admin/profile.html" style="display:block;padding:0 16px;height:40px;line-height:40px;color:#1F2D23;text-decoration:none;font-weight:500;font-size:14px;">Profile</a>
+        </li>
+        <li>
+          <a href="/admin/template.html" style="display:block;padding:0 16px;height:40px;line-height:40px;color:#1F2D23;text-decoration:none;font-weight:500;font-size:14px;">Others</a>
+        </li>
+
+        <!-- Spacer -->
+        <li style="flex:1;padding:16px"></li>
+
+        <!-- Call-to-Action (green primary) -->
+        <li style="padding:16px">
+          <a href="/map" target="_blank" style="display:block;text-align:center;background:#2F6E4F;color:#ffffff;text-decoration:none;padding:10px 12px;border-radius:8px;font-weight:600;">Go to Echo</a>
+        </li>
+
+      </ul>
     </nav>
-    <!-- End Sidebar navigation -->
   </div>
-  <!-- End Sidebar scroll-->
 </aside>
 <!--  Sidebar End -->

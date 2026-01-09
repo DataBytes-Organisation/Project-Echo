@@ -1,4 +1,6 @@
 name: efficientnet_v2_qat
+norm_choice: swap_rms_norm
+# norm_choice: freeze_bn
 params:
   model_name: "efficientnet_v2_s" 
   pretrained: true
