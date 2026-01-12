@@ -1,5 +1,6 @@
-ARG BASE_IMAGE=python:3.9-alpine 
-FROM python:3.11-alpine
+
+ARG BASE_IMAGE=python:3.9-alpine
+FROM python:3.11-alpine AS echo_api_builder
 
 WORKDIR /build
 
@@ -21,6 +22,7 @@ ENV PATH="/opt/venv/bin:$PATH"
 # Copy and install requirements
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt 
+
 
 # Runtime stage - slim final image
 FROM ${BASE_IMAGE}
