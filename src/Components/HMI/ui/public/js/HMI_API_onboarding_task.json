@@ -335,27 +335,66 @@
     },
     {
         "Bird": "Cophixalus bombiens",
-        "description": []
+        "description": [
+        "A small rainforest frog from Queensland, often called the creaking nursery frog.",
+        "Its call sounds like a creaking noise, which helps identify it.",
+        "These frogs prefer wet forest floors and hidden spaces under leaves.",
+        "They are nocturnal and usually active after rain."
+        ]
     },
     {
         "Bird": "Cophixalus exiguus",
-        "description": []
+        "description": ["The scanty frog is a very small frog, reaching a size of 16-19 millimetres (0.6-0.7 in). The dorsal surface is grey-brown, with random pale sections. In some specimens, a broad vertebral line is present, which broadens towards the eyes. It has a deep red patch on the groin. A faint "H" shape is present on the shoulders, and a V shape between the eyes. Toe pads are present, and webbing between toes and fingers are absent."]
     },
     {
         "Bird": "Cophixalus infacetus",
-        "description": []
+        "description": ["The inelegant frog (Cophixalus infacetus) is a species of frog in the family Microhylidae. It is also known as the creaking frog or the creaking nursery frog[2] due to its singular call. It is endemic to Australia. Its natural habitat is subtropical or tropical moist lowland forests. It is threatened by habitat loss."]
     },
     {
         "Bird": "Cophixalus ornatus",
-        "description": []
+        "description": ["Cophixalus ornatus, commonly known as the ornate nursery-frog, is a species of frog in the family Microhylidae. It is endemic to north-eastern Queensland, Australia.[1]"]
     },
     {
         "Bird": "Coracina novaehollandiae",
-        "description": []
+        "description": ["The black-faced cuckooshrike (Coracina novaehollandiae) is a common omnivorous passerine bird native to Australia and southern New Guinea. It has a protected status in New South Wales, under the National Parks and Wildlife Act, 1974."]
+        "description": [
+        "One of the smallest frog species in Australia, found in north-east Queensland.",
+        "It lives in rainforest environments with high moisture.",
+        "This species makes soft clicking calls at night.",
+        "Its tiny body size makes it difficult to see in dense leaf litter."
+        ]
+    },
+    {
+        "Bird": "Cophixalus infacetus",
+        "description": [
+          "A small rainforest frog from Queensland, often called the creaking nursery frog.",
+        "Its call sounds like a creaking noise, which helps identify it.",
+        "These frogs prefer wet forest floors and hidden spaces under leaves.",
+        "They are nocturnal and usually active after rain."
+        ]
+    },
+    {
+        "Bird": "Cophixalus ornatus",
+        "description": [
+          "A small ornate nursery frog found in north-eastern Queensland.",
+        "It often has brown or grey colouring with subtle patterns on its back.",
+        "These frogs live in wet forests and like hiding under logs and leaf litter.",
+        "They are known for their quiet nighttime calls."
+        ]
+    },
+    {
+        "Bird": "Coracina novaehollandiae",
+        "description": [
+          "Commonly called the black-faced cuckooshrike.",
+        "A medium-sized Australian bird with a black face and grey body.",
+        "It lives in woodlands, forests, and suburban areas.",
+        "Often seen gliding between trees or perched on powerlines.",
+        "It feeds on insects, fruit, and small invertebrates."
+        ]
     },
     {
         "Bird": "Coracina papuensis",
-        "description": []
+        "description": ["The white-bellied cuckooshrike (Coracina papuensis) is a species of bird in the family Campephagidae. It is found in Australia, the Moluccas, New Guinea and the Solomon Islands."]
     },
     {
         "Bird": "Corcorax melanorhamphos",
@@ -375,23 +414,23 @@
     },
     {
         "Bird": "Corvus mellori",
-        "description": []
+        "description": ["The little raven (Corvus mellori) is a species of the family Corvidae that is native to southeastern Australia. An adult individual is about 48–50 cm (19–19.5 in) in length, with completely black plumage, beak, and legs; as with all Australian species of Corvus, the black feathers have a grey base, and the iris of the adult bird is white (typical also of some related species from islands to the north of Australia). Although the little raven was first named by Gregory Mathews in 1912, it was only in 1967 that there was consensus to separate it from the Australian raven (C. coronoides) as a distinct species"]
     },
     {
         "Bird": "Corvus orru",
-        "description": []
+        "description": ["The Torresian crow (Corvus orru), also called the Australian crow or Papuan crow, is a passerine bird in the crow family native to the north and west of Australia and nearby islands in Indonesia and Papua New Guinea. The species has a black plumage, beak and mouth with white irises. The base of the feathers on the head and neck are white. The Torresian crow is slightly larger with a more robust bill than the morphologically similar little crow"]
     },
     {
         "Bird": "Coturnix pectoralis",
-        "description": []
+        "description": ["The stubble quail (Coturnix pectoralis) is a species of Old World quail native to Australia.[2] The species is not under any threat of extinction (IUCN Least Concern).[3] Stubble quail are widespread and found throughout all states and territories of Australia excluding Tasmania.[4] Other common names include grey quail and pectoral quail."]
     },
     {
         "Bird": "Cracticus nigrogularis",
-        "description": []
+        "description": ["The pied butcherbird (Cracticus nigrogularis) is a songbird native to Australia. Described by John Gould in 1837, it is a black and white bird 28 to 32 cm (11 to 12.5 in) long with a long hooked bill. Its head and throat are black, making a distinctive hood; the mantle and much of the tail and wings are also black. The neck, underparts and outer wing feathers are white. The juvenile and immature birds are predominantly brown and white. As they mature their brown feathers are replaced by black feathers. There are two recognised subspecies of pied butcherbird."]
     },
     {
         "Bird": "Cracticus torquatus",
-        "description": []
+        "description": ["The grey butcherbird (Cracticus torquatus) is a widely distributed species endemic to Australia. It occurs in a range of different habitats including arid, semi-arid and temperate zones. It is found across southern Australia, but is absent from the deserts of central Australia and the monsoon tropics of northern Australia.[4] It has a characteristic rollicking birdsong. It appears to be adapting well to city living, and can be encountered in the suburbs of many Australian cities including Brisbane, Melbourne, Perth, Sydney and Hobart. The grey butcherbird preys on small vertebrates including other birds."]
     },
     {
         "Bird": "Crinia signifera",

@@ -529,7 +529,14 @@ app.get("/admin-nodes", (req, res) => {
 app.get("/admin-nodes-temp", (req, res) => {
   return res.sendFile(path.join(__dirname, 'public/admin/admin-nodes-temp.html'));
 });
+//cloud page
+app.get("/admin-compute", (req, res) => {
+  return res.sendFile(path.join(__dirname, 'public/admin/cloud-compute.html'));
+});
 
+app.get("/admin-projects", (req, res) => {
+  return res.sendFile(path.join(__dirname, 'public/admin/projects.html'));
+});
 
 //Serve the profile tab
 app.get("/admin-profile", (req,res)=> {

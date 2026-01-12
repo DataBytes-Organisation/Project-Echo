@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sensor Health Management</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div class="app-container">
+  <div class="app-header">
+    <h1>Sensor Health Management</h1>
+    <div class="badge">Web Prototype</div>
+  </div>
+
+  <div class="nav">
+    <button class="active" onclick="showPage('dashboard')">Dashboard</button>
+    <button onclick="showPage('sensor-health')">Sensor Health</button>
+    <button onclick="showPage('alerts')">Alerts by Exception</button>
+    <button onclick="showPage('reboot')">Reboot</button>
+    <button onclick="showPage('settings')">Adjust Settings</button>
+    <button onclick="showPage('projects')">Add Project</button>
+  </div>
+
+  <div id="dashboard" class="page active">
+    <h2>Overview</h2>
+    <p class="section-description">
+      High-level summary of sensor health, alerts and active projects.
+    </p>
+    <table>
+      <tr><th>Metric</th><th>Value</th><th>Status</th></tr>
+      <tr><td>Total Sensors</td><td>128</td><td><span class="pill pill-ok">Healthy</span></td></tr>
+      <tr><td>Active Alerts</td><td>5</td><td><span class="pill pill-warn">Attention</span></td></tr>
+      <tr><td>Projects</td><td>7</td><td><span class="pill pill-ok">Running</span></td></tr>
+    </table>
+  </div>
+
+  <div id="sensor-health" class="page">
+    <h2>Sensor Health Management</h2>
+    <p class="section-description">
+      Real-time status of sensors, battery and connectivity.
+    </p>
+    <table>
+      <tr>
+        <th>Sensor ID</th><th>Project</th><th>Status</th><th>Battery</th><th>Last Contact</th>
+      </tr>
+      <tr>
+        <td>SEN-01</td><td>Rainforest A</td>
+        <td><span class="pill pill-ok">Online</span></td><td>87%</td><td>2 min ago</td>
+      </tr>
+      <tr>
+        <td>SEN-14</td><td>Rainforest A</td>
+        <td><span class="pill pill-warn">Degraded</span></td><td>21%</td><td>15 min ago</td>
+      </tr>
+      <tr>
+        <td>SEN-77</td><td>Savannah Trial</td>
+        <td><span class="pill pill-bad">Offline</span></td><td>—</td><td>2 h ago</td>
+      </tr>
+    </table>
+  </div>
+
+  <div id="alerts" class="page">
+    <h2>Alerts by Exception</h2>
+    <p class="section-description">
+      Low battery, offline, not functioning, and last-audio issues.
+    </p>
+    <table>
+      <tr>
+        <th>Sensor ID</th><th>Alert Type</th><th>Details</th><th>Last Audio</th>
+      </tr>
+      <tr>
+        <td>SEN-14</td>
+        <td><span class="pill pill-warn">Low Battery</span></td>
+        <td>Battery 21% – threshold 25%</td>
+        <td>32 min ago</td>
+      </tr>
+      <tr>
+        <td>SEN-77</td>
+        <td><span class="pill pill-bad">Offline</span></td>
+        <td>No contact for 2 h</td>
+        <td>2 h 5 min ago</td>
+      </tr>
+      <tr>
+        <td>SEN-88</td>
+        <td><span class="pill pill-bad">Last audio missing</span></td>
+        <td>No audio in last 6 h</td>
+        <td>6 h ago</td>
+      </tr>
+    </table>
+  </div>
+
+  <div id="reboot" class="page">
+    <h2>Reboot Sensors</h2>
+    <p class="section-description">
+      Queue a reboot for specific sensors.
+    </p>
+    <div class="form-grid">
+      <div>
+        <label for="reboot-sensor">Sensor ID(s)</label>
+        <input id="reboot-sensor" placeholder="e.g. SEN-77, SEN-14" />
+        <p class="note">Comma-separated list allowed.</p>
+      </div>
+      <div>
+        <label for="reboot-reason">Reason</label>
+        <input id="reboot-reason" placeholder="e.g. frozen, config update" />
+      </div>
+    </div>
+    <button class="btn-primary" onclick="fakeReboot()">Reboot Now</button>
+    <button class="btn-secondary">View Reboot History</button>
+    <p id="reboot-message" class="note"></p>
+  </div>
+
+  <div id="settings" class="page">
+    <h2>Adjust Settings</h2>
+    <p class="section-description">
+      Configure recording and alert behaviour for sensors.
+    </p>
+    <div class="form-grid">
+      <div>
+        <label for="settings-sensors">Target Sensors / Group</label>
+        <input id="settings-sensors" placeholder="e.g. all in Rainforest A" />
+      </div>
+      <div>
+        <label for="record-interval">Recording Interval</label>
+        <select id="record-interval">
+          <option>30 seconds</option>
+          <option>1 minute</option>
+          <option>5 minutes</option>
+          <option>10 minutes</option>
+        </select>
+      </div>
+      <div>
+        <label for="sensitivity">Sensitivity</label>
+        <select id="sensitivity">
+          <option>Low</option>
+          <option selected>Medium</option>
+          <option>High</option>
+        </select>
+      </div>
+      <div>
+        <label for="battery-threshold">Low Battery Threshold (%)</label>
+        <input id="battery-threshold" type="number" value="25" min="1" max="100" />
+      </div>
+    </div>
+    <label for="settings-notes">Configuration Notes</label>
+    <textarea id="settings-notes"
+      placeholder="Describe why these settings are being changed..."></textarea>
+    <br><br>
+    <button class="btn-primary" onclick="fakeSaveSettings()">Save Settings</button>
+    <button class="btn-secondary">Reset to Defaults</button>
+    <p id="settings-message" class="note"></p>
+  </div>
+
+  <div id="projects" class="page">
+    <h2>Add a Project</h2>
+    <p class="section-description">
+      Create a project and assign sensors to it (this fulfils “Able to add a project”).
+    </p>
+    <div class="form-grid">
+      <div>
+        <label for="project-name">Project Name</label>
+        <input id="project-name" placeholder="e.g. Echo – Amazon North 2025" />
+      </div>
+      <div>
+        <label for="project-location">Location</label>
+        <input id="project-location" placeholder="e.g. Amazon Basin, Zone A3" />
+      </div>
+      <div>
+        <label for="project-start">Start Date</label>
+        <input id="project-start" type="date" />
+      </div>
+      <div>
+        <label for="project-end">End Date</label>
+        <input id="project-end" type="date" />
+      </div>
+    </div>
+    <label for="project-description">Description</label>
+    <textarea id="project-description"
+      placeholder="Briefly describe the purpose and scope..."></textarea>
+    <br><br>
+    <label for="project-sensors">Assign Sensors</label>
+    <input id="project-sensors" placeholder="e.g. SEN-01–SEN-32" />
+    <p class="note">IDs, ranges or group names.</p>
+
+    <button class="btn-primary" onclick="fakeCreateProject()">Create Project</button>
+    <button class="btn-secondary">Cancel</button>
+    <p id="project-message" class="note"></p>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
