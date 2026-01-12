@@ -1,7 +1,5 @@
-
 {
     "DB_USERNAME": "modelUser",
     "DB_PASSWORD": "EchoNetAccess2023",
-    "DB_HOSTNAME": "ts-mongodb-cont",
-    "engine_interval_seconds": 5
+    "DB_HOSTNAME": "ts-mongodb-cont"
 }

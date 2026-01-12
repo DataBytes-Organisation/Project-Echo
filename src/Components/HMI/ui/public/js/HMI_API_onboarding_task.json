@@ -344,19 +344,6 @@
     },
     {
         "Bird": "Cophixalus exiguus",
-        "description": ["The scanty frog is a very small frog, reaching a size of 16-19 millimetres (0.6-0.7 in). The dorsal surface is grey-brown, with random pale sections. In some specimens, a broad vertebral line is present, which broadens towards the eyes. It has a deep red patch on the groin. A faint "H" shape is present on the shoulders, and a V shape between the eyes. Toe pads are present, and webbing between toes and fingers are absent."]
-    },
-    {
-        "Bird": "Cophixalus infacetus",
-        "description": ["The inelegant frog (Cophixalus infacetus) is a species of frog in the family Microhylidae. It is also known as the creaking frog or the creaking nursery frog[2] due to its singular call. It is endemic to Australia. Its natural habitat is subtropical or tropical moist lowland forests. It is threatened by habitat loss."]
-    },
-    {
-        "Bird": "Cophixalus ornatus",
-        "description": ["Cophixalus ornatus, commonly known as the ornate nursery-frog, is a species of frog in the family Microhylidae. It is endemic to north-eastern Queensland, Australia.[1]"]
-    },
-    {
-        "Bird": "Coracina novaehollandiae",
-        "description": ["The black-faced cuckooshrike (Coracina novaehollandiae) is a common omnivorous passerine bird native to Australia and southern New Guinea. It has a protected status in New South Wales, under the National Parks and Wildlife Act, 1974."]
         "description": [
         "One of the smallest frog species in Australia, found in north-east Queensland.",
         "It lives in rainforest environments with high moisture.",
@@ -394,7 +381,7 @@
     },
     {
         "Bird": "Coracina papuensis",
-        "description": ["The white-bellied cuckooshrike (Coracina papuensis) is a species of bird in the family Campephagidae. It is found in Australia, the Moluccas, New Guinea and the Solomon Islands."]
+        "description": []
     },
     {
         "Bird": "Corcorax melanorhamphos",

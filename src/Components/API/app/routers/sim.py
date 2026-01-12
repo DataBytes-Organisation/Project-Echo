@@ -18,8 +18,8 @@ conf = ConnectionConfig(
     MAIL_FROM="projectechodeakintest@gmail.com",
     MAIL_PORT=587,
     MAIL_SERVER="smtp.gmail.com",
-    MAIL_STARTTLS=True,
-    MAIL_SSL_TLS=False,
+    MAIL_TLS=True,
+    MAIL_SSL=False,
     USE_CREDENTIALS=True
 )
 
