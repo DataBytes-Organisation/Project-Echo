@@ -58,7 +58,11 @@ app.include_router(live.router) #Websocket
 def show_home():
     return 'Welcome to echo api, move to /docs for more'
 
-# --- OpenAPI Spec Endpoints ---
+app.include_router(auth_router.router, tags=["auth"], prefix="/api")
+from app.routers import detections
+app.include_router(detections.router)
+
+# ✅ /openapi-export - fetch live OpenAPI spec
 @app.get("/openapi-export", include_in_schema=False)
 async def get_openapi_spec():
     return app.openapi()
