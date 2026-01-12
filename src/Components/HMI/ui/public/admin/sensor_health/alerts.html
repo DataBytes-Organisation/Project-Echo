@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Alerts – Project Echo</title>
+  <link rel="stylesheet" href="/admin/sensor_health/style.css" />
+  <script src="/admin/sensor_health/script.js" defer></script>
+  <script src="/admin/sensor_health/charts.js" defer></script>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-brand"><img src="/admin/images/logos/echo-icon.png" class="brand-logo" alt="Echo logo" /></div>
+    <nav class="sidebar-menu"><div class="nav-section"><div class="nav-title">MENU</div>
+      <a class="nav-link" href="/admin/dashboard.html"><span class="nav-icon">▦</span><span class="nav-text">Dashboard</span></a>
+      <a class="nav-link" href="/admin/sensor-health.html"><span class="nav-icon">📡</span><span class="nav-text">Sensor Health</span></a>
+      <a class="nav-link active" href="/admin/sensor_health/alerts.html"><span class="nav-icon">🔔</span><span class="nav-text">Alerts</span></a>
+      <a class="nav-link" href="/admin/sensor_health/reboot.html"><span class="nav-icon">⟲</span><span class="nav-text">Reboot</span></a>
+      <a class="nav-link" href="/admin/sensor_health/settings.html"><span class="nav-icon">⚙</span><span class="nav-text">Settings</span></a>
+      <a class="nav-link" href="/admin/sensor_health/add-project.html"><span class="nav-icon">➕</span><span class="nav-text">Add a Project</span></a>
+    </div></nav>
+    <div class="sidebar-footer"> v1.0 • Admin Console </div>
+  </aside>
+  <div class="mobile-backdrop" id="mobile-backdrop"></div>
+  <main class="main">
+    <header class="page-header"><div></div><div class="page-header-actions"><button class="icon-button" id="menu-toggle">☰</button><button class="icon-button" id="theme-toggle">🌙</button></div></header>
+    <div class="dashboard-shell">
+      <section class="hero-header"><h1>Alerts</h1><p class="subtitle">real-time detection of issues across deployed sensors</p></section>
+      <section class="card"><h3>Alert Severity Overview</h3><p class="card-subtitle">Distribution of active alerts</p><canvas id="alertsChart" height="120"></canvas></section>
+      <section class="card"><h3>Active Alerts</h3><p class="card-subtitle">Sensors requiring immediate or near-term attention</p>
+        <table><thead><tr><th>Sensor</th><th>Issue</th><th>Details</th><th>Last Audio</th></tr></thead>
+        <tbody>
+          <tr><td>SEN-14</td><td><span class="pill pill-warning">Low Battery</span></td><td>Battery at 21% (threshold 25%)</td><td>32m ago</td></tr>
+          <tr><td>SEN-77</td><td><span class="pill pill-danger">Offline</span></td><td>No contact for 2 hours</td><td>2h 5m ago</td></tr>
+          <tr><td>SEN-88</td><td><span class="pill pill-danger">No Audio</span></td><td>No audio in last 6 hours</td><td>6h ago</td></tr>
+          <tr><td>SEN-104</td><td><span class="pill pill-warning">Degraded</span></td><td>Packet loss detected (18%)</td><td>22m ago</td></tr>
+        </tbody></table>
+      </section>
+    </div>
+  </main>
+</div>
+</body>
+</html>

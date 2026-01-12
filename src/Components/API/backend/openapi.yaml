@@ -1344,6 +1344,188 @@ paths:
           schema:
             $ref: '#/definitions/HTTPValidationError'
           headers: {}
+    /detections:
+    get:
+      description: ''
+      summary: list_detections_detections_get
+      tags:
+      - detections
+      operationId: list_detections_detections_get
+      deprecated: false
+      produces:
+      - application/json
+      parameters:
+      - name: sensorId
+        in: query
+        required: false
+        type: string
+        description: ''
+      - name: species
+        in: query
+        required: false
+        type: string
+        description: ''
+      - name: skip
+        in: query
+        required: false
+        type: integer
+        format: int32
+        default: 0
+        description: ''
+      - name: limit
+        in: query
+        required: false
+        type: integer
+        format: int32
+        default: 100
+        description: ''
+      responses:
+        '200':
+          description: Successful Response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Detection'
+          headers: {}
+        '422':
+          description: Validation Error
+          schema:
+            $ref: '#/definitions/HTTPValidationError'
+          headers: {}
+    post:
+      description: ''
+      summary: create_detection_detections_post
+      tags:
+      - detections
+      operationId: create_detection_detections_post
+      deprecated: false
+      produces:
+      - application/json
+      consumes:
+      - application/json
+      parameters:
+      - name: Content-Type
+        in: header
+        required: false
+        enum:
+        - application/json
+        type: string
+        description: ''
+      - name: body
+        in: body
+        required: true
+        description: ''
+        schema:
+          $ref: '#/definitions/DetectionCreate'
+      responses:
+        '201':
+          description: Successful Response
+          schema:
+            $ref: '#/definitions/Detection'
+          headers: {}
+        '422':
+          description: Validation Error
+          schema:
+            $ref: '#/definitions/HTTPValidationError'
+          headers: {}
+
+  /detections/{detection_id}:
+    get:
+      description: ''
+      summary: get_detection_detections__detection_id__get
+      tags:
+      - detections
+      operationId: get_detection_detections__detection_id__get
+      deprecated: false
+      produces:
+      - application/json
+      parameters:
+      - name: detection_id
+        in: path
+        required: true
+        type: string
+        description: MongoDB ObjectId of the detection
+      responses:
+        '200':
+          description: Successful Response
+          schema:
+            $ref: '#/definitions/Detection'
+          headers: {}
+        '404':
+          description: Detection not found
+          schema:
+            type: object
+          headers: {}
+        '422':
+          description: Validation Error
+          schema:
+            $ref: '#/definitions/HTTPValidationError'
+          headers: {}
+    delete:
+      description: ''
+      summary: delete_detection_detections__detection_id__delete
+      tags:
+      - detections
+      operationId: delete_detection_detections__detection_id__delete
+      deprecated: false
+      produces:
+      - application/json
+      parameters:
+      - name: detection_id
+        in: path
+        required: true
+        type: string
+        description: MongoDB ObjectId of the detection
+      responses:
+        '204':
+          description: Successful Response
+          schema:
+            type: object
+          headers: {}
+        '404':
+          description: Detection not found
+          schema:
+            type: object
+          headers: {}
+    patch:
+      description: ''
+      summary: update_detection_detections__detection_id__patch
+      tags:
+      - detections
+      operationId: update_detection_detections__detection_id__patch
+      deprecated: false
+      produces:
+      - application/json
+      consumes:
+      - application/json
+      parameters:
+      - name: detection_id
+        in: path
+        required: true
+        type: string
+        description: MongoDB ObjectId of the detection
+      - name: body
+        in: body
+        required: true
+        description: ''
+        schema:
+          type: object
+      responses:
+        '200':
+          description: Successful Response
+          schema:
+            $ref: '#/definitions/Detection'
+          headers: {}
+        '404':
+          description: Detection not found
+          schema:
+            type: object
+          headers: {}
+        '422':
+          description: Validation Error
+          schema:
+            $ref: '#/definitions/HTTPValidationError'
+          headers: {}
 definitions:
   AddressSchema:
     title: AddressSchema
@@ -1730,6 +1912,22 @@ definitions:
     - loc
     - msg
     - type
+    DetectionCreate:
+    title: DetectionCreate
+    allOf:
+    - $ref: '#/definitions/EventSchema'
+
+  Detection:
+    title: Detection
+    allOf:
+    - $ref: '#/definitions/EventSchema'
+    - type: object
+      properties:
+        id:
+          type: string
+          description: MongoDB ObjectId of the detection
+      required:
+      - id
 tags:
 - name: hmi
   description: ''
@@ -1740,4 +1938,6 @@ tags:
 - name: iot
   description: ''
 - name: predict
+  description: ''
+- name: detections
   description: ''
