@@ -335,27 +335,66 @@
     },
     {
         "Bird": "Cophixalus bombiens",
-        "description": []
+        "description": [
+        "A small rainforest frog from Queensland, often called the creaking nursery frog.",
+        "Its call sounds like a creaking noise, which helps identify it.",
+        "These frogs prefer wet forest floors and hidden spaces under leaves.",
+        "They are nocturnal and usually active after rain."
+        ]
     },
     {
         "Bird": "Cophixalus exiguus",
-        "description": []
+        "description": ["The scanty frog is a very small frog, reaching a size of 16-19 millimetres (0.6-0.7 in). The dorsal surface is grey-brown, with random pale sections. In some specimens, a broad vertebral line is present, which broadens towards the eyes. It has a deep red patch on the groin. A faint "H" shape is present on the shoulders, and a V shape between the eyes. Toe pads are present, and webbing between toes and fingers are absent."]
     },
     {
         "Bird": "Cophixalus infacetus",
-        "description": []
+        "description": ["The inelegant frog (Cophixalus infacetus) is a species of frog in the family Microhylidae. It is also known as the creaking frog or the creaking nursery frog[2] due to its singular call. It is endemic to Australia. Its natural habitat is subtropical or tropical moist lowland forests. It is threatened by habitat loss."]
     },
     {
         "Bird": "Cophixalus ornatus",
-        "description": []
+        "description": ["Cophixalus ornatus, commonly known as the ornate nursery-frog, is a species of frog in the family Microhylidae. It is endemic to north-eastern Queensland, Australia.[1]"]
     },
     {
         "Bird": "Coracina novaehollandiae",
-        "description": []
+        "description": ["The black-faced cuckooshrike (Coracina novaehollandiae) is a common omnivorous passerine bird native to Australia and southern New Guinea. It has a protected status in New South Wales, under the National Parks and Wildlife Act, 1974."]
+        "description": [
+        "One of the smallest frog species in Australia, found in north-east Queensland.",
+        "It lives in rainforest environments with high moisture.",
+        "This species makes soft clicking calls at night.",
+        "Its tiny body size makes it difficult to see in dense leaf litter."
+        ]
+    },
+    {
+        "Bird": "Cophixalus infacetus",
+        "description": [
+          "A small rainforest frog from Queensland, often called the creaking nursery frog.",
+        "Its call sounds like a creaking noise, which helps identify it.",
+        "These frogs prefer wet forest floors and hidden spaces under leaves.",
+        "They are nocturnal and usually active after rain."
+        ]
+    },
+    {
+        "Bird": "Cophixalus ornatus",
+        "description": [
+          "A small ornate nursery frog found in north-eastern Queensland.",
+        "It often has brown or grey colouring with subtle patterns on its back.",
+        "These frogs live in wet forests and like hiding under logs and leaf litter.",
+        "They are known for their quiet nighttime calls."
+        ]
+    },
+    {
+        "Bird": "Coracina novaehollandiae",
+        "description": [
+          "Commonly called the black-faced cuckooshrike.",
+        "A medium-sized Australian bird with a black face and grey body.",
+        "It lives in woodlands, forests, and suburban areas.",
+        "Often seen gliding between trees or perched on powerlines.",
+        "It feeds on insects, fruit, and small invertebrates."
+        ]
     },
     {
         "Bird": "Coracina papuensis",
-        "description": []
+        "description": ["The white-bellied cuckooshrike (Coracina papuensis) is a species of bird in the family Campephagidae. It is found in Australia, the Moluccas, New Guinea and the Solomon Islands."]
     },
     {
         "Bird": "Corcorax melanorhamphos",

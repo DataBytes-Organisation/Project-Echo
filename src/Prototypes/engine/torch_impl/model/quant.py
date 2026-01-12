@@ -36,6 +36,10 @@ qconfig_mapping = quantization.QConfigMapping().set_object_type(
 	torch.nn.Linear, qconfig_per_tensor
 ).set_object_type(
 	torch.nn.BatchNorm2d, qconfig_per_tensor
+).set_object_type(
+	torch.nn.ReLU, qconfig_per_tensor
+).set_object_type(
+	torch.nn.ReLU6, qconfig_per_tensor
 )
 
 def prepare_qat_fx(float_model, input_size=(1, 3, 32, 32)):

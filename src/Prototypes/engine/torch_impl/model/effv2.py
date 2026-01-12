@@ -117,4 +117,5 @@ class EfficientNetV2ArcFace(EfficientNet):
 		self._fuse_conv_bn(self.features[0])
 		for module in self.modules():
 			if isinstance(module, (MBConv, FusedMBConv)): self._fuse_conv_bn(module.block)
+
 		print("Model fusion completed successfully.")

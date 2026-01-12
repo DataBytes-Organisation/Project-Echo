@@ -1,5 +1,8 @@
 name: panns_mobilenetv2
 params:
+  model_name: "panns_mobilenetv2"
   pretrained: true
   num_classes: ${data.num_classes}
-  use_arcface: false
+  use_qat: false
+  trainable_blocks: -1
+  use_arcface: true
