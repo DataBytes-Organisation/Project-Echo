@@ -398,7 +398,7 @@
     },
     {
         "Bird": "Corcorax melanorhamphos",
-        "description": []
+        "description": ["The white-winged chough is one of only two surviving species of the Australian mud-nest builders family, Corcoracidae, and is the only member of the genus"]
     },
     {
         "Bird": "Cormobates leucophaea",
@@ -410,7 +410,7 @@
     },
     {
         "Bird": "Corvus coronoides",
-        "description": []
+        "description": ["The Australian raven (Corvus coronoides) is a passerine corvid bird native to Australia. Measuring 46–53 centimetres (18–21 in) in length, it has an all-black plumage, beak and mouth, as well as strong, greyish-black legs and feet. The upperparts of its body are glossy, with a purple-blue, greenish sheen; its black feathers have grey bases. The Australian raven is distinguished from the Australian crow, and other related corvids, by its long chest feathers, or throat hackles, which are prominent in mature birds."]
     },
     {
         "Bird": "Corvus mellori",
@@ -837,7 +837,7 @@
         },
         {
             "Bird": "Coracina papuensis",
-            "description": []
+            "description": ["The white-bellied cuckooshrike (Coracina papuensis) is a species of bird in the family Campephagidae. It is found in Australia, the Moluccas, New Guinea and the Solomon Islands."]
         },
         {
             "Bird": "Corcorax melanorhamphos",
