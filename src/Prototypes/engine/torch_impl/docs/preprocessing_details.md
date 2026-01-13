@@ -8,10 +8,10 @@ The classifier, a Convolutional Neural Network (CNN), is designed to process 2D 
 
 The creation process is as follows:
 
-1.  **Create a Spectrogram (The "Musical Score")**:
-    *   A spectrogram decomposes the sound into its constituent frequencies over time. This is analogous to creating a musical score from an audio file, where the score shows which notes (frequencies) are played at what times and with what intensity (loudness). The result is a chart with time on one axis, frequency on the other, and the colour/brightness of each point showing the loudness of that frequency at that moment.
+1.  **Create a Spectrogram (The "Audio Image")**:
+    *   A spectrogram decomposes the sound into its constituent frequencies over time. This is analogous to creating an audio image from an audio file, where the image shows which notes (frequencies) are played at what times and with what intensity (loudness). The result is a chart with time on one axis, frequency on the other, and the colour/brightness of each point showing the loudness of that frequency at that moment.
 
-2.  **Apply the "Mel" Scale (Focus Like a Human Ear)**:
+2.  **Apply the "Mel" Scale**:
     *   Humans perceive sound frequencies non-linearly; we are more sensitive to changes in low frequencies than high ones.
     *   The **Mel scale** reorganises the spectrogram's frequency axis to mimic this perception. It allocates more resolution to lower frequencies and compresses higher frequencies. This helps the model focus on the frequency ranges most critical for distinguishing real-world sounds.
 
