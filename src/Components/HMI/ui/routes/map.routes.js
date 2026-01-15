@@ -87,4 +87,25 @@ module.exports = function(app) {
     res.send(response.data);
     next()
   })
+  
+    app.get(`/movement_time/:start/:end`, async (req, res, next) => {
+    const start = req.params.start;
+    const end = req.params.end;
+    const response = await axios.get(
+      `${MESSAGE_API_URL}/movement_time?start=${start}&end=${end}`
+    );
+    res.send(response.data || []);
+  });
+
+  app.get(`/movement_time_daily/:start/:end`, async (req, res, next) => {
+    const start = req.params.start;
+    const end = req.params.end;
+
+    const response = await axios.get(
+      `${MESSAGE_API_URL}/movement_time_daily?start=${start}&end=${end}`
+    );
+
+    res.send(response.data || []);
+  });
+
 }
