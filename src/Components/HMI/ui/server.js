@@ -778,6 +778,33 @@ app.post('/suspendUser', async (req, res) => {
 
 //Page direction to the map
 // Proxy route for IoT nodes API
+// Proxy routes for Sensor Health API
+async function proxyToApi(req, res) {
+  try {
+    const url = `http://ts-api-cont:9000${req.originalUrl}`;
+    const response = await axios({
+      method: req.method,
+      url,
+      params: req.query,
+      data: req.body,
+      validateStatus: () => true,
+    });
+
+    res.status(response.status);
+    // axios may return undefined data for 204
+    if (typeof response.data === 'undefined') {
+      return res.end();
+    }
+    return res.send(response.data);
+  } catch (error) {
+    console.error('Error proxying to API:', error);
+    return res.status(500).json({ error: 'Error proxying to API' });
+  }
+}
+
+app.all('/sensors', proxyToApi);
+app.all('/sensors/*', proxyToApi);
+
 app.get('/iot/nodes', async (req, res) => {
   try {
     const response = await axios.get('http://ts-api-cont:9000/iot/nodes');

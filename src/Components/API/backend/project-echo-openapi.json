@@ -1840,6 +1840,327 @@
         }
       }
     },
+    "/sensors/updates": {
+      "get": {
+        "tags": [
+          "sensors"
+        ],
+        "summary": "Get Sensor Updates",
+        "operationId": "get_sensor_updates_sensors_updates_get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 5000.0,
+              "minimum": 1.0,
+              "title": "Limit",
+              "default": 500
+            },
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Derived sensor health updates",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sensors/alerts": {
+      "get": {
+        "tags": [
+          "sensors"
+        ],
+        "summary": "Get Sensor Alerts",
+        "operationId": "get_sensor_alerts_sensors_alerts_get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 5000.0,
+              "minimum": 1.0,
+              "title": "Limit",
+              "default": 500
+            },
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Derived alerts from sensor health",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sensors/{sensor_id}/settings": {
+      "get": {
+        "tags": [
+          "sensors"
+        ],
+        "summary": "Get Sensor Settings",
+        "operationId": "get_sensor_settings_sensors__sensor_id__settings_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Sensor Id"
+            },
+            "name": "sensor_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get sensor settings (sensor-specific or global defaults)",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "sensors"
+        ],
+        "summary": "Put Sensor Settings",
+        "operationId": "put_sensor_settings_sensors__sensor_id__settings_put",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Sensor Id"
+            },
+            "name": "sensor_id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "title": "Payload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Upsert sensor settings",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sensors/{sensor_id}/reboot": {
+      "post": {
+        "tags": [
+          "sensors"
+        ],
+        "summary": "Queue Reboot",
+        "operationId": "queue_reboot_sensors__sensor_id__reboot_post",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Sensor Id"
+            },
+            "name": "sensor_id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "title": "Payload",
+                "default": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Queue a reboot command (records intent only)",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sensors/{sensor_id}/reboots": {
+      "get": {
+        "tags": [
+          "sensors"
+        ],
+        "summary": "Get Reboot History",
+        "operationId": "get_reboot_history_sensors__sensor_id__reboots_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Sensor Id"
+            },
+            "name": "sensor_id",
+            "in": "path"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200.0,
+              "minimum": 1.0,
+              "title": "Limit",
+              "default": 50
+            },
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Reboot history for a sensor",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sensors/reboots/recent": {
+      "get": {
+        "tags": [
+          "sensors"
+        ],
+        "summary": "Get Recent Reboots",
+        "operationId": "get_recent_reboots_sensors_reboots_recent_get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200.0,
+              "minimum": 1.0,
+              "title": "Limit",
+              "default": 50
+            },
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Recent reboot history across all sensors",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/predict": {
       "post": {
         "tags": [
@@ -2013,6 +2334,311 @@
           }
         }
       }
+    },
+    "/detections": {
+      "get": {
+        "tags": [
+          "detections"
+        ],
+        "summary": "List detections with pagination and filtering",
+        "operationId": "list_detections_endpoint_detections_get",
+        "parameters": [
+          {
+            "description": "Filter by species name (exact match)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Species",
+              "description": "Filter by species name (exact match)"
+            },
+            "name": "species",
+            "in": "query"
+          },
+          {
+            "description": "Filter detections from this timestamp (inclusive, ISO 8601)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Start Time",
+              "description": "Filter detections from this timestamp (inclusive, ISO 8601)"
+            },
+            "name": "start_time",
+            "in": "query"
+          },
+          {
+            "description": "Filter detections up to this timestamp (inclusive, ISO 8601)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "title": "End Time",
+              "description": "Filter detections up to this timestamp (inclusive, ISO 8601)"
+            },
+            "name": "end_time",
+            "in": "query"
+          },
+          {
+            "description": "Latitude for location filter (requires lon & radius_km)",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "title": "Lat",
+              "description": "Latitude for location filter (requires lon & radius_km)"
+            },
+            "name": "lat",
+            "in": "query"
+          },
+          {
+            "description": "Longitude for location filter (requires lat & radius_km)",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "title": "Lon",
+              "description": "Longitude for location filter (requires lat & radius_km)"
+            },
+            "name": "lon",
+            "in": "query"
+          },
+          {
+            "description": "Radius in kilometres for location filter (requires lat & lon)",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "title": "Radius Km",
+              "description": "Radius in kilometres for location filter (requires lat & lon)"
+            },
+            "name": "radius_km",
+            "in": "query"
+          },
+          {
+            "description": "Page number (1-based)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1.0,
+              "title": "Page",
+              "description": "Page number (1-based)",
+              "default": 1
+            },
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "description": "Number of detections per page (max 100)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100.0,
+              "minimum": 1.0,
+              "title": "Page Size",
+              "description": "Number of detections per page (max 100)",
+              "default": 20
+            },
+            "name": "page_size",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DetectionListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "detections"
+        ],
+        "summary": "Create a new detection",
+        "operationId": "create_detection_endpoint_detections_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DetectionCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Detection"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/detections/{detection_id}": {
+      "get": {
+        "tags": [
+          "detections"
+        ],
+        "summary": "Get a single detection by id",
+        "operationId": "get_detection_endpoint_detections__detection_id__get",
+        "parameters": [
+          {
+            "description": "MongoDB ObjectId of the detection",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Detection Id",
+              "description": "MongoDB ObjectId of the detection"
+            },
+            "name": "detection_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Detection"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "detections"
+        ],
+        "summary": "Delete a detection by id",
+        "operationId": "delete_detection_endpoint_detections__detection_id__delete",
+        "parameters": [
+          {
+            "description": "MongoDB ObjectId of the detection",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Detection Id",
+              "description": "MongoDB ObjectId of the detection"
+            },
+            "name": "detection_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "detections"
+        ],
+        "summary": "Update fields of a detection",
+        "operationId": "update_detection_endpoint_detections__detection_id__patch",
+        "parameters": [
+          {
+            "description": "MongoDB ObjectId of the detection",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Detection Id",
+              "description": "MongoDB ObjectId of the detection"
+            },
+            "name": "detection_id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "title": "Updates",
+                "description": "Partial update payload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Detection"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -2100,6 +2726,245 @@
           "file"
         ],
         "title": "Body_upload_audio_api_audio_upload_post"
+      },
+      "Detection": {
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "sensorId": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Sensorid"
+          },
+          "species": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Species"
+          },
+          "microphoneLLA": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 3,
+            "title": "Microphonella"
+          },
+          "animalEstLLA": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 3,
+            "title": "Animalestlla"
+          },
+          "animalTrueLLA": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 3,
+            "title": "Animaltruella"
+          },
+          "animalLLAUncertainty": {
+            "type": "integer",
+            "title": "Animalllauncertainty"
+          },
+          "audioClip": {
+            "type": "string",
+            "title": "Audioclip"
+          },
+          "confidence": {
+            "type": "number",
+            "exclusiveMaximum": 100.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Confidence"
+          },
+          "sampleRate": {
+            "type": "integer",
+            "title": "Samplerate"
+          },
+          "_id": {
+            "type": "string",
+            "title": " Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "timestamp",
+          "sensorId",
+          "species",
+          "microphoneLLA",
+          "animalEstLLA",
+          "animalTrueLLA",
+          "animalLLAUncertainty",
+          "audioClip",
+          "confidence",
+          "sampleRate"
+        ],
+        "title": "Detection",
+        "example": {
+          "timestamp": "2023-03-22T13:45:12.000Z",
+          "sensorId": "2",
+          "species": "Sus Scrofa",
+          "microphoneLLA": [
+            -33.1101,
+            150.0567,
+            23
+          ],
+          "animalEstLLA": [
+            -33.1105,
+            150.0569,
+            23
+          ],
+          "animalTrueLLA": [
+            -33.1106,
+            150.057,
+            23
+          ],
+          "animalLLAUncertainty": 10,
+          "audioClip": "some audio_base64 data",
+          "confidence": 99.4,
+          "sampleRate": 48000
+        }
+      },
+      "DetectionCreate": {
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "sensorId": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Sensorid"
+          },
+          "species": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Species"
+          },
+          "microphoneLLA": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 3,
+            "title": "Microphonella"
+          },
+          "animalEstLLA": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 3,
+            "title": "Animalestlla"
+          },
+          "animalTrueLLA": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 3,
+            "title": "Animaltruella"
+          },
+          "animalLLAUncertainty": {
+            "type": "integer",
+            "title": "Animalllauncertainty"
+          },
+          "audioClip": {
+            "type": "string",
+            "title": "Audioclip"
+          },
+          "confidence": {
+            "type": "number",
+            "exclusiveMaximum": 100.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Confidence"
+          },
+          "sampleRate": {
+            "type": "integer",
+            "title": "Samplerate"
+          }
+        },
+        "type": "object",
+        "required": [
+          "timestamp",
+          "sensorId",
+          "species",
+          "microphoneLLA",
+          "animalEstLLA",
+          "animalTrueLLA",
+          "animalLLAUncertainty",
+          "audioClip",
+          "confidence",
+          "sampleRate"
+        ],
+        "title": "DetectionCreate",
+        "example": {
+          "timestamp": "2023-03-22T13:45:12.000Z",
+          "sensorId": "2",
+          "species": "Sus Scrofa",
+          "microphoneLLA": [
+            -33.1101,
+            150.0567,
+            23
+          ],
+          "animalEstLLA": [
+            -33.1105,
+            150.0569,
+            23
+          ],
+          "animalTrueLLA": [
+            -33.1106,
+            150.057,
+            23
+          ],
+          "animalLLAUncertainty": 10,
+          "audioClip": "some audio_base64 data",
+          "confidence": 99.4,
+          "sampleRate": 48000
+        }
+      },
+      "DetectionListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/Detection"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "page_size": {
+            "type": "integer",
+            "title": "Page Size"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "page",
+          "page_size"
+        ],
+        "title": "DetectionListResponse"
       },
       "EmailNotifications": {
         "properties": {

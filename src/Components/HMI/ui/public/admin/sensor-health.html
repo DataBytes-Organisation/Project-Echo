@@ -79,7 +79,7 @@
         <div class="form-grid">
           <div>
             <label>Status</label>
-            <select>
+            <select id="sensor-status-filter">
               <option>All</option>
               <option>Online</option>
               <option>Offline</option>
@@ -89,11 +89,8 @@
           </div>
           <div>
             <label>Project</label>
-            <select>
+            <select id="sensor-project-filter">
               <option>All Projects</option>
-              <option>Rainforest A</option>
-              <option>Savannah Trial</option>
-              <option>Wetlands 2025</option>
             </select>
           </div>
         </div>
@@ -112,34 +109,9 @@
               <th>Last contact</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody id="sensor-overview-tbody">
             <tr>
-              <td>SEN-01</td>
-              <td>Rainforest A</td>
-              <td><span class="pill pill-success">Online</span></td>
-              <td>87%</td>
-              <td>2m ago</td>
-            </tr>
-            <tr>
-              <td>SEN-14</td>
-              <td>Rainforest A</td>
-              <td><span class="pill pill-warning">Degraded</span></td>
-              <td>21%</td>
-              <td>15m ago</td>
-            </tr>
-            <tr>
-              <td>SEN-77</td>
-              <td>Savannah Trial</td>
-              <td><span class="pill pill-danger">Offline</span></td>
-              <td>—</td>
-              <td>2h ago</td>
-            </tr>
-            <tr>
-              <td>SEN-88</td>
-              <td>Wetlands 2025</td>
-              <td><span class="pill pill-warning">Low Battery</span></td>
-              <td>18%</td>
-              <td>8m ago</td>
+              <td colspan="5">Loading…</td>
             </tr>
           </tbody>
         </table>

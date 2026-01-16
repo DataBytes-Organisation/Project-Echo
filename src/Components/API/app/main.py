@@ -17,7 +17,7 @@ import pymongo
 
 # Routers
 from .routers import add_csv_output_option, audio_upload_router
-from app.routers import species_predictor, auth_router, hmi, engine, sim, two_factor, public, iot, live #Websocket
+from app.routers import species_predictor, auth_router, hmi, engine, sim, two_factor, public, iot, live, sensors #Websocket
 
 # --- FastAPI App Setup ---
 app = FastAPI(
@@ -49,6 +49,7 @@ app.include_router(sim.router, tags=['sim'], prefix='/sim')
 app.include_router(two_factor.router)
 app.include_router(public.router, tags=['public'], prefix='/public')
 app.include_router(iot.router, tags=['iot'], prefix='/iot')
+app.include_router(sensors.router, tags=['sensors'], prefix='/sensors')
 app.include_router(species_predictor.router, tags=["predict"])
 app.include_router(auth_router.router, tags=["auth"], prefix="/api")
 app.include_router(live.router) #Websocket 
