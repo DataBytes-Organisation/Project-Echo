@@ -6,6 +6,7 @@ from fastapi import FastAPI, Body, HTTPException, status, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import species_predictor
 from app.routers import auth_router
+from app.routers import admin_budget, admin_services
 from fastapi.responses import Response, JSONResponse
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel, Field, EmailStr
@@ -65,7 +66,8 @@ app.include_router(hmi.router, tags=['hmi'], prefix='/hmi')
 app.include_router(engine.router, tags=['engine'], prefix='/engine')
 app.include_router(sim.router, tags=['sim'], prefix='/sim')
 app.include_router(two_factor.router)
-
+app.include_router(admin_budget.router, tags=["admin"], prefix="/api")
+app.include_router(admin_services.router, tags=["admin"], prefix="/api")
 
 app.include_router(public.router, tags=['public'], prefix='/public')
 
