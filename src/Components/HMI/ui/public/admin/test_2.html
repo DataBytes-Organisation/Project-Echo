@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Movement Time Table</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #999; padding: 6px; }
+    th { text-align: left; }
+    tbody tr:nth-child(even) { background: #f2f2f2; }
+    #status { margin: 8px 0; }
+  </style>
+</head>
+<body>
+
+<h3>Movement Time</h3>
+<div id="status">loading…</div>
+
+<table>
+	<thead>
+	  <tr>
+		<th>Common Name</th>
+		<th>Type</th>
+		<th>Species</th>
+		<th>Count</th>
+		<th>First Seen</th>
+		<th>Last Seen</th>
+	  </tr>
+	</thead>
+  <tbody id="tbody"></tbody>
+</table>
+
+<script>
+(async () => {
+  const start = 1763654400;
+  const end   = 1763740800;
+  const url = `/movement_time/${start}/${end}`;
+
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(res.status + " " + res.statusText);
+
+    const data = await res.json();
+
+    const agg = new Map();
+
+    for (const e of data) {
+      const key = e.commonName ?? "(unknown)";
+      const ts = typeof e.timestamp === "number" ? e.timestamp : null; // seconds
+
+      if (!agg.has(key)) {
+        agg.set(key, {
+          count: 0,
+          minTs: ts,
+          maxTs: ts,
+          type: e.type ?? "",
+          species: e.species ?? ""
+        });
+      }
+
+      const a = agg.get(key);
+      a.count += 1;
+
+      if (ts != null) {
+        if (a.minTs == null || ts < a.minTs) a.minTs = ts;
+        if (a.maxTs == null || ts > a.maxTs) a.maxTs = ts;
+      }
+    }
+
+    const tbody = document.getElementById("tbody");
+    tbody.innerHTML = "";
+
+    const rows = Array.from(agg.entries())
+      .sort((a, b) => b[1].count - a[1].count);
+
+    for (const [name, a] of rows) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${name}</td>
+        <td>${a.type}</td>
+        <td>${a.species}</td>
+        <td>${a.count}</td>
+        <td>${a.minTs ? new Date(a.minTs * 1000).toLocaleString() : ""}</td>
+        <td>${a.maxTs ? new Date(a.maxTs * 1000).toLocaleString() : ""}</td>
+      `;
+      tbody.appendChild(tr);
+    }
+
+    document.getElementById("status").textContent = `groups: ${rows.length}`;
+  } catch (err) {
+    document.getElementById("status").textContent = err.toString();
+  }
+})();
+</script>
+
+
+
+
+</body>
+</html>

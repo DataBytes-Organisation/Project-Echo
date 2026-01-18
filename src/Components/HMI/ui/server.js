@@ -490,7 +490,11 @@ app.post('/api/applyAlgorithm', (req, res) => {
 require('./routes/auth.routes')(app);
 require('./routes/user.routes')(app);
 require('./routes/map.routes')(app);
-app.get('*', checkUserSession);
+//updated 2026/01/26 to serve mongodb api endpoints to admin folder for data integration
+app.get(
+  ['/admin/*', '/map', '/requests', '/notifications'],
+  checkUserSession
+);
 app.get("/verify-otp", (req, res) => {
   res.sendFile(path.join(__dirname, 'public/verify-otp.html'));
 });

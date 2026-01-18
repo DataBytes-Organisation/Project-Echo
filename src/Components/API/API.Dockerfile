@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=python:3.9-alpine
+ARG BASE_IMAGE=python:3.9-alpine 
 FROM ${BASE_IMAGE} AS echo_api_builder
 
 WORKDIR /build
@@ -22,6 +22,7 @@ ENV PATH="/opt/venv/bin:$PATH"
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt 
 
+
 # Runtime stage - slim final image
 FROM ${BASE_IMAGE}
 
@@ -30,16 +31,14 @@ WORKDIR /app
 # Install only runtime dependencies (not build tools)
 RUN apk add --no-cache \
 	libstdc++ \
-	libgcc 
+	libgcc
 
 COPY --from=echo_api_builder /opt/venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
 COPY . /app
 
-# Expose the ports that the API will run on
-EXPOSE 9000
-EXPOSE 9080
+EXPOSE 8080
 
 # Start the API using uvicorn
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "9000"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
