@@ -27,9 +27,10 @@ class EventSchema(BaseModel):
     timestamp: datetime  # Event timestamp
     sensorId: constr(min_length=1)  # Non-empty string for sensor ID
     species: constr(min_length=1)  # Non-empty string for species name
-    microphoneLLA: List[float] = Field(..., min_length=3, max_length=3)  # List of exactly 3 floats for microphone location
-    animalEstLLA: List[float] = Field(..., min_length=3, max_length=3)  # List of exactly 3 floats for estimated animal location
-    animalTrueLLA: List[float] = Field(..., min_length=3, max_length=3)  # List of exactly 3 floats for true animal location
+    microphoneLLA: List[float] = Field(..., min_items=3, max_items=3)  # List of exactly 3 floats for microphone location
+    #microphoneLLA: List[float] = Field(..., min_items=3, max_items=3) #updated 19/01/26
+    animalEstLLA: List[float] = Field(..., min_items=3, max_items=3)  # List of exactly 3 floats for estimated animal location
+    animalTrueLLA: List[float] = Field(..., min_items=3, max_items=3)  # List of exactly 3 floats for true animal location
     animalLLAUncertainty: int  # Uncertainty value
     audioClip: str  # Audio clip data
     confidence: condecimal(gt=0, lt=100)  # Confidence value between 0 and 100
