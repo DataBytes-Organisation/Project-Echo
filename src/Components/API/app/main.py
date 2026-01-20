@@ -87,6 +87,10 @@ app.include_router(species_predictor.router, tags=["predict"])
 app.include_router(auth_router.router, tags=["auth"], prefix="/api")
 app.include_router(live.router) #Websocket 
 app.include_router(insights.router, tags=["insights"])
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
 
 >>>>>>> Stashed changes
 
