@@ -33,8 +33,8 @@
 
 <script>
 (async () => {
-  const start = 1763654400;
-  const end   = 1763740800;
+  const start = 0;
+  const end   = 3000000000;
   const url = `/movement_time/${start}/${end}`;
 
   try {
@@ -81,8 +81,8 @@
         <td>${a.type}</td>
         <td>${a.species}</td>
         <td>${a.count}</td>
-        <td>${a.minTs ? new Date(a.minTs * 1000).toLocaleString() : ""}</td>
-        <td>${a.maxTs ? new Date(a.maxTs * 1000).toLocaleString() : ""}</td>
+        <td>${a.minTs ? new Date(a.minTs).toLocaleString() : ""}</td>
+        <td>${a.maxTs ? new Date(a.maxTs).toLocaleString() : ""}</td>
       `;
       tbody.appendChild(tr);
     }
