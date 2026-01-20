@@ -5,13 +5,26 @@ services:
     build:
       context: ./frontend
     image: rb-echo-hmi
+    ports:
+      - "8080:8080"
+    depends_on:
+      - api
 
   api:
     build:
       context: ./api
     image: rb-echo-api
+    ports:
+      - "9001:9000"
+      
+    environment:
+      - MONGO_URI=mongodb://db:27017
+      - MONGO_DB=project_echo
+    depends_on:
+      - db
 
   db:
     build:
       context: ./MongoDb
     image: rb-echo-db
+    

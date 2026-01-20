@@ -11,6 +11,7 @@ from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel, Field, EmailStr
 from bson import ObjectId
 from typing import Optional, List
+from app.routers import insights
 import datetime
 import pymongo
 import json 
@@ -81,6 +82,13 @@ print(f" database names: {client.list_database_names()}")
 
 app.include_router(iot.router, tags=['iot'], prefix='/iot')
 app.include_router(species_predictor.router, tags=["predict"])
+<<<<<<< Updated upstream
+=======
+app.include_router(auth_router.router, tags=["auth"], prefix="/api")
+app.include_router(live.router) #Websocket 
+app.include_router(insights.router, tags=["insights"])
+
+>>>>>>> Stashed changes
 
 
 

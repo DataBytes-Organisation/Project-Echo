@@ -22,11 +22,11 @@ uvicorn==0.12.3
 python-dotenv==1.0.0
 paho-mqtt==1.6.1
 bcrypt
-flask
+Flask==2.0.3
 pyjwt==2.4.0
 requests
 python-decouple
 pandas
-Werkzeug==2.3.7
+Werkzeug==2.0.3
 fastapi_mail
 twilio==8.5.0
