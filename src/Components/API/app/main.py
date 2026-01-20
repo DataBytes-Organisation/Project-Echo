@@ -89,6 +89,7 @@ app.include_router(insights.router, tags=["insights"])
 
 
 
+
 # ✅ Root endpoint
 @app.get("/", response_description="API Root")
 def show_home():
