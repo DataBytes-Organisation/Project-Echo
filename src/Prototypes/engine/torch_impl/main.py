@@ -10,10 +10,27 @@ from pathlib import Path
 import copy
 from tqdm import tqdm
 import numpy as np
+from collections import defaultdict
 
 from dataset import SpectrogramDataset, index_directory
 from model import Model
 from train import Trainer
+
+def validation_collate_fn(batch):
+	"""
+	Custom collate function for validation.
+	"""
+	specs_list = [item[0] for item in batch]
+	labels_list = [item[1] for item in batch]
+	
+	# Concatenate along the batch dimension (dim 0)
+	# specs_list[i] shape is (Ni, C, F, T) -> Result: (Sum(Ni), C, F, T)
+	flattened_specs = torch.cat(specs_list, dim=0)
+	
+	# labels_list[i] shape is (Ni) -> Result: (Sum(Ni))
+	flattened_labels = torch.cat(labels_list, dim=0)
+	
+	return flattened_specs, flattened_labels
 
 @hydra.main(config_path="config", config_name="config", version_base=None)
 def main(cfg: DictConfig):
@@ -34,16 +51,50 @@ def main(cfg: DictConfig):
 	val_size = int(cfg.data.val_split * dataset_size)
 	# test_size = dataset_size - train_size - val_size
 	
-	indices = torch.tensor(list(range(dataset_size)))
-	torch.manual_seed(cfg.training.seed)
-	shuffled_indices = torch.randperm(len(indices))
-	indices = indices[shuffled_indices]
-	# torch.random.shuffle(torch.as_tensor(indices))
+	# indices = torch.tensor(list(range(dataset_size)))
+	# torch.manual_seed(cfg.training.seed)
+	# shuffled_indices = torch.randperm(len(indices))
+	# indices = indices[shuffled_indices]
+	# # torch.random.shuffle(torch.as_tensor(indices))
+	#
+	# train_indices = indices[:train_size]
+	# # val_indices = indices[train_size : train_size + val_size]
+	# val_indices = indices[train_size:]
+	# # test_indices = indices[train_size + val_size:]
+	
+	print(f"Splitting dataset with stratification (Val split: {cfg.data.val_split})...")
+	class_indices = defaultdict(list)
+	for idx, label in enumerate(labels):
+		class_indices[label].append(idx)
 
-	train_indices = indices[:train_size]
-	# val_indices = indices[train_size : train_size + val_size]
-	val_indices = indices[train_size:]
-	# test_indices = indices[train_size + val_size:]
+	train_indices = []
+	val_indices = []
+
+	# Iterate over each class and split independently
+	for label, indices in class_indices.items():
+		indices = torch.tensor(indices)
+		
+		# Shuffle indices for this specific class
+		# (uses the same seed set at start of main)
+		shuffled_class_indices = indices[torch.randperm(len(indices))]
+		
+		# Calculate split sizes for this class
+		n_total = len(indices)
+		n_val = int(n_total * cfg.data.val_split)
+		
+		# Determine split points
+		# If a class is too small (e.g. 1 sample), n_val might be 0. 
+		# You might want to force at least 1 val sample if n_total > 1, 
+		# but strict percentage is standard.
+		
+		val_subset = shuffled_class_indices[:n_val]
+		train_subset = shuffled_class_indices[n_val:]
+		
+		val_indices.extend(val_subset.tolist())
+		train_indices.extend(train_subset.tolist())
+
+	print(f"Total Training samples: {len(train_indices)}")
+	print(f"Total Validation samples: {len(val_indices)}")
 
 	audio_transforms = hydra.utils.instantiate(cfg.augmentations.audio) if 'augmentations' in cfg and 'audio' in cfg.augmentations else None
 	image_transforms = hydra.utils.instantiate(cfg.augmentations.image) if 'augmentations' in cfg and 'image' in cfg.augmentations else None
@@ -70,7 +121,7 @@ def main(cfg: DictConfig):
 	# )
 	
 	train_loader = DataLoader(train_dataset, batch_size=cfg.training.batch_size, shuffle=True, num_workers=cfg.training.num_workers, pin_memory=True)
-	val_loader = DataLoader(val_dataset, batch_size=cfg.training.batch_size, shuffle=False, num_workers=cfg.training.num_workers, pin_memory=True)
+	val_loader = DataLoader(val_dataset, batch_size=cfg.training.batch_size, shuffle=False, num_workers=cfg.training.num_workers, collate_fn=validation_collate_fn, pin_memory=True)
 	# test_loader = DataLoader(test_dataset, batch_size=cfg.training.batch_size, shuffle=False, num_workers=cfg.training.num_workers, pin_memory=True)
 
 	# cfg.training.epochs = 15
