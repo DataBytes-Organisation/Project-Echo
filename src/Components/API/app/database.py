@@ -78,3 +78,12 @@ Detections.create_index(
     [("microphoneLLA.0", pymongo.ASCENDING), ("microphoneLLA.1", pymongo.ASCENDING)],
     name="idx_microphone_lat_lon"
 )
+
+AdminBudgets = db.admin_budgets
+ServiceStates = db.service_states
+
+Projects = db["projects"]
+Projects.create_index("name")
+Projects.create_index("status")
+Projects.create_index("location")
+Projects.create_index("ecologists")
