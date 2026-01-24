@@ -3,7 +3,7 @@ from typing import Optional, Dict, Any
 
 from fastapi import APIRouter, Query, Path, Body, HTTPException, Depends
 
-from app.schemas import Detection, DetectionCreate, DetectionListResponse
+from app.schemas import Detection, DetectionCreate, DetectionListResponses
 from app import detections as detections_service
 from app.middleware.pause_guard import pause_guard
 from app.services.budget import enforce_and_consume
@@ -26,7 +26,7 @@ def create_detection_endpoint(payload: DetectionCreate = Body(...)):
 
 @router.get(
     "",
-    response_model=DetectionListResponse,
+    response_model=DetectionListResponses,
     summary="List detections with pagination and filtering",
     dependencies=[Depends(pause_guard("detections"))],
 )

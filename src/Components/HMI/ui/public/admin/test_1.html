@@ -33,9 +33,9 @@
 
 <script>
 (async () => {
-  const start = 1763654400;
-  const end   = 1763740800;
-  const url = `http://localhost:8080/movement_time/${start}/${end}`;
+  const start = 0;
+  const end   = 3000000000;
+  const url = `/movement_time/${start}/${end}`;
 
   try {
     const res = await fetch(url);

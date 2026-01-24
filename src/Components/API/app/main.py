@@ -1,11 +1,10 @@
 
-
 import os
 import time
 import logging
 import threading
 import json
-from fastapi import FastAPI, Body, HTTPException, status, APIRouter
+from fastapi import FastAPI, Body, HTTPException, status, APIRouter, Request
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.routers import species_predictor
