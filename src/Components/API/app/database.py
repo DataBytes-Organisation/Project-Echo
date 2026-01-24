@@ -81,3 +81,9 @@ Detections.create_index(
 
 AdminBudgets = db.admin_budgets
 ServiceStates = db.service_states
+
+Projects = db["projects"]
+Projects.create_index("name")
+Projects.create_index("status")
+Projects.create_index("location")
+Projects.create_index("ecologists")
