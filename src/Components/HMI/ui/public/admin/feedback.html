@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Client Feedback | Project Echo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
+
+  <style>
+    :root{
+      --bg:#f5f7fb;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --border:rgba(148,163,184,.35);
+      --shadow:0 10px 30px rgba(2,6,23,.08);
+      --brand:#0d6efd;
+      --brand-2:#20c997;
+      --danger:#dc3545;
+      --success:#198754;
+      --warning:#ffc107;
+      --radius:18px;
+    }
+
+    body{
+      background:
+        radial-gradient(900px 500px at 15% 0%, rgba(13,110,253,.10), transparent 55%),
+        radial-gradient(900px 500px at 85% 10%, rgba(32,201,151,.10), transparent 55%),
+        var(--bg);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, "Noto Sans", sans-serif;
+      color:var(--text);
+    }
+
+    .page-wrapper{ padding: 1.5rem; max-width: 1150px; margin: 0 auto; }
+    .card{
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--card);
+      box-shadow: var(--shadow);
+    }
+    .soft-pill{
+      border-radius: 999px;
+      padding: .25rem .7rem;
+      font-size: .8rem;
+      background: rgba(13,110,253,.10);
+      color: var(--brand);
+      border: 1px solid rgba(13,110,253,.18);
+    }
+    .muted{ color:var(--muted); }
+
+    .hero{
+      padding: 1.25rem 1.25rem 1rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background:
+        linear-gradient(135deg, rgba(13,110,253,.10), rgba(32,201,151,.10)),
+        #fff;
+      box-shadow: var(--shadow);
+    }
+
+    .input-group-text{ background:#f8fafc; border-color: var(--border); }
+    .form-control, .form-select{
+      border-color: var(--border);
+      border-radius: 14px;
+    }
+    .form-control:focus, .form-select:focus{
+      border-color: rgba(13,110,253,.55);
+      box-shadow: 0 0 0 .2rem rgba(13,110,253,.15);
+    }
+
+    .section-title{ font-weight: 700; }
+    .hint{ font-size:.85rem; color:var(--muted); }
+
+    .success-banner, .error-banner{
+      display:none;
+      border-radius: 14px;
+      padding: .9rem 1rem;
+      margin-bottom: 1rem;
+      border: 1px solid;
+    }
+    .success-banner{
+      background: rgba(25,135,84,.10);
+      border-color: rgba(25,135,84,.25);
+      color: var(--success);
+    }
+    .error-banner{
+      background: rgba(220,53,69,.08);
+      border-color: rgba(220,53,69,.22);
+      color: var(--danger);
+    }
+
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:.35rem;
+      padding:.35rem .65rem;
+      border-radius:999px;
+      border: 1px solid var(--border);
+      background:#fff;
+      cursor:pointer;
+      user-select:none;
+      font-size:.85rem;
+    }
+    .chip input{ display:none; }
+    .chip.active{
+      border-color: rgba(13,110,253,.35);
+      background: rgba(13,110,253,.08);
+      color: var(--brand);
+      box-shadow: 0 8px 20px rgba(13,110,253,.10);
+    }
+
+    .severity-btn{
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: #fff;
+      padding: .65rem .8rem;
+      cursor:pointer;
+      transition: transform .06s ease;
+    }
+    .severity-btn:active{ transform: scale(.99); }
+    .severity-btn.active{
+      border-color: rgba(32,201,151,.35);
+      background: rgba(32,201,151,.08);
+    }
+    .sev-dot{
+      width:10px; height:10px; border-radius:50%;
+      display:inline-block;
+      margin-right:.5rem;
+      background: #adb5bd;
+    }
+    .sev-low .sev-dot{ background: rgba(25,135,84,.9); }
+    .sev-med .sev-dot{ background: rgba(255,193,7,.9); }
+    .sev-high .sev-dot{ background: rgba(220,53,69,.9); }
+
+    .counter{
+      font-variant-numeric: tabular-nums;
+      font-size: .85rem;
+      color: var(--muted);
+    }
+
+    .dropzone{
+      border: 1.5px dashed rgba(148,163,184,.7);
+      border-radius: 16px;
+      padding: 1rem;
+      background: #fbfcff;
+      transition: border-color .15s ease, background .15s ease;
+    }
+    .dropzone.drag{
+      border-color: rgba(13,110,253,.65);
+      background: rgba(13,110,253,.06);
+    }
+    .file-item{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:.75rem;
+      padding:.55rem .7rem;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background:#fff;
+      margin-top:.6rem;
+    }
+    .file-meta{ display:flex; align-items:center; gap:.6rem; min-width:0; }
+    .file-name{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width: 320px; }
+    .small-btn{
+      border-radius: 12px;
+      padding: .35rem .6rem;
+    }
+
+    .btn-primary{
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--brand), #4f8bff);
+      border: none;
+      box-shadow: 0 10px 24px rgba(13,110,253,.22);
+    }
+    .btn-outline-secondary{ border-radius: 14px; }
+    .btn-outline-danger{ border-radius: 14px; }
+
+    .preview-card{
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: #fff;
+      padding: 1rem;
+      position: sticky;
+      top: 1rem;
+      box-shadow: var(--shadow);
+    }
+    .kv{
+      display:flex; justify-content:space-between; gap:1rem;
+      padding:.35rem 0; border-bottom: 1px dashed rgba(148,163,184,.35);
+      font-size:.92rem;
+    }
+    .kv:last-child{ border-bottom:none; }
+    .kv .k{ color: var(--muted); }
+
+    .req{ color: var(--danger); }
+    .spinner-border{ width: 1.1rem; height: 1.1rem; }
+  </style>
+</head>
+
+<body>
+<div class="page-wrapper">
+
+  <!-- TOP HERO -->
+  <div class="hero mb-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <span class="soft-pill"><i class="bi bi-chat-dots me-1"></i> Client Feedback</span>
+          <span class="soft-pill" style="background:rgba(32,201,151,.10); color:var(--brand-2); border-color:rgba(32,201,151,.18)">
+            <i class="bi bi-shield-check me-1"></i> Trusted channel
+          </span>
+        </div>
+        <h2 class="fw-bold mb-1">Help us improve Project Echo</h2>
+        <p class="muted mb-0">Report bugs, request features, or share usability feedback. You’ll get an email confirmation after submitting.</p>
+      </div>
+
+      <div class="d-flex gap-2">
+        <a href="/admin-dashboard" class="btn btn-outline-secondary btn-sm">
+          <i class="bi bi-arrow-left me-1"></i> Back
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ALERTS -->
+  <div id="successBanner" class="success-banner">
+    <i class="bi bi-check-circle-fill me-2"></i>
+    Thank you! Your feedback has been sent. Please check your email for confirmation.
+  </div>
+  <div id="errorBanner" class="error-banner">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+    <span id="errorText">Something went wrong.</span>
+  </div>
+
+  <div class="row g-4">
+
+    <!-- LEFT: FORM -->
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-body p-4">
+
+          <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+            <div>
+              <h5 class="section-title mb-1">Submit feedback</h5>
+              <div class="hint">Fields marked with <span class="req">*</span> are required.</div>
+            </div>
+            <button type="button" id="clearBtn" class="btn btn-outline-danger btn-sm">
+              <i class="bi bi-trash3 me-1"></i> Clear
+            </button>
+          </div>
+
+          <form id="feedbackForm" novalidate>
+            <div class="row g-3">
+
+              <!-- EMAIL -->
+              <div class="col-md-6">
+                <label class="form-label">Your Email <span class="req">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                  <input type="email" id="email" class="form-control" placeholder="name@example.com" required />
+                </div>
+                <div class="invalid-feedback">Please enter a valid email.</div>
+              </div>
+
+              <!-- TYPE -->
+              <div class="col-md-6">
+                <label class="form-label">Feedback Type <span class="req">*</span></label>
+                <select id="type" class="form-select" required>
+                  <option value="">Select type</option>
+                  <option value="Bug">Bug</option>
+                  <option value="Feature Request">Feature Request</option>
+                  <option value="Usability">Usability</option>
+                  <option value="Data Issue">Data Issue</option>
+                  <option value="Other">Other</option>
+                </select>
+                <div class="invalid-feedback">Please select a feedback type.</div>
+              </div>
+
+              <!-- QUICK TAGS -->
+              <div class="col-12">
+                <label class="form-label mb-2">Quick tags (optional)</label>
+                <div class="d-flex flex-wrap gap-2" id="tagWrap">
+                  <label class="chip"><input type="checkbox" value="Dashboard"><i class="bi bi-speedometer2"></i> Dashboard</label>
+                  <label class="chip"><input type="checkbox" value="Data Insights"><i class="bi bi-graph-up"></i> Data Insights</label>
+                  <label class="chip"><input type="checkbox" value="Login/Auth"><i class="bi bi-shield-lock"></i> Login/Auth</label>
+                  <label class="chip"><input type="checkbox" value="Maps"><i class="bi bi-map"></i> Maps</label>
+                  <label class="chip"><input type="checkbox" value="Performance"><i class="bi bi-lightning"></i> Performance</label>
+                  <label class="chip"><input type="checkbox" value="UI/UX"><i class="bi bi-palette2"></i> UI/UX</label>
+                </div>
+                <div class="hint mt-2">Tags help the team route feedback faster.</div>
+              </div>
+
+              <!-- SEVERITY -->
+              <div class="col-12">
+                <label class="form-label mb-2">Severity (optional)</label>
+                <div class="row g-2">
+                  <div class="col-md-4">
+                    <button type="button" class="w-100 severity-btn sev-low" data-sev="Low">
+                      <span class="sev-dot"></span><b>Low</b>
+                      <div class="hint mb-0">Minor issue</div>
+                    </button>
+                  </div>
+                  <div class="col-md-4">
+                    <button type="button" class="w-100 severity-btn sev-med" data-sev="Medium">
+                      <span class="sev-dot"></span><b>Medium</b>
+                      <div class="hint mb-0">Impacts workflow</div>
+                    </button>
+                  </div>
+                  <div class="col-md-4">
+                    <button type="button" class="w-100 severity-btn sev-high" data-sev="High">
+                      <span class="sev-dot"></span><b>High</b>
+                      <div class="hint mb-0">Blocking</div>
+                    </button>
+                  </div>
+                </div>
+                <input type="hidden" id="severity" value="" />
+              </div>
+
+              <!-- PAGE / URL -->
+              <div class="col-md-6">
+                <label class="form-label">Page / Screen (optional)</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-link-45deg"></i></span>
+                  <input type="text" id="page" class="form-control" placeholder="e.g., /admin-hmi-data-insights" />
+                </div>
+                <div class="hint mt-1">Where did you notice this? URL or screen name.</div>
+              </div>
+
+              <!-- CONTACT OK -->
+              <div class="col-md-6">
+                <label class="form-label">Follow-up (optional)</label>
+                <div class="d-flex align-items-center gap-2 mt-1">
+                  <input class="form-check-input mt-0" type="checkbox" id="okToContact" />
+                  <label class="form-check-label" for="okToContact">
+                    It’s okay to contact me about this feedback
+                  </label>
+                </div>
+                <div class="hint mt-1">We’ll only use your email for this feedback thread.</div>
+              </div>
+
+              <!-- MESSAGE -->
+              <div class="col-12">
+                <label class="form-label">Message <span class="req">*</span></label>
+                <textarea id="message" class="form-control" rows="6" placeholder="Tell us what happened / what you want to see..." maxlength="1000" required></textarea>
+                <div class="d-flex justify-content-between align-items-center mt-1">
+                  <div class="invalid-feedback d-block" id="messageErr" style="display:none;">Please add a message.</div>
+                  <div class="counter" id="charCount">0 / 1000</div>
+                </div>
+              </div>
+
+              <!-- ATTACHMENTS -->
+              <div class="col-12">
+                <label class="form-label">Attachments (optional)</label>
+
+                <div id="dropzone" class="dropzone">
+                  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                    <div>
+                      <div class="fw-semibold"><i class="bi bi-paperclip me-1"></i> Drag & drop screenshots here</div>
+                      <div class="hint mb-0">PNG/JPG/PDF — up to 3 files, 2MB each. (Demo: sent as filenames only unless you wire backend upload)</div>
+                    </div>
+                    <div>
+                      <input type="file" id="files" class="d-none" accept=".png,.jpg,.jpeg,.pdf" multiple />
+                      <button type="button" class="btn btn-outline-secondary btn-sm" id="browseBtn">
+                        <i class="bi bi-folder2-open me-1"></i> Browse
+                      </button>
+                    </div>
+                  </div>
+
+                  <div id="fileList"></div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- BUTTONS -->
+            <div class="mt-4 d-flex flex-wrap gap-2">
+              <button type="submit" class="btn btn-primary" id="submitBtn">
+                <span class="btn-text"><i class="bi bi-send me-1"></i> Submit Feedback</span>
+                <span class="btn-loading d-none"><span class="spinner-border me-2" role="status" aria-hidden="true"></span> Sending...</span>
+              </button>
+
+              <a href="/admin-dashboard" class="btn btn-outline-secondary">
+                Cancel
+              </a>
+            </div>
+
+            <hr class="my-4" />
+
+    
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: LIVE PREVIEW -->
+    <div class="col-lg-4">
+      <div class="preview-card">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <div class="fw-semibold"><i class="bi bi-eye me-1"></i> Preview</div>
+          <span class="soft-pill" id="statusPill"><i class="bi bi-circle-fill me-1" style="font-size:.6rem"></i> Draft</span>
+        </div>
+
+        <div class="kv"><div class="k">Email</div><div class="v text-end" id="pvEmail">—</div></div>
+        <div class="kv"><div class="k">Type</div><div class="v text-end" id="pvType">—</div></div>
+        <div class="kv"><div class="k">Tags</div><div class="v text-end" id="pvTags">—</div></div>
+        <div class="kv"><div class="k">Severity</div><div class="v text-end" id="pvSev">—</div></div>
+        <div class="kv"><div class="k">Page</div><div class="v text-end" id="pvPage">—</div></div>
+        <div class="kv"><div class="k">OK to contact</div><div class="v text-end" id="pvOk">—</div></div>
+
+        <div class="mt-3">
+          <div class="k muted mb-1">Message</div>
+          <div class="p-3" style="border:1px solid var(--border); border-radius:14px; background:#fbfdff; min-height:120px; white-space:pre-wrap;" id="pvMsg">Start typing…</div>
+        </div>
+
+        <div class="mt-3">
+          <div class="k muted mb-1">Attachments</div>
+          <div class="hint mb-0" id="pvFiles">—</div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const form = document.getElementById("feedbackForm");
+  const successBanner = document.getElementById("successBanner");
+  const errorBanner = document.getElementById("errorBanner");
+  const errorText = document.getElementById("errorText");
+
+  const emailEl = document.getElementById("email");
+  const typeEl = document.getElementById("type");
+  const messageEl = document.getElementById("message");
+  const pageEl = document.getElementById("page");
+  const okEl = document.getElementById("okToContact");
+  const charCount = document.getElementById("charCount");
+  const severityHidden = document.getElementById("severity");
+
+  const msgErr = document.getElementById("messageErr");
+  const clearBtn = document.getElementById("clearBtn");
+  const submitBtn = document.getElementById("submitBtn");
+  const btnText = submitBtn.querySelector(".btn-text");
+  const btnLoading = submitBtn.querySelector(".btn-loading");
+
+  const tagWrap = document.getElementById("tagWrap");
+  const chips = Array.from(tagWrap.querySelectorAll(".chip"));
+
+  const sevBtns = Array.from(document.querySelectorAll(".severity-btn"));
+
+  const dropzone = document.getElementById("dropzone");
+  const browseBtn = document.getElementById("browseBtn");
+  const filesInput = document.getElementById("files");
+  const fileList = document.getElementById("fileList");
+
+  // Preview fields
+  const pvEmail = document.getElementById("pvEmail");
+  const pvType = document.getElementById("pvType");
+  const pvTags = document.getElementById("pvTags");
+  const pvSev  = document.getElementById("pvSev");
+  const pvPage = document.getElementById("pvPage");
+  const pvOk   = document.getElementById("pvOk");
+  const pvMsg  = document.getElementById("pvMsg");
+  const pvFiles= document.getElementById("pvFiles");
+  const statusPill = document.getElementById("statusPill");
+
+  const MAX_FILES = 3;
+  const MAX_MB = 2;
+  let selectedFiles = []; // local list
+
+  function setStatus(text){
+    statusPill.innerHTML = `<i class="bi bi-circle-fill me-1" style="font-size:.6rem"></i> ${text}`;
+  }
+
+  function showError(msg){
+    errorText.textContent = msg;
+    errorBanner.style.display = "block";
+    successBanner.style.display = "none";
+    errorBanner.scrollIntoView({behavior:"smooth", block:"start"});
+  }
+  function showSuccess(){
+    successBanner.style.display = "block";
+    errorBanner.style.display = "none";
+    successBanner.scrollIntoView({behavior:"smooth", block:"start"});
+    setTimeout(()=> successBanner.style.display="none", 5000);
+  }
+
+  function updateChar(){
+    charCount.textContent = `${messageEl.value.length} / 1000`;
+    pvMsg.textContent = messageEl.value.trim() ? messageEl.value : "Start typing…";
+  }
+
+  function getSelectedTags(){
+    return chips
+      .filter(ch => ch.classList.contains("active"))
+      .map(ch => ch.querySelector("input").value);
+  }
+
+  function updatePreview(){
+    pvEmail.textContent = emailEl.value || "—";
+    pvType.textContent = typeEl.value || "—";
+    const tags = getSelectedTags();
+    pvTags.textContent = tags.length ? tags.join(", ") : "—";
+    pvSev.textContent = severityHidden.value || "—";
+    pvPage.textContent = pageEl.value || "—";
+    pvOk.textContent = okEl.checked ? "Yes" : "No";
+    pvFiles.textContent = selectedFiles.length ? selectedFiles.map(f => f.name).join(", ") : "—";
+
+    const hasAnything = !!(emailEl.value || typeEl.value || messageEl.value || pageEl.value || tags.length || severityHidden.value || selectedFiles.length);
+    setStatus(hasAnything ? "Draft" : "Empty");
+  }
+
+  // Chips toggle
+  chips.forEach(chip => {
+    chip.addEventListener("click", () => {
+      chip.classList.toggle("active");
+      updatePreview();
+    });
+  });
+
+  // Severity toggle
+  sevBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      sevBtns.forEach(b => b.classList.remove("active"));
+      if (severityHidden.value === btn.dataset.sev){
+        severityHidden.value = "";
+      } else {
+        btn.classList.add("active");
+        severityHidden.value = btn.dataset.sev;
+      }
+      updatePreview();
+    });
+  });
+
+  // File helpers (UI only)
+  function bytesToSize(bytes){
+    const mb = bytes / (1024*1024);
+    return `${mb.toFixed(2)} MB`;
+  }
+
+  function renderFiles(){
+    fileList.innerHTML = "";
+    selectedFiles.forEach((f, idx) => {
+      const div = document.createElement("div");
+      div.className = "file-item";
+      div.innerHTML = `
+        <div class="file-meta">
+          <i class="bi ${f.type.includes("pdf") ? "bi-file-earmark-pdf" : "bi-image"} fs-5"></i>
+          <div class="min-width-0">
+            <div class="file-name fw-semibold">${f.name}</div>
+            <div class="hint mb-0">${bytesToSize(f.size)}</div>
+          </div>
+        </div>
+        <button type="button" class="btn btn-outline-danger btn-sm small-btn" data-remove="${idx}">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      `;
+      fileList.appendChild(div);
+    });
+
+    fileList.querySelectorAll("[data-remove]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const i = parseInt(btn.getAttribute("data-remove"), 10);
+        selectedFiles.splice(i, 1);
+        renderFiles();
+        updatePreview();
+      });
+    });
+
+    updatePreview();
+  }
+
+  function validateAndAddFiles(files){
+    const incoming = Array.from(files);
+    for (const f of incoming){
+      if (selectedFiles.length >= MAX_FILES){
+        showError(`You can attach up to ${MAX_FILES} files.`);
+        break;
+      }
+      const sizeMb = f.size / (1024*1024);
+      if (sizeMb > MAX_MB){
+        showError(`"${f.name}" is larger than ${MAX_MB}MB.`);
+        continue;
+      }
+      const okType = /image\/(png|jpeg)|application\/pdf/.test(f.type);
+      if (!okType){
+        showError(`"${f.name}" type not allowed. Use PNG/JPG/PDF only.`);
+        continue;
+      }
+      selectedFiles.push(f);
+    }
+    renderFiles();
+  }
+
+  browseBtn.addEventListener("click", () => filesInput.click());
+  filesInput.addEventListener("change", (e) => validateAndAddFiles(e.target.files));
+
+  // Drag n drop UI
+  ["dragenter","dragover"].forEach(evt => {
+    dropzone.addEventListener(evt, (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      dropzone.classList.add("drag");
+    });
+  });
+  ["dragleave","drop"].forEach(evt => {
+    dropzone.addEventListener(evt, (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      dropzone.classList.remove("drag");
+    });
+  });
+  dropzone.addEventListener("drop", (e) => validateAndAddFiles(e.dataTransfer.files));
+
+  // Live updates
+  [emailEl, typeEl, pageEl].forEach(el => el.addEventListener("input", updatePreview));
+  okEl.addEventListener("change", updatePreview);
+  messageEl.addEventListener("input", () => { updateChar(); updatePreview(); });
+
+  updateChar();
+  updatePreview();
+
+  // Clear
+  clearBtn.addEventListener("click", () => {
+    form.reset();
+    msgErr.style.display = "none";
+    severityHidden.value = "";
+    sevBtns.forEach(b => b.classList.remove("active"));
+    chips.forEach(c => c.classList.remove("active"));
+    selectedFiles = [];
+    renderFiles();
+    updateChar();
+    updatePreview();
+    successBanner.style.display = "none";
+    errorBanner.style.display = "none";
+    setStatus("Empty");
+  });
+
+  // Submit
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    msgErr.style.display = "none";
+    successBanner.style.display = "none";
+    errorBanner.style.display = "none";
+
+    const email = emailEl.value.trim();
+    const type = typeEl.value.trim();
+    const message = messageEl.value.trim();
+
+    let valid = true;
+    if (!emailEl.checkValidity()){ emailEl.classList.add("is-invalid"); valid = false; }
+    else emailEl.classList.remove("is-invalid");
+
+    if (!type){ typeEl.classList.add("is-invalid"); valid = false; }
+    else typeEl.classList.remove("is-invalid");
+
+    if (!message){
+      msgErr.style.display = "block";
+      valid = false;
+    }
+
+    if (!valid) {
+      showError("Please fill the required fields correctly.");
+      return;
+    }
+
+    // UI loading state
+    submitBtn.disabled = true;
+    btnText.classList.add("d-none");
+    btnLoading.classList.remove("d-none");
+
+    try{
+      const payload = {
+        email,
+        type,
+        message,
+        page: pageEl.value.trim() || null,
+        severity: severityHidden.value || null,
+        tags: getSelectedTags(),
+        okToContact: okEl.checked,
+        attachments: selectedFiles.map(f => ({ name: f.name, size: f.size, type: f.type })) // UI-only metadata
+      };
+
+      const res = await fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok){
+        const t = await res.text().catch(()=> "");
+        throw new Error(t || "Server error");
+      }
+
+      showSuccess();
+      setStatus("Sent");
+
+      // Reset form after submit
+      form.reset();
+      severityHidden.value = "";
+      sevBtns.forEach(b => b.classList.remove("active"));
+      chips.forEach(c => c.classList.remove("active"));
+      selectedFiles = [];
+      renderFiles();
+      updateChar();
+      updatePreview();
+    } catch(err){
+      console.error(err);
+      showError("Failed to send feedback. Please try again.");
+    } finally {
+      submitBtn.disabled = false;
+      btnLoading.classList.add("d-none");
+      btnText.classList.remove("d-none");
+    }
+  });
+</script>
+
+</body>
+</html>
