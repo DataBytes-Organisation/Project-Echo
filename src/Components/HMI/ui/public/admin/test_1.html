@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Movement Time Table</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #999; padding: 6px; }
+    th { text-align: left; }
+    tbody tr:nth-child(even) { background: #f2f2f2; }
+    #status { margin: 8px 0; }
+  </style>
+</head>
+<body>
+
+<h3>Movement Time</h3>
+<div id="status">loading…</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>Timestamp</th>
+      <th>Common Name</th>
+      <th>Type</th>
+      <th>Species</th>
+      <th>Latitude</th>
+      <th>Longitude</th>
+    </tr>
+  </thead>
+  <tbody id="tbody"></tbody>
+</table>
+
+<script>
+(async () => {
+  const start = 0;
+  const end   = 3000000000;
+  const url = `/movement_time/${start}/${end}`;
+
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(res.status + " " + res.statusText);
+
+    const data = await res.json();
+    const tbody = document.getElementById("tbody");
+    tbody.innerHTML = "";
+
+    document.getElementById("status").textContent =
+      `rows: ${Array.isArray(data) ? data.length : 0}`;
+
+    for (const e of data) {
+      const lla = Array.isArray(e.animalTrueLLA) ? e.animalTrueLLA : [];
+
+      const ts = typeof e.timestamp === "number"
+        ? new Date(e.timestamp).toLocaleString()
+        : "";
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${ts}</td>
+        <td>${e.commonName ?? ""}</td>
+        <td>${e.type ?? ""}</td>
+        <td>${e.species ?? ""}</td>
+        <td>${lla[0] ?? ""}</td>
+        <td>${lla[1] ?? ""}</td>
+      `;
+
+      tbody.appendChild(tr);
+    }
+  } catch (err) {
+    document.getElementById("status").textContent = err.toString();
+  }
+})();
+</script>
+
+</body>
+</html>
