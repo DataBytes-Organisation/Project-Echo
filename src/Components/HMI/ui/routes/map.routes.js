@@ -3,7 +3,7 @@ const axios = require('axios');
 
 
 // const MESSAGE_API_URL = 'http://localhost:9000/hmi';
-const MESSAGE_API_URL = 'http://ts-api-cont:9000/hmi';
+const MESSAGE_API_URL = 'http://api-service:9000/hmi';
 let token;
 // client.get('JWT', (err, storedToken) => {
 //   if (err) {

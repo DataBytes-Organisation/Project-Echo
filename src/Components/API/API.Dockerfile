@@ -38,7 +38,7 @@ ENV PATH="/opt/venv/bin:$PATH"
 
 COPY . /app
 
-EXPOSE 8080
+EXPOSE 9000
 
 # Start the API using uvicorn
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "9000"]
