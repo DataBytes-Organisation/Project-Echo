@@ -14,6 +14,9 @@ torch-impl/
 ├── main.py                             # Main training/evaluation script
 ├── train.py                            # Training logic and utilities
 ├── pyproject.toml                      # Project dependencies and metadata
+├── docs/                               # Documentation files
+│   ├── download_data.md                # Instructions for downloading the background noise dataset
+│   └── ...
 ├── config/                             # Configuration files (Hydra)
 │   ├── config.yaml                     # Main configuration
 │   ├── model/                          # Model-specific configs
@@ -76,6 +79,12 @@ Uses Hydra for hierarchical configuration management:
 - Modular configs for different components
 - Easy experimentation with parameter sweeps
 - Environment-specific overrides
+
+## Data Setup
+
+This project requires setting up your main dataset for training. Additionally, you can download the ESC-50 dataset which is used to provide background noise for data augmentation.
+
+For instructions on downloading the background noise dataset, see [download_data.md](./download_data.md).
 
 ## Quick Start
 

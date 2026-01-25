@@ -3,3 +3,4 @@ params:
   model_name: "efficientnet_v2_s" # From torchvision
   pretrained: true
   num_classes: ${data.num_classes}
+  use_arcface: true

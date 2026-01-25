@@ -1,5 +1,5 @@
 defaults:
-  - model: ghost_efficientnet_v2
+  - model: efficientnet_v2_qat
   - teacher_model: efficientnet_v2
   - _self_
 
@@ -8,23 +8,17 @@ hydra:
     dir: outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}
 
 system:
-  # audio_data_directory: /newbee/prjs/ai/Project-Echo/src/Components/Store/d:\data\b3
-  # cache_directory: /home/newbee/prjs/ai/Project-Echo/src/Prototypes/engine/torch_impl/.cache
-  # audio_data_directory: ../../../Components/Store/d:\data\b3
   audio_data_directory: b3
   background_noise_dir: "background_noise"
   cache_directory: .cache
-  # audio_data_directory: /home/newbee/Projects/ai/Project-Echo/src/Components/Store/d:\data\b3
-  # cache_directory: /home/newbee/Projects/ai/Project-Echo/src/Prototypes/engine/torch_impl/.cache
   use_disk_cache: True
 
 data:
   audio_clip_duration: 2 # seconds
   sample_rate: 48000
-  n_fft: 1024
-  # hop_length: 923 # for width of 260 with 5s audio at 48kHz
-  hop_length: 320 # Matches PANNs 10ms resolution
-  n_mels: 64
+  n_fft: 4096
+  hop_length: 480 # 10ms hop @ 48kHz sample rate
+  n_mels: 384
   fmin: 50
   fmax: 14000
   top_db: 80
@@ -41,11 +35,11 @@ run:
   checkpoint_path: ./outputs/2025-08-23/18-50-17/best_efficientnet_v2_qat.pth
   
 training:
-  batch_size: 1
-  grad_accum_steps: 128
-  epochs: 100
+  batch_size: 64
+  grad_accum_steps: 2
+  epochs: 500
   learning_rate: 1e-3
-  num_workers: 6
+  num_workers: 12
   device: "cuda" # "cuda" or "cpu"
   # device: "cpu"
   seed: 0
