@@ -2935,7 +2935,7 @@
           "sampleRate": 48000
         }
       },
-      "DetectionListResponse": {
+      "DetectionListResponses": {
         "properties": {
           "items": {
             "items": {
@@ -2964,7 +2964,7 @@
           "page",
           "page_size"
         ],
-        "title": "DetectionListResponse"
+        "title": "DetectionListResponses"
       },
       "EmailNotifications": {
         "properties": {
