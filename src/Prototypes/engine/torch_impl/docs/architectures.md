@@ -17,6 +17,7 @@ The project supports several neural network architectures, selectable via the co
         -   `0`: **Feature Extraction**. All pre-trained layers are frozen. Only the final, task-specific classification layer is trained. This is fast and suitable for smaller datasets.
         -   `N`: **Fine-Tuning**. The final layer and the last `N` blocks of the model are trained. This allows the model to adjust its learned features to the nuances of audio data.
         -   `-1`: **Full Training**. All model layers are unfrozen and trained. This is computationally intensive and best used with a large dataset.
+    -   `replace_silu_with_relu`: (Optional `bool`, defaults to `false`) If `true`, all `SiLU` activation functions in the network are replaced with `ReLU`. This can be useful for hardware compatibility or performance tuning, but may impact accuracy.
 
 ### PANNs (Pre-trained Audio Neural Networks)
 

@@ -4,7 +4,7 @@ import torch.nn.functional as F
 from torch.hub import load_state_dict_from_url
 import re
 
-from model.utils import ArcMarginProduct
+from model.utils import CosineLinear
 
 # Pretrained weights for Cnn14, trained on AudioSet with 32kHz audio.
 PRETRAINED_URL = "https://zenodo.org/record/3987831/files/Cnn14_32k_mAP%3D0.431.pth"
@@ -83,7 +83,7 @@ class Cnn14(nn.Module):
 		return self.fc_audioset(embedding), embedding
 
 class PannsCNN14ArcFace(nn.Module):
-	def __init__(self, num_classes: int, pretrained: bool, use_arcface: bool = False, **arcface_params):
+	def __init__(self, classes_num: int, pretrained: bool, use_arcface: bool = False):
 		super().__init__()
 		PRETRAINED_URL = "https://zenodo.org/records/3987831/files/Cnn14_mAP=0.431.pth"
 		original_classes = 527
@@ -103,27 +103,18 @@ class PannsCNN14ArcFace(nn.Module):
 				new_state_dict[new_k] = v
 			self.cnn.load_state_dict(new_state_dict, strict=False)
 
-		self.use_arcface = use_arcface
 		in_features = self.cnn.fc_audioset.in_features
-		if self.use_arcface:
-			self.head = ArcMarginProduct(in_features, num_classes, **arcface_params)
+		if use_arcface:
+			self.head = CosineLinear(in_features, classes_num)
 		else:
-			self.head = nn.Linear(in_features, num_classes)
+			self.head = nn.Linear(in_features, classes_num)
 		self.cnn.fc_audioset = nn.Identity()
 
-	def forward(self, x: torch.Tensor, labels: torch.Tensor = None) -> torch.Tensor:
+	def forward(self, x: torch.Tensor) -> torch.Tensor:
 		if x.dim() == 3:
 			x = x.unsqueeze(1)
 		_, embedding = self.cnn(x)
-		if self.use_arcface:
-			if self.training:
-				if labels is None:
-						raise ValueError("Labels are required for ArcFace training.")
-				return self.head(embedding, labels)
-			else:
-				return F.normalize(embedding, p=2, dim=1)
-		else:
-			return self.head(embedding)
+		return self.head(embedding)
 
 	def fuse_model(self):
 		if self.training:

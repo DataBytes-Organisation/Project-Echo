@@ -1,5 +1,5 @@
 defaults:
-  - model: efficientnet_v2_qat
+  - model: efficientnet_v2
   - teacher_model: efficientnet_v2
   - _self_
 
@@ -22,7 +22,7 @@ data:
   fmin: 50
   fmax: 14000
   top_db: 80
-  
+
   train_split: 0.8
   val_split: 0.2
   num_classes: -1 # Should be inferred from data directory at runtime
@@ -33,7 +33,7 @@ run:
   test: false
   quantise: true
   checkpoint_path: ./outputs/2025-08-23/18-50-17/best_efficientnet_v2_qat.pth
-  
+
 training:
   batch_size: 64
   grad_accum_steps: 2
@@ -50,7 +50,7 @@ training:
     s: 30
     m: 0.5
   circle:
-    s: 80 
+    s: 80
     m: 0.4
 
   early_stopping_patience: 15
@@ -89,7 +89,7 @@ augmentations:
   audio:
     _target_: torch_audiomentations.Compose
     transforms:
-      # Replaces AddGaussianNoise. 
+      # Replaces AddGaussianNoise.
       # f_decay=0.0 ensures White Noise (equivalent to Gaussian).
       # - _target_: torch_audiomentations.AddColoredNoise
       #   output_type: "tensor"
@@ -102,7 +102,7 @@ augmentations:
       #   sample_rate: ${data.sample_rate}
       - _target_: torch_audiomentations.AddBackgroundNoise
         background_paths: ${system.background_noise_dir}
-        min_snr_in_db: 10.0 
+        min_snr_in_db: 10.0
         max_snr_in_db: 30.0
         p: 0.5
         sample_rate: ${data.sample_rate}
@@ -116,7 +116,7 @@ augmentations:
         rollover: false
         p: 0.2
         sample_rate: ${data.sample_rate}
-      
+
       # Added to replace Pitch/Time variance (not supported in torch-audiomentations)
       - _target_: torch_audiomentations.Gain
         output_type: "tensor"
@@ -124,7 +124,7 @@ augmentations:
         min_gain_in_db: -6.0
         max_gain_in_db: 6.0
         p: 0.2
-        sample_rate: ${data.sample_rate}  
+        sample_rate: ${data.sample_rate}
 
   image: # Spectrogram augmentations
     _target_: torchvision.transforms.Compose
