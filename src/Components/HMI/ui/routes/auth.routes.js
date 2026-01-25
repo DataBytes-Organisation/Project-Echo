@@ -34,7 +34,9 @@ module.exports = function (app) {
 
   
       try {
-        const axiosResponse = await axios.post('http://ts-api-cont:9000/hmi/signup',schema)
+        // Use environment variable for API URL or fallback to localhost
+        const apiUrl = process.env.API_URL || 'http://localhost:9000';
+        const axiosResponse = await axios.post(`${apiUrl}/hmi/signup`,schema)
       
         if (axiosResponse.status === 201) {
           console.log('Status Code: ' + axiosResponse.status + ' ' + axiosResponse.statusText)
@@ -52,69 +54,129 @@ module.exports = function (app) {
   app.post("/api/auth/signin", async (req, res) => {
     let uname = req.body.username;
     let pw = req.body.password;
-
     let email = req.body.email;
       
     try {
-      const axiosResponse = await axios.post('http://ts-api-cont:9000/hmi/signin',{
-        username: uname,
-        email: email,
-        password: pw
-      });
+      // Try to connect to external API first
+      const apiUrl = process.env.API_URL || 'http://localhost:9000';
+      let useExternalAPI = true;
       
-      if (axiosResponse.status === 200) {
-        // Check if MFA is enabled
-        if (axiosResponse.data.mfa_phone_enabled) {
-          res.status(200).send(
-            `<script>
-              window.location.href = "/verify-otp?user_id=${axiosResponse.data.user_id}";
-            </script>`
-          );
-          return;
-        }
+      // Check if external API is available
+      try {
+        await axios.get(`${apiUrl}/`, { timeout: 1000 });
+      } catch (apiCheckError) {
+        console.log('External API not available, using local authentication');
+        useExternalAPI = false;
+      }
 
-        // Normal login flow
-        await client.set("JWT", axiosResponse.data.tkn, (err, res)=> {
-          if (err) {
-            console.log("Set JWT Token error: ", err)
-          } else {
-            console.log("Set JWT successfully: ", res)
-          }
-        })
-        await client.set("Roles", axiosResponse.data.roles.toString(), (err, res)=> {
-          if (err) {
-            console.log("Set User Roles Token error: ", err)
-          } else {
-            console.log("Set User roles successfully: ", res)
-          }
-        })
-        await client.set("Users", JSON.stringify(axiosResponse.data.user), (err, res)=> {
-          if (err) {
-            console.log("Set User Roles Token error: ", err)
-          } else {
-            console.log("Set User roles successfully: ", res)
-          }
-        })
-        /*
-        res.status(200).send(
-        `<script> 
-          alert("Login Successfully");
-          window.location.href = "/welcome"
-        </script>`);
-        */
-        res.status(200).json({
-          message: "Login Successful",
-          token: axiosResponse.data.tkn,
-          userId: axiosResponse.data.user.id,
+      if (useExternalAPI) {
+        // Use external API
+        const axiosResponse = await axios.post(`${apiUrl}/hmi/signin`,{
+          username: uname,
+          email: email,
+          password: pw
         });
-                
+        
+        if (axiosResponse.status === 200) {
+          // Check if MFA is enabled
+          if (axiosResponse.data.mfa_phone_enabled) {
+            res.status(200).send(
+              `<script>
+                window.location.href = "/verify-otp?user_id=${axiosResponse.data.user_id}";
+              </script>`
+            );
+            return;
+          }
+
+          // Normal login flow
+          await client.set("JWT", axiosResponse.data.tkn, (err, res)=> {
+            if (err) {
+              console.log("Set JWT Token error: ", err)
+            } else {
+              console.log("Set JWT successfully: ", res)
+            }
+          })
+          await client.set("Roles", axiosResponse.data.roles.toString(), (err, res)=> {
+            if (err) {
+              console.log("Set User Roles Token error: ", err)
+            } else {
+              console.log("Set User roles successfully: ", res)
+            }
+          })
+          await client.set("Users", JSON.stringify(axiosResponse.data.user), (err, res)=> {
+            if (err) {
+              console.log("Set User Roles Token error: ", err)
+            } else {
+              console.log("Set User roles successfully: ", res)
+            }
+          })
+          
+          res.status(200).json({
+            message: "Login Successful",
+            token: axiosResponse.data.tkn,
+            userId: axiosResponse.data.user.id,
+          });
+                  
+        } else {
+          console.log("Login response: ", axiosResponse.data);
+          res.status(400).json({ message: "Failed! Invalid credentials!" });
+        }
       } else {
-        console.log("Login response: ", axiosResponse.data);
-        res.status(400).send('<script> window.location.href = "/login"; alert("Failed! Invalid credentials!");</script>');
+        // Local authentication fallback
+        const bcrypt = require('bcryptjs');
+        const jwt = require('jsonwebtoken');
+        const { MongoClient } = require('mongodb');
+        
+        // Connect to MongoDB
+        const mongoUri = process.env.MONGODB_URI || "mongodb://root:root_password@ts-mongodb-cont:27017";
+        const mongoClient = new MongoClient(mongoUri, {
+          serverSelectionTimeoutMS: 5000,
+          connectTimeoutMS: 10000
+        });
+        
+        try {
+          await mongoClient.connect();
+          const db = mongoClient.db('UserSample'); // Use UserSample database
+          const usersCollection = db.collection('users');
+          
+          // Find user by username or email
+          const query = uname ? { username: uname } : { email: email };
+          const user = await usersCollection.findOne(query);
+          
+          if (!user) {
+            return res.status(401).json({ message: "Invalid credentials" });
+          }
+          
+          // Verify password
+          const isValidPassword = await bcrypt.compare(pw, user.password);
+          if (!isValidPassword) {
+            return res.status(401).json({ message: "Invalid credentials" });
+          }
+          
+          // Generate JWT token
+          const token = jwt.sign(
+            { id: user._id, username: user.username, email: user.email },
+            process.env.JWT_SECRET || 'your-secret-key',
+            { expiresIn: '24h' }
+          );
+          
+          // Store in Redis
+          await client.set("JWT", token);
+          await client.set("Users", JSON.stringify(user));
+          
+          res.status(200).json({
+            message: "Login Successful",
+            token: token,
+            userId: user._id.toString(),
+          });
+          
+        } finally {
+          await mongoClient.close();
+        }
       }
     } catch (err) {
-      console.log('Login exception error: ' + err)
-      res.send(`<script> window.location.href = "/login"; alert("Login exception Error: ${err}!");</script>`);
+      console.log('Login exception error: ' + err);
+      res.status(500).json({ message: "Login error: " + err.message });
     }  
   });
 
@@ -126,7 +188,9 @@ module.exports = function (app) {
     // let email = req.body.email;
       
     try {
-      const axiosResponse = await axios.post('http://ts-api-cont:9000/2fa/verify',{
+      // Use environment variable for API URL or fallback to localhost
+      const apiUrl = process.env.API_URL || 'http://localhost:9000';
+      const axiosResponse = await axios.post(`${apiUrl}/2fa/verify`,{
         user_id: user_id,
         otp: otp
       });
@@ -211,7 +275,9 @@ module.exports = function (app) {
     console.log(account)
     
     try {
-      const axiosResponse = await axios.post('http://ts-api-cont:9000/hmi/forgot-password', {
+      // Use environment variable for API URL or fallback to localhost
+      const apiUrl = process.env.API_URL || 'http://localhost:9000';
+      const axiosResponse = await axios.post(`${apiUrl}/hmi/forgot-password`, {
         user: account
       });
       
@@ -246,7 +312,9 @@ module.exports = function (app) {
     // let _otp_ = req.body.otp;
 
     try {
-      const axiosResponse = await axios.post('http://ts-api-cont:9000/hmi/reset-password',{
+      // Use environment variable for API URL or fallback to localhost
+      const apiUrl = process.env.API_URL || 'http://localhost:9000';
+      const axiosResponse = await axios.post(`${apiUrl}/hmi/reset-password`,{
         username: uname,
         password: pw
         // otp : _otp_

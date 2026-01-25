@@ -4,7 +4,7 @@ options:
 
 substitutions:
   _ENV: dev
-  _REGION: australia-southeast2
+  _REGION: australia-southeast1
   _REPOSITORY: echonet
   _CLUSTER: echonet-gke
   _DEPLOY_OVERLAY: k8s/overlays/${_ENV}

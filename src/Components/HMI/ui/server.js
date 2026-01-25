@@ -788,6 +788,27 @@ app.get('/iot/nodes', async (req, res) => {
   }
 });
 
+// Proxy routes for Cloud Compute API
+app.get('/cloud/cloud-metrics', async (req, res) => {
+  try {
+    const response = await axios.get('http://ts-api-cont:9000/cloud/cloud-metrics');
+    res.json(response.data);
+  } catch (error) {
+    console.error('Error fetching cloud metrics:', error);
+    res.status(500).json({ error: 'Error fetching cloud metrics' });
+  }
+});
+
+app.get('/cloud/cloud-info', async (req, res) => {
+  try {
+    const response = await axios.get('http://ts-api-cont:9000/cloud/cloud-info');
+    res.json(response.data);
+  } catch (error) {
+    console.error('Error fetching cloud info:', error);
+    res.status(500).json({ error: 'Error fetching cloud info' });
+  }
+});
+
 app.get("/map", async(req,res) => {
   res.sendFile(path.join(__dirname, 'public/index.html'))
 })

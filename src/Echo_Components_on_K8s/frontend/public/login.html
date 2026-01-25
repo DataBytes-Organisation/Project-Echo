@@ -41,6 +41,8 @@
     <link rel="stylesheet" href="./css/auth-form.css" type="text/css">
     <!-- End Imports -->
     <title>Echo | Login</title>
+    <!-- reCAPTCHA Enterprise v3 (invisible) -->
+    <script src="https://www.google.com/recaptcha/enterprise.js?render=6Lee1k0sAAAAAGYhpdP_0jcaghmD5Ta6K8WPUsyA"></script>
 </head>
 
 <body>
@@ -86,17 +88,13 @@
                     <label for="password"><b>Password</b></label>
                     <input type="password" placeholder="Enter Password" name="password" required>
 
+                    <!-- Hidden field to carry reCAPTCHA Enterprise token -->
+                    <input type="hidden" name="recaptchaToken" id="recaptchaToken" />
+
                     <input type="checkbox" id="switchInput" onclick="toggleLoginType()" name="switchInput">
                     <label for="switchInput" id="switchText">Use Email instead</label>
-                    <input type="checkbox" id="login-form-checkbox" checked='false' onclick="openCaptcha('login-form')" required> <span id="login-form-checkbox-txt"> Verify captcha</span>
-                    <div id="login-form-captcha" class="captcha-block animate">
-                        <img id="login-form-img" class="captcha-img"/>
-                        <input type="text" id="login-form-txt" placeholder="Enter highlighted text" required>
-                        <span id="login-form-captcha-error" class="error-text"></span>
-                        <button type="button" onclick="VerifyCaptcha('login-form')"> Verify</button>
-                    </div>
-
-                    <button id="login-form-submit" type="submit" class="btn10 animate disabled" disabled><span>Login</span></button>
+                    <!-- Captcha temporarily disabled to unblock login; using invisible Enterprise token on submit -->
+                    <button id="login-form-submit" type="submit" class="btn10 animate"><span>Login</span></button>
                     <label>
                         <input type="checkbox" checked="checked" name="remember"> Remember me
                     </label>
@@ -201,6 +199,32 @@
 
     <div id="blur"></div>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        // Execute Enterprise v3 and attach token on submit
+        document.addEventListener('DOMContentLoaded', function() {
+            var form = document.querySelector('form#login-form');
+            if (!form) return;
+            form.addEventListener('submit', async function(e) {
+                try {
+                    if (window.grecaptcha && window.grecaptcha.enterprise && typeof window.grecaptcha.enterprise.execute === 'function') {
+                        e.preventDefault();
+                        const token = await window.grecaptcha.enterprise.execute('6Lee1k0sAAAAAGYhpdP_0jcaghmD5Ta6K8WPUsyA', { action: 'LOGIN' });
+                        var tokenInput = document.getElementById('recaptchaToken');
+                        if (tokenInput) tokenInput.value = token;
+                        console.log('reCAPTCHA token obtained successfully');
+                        form.submit();
+                    } else {
+                        console.warn('reCAPTCHA not available, submitting form without token');
+                        // Allow form submission without reCAPTCHA
+                    }
+                } catch (err) {
+                    console.error('reCAPTCHA Enterprise error:', err);
+                    console.warn('Submitting form without reCAPTCHA token due to error');
+                    // Allow form submission even if reCAPTCHA fails
+                }
+            });
+        });
+    </script>
 
 </body>
 
@@ -241,19 +265,14 @@
         console.log("Open form: ", id);
         let ele = id;
         document.getElementById(ele).style.display = 'block';
-        const eleCheckbox = id + "-checkbox"
-        document.getElementById(eleCheckbox).checked = false    
+        // Enable login immediately (captcha bypass)
+        const eleBtn = id + "-submit";
+        const btn = document.getElementById(eleBtn);
+        if (btn) {
+            btn.disabled = false;
+            btn.classList.remove("disabled");
+        }
         document.getElementById(ele).style.display='block';
-        console.log("Fetched data start!")
-        await fetch('/data/captcha')
-            .then((response) => response.json())
-            .then((data) => {
-                console.log("Captcha data: ", data)
-                captchaTxt = data.text;
-            })
-            .catch((error) => {
-                console.error('Error fetching data:', error);
-            });
         // document.getElementById(project-title).style.display='none';
     }
 

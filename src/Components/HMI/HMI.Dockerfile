@@ -7,11 +7,9 @@ WORKDIR /usr/src/app/ui
 # This prevents re-installing node_modules.
 COPY ui/package*.json ./
 
-# Install Production Dependencies Only
-# 'npm ci' is faster and more reliable than 'install'.
-# '--omit=dev' skips devDependencies (saves huge space).
-# 'npm cache clean' removes the installation cache.
-RUN npm ci --omit=dev && \
+# Install All Dependencies (dev and production)
+# Use npm install for flexibility with all dependencies
+RUN npm install && \
     npm cache clean --force
 
 COPY ui/ .

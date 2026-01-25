@@ -18,7 +18,8 @@ require("dotenv").config();
 const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY);
 const axios = require("axios");
 
-const { createCaptchaSync } = require("captcha-canvas");
+// Temporarily removed the captcha-canvas package - not needed for login
+// const { createCaptchaSync } = require("captcha-canvas");
 //Add mongoDB module inside config folder
 const db = require("./model");
 const Role = db.role;

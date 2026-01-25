@@ -12,8 +12,8 @@ COPY . .
 # Change to the UI directory where your package.json file is located
 WORKDIR /app
 
-# Install your application's dependencies
-RUN npm install
+# Install your application's dependencies (omit optional native modules)
+RUN npm install --no-optional
 
 # The application runs on port 8080, so let Docker know about this
 EXPOSE 8080

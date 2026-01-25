@@ -9,8 +9,8 @@
 
     <script type="text/javascript" src="./js/ol.js"></script>
 
-    <script src="https://www.google.com/recaptcha/api.js" async defer onerror="window.recaptchaLoaded=false; console.warn('reCAPTCHA failed to load')"></script>
-    <script src="https://www.google.com/recaptcha/enterprise.js?render=6Lee1k0sAAAAAGYhpdP_0jcaghmD5Ta6K8WPUsyA" onerror="window.recaptchaLoaded=false; console.warn('reCAPTCHA Enterprise failed to load')"></script>
+    <script src="https://www.google.com/recaptcha/api.js" async defer onerror="window.recaptchaLoaded=false"></script>
+    <script src="https://www.google.com/recaptcha/enterprise.js?render=6Lee1k0sAAAAAGYhpdP_0jcaghmD5Ta6K8WPUsyA" onerror="window.recaptchaLoaded=false"></script>
 
     <!-- Your code -->
 
@@ -418,17 +418,14 @@
         const email = document.querySelector('input[name="email"]') ? document.querySelector('input[name="email"]').value : '';
 
         try {
-            // Get reCAPTCHA Enterprise token using execute() - make it optional
+            // Get reCAPTCHA Enterprise token using execute()
             let recaptchaToken = null;
-            if (window.grecaptcha && window.grecaptcha.enterprise && typeof window.grecaptcha.enterprise.execute === 'function') {
+            if (window.grecaptcha && window.grecaptcha.enterprise) {
                 try {
                     recaptchaToken = await window.grecaptcha.enterprise.execute('6Lee1k0sAAAAAGYhpdP_0jcaghmD5Ta6K8WPUsyA', { action: 'LOGIN' });
-                    console.log('reCAPTCHA token obtained successfully');
                 } catch (err) {
-                    console.warn('reCAPTCHA execution failed, continuing without token:', err);
+                    console.warn('reCAPTCHA execution failed:', err);
                 }
-            } else {
-                console.warn('reCAPTCHA not loaded, continuing without token');
             }
 
             const response = await fetch('/api/auth/signin', {
@@ -456,11 +453,11 @@
                 window.location.href = "/admin-dashboard"; // CHANGED: Redirect to admin-dashboard instead of index.html
             } else {
                 const errorData = await response.json();
-                alert(errorData.message || 'Login failed. Please check your credentials.');
+                alert(errorData.message);
             }
         } catch (err) {
             console.error('Login error:', err);
-            alert("An error occurred during login. Please try again.");
+            alert("An error occurred during login.");
         }
     });
 </script>

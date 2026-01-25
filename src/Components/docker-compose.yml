@@ -98,13 +98,14 @@ services:
     networks:
       - echo-net
     ports:
-      - "9000:9000"
-      - "9080:9080"
+      - "10000:9000"
     volumes:
       - ./API:/app # Mount the API's src directory to /app in the container
       - credentials_volume:/root/.config/gcloud/
+      - ./API/gcloud-credentials.json:/app/gcloud-credentials.json:ro
       - weather_data:/app/weather_data  # Add a volume for weather data
-
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/gcloud-credentials.json
     stdin_open: false
     tty: true
     command: uvicorn app.main:app --host 0.0.0.0 --port 9000 --reload
