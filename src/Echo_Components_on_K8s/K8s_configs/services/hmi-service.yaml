@@ -3,10 +3,11 @@ kind: Service
 metadata:
   name: hmi-service
 spec:
+  type: LoadBalancer
+  loadBalancerIP: "34.151.149.69"
   selector:
     app: hmi
   ports:
     - protocol: TCP
       port: 8080
       targetPort: 8080
-  type: LoadBalancer

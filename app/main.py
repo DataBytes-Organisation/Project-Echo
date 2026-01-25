@@ -3,6 +3,7 @@ from fastapi import FastAPI, UploadFile, File, HTTPException
 from pydantic import BaseModel
 import asyncio, os, time
 from .model import DummyModel
+from google.cloud import compute_v1
 
 app = FastAPI(title="EchoNet Model API", version="0.1.0")
 
@@ -43,3 +44,28 @@ async def predict(file: UploadFile = File(...)):
         label = await loop.run_in_executor(None, _model.predict, data)
     latency_ms = int((time.perf_counter() - start) * 1000)
     return {"label": label, "latency_ms": latency_ms}
+
+@app.get("/cloud-info")
+async def get_cloud_info():
+    try:
+        # Initialize Google Cloud client lazily
+        client = compute_v1.InstancesClient()
+        
+        # Replace 'your-project-id' and 'your-zone' with actual values
+        project = "your-project-id"
+        zone = "your-zone"
+
+        # Fetch instance details
+        instances = client.list(project=project, zone=zone)
+        instance_list = [
+            {
+                "name": instance.name,
+                "status": instance.status,
+                "machine_type": instance.machine_type,
+            }
+            for instance in instances
+        ]
+
+        return {"instances": instance_list}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching cloud info: {str(e)}")

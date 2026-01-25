@@ -44,7 +44,9 @@ module.exports = function (app) {
 
   
       try {
-        const axiosResponse = await axios.post('http://ts-api-cont:9000/hmi/signup',schema)
+        // Use environment variable for API URL or fallback to Kubernetes service
+        const apiUrl = process.env.API_URL || 'http://api-service:9000';
+        const axiosResponse = await axios.post(`${apiUrl}/hmi/signup`,schema)
       
         if (axiosResponse.status === 201) {
           console.log('Status Code: ' + axiosResponse.status + ' ' + axiosResponse.statusText)
@@ -69,10 +71,13 @@ module.exports = function (app) {
       if (uname.match(re) === null) {
         console.log("username is not from Guest, proceed to User Signin")
         try {
-          const axiosResponse = await axios.post('http://ts-api-cont:9000/hmi/signin', {
+          // Use environment variable for API URL or fallback to Kubernetes service
+          const apiUrl = process.env.API_URL || 'http://api-service:9000';
+          const axiosResponse = await axios.post(`${apiUrl}/hmi/signin`, {
             username: uname,
             email: email,
-            password: pw
+            password: pw,
+            recaptchaToken: req.body.recaptchaToken
           });
           
           if (axiosResponse.status === 200) {

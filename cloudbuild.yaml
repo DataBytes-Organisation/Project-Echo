@@ -1,0 +1,77 @@
+options:
+  logging: CLOUD_LOGGING_ONLY
+  substitutionOption: ALLOW_LOOSE
+
+substitutions:
+  _ENV: dev
+  _REGION: australia-southeast1
+  _REPOSITORY: echonet
+  _CLUSTER: echonet-gke
+  _DEPLOY_OVERLAY: k8s/overlays/${_ENV}
+
+steps:
+  - id: "build-api"
+    name: gcr.io/cloud-builders/docker
+    dir: src/Echo_Components_on_K8s/api
+    args:
+      - build
+      - "-t"
+      - "${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/api:${SHORT_SHA}"
+      - .
+
+  - id: "build-engine"
+    name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - "-t"
+      - "${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/engine:${SHORT_SHA}"
+      - .
+
+  - id: "build-hmi"
+    name: gcr.io/cloud-builders/docker
+    dir: src/Echo_Components_on_K8s/frontend
+    args:
+      - build
+      - "-t"
+      - "${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/hmi:${SHORT_SHA}"
+      - .
+
+  - id: "push-images"
+    name: gcr.io/cloud-builders/docker
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        docker push ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/api:${SHORT_SHA}
+        docker push ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/engine:${SHORT_SHA}
+        docker push ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/hmi:${SHORT_SHA}
+
+  - id: "tag-release"
+    name: gcr.io/cloud-builders/docker
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        docker tag ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/api:${SHORT_SHA} ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/api:${_ENV}
+        docker tag ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/engine:${SHORT_SHA} ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/engine:${_ENV}
+        docker tag ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/hmi:${SHORT_SHA} ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/hmi:${_ENV}
+        docker push ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/api:${_ENV}
+        docker push ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/engine:${_ENV}
+        docker push ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/hmi:${_ENV}
+
+  - id: "deploy"
+    name: gcr.io/cloud-builders/gcloud
+    entrypoint: bash
+    env:
+      - CLOUDSDK_COMPUTE_REGION=${_REGION}
+      - CLOUDSDK_CONTAINER_CLUSTER=${_CLUSTER}
+    args:
+      - -c
+      - |
+        gcloud container clusters get-credentials ${_CLUSTER} --region ${_REGION}
+        kubectl apply -k ${_DEPLOY_OVERLAY}
+
+images:
+  - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/api:${SHORT_SHA}
+  - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/engine:${SHORT_SHA}
+  - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/hmi:${SHORT_SHA}

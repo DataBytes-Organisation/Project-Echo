@@ -13,6 +13,18 @@ from bson import ObjectId
 from typing import Optional, List
 import datetime
 import pymongo
+import json 
+
+from app.routers import hmi, engine, sim, two_factor
+from app.routers import public
+from app.routers import cloud_compute
+app = FastAPI()
+
+# Add the CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:8080"],  # 可根据实际需求配置
+)
 
 # Routers
 from .routers import add_csv_output_option, audio_upload_router
@@ -49,13 +61,32 @@ app.include_router(two_factor.router)
 app.include_router(public.router, tags=['public'], prefix='/public')
 app.include_router(iot.router, tags=['iot'], prefix='/iot')
 app.include_router(species_predictor.router, tags=["predict"])
-app.include_router(auth_router.router, tags=["auth"], prefix="/api")
-app.include_router(live.router) #Websocket 
+app.include_router(cloud_compute.router, tags=['cloud'], prefix='/cloud')
 
 # --- Root Endpoint ---
 @app.get("/", response_description="API Root")
 def show_home():
     return 'Welcome to echo api, move to /docs for more'
+
+# ✅ Login endpoint (redirect or placeholder)
+@app.get("/login", response_description="Login Page")
+def login_page():
+    return {
+        "message": "Login endpoint",
+        "status": "ok",
+        "redirect": "/api/auth/signin",
+        "note": "Use POST /api/auth/signin with credentials for authentication"
+    }
+
+@app.post("/login", response_description="Login API Endpoint")
+async def login(username: str = None, password: str = None):
+    """
+    Login endpoint that redirects to signin
+    """
+    if not username or not password:
+        return {"error": "Username and password required"}
+    # Redirect to the actual signin endpoint
+    return {"message": "Please use POST /api/auth/signin instead"}
 
 app.include_router(auth_router.router, tags=["auth"], prefix="/api")
 from app.routers import detections

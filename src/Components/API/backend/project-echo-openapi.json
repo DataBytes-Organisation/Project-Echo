@@ -1920,6 +1920,123 @@
         }
       }
     },
+    "/cloud/cloud-info": {
+      "get": {
+        "tags": [
+          "cloud"
+        ],
+        "summary": "Get Cloud Info",
+        "description": "Fetch Google Cloud Compute Engine instance details\n\nReturns:\n    dict: Dictionary containing list of instances with their details",
+        "operationId": "get_cloud_info_cloud_cloud_info_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cloud/cloud-metrics": {
+      "get": {
+        "tags": [
+          "cloud"
+        ],
+        "summary": "Get Cloud Metrics",
+        "description": "Fetch aggregated cloud metrics including real-time billing information\n\nReturns:\n    dict: Dictionary containing CPU, memory, storage, and billing metrics",
+        "operationId": "get_cloud_metrics_cloud_cloud_metrics_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/": {
+      "get": {
+        "summary": "Show Home",
+        "operationId": "show_home__get",
+        "responses": {
+          "200": {
+            "description": "API Root",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/login": {
+      "get": {
+        "summary": "Login Page",
+        "operationId": "login_page_login_get",
+        "responses": {
+          "200": {
+            "description": "Login Page",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Login",
+        "description": "Login endpoint that redirects to signin",
+        "operationId": "login_login_post",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "title": "Username",
+              "type": "string"
+            },
+            "name": "username",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "title": "Password",
+              "type": "string"
+            },
+            "name": "password",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Login API Endpoint",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/signin": {
       "post": {
         "tags": [
@@ -3057,21 +3174,27 @@
         },
         "type": "object",
         "required": [
-          "user",
-          "password",
-          "otp"
+          "password"
         ],
         "title": "ResetPasswordSchema"
       },
       "SignInRequest": {
         "properties": {
+          "username": {
+            "title": "Username",
+            "type": "string"
+          },
           "email": {
             "type": "string",
             "title": "Email"
           },
           "password": {
-            "type": "string",
-            "title": "Password"
+            "title": "Password",
+            "type": "string"
+          },
+          "recaptchaToken": {
+            "title": "Recaptchatoken",
+            "type": "string"
           }
         },
         "type": "object",
