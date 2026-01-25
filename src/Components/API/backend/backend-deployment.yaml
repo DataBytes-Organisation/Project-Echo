@@ -1,0 +1,23 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: echo-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: echo-backend
+  template:
+    metadata:
+      labels:
+        app: echo-backend
+    spec:
+      containers:
+      - name: echo-backend
+        image: ts-api:latest #for production,use registry path: docker.io/yourusername/ts-api:latest 
+        ports:
+        - containerPort: 9000
+        env:
+        # Add environment variables here if needed
+        restartPolicy: Always

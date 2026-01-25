@@ -243,7 +243,7 @@ module.exports = function (app) {
     // console.log(account)
     
     // try {
-    //   const axiosResponse = await axios.post('http://ts-api-cont:9000/hmi/forgot-password', {
+    //   const axiosResponse = await axios.post('http://api-service:9000/hmi/forgot-password', {
     //     user: account
     //   });
       
