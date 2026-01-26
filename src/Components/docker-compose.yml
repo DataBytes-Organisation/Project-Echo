@@ -104,6 +104,10 @@ services:
       - ./API:/app # Mount the API's src directory to /app in the container
       - credentials_volume:/root/.config/gcloud/
       - weather_data:/app/weather_data  # Add a volume for weather data
+    environment:
+      MAIL_STARTTLS: "true"
+      MAIL_SSL_TLS: "false"
+
 
     stdin_open: false
     tty: true
