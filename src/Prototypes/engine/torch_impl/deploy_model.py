@@ -24,6 +24,10 @@ import json
 import onnxsim
 import shutil
 
+from torch.nn.modules.conv import Conv2d
+from typing import Optional
+import types
+
 class TorchscriptModelWrapper(nn.Module):
 	"""
 	A TorchScript-compatible wrapper for the classifier model that includes
@@ -223,6 +227,35 @@ def fix_onnx_model(input_path: Path, output_path: Path):
 		shutil.copy(str(input_path), str(output_path))
 
 
+def patch_conv2d_instances_for_jit(module: nn.Module):
+	"""
+	Recursively traverses a module and patches all Conv2d instances
+	with a JIT-friendly _conv_forward method.
+	"""
+
+	def _patched_conv_forward(self, input: torch.Tensor, weight: torch.Tensor, bias: Optional[torch.Tensor]) -> torch.Tensor:
+		if self.padding_mode != 'zeros':
+			if self.padding_mode == 'reflect':
+				return F.conv2d(F.pad(input, self._reversed_padding_repeated_twice, mode='reflect'),
+								weight, bias, self.stride, (0, 0), self.dilation, self.groups)
+			elif self.padding_mode == 'replicate':
+				return F.conv2d(F.pad(input, self._reversed_padding_repeated_twice, mode='replicate'),
+								weight, bias, self.stride, (0, 0), self.dilation, self.groups)
+			elif self.padding_mode == 'circular':
+				return F.conv2d(F.pad(input, self._reversed_padding_repeated_twice, mode='circular'),
+								weight, bias, self.stride, (0, 0), self.dilation, self.groups)
+			else:
+				raise ValueError(f"Unsupported padding mode: {self.padding_mode}")
+		return F.conv2d(input, weight, bias, self.stride, self.padding, self.dilation, self.groups)
+
+	for child_module in module.children():
+		if isinstance(child_module, Conv2d):
+			# Bind the patched method to the instance
+			child_module._conv_forward = types.MethodType(_patched_conv_forward, child_module)
+		else:
+			patch_conv2d_instances_for_jit(child_module)
+
+
 def main(args):
 	"""Main function to perform the conversion and packaging."""
 	model_dir = Path(args.model_dir)
@@ -282,6 +315,9 @@ def main(args):
 
 	print("\n--- Step 2: Creating and scripting the classifier model wrapper ---")
 	try:
+		# Apply the patch to the model instances before scripting
+		patch_conv2d_instances_for_jit(model)
+
 		wrapper = TorchscriptModelWrapper(model)
 		wrapper.eval()
 		scripted_wrapper = torch.jit.script(wrapper)
