@@ -1837,6 +1837,327 @@
         }
       }
     },
+    "/sensors/updates": {
+      "get": {
+        "tags": [
+          "sensors"
+        ],
+        "summary": "Get Sensor Updates",
+        "operationId": "get_sensor_updates_sensors_updates_get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 5000.0,
+              "minimum": 1.0,
+              "title": "Limit",
+              "default": 500
+            },
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Derived sensor health updates",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sensors/alerts": {
+      "get": {
+        "tags": [
+          "sensors"
+        ],
+        "summary": "Get Sensor Alerts",
+        "operationId": "get_sensor_alerts_sensors_alerts_get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 5000.0,
+              "minimum": 1.0,
+              "title": "Limit",
+              "default": 500
+            },
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Derived alerts from sensor health",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sensors/{sensor_id}/settings": {
+      "get": {
+        "tags": [
+          "sensors"
+        ],
+        "summary": "Get Sensor Settings",
+        "operationId": "get_sensor_settings_sensors__sensor_id__settings_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Sensor Id"
+            },
+            "name": "sensor_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get sensor settings (sensor-specific or global defaults)",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "sensors"
+        ],
+        "summary": "Put Sensor Settings",
+        "operationId": "put_sensor_settings_sensors__sensor_id__settings_put",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Sensor Id"
+            },
+            "name": "sensor_id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "title": "Payload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Upsert sensor settings",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sensors/{sensor_id}/reboot": {
+      "post": {
+        "tags": [
+          "sensors"
+        ],
+        "summary": "Queue Reboot",
+        "operationId": "queue_reboot_sensors__sensor_id__reboot_post",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Sensor Id"
+            },
+            "name": "sensor_id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "title": "Payload",
+                "default": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Queue a reboot command (records intent only)",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sensors/{sensor_id}/reboots": {
+      "get": {
+        "tags": [
+          "sensors"
+        ],
+        "summary": "Get Reboot History",
+        "operationId": "get_reboot_history_sensors__sensor_id__reboots_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Sensor Id"
+            },
+            "name": "sensor_id",
+            "in": "path"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200.0,
+              "minimum": 1.0,
+              "title": "Limit",
+              "default": 50
+            },
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Reboot history for a sensor",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sensors/reboots/recent": {
+      "get": {
+        "tags": [
+          "sensors"
+        ],
+        "summary": "Get Recent Reboots",
+        "operationId": "get_recent_reboots_sensors_reboots_recent_get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200.0,
+              "minimum": 1.0,
+              "title": "Limit",
+              "default": 50
+            },
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Recent reboot history across all sensors",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/predict": {
       "post": {
         "tags": [
@@ -2121,7 +2442,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DetectionListResponses"
+                  "$ref": "#/components/schemas/DetectionListResponse"
                 }
               }
             }
