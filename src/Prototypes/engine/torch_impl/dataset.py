@@ -40,13 +40,14 @@ def index_directory(directory, file_types=('.ogg', '.mp3', '.wav', '.flac')):
 	return audio_files, labels, class_names
 
 class SpectrogramDataset(Dataset):
-	def __init__(self, audio_files, labels, cfg, audio_transforms=None, image_transforms=None, is_train=False):
+	def __init__(self, audio_files, labels, cfg, audio_transforms=None, image_transforms=None, is_train=False, target_width=None):
 		super().__init__()
 		self.audio_files = audio_files
 		self.labels = labels
 		self.cfg = cfg
 		self.audio_transforms = audio_transforms
 		self.image_transforms = image_transforms
+		self.force_width = target_width
 		
 		self.clip_samples = int(cfg.data.audio_clip_duration * cfg.data.sample_rate)
 
@@ -119,6 +120,16 @@ class SpectrogramDataset(Dataset):
 		# Global Normalization [-80, 0] -> [0, 1]
 		spec = (spec + self.top_db) / self.top_db
 
+		# Force spectrogram to a fixed width if specified
+		if self.force_width is not None:
+			current_width = spec.shape[-1]
+			if current_width > self.force_width:
+				spec = spec[..., :self.force_width]
+			elif current_width < self.force_width:
+				padding = self.force_width - current_width
+				# Pad on the right
+				spec = F.pad(spec, (0, padding), 'constant', 0)
+
 		# Apply Image Augmentations
 		if self.image_transforms:
 			if spec.dim() == 2:
@@ -174,8 +185,10 @@ class SpectrogramDataset(Dataset):
 
 			except Exception as e:
 				print(f"Error loading {file_path}: {e}")
-				# Return silent tensor of correct shape on error
-				return torch.zeros(self.target_samples), torch.tensor(label).long()
+				# Return silent spectrogram on error
+				silent_waveform = torch.zeros(1, self.target_samples)
+				spec = self._process_waveform_to_spec(silent_waveform, file_path)
+				return spec, torch.tensor(label).long()
 
 		# Pad or Crop to fixed length (Training Randomness happens here)
 		num_samples = waveform.shape[1]
@@ -236,3 +249,20 @@ class SpectrogramDataset(Dataset):
 			stacked_labels = torch.tensor([label] * len(specs)).long()
 
 			return stacked_specs, stacked_labels
+
+def validation_collate_fn(batch):
+	"""
+	Custom collate function for validation/testing.
+	It unnests the chunks from each audio file.
+	"""
+	specs_list = [item[0] for item in batch]
+	labels_list = [item[1] for item in batch]
+	
+	# Concatenate along the batch dimension (dim 0)
+	# specs_list[i] shape is (Ni, C, F, T) -> Result: (Sum(Ni), C, F, T)
+	flattened_specs = torch.cat(specs_list, dim=0)
+	
+	# labels_list[i] shape is (Ni) -> Result: (Sum(Ni))
+	flattened_labels = torch.cat(labels_list, dim=0)
+	
+	return flattened_specs, flattened_labels

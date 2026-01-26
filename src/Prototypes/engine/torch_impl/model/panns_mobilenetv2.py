@@ -200,7 +200,7 @@ class PannsMobileNetV2ArcFace(nn.Module):
 		else:
 			self.head = nn.Linear(in_features, num_classes)
 
-	def forward(self, x: torch.Tensor, labels: torch.Tensor = None) -> torch.Tensor:
+	def forward(self, x: torch.Tensor) -> torch.Tensor:
 		_, embedding = self.cnn(x)
 
 		return self.head(embedding)
