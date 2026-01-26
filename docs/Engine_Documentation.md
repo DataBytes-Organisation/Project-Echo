@@ -2,14 +2,13 @@
 
 ## Table of Contents
 
-1. [Project Overview](#project-overview)
-2. [Quick Start (For Juniors)](#quick-start-for-juniors)
-3. [Technical Deep Dive (For Seniors)](#technical-deep-dive-for-seniors)
-4. [Architecture & Components](#architecture--components)
-5. [Configuration & Credentials](#configuration--credentials)
-6. [Deployment (Docker)](#deployment-docker)
-7. [Edge Cases & Warnings](#edge-cases--warnings)
-8. [Future Improvements](#future-improvements)
+1. Project Overview
+2. Quick Start (For Juniors)
+3. Technical Deep Dive (For Seniors)
+4. Architecture & Components
+5. Configuration & Credentials
+6. Deployment (Docker)
+7. Edge Cases & Warnings
 
 ---
 
@@ -612,9 +611,9 @@ ffmpeg -version     # Should display version info
 
 | Scenario | Result |
 |----------|--------|
-| Train: 48kHz, Infer: 48kHz | ✅ Correct |
-| Train: 48kHz, Infer: 16kHz | ❌ Spectrograms misaligned, predictions invalid |
-| Train: 16kHz, Infer: 48kHz | ❌ Frequency bins don't match model expectations |
+| Train: 48kHz, Infer: 48kHz |  Correct |
+| Train: 48kHz, Infer: 16kHz |  Spectrograms misaligned, predictions invalid |
+| Train: 16kHz, Infer: 48kHz |  Frequency bins don't match model expectations |
 
 **Root Cause:** Mel filterbanks are calculated based on sample rate. Changing SR shifts the frequency-to-bin mapping.
 
@@ -720,10 +719,10 @@ new_lat, new_lon = self.generate_random_location(lat, lon, 50, 100)
 
 ## Table of Contents
 
-1. [Overview](#overview)
-2. [Torch Implementation (Audio Classification)](#torch-implementation-audio-classification)
-3. [Computer Vision (Image Classification)](#computer-vision-image-classification)
-4. [Integration Guide](#integration-guide)
+1. Overview
+2. Torch Implementation (Audio Classification)
+3. Computer Vision (Image Classification)
+4. Integration Guide
 
 ---
 
@@ -1232,20 +1231,5 @@ python benchmark_server.py --url http://localhost:8501 --requests 100
 
 # Deploy
 python light_echo_engine.py
-```
-
-### Image Classification (Computer Vision)
-
-```bash
-# Create dataset
-python get_creatures_v1.py
-python augment_creatures_v1.py
-
-# Train
-python train_model_v1.py
-
-# Inference
-python classify_stills_v1.py
-python classify_video_v1.py
 ```
 
