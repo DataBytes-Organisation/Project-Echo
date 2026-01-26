@@ -7,23 +7,23 @@ from model.utils import CosineLinear
 
 PRETRAINED_URL = "https://zenodo.org/record/3987831/files/MobileNetV1_mAP%3D0.389.pth"
 
+
 def init_layer(layer):
 	"""Initialize a Linear or Convolutional layer."""
 	nn.init.xavier_uniform_(layer.weight)
-	if hasattr(layer, 'bias') and layer.bias is not None:
-		layer.bias.data.fill_(0.)
+	if hasattr(layer, "bias") and layer.bias is not None:
+		layer.bias.data.fill_(0.0)
+
 
 def init_bn(bn):
 	"""Initialize a Batchnorm layer."""
-	bn.bias.data.fill_(0.)
-	bn.weight.data.fill_(1.)
+	bn.bias.data.fill_(0.0)
+	bn.weight.data.fill_(1.0)
+
 
 def conv_bn_v1(inp, oup, stride):
-	return nn.Sequential(
-		nn.Conv2d(inp, oup, 3, stride, 1, bias=False),
-		nn.BatchNorm2d(oup),
-		nn.ReLU(inplace=True)
-	)
+	return nn.Sequential(nn.Conv2d(inp, oup, 3, stride, 1, bias=False), nn.BatchNorm2d(oup), nn.ReLU(inplace=True))
+
 
 def conv_dw_v1(inp, oup, stride):
 	return nn.Sequential(
@@ -31,22 +31,31 @@ def conv_dw_v1(inp, oup, stride):
 		nn.Conv2d(inp, inp, 3, stride, 1, groups=inp, bias=False),
 		nn.BatchNorm2d(inp),
 		nn.ReLU(inplace=True),
-
 		# Pointwise convolution
 		nn.Conv2d(inp, oup, 1, 1, 0, bias=False),
 		nn.BatchNorm2d(oup),
 		nn.ReLU(inplace=True),
 	)
 
+
 class MobileNetV1(nn.Module):
 	def __init__(self, classes_num):
 		super(MobileNetV1, self).__init__()
 		self.features = nn.Sequential(
-			conv_bn_v1(1, 32, 2), conv_dw_v1(32, 64, 1), conv_dw_v1(64, 128, 2),
-			conv_dw_v1(128, 128, 1), conv_dw_v1(128, 256, 2), conv_dw_v1(256, 256, 1),
-			conv_dw_v1(256, 512, 2), conv_dw_v1(512, 512, 1), conv_dw_v1(512, 512, 1),
-			conv_dw_v1(512, 512, 1), conv_dw_v1(512, 512, 1), conv_dw_v1(512, 512, 1),
-			conv_dw_v1(512, 1024, 2), conv_dw_v1(1024, 1024, 1)
+			conv_bn_v1(1, 32, 2),
+			conv_dw_v1(32, 64, 1),
+			conv_dw_v1(64, 128, 2),
+			conv_dw_v1(128, 128, 1),
+			conv_dw_v1(128, 256, 2),
+			conv_dw_v1(256, 256, 1),
+			conv_dw_v1(256, 512, 2),
+			conv_dw_v1(512, 512, 1),
+			conv_dw_v1(512, 512, 1),
+			conv_dw_v1(512, 512, 1),
+			conv_dw_v1(512, 512, 1),
+			conv_dw_v1(512, 512, 1),
+			conv_dw_v1(512, 1024, 2),
+			conv_dw_v1(1024, 1024, 1),
 		)
 		self.fc = nn.Linear(1024, 1024, bias=True)
 		self.fc_audioset = nn.Linear(1024, classes_num, bias=True)
@@ -75,6 +84,7 @@ class MobileNetV1(nn.Module):
 
 		return clipwise_output, embedding
 
+
 class PannsMobileNetV1ArcFace(nn.Module):
 	def __init__(self, classes_num: int, pretrained: bool, use_arcface: bool = False):
 		super().__init__()
@@ -84,8 +94,17 @@ class PannsMobileNetV1ArcFace(nn.Module):
 
 		if pretrained:
 			print("Loading pretrained MobileNetV1 weights.")
-			state_dict = load_state_dict_from_url(PRETRAINED_URL, progress=True)['model']
-			for key in ['spectrogram_extractor.stft.conv_real.weight', 'spectrogram_extractor.stft.conv_imag.weight', 'logmel_extractor.melW', 'bn0.weight', 'bn0.bias', 'bn0.running_mean', 'bn0.running_var', 'bn0.num_batches_tracked']:
+			state_dict = load_state_dict_from_url(PRETRAINED_URL, progress=True)["model"]
+			for key in [
+				"spectrogram_extractor.stft.conv_real.weight",
+				"spectrogram_extractor.stft.conv_imag.weight",
+				"logmel_extractor.melW",
+				"bn0.weight",
+				"bn0.bias",
+				"bn0.running_mean",
+				"bn0.running_var",
+				"bn0.num_batches_tracked",
+			]:
 				state_dict.pop(key, None)
 			self.cnn.load_state_dict(state_dict)
 
@@ -98,7 +117,8 @@ class PannsMobileNetV1ArcFace(nn.Module):
 		self.cnn.fc_audioset = nn.Identity()
 
 	def forward(self, x: torch.Tensor) -> torch.Tensor:
-		if x.dim() == 3: x = x.unsqueeze(1)
+		if x.dim() == 3:
+			x = x.unsqueeze(1)
 		_, embedding = self.cnn(x)
 		return self.head(embedding)
 
@@ -110,9 +130,9 @@ class PannsMobileNetV1ArcFace(nn.Module):
 		for module in self.cnn.features:
 			if isinstance(module, nn.Sequential):
 				if len(module) == 3:
-					torch.ao.quantization.fuse_modules(module, ['0', '1', '2'], inplace=True)
+					torch.ao.quantization.fuse_modules(module, ["0", "1", "2"], inplace=True)
 				elif len(module) == 6:
-					torch.ao.quantization.fuse_modules(module, ['0', '1', '2'], inplace=True)
-					torch.ao.quantization.fuse_modules(module, ['3', '4', '5'], inplace=True)
+					torch.ao.quantization.fuse_modules(module, ["0", "1", "2"], inplace=True)
+					torch.ao.quantization.fuse_modules(module, ["3", "4", "5"], inplace=True)
 
 		print("Model fusion completed successfully.")

@@ -17,13 +17,19 @@ MODEL_CONFIGS = {
 	"efficientnet_v2_l": {"dropout": 0.4},
 }
 
+
 class EfficientNetV2ArcFace(EfficientNet):
 	def __init__(
-		self, model_name: str, pretrained: bool,
-		num_classes: int, use_arcface: bool, in_channels: int = 1,
-		trainable_blocks: int = 0, replace_silu_with_relu: bool = False
+		self,
+		model_name: str,
+		pretrained: bool,
+		num_classes: int,
+		use_arcface: bool,
+		in_channels: int = 1,
+		trainable_blocks: int = 0,
+		replace_silu_with_relu: bool = False,
 	):
-		if not model_name.startswith('efficientnet_v2'):
+		if not model_name.startswith("efficientnet_v2"):
 			raise ValueError("This class is for EfficientNetV2 models.")
 
 		if model_name not in MODEL_CONFIGS:
@@ -33,23 +39,25 @@ class EfficientNetV2ArcFace(EfficientNet):
 		dropout = MODEL_CONFIGS[model_name]["dropout"]
 		original_weights_enum = getattr(models, f"EfficientNet_V2_{model_name.split('_')[-1].title()}_Weights")
 		temp_num_classes = len(original_weights_enum.DEFAULT.meta["categories"]) if pretrained else num_classes
-		
+
 		kwargs = {}
 		if replace_silu_with_relu:
-			kwargs['activation_layer'] = nn.ReLU
+			kwargs["activation_layer"] = nn.ReLU
 
 		super().__init__(
-			inverted_residual_setting, 
-			dropout=dropout, 
-			last_channel=last_channel, 
+			inverted_residual_setting,
+			dropout=dropout,
+			last_channel=last_channel,
 			num_classes=temp_num_classes,
-			**kwargs
+			**kwargs,
 		)
 
 		if pretrained:
 			self.load_state_dict(original_weights_enum.DEFAULT.get_state_dict(progress=True))
 			if replace_silu_with_relu:
-				print("Warning: Replacing SiLU with ReLU on a pretrained model. This is not standard and may impact performance.")
+				print(
+					"Warning: Replacing SiLU with ReLU on a pretrained model. This is not standard and may impact performance."
+				)
 
 		self.use_arcface = use_arcface
 		self._modify_first_conv_layer(in_channels, pretrained)
@@ -65,7 +73,7 @@ class EfficientNetV2ArcFace(EfficientNet):
 	def _modify_first_conv_layer(self, in_channels: int, pretrained: bool):
 		first_conv = self.features[0][0]
 		original_in_channels = first_conv.in_channels
-		if in_channels == original_in_channels: 
+		if in_channels == original_in_channels:
 			return
 
 		new_first_conv = nn.Conv2d(
@@ -74,26 +82,32 @@ class EfficientNetV2ArcFace(EfficientNet):
 			kernel_size=first_conv.kernel_size,
 			stride=first_conv.stride,
 			padding=first_conv.padding,
-			bias=first_conv.bias is not None
+			bias=first_conv.bias is not None,
 		)
 
 		if pretrained:
-			print(f"Adapting pretrained weights of first conv layer from {original_in_channels} to {in_channels} channels.")
+			print(
+				f"Adapting pretrained weights of first conv layer from {original_in_channels} to {in_channels} channels."
+			)
 			original_weights = first_conv.weight.data
 			if original_in_channels == 3 and in_channels == 1:
-				new_weights = original_weights.mean(dim=1, keepdim=True) 
+				new_weights = original_weights.mean(dim=1, keepdim=True)
 			else:
-				new_weights = original_weights.sum(dim=1, keepdim=True).repeat(1, in_channels, 1, 1) / original_in_channels
+				new_weights = (
+					original_weights.sum(dim=1, keepdim=True).repeat(1, in_channels, 1, 1) / original_in_channels
+				)
 
 			new_first_conv.weight.data = new_weights
 
 		self.features[0][0] = new_first_conv
 
 	def set_trainable_layers(self, trainable_blocks: int = 0):
-		for param in self.parameters(): param.requires_grad = False
+		for param in self.parameters():
+			param.requires_grad = False
 
 		if trainable_blocks == -1:
-			for param in self.parameters(): param.requires_grad = True
+			for param in self.parameters():
+				param.requires_grad = True
 			print("Model unfrozen: All layers are now trainable.")
 			return
 
@@ -104,10 +118,11 @@ class EfficientNetV2ArcFace(EfficientNet):
 			num_feature_blocks = len(self.features)
 			trainable_blocks = min(trainable_blocks, num_feature_blocks)
 			for i in range(num_feature_blocks - trainable_blocks, num_feature_blocks):
-				for param in self.features[i].parameters(): param.requires_grad = True
+				for param in self.features[i].parameters():
+					param.requires_grad = True
 
 		if trainable_blocks > 0:
-			trainable_msg = f"The head and the last {trainable_blocks} feature blocks are trainable."  
+			trainable_msg = f"The head and the last {trainable_blocks} feature blocks are trainable."
 		else:
 			trainable_msg = "Only the head is trainable."
 
@@ -115,11 +130,15 @@ class EfficientNetV2ArcFace(EfficientNet):
 
 	def forward(self, x: torch.Tensor) -> torch.Tensor:
 		embedding = torch.flatten(self.avgpool(self.features(x)), 1)
-		
+
 		return self.head(embedding)
 
 	def _fuse_conv_bn(self, block: nn.Sequential):
-		fuse_candidates = [[str(i), str(i+1)] for i in range(len(block) - 1) if isinstance(block[i], nn.Conv2d) and isinstance(block[i+1], nn.BatchNorm2d)]
+		fuse_candidates = [
+			[str(i), str(i + 1)]
+			for i in range(len(block) - 1)
+			if isinstance(block[i], nn.Conv2d) and isinstance(block[i + 1], nn.BatchNorm2d)
+		]
 		if fuse_candidates:
 			torch.ao.quantization.fuse_modules(block, fuse_candidates, inplace=True)
 
@@ -129,6 +148,7 @@ class EfficientNetV2ArcFace(EfficientNet):
 			return
 		self._fuse_conv_bn(self.features[0])
 		for module in self.modules():
-			if isinstance(module, (MBConv, FusedMBConv)): self._fuse_conv_bn(module.block)
+			if isinstance(module, (MBConv, FusedMBConv)):
+				self._fuse_conv_bn(module.block)
 
 		print("Model fusion completed successfully.")

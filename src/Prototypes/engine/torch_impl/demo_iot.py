@@ -8,18 +8,19 @@ import tensorflow as tf
 from scipy import signal
 from omegaconf import OmegaConf
 
+
 def preprocess_with_librosa(waveform: np.ndarray, pp_data: dict) -> np.ndarray:
 	"""
 	A torch-free preprocessor for audio data that uses a dictionary of
 	pre-computed data (including filter bank).
 	"""
 	# Extract parameters from the loaded dictionary
-	sample_rate = pp_data['sample_rate']
-	target_duration_samples = int(pp_data['audio_clip_duration'] * sample_rate)
-	n_fft = pp_data['n_fft']
-	hop_length = pp_data['hop_length']
-	mel_filters = pp_data['mel_filters']
-	top_db = pp_data['top_db']
+	sample_rate = pp_data["sample_rate"]
+	target_duration_samples = int(pp_data["audio_clip_duration"] * sample_rate)
+	n_fft = pp_data["n_fft"]
+	hop_length = pp_data["hop_length"]
+	mel_filters = pp_data["mel_filters"]
+	top_db = pp_data["top_db"]
 
 	# Pad or truncate to target duration
 	current_len = waveform.shape[-1]
@@ -33,10 +34,10 @@ def preprocess_with_librosa(waveform: np.ndarray, pp_data: dict) -> np.ndarray:
 
 	# Manually pad for STFT consistency
 	padding = n_fft // 2
-	waveform = np.pad(waveform, padding, mode='reflect')
+	waveform = np.pad(waveform, padding, mode="reflect")
 
 	# Calculate STFT Power Spectrogram using librosa
-	hann_window_periodic_np = signal.get_window('hann', n_fft, fftbins=True)
+	hann_window_periodic_np = signal.get_window("hann", n_fft, fftbins=True)
 	stft_complex = librosa.stft(
 		y=waveform,
 		n_fft=n_fft,
@@ -44,18 +45,13 @@ def preprocess_with_librosa(waveform: np.ndarray, pp_data: dict) -> np.ndarray:
 		center=False,
 		window=hann_window_periodic_np,
 	)
-	stft_power = np.abs(stft_complex)**2
+	stft_power = np.abs(stft_complex) ** 2
 
 	# Apply the pre-computed torchaudio filter bank
 	mel_spectrogram = (stft_power.T @ mel_filters).T
 
 	# Convert to dB scale
-	melspec_db = librosa.power_to_db(
-		mel_spectrogram,
-		ref=1.0,
-		amin=1e-10,
-		top_db=top_db
-	)
+	melspec_db = librosa.power_to_db(mel_spectrogram, ref=1.0, amin=1e-10, top_db=top_db)
 
 	# Normalize
 	normalized_spec = (melspec_db + top_db) / top_db
@@ -113,11 +109,11 @@ def main(args):
 		sys.exit(1)
 
 	print(f"\nSearching for audio files in '{audio_dir}'...")
-	audio_extensions = ['.wav', '.mp3', '.flac', '.ogg']
+	audio_extensions = [".wav", ".mp3", ".flac", ".ogg"]
 	audio_files = []
 	for ext in audio_extensions:
-		audio_files.extend(list(audio_dir.rglob(f'*{ext}')))
-		audio_files.extend(list(audio_dir.rglob(f'*{ext.upper()}')))
+		audio_files.extend(list(audio_dir.rglob(f"*{ext}")))
+		audio_files.extend(list(audio_dir.rglob(f"*{ext.upper()}")))
 
 	audio_files = sorted(list(set(audio_files)))
 
@@ -130,11 +126,11 @@ def main(args):
 	# Process Each Audio File
 	input_details = interpreter.get_input_details()[0]
 	output_details = interpreter.get_output_details()[0]
-	clip_duration = pp_data['audio_clip_duration']
-	target_sr = pp_data['sample_rate']
+	clip_duration = pp_data["audio_clip_duration"]
+	target_sr = pp_data["sample_rate"]
 
 	# Get target width from the model's input details.
-	target_width = input_details['shape'][2]  # Shape is (N,H,W,C)
+	target_width = input_details["shape"][2]  # Shape is (N,H,W,C)
 	print(f"\n[i] Model expects input width: {target_width}. Spectrograms will be resized if necessary.")
 
 	try:
@@ -167,11 +163,11 @@ def main(args):
 					else:  # current_width < target_width
 						pad_width = target_width - current_width
 						paddings = ((0, 0), (0, 0), (0, pad_width), (0, 0))
-						spectrogram = np.pad(spectrogram, paddings, mode='constant', constant_values=0)
+						spectrogram = np.pad(spectrogram, paddings, mode="constant", constant_values=0)
 
-				interpreter.set_tensor(input_details['index'], spectrogram)
+				interpreter.set_tensor(input_details["index"], spectrogram)
 				interpreter.invoke()
-				logits = interpreter.get_tensor(output_details['index'])
+				logits = interpreter.get_tensor(output_details["index"])
 
 				probabilities = tf.nn.softmax(logits[0]).numpy()
 				top_prob = np.max(probabilities)
@@ -194,26 +190,16 @@ def main(args):
 
 
 if __name__ == "__main__":
-	parser = argparse.ArgumentParser(
-		description="Run inference on a directory of audio files using a TFLite model."
-	)
+	parser = argparse.ArgumentParser(description="Run inference on a directory of audio files using a TFLite model.")
 	parser.add_argument(
 		"--model_dir",
 		type=str,
 		required=True,
-		help="Path to the trained model directory containing artifacts (TFLite, preprocess.npy, etc.)."
+		help="Path to the trained model directory containing artifacts (TFLite, preprocess.npy, etc.).",
 	)
+	parser.add_argument("--audio_dir", type=str, required=True, help="Path to the directory of audio files to process.")
 	parser.add_argument(
-		"--audio_dir",
-		type=str,
-		required=True,
-		help="Path to the directory of audio files to process."
-	)
-	parser.add_argument(
-		"--threshold",
-		type=float,
-		default=0.01,
-		help="Confidence threshold for predictions (from 0.0 to 1.0)."
+		"--threshold", type=float, default=0.01, help="Confidence threshold for predictions (from 0.0 to 1.0)."
 	)
 	args = parser.parse_args()
 	main(args)

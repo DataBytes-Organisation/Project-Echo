@@ -9,29 +9,46 @@ from model.utils import CosineLinear
 # Pretrained weights for Cnn14, trained on AudioSet with 32kHz audio.
 PRETRAINED_URL = "https://zenodo.org/record/3987831/files/Cnn14_32k_mAP%3D0.431.pth"
 
+
 def init_layer(layer):
 	"""Initialize a Linear or Convolutional layer."""
 	nn.init.xavier_uniform_(layer.weight)
-	if hasattr(layer, 'bias') and layer.bias is not None:
-		layer.bias.data.fill_(0.)
+	if hasattr(layer, "bias") and layer.bias is not None:
+		layer.bias.data.fill_(0.0)
+
 
 def init_bn(bn):
 	"""Initialize a Batchnorm layer."""
-	bn.bias.data.fill_(0.)
-	bn.weight.data.fill_(1.)
+	bn.bias.data.fill_(0.0)
+	bn.weight.data.fill_(1.0)
+
 
 class ConvBlock(nn.Module):
 	def __init__(self, in_channels, out_channels):
 		super(ConvBlock, self).__init__()
 		self.seq1 = nn.Sequential(
-			nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False),
+			nn.Conv2d(
+				in_channels=in_channels,
+				out_channels=out_channels,
+				kernel_size=(3, 3),
+				stride=(1, 1),
+				padding=(1, 1),
+				bias=False,
+			),
 			nn.BatchNorm2d(out_channels),
-			nn.ReLU()
+			nn.ReLU(),
 		)
 		self.seq2 = nn.Sequential(
-			nn.Conv2d(in_channels=out_channels, out_channels=out_channels, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False),
+			nn.Conv2d(
+				in_channels=out_channels,
+				out_channels=out_channels,
+				kernel_size=(3, 3),
+				stride=(1, 1),
+				padding=(1, 1),
+				bias=False,
+			),
 			nn.BatchNorm2d(out_channels),
-			nn.ReLU()
+			nn.ReLU(),
 		)
 
 		init_layer(self.seq1[0])
@@ -39,14 +56,15 @@ class ConvBlock(nn.Module):
 		init_bn(self.seq1[1])
 		init_bn(self.seq2[1])
 
-	def forward(self, x, pool_size=(2, 2), pool_type='avg'):
+	def forward(self, x, pool_size=(2, 2), pool_type="avg"):
 		x = self.seq1(x)
 		x = self.seq2(x)
-		if pool_type == 'max':
+		if pool_type == "max":
 			x = F.max_pool2d(x, kernel_size=pool_size)
-		elif pool_type == 'avg':
+		elif pool_type == "avg":
 			x = F.avg_pool2d(x, kernel_size=pool_size)
 		return x
+
 
 class Cnn14(nn.Module):
 	def __init__(self, classes_num):
@@ -65,12 +83,12 @@ class Cnn14(nn.Module):
 		init_layer(self.fc_audioset)
 
 	def forward(self, x):
-		x = self.conv_block1(x, pool_size=(2, 2), pool_type='avg')
-		x = self.conv_block2(x, pool_size=(2, 2), pool_type='avg')
-		x = self.conv_block3(x, pool_size=(2, 2), pool_type='avg')
-		x = self.conv_block4(x, pool_size=(2, 2), pool_type='avg')
-		x = self.conv_block5(x, pool_size=(2, 2), pool_type='avg')
-		x = self.conv_block6(x, pool_size=(1, 1), pool_type='avg')
+		x = self.conv_block1(x, pool_size=(2, 2), pool_type="avg")
+		x = self.conv_block2(x, pool_size=(2, 2), pool_type="avg")
+		x = self.conv_block3(x, pool_size=(2, 2), pool_type="avg")
+		x = self.conv_block4(x, pool_size=(2, 2), pool_type="avg")
+		x = self.conv_block5(x, pool_size=(2, 2), pool_type="avg")
+		x = self.conv_block6(x, pool_size=(1, 1), pool_type="avg")
 
 		x = torch.mean(x, dim=3)
 		(x1, _) = torch.max(x, dim=2)
@@ -82,6 +100,7 @@ class Cnn14(nn.Module):
 
 		return self.fc_audioset(embedding), embedding
 
+
 class PannsCNN14ArcFace(nn.Module):
 	def __init__(self, classes_num: int, pretrained: bool, use_arcface: bool = False):
 		super().__init__()
@@ -91,15 +110,15 @@ class PannsCNN14ArcFace(nn.Module):
 
 		if pretrained:
 			print("Loading pretrained Cnn14 weights.")
-			state_dict = load_state_dict_from_url(PRETRAINED_URL, progress=True)['model']
+			state_dict = load_state_dict_from_url(PRETRAINED_URL, progress=True)["model"]
 			new_state_dict = {}
 			for k, v in state_dict.items():
 				new_k = k
-				if 'conv_block' in k:
-					new_k = re.sub(r'\.conv1\.', '.seq1.0.', new_k)
-					new_k = re.sub(r'\.bn1\.',	 '.seq1.1.', new_k)
-					new_k = re.sub(r'\.conv2\.', '.seq2.0.', new_k)
-					new_k = re.sub(r'\.bn2\.',	 '.seq2.1.', new_k)
+				if "conv_block" in k:
+					new_k = re.sub(r"\.conv1\.", ".seq1.0.", new_k)
+					new_k = re.sub(r"\.bn1\.", ".seq1.1.", new_k)
+					new_k = re.sub(r"\.conv2\.", ".seq2.0.", new_k)
+					new_k = re.sub(r"\.bn2\.", ".seq2.1.", new_k)
 				new_state_dict[new_k] = v
 			self.cnn.load_state_dict(new_state_dict, strict=False)
 
@@ -123,7 +142,7 @@ class PannsCNN14ArcFace(nn.Module):
 
 		for module in self.modules():
 			if isinstance(module, ConvBlock):
-				torch.ao.quantization.fuse_modules(module.seq1, ['0', '1', '2'], inplace=True)
-				torch.ao.quantization.fuse_modules(module.seq2, ['0', '1', '2'], inplace=True)
+				torch.ao.quantization.fuse_modules(module.seq1, ["0", "1", "2"], inplace=True)
+				torch.ao.quantization.fuse_modules(module.seq2, ["0", "1", "2"], inplace=True)
 
 		print("Model fusion completed successfully.")

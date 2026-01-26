@@ -15,11 +15,13 @@ from model.quant import prepare_qat_fx, prepare_post_static_quantize_fx, convert
 
 from enum import Enum
 
+
 class RMSNorm2d(nn.Module):
 	"""
 	Standard RMSNorm (no mean subtraction) adapted for 4D CNN input (B, C, H, W).
 	Normalizes across (C, H, W) dimensions for each sample.
 	"""
+
 	def __init__(self, channels: int, eps: float = 1e-6, add_unit_offset: bool = True):
 		super().__init__()
 		self.eps = eps
@@ -144,7 +146,7 @@ class Model(nn.Module):
 					# Replace the module in the parent container
 					setattr(module, name, new_norm)
 				else:
-					replace_module(child) # Recursively apply to children
+					replace_module(child)  # Recursively apply to children
 
 		replace_module(self.model)
 

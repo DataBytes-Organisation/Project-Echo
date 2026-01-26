@@ -24,11 +24,17 @@ import json
 import onnxsim
 import shutil
 
+from torch.nn.modules.conv import Conv2d
+from typing import Optional
+import types
+
+
 class TorchscriptModelWrapper(nn.Module):
 	"""
 	A TorchScript-compatible wrapper for the classifier model that includes
 	thresholding logic directly in its forward pass.
 	"""
+
 	def __init__(self, model: nn.Module):
 		super().__init__()
 		self.model = model
@@ -53,6 +59,7 @@ class Preprocessor(nn.Module):
 	"""
 	A TorchScript-compatible preprocessor for audio data.
 	"""
+
 	def __init__(self, cfg: OmegaConf):
 		super().__init__()
 		data_cfg = cfg.data
@@ -69,15 +76,13 @@ class Preprocessor(nn.Module):
 		)
 
 		self.top_db = float(data_cfg.top_db)
-		self.amplitude_to_db = torchaudio.transforms.AmplitudeToDB(
-			stype='power', top_db=self.top_db
-		)
+		self.amplitude_to_db = torchaudio.transforms.AmplitudeToDB(stype="power", top_db=self.top_db)
 
 	def _pad_or_truncate(self, waveform: torch.Tensor) -> torch.Tensor:
 		current_len = waveform.shape[-1]
 
 		if current_len > self.target_duration_samples:
-			return waveform[..., :self.target_duration_samples]
+			return waveform[..., : self.target_duration_samples]
 		elif current_len < self.target_duration_samples:
 			pad_amount = self.target_duration_samples - current_len
 			return F.pad(waveform, (0, pad_amount))
@@ -114,7 +119,7 @@ def simplify_onnx_model(input_path: Path, output_path: Path):
 		if result.returncode != 0:
 			print(f"  Warning: onnxsim failed/crashed (Return Code: {result.returncode}).")
 			if result.returncode == -11 or result.returncode == 139:
-				 print("  Error type: Segmentation Fault (Core Dumped) in onnxsim.")
+				print("  Error type: Segmentation Fault (Core Dumped) in onnxsim.")
 
 			print(f"  onnxsim stderr: {result.stderr}")
 			print("  Skipping simplification and using original ONNX model.")
@@ -139,17 +144,17 @@ def fix_onnx_model(input_path: Path, output_path: Path):
 
 	# Define sensitive inputs: {OpType: [index_of_input_that_must_be_int32]}
 	target_ops = {
-		'Expand': [1],
-		'Reshape': [1],
-		'Tile': [1],
-		'ReduceL2': [1],
-		'ReduceMean': [1],
-		'ReduceSum': [1],
-		'ReduceMax': [1],
-		'ReduceMin': [1],
-		'OneHot': [1],
-		'Gather': [1],
-		'Slice': [1, 2, 3, 4]
+		"Expand": [1],
+		"Reshape": [1],
+		"Tile": [1],
+		"ReduceL2": [1],
+		"ReduceMean": [1],
+		"ReduceSum": [1],
+		"ReduceMax": [1],
+		"ReduceMin": [1],
+		"OneHot": [1],
+		"Gather": [1],
+		"Slice": [1, 2, 3, 4],
 	}
 
 	# Find all tensor names connected to these sensitive inputs
@@ -172,10 +177,7 @@ def fix_onnx_model(input_path: Path, output_path: Path):
 			data = onnx.numpy_helper.to_array(initializer)
 			new_data = data.astype(np.int32)
 			new_initializer = onnx.helper.make_tensor(
-				name=initializer.name,
-				data_type=onnx.TensorProto.INT32,
-				dims=new_data.shape,
-				vals=new_data.flatten()
+				name=initializer.name, data_type=onnx.TensorProto.INT32, dims=new_data.shape, vals=new_data.flatten()
 			)
 			new_initializers.append(new_initializer)
 		else:
@@ -184,8 +186,8 @@ def fix_onnx_model(input_path: Path, output_path: Path):
 	# Fix Constant Nodes (Embedded Constants in the graph flow)
 	new_nodes = []
 	for node in graph.node:
-		if node.op_type == 'Constant' and node.output[0] in sensitive_tensor_names:
-			attr = next((a for a in node.attribute if a.name == 'value'), None)
+		if node.op_type == "Constant" and node.output[0] in sensitive_tensor_names:
+			attr = next((a for a in node.attribute if a.name == "value"), None)
 			if attr and attr.t.data_type == onnx.TensorProto.INT64:
 				made_changes = True
 				tensor = attr.t
@@ -195,14 +197,10 @@ def fix_onnx_model(input_path: Path, output_path: Path):
 					name=f"{node.name}_fixed",
 					data_type=onnx.TensorProto.INT32,
 					dims=new_data.shape,
-					vals=new_data.flatten()
+					vals=new_data.flatten(),
 				)
 				new_node = onnx.helper.make_node(
-					'Constant',
-					inputs=[],
-					outputs=node.output,
-					name=node.name,
-					value=new_tensor
+					"Constant", inputs=[], outputs=node.output, name=node.name, value=new_tensor
 				)
 				new_nodes.append(new_node)
 				continue
@@ -211,16 +209,67 @@ def fix_onnx_model(input_path: Path, output_path: Path):
 
 	# Save the fixed model
 	if made_changes:
-		new_graph = onnx.helper.make_graph(
-			new_nodes, graph.name, graph.input, graph.output, new_initializers
-		)
+		new_graph = onnx.helper.make_graph(new_nodes, graph.name, graph.input, graph.output, new_initializers)
 		new_model = onnx.helper.make_model(new_graph, opset_imports=model.opset_import)
 		onnx.save(new_model, str(output_path))
 		print(f"  Fixed model saved to: {output_path}")
 	else:
 		print("  No problematic int64 tensors found. Copying input to output.")
 		import shutil
+
 		shutil.copy(str(input_path), str(output_path))
+
+
+def patch_conv2d_instances_for_jit(module: nn.Module):
+	"""
+	Recursively traverses a module and patches all Conv2d instances
+	with a JIT-friendly _conv_forward method.
+	"""
+
+	def _patched_conv_forward(
+		self, input: torch.Tensor, weight: torch.Tensor, bias: Optional[torch.Tensor]
+	) -> torch.Tensor:
+		if self.padding_mode != "zeros":
+			if self.padding_mode == "reflect":
+				return F.conv2d(
+					F.pad(input, self._reversed_padding_repeated_twice, mode="reflect"),
+					weight,
+					bias,
+					self.stride,
+					(0, 0),
+					self.dilation,
+					self.groups,
+				)
+			elif self.padding_mode == "replicate":
+				return F.conv2d(
+					F.pad(input, self._reversed_padding_repeated_twice, mode="replicate"),
+					weight,
+					bias,
+					self.stride,
+					(0, 0),
+					self.dilation,
+					self.groups,
+				)
+			elif self.padding_mode == "circular":
+				return F.conv2d(
+					F.pad(input, self._reversed_padding_repeated_twice, mode="circular"),
+					weight,
+					bias,
+					self.stride,
+					(0, 0),
+					self.dilation,
+					self.groups,
+				)
+			else:
+				raise ValueError(f"Unsupported padding mode: {self.padding_mode}")
+		return F.conv2d(input, weight, bias, self.stride, self.padding, self.dilation, self.groups)
+
+	for child_module in module.children():
+		if isinstance(child_module, Conv2d):
+			# Bind the patched method to the instance
+			child_module._conv_forward = types.MethodType(_patched_conv_forward, child_module)
+		else:
+			patch_conv2d_instances_for_jit(child_module)
 
 
 def main(args):
@@ -263,14 +312,14 @@ def main(args):
 			sys.exit(1)
 
 		print(f"  Loading model weights from '{model_path}'")
-		checkpoint = torch.load(model_path, map_location='cpu')
+		checkpoint = torch.load(model_path, map_location="cpu")
 
-		if 'model_state_dict' in checkpoint:
-			model.load_state_dict(checkpoint['model_state_dict'])
+		if "model_state_dict" in checkpoint:
+			model.load_state_dict(checkpoint["model_state_dict"])
 		else:
 			model.load_state_dict(checkpoint)
 
-		if cfg.run.get('quantise', False):
+		if cfg.run.get("quantise", False):
 			print("  Model was trained with QAT, converting to final quantized model...")
 			model.quantise()
 
@@ -282,6 +331,9 @@ def main(args):
 
 	print("\n--- Step 2: Creating and scripting the classifier model wrapper ---")
 	try:
+		# Apply the patch to the model instances before scripting
+		patch_conv2d_instances_for_jit(model)
+
 		wrapper = TorchscriptModelWrapper(model)
 		wrapper.eval()
 		scripted_wrapper = torch.jit.script(wrapper)
@@ -311,8 +363,8 @@ def main(args):
 			export_params=True,
 			opset_version=18,
 			do_constant_folding=True,
-			input_names=['input'],
-			output_names=['output'],
+			input_names=["input"],
+			output_names=["output"],
 			dynamo=False,
 		)
 		print("  ONNX model saved successfully.")
@@ -323,7 +375,7 @@ def main(args):
 	# --- Simplify ONNX ---
 	# This is crucial for fixing 'Expand' and constant folding issues
 	print("\n--- Step 3.5: Simplifying ONNX model (Folding constants) ---")
-	simplified_onnx_path = onnx_path.with_suffix('.simplified.onnx')
+	simplified_onnx_path = onnx_path.with_suffix(".simplified.onnx")
 	try:
 		simplify_onnx_model(onnx_path, simplified_onnx_path)
 	except Exception as e:
@@ -332,7 +384,7 @@ def main(args):
 
 	# Fix INT64 inputs on the SIMPLIFIED model ---
 	print("\n--- Step 3.6: Fixing INT64 inputs for TFLite compatibility ---")
-	fixed_onnx_path = onnx_path.with_suffix('.fixed.onnx')
+	fixed_onnx_path = onnx_path.with_suffix(".fixed.onnx")
 	try:
 		fix_onnx_model(simplified_onnx_path, fixed_onnx_path)
 	except Exception as e:
@@ -349,11 +401,14 @@ def main(args):
 
 		command = [
 			"onnx2tf",
-			"-i", str(fixed_onnx_path),
-			"-o", str(tf_saved_model_path),
+			"-i",
+			str(fixed_onnx_path),
+			"-o",
+			str(tf_saved_model_path),
 			"--non_verbose",
 			"-eatfp16",  # Enable experimental FP16 support
-			"-b", "1",   # Force batch size 1
+			"-b",
+			"1",  # Force batch size 1
 		]
 
 		subprocess.run(command, check=True, capture_output=True)
@@ -362,18 +417,16 @@ def main(args):
 		print(f"  [2/3] Converting TensorFlow SavedModel to TFLite at '{tflite_path}'...")
 		converter = tf.lite.TFLiteConverter.from_saved_model(str(tf_saved_model_path))
 		converter.optimizations = [tf.lite.Optimize.DEFAULT]
-		converter.target_spec.supported_ops = [
-			tf.lite.OpsSet.TFLITE_BUILTINS,
-			tf.lite.OpsSet.SELECT_TF_OPS
-		]
+		converter.target_spec.supported_ops = [tf.lite.OpsSet.TFLITE_BUILTINS, tf.lite.OpsSet.SELECT_TF_OPS]
 		tflite_model = converter.convert()
 
-		with open(tflite_path, 'wb') as f:
+		with open(tflite_path, "wb") as f:
 			f.write(tflite_model)
 		print("  [3/3] TFLite model saved successfully.")
 
 		# Cleanup
 		import shutil
+
 		if tf_saved_model_path.exists():
 			print(f"  Cleaning up temporary directory '{tf_saved_model_path}'...")
 			shutil.rmtree(str(tf_saved_model_path))
@@ -399,12 +452,12 @@ def main(args):
 		filter_bank = mel_spectrogram_transform.mel_scale.fb.numpy()
 
 		preprocess_data = {
-			'sample_rate': cfg.data.sample_rate,
-			'n_fft': cfg.data.n_fft,
-			'hop_length': cfg.data.hop_length,
-			'top_db': cfg.data.top_db,
-			'audio_clip_duration': cfg.data.audio_clip_duration,
-			'mel_filters': filter_bank,
+			"sample_rate": cfg.data.sample_rate,
+			"n_fft": cfg.data.n_fft,
+			"hop_length": cfg.data.hop_length,
+			"top_db": cfg.data.top_db,
+			"audio_clip_duration": cfg.data.audio_clip_duration,
+			"mel_filters": filter_bank,
 		}
 
 		np.save(preprocess_path, preprocess_data)
@@ -413,7 +466,6 @@ def main(args):
 	except Exception as e:
 		print(f"\n  Error generating preprocessing data: {e}")
 		sys.exit(1)
-
 
 	print("\n" + "=" * 60)
 	print("Generated Artifacts Summary")
@@ -428,17 +480,9 @@ def main(args):
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(
 		description="Generate all deployment artifacts (TorchScript, ONNX, TFLite).",
-		formatter_class=argparse.RawTextHelpFormatter
+		formatter_class=argparse.RawTextHelpFormatter,
 	)
-	parser.add_argument(
-		"model_dir",
-		type=str,
-		help="Path to the directory of the trained model."
-	)
-	parser.add_argument(
-		'--torchscript-only',
-		action='store_true',
-		help='Only generate the TorchScript model and exit.'
-	)
+	parser.add_argument("model_dir", type=str, help="Path to the directory of the trained model.")
+	parser.add_argument("--torchscript-only", action="store_true", help="Only generate the TorchScript model and exit.")
 	args = parser.parse_args()
 	main(args)
