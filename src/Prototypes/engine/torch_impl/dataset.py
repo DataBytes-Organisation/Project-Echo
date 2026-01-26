@@ -24,23 +24,27 @@ warnings.filterwarnings("ignore", message=".*StreamingMediaDecoder.*")
 warnings.filterwarnings("ignore", module="torchaudio._backend.ffmpeg")
 warnings.filterwarnings("ignore", message=".*AudioMetaData has been deprecated.*")
 
-def index_directory(directory, file_types=('.ogg', '.mp3', '.wav', '.flac')):
+
+def index_directory(directory, file_types=(".ogg", ".mp3", ".wav", ".flac")):
 	audio_files = []
 	labels = []
-	class_names = sorted([d.name for d in Path(directory).glob('*') if d.is_dir()])
+	class_names = sorted([d.name for d in Path(directory).glob("*") if d.is_dir()])
 	class_to_idx = {name: i for i, name in enumerate(class_names)}
 
 	for class_name in class_names:
 		class_dir = Path(directory) / class_name
-		for file_path in class_dir.glob('**/*'):
+		for file_path in class_dir.glob("**/*"):
 			if file_path.suffix.lower() in file_types:
 				audio_files.append(str(file_path))
 				labels.append(class_to_idx[class_name])
 
 	return audio_files, labels, class_names
 
+
 class SpectrogramDataset(Dataset):
-	def __init__(self, audio_files, labels, cfg, audio_transforms=None, image_transforms=None, is_train=False, target_width=None):
+	def __init__(
+		self, audio_files, labels, cfg, audio_transforms=None, image_transforms=None, is_train=False, target_width=None
+	):
 		super().__init__()
 		self.audio_files = audio_files
 		self.labels = labels
@@ -48,7 +52,7 @@ class SpectrogramDataset(Dataset):
 		self.audio_transforms = audio_transforms
 		self.image_transforms = image_transforms
 		self.force_width = target_width
-		
+
 		self.clip_samples = int(cfg.data.audio_clip_duration * cfg.data.sample_rate)
 
 		self.target_sample_rate = cfg.data.sample_rate
@@ -57,8 +61,7 @@ class SpectrogramDataset(Dataset):
 
 		self.common_source_sr = 44100
 		self.cached_resampler = torchaudio.transforms.Resample(
-			orig_freq=self.common_source_sr, 
-			new_freq=self.target_sample_rate
+			orig_freq=self.common_source_sr, new_freq=self.target_sample_rate
 		)
 
 		self.mel_spec = torchaudio.transforms.MelSpectrogram(
@@ -68,34 +71,34 @@ class SpectrogramDataset(Dataset):
 			n_mels=cfg.data.n_mels,
 			f_min=cfg.data.fmin,
 			f_max=cfg.data.fmax,
-			power=2.0
+			power=2.0,
 		)
 		self.amplitude_to_db = torchaudio.transforms.AmplitudeToDB(top_db=cfg.data.top_db)
 		self.top_db = cfg.data.top_db
 
-		self.use_cache = cfg.system.get('use_disk_cache', False)
-		self.env = None # Lazy init for multi-processing safety
+		self.use_cache = cfg.system.get("use_disk_cache", False)
+		self.env = None  # Lazy init for multi-processing safety
 		if self.use_cache:
 			self.cache_path = Path(cfg.system.cache_directory)
 			self.cache_path.mkdir(parents=True, exist_ok=True)
-			
+
 			# Map size: 1TB (Virtual memory, doesn't allocate physical RAM)
-			self.map_size = 1099511627776 
+			self.map_size = 1099511627776
 
 	def _get_cache_key(self, file_path):
 		"""Generate a unique key for the cache based on file path and sample rate."""
 		key_str = f"{file_path}_{self.target_sample_rate}"
-		return key_str.encode('utf-8')
+		return key_str.encode("utf-8")
 
 	def _init_db(self):
 		"""Initialize LMDB environment inside the worker process."""
 		self.env = lmdb.open(
-			str(self.cache_path), 
-			map_size=self.map_size, 
-			subdir=True, 
-			lock=True, # Needed for concurrent writes
-			readahead=False, 
-			meminit=False
+			str(self.cache_path),
+			map_size=self.map_size,
+			subdir=True,
+			lock=True,  # Needed for concurrent writes
+			readahead=False,
+			meminit=False,
 		)
 
 	def __len__(self):
@@ -106,10 +109,10 @@ class SpectrogramDataset(Dataset):
 
 		# Apply Audio Augmentations
 		if self.audio_transforms:
-			waveform_input = waveform.unsqueeze(0) # (1, 1, Time)
+			waveform_input = waveform.unsqueeze(0)  # (1, 1, Time)
 			try:
 				augmented = self.audio_transforms(waveform_input, sample_rate=self.target_sample_rate)
-				waveform = augmented.squeeze(0) # (1, Time)
+				waveform = augmented.squeeze(0)  # (1, Time)
 			except Exception as e:
 				print(f"Augmentation error on {file_path_for_debug}: {e}")
 
@@ -124,11 +127,11 @@ class SpectrogramDataset(Dataset):
 		if self.force_width is not None:
 			current_width = spec.shape[-1]
 			if current_width > self.force_width:
-				spec = spec[..., :self.force_width]
+				spec = spec[..., : self.force_width]
 			elif current_width < self.force_width:
 				padding = self.force_width - current_width
 				# Pad on the right
-				spec = F.pad(spec, (0, padding), 'constant', 0)
+				spec = F.pad(spec, (0, padding), "constant", 0)
 
 		# Apply Image Augmentations
 		if self.image_transforms:
@@ -169,12 +172,14 @@ class SpectrogramDataset(Dataset):
 					if sr == self.common_source_sr:
 						waveform = self.cached_resampler(waveform)
 					else:
-						waveform = torchaudio.functional.resample(waveform, orig_freq=sr, new_freq=self.target_sample_rate)
+						waveform = torchaudio.functional.resample(
+							waveform, orig_freq=sr, new_freq=self.target_sample_rate
+						)
 
 				# Mix to Mono (Average channels)
 				if waveform.shape[0] > 1:
 					waveform = torch.mean(waveform, dim=0, keepdim=True)
-				
+
 				# Write to Cache (Decoded, Resampled, Mono)
 				if self.use_cache:
 					try:
@@ -214,13 +219,13 @@ class SpectrogramDataset(Dataset):
 			if num_samples > self.target_samples:
 				start = random.randint(0, num_samples - self.target_samples)
 				waveform = waveform[:, start : start + self.target_samples]
-			
+
 			spec = self._process_waveform_to_spec(waveform, file_path)
 			return spec, torch.tensor(label).long()
 
 		else:
 			chunks = []
-			
+
 			# Case A: Exact match (after duplication logic)
 			if num_samples == self.target_samples:
 				chunks.append(waveform)
@@ -233,7 +238,7 @@ class SpectrogramDataset(Dataset):
 					if end <= num_samples:
 						chunks.append(waveform[:, start:end])
 					else:
-						chunks.append(waveform[:, -self.target_samples:])
+						chunks.append(waveform[:, -self.target_samples :])
 
 			# Process all chunks into spectrograms
 			specs = []
@@ -244,11 +249,12 @@ class SpectrogramDataset(Dataset):
 
 			# Stack them: (Num_Chunks, C, F, T)
 			stacked_specs = torch.stack(specs)
-			
+
 			# Duplicate labels: (Num_Chunks)
 			stacked_labels = torch.tensor([label] * len(specs)).long()
 
 			return stacked_specs, stacked_labels
+
 
 def validation_collate_fn(batch):
 	"""
@@ -257,12 +263,12 @@ def validation_collate_fn(batch):
 	"""
 	specs_list = [item[0] for item in batch]
 	labels_list = [item[1] for item in batch]
-	
+
 	# Concatenate along the batch dimension (dim 0)
 	# specs_list[i] shape is (Ni, C, F, T) -> Result: (Sum(Ni), C, F, T)
 	flattened_specs = torch.cat(specs_list, dim=0)
-	
+
 	# labels_list[i] shape is (Ni) -> Result: (Sum(Ni))
 	flattened_labels = torch.cat(labels_list, dim=0)
-	
+
 	return flattened_specs, flattened_labels

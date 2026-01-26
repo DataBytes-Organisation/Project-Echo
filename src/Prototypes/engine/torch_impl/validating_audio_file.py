@@ -23,20 +23,21 @@ ASSETS = {
 	"pp_data": None,
 	"input_details": None,
 	"output_details": None,
-	"error": None
+	"error": None,
 }
+
 
 def preprocess_with_librosa(waveform: np.ndarray, pp_data: dict) -> np.ndarray:
 	"""
 	A torch-free preprocessor for audio data that uses a dictionary of
 	pre-computed data (including filter bank).
 	"""
-	sample_rate = pp_data['sample_rate']
-	target_duration_samples = int(pp_data['audio_clip_duration'] * sample_rate)
-	n_fft = pp_data['n_fft']
-	hop_length = pp_data['hop_length']
-	mel_filters = pp_data['mel_filters']
-	top_db = pp_data['top_db']
+	sample_rate = pp_data["sample_rate"]
+	target_duration_samples = int(pp_data["audio_clip_duration"] * sample_rate)
+	n_fft = pp_data["n_fft"]
+	hop_length = pp_data["hop_length"]
+	mel_filters = pp_data["mel_filters"]
+	top_db = pp_data["top_db"]
 
 	current_len = waveform.shape[-1]
 	if current_len > target_duration_samples:
@@ -48,9 +49,9 @@ def preprocess_with_librosa(waveform: np.ndarray, pp_data: dict) -> np.ndarray:
 		waveform = waveform[..., :target_duration_samples]
 
 	padding = n_fft // 2
-	waveform = np.pad(waveform, padding, mode='reflect')
+	waveform = np.pad(waveform, padding, mode="reflect")
 
-	hann_window_periodic_np = signal.get_window('hann', n_fft, fftbins=True)
+	hann_window_periodic_np = signal.get_window("hann", n_fft, fftbins=True)
 	stft_complex = librosa.stft(
 		y=waveform,
 		n_fft=n_fft,
@@ -58,20 +59,17 @@ def preprocess_with_librosa(waveform: np.ndarray, pp_data: dict) -> np.ndarray:
 		center=False,
 		window=hann_window_periodic_np,
 	)
-	stft_power = np.abs(stft_complex)**2
+	stft_power = np.abs(stft_complex) ** 2
 	mel_spectrogram = (stft_power.T @ mel_filters).T
 
-	melspec_db = librosa.power_to_db(
-		mel_spectrogram,
-		ref=1.0,
-		amin=1e-10,
-		top_db=top_db
-	)
+	melspec_db = librosa.power_to_db(mel_spectrogram, ref=1.0, amin=1e-10, top_db=top_db)
 
 	normalized_spec = (melspec_db + top_db) / top_db
 	return normalized_spec
 
+
 # --- Backend Functions ---
+
 
 def handle_audio_upload(audio_input):
 	if audio_input is None:
@@ -82,7 +80,7 @@ def handle_audio_upload(audio_input):
 
 	sr, audio_data = audio_input
 
-	target_sr = pp_data['sample_rate']
+	target_sr = pp_data["sample_rate"]
 	if sr != target_sr:
 		gr.Info(f"Resampling audio from {sr}Hz to {target_sr}Hz using librosa...")
 		audio_data = librosa.resample(y=audio_data.astype(np.float32), orig_sr=sr, target_sr=target_sr)
@@ -91,7 +89,14 @@ def handle_audio_upload(audio_input):
 		audio_data = audio_data.mean(axis=1)
 
 	# Return None for the plot output to clear it on new upload
-	return audio_data.astype(np.float32), 0, gr.update(visible=True, value="Start Processing"), "Ready to process audio.", None
+	return (
+		audio_data.astype(np.float32),
+		0,
+		gr.update(visible=True, value="Start Processing"),
+		"Ready to process audio.",
+		None,
+	)
+
 
 def process_single_chunk(model_type, full_audio, offset, threshold):
 	if model_type == "PyTorch":
@@ -105,8 +110,8 @@ def process_single_chunk(model_type, full_audio, offset, threshold):
 	target_width = ASSETS["target_width"]
 	pp_data = ASSETS["pp_data"]
 
-	clip_duration_s = pp_data['audio_clip_duration']
-	sample_rate = pp_data['sample_rate']
+	clip_duration_s = pp_data["audio_clip_duration"]
+	sample_rate = pp_data["sample_rate"]
 	clip_duration_samples = int(clip_duration_s * sample_rate)
 
 	start_sample = int(offset)
@@ -123,7 +128,7 @@ def process_single_chunk(model_type, full_audio, offset, threshold):
 				spectrogram = spectrogram[:, :target_width]
 			else:
 				pad_width = target_width - current_width
-				spectrogram = np.pad(spectrogram, ((0, 0), (0, pad_width)), mode='constant', constant_values=0)
+				spectrogram = np.pad(spectrogram, ((0, 0), (0, pad_width)), mode="constant", constant_values=0)
 
 	logits = None
 	if model_type == "TFLite":
@@ -132,9 +137,9 @@ def process_single_chunk(model_type, full_audio, offset, threshold):
 		output_details = ASSETS["output_details"]
 		# NHWC format for TFLite
 		spectrogram_np = spectrogram[np.newaxis, ..., np.newaxis]
-		tflite_interpreter.set_tensor(input_details['index'], spectrogram_np)
+		tflite_interpreter.set_tensor(input_details["index"], spectrogram_np)
 		tflite_interpreter.invoke()
-		logits = tflite_interpreter.get_tensor(output_details['index'])
+		logits = tflite_interpreter.get_tensor(output_details["index"])
 
 	elif model_type == "PyTorch":
 		pytorch_model = ASSETS["pytorch_model"]
@@ -168,24 +173,37 @@ def process_single_chunk(model_type, full_audio, offset, threshold):
 	top_10_indices = np.argsort(probabilities)[::-1][:10]
 	top_10_probs = probabilities[top_10_indices]
 
-	plot_data = pd.DataFrame({
-		"Class": [(class_names[i] if class_names and i < len(class_names) else f"Class {i}") for i in top_10_indices],
-		"Probability": top_10_probs.tolist()
-	})
+	plot_data = pd.DataFrame(
+		{
+			"Class": [
+				(class_names[i] if class_names and i < len(class_names) else f"Class {i}") for i in top_10_indices
+			],
+			"Probability": top_10_probs.tolist(),
+		}
+	)
 
 	new_offset = start_sample + clip_duration_samples
 	continue_visible = new_offset < len(full_audio)
 	if not continue_visible:
 		output_text += "\n\nProcessing complete."
 
-	return full_audio, new_offset, output_text, plot_data, gr.update(visible=continue_visible, value="Process Next Chunk")
+	return (
+		full_audio,
+		new_offset,
+		output_text,
+		plot_data,
+		gr.update(visible=continue_visible, value="Process Next Chunk"),
+	)
+
 
 # --- Gradio UI ---
 
 with gr.Blocks() as demo:
 	gr.Markdown("# Audio File Validator")
 
-	parser = argparse.ArgumentParser(description="Gradio App for validating audio files with TFLite and PyTorch models.")
+	parser = argparse.ArgumentParser(
+		description="Gradio App for validating audio files with TFLite and PyTorch models."
+	)
 	parser.add_argument("--model_dir", type=str, required=True, help="Path to the model directory.")
 	args, unknown = parser.parse_known_args()
 
@@ -199,7 +217,9 @@ with gr.Blocks() as demo:
 		preprocess_path = model_dir / "preprocess.npy"
 
 		if not all([p.exists() for p in [config_path, class_names_path, preprocess_path]]):
-			raise FileNotFoundError("One or more required asset files are missing (config, class names, or preprocess data).")
+			raise FileNotFoundError(
+				"One or more required asset files are missing (config, class names, or preprocess data)."
+			)
 
 		cfg = OmegaConf.load(config_path)
 		ASSETS["cfg"] = cfg
@@ -217,7 +237,7 @@ with gr.Blocks() as demo:
 			ASSETS["tflite_interpreter"] = interpreter
 			ASSETS["input_details"] = interpreter.get_input_details()[0]
 			ASSETS["output_details"] = interpreter.get_output_details()[0]
-			ASSETS["target_width"] = ASSETS["input_details"]['shape'][2]
+			ASSETS["target_width"] = ASSETS["input_details"]["shape"][2]
 			model_choices.append("TFLite")
 			gr.Info("TFLite model loaded successfully.")
 		else:
@@ -231,8 +251,8 @@ with gr.Blocks() as demo:
 			OmegaConf.set_struct(cfg, True)
 
 			pytorch_model = Model(cfg)
-			checkpoint = torch.load(pytorch_model_path, map_location='cpu')
-			state_dict = checkpoint.get('model_state_dict', checkpoint)
+			checkpoint = torch.load(pytorch_model_path, map_location="cpu")
+			state_dict = checkpoint.get("model_state_dict", checkpoint)
 			pytorch_model.load_state_dict(state_dict)
 			pytorch_model.eval()
 			ASSETS["pytorch_model"] = pytorch_model
@@ -265,7 +285,9 @@ with gr.Blocks() as demo:
 				gr.Markdown("### 1. Upload & Configure")
 				model_selector = gr.Radio(model_choices, label="Model Type", value=default_model)
 				audio_input = gr.Audio(type="numpy", label="Upload Audio File")
-				threshold_slider = gr.Slider(minimum=0.0, maximum=1.0, value=0.01, step=0.05, label="Confidence Threshold")
+				threshold_slider = gr.Slider(
+					minimum=0.0, maximum=1.0, value=0.01, step=0.05, label="Confidence Threshold"
+				)
 				process_status = gr.Textbox(label="Status", interactive=False, value="Waiting for audio file...")
 
 			with gr.Column(scale=2):
@@ -278,7 +300,7 @@ with gr.Blocks() as demo:
 						y="Class",
 						x_lim=[0, 1],
 						tooltip=["Class", "Probability"],
-						height=400
+						height=400,
 					)
 
 				process_button = gr.Button("Start Processing", visible=False)
@@ -286,13 +308,13 @@ with gr.Blocks() as demo:
 		audio_input.upload(
 			fn=handle_audio_upload,
 			inputs=[audio_input],
-			outputs=[audio_data_state, offset_state, process_button, process_status, probability_plot]
+			outputs=[audio_data_state, offset_state, process_button, process_status, probability_plot],
 		)
 
 		process_button.click(
 			fn=process_single_chunk,
 			inputs=[model_selector, audio_data_state, offset_state, threshold_slider],
-			outputs=[audio_data_state, offset_state, output_textbox, probability_plot, process_button]
+			outputs=[audio_data_state, offset_state, output_textbox, probability_plot, process_button],
 		)
 
 if __name__ == "__main__":

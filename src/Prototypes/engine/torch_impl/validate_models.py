@@ -24,12 +24,12 @@ def preprocess_with_librosa(waveform: np.ndarray, pp_data: dict) -> np.ndarray:
 	pre-computed data (including filter bank).
 	"""
 	# Extract parameters from the loaded dictionary
-	sample_rate = pp_data['sample_rate']
-	target_duration_samples = int(pp_data['audio_clip_duration'] * sample_rate)
-	n_fft = pp_data['n_fft']
-	hop_length = pp_data['hop_length']
-	mel_filters = pp_data['mel_filters']
-	top_db = pp_data['top_db']
+	sample_rate = pp_data["sample_rate"]
+	target_duration_samples = int(pp_data["audio_clip_duration"] * sample_rate)
+	n_fft = pp_data["n_fft"]
+	hop_length = pp_data["hop_length"]
+	mel_filters = pp_data["mel_filters"]
+	top_db = pp_data["top_db"]
 
 	# Pad or truncate to target duration
 	current_len = waveform.shape[-1]
@@ -41,10 +41,10 @@ def preprocess_with_librosa(waveform: np.ndarray, pp_data: dict) -> np.ndarray:
 
 	# Manually pad for STFT consistency
 	padding = n_fft // 2
-	waveform = np.pad(waveform, padding, mode='reflect')
+	waveform = np.pad(waveform, padding, mode="reflect")
 
 	# Calculate STFT Power Spectrogram using librosa
-	hann_window_periodic_np = signal.get_window('hann', n_fft, fftbins=True)
+	hann_window_periodic_np = signal.get_window("hann", n_fft, fftbins=True)
 	stft_complex = librosa.stft(
 		y=waveform,
 		n_fft=n_fft,
@@ -52,18 +52,13 @@ def preprocess_with_librosa(waveform: np.ndarray, pp_data: dict) -> np.ndarray:
 		center=False,
 		window=hann_window_periodic_np,
 	)
-	stft_power = np.abs(stft_complex)**2
+	stft_power = np.abs(stft_complex) ** 2
 
 	# Apply the pre-computed torchaudio filter bank
 	mel_spectrogram = (stft_power.T @ mel_filters).T
 
 	# Convert to dB scale
-	melspec_db = librosa.power_to_db(
-		mel_spectrogram,
-		ref=1.0,
-		amin=1e-10,
-		top_db=top_db
-	)
+	melspec_db = librosa.power_to_db(mel_spectrogram, ref=1.0, amin=1e-10, top_db=top_db)
 
 	# Normalize
 	normalized_spec = (melspec_db + top_db) / top_db
@@ -79,15 +74,17 @@ def run_pytorch_inference(model: Model, input_data: torch.Tensor) -> np.ndarray:
 		output = model(input_data)
 	return output.numpy()
 
+
 def run_tflite_inference(interpreter: tf.lite.Interpreter, input_data: np.ndarray) -> np.ndarray:
 	"""Runs inference on the TFLite model."""
 	input_details = interpreter.get_input_details()[0]
 	output_details = interpreter.get_output_details()[0]
 
-	interpreter.set_tensor(input_details['index'], input_data)
+	interpreter.set_tensor(input_details["index"], input_data)
 	interpreter.invoke()
 
-	return interpreter.get_tensor(output_details['index'])
+	return interpreter.get_tensor(output_details["index"])
+
 
 def compare_models(args):
 	"""
@@ -135,8 +132,8 @@ def compare_models(args):
 		OmegaConf.set_struct(cfg, True)
 
 		pytorch_model = Model(cfg)
-		checkpoint = torch.load(pytorch_model_path, map_location='cpu')
-		state_dict = checkpoint.get('model_state_dict', checkpoint)
+		checkpoint = torch.load(pytorch_model_path, map_location="cpu")
+		state_dict = checkpoint.get("model_state_dict", checkpoint)
 		pytorch_model.load_state_dict(state_dict)
 		pytorch_model.eval()
 		print("  [✓] PyTorch model loaded.")
@@ -160,7 +157,7 @@ def compare_models(args):
 
 	print("\n--- Step 2a: Loading validation dataset ---")
 	input_details = interpreter.get_input_details()[0]
-	target_width = input_details['shape'][2]
+	target_width = input_details["shape"][2]
 	print(f"  [i] TFLite model expects input width: {target_width}")
 
 	audio_files, labels, class_names = index_directory(cfg.system.audio_data_directory)
@@ -185,11 +182,10 @@ def compare_models(args):
 		[labels[i] for i in val_indices],
 		cfg,
 		is_train=False,
-		target_width=target_width
+		target_width=target_width,
 	)
 	val_loader_torch = torch.utils.data.DataLoader(
-		val_dataset_torch, batch_size=1, shuffle=False,
-		num_workers=os.cpu_count(), collate_fn=validation_collate_fn
+		val_dataset_torch, batch_size=1, shuffle=False, num_workers=os.cpu_count(), collate_fn=validation_collate_fn
 	)
 
 	# Run Comparisons
@@ -205,15 +201,16 @@ def compare_models(args):
 
 	iterator = zip(val_loader_torch, val_audio_paths)
 
-	for i, ((torch_inputs, torch_labels), audio_path) in enumerate(tqdm(iterator, total=len(val_audio_paths), desc="Comparing pipelines")):
-
+	for i, ((torch_inputs, torch_labels), audio_path) in enumerate(
+		tqdm(iterator, total=len(val_audio_paths), desc="Comparing pipelines")
+	):
 		# For the first sample, explicitly verify the spectrograms are consistent
 		if i == 0:
 			print("\n--- Verifying librosa preprocessing against torchaudio ---")
-			torchaudio_spec = torch_inputs[0].to('cpu').numpy()
+			torchaudio_spec = torch_inputs[0].to("cpu").numpy()
 
-			target_sr = pp_data['sample_rate']
-			clip_duration = pp_data['audio_clip_duration']
+			target_sr = pp_data["sample_rate"]
+			clip_duration = pp_data["audio_clip_duration"]
 			chunk_size_samples = int(clip_duration * target_sr)
 			waveform, _ = librosa.load(audio_path, sr=target_sr, mono=True)
 			chunk_waveform = waveform[0:chunk_size_samples]
@@ -227,7 +224,7 @@ def compare_models(args):
 				else:
 					pad_width = target_width - current_width
 					paddings = ((0, 0), (0, 0), (0, pad_width), (0, 0))
-					librosa_spec = np.pad(librosa_spec, paddings, mode='constant', constant_values=0)
+					librosa_spec = np.pad(librosa_spec, paddings, mode="constant", constant_values=0)
 
 			librosa_spec_reshaped = librosa_spec.squeeze(axis=(0, 3))[np.newaxis, :, :]
 
@@ -245,7 +242,7 @@ def compare_models(args):
 		true_file_labels.append(true_label_idx)
 
 		# --- PyTorch Pipeline (torchaudio) ---
-		pytorch_outputs_chunks = run_pytorch_inference(pytorch_model, torch_inputs.to('cpu'))
+		pytorch_outputs_chunks = run_pytorch_inference(pytorch_model, torch_inputs.to("cpu"))
 		pytorch_output_agg = np.mean(pytorch_outputs_chunks, axis=0)
 		pytorch_probs = torch.nn.functional.softmax(torch.from_numpy(pytorch_output_agg), dim=0).numpy()
 
@@ -253,8 +250,8 @@ def compare_models(args):
 		pytorch_class_confidences[true_label_idx].append(np.max(pytorch_probs))
 
 		# --- TFLite Pipeline (librosa) ---
-		target_sr = pp_data['sample_rate']
-		clip_duration = pp_data['audio_clip_duration']
+		target_sr = pp_data["sample_rate"]
+		clip_duration = pp_data["audio_clip_duration"]
 		chunk_size_samples = int(clip_duration * target_sr)
 
 		waveform, _ = librosa.load(audio_path, sr=target_sr, mono=True)
@@ -276,7 +273,7 @@ def compare_models(args):
 				else:
 					pad_width = target_width - current_width
 					paddings = ((0, 0), (0, 0), (0, pad_width), (0, 0))
-					spectrogram = np.pad(spectrogram, paddings, mode='constant', constant_values=0)
+					spectrogram = np.pad(spectrogram, paddings, mode="constant", constant_values=0)
 
 			tflite_chunk_output = run_tflite_inference(interpreter, spectrogram)
 			tflite_outputs_chunks.append(tflite_chunk_output)
@@ -319,7 +316,7 @@ def compare_models(args):
 
 	print("\n--- Per-Class Analysis (based on TFLite predictions) ---")
 	cm = confusion_matrix(true_file_labels, tflite_file_preds, labels=np.arange(len(class_names)))
-	with np.errstate(divide='ignore', invalid='ignore'):
+	with np.errstate(divide="ignore", invalid="ignore"):
 		per_class_acc = cm.diagonal() / cm.sum(axis=1)
 
 	class_accuracies = []
@@ -337,7 +334,7 @@ def compare_models(args):
 		print(f"\n  Top {num_to_show} Best Performing Classes:")
 		header = f"    {'Class Name':<30} {'Accuracy':<12} {'PT Avg Conf':<15} {'TFLite Avg Conf'}"
 		print(header)
-		print(f"    {'-'*30} {'-'*12} {'-'*15} {'-'*15}")
+		print(f"    {'-' * 30} {'-' * 12} {'-' * 15} {'-' * 15}")
 		for class_name, acc in sorted_accuracies[:num_to_show]:
 			acc_str = f"{acc:.2%}" if not np.isnan(acc) else "N/A"
 			pt_conf_str = f"{pytorch_avg_confidences.get(class_name, 0):.2%}"
@@ -346,7 +343,7 @@ def compare_models(args):
 
 		print(f"\n  Top {num_to_show} Worst Performing Classes:")
 		print(header)
-		print(f"    {'-'*30} {'-'*12} {'-'*15} {'-'*15}")
+		print(f"    {'-' * 30} {'-' * 12} {'-' * 15} {'-' * 15}")
 		worst_classes = sorted_accuracies[-num_to_show:]
 		for class_name, acc in reversed(worst_classes):
 			acc_str = f"{acc:.2%}" if not np.isnan(acc) else "N/A"
@@ -358,19 +355,13 @@ def compare_models(args):
 
 
 if __name__ == "__main__":
-	parser = argparse.ArgumentParser(
-		description="Validate a TFLite model against its original PyTorch checkpoint."
-	)
+	parser = argparse.ArgumentParser(description="Validate a TFLite model against its original PyTorch checkpoint.")
+	parser.add_argument("model_dir", type=str, help="Path to the trained model directory containing all artifacts.")
 	parser.add_argument(
-		"model_dir",
-		type=str,
-		help="Path to the trained model directory containing all artifacts."
-	)
-	parser.add_argument(
-		"--num_tests", # This argument will now be ignored/deprecated
+		"--num_tests",  # This argument will now be ignored/deprecated
 		type=int,
-		default=0, # Set default to 0 as it's not used for validation set size
-		help="This argument is deprecated. The validation set size will be used."
+		default=0,  # Set default to 0 as it's not used for validation set size
+		help="This argument is deprecated. The validation set size will be used.",
 	)
 	args = parser.parse_args()
 	compare_models(args)

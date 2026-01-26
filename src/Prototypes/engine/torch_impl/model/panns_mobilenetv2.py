@@ -26,16 +26,19 @@ PRETRAINED_URL = "https://zenodo.org/record/3987831/files/MobileNetV2_mAP%3D0.38
 # 	return ConvBnReLU6(conv, bn)
 #
 
+
 def init_bn(bn):
 	"""Initialize a Batchnorm layer."""
-	bn.bias.data.fill_(0.)
-	bn.weight.data.fill_(1.)
+	bn.bias.data.fill_(0.0)
+	bn.weight.data.fill_(1.0)
+
 
 def init_layer(layer):
 	"""Initialize a Linear or Convolutional layer."""
 	nn.init.xavier_uniform_(layer.weight)
-	if hasattr(layer, 'bias') and layer.bias is not None:
-		layer.bias.data.fill_(0.)
+	if hasattr(layer, "bias") and layer.bias is not None:
+		layer.bias.data.fill_(0.0)
+
 
 def conv_bn_v2(inp, oup, stride):
 	return nn.Sequential(
@@ -46,6 +49,7 @@ def conv_bn_v2(inp, oup, stride):
 		# nn.ReLU(inplace=True),
 	)
 
+
 def conv_1x1_bn_v2(inp, oup):
 	return nn.Sequential(
 		nn.Conv2d(inp, oup, 1, 1, 0, bias=False),
@@ -53,6 +57,7 @@ def conv_1x1_bn_v2(inp, oup):
 		nn.ReLU6(inplace=True),
 		# nn.ReLU(inplace=True),
 	)
+
 
 class InvertedResidual(nn.Module):
 	def __init__(self, inp, oup, stride, expand_ratio):
@@ -98,16 +103,17 @@ class InvertedResidual(nn.Module):
 		else:
 			return self.conv(x)
 
+
 class MobileNetV2(nn.Module):
 	def __init__(self, classes_num=527, **kwargs):
 		super(MobileNetV2, self).__init__()
 
-		num_features = kwargs.get('num_features', 64)
-		embedding_size = kwargs.get('embedding_size', 1280)
+		num_features = kwargs.get("num_features", 64)
+		embedding_size = kwargs.get("embedding_size", 1280)
 
 		self.bn0 = nn.BatchNorm2d(num_features)
 
-		width_mult = 1.
+		width_mult = 1.0
 		block = InvertedResidual
 		input_channel = 32
 		last_channel = 1280
@@ -130,8 +136,7 @@ class MobileNetV2(nn.Module):
 			output_channel = int(c * width_mult)
 			for i in range(n):
 				stride = s if i == 0 else 1
-				self.features.append(
-					block(input_channel, output_channel, stride, expand_ratio=t))
+				self.features.append(block(input_channel, output_channel, stride, expand_ratio=t))
 				input_channel = output_channel
 
 		self.features.append(conv_1x1_bn_v2(input_channel, self.last_channel))
@@ -148,7 +153,7 @@ class MobileNetV2(nn.Module):
 		init_layer(self.fc_audioset)
 		for m in self.modules():
 			if isinstance(m, nn.Conv2d):
-				nn.init.kaiming_normal_(m.weight, mode='fan_out')
+				nn.init.kaiming_normal_(m.weight, mode="fan_out")
 				if m.bias is not None:
 					nn.init.zeros_(m.bias)
 			elif isinstance(m, nn.BatchNorm2d):
@@ -177,6 +182,7 @@ class MobileNetV2(nn.Module):
 
 		return clipwise_output, embedding
 
+
 class PannsMobileNetV2ArcFace(nn.Module):
 	def __init__(self, num_classes: int, pretrained: bool, use_arcface: bool = False, **arcface_params):
 		super().__init__()
@@ -186,8 +192,12 @@ class PannsMobileNetV2ArcFace(nn.Module):
 
 		if pretrained:
 			print("Loading pretrained MobileNetV2 weights.")
-			state_dict = load_state_dict_from_url(PRETRAINED_URL, progress=True)['model']
-			for key in ['spectrogram_extractor.stft.conv_real.weight', 'spectrogram_extractor.stft.conv_imag.weight', 'logmel_extractor.melW']:
+			state_dict = load_state_dict_from_url(PRETRAINED_URL, progress=True)["model"]
+			for key in [
+				"spectrogram_extractor.stft.conv_real.weight",
+				"spectrogram_extractor.stft.conv_imag.weight",
+				"logmel_extractor.melW",
+			]:
 				state_dict.pop(key, None)
 			self.cnn.load_state_dict(state_dict)
 
@@ -212,9 +222,9 @@ class PannsMobileNetV2ArcFace(nn.Module):
 		"""
 		fuse_candidates = []
 		for i in range(len(block) - 1):
-			if isinstance(block[i], nn.Conv2d) and isinstance(block[i+1], nn.BatchNorm2d):
-				fuse_candidates.append([str(i), str(i+1)])
-		
+			if isinstance(block[i], nn.Conv2d) and isinstance(block[i + 1], nn.BatchNorm2d):
+				fuse_candidates.append([str(i), str(i + 1)])
+
 		if fuse_candidates:
 			torch.ao.quantization.fuse_modules(block, fuse_candidates, inplace=True)
 
@@ -229,10 +239,10 @@ class PannsMobileNetV2ArcFace(nn.Module):
 			# Case A: Simple Sequential blocks (e.g., initial conv or 1x1 convs)
 			if isinstance(module, nn.Sequential):
 				self._fuse_conv_bn(module)
-			
+
 			# Case B: InvertedResidual blocks (main building blocks)
 			elif isinstance(module, InvertedResidual):
-				if hasattr(module, 'conv') and isinstance(module.conv, nn.Sequential):
+				if hasattr(module, "conv") and isinstance(module.conv, nn.Sequential):
 					self._fuse_conv_bn(module.conv)
 
 		print("Model fusion completed successfully.")
