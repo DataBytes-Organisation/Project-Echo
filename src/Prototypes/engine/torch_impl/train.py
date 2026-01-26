@@ -26,6 +26,7 @@ class Trainer:
 		self.dtype = getattr(torch, cfg.training.get('dtype', 'bfloat16'))
 		self.use_amp = (self.dtype == torch.float16) and ('cuda' in self.device.type)
 		self.scaler = GradScaler(self.device.type, enabled=self.use_amp)
+		self.grad_accum_steps = self.cfg.training.get('grad_accum_steps', 1)
 		
 		self.criterion = hydra.utils.instantiate(self.cfg.training.criterion)
 		self.optimizer = hydra.utils.instantiate(self.cfg.training.optimizer, params=self.model.parameters())
@@ -129,7 +130,7 @@ class Trainer:
 		all_labels = []
 		all_predictions = []
 		
-		for inputs, labels in self.train_loader:
+		for batch_idx, (inputs, labels) in enumerate(self.train_loader):
 			inputs, labels = inputs.to(self.device), labels.to(self.device)
 			self.optimizer.zero_grad()
 			
@@ -151,24 +152,39 @@ class Trainer:
 				else:
 					loss = self.criterion(student_outputs, labels)
 
+				loss = loss / self.grad_accum_steps
+
 			self.scaler.scale(loss).backward()
 
-			if self.grad_clip is not None:
-				# Unscale the gradients before clipping to avoid clipping scaled gradients
-				self.scaler.unscale_(self.optimizer)
-				torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.grad_clip)
+			# if self.grad_clip is not None:
+			# 	# Unscale the gradients before clipping to avoid clipping scaled gradients
+			# 	self.scaler.unscale_(self.optimizer)
+			# 	torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.grad_clip)
 
-			self.scaler.step(self.optimizer)
-			self.scaler.update()
+			if (batch_idx + 1) % self.grad_accum_steps == 0 or (batch_idx + 1) == len(self.train_loader):
+				if self.grad_clip is not None:
+					self.scaler.unscale_(self.optimizer)
+					torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.grad_clip)
 
-			running_loss += loss.item() * inputs.size(0)
+				self.scaler.step(self.optimizer)
+				self.scaler.update()
+				
+				# Flush gradients after the update
+				self.optimizer.zero_grad()
+
+			# self.scaler.step(self.optimizer)
+			# self.scaler.update()
+
+			running_loss += (loss.item() * self.grad_accum_steps) * inputs.size(0)
+
 			_, predicted = torch.max(student_outputs.data, 1)
 			all_labels.extend(labels.cpu().numpy())
 			all_predictions.extend(predicted.cpu().numpy())
 			
-			metrics_dict['batch_loss'] = f'{loss.item():.4f}'
+			metrics_dict['batch_loss'] = f'{loss.item() * self.grad_accum_steps:.4f}'
 			metrics_dict['phase'] = 'train'
 			pbar.set_postfix(metrics_dict)
+			pbar.update(1)
 			
 		epoch_loss = running_loss / len(self.train_loader.dataset)
 		epoch_acc = accuracy_score(all_labels, all_predictions)
@@ -180,43 +196,57 @@ class Trainer:
 
 	def _evaluate(self, dataloader, pbar, metrics_dict):
 		self.model.eval()
-		running_loss = 0.0
-		all_labels = []
-		all_predictions = []
+		total_file_loss = 0.0
+		all_file_labels = []
+		all_file_predictions = []
 
 		with torch.no_grad():
-			for inputs, labels in dataloader:
-				inputs, labels = inputs.to(self.device), labels.to(self.device)
-				with autocast(self.device.type, enabled=self.use_amp):
-					outputs = self.model(inputs)
-					if self.metric_loss_module is not None:
-						outputs = self.metric_loss_module(outputs, labels)
+			for inputs, labels in dataloader: # Here, inputs are all chunks for one file
+				inputs = inputs.to(self.device)
+				# All labels in `labels` are the same for this file, pick the first one
+				true_file_label = labels[0].to(self.device) 
 
-					loss = self.criterion(outputs, labels)
+				with autocast(device_type=self.device.type, dtype=self.dtype, enabled=self.use_amp):
+					outputs = self.model(inputs) # outputs are (num_chunks, num_classes)
+					
+					# Aggregate chunk outputs (logits) to get a single prediction for the file
+					# Mean of logits is a common approach for test-time augmentation / chunk aggregation
+					aggregated_output = outputs.mean(dim=0) # (num_classes)
+					
+					# Calculate loss for the file using the aggregated output and the true file label
+					# Unsqueeze aggregated_output and true_file_label to match (batch_size, num_classes) and (batch_size) for criterion
+					loss = self.criterion(aggregated_output.unsqueeze(0), true_file_label.unsqueeze(0))
 
-				running_loss += loss.item() * inputs.size(0)
-				_, predicted = torch.max(outputs.data, 1)
-				all_labels.extend(labels.cpu().numpy())
-				all_predictions.extend(predicted.cpu().numpy())
+				total_file_loss += loss.item() # Accumulate file-level loss
+				
+				# Get file-level prediction
+				_, predicted_file_label = torch.max(aggregated_output.unsqueeze(0).data, 1)
+				
+				all_file_labels.append(true_file_label.item())
+				all_file_predictions.append(predicted_file_label.item())
 				
 				metrics_dict['phase'] = 'val'
 				pbar.set_postfix(metrics_dict)
+				pbar.update(1)
 		
-		epoch_loss = running_loss / len(dataloader.dataset)
-		epoch_acc = accuracy_score(all_labels, all_predictions)
+		# Now, total_file_loss is sum of losses for each file, and len(dataloader.dataset) is number of files
+		epoch_loss = total_file_loss / len(dataloader.dataset)
+		epoch_acc = accuracy_score(all_file_labels, all_file_predictions)
 		
 		return epoch_loss, epoch_acc
 
 	def train(self):
-		pbar = tqdm(range(self.epochs), total=self.epochs, desc="Training Progress")
+		total_steps = self.epochs * (len(self.train_loader) + len(self.val_loader))
+		pbar = tqdm(total=total_steps, desc="Training Progress")
 		
 		metrics_dict = {
 			'phase': 'train',
 			'best_metric': f'{self.best_metric:.4f}'
 		}
 		
-		for epoch in pbar:
+		for epoch in range(self.epochs):
 			self.current_epoch = epoch + 1
+			pbar.set_description(f"Epoch {self.current_epoch}/{self.epochs}")
 			train_loss, train_acc = self._train_one_epoch(pbar, metrics_dict)
 			val_loss, val_acc = self._evaluate(self.val_loader, pbar, metrics_dict)
 			
@@ -255,7 +285,8 @@ class Trainer:
 			if self.epochs_no_improve >= self.early_stopping_patience:
 				print(f"\nEarly stopping triggered after {self.epochs_no_improve} epochs with no improvement.")
 				break
-				
+		
+		pbar.close()
 		self.writer.close()
 		print(f"\nTraining complete. Best model from epoch {self.best_epoch} saved to {self.best_model_path}")
 
@@ -275,23 +306,30 @@ class Trainer:
 
 		model.eval()
 
-		all_labels = []
-		all_predictions = []
+		all_file_labels = []
+		all_file_predictions = []
 
 		with torch.no_grad():
 			for inputs, labels in tqdm(test_loader, desc="[Testing]"):
-				inputs, labels = inputs.to(self.device), labels.to(self.device)
-				with autocast(self.device.type, enabled=self.use_amp):
-					outputs = self.model(inputs)
+				inputs = inputs.to(eval_device)
+				true_file_label = labels[0].to(eval_device) # All labels in `labels` are the same for this file
 
-				_, predicted = torch.max(outputs.data, 1)
-				all_labels.extend(labels.cpu().numpy())
-				all_predictions.extend(predicted.cpu().numpy())
+				with autocast(device_type=eval_device.type, enabled=self.use_amp):
+					outputs = model(inputs) # outputs are (num_chunks, num_classes)
+					
+					# Aggregate chunk outputs (logits) to get a single prediction for the file
+					aggregated_output = outputs.mean(dim=0) # (num_classes)
 
-		accuracy = accuracy_score(all_labels, all_predictions)
-		precision = precision_score(all_labels, all_predictions, average='weighted', zero_division=0)
-		recall = recall_score(all_labels, all_predictions, average='weighted', zero_division=0)
-		f1 = f1_score(all_labels, all_predictions, average='weighted', zero_division=0)
+				# Get file-level prediction
+				_, predicted_file_label = torch.max(aggregated_output.unsqueeze(0).data, 1)
+				
+				all_file_labels.append(true_file_label.item())
+				all_file_predictions.append(predicted_file_label.item())
+
+		accuracy = accuracy_score(all_file_labels, all_file_predictions)
+		precision = precision_score(all_file_labels, all_file_predictions, average='weighted', zero_division=0)
+		recall = recall_score(all_file_labels, all_file_predictions, average='weighted', zero_division=0)
+		f1 = f1_score(all_file_labels, all_file_predictions, average='weighted', zero_division=0)
 		
 		print("\n--- Test Set Metrics ---")
 		print(f"Accuracy: {accuracy:.4f}")

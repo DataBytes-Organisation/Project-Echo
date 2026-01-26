@@ -21,7 +21,7 @@ class EfficientNetV2ArcFace(EfficientNet):
 	def __init__(
 		self, model_name: str, pretrained: bool,
 		num_classes: int, use_arcface: bool, in_channels: int = 1,
-		trainable_blocks: int = 0
+		trainable_blocks: int = 0, replace_silu_with_relu: bool = False
 	):
 		if not model_name.startswith('efficientnet_v2'):
 			raise ValueError("This class is for EfficientNetV2 models.")
@@ -33,10 +33,23 @@ class EfficientNetV2ArcFace(EfficientNet):
 		dropout = MODEL_CONFIGS[model_name]["dropout"]
 		original_weights_enum = getattr(models, f"EfficientNet_V2_{model_name.split('_')[-1].title()}_Weights")
 		temp_num_classes = len(original_weights_enum.DEFAULT.meta["categories"]) if pretrained else num_classes
-		super().__init__(inverted_residual_setting, dropout=dropout, last_channel=last_channel, num_classes=temp_num_classes)
+		
+		kwargs = {}
+		if replace_silu_with_relu:
+			kwargs['activation_layer'] = nn.ReLU
+
+		super().__init__(
+			inverted_residual_setting, 
+			dropout=dropout, 
+			last_channel=last_channel, 
+			num_classes=temp_num_classes,
+			**kwargs
+		)
 
 		if pretrained:
 			self.load_state_dict(original_weights_enum.DEFAULT.get_state_dict(progress=True))
+			if replace_silu_with_relu:
+				print("Warning: Replacing SiLU with ReLU on a pretrained model. This is not standard and may impact performance.")
 
 		self.use_arcface = use_arcface
 		self._modify_first_conv_layer(in_channels, pretrained)
@@ -100,7 +113,7 @@ class EfficientNetV2ArcFace(EfficientNet):
 
 		print(f"Model layers configured: {trainable_msg}")
 
-	def forward(self, x: torch.Tensor, labels: torch.Tensor = None) -> torch.Tensor:
+	def forward(self, x: torch.Tensor) -> torch.Tensor:
 		embedding = torch.flatten(self.avgpool(self.features(x)), 1)
 		
 		return self.head(embedding)
@@ -117,4 +130,5 @@ class EfficientNetV2ArcFace(EfficientNet):
 		self._fuse_conv_bn(self.features[0])
 		for module in self.modules():
 			if isinstance(module, (MBConv, FusedMBConv)): self._fuse_conv_bn(module.block)
+
 		print("Model fusion completed successfully.")

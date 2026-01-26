@@ -16,7 +16,7 @@ SERVER_URL = "http://192.168.1.122:5000/upload"
 SAMPLE_RATE = 16000
 DURATION = 5
 N_MFCC = 40
-MODEL_PATH = "models/checkpoint_MobileNetV3-Large.tflite"
+MODEL_PATH = "models/checkpoint_MobileNetV3-Large.tflite" 
 CLASS_PATH = "models/class_names_MobileNetV3-Large.json"
 SAVE_DIR = "audioLocal"
 os.makedirs(SAVE_DIR, exist_ok=True)
@@ -42,6 +42,7 @@ def get_health_report():
         "uptime": psutil.boot_time()
     }
 
+# sub-optimal, convert to using gps3 and gpsd
 def get_gps_location(port="/dev/ttyACM0",baudrate=9600,timeout=1):
     try:
         with serial.Serial(port, baudrate, timeout=timeout) as ser:
@@ -62,6 +63,8 @@ def get_gps_location(port="/dev/ttyACM0",baudrate=9600,timeout=1):
     
     return  {"latitude": None, "longitude": None}
 
+
+#Check audio recording duration and quality, method for sending .wav file to server
 def record_audio(duration=5, samplerate=44100):
     timestamp = time.strftime("%Y-%m-%d_%H-%M-%S")
     filename = f"audio_{timestamp}.wav"
@@ -78,7 +81,7 @@ def record_audio(duration=5, samplerate=44100):
     print("Recording complete", filename)
     return filepath, np.squeeze(audio_data)
 
-
+# Is processing neccessary? How does the model expect input?
 def preprocess_audio(audio, sr=SAMPLE_RATE):
     mel_spec = librosa.feature.melspectrogram(y=audio, sr=sr, n_mels=224, fmax=sr//2)
     mel_spec_db = librosa.power_to_db(mel_spec, ref=np.max)
@@ -94,6 +97,8 @@ def softmax(x):
     e_x = np.exp(x - np.max(x))
     return e_x / e_x.sum()
 
+
+# Does this prediction help the actual model in any way?
 def predict_species(audio):
     input_data = preprocess_audio(audio)
     

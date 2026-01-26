@@ -1,5 +1,9 @@
 import torch
+import torchaudio
+import torch.nn as nn
+import torch.nn.functional as F
 from torch.utils.data import Dataset
+
 import os
 from pathlib import Path
 import librosa
@@ -7,6 +11,18 @@ import numpy as np
 import hashlib
 import diskcache as dc
 import soundfile as sf
+import random
+import math
+
+import lmdb
+import pickle
+
+import warnings
+
+warnings.filterwarnings("ignore", message=".*load_with_torchcodec.*")
+warnings.filterwarnings("ignore", message=".*StreamingMediaDecoder.*")
+warnings.filterwarnings("ignore", module="torchaudio._backend.ffmpeg")
+warnings.filterwarnings("ignore", message=".*AudioMetaData has been deprecated.*")
 
 def index_directory(directory, file_types=('.ogg', '.mp3', '.wav', '.flac')):
 	audio_files = []
@@ -23,98 +39,230 @@ def index_directory(directory, file_types=('.ogg', '.mp3', '.wav', '.flac')):
 
 	return audio_files, labels, class_names
 
-"""
-TODO: 
-- [  ] use lmdb for cache to improve performance
-"""
 class SpectrogramDataset(Dataset):
-	def __init__(self, audio_files, labels, cfg, audio_transforms=None, image_transforms=None, is_train=False):
+	def __init__(self, audio_files, labels, cfg, audio_transforms=None, image_transforms=None, is_train=False, target_width=None):
 		super().__init__()
 		self.audio_files = audio_files
 		self.labels = labels
 		self.cfg = cfg
 		self.audio_transforms = audio_transforms
 		self.image_transforms = image_transforms
+		self.force_width = target_width
 		
 		self.clip_samples = int(cfg.data.audio_clip_duration * cfg.data.sample_rate)
 
-		if cfg.system.use_disk_cache:
-			self.cache = dc.Cache(cfg.system.cache_directory, size_limit=10**10)
-		else:
-			self.cache = None
-
+		self.target_sample_rate = cfg.data.sample_rate
+		self.target_samples = int(cfg.data.audio_clip_duration * self.target_sample_rate)
 		self.is_train = is_train
 
+		self.common_source_sr = 44100
+		self.cached_resampler = torchaudio.transforms.Resample(
+			orig_freq=self.common_source_sr, 
+			new_freq=self.target_sample_rate
+		)
+
+		self.mel_spec = torchaudio.transforms.MelSpectrogram(
+			sample_rate=cfg.data.sample_rate,
+			n_fft=cfg.data.n_fft,
+			hop_length=cfg.data.hop_length,
+			n_mels=cfg.data.n_mels,
+			f_min=cfg.data.fmin,
+			f_max=cfg.data.fmax,
+			power=2.0
+		)
+		self.amplitude_to_db = torchaudio.transforms.AmplitudeToDB(top_db=cfg.data.top_db)
+		self.top_db = cfg.data.top_db
+
+		self.use_cache = cfg.system.get('use_disk_cache', False)
+		self.env = None # Lazy init for multi-processing safety
+		if self.use_cache:
+			self.cache_path = Path(cfg.system.cache_directory)
+			self.cache_path.mkdir(parents=True, exist_ok=True)
+			
+			# Map size: 1TB (Virtual memory, doesn't allocate physical RAM)
+			self.map_size = 1099511627776 
+
 	def _get_cache_key(self, file_path):
-		m = hashlib.sha256()
+		"""Generate a unique key for the cache based on file path and sample rate."""
+		key_str = f"{file_path}_{self.target_sample_rate}"
+		return key_str.encode('utf-8')
 
-		m.update(str(file_path).encode())
-		m.update(str(self.cfg.data).encode())
-
-		if self.audio_transforms:
-			m.update(str(self.cfg.augmentations.audio).encode())
-
-		if self.image_transforms:
-			m.update(str(self.cfg.augmentations.image).encode())
-
-		return m.hexdigest()
+	def _init_db(self):
+		"""Initialize LMDB environment inside the worker process."""
+		self.env = lmdb.open(
+			str(self.cache_path), 
+			map_size=self.map_size, 
+			subdir=True, 
+			lock=True, # Needed for concurrent writes
+			readahead=False, 
+			meminit=False
+		)
 
 	def __len__(self):
 		return len(self.audio_files)
+
+	def _process_waveform_to_spec(self, waveform, file_path_for_debug="Unknown"):
+		"""Helper to convert a waveform tensor (1, T) to Spectrogram (C, F, T)"""
+
+		# Apply Audio Augmentations
+		if self.audio_transforms:
+			waveform_input = waveform.unsqueeze(0) # (1, 1, Time)
+			try:
+				augmented = self.audio_transforms(waveform_input, sample_rate=self.target_sample_rate)
+				waveform = augmented.squeeze(0) # (1, Time)
+			except Exception as e:
+				print(f"Augmentation error on {file_path_for_debug}: {e}")
+
+		# Convert to Spectrogram
+		spec = self.mel_spec(waveform)
+		spec = self.amplitude_to_db(spec)
+
+		# Global Normalization [-80, 0] -> [0, 1]
+		spec = (spec + self.top_db) / self.top_db
+
+		# Force spectrogram to a fixed width if specified
+		if self.force_width is not None:
+			current_width = spec.shape[-1]
+			if current_width > self.force_width:
+				spec = spec[..., :self.force_width]
+			elif current_width < self.force_width:
+				padding = self.force_width - current_width
+				# Pad on the right
+				spec = F.pad(spec, (0, padding), 'constant', 0)
+
+		# Apply Image Augmentations
+		if self.image_transforms:
+			if spec.dim() == 2:
+				spec = spec.unsqueeze(0)
+			spec = self.image_transforms(spec)
+
+		if spec.dim() == 2:
+			spec = spec.unsqueeze(0)
+
+		return spec
 
 	def __getitem__(self, idx):
 		file_path = self.audio_files[idx]
 		label = self.labels[idx]
 
-		cache_key = None
-		if self.cache:
-			cache_key = self._get_cache_key(file_path)
-			if cache_key in self.cache:
-				spectrogram = self.cache[cache_key]
-				return torch.from_numpy(spectrogram).float(), torch.tensor(label).long()
+		if self.use_cache and self.env is None:
+			self._init_db()
 
-		try:
-			audio_data, sr = librosa.load(file_path, sr=self.cfg.data.sample_rate, mono=True)
-		except Exception as e:
-			print(f"Error loading {file_path}: {e}")
-			audio_data = np.zeros(self.clip_samples, dtype=np.float32)
+		waveform = None
 
-		# Randomly sample a clip during training
-		if len(audio_data) > self.clip_samples:
-			if self.is_train:
-				start = np.random.randint(0, len(audio_data) - self.clip_samples)
+		if self.use_cache:
+			key = self._get_cache_key(file_path)
+			try:
+				with self.env.begin(write=False) as txn:
+					data = txn.get(key)
+					if data:
+						waveform = pickle.loads(data)
+			except Exception as e:
+				print(f"Cache read error for {file_path}: {e}")
+
+		if waveform is None:
+			try:
+				waveform, sr = torchaudio.load(file_path)
+
+				# Resample if necessary
+				if sr != self.target_sample_rate:
+					if sr == self.common_source_sr:
+						waveform = self.cached_resampler(waveform)
+					else:
+						waveform = torchaudio.functional.resample(waveform, orig_freq=sr, new_freq=self.target_sample_rate)
+
+				# Mix to Mono (Average channels)
+				if waveform.shape[0] > 1:
+					waveform = torch.mean(waveform, dim=0, keepdim=True)
+				
+				# Write to Cache (Decoded, Resampled, Mono)
+				if self.use_cache:
+					try:
+						with self.env.begin(write=True) as txn:
+							txn.put(key, pickle.dumps(waveform))
+					except Exception as e:
+						print(f"Cache write error for {file_path}: {e}")
+
+			except Exception as e:
+				print(f"Error loading {file_path}: {e}")
+				# Return silent spectrogram on error
+				silent_waveform = torch.zeros(1, self.target_samples)
+				spec = self._process_waveform_to_spec(silent_waveform, file_path)
+				return spec, torch.tensor(label).long()
+
+		# Pad or Crop to fixed length (Training Randomness happens here)
+		num_samples = waveform.shape[1]
+
+		# if num_samples > self.target_samples:
+		# 	# Crop
+		# 	if self.is_train:
+		# 		start = random.randint(0, num_samples - self.target_samples)
+		# 	else:
+		# 		start = (num_samples - self.target_samples) // 2
+		# 	waveform = waveform[:, start : start + self.target_samples]
+		# elif num_samples < self.target_samples:
+		# 	# Pad (Right padding)
+		# 	padding = self.target_samples - num_samples
+		# 	waveform = F.pad(waveform, (0, padding))
+
+		if num_samples < self.target_samples:
+			repeats = math.ceil(self.target_samples / num_samples)
+			waveform = waveform.repeat(1, repeats)
+			num_samples = waveform.shape[1]
+
+		if self.is_train:
+			if num_samples > self.target_samples:
+				start = random.randint(0, num_samples - self.target_samples)
+				waveform = waveform[:, start : start + self.target_samples]
+			
+			spec = self._process_waveform_to_spec(waveform, file_path)
+			return spec, torch.tensor(label).long()
+
+		else:
+			chunks = []
+			
+			# Case A: Exact match (after duplication logic)
+			if num_samples == self.target_samples:
+				chunks.append(waveform)
+
+			# Case B: Break into fixed chunks
 			else:
-				start = (len(audio_data) - self.clip_samples) // 2
-			audio_data = audio_data[start : start + self.clip_samples]
-		elif len(audio_data) < self.clip_samples:
-			padding = self.clip_samples - len(audio_data)
-			audio_data = np.pad(audio_data, (0, padding), 'constant')
+				# Stride = target_samples (No overlap, just tiling)
+				for start in range(0, num_samples, self.target_samples):
+					end = start + self.target_samples
+					if end <= num_samples:
+						chunks.append(waveform[:, start:end])
+					else:
+						chunks.append(waveform[:, -self.target_samples:])
 
-		if self.audio_transforms:
-			audio_data = self.audio_transforms(samples=audio_data, sample_rate=self.cfg.data.sample_rate)
+			# Process all chunks into spectrograms
+			specs = []
+			for chunk_wave in chunks:
+				# chunk_wave is (1, Time)
+				s = self._process_waveform_to_spec(chunk_wave, file_path)
+				specs.append(s)
 
-		mel_spec = librosa.feature.melspectrogram(
-			y=audio_data,
-			sr=self.cfg.data.sample_rate,
-			n_fft=self.cfg.data.n_fft,
-			hop_length=self.cfg.data.hop_length,
-			n_mels=self.cfg.data.n_mels,
-			fmin=self.cfg.data.fmin,
-			fmax=self.cfg.data.fmax
-		)
-		
-		mel_spec_db = librosa.power_to_db(mel_spec, ref=np.max, top_db=self.cfg.data.top_db)
-		
-		mel_spec_db = (mel_spec_db - mel_spec_db.min()) / (mel_spec_db.max() - mel_spec_db.min() + 1e-6)
+			# Stack them: (Num_Chunks, C, F, T)
+			stacked_specs = torch.stack(specs)
+			
+			# Duplicate labels: (Num_Chunks)
+			stacked_labels = torch.tensor([label] * len(specs)).long()
 
-		spectrogram = np.expand_dims(mel_spec_db, axis=0)
-		
-		if self.image_transforms:
-			spectrogram_tensor = torch.from_numpy(spectrogram).float()
-			spectrogram_tensor = self.image_transforms(spectrogram_tensor)
-			spectrogram = spectrogram_tensor.numpy()
+			return stacked_specs, stacked_labels
 
-		if self.cache:
-			self.cache[cache_key] = spectrogram
-
-		return torch.from_numpy(spectrogram).float(), torch.tensor(label).long()
+def validation_collate_fn(batch):
+	"""
+	Custom collate function for validation/testing.
+	It unnests the chunks from each audio file.
+	"""
+	specs_list = [item[0] for item in batch]
+	labels_list = [item[1] for item in batch]
+	
+	# Concatenate along the batch dimension (dim 0)
+	# specs_list[i] shape is (Ni, C, F, T) -> Result: (Sum(Ni), C, F, T)
+	flattened_specs = torch.cat(specs_list, dim=0)
+	
+	# labels_list[i] shape is (Ni) -> Result: (Sum(Ni))
+	flattened_labels = torch.cat(labels_list, dim=0)
+	
+	return flattened_specs, flattened_labels
