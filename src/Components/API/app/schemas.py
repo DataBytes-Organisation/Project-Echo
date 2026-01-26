@@ -27,9 +27,10 @@ class EventSchema(BaseModel):
     timestamp: datetime  # Event timestamp
     sensorId: constr(min_length=1)  # Non-empty string for sensor ID
     species: constr(min_length=1)  # Non-empty string for species name
-    microphoneLLA: conlist(float, min_items=3, max_items=3)  # List of exactly 3 floats for microphone location
-    animalEstLLA: conlist(float, min_items=3, max_items=3)  # List of exactly 3 floats for estimated animal location
-    animalTrueLLA: conlist(float, min_items=3, max_items=3)  # List of exactly 3 floats for true animal location
+    microphoneLLA: List[float] = Field(..., min_items=3, max_items=3)  # List of exactly 3 floats for microphone location
+    #microphoneLLA: List[float] = Field(..., min_items=3, max_items=3) #updated 19/01/26
+    animalEstLLA: List[float] = Field(..., min_items=3, max_items=3)  # List of exactly 3 floats for estimated animal location
+    animalTrueLLA: List[float] = Field(..., min_items=3, max_items=3)  # List of exactly 3 floats for true animal location
     animalLLAUncertainty: int  # Uncertainty value
     audioClip: str  # Audio clip data
     confidence: condecimal(gt=0, lt=100)  # Confidence value between 0 and 100
@@ -60,7 +61,7 @@ class MovementSchema(BaseModel):
     timestamp: datetime  # Movement timestamp
     species: constr(min_length=1)  # Non-empty string for species name
     animalId: constr(min_length=1)  # Non-empty string for animal ID
-    animalTrueLLA: conlist(float, min_items=3, max_items=3)  # List of exactly 3 floats for true animal location
+    animalTrueLLA: List[float] = Field(..., min_items=3, max_items=3)  # List of exactly 3 floats for true animal location
 
     # Configuration and schema example
     class Config:
@@ -79,7 +80,7 @@ class MovementSchema(BaseModel):
 # Schema to validate microphone location data
 class MicrophoneSchema(BaseModel):
     sensorId: constr(min_length=1)  # Non-empty string for sensor ID
-    microphoneLLA: conlist(float, min_items=3, max_items=3)  # List of exactly 3 floats for microphone location
+    microphoneLLA: List[float] = Field(..., min_items=3, max_items=3)  # List of exactly 3 floats for microphone location
 
     # Configuration and schema example
     class Config:
@@ -302,9 +303,9 @@ class ResetPasswordSchema(BaseModel):
 class RecordingData(BaseModel):
     timestamp: datetime  # Timestamp for recording
     sensorId: str  # Sensor ID
-    microphoneLLA: conlist(float, min_items=3, max_items=3)  # List of 3 floats for microphone location
-    animalEstLLA: conlist(float, min_items=3, max_items=3)  # List of 3 floats for estimated animal location
-    animalTrueLLA: conlist(float, min_items=3, max_items=3)  # List of 3 floats for true animal location
+    microphoneLLA: List[float] = Field(..., min_items=3, max_items=3)  # List of 3 floats for microphone location
+    animalEstLLA: List[float] = Field(..., min_items=3, max_items=3)  # List of 3 floats for estimated animal location
+    animalTrueLLA: List[float] = Field(..., min_items=3, max_items=3)  # List of 3 floats for true animal location
     animalLLAUncertainty: condecimal(gt=0)  # Uncertainty greater than 0
     audioClip: str  # Audio clip data
     mode: str  # Recording mode
