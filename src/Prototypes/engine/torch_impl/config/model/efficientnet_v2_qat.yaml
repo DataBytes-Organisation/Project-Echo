@@ -1,11 +1,12 @@
 name: efficientnet_v2_qat
-norm_choice: swap_rms_norm
-# norm_choice: freeze_bn
+norm_choice: freeze_bn
+
 params:
-  model_name: "efficientnet_v2_s" 
+  model_name: "efficientnet_v2_s"
   pretrained: true
   num_classes: ${data.num_classes}
   use_qat: true
   trainable_blocks: -1
   use_arcface: true
+  replace_silu_with_relu: true
 

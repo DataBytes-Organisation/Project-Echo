@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.hub import load_state_dict_from_url
 
-from model.utils import ArcMarginProduct
+from model.utils import CosineLinear
 
 PRETRAINED_URL = "https://zenodo.org/record/3987831/files/MobileNetV1_mAP%3D0.389.pth"
 
@@ -76,7 +76,7 @@ class MobileNetV1(nn.Module):
 		return clipwise_output, embedding
 
 class PannsMobileNetV1ArcFace(nn.Module):
-	def __init__(self, num_classes: int, pretrained: bool, use_arcface: bool = False, **arcface_params):
+	def __init__(self, classes_num: int, pretrained: bool, use_arcface: bool = False):
 		super().__init__()
 		PRETRAINED_URL = "https://zenodo.org/record/3987831/files/MobileNetV1_mAP%3D0.389.pth"
 		original_classes = 527
@@ -88,29 +88,19 @@ class PannsMobileNetV1ArcFace(nn.Module):
 			for key in ['spectrogram_extractor.stft.conv_real.weight', 'spectrogram_extractor.stft.conv_imag.weight', 'logmel_extractor.melW', 'bn0.weight', 'bn0.bias', 'bn0.running_mean', 'bn0.running_var', 'bn0.num_batches_tracked']:
 				state_dict.pop(key, None)
 			self.cnn.load_state_dict(state_dict)
-		self.use_arcface = use_arcface
 
 		in_features = self.cnn.fc_audioset.in_features
-		if self.use_arcface:
-			self.head = ArcMarginProduct(in_features, num_classes, **arcface_params)
+		if use_arcface:
+			self.head = CosineLinear(in_features, classes_num)
 		else:
-			self.head = nn.Linear(in_features, num_classes)
+			self.head = nn.Linear(in_features, classes_num)
 
 		self.cnn.fc_audioset = nn.Identity()
 
-	def forward(self, x: torch.Tensor, labels: torch.Tensor = None) -> torch.Tensor:
+	def forward(self, x: torch.Tensor) -> torch.Tensor:
 		if x.dim() == 3: x = x.unsqueeze(1)
 		_, embedding = self.cnn(x)
-		if self.use_arcface:
-			if self.training:
-				if labels is None:
-					 raise ValueError("Labels are required for ArcFace training.")
-
-				return self.head(embedding, labels)
-			else:
-				 return F.normalize(embedding, p=2, dim=1)
-		else:
-			return self.head(embedding)
+		return self.head(embedding)
 
 	def fuse_model(self):
 		if self.training:

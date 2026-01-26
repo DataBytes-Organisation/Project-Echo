@@ -233,7 +233,7 @@ class GhostEfficientNetV2(nn.Module):
 		else:
 			self.head = nn.Linear(in_channels, num_classes)
 
-	def forward(self, x, labels=None):
+	def forward(self, x: torch.Tensor) -> torch.Tensor:
 		embs = self.backbone(x)
 		logits = self.head(embs)
 	
