@@ -400,3 +400,8 @@ class DetectionListResponses(BaseModel):
         allow_population_by_fiels_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
+
+
+# Backwards/expected import name used by app.routers.detections
+class DetectionListResponse(DetectionListResponses):
+    pass

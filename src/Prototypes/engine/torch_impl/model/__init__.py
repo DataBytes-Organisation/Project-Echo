@@ -15,11 +15,13 @@ from model.quant import prepare_qat_fx, prepare_post_static_quantize_fx, convert
 
 from enum import Enum
 
+
 class RMSNorm2d(nn.Module):
 	"""
 	Standard RMSNorm (no mean subtraction) adapted for 4D CNN input (B, C, H, W).
 	Normalizes across (C, H, W) dimensions for each sample.
 	"""
+
 	def __init__(self, channels: int, eps: float = 1e-6, add_unit_offset: bool = True):
 		super().__init__()
 		self.eps = eps
@@ -30,24 +32,24 @@ class RMSNorm2d(nn.Module):
 		# Calculate RMS across (C, H, W).
 		# Mean operation is over dimensions 1, 2, 3 (Channel, Height, Width)
 		# Sum of x.pow(2) divided by the total number of elements used for the mean (C*H*W)
-		
+
 		# Calculate the mean of the squared input over the normalization axis
 		# dim=[1, 2, 3] ensures that the statistics are calculated per image.
 		mean_squared = x.pow(2).mean(dim=[1, 2, 3], keepdim=True)
-		
+
 		# Calculate 1/sqrt(mean_squared + eps)
 		rsqrt_val = torch.rsqrt(mean_squared + self.eps)
 		return x * rsqrt_val
 
 	def forward(self, x):
 		output = self._norm(x.float())
-		
+
 		# Apply learned weight (scale)
 		if self.add_unit_offset:
 			output = output * (1 + self.weight.float())
 		else:
 			output = output * self.weight.float()
-			
+
 		return output.type_as(x)
 
 
@@ -105,7 +107,7 @@ class Model(nn.Module):
 		self.use_qat = model_params.get("use_qat", False)
 		if self.use_qat:
 			self.model.eval()
-			self.model.fuse_model() 
+			self.model.fuse_model()
 			self.model = prepare_qat_fx(self.model)
 
 	def freeze_batch_norm(self):
@@ -126,12 +128,12 @@ class Model(nn.Module):
 		"""
 		norm_name = target_norm.__name__
 		print(f"Applying: SWAP_NORM. Replacing BatchNorm2d with {norm_name}.")
-		
+
 		def replace_module(module: nn.Module):
 			for name, child in module.named_children():
 				if isinstance(child, nn.BatchNorm2d):
 					num_features = child.num_features
-					
+
 					if target_norm == nn.GroupNorm:
 						# For GroupNorm, must specify num_groups and num_channels
 						# Setting num_groups=1 is the CNN-friendly equivalent of LayerNorm
@@ -144,36 +146,37 @@ class Model(nn.Module):
 					# Replace the module in the parent container
 					setattr(module, name, new_norm)
 				else:
-					replace_module(child) # Recursively apply to children
-		
+					replace_module(child)  # Recursively apply to children
+
 		replace_module(self.model)
-	
-	def forward(self, *args, **kwargs):
-		return self.model(*args, **kwargs)
 
-	def load_state_dict(self, state_dict):
-		self.model.load_state_dict(state_dict)
+	def forward(self, x: torch.Tensor) -> torch.Tensor:
+		return self.model(x)
 
-	def state_dict(self):
-		return self.model.state_dict()
+	def load_state_dict(self, state_dict, strict=True):
+		return self.model.load_state_dict(state_dict, strict=strict)
+
+	def state_dict(self, *args, **kwargs):
+		return self.model.state_dict(*args, **kwargs)
 
 	def quantise(self):
 		if not self.use_qat:
+			print("Warning: quantise() called, but model was not trained with QAT. Only fusing modules.")
 			self.model.eval()
-			self.model.fuse_model() 
-			self.model = prepare_post_static_quantize_fx(self.model)
+			self.model.fuse_model()
+			return
 
 		self.model = convert_fx(self.model)
 
 	def summary(self):
 		"""
-		Prints a summary of the model, including the number of parameters 
+		Prints a summary of the model, including the number of parameters
 		and its estimated size on disk.
 		"""
 
 		total_params = sum(p.numel() for p in self.model.parameters())
 		trainable_params = sum(p.numel() for p in self.model.parameters() if p.requires_grad)
-		
+
 		buffer = io.BytesIO()
 		torch.save(self.state_dict(), buffer)
 		size_mb = buffer.getbuffer().nbytes / (1024**2)

@@ -1,265 +1,367 @@
+import argparse
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
-import tensorflow as tf
 import numpy as np
+import tensorflow as tf
+from omegaconf import OmegaConf
+from pathlib import Path
+import sys
 import os
+from tqdm import tqdm
+from sklearn.metrics import accuracy_score, confusion_matrix
+from collections import defaultdict
+import librosa
+from scipy import signal
 
-from torchvision.models.efficientnet import EfficientNet, _efficientnet_conf
-import torchvision.models as models
+# Add project root to path to allow importing 'model' and 'dataset'
+sys.path.append(str(Path(__file__).resolve().parent))
+from model import Model
+from dataset import SpectrogramDataset, index_directory, validation_collate_fn
 
-# Model paths
-PYTORCH_MODEL_PATH = r".pth" # Your existing PyTorch model
-TFLITE_MODEL_PATH = "EFF2_QAT_Circle_clean.tflite"  # Your existing TFLite model
 
-# Model configuration
-# You can modify these parameters as needed
-MODEL_NAME = "efficientnet_v2_s"
-NUM_CLASSES = 118
-USE_ARCFACE = True
-IN_CHANNELS = 1
-INPUT_SIZE = 224
+def preprocess_with_librosa(waveform: np.ndarray, pp_data: dict) -> np.ndarray:
+	"""
+	A torch-free preprocessor for audio data that uses a dictionary of
+	pre-computed data (including filter bank).
+	"""
+	# Extract parameters from the loaded dictionary
+	sample_rate = pp_data["sample_rate"]
+	target_duration_samples = int(pp_data["audio_clip_duration"] * sample_rate)
+	n_fft = pp_data["n_fft"]
+	hop_length = pp_data["hop_length"]
+	mel_filters = pp_data["mel_filters"]
+	top_db = pp_data["top_db"]
 
-MODEL_CONFIGS = {
-    "efficientnet_v2_s": {"dropout": 0.2},
-    "efficientnet_v2_m": {"dropout": 0.3},
-    "efficientnet_v2_l": {"dropout": 0.4},
-}
+	# Pad or truncate to target duration
+	current_len = waveform.shape[-1]
+	if current_len > target_duration_samples:
+		waveform = waveform[..., :target_duration_samples]
+	elif current_len < target_duration_samples:
+		pad_amount = target_duration_samples - current_len
+		waveform = np.pad(waveform, (0, pad_amount))
 
-# CosineLinear implementation for ArcFace
-class CosineLinear(nn.Module):
-    def __init__(self, in_features, out_features):
-        super(CosineLinear, self).__init__()
-        self.in_features = in_features
-        self.out_features = out_features
-        self.weight = nn.Parameter(torch.Tensor(out_features, in_features))
-        nn.init.xavier_uniform_(self.weight)
-    
-    def forward(self, input):
-        normalized_weight = F.normalize(self.weight, p=2, dim=1)
-        normalized_input = F.normalize(input, p=2, dim=1)
-        cosine = F.linear(normalized_input, normalized_weight)
-        return cosine
+	# Manually pad for STFT consistency
+	padding = n_fft // 2
+	waveform = np.pad(waveform, padding, mode="reflect")
 
-class EfficientNetV2ArcFace(EfficientNet):
-    def __init__(self, model_name: str, pretrained: bool, num_classes: int, 
-                 use_arcface: bool, in_channels: int = 1, trainable_blocks: int = 0):
-        if not model_name.startswith('efficientnet_v2'):
-            raise ValueError("This class is for EfficientNetV2 models.")
-        if model_name not in MODEL_CONFIGS:
-            raise ValueError(f"Unsupported model: {model_name}")
+	# Calculate STFT Power Spectrogram using librosa
+	hann_window_periodic_np = signal.get_window("hann", n_fft, fftbins=True)
+	stft_complex = librosa.stft(
+		y=waveform,
+		n_fft=n_fft,
+		hop_length=hop_length,
+		center=False,
+		window=hann_window_periodic_np,
+	)
+	stft_power = np.abs(stft_complex) ** 2
 
-        inverted_residual_setting, last_channel = _efficientnet_conf(model_name)
-        dropout = MODEL_CONFIGS[model_name]["dropout"]
-        original_weights_enum = getattr(models, f"EfficientNet_V2_{model_name.split('_')[-1].title()}_Weights")
-        temp_num_classes = len(original_weights_enum.DEFAULT.meta["categories"]) if pretrained else num_classes
-        super().__init__(inverted_residual_setting, dropout=dropout, last_channel=last_channel, num_classes=temp_num_classes)
+	# Apply the pre-computed torchaudio filter bank
+	mel_spectrogram = (stft_power.T @ mel_filters).T
 
-        self.use_arcface = use_arcface
-        self._modify_first_conv_layer(in_channels, pretrained)
-        in_features = self.classifier[1].in_features
-        
-        if self.use_arcface:
-            self.head = CosineLinear(in_features, num_classes)
-        else:
-            self.head = nn.Linear(in_features, num_classes)
+	# Convert to dB scale
+	melspec_db = librosa.power_to_db(mel_spectrogram, ref=1.0, amin=1e-10, top_db=top_db)
 
-        self.classifier = nn.Identity()
-        self.set_trainable_layers(trainable_blocks)
+	# Normalize
+	normalized_spec = (melspec_db + top_db) / top_db
 
-    def _modify_first_conv_layer(self, in_channels: int, pretrained: bool):
-        first_conv = self.features[0][0]
-        original_in_channels = first_conv.in_channels
-        if in_channels == original_in_channels: 
-            return
+	# Add a channel and batch dimension for TFLite (NHWC)
+	normalized_spec = normalized_spec[..., np.newaxis]
+	return normalized_spec[np.newaxis, ...]
 
-        new_first_conv = nn.Conv2d(
-            in_channels=in_channels, out_channels=first_conv.out_channels,
-            kernel_size=first_conv.kernel_size, stride=first_conv.stride,
-            padding=first_conv.padding, bias=first_conv.bias is not None
-        )
 
-        if pretrained:
-            original_weights = first_conv.weight.data
-            if original_in_channels == 3 and in_channels == 1:
-                new_weights = original_weights.mean(dim=1, keepdim=True) 
-            else:
-                new_weights = original_weights.sum(dim=1, keepdim=True).repeat(1, in_channels, 1, 1) / original_in_channels
-            new_first_conv.weight.data = new_weights
+def run_pytorch_inference(model: Model, input_data: torch.Tensor) -> np.ndarray:
+	"""Runs inference on the PyTorch model."""
+	with torch.no_grad():
+		output = model(input_data)
+	return output.numpy()
 
-        self.features[0][0] = new_first_conv
 
-    def set_trainable_layers(self, trainable_blocks: int = 0):
-        for param in self.parameters(): 
-            param.requires_grad = False
-        if trainable_blocks == -1:
-            for param in self.parameters(): 
-                param.requires_grad = True
-            return
-        for param in self.head.parameters():
-            param.requires_grad = True
-        if trainable_blocks > 0:
-            num_feature_blocks = len(self.features)
-            trainable_blocks = min(trainable_blocks, num_feature_blocks)
-            for i in range(num_feature_blocks - trainable_blocks, num_feature_blocks):
-                for param in self.features[i].parameters(): 
-                    param.requires_grad = True
+def run_tflite_inference(interpreter: tf.lite.Interpreter, input_data: np.ndarray) -> np.ndarray:
+	"""Runs inference on the TFLite model."""
+	input_details = interpreter.get_input_details()[0]
+	output_details = interpreter.get_output_details()[0]
 
-    def forward(self, x: torch.Tensor, labels: torch.Tensor = None) -> torch.Tensor:
-        embedding = torch.flatten(self.avgpool(self.features(x)), 1)
-        return self.head(embedding)
+	interpreter.set_tensor(input_details["index"], input_data)
+	interpreter.invoke()
 
-def load_pytorch_model():
-    """Load PyTorch model"""
-    print("Loading PyTorch model...")
-    
-    model = EfficientNetV2ArcFace(
-        model_name=MODEL_NAME, pretrained=False, num_classes=NUM_CLASSES,
-        use_arcface=USE_ARCFACE, in_channels=IN_CHANNELS, trainable_blocks=0
-    )
-    
-    checkpoint = torch.load(PYTORCH_MODEL_PATH, map_location='cpu')
-    
-    if isinstance(checkpoint, dict):
-        if 'state_dict' in checkpoint:
-            state_dict = checkpoint['state_dict']
-        elif 'model_state_dict' in checkpoint:
-            state_dict = checkpoint['model_state_dict']
-        else:
-            state_dict = checkpoint
-    else:
-        state_dict = checkpoint
-    
-    # Filter out QAT-specific keys
-    filtered_state_dict = {k: v for k, v in state_dict.items() 
-                          if not any(x in k for x in ['fake_quant', 'observer', 'activation_post_process'])}
-    
-    model.load_state_dict(filtered_state_dict, strict=False)
-    model.eval()
-    
-    print("PyTorch model loaded")
-    return model
+	return interpreter.get_tensor(output_details["index"])
 
-def run_pytorch_inference(model, input_data):
-    """Run PyTorch inference"""
-    with torch.no_grad():
-        torch_input = torch.from_numpy(input_data)
-        output = model(torch_input)
-        output_np = output.numpy() if isinstance(output, torch.Tensor) else output
-    return output_np
 
-def run_tflite_inference(input_data):
-    """Run TFLite inference"""
-    interpreter = tf.lite.Interpreter(model_path=TFLITE_MODEL_PATH)
-    interpreter.allocate_tensors()
-    
-    input_details = interpreter.get_input_details()
-    output_details = interpreter.get_output_details()
-    
-    # Check if we need to transpose (NCHW -> NHWC)
-    if len(input_details[0]['shape']) == 4 and input_details[0]['shape'][3] == IN_CHANNELS:
-        tflite_input = np.transpose(input_data, (0, 2, 3, 1))
-    else:
-        tflite_input = input_data
-    
-    interpreter.set_tensor(input_details[0]['index'], tflite_input.astype(input_details[0]['dtype']))
-    interpreter.invoke()
-    output_np = interpreter.get_tensor(output_details[0]['index'])
-    
-    return output_np
+def compare_models(args):
+	"""
+	Loads a PyTorch and TFLite model from a specified directory,
+	runs inference on dummy data, and compares their outputs.
+	"""
+	model_dir = Path(args.model_dir)
 
-def compare_models(num_tests=10):
-    """Compare PyTorch and TFLite models across multiple test inputs"""
-    print("=" * 70)
-    print("PyTorch vs TFLite Model Validation")
-    print("=" * 70)
-    print(f"\nConfiguration:")
-    print(f"  Model: {MODEL_NAME}")
-    print(f"  Classes: {NUM_CLASSES}")
-    print(f"  Input: {IN_CHANNELS}x{INPUT_SIZE}x{INPUT_SIZE}")
-    print(f"  ArcFace: {USE_ARCFACE}")
-    print(f"  Number of tests: {num_tests}")
-    
-    # Load PyTorch model
-    pytorch_model = load_pytorch_model()
-    
-    # Check TFLite model exists
-    if not os.path.exists(TFLITE_MODEL_PATH):
-        print(f"\n TFLite model not found at: {TFLITE_MODEL_PATH}")
-        return
-    
-    print(f" TFLite model found\n")
-    
-    print("=" * 70)
-    print("Running comparisons...")
-    print("=" * 70)
-    
-    all_diffs = []
-    all_relative_errors = []
-    
-    for test_num in range(num_tests):
-        # Create test input
-        np.random.seed(42 + test_num)
-        test_input = np.random.randn(1, IN_CHANNELS, INPUT_SIZE, INPUT_SIZE).astype(np.float32)
-        
-        # Run both models
-        pytorch_output = run_pytorch_inference(pytorch_model, test_input)
-        tflite_output = run_tflite_inference(test_input)
-        
-        # Reshape if needed
-        if pytorch_output.shape != tflite_output.shape:
-            if np.prod(pytorch_output.shape) == np.prod(tflite_output.shape):
-                tflite_output = tflite_output.reshape(pytorch_output.shape)
-        
-        # Calculate differences
-        diff = np.abs(pytorch_output - tflite_output)
-        max_diff = np.max(diff)
-        mean_diff = np.mean(diff)
-        relative_error = max_diff / (np.abs(pytorch_output).max() + 1e-10)
-        
-        all_diffs.append(max_diff)
-        all_relative_errors.append(relative_error)
-        
-        # Get top predictions
-        pytorch_top = np.argsort(pytorch_output[0])[-3:][::-1]
-        tflite_top = np.argsort(tflite_output[0])[-3:][::-1]
-        
-        predictions_match = np.array_equal(pytorch_top, tflite_top)
-        
-        print(f"\nTest {test_num + 1}:")
-        print(f"  PyTorch top-3: {pytorch_top} → values: {pytorch_output[0][pytorch_top]}")
-        print(f"  TFLite  top-3: {tflite_top} → values: {tflite_output[0][tflite_top]}")
-        print(f"  Predictions match: {'✓' if predictions_match else '✗'}")
-        print(f"  Max difference: {max_diff:.8f}")
-        print(f"  Mean difference: {mean_diff:.8f}")
-        print(f"  Relative error: {relative_error:.8f}")
-    
-    # Summary
-    print("\n" + "=" * 70)
-    print("SUMMARY")
-    print("=" * 70)
-    
-    avg_max_diff = np.mean(all_diffs)
-    max_max_diff = np.max(all_diffs)
-    avg_relative_error = np.mean(all_relative_errors)
-    
-    print(f"\nAcross {num_tests} tests:")
-    print(f"  Average max difference: {avg_max_diff:.8f}")
-    print(f"  Worst max difference: {max_max_diff:.8f}")
-    print(f"  Average relative error: {avg_relative_error:.8f}")
-    
-    tolerance = 1e-3
-    if max_max_diff < tolerance:
-        print(f"\n ALL TESTS PASSED (within tolerance {tolerance})")
-        print("  The TFLite model produces equivalent outputs to PyTorch!")
-    elif max_max_diff < 0.01:
-        print(f"\n MINOR DIFFERENCES DETECTED (max: {max_max_diff:.6f})")
-        print("  Differences are small and likely acceptable for most use cases.")
-    else:
-        print(f"\n SIGNIFICANT DIFFERENCES DETECTED (max: {max_max_diff:.6f})")
-        print("  The models may not be equivalent. Review the conversion process.")
-    
-    print("=" * 70)
+	print("=" * 70)
+	print("PyTorch vs. TFLite End-to-End Validation")
+	print("=" * 70)
+
+	# Load Config and Find Models
+	print("\n--- Step 1: Loading configuration and finding models ---")
+	config_path = model_dir / ".hydra" / "config.yaml"
+	if not config_path.exists():
+		print(f"Error: Could not find configuration file at '{config_path}'.")
+		sys.exit(1)
+
+	cfg = OmegaConf.load(config_path)
+
+	pytorch_model_path = model_dir / f"best_{cfg.model.name}.pth"
+	tflite_model_path = model_dir / f"{cfg.model.name}.tflite"
+
+	if not pytorch_model_path.exists():
+		print(f"Error: PyTorch model not found at '{pytorch_model_path}'")
+		sys.exit(1)
+	if not tflite_model_path.exists():
+		print(f"Error: TFLite model not found at '{tflite_model_path}'")
+		sys.exit(1)
+
+	print(f"  [✓] PyTorch model: {pytorch_model_path.name}")
+	print(f"  [✓] TFLite model:  {tflite_model_path.name}")
+
+	# Load Models & Assets
+	print("\n--- Step 2: Loading models and assets ---")
+	try:
+		# Load PyTorch model
+		class_names_path = model_dir / "class_names.txt"
+		with open(class_names_path, "r") as f:
+			num_classes = len([line for line in f if line.strip()])
+
+		OmegaConf.set_struct(cfg, False)
+		cfg.data.num_classes = num_classes
+		OmegaConf.set_struct(cfg, True)
+
+		pytorch_model = Model(cfg)
+		checkpoint = torch.load(pytorch_model_path, map_location="cpu")
+		state_dict = checkpoint.get("model_state_dict", checkpoint)
+		pytorch_model.load_state_dict(state_dict)
+		pytorch_model.eval()
+		print("  [✓] PyTorch model loaded.")
+
+		# Load TFLite model
+		interpreter = tf.lite.Interpreter(model_path=str(tflite_model_path))
+		interpreter.allocate_tensors()
+		print("  [✓] TFLite model loaded.")
+
+		# Load preprocessing data for Librosa pipeline
+		preprocess_path = model_dir / "preprocess.npy"
+		if not preprocess_path.exists():
+			print(f"Error: Preprocessing data not found at '{preprocess_path}'")
+			sys.exit(1)
+		pp_data = np.load(preprocess_path, allow_pickle=True).item()
+		print("  [✓] Librosa preprocessing data loaded.")
+
+	except Exception as e:
+		print(f"Error loading models: {e}")
+		sys.exit(1)
+
+	print("\n--- Step 2a: Loading validation dataset ---")
+	input_details = interpreter.get_input_details()[0]
+	target_width = input_details["shape"][2]
+	print(f"  [i] TFLite model expects input width: {target_width}")
+
+	audio_files, labels, class_names = index_directory(cfg.system.audio_data_directory)
+	torch.manual_seed(cfg.training.seed)
+
+	class_indices = defaultdict(list)
+	for idx, label in enumerate(labels):
+		class_indices[label].append(idx)
+
+	val_indices = []
+	for class_label, indices_list in class_indices.items():
+		indices = torch.tensor(indices_list)
+		shuffled_class_indices = indices[torch.randperm(len(indices))]
+		n_val = int(len(indices) * cfg.data.val_split)
+		val_indices.extend(shuffled_class_indices[:n_val].tolist())
+
+	print(f"  [✓] Found {len(val_indices)} validation samples.")
+
+	# This dataset is for the PyTorch (torchaudio) pipeline
+	val_dataset_torch = SpectrogramDataset(
+		[audio_files[i] for i in val_indices],
+		[labels[i] for i in val_indices],
+		cfg,
+		is_train=False,
+		target_width=target_width,
+	)
+	val_loader_torch = torch.utils.data.DataLoader(
+		val_dataset_torch, batch_size=1, shuffle=False, num_workers=os.cpu_count(), collate_fn=validation_collate_fn
+	)
+
+	# Run Comparisons
+	print(f"\n--- Step 3: Running comparisons on validation set ({len(val_indices)} samples) ---")
+
+	pytorch_file_preds = []
+	tflite_file_preds = []
+	true_file_labels = []
+	pytorch_class_confidences = defaultdict(list)
+	tflite_class_confidences = defaultdict(list)
+
+	val_audio_paths = [audio_files[i] for i in val_indices]
+
+	iterator = zip(val_loader_torch, val_audio_paths)
+
+	for i, ((torch_inputs, torch_labels), audio_path) in enumerate(
+		tqdm(iterator, total=len(val_audio_paths), desc="Comparing pipelines")
+	):
+		# For the first sample, explicitly verify the spectrograms are consistent
+		if i == 0:
+			print("\n--- Verifying librosa preprocessing against torchaudio ---")
+			torchaudio_spec = torch_inputs[0].to("cpu").numpy()
+
+			target_sr = pp_data["sample_rate"]
+			clip_duration = pp_data["audio_clip_duration"]
+			chunk_size_samples = int(clip_duration * target_sr)
+			waveform, _ = librosa.load(audio_path, sr=target_sr, mono=True)
+			chunk_waveform = waveform[0:chunk_size_samples]
+
+			librosa_spec = preprocess_with_librosa(chunk_waveform, pp_data)
+
+			current_width = librosa_spec.shape[2]
+			if current_width != target_width:
+				if current_width > target_width:
+					librosa_spec = librosa_spec[:, :, :target_width, :]
+				else:
+					pad_width = target_width - current_width
+					paddings = ((0, 0), (0, 0), (0, pad_width), (0, 0))
+					librosa_spec = np.pad(librosa_spec, paddings, mode="constant", constant_values=0)
+
+			librosa_spec_reshaped = librosa_spec.squeeze(axis=(0, 3))[np.newaxis, :, :]
+
+			spec_diff = np.abs(torchaudio_spec - librosa_spec_reshaped)
+			max_spec_diff = np.max(spec_diff)
+
+			print(f"  Max element-wise difference between spectrograms: {max_spec_diff:.8f}")
+			spec_tolerance = 1e-5
+			if max_spec_diff < spec_tolerance:
+				print("  [✓] PASSED: Librosa-based preprocessing is consistent with torchaudio.")
+			else:
+				print("  [✗] FAILED: Librosa-based preprocessing differs significantly from torchaudio.")
+
+		true_label_idx = torch_labels[0].item()
+		true_file_labels.append(true_label_idx)
+
+		# --- PyTorch Pipeline (torchaudio) ---
+		pytorch_outputs_chunks = run_pytorch_inference(pytorch_model, torch_inputs.to("cpu"))
+		pytorch_output_agg = np.mean(pytorch_outputs_chunks, axis=0)
+		pytorch_probs = torch.nn.functional.softmax(torch.from_numpy(pytorch_output_agg), dim=0).numpy()
+
+		pytorch_file_preds.append(np.argmax(pytorch_probs))
+		pytorch_class_confidences[true_label_idx].append(np.max(pytorch_probs))
+
+		# --- TFLite Pipeline (librosa) ---
+		target_sr = pp_data["sample_rate"]
+		clip_duration = pp_data["audio_clip_duration"]
+		chunk_size_samples = int(clip_duration * target_sr)
+
+		waveform, _ = librosa.load(audio_path, sr=target_sr, mono=True)
+
+		tflite_outputs_chunks = []
+		current_pos_samples = 0
+		while current_pos_samples < waveform.shape[-1]:
+			chunk_waveform = waveform[current_pos_samples : current_pos_samples + chunk_size_samples]
+
+			if len(chunk_waveform) == 0:
+				break
+
+			spectrogram = preprocess_with_librosa(chunk_waveform, pp_data)
+
+			current_width = spectrogram.shape[2]
+			if current_width != target_width:
+				if current_width > target_width:
+					spectrogram = spectrogram[:, :, :target_width, :]
+				else:
+					pad_width = target_width - current_width
+					paddings = ((0, 0), (0, 0), (0, pad_width), (0, 0))
+					spectrogram = np.pad(spectrogram, paddings, mode="constant", constant_values=0)
+
+			tflite_chunk_output = run_tflite_inference(interpreter, spectrogram)
+			tflite_outputs_chunks.append(tflite_chunk_output)
+			current_pos_samples += chunk_size_samples
+
+		tflite_output_agg = np.mean(np.vstack(tflite_outputs_chunks), axis=0)
+		tflite_probs = tf.nn.softmax(tflite_output_agg).numpy()
+
+		tflite_file_preds.append(np.argmax(tflite_probs))
+		tflite_class_confidences[true_label_idx].append(np.max(tflite_probs))
+
+	print("\n" + "=" * 70)
+	print("Validation Summary")
+	print("=" * 70)
+
+	print(f"  Number of samples validated: {len(val_indices)}")
+
+	print("\n--- Classification Accuracy ---")
+	pytorch_accuracy = accuracy_score(true_file_labels, pytorch_file_preds)
+	tflite_accuracy = accuracy_score(true_file_labels, tflite_file_preds)
+
+	print(f"  PyTorch Model Accuracy (torchaudio): {pytorch_accuracy:.4f}")
+	print(f"  TFLite Model Accuracy (librosa):   {tflite_accuracy:.4f}")
+
+	if np.isclose(pytorch_accuracy, tflite_accuracy, atol=0.01):
+		print("\n  [✓] PASSED: TFLite (librosa) pipeline accuracy is consistent with PyTorch (torchaudio) pipeline.")
+	else:
+		print("\n  [✗] FAILED: TFLite (librosa) pipeline accuracy differs significantly from PyTorch (torchaudio).")
+
+	# --- Per-Class Accuracy Analysis ---
+	pytorch_avg_confidences = {}
+	for class_idx, conf_list in pytorch_class_confidences.items():
+		if conf_list:
+			pytorch_avg_confidences[class_names[class_idx]] = np.mean(conf_list)
+
+	tflite_avg_confidences = {}
+	for class_idx, conf_list in tflite_class_confidences.items():
+		if conf_list:
+			tflite_avg_confidences[class_names[class_idx]] = np.mean(conf_list)
+
+	print("\n--- Per-Class Analysis (based on TFLite predictions) ---")
+	cm = confusion_matrix(true_file_labels, tflite_file_preds, labels=np.arange(len(class_names)))
+	with np.errstate(divide="ignore", invalid="ignore"):
+		per_class_acc = cm.diagonal() / cm.sum(axis=1)
+
+	class_accuracies = []
+	for i, class_name in enumerate(class_names):
+		if cm.sum(axis=1)[i] > 0:
+			class_accuracies.append((class_name, per_class_acc[i]))
+
+	sorted_accuracies = sorted(class_accuracies, key=lambda item: item[1], reverse=True)
+
+	if not sorted_accuracies:
+		print("  Could not calculate per-class accuracies (no validation samples found).")
+	else:
+		num_to_show = min(10, len(sorted_accuracies))
+
+		print(f"\n  Top {num_to_show} Best Performing Classes:")
+		header = f"    {'Class Name':<30} {'Accuracy':<12} {'PT Avg Conf':<15} {'TFLite Avg Conf'}"
+		print(header)
+		print(f"    {'-' * 30} {'-' * 12} {'-' * 15} {'-' * 15}")
+		for class_name, acc in sorted_accuracies[:num_to_show]:
+			acc_str = f"{acc:.2%}" if not np.isnan(acc) else "N/A"
+			pt_conf_str = f"{pytorch_avg_confidences.get(class_name, 0):.2%}"
+			tflite_conf_str = f"{tflite_avg_confidences.get(class_name, 0):.2%}"
+			print(f"    - {class_name:<28} {acc_str:<12} {pt_conf_str:<15} {tflite_conf_str}")
+
+		print(f"\n  Top {num_to_show} Worst Performing Classes:")
+		print(header)
+		print(f"    {'-' * 30} {'-' * 12} {'-' * 15} {'-' * 15}")
+		worst_classes = sorted_accuracies[-num_to_show:]
+		for class_name, acc in reversed(worst_classes):
+			acc_str = f"{acc:.2%}" if not np.isnan(acc) else "N/A"
+			pt_conf_str = f"{pytorch_avg_confidences.get(class_name, 0):.2%}"
+			tflite_conf_str = f"{tflite_avg_confidences.get(class_name, 0):.2%}"
+			print(f"    - {class_name:<28} {acc_str:<12} {pt_conf_str:<15} {tflite_conf_str}")
+
+	print("=" * 70)
+
 
 if __name__ == "__main__":
-    compare_models(num_tests=10)
+	parser = argparse.ArgumentParser(description="Validate a TFLite model against its original PyTorch checkpoint.")
+	parser.add_argument("model_dir", type=str, help="Path to the trained model directory containing all artifacts.")
+	parser.add_argument(
+		"--num_tests",  # This argument will now be ignored/deprecated
+		type=int,
+		default=0,  # Set default to 0 as it's not used for validation set size
+		help="This argument is deprecated. The validation set size will be used.",
+	)
+	args = parser.parse_args()
+	compare_models(args)

@@ -24,6 +24,16 @@ Nodes = db.nodes
 Components = db.components
 Commands = db.commands
 
+# Sensor Health (Admin)
+SensorSettings = db.sensor_settings
+SensorReboots = db.sensor_reboots
+
+SensorSettings.create_index([("_id", pymongo.ASCENDING)], name="idx_sensor_settings_id")
+SensorReboots.create_index(
+    [("sensorId", pymongo.ASCENDING), ("requestedAt", pymongo.DESCENDING)],
+    name="idx_sensor_reboots_sensor_requestedAt_desc",
+)
+
 # User DB connection (env first, then service hostname)
 # legacy (kept for reference):
 # User_connection_string = "mongodb://root:root_password@ts-mongodb-cont/UserSample?authSource=admin"
