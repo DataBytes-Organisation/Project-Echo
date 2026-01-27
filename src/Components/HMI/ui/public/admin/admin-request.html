@@ -74,6 +74,8 @@
           </div>
         </div>
       </div>
+      <div id="footer"></div>
+      </div>
     </div>
 
 
@@ -83,6 +85,7 @@
           console.log("Start!")
           $("#sidebar").load("/admin/component/sidebar-component.html", function() { $.getScript('/admin/js/sidebarmenu.js'); });
           $("#header").load("/admin/component/header-component.html");
+          $("#footer").load("/admin/component/footer-component.html");
       });
     </script>
 
