@@ -2,12 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Sensor Health – Project Echo</title>
+  <title>Settings – Project Echo</title>
 
-  <!-- CSS -->
   <link rel="stylesheet" href="style.css" />
-
-  <!-- JS -->
   <script src="script.js" defer></script>
 </head>
 <body>
@@ -15,10 +12,9 @@
 <div class="layout">
 
   <!-- ============================
-       SIDEBAR (v0.1 style)
+       SIDEBAR
        ============================ -->
-
-<aside class="sidebar">
+ <aside class="sidebar">
   <div class="sidebar-brand">
     <img src="icons/echo.svg" class="brand-logo" alt="Echo logo" />
   </div>
@@ -77,6 +73,7 @@
   </div>
 </aside>
 
+
     <div class="sidebar-footer">
       v1.0 • Admin Console
     </div>
@@ -92,7 +89,7 @@
        ============================ -->
   <main class="main">
 
-    <!-- Top-right controls -->
+    <!-- Top icons -->
     <header class="page-header">
       <div></div>
       <div class="page-header-actions">
@@ -103,101 +100,56 @@
 
 
     <!-- ============================
-         DASHBOARD SHELL (Beige)
+         DASHBOARD SHELL (beige)
          ============================ -->
     <div class="dashboard-shell">
 
-      <!-- Page Title -->
+      <!-- Page title -->
       <section class="hero-header">
-        <h1>Sensor health</h1>
-        <p class="subtitle">real-time device status across all deployed locations</p>
+        <h1>Settings</h1>
+        <p class="subtitle">configure recording behaviour and alert thresholds</p>
       </section>
 
+      <!-- message area used by JS -->
+      <p id="settings-message" class="note"></p>
 
 
-      <!-- FILTER CARD -->
+      <!-- RECORDING & ALERT SETTINGS -->
       <section class="card">
-        <h3>Filter</h3>
-        <p class="card-subtitle">Narrow down sensors by project or status.</p>
+        <h3>Recording & alert settings</h3>
+        <p class="card-subtitle">
+          Adjust global defaults for sensor recording interval, sensitivity and low-battery alerts.
+        </p>
 
         <div class="form-grid">
 
           <div>
-            <label>Status</label>
-            <select>
-              <option>All</option>
-              <option>Online</option>
-              <option>Offline</option>
-              <option>Low Battery</option>
-              <option>Degraded</option>
+            <label for="record-interval">Recording interval</label>
+            <select id="record-interval">
+              <option>30 seconds</option>
+              <option selected>1 minute</option>
+              <option>5 minutes</option>
+              <option>10 minutes</option>
             </select>
           </div>
 
           <div>
-            <label>Project</label>
-            <select>
-              <option>All Projects</option>
-              <option>Rainforest A</option>
-              <option>Savannah Trial</option>
-              <option>Wetlands 2025</option>
+            <label for="sensitivity">Sensitivity</label>
+            <select id="sensitivity">
+              <option>Low</option>
+              <option selected>Medium</option>
+              <option>High</option>
             </select>
           </div>
 
+          <div>
+            <label for="battery-threshold">Battery warning threshold (%)</label>
+            <input id="battery-threshold" type="number" value="25" min="1" max="100" />
+          </div>
+
         </div>
-      </section>
 
-
-
-      <!-- SENSOR TABLE -->
-      <section class="card">
-        <h3>Live sensor overview</h3>
-        <p class="card-subtitle">Updated continuously as sensors report in.</p>
-
-        <table>
-          <thead>
-            <tr>
-              <th>Sensor ID</th>
-              <th>Project</th>
-              <th>Status</th>
-              <th>Battery</th>
-              <th>Last contact</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            <tr>
-              <td>SEN-01</td>
-              <td>Rainforest A</td>
-              <td><span class="pill pill-success">Online</span></td>
-              <td>87%</td>
-              <td>2m ago</td>
-            </tr>
-
-            <tr>
-              <td>SEN-14</td>
-              <td>Rainforest A</td>
-              <td><span class="pill pill-warning">Degraded</span></td>
-              <td>21%</td>
-              <td>15m ago</td>
-            </tr>
-
-            <tr>
-              <td>SEN-77</td>
-              <td>Savannah Trial</td>
-              <td><span class="pill pill-danger">Offline</span></td>
-              <td>—</td>
-              <td>2h ago</td>
-            </tr>
-
-            <tr>
-              <td>SEN-88</td>
-              <td>Wetlands 2025</td>
-              <td><span class="pill pill-warning">Low Battery</span></td>
-              <td>18%</td>
-              <td>8m ago</td>
-            </tr>
-          </tbody>
-        </table>
+        <button class="btn-primary" onclick="fakeSaveSettings()">Save settings</button>
       </section>
 
     </div><!-- /dashboard-shell -->

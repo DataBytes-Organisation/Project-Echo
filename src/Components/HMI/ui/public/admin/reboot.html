@@ -2,12 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Sensor Health – Project Echo</title>
+  <title>Reboot Sensors – Project Echo</title>
 
-  <!-- CSS -->
   <link rel="stylesheet" href="style.css" />
-
-  <!-- JS -->
   <script src="script.js" defer></script>
 </head>
 <body>
@@ -15,10 +12,9 @@
 <div class="layout">
 
   <!-- ============================
-       SIDEBAR (v0.1 style)
+       SIDEBAR
        ============================ -->
-
-<aside class="sidebar">
+ <aside class="sidebar">
   <div class="sidebar-brand">
     <img src="icons/echo.svg" class="brand-logo" alt="Echo logo" />
   </div>
@@ -77,9 +73,8 @@
   </div>
 </aside>
 
-    <div class="sidebar-footer">
-      v1.0 • Admin Console
-    </div>
+
+    <div class="sidebar-footer">v1.0 • Admin Console</div>
   </aside>
 
   <!-- Mobile backdrop -->
@@ -88,11 +83,11 @@
 
 
   <!-- ============================
-       MAIN AREA
+       MAIN SECTION
        ============================ -->
   <main class="main">
 
-    <!-- Top-right controls -->
+    <!-- Header with icons -->
     <header class="page-header">
       <div></div>
       <div class="page-header-actions">
@@ -103,101 +98,82 @@
 
 
     <!-- ============================
-         DASHBOARD SHELL (Beige)
+         DASHBOARD SHELL (beige)
          ============================ -->
     <div class="dashboard-shell">
 
-      <!-- Page Title -->
+      <!-- PAGE HERO TITLE -->
       <section class="hero-header">
-        <h1>Sensor health</h1>
-        <p class="subtitle">real-time device status across all deployed locations</p>
+        <h1>Reboot sensors</h1>
+        <p class="subtitle">queue reboot commands for malfunctioning or frozen devices</p>
       </section>
 
 
 
-      <!-- FILTER CARD -->
+      <!-- REBOOT FORM -->
       <section class="card">
-        <h3>Filter</h3>
-        <p class="card-subtitle">Narrow down sensors by project or status.</p>
+        <h3>Queue a reboot</h3>
+        <p class="card-subtitle">Send a reboot instruction to one or more sensors.</p>
 
         <div class="form-grid">
-
           <div>
-            <label>Status</label>
-            <select>
-              <option>All</option>
-              <option>Online</option>
-              <option>Offline</option>
-              <option>Low Battery</option>
-              <option>Degraded</option>
-            </select>
+            <label for="reboot-sensor">Sensor IDs</label>
+            <input id="reboot-sensor" placeholder="e.g. SEN-01, SEN-14, SEN-77">
           </div>
 
           <div>
-            <label>Project</label>
-            <select>
-              <option>All Projects</option>
-              <option>Rainforest A</option>
-              <option>Savannah Trial</option>
-              <option>Wetlands 2025</option>
-            </select>
+            <label for="reboot-reason">Reason</label>
+            <input id="reboot-reason" placeholder="e.g. frozen board, config update">
           </div>
-
         </div>
+
+        <button class="btn-primary" onclick="fakeReboot()">Reboot now</button>
+        <p id="reboot-message" class="note"></p>
       </section>
 
 
 
-      <!-- SENSOR TABLE -->
+      <!-- REBOOT HISTORY -->
       <section class="card">
-        <h3>Live sensor overview</h3>
-        <p class="card-subtitle">Updated continuously as sensors report in.</p>
+        <h3>Reboot history</h3>
+        <p class="card-subtitle">Recent reboot attempts and their outcomes.</p>
 
         <table>
           <thead>
             <tr>
-              <th>Sensor ID</th>
-              <th>Project</th>
+              <th>Sensor</th>
               <th>Status</th>
-              <th>Battery</th>
-              <th>Last contact</th>
+              <th>Time</th>
             </tr>
           </thead>
 
           <tbody>
             <tr>
-              <td>SEN-01</td>
-              <td>Rainforest A</td>
-              <td><span class="pill pill-success">Online</span></td>
-              <td>87%</td>
-              <td>2m ago</td>
+              <td>SEN-14</td>
+              <td><span class="pill pill-success">Success</span></td>
+              <td>13:22</td>
             </tr>
 
             <tr>
-              <td>SEN-14</td>
-              <td>Rainforest A</td>
-              <td><span class="pill pill-warning">Degraded</span></td>
-              <td>21%</td>
-              <td>15m ago</td>
+              <td>SEN-04</td>
+              <td><span class="pill pill-warning">Pending</span></td>
+              <td>13:10</td>
             </tr>
 
             <tr>
               <td>SEN-77</td>
-              <td>Savannah Trial</td>
-              <td><span class="pill pill-danger">Offline</span></td>
-              <td>—</td>
-              <td>2h ago</td>
+              <td><span class="pill pill-danger">Failed</span></td>
+              <td>12:44</td>
             </tr>
 
             <tr>
-              <td>SEN-88</td>
-              <td>Wetlands 2025</td>
-              <td><span class="pill pill-warning">Low Battery</span></td>
-              <td>18%</td>
-              <td>8m ago</td>
+              <td>SEN-101</td>
+              <td><span class="pill pill-success">Success</span></td>
+              <td>11:58</td>
             </tr>
           </tbody>
         </table>
+
       </section>
 
     </div><!-- /dashboard-shell -->

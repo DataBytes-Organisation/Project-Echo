@@ -2,22 +2,19 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Sensor Health – Project Echo</title>
+  <title>Alerts – Project Echo</title>
 
-  <!-- CSS -->
   <link rel="stylesheet" href="style.css" />
-
-  <!-- JS -->
   <script src="script.js" defer></script>
+  <script src="charts.js" defer></script>
 </head>
 <body>
 
 <div class="layout">
 
   <!-- ============================
-       SIDEBAR (v0.1 style)
+       SIDEBAR
        ============================ -->
-
 <aside class="sidebar">
   <div class="sidebar-brand">
     <img src="icons/echo.svg" class="brand-logo" alt="Echo logo" />
@@ -82,7 +79,6 @@
     </div>
   </aside>
 
-  <!-- Mobile backdrop -->
   <div class="mobile-backdrop" id="mobile-backdrop"></div>
 
 
@@ -92,7 +88,6 @@
        ============================ -->
   <main class="main">
 
-    <!-- Top-right controls -->
     <header class="page-header">
       <div></div>
       <div class="page-header-actions">
@@ -103,99 +98,72 @@
 
 
     <!-- ============================
-         DASHBOARD SHELL (Beige)
+         DASHBOARD SHELL (beige)
          ============================ -->
     <div class="dashboard-shell">
 
-      <!-- Page Title -->
+      <!-- HERO HEADER -->
       <section class="hero-header">
-        <h1>Sensor health</h1>
-        <p class="subtitle">real-time device status across all deployed locations</p>
+        <h1>Alerts</h1>
+        <p class="subtitle">real-time detection of issues across deployed sensors</p>
       </section>
 
 
 
-      <!-- FILTER CARD -->
+      <!-- ALERT SEVERITY CHART -->
       <section class="card">
-        <h3>Filter</h3>
-        <p class="card-subtitle">Narrow down sensors by project or status.</p>
+        <h3>Alert Severity Overview</h3>
+        <p class="card-subtitle">Distribution of active alerts</p>
 
-        <div class="form-grid">
-
-          <div>
-            <label>Status</label>
-            <select>
-              <option>All</option>
-              <option>Online</option>
-              <option>Offline</option>
-              <option>Low Battery</option>
-              <option>Degraded</option>
-            </select>
-          </div>
-
-          <div>
-            <label>Project</label>
-            <select>
-              <option>All Projects</option>
-              <option>Rainforest A</option>
-              <option>Savannah Trial</option>
-              <option>Wetlands 2025</option>
-            </select>
-          </div>
-
-        </div>
+        <canvas id="alertsChart" height="120"></canvas>
       </section>
 
 
 
-      <!-- SENSOR TABLE -->
+      <!-- ACTIVE ALERTS TABLE -->
       <section class="card">
-        <h3>Live sensor overview</h3>
-        <p class="card-subtitle">Updated continuously as sensors report in.</p>
+        <h3>Active Alerts</h3>
+        <p class="card-subtitle">Sensors requiring immediate or near-term attention</p>
 
         <table>
           <thead>
             <tr>
-              <th>Sensor ID</th>
-              <th>Project</th>
-              <th>Status</th>
-              <th>Battery</th>
-              <th>Last contact</th>
+              <th>Sensor</th>
+              <th>Issue</th>
+              <th>Details</th>
+              <th>Last Audio</th>
             </tr>
           </thead>
 
           <tbody>
             <tr>
-              <td>SEN-01</td>
-              <td>Rainforest A</td>
-              <td><span class="pill pill-success">Online</span></td>
-              <td>87%</td>
-              <td>2m ago</td>
-            </tr>
-
-            <tr>
               <td>SEN-14</td>
-              <td>Rainforest A</td>
-              <td><span class="pill pill-warning">Degraded</span></td>
-              <td>21%</td>
-              <td>15m ago</td>
+              <td><span class="pill pill-warning">Low Battery</span></td>
+              <td>Battery at 21% (threshold 25%)</td>
+              <td>32m ago</td>
             </tr>
 
             <tr>
               <td>SEN-77</td>
-              <td>Savannah Trial</td>
               <td><span class="pill pill-danger">Offline</span></td>
-              <td>—</td>
-              <td>2h ago</td>
+              <td>No contact for 2 hours</td>
+              <td>2h 5m ago</td>
             </tr>
 
             <tr>
               <td>SEN-88</td>
-              <td>Wetlands 2025</td>
-              <td><span class="pill pill-warning">Low Battery</span></td>
-              <td>18%</td>
-              <td>8m ago</td>
+              <td><span class="pill pill-danger">No Audio</span></td>
+              <td>No audio in last 6 hours</td>
+              <td>6h ago</td>
             </tr>
+
+            <tr>
+              <td>SEN-104</td>
+              <td><span class="pill pill-warning">Degraded</span></td>
+              <td>Packet loss detected (18%)</td>
+              <td>22m ago</td>
+            </tr>
+
           </tbody>
         </table>
       </section>
