@@ -85,6 +85,23 @@ def _modify_first_conv_layer(self, in_channels: int, pretrained: bool):
 
 **Purpose**: Convert RGB pretrained weights to grayscale spectrogram input
 
+#### Activation Function Modification
+
+The model allows for replacing the default `SiLU` (Sigmoid-weighted Linear Unit) activation functions with `ReLU` (Rectified Linear Unit) throughout the network. This can be useful for experimentation or for targeting hardware that has better support for ReLU.
+
+```python
+# This is controlled by the `replace_silu_with_relu` parameter
+__init__(..., replace_silu_with_relu: bool = False)
+```
+
+**Benefits**:
+- Potential for faster inference on some hardware.
+- Simplifies the architecture.
+
+**Trade-offs**:
+- May lead to a drop in accuracy, as `SiLU` often provides better performance than `ReLU` in deep networks.
+- Using this with pretrained weights is not recommended as the model was trained with `SiLU`.
+
 #### ArcFace/CircleLoss Integration
 
 ```python
@@ -153,4 +170,5 @@ params:
   num_classes: 6
   use_arcface: true
   trainable_blocks: -1
+  replace_silu_with_relu: false # Optionally set to true
 ```

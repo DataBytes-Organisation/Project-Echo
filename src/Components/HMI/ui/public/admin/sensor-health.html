@@ -2,145 +2,141 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Sensor Health – Project Echo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Project Echo – Admin Dashboard</title>
 
-  <!-- CSS -->
   <link rel="stylesheet" href="style.css" />
-
-  <!-- JS -->
   <script src="script.js" defer></script>
+  <script src="charts.js" defer></script>
 </head>
 <body>
 
 <div class="layout">
 
-  <!-- ============================
-       SIDEBAR (v0.1 style)
-       ============================ -->
-
-<aside class="sidebar">
-  <div class="sidebar-brand">
-    <img src="icons/echo.svg" class="brand-logo" alt="Echo logo" />
-  </div>
-
-  <nav class="sidebar-menu">
-
-    <div class="nav-section">
-      <div class="nav-title">MENU</div>
-
-      <a class="nav-link active" href="index.html">
-        <span class="nav-icon">▦</span>
-        <span class="nav-text">Dashboard</span>
-      </a>
-
-      <a class="nav-link" href="sensor-health.html">
-        <span class="nav-icon">📡</span>
-        <span class="nav-text">Sensor Health</span>
-      </a>
-
-      <a class="nav-link" href="alerts.html">
-        <span class="nav-icon">🔔</span>
-        <span class="nav-text">Alerts</span>
-      </a>
-
-      <a class="nav-link" href="reboot.html">
-        <span class="nav-icon">⟲</span>
-        <span class="nav-text">Reboot</span>
-      </a>
-
-      <a class="nav-link" href="settings.html">
-        <span class="nav-icon">⚙</span>
-        <span class="nav-text">Settings</span>
-      </a>
-
-      <a class="nav-link" href="add-project.html">
-        <span class="nav-icon">➕</span>
-        <span class="nav-text">Add a Project</span>
-      </a>
-
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <img src="icons/echo.svg" class="brand-logo" alt="Echo logo" />
     </div>
 
-  </nav>
+    <nav class="sidebar-menu">
+      <div class="nav-section">
+        <div class="nav-title">MENU</div>
 
-  <div class="sidebar-footer">
-    <span class="footer-dot"></span>
-    <span class="footer-text">ECHO</span>
-  </div>
-</aside>
+        <button class="nav-link" type="button" data-view="dashboard">
+          <span class="nav-icon">▦</span>
+          <span class="nav-text">Dashboard</span>
+        </button>
 
+        <!-- Accordion Parent -->
+        <button class="nav-link nav-accordion" type="button"
+                aria-expanded="false"
+                aria-controls="sensor-accordion"
+                data-accordion="sensor">
+          <span class="nav-icon">📡</span>
+          <span class="nav-text">Sensor Health Management</span>
+          <span class="nav-caret">▾</span>
+        </button>
 
-  </nav>
-
-  <div class="sidebar-footer">
-    <span class="footer-dot"></span>
-    <span class="footer-text">ECHO</span>
-  </div>
-</aside>
+        <!-- Accordion Children (no page navigation) -->
+        <div class="nav-children" id="sensor-accordion">
+          <button class="nav-sublink" type="button" data-view="sensor-health">Sensor Health</button>
+          <button class="nav-sublink" type="button" data-view="alerts">Alerts</button>
+          <button class="nav-sublink" type="button" data-view="reboot">Reboot</button>
+          <button class="nav-sublink" type="button" data-view="settings">Settings</button>
+          <button class="nav-sublink" type="button" data-view="projects">Add a Project</button>
+        </div>
+      </div>
+    </nav>
 
     <div class="sidebar-footer">
-      v1.0 • Admin Console
+      <span class="footer-dot"></span>
+      <span class="footer-text">ECHO</span>
     </div>
   </aside>
 
   <!-- Mobile backdrop -->
   <div class="mobile-backdrop" id="mobile-backdrop"></div>
 
-
-
-  <!-- ============================
-       MAIN AREA
-       ============================ -->
+  <!-- MAIN -->
   <main class="main">
-
-    <!-- Top-right controls -->
     <header class="page-header">
       <div></div>
       <div class="page-header-actions">
-        <button class="icon-button" id="menu-toggle">☰</button>
-        <button class="icon-button" id="theme-toggle">🌙</button>
+        <button class="icon-button" id="menu-toggle" aria-label="Open menu">☰</button>
+        <button class="icon-button" id="theme-toggle" aria-label="Toggle theme">🌙</button>
       </div>
     </header>
 
+    <!-- Content root (views load here) -->
+    <div id="view-root">
+      <div class="dashboard-shell">
 
-    <!-- ============================
-         DASHBOARD SHELL (Beige)
-         ============================ -->
-    <div class="dashboard-shell">
-
-      <!-- Page Title -->
+      <!-- HERO HEADER -->
       <section class="hero-header">
-        <h1>Sensor health</h1>
-        <p class="subtitle">real-time device status across all deployed locations</p>
+        <h1>Project echo</h1>
+        <p class="subtitle">wildlife sound monitoring & sensor management</p>
+
+        <div class="hero-actions">
+          <button class="btn-primary">View Projects</button>
+          <button class="btn-secondary">Learn More</button>
+        </div>
       </section>
 
 
 
-      <!-- FILTER CARD -->
+      <!-- KPI CARDS -->
+      <section class="kpi-grid">
+        <div class="kpi-card">
+          <p>ACTIVE PROJECTS</p>
+          <h3>7</h3>
+        </div>
+
+        <div class="kpi-card">
+          <p>REGISTERED ECOLOGISTS</p>
+          <h3>69</h3>
+        </div>
+
+        <div class="kpi-card">
+          <p>SENSORS DEPLOYED</p>
+          <h3>420</h3>
+        </div>
+      </section>
+
+
+
+      <!-- PROJECT HIGHLIGHTS -->
       <section class="card">
-        <h3>Filter</h3>
-        <p class="card-subtitle">Narrow down sensors by project or status.</p>
+        <h3>Active Projects</h3>
+        <p class="card-subtitle">Overview of ongoing conservation deployments</p>
 
         <div class="form-grid">
 
-          <div>
-            <label>Status</label>
-            <select>
-              <option>All</option>
-              <option>Online</option>
-              <option>Offline</option>
-              <option>Low Battery</option>
-              <option>Degraded</option>
-            </select>
+          <div class="card">
+            <h3>Rainforest A</h3>
+            <p class="note">
+              Amazon Basin — Zone A1<br>
+              32 active sensors
+            </p>
+            <span class="pill pill-success">ACTIVE</span>
           </div>
 
-          <div>
-            <label>Project</label>
-            <select>
-              <option>All Projects</option>
-              <option>Rainforest A</option>
-              <option>Savannah Trial</option>
-              <option>Wetlands 2025</option>
-            </select>
+          <div class="card">
+            <h3>Savannah Trial</h3>
+            <p class="note">
+              Serengeti — West Ridge<br>
+              18 active sensors
+            </p>
+            <span class="pill pill-success">ACTIVE</span>
+          </div>
+
+          <div class="card">
+            <h3>Wetlands 2025</h3>
+            <p class="note">
+              New Plymouth — Zone Delta<br>
+              12 sensors in queue
+            </p>
+            <span class="pill pill-warning">PLANNING</span>
           </div>
 
         </div>
@@ -148,60 +144,42 @@
 
 
 
-      <!-- SENSOR TABLE -->
-      <section class="card">
-        <h3>Live sensor overview</h3>
-        <p class="card-subtitle">Updated continuously as sensors report in.</p>
+      <!-- FOOTER COLUMNS -->
+      <section class="footer-columns">
 
-        <table>
-          <thead>
-            <tr>
-              <th>Sensor ID</th>
-              <th>Project</th>
-              <th>Status</th>
-              <th>Battery</th>
-              <th>Last contact</th>
-            </tr>
-          </thead>
+        <div>
+          <h4>Wildlife Sound Monitor</h4>
+          <ul>
+            <li>Automated biodiversity tracking</li>
+            <li>24/7 acoustic scanning</li>
+            <li>Data-driven conservation</li>
+          </ul>
+        </div>
 
-          <tbody>
-            <tr>
-              <td>SEN-01</td>
-              <td>Rainforest A</td>
-              <td><span class="pill pill-success">Online</span></td>
-              <td>87%</td>
-              <td>2m ago</td>
-            </tr>
+        <div>
+          <h4>Quick Links</h4>
+          <ul>
+            <li>Home</li>
+            <li>Projects</li>
+            <li>Deployment Guide</li>
+            <li>Documentation</li>
+          </ul>
+        </div>
 
-            <tr>
-              <td>SEN-14</td>
-              <td>Rainforest A</td>
-              <td><span class="pill pill-warning">Degraded</span></td>
-              <td>21%</td>
-              <td>15m ago</td>
-            </tr>
+        <div>
+          <h4>Resources</h4>
+          <ul>
+            <li>API Reference</li>
+            <li>Support</li>
+            <li>Terms</li>
+            <li>Privacy Policy</li>
+          </ul>
+        </div>
 
-            <tr>
-              <td>SEN-77</td>
-              <td>Savannah Trial</td>
-              <td><span class="pill pill-danger">Offline</span></td>
-              <td>—</td>
-              <td>2h ago</td>
-            </tr>
-
-            <tr>
-              <td>SEN-88</td>
-              <td>Wetlands 2025</td>
-              <td><span class="pill pill-warning">Low Battery</span></td>
-              <td>18%</td>
-              <td>8m ago</td>
-            </tr>
-          </tbody>
-        </table>
       </section>
 
-    </div><!-- /dashboard-shell -->
-
+    </div><!-- END dashboard-shell -->
+    </div>
   </main>
 
 </div>

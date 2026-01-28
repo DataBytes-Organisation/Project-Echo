@@ -15,6 +15,7 @@ from model.utils import ArcMarginProduct, CircleLoss
 from model import Model
 from copy import copy
 
+
 class Trainer:
 	def __init__(self, cfg: DictConfig, model, train_loader, val_loader, device, name=None):
 		self.cfg = cfg
@@ -22,30 +23,28 @@ class Trainer:
 		self.train_loader = train_loader
 		self.val_loader = val_loader
 		self.device = device
-		
-		self.dtype = getattr(torch, cfg.training.get('dtype', 'bfloat16'))
-		self.use_amp = (self.dtype == torch.float16) and ('cuda' in self.device.type)
+
+		self.dtype = getattr(torch, cfg.training.get("dtype", "bfloat16"))
+		self.use_amp = (self.dtype == torch.float16) and ("cuda" in self.device.type)
 		self.scaler = GradScaler(self.device.type, enabled=self.use_amp)
-		self.grad_accum_steps = self.cfg.training.get('grad_accum_steps', 1)
-		
+		self.grad_accum_steps = self.cfg.training.get("grad_accum_steps", 1)
+
 		self.criterion = hydra.utils.instantiate(self.cfg.training.criterion)
 		self.optimizer = hydra.utils.instantiate(self.cfg.training.optimizer, params=self.model.parameters())
 		self.scheduler = hydra.utils.instantiate(self.cfg.training.scheduler, optimizer=self.optimizer)
 
-		self.grad_clip = self.cfg.training.get('grad_clip', 1.0)
+		self.grad_clip = self.cfg.training.get("grad_clip", 1.0)
 
 		self.metric_loss_module = None
-		use_arcface_cfg = self.cfg.training.get('use_arcface', None)
-		if use_arcface_cfg == 'arcface':
-			self.metric_loss_module = ArcMarginProduct(
-				s=self.cfg.training.arcface.s,
-				m=self.cfg.training.arcface.m
-			).to(self.device)
-		elif use_arcface_cfg == 'circle':
-			self.metric_loss_module = CircleLoss(
-				s=self.cfg.training.circle.s,
-				m=self.cfg.training.circle.m
-			).to(self.device)
+		use_arcface_cfg = self.cfg.training.get("use_arcface", None)
+		if use_arcface_cfg == "arcface":
+			self.metric_loss_module = ArcMarginProduct(s=self.cfg.training.arcface.s, m=self.cfg.training.arcface.m).to(
+				self.device
+			)
+		elif use_arcface_cfg == "circle":
+			self.metric_loss_module = CircleLoss(s=self.cfg.training.circle.s, m=self.cfg.training.circle.m).to(
+				self.device
+			)
 
 		self.distillation = self.cfg.training.distillation.enabled
 		self.teacher_model_path = self.cfg.training.distillation.teacher_model_path
@@ -58,7 +57,9 @@ class Trainer:
 				self.cfg.model = copy(self.cfg.teacher_model)
 
 				self.teacher_model = Model(self.cfg)
-				self.teacher_model.load_state_dict(torch.load(self.teacher_model_path, map_location=torch.device("cpu")))
+				self.teacher_model.load_state_dict(
+					torch.load(self.teacher_model_path, map_location=torch.device("cpu"))
+				)
 
 				self.teacher_model = self.teacher_model.to(self.device)
 				self.teacher_model.eval()
@@ -75,27 +76,29 @@ class Trainer:
 		self.name = name if name is not None else "model"
 
 		self.epochs = self.cfg.training.epochs
-		self.best_metric = float('inf') if self.cfg.training.metric_mode == 'min' else float('-inf')
+		self.best_metric = float("inf") if self.cfg.training.metric_mode == "min" else float("-inf")
 		self.metric_mode = self.cfg.training.metric_mode
-		self.best_model_path = Path(hydra.core.hydra_config.HydraConfig.get().runtime.output_dir) / f"best_{self.name}.pth"
+		self.best_model_path = (
+			Path(hydra.core.hydra_config.HydraConfig.get().runtime.output_dir) / f"best_{self.name}.pth"
+		)
 
-		self.early_stopping_patience = self.cfg.training.get('early_stopping_patience', 3)
+		self.early_stopping_patience = self.cfg.training.get("early_stopping_patience", 3)
 		self.epochs_no_improve = 0
 		self.best_epoch = 0
-		
+
 		self.writer = SummaryWriter(log_dir=self.best_model_path.parent)
 
 	def save_checkpoint(self, path, epoch, best=True):
 		"""Save training checkpoint."""
 		checkpoint = {
-			'epoch': epoch,
-			'model_state_dict': self.model.state_dict(),
-			'optimizer_state_dict': self.optimizer.state_dict(),
-			'scheduler_state_dict': self.scheduler.state_dict() if self.scheduler else None,
-			'best_metric': self.best_metric,
-			'epochs_no_improve': self.epochs_no_improve,
-			'best_epoch': self.best_epoch,
-			'cfg': OmegaConf.to_container(self.cfg, resolve=True),
+			"epoch": epoch,
+			"model_state_dict": self.model.state_dict(),
+			"optimizer_state_dict": self.optimizer.state_dict(),
+			"scheduler_state_dict": self.scheduler.state_dict() if self.scheduler else None,
+			"best_metric": self.best_metric,
+			"epochs_no_improve": self.epochs_no_improve,
+			"best_epoch": self.best_epoch,
+			"cfg": OmegaConf.to_container(self.cfg, resolve=True),
 		}
 
 		torch.save(checkpoint, path)
@@ -104,22 +107,26 @@ class Trainer:
 		if best:
 			torch.save(checkpoint, self.best_model_path)
 			print(f"Best model checkpoint saved to {self.best_model_path}")
-	
+
 	def load_checkpoint(self, path):
 		"""Load training checkpoint to resume training."""
 
 		if path.is_file():
 			checkpoint = torch.load(path, map_location=self.device)
-			self.model.load_state_dict(checkpoint['model_state_dict'])
-			self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
-			if self.scheduler and 'scheduler_state_dict' in checkpoint and checkpoint['scheduler_state_dict'] is not None:
-				self.scheduler.load_state_dict(checkpoint['scheduler_state_dict'])
-			
-			self.start_epoch = checkpoint.get('epoch', 0)
-			self.best_metric = checkpoint.get('best_metric', self.best_metric)
-			self.epochs_no_improve = checkpoint.get('epochs_no_improve', 0)
-			self.best_epoch = checkpoint.get('best_epoch', 0)
-			
+			self.model.load_state_dict(checkpoint["model_state_dict"])
+			self.optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
+			if (
+				self.scheduler
+				and "scheduler_state_dict" in checkpoint
+				and checkpoint["scheduler_state_dict"] is not None
+			):
+				self.scheduler.load_state_dict(checkpoint["scheduler_state_dict"])
+
+			self.start_epoch = checkpoint.get("epoch", 0)
+			self.best_metric = checkpoint.get("best_metric", self.best_metric)
+			self.epochs_no_improve = checkpoint.get("epochs_no_improve", 0)
+			self.best_epoch = checkpoint.get("best_epoch", 0)
+
 			print(f"Resumed from epoch {self.start_epoch}, best metric {self.best_metric:.4f}")
 		else:
 			raise FileNotFoundError(f"Checkpoint not found at {path}")
@@ -129,11 +136,11 @@ class Trainer:
 		running_loss = 0.0
 		all_labels = []
 		all_predictions = []
-		
+
 		for batch_idx, (inputs, labels) in enumerate(self.train_loader):
 			inputs, labels = inputs.to(self.device), labels.to(self.device)
 			self.optimizer.zero_grad()
-			
+
 			with autocast(device_type=self.device.type, dtype=self.dtype, enabled=self.use_amp):
 				student_outputs = self.model(inputs)
 				if self.metric_loss_module is not None:
@@ -146,9 +153,11 @@ class Trainer:
 					student_loss = self.criterion(student_outputs, labels)
 					distillation_loss = self.distillation_criterion(
 						F.log_softmax(student_outputs / self.distillation_temperature, dim=1),
-						F.softmax(teacher_outputs / self.distillation_temperature, dim=1)
+						F.softmax(teacher_outputs / self.distillation_temperature, dim=1),
 					)
-					loss = (1. - self.distillation_alpha) * student_loss + self.distillation_alpha * distillation_loss * (self.distillation_temperature ** 2)
+					loss = (
+						1.0 - self.distillation_alpha
+					) * student_loss + self.distillation_alpha * distillation_loss * (self.distillation_temperature**2)
 				else:
 					loss = self.criterion(student_outputs, labels)
 
@@ -168,7 +177,7 @@ class Trainer:
 
 				self.scaler.step(self.optimizer)
 				self.scaler.update()
-				
+
 				# Flush gradients after the update
 				self.optimizer.zero_grad()
 
@@ -180,81 +189,94 @@ class Trainer:
 			_, predicted = torch.max(student_outputs.data, 1)
 			all_labels.extend(labels.cpu().numpy())
 			all_predictions.extend(predicted.cpu().numpy())
-			
-			metrics_dict['batch_loss'] = f'{loss.item() * self.grad_accum_steps:.4f}'
-			metrics_dict['phase'] = 'train'
+
+			metrics_dict["batch_loss"] = f"{loss.item() * self.grad_accum_steps:.4f}"
+			metrics_dict["phase"] = "train"
 			pbar.set_postfix(metrics_dict)
-			
+			pbar.update(1)
+
 		epoch_loss = running_loss / len(self.train_loader.dataset)
 		epoch_acc = accuracy_score(all_labels, all_predictions)
-		
-		self.writer.add_scalar('Loss/train', epoch_loss, self.current_epoch)
-		self.writer.add_scalar('Accuracy/train', epoch_acc, self.current_epoch)
-		
+
+		self.writer.add_scalar("Loss/train", epoch_loss, self.current_epoch)
+		self.writer.add_scalar("Accuracy/train", epoch_acc, self.current_epoch)
+
 		return epoch_loss, epoch_acc
 
 	def _evaluate(self, dataloader, pbar, metrics_dict):
 		self.model.eval()
-		running_loss = 0.0
-		all_labels = []
-		all_predictions = []
+		total_file_loss = 0.0
+		all_file_labels = []
+		all_file_predictions = []
 
 		with torch.no_grad():
-			for inputs, labels in dataloader:
-				inputs, labels = inputs.to(self.device), labels.to(self.device)
-				with autocast(self.device.type, enabled=self.use_amp):
-					outputs = self.model(inputs)
-					if self.metric_loss_module is not None:
-						outputs = self.metric_loss_module(outputs, labels)
+			for inputs, labels in dataloader:  # Here, inputs are all chunks for one file
+				inputs = inputs.to(self.device)
+				# All labels in `labels` are the same for this file, pick the first one
+				true_file_label = labels[0].to(self.device)
 
-					loss = self.criterion(outputs, labels)
+				with autocast(device_type=self.device.type, dtype=self.dtype, enabled=self.use_amp):
+					outputs = self.model(inputs)  # outputs are (num_chunks, num_classes)
 
-				running_loss += loss.item() * inputs.size(0)
-				_, predicted = torch.max(outputs.data, 1)
-				all_labels.extend(labels.cpu().numpy())
-				all_predictions.extend(predicted.cpu().numpy())
-				
-				metrics_dict['phase'] = 'val'
+					# Aggregate chunk outputs (logits) to get a single prediction for the file
+					# Mean of logits is a common approach for test-time augmentation / chunk aggregation
+					aggregated_output = outputs.mean(dim=0)  # (num_classes)
+
+					# Calculate loss for the file using the aggregated output and the true file label
+					# Unsqueeze aggregated_output and true_file_label to match (batch_size, num_classes) and (batch_size) for criterion
+					loss = self.criterion(aggregated_output.unsqueeze(0), true_file_label.unsqueeze(0))
+
+				total_file_loss += loss.item()  # Accumulate file-level loss
+
+				# Get file-level prediction
+				_, predicted_file_label = torch.max(aggregated_output.unsqueeze(0).data, 1)
+
+				all_file_labels.append(true_file_label.item())
+				all_file_predictions.append(predicted_file_label.item())
+
+				metrics_dict["phase"] = "val"
 				pbar.set_postfix(metrics_dict)
-		
-		epoch_loss = running_loss / len(dataloader.dataset)
-		epoch_acc = accuracy_score(all_labels, all_predictions)
-		
+				pbar.update(1)
+
+		# Now, total_file_loss is sum of losses for each file, and len(dataloader.dataset) is number of files
+		epoch_loss = total_file_loss / len(dataloader.dataset)
+		epoch_acc = accuracy_score(all_file_labels, all_file_predictions)
+
 		return epoch_loss, epoch_acc
 
 	def train(self):
-		pbar = tqdm(range(self.epochs), total=self.epochs, desc="Training Progress")
-		
-		metrics_dict = {
-			'phase': 'train',
-			'best_metric': f'{self.best_metric:.4f}'
-		}
-		
-		for epoch in pbar:
+		total_steps = self.epochs * (len(self.train_loader) + len(self.val_loader))
+		pbar = tqdm(total=total_steps, desc="Training Progress")
+
+		metrics_dict = {"phase": "train", "best_metric": f"{self.best_metric:.4f}"}
+
+		for epoch in range(self.epochs):
 			self.current_epoch = epoch + 1
+			pbar.set_description(f"Epoch {self.current_epoch}/{self.epochs}")
 			train_loss, train_acc = self._train_one_epoch(pbar, metrics_dict)
 			val_loss, val_acc = self._evaluate(self.val_loader, pbar, metrics_dict)
-			
-			metrics_dict['train_loss'] = f'{train_loss:.4f}'
-			metrics_dict['train_acc'] = f'{train_acc:.4f}'
-			metrics_dict['val_loss'] = f'{val_loss:.4f}'
-			metrics_dict['val_acc'] = f'{val_acc:.4f}'
-			
-			self.writer.add_scalar('Loss/val', val_loss, self.current_epoch)
-			self.writer.add_scalar('Accuracy/val', val_acc, self.current_epoch)
 
-			current_metric = val_loss if self.cfg.training.metric_mode == 'min' else val_acc
-			
+			metrics_dict["train_loss"] = f"{train_loss:.4f}"
+			metrics_dict["train_acc"] = f"{train_acc:.4f}"
+			metrics_dict["val_loss"] = f"{val_loss:.4f}"
+			metrics_dict["val_acc"] = f"{val_acc:.4f}"
+
+			self.writer.add_scalar("Loss/val", val_loss, self.current_epoch)
+			self.writer.add_scalar("Accuracy/val", val_acc, self.current_epoch)
+
+			current_metric = val_loss if self.cfg.training.metric_mode == "min" else val_acc
+
 			# Check for improvement
-			is_better = (self.metric_mode == 'min' and current_metric < self.best_metric) or \
-						(self.metric_mode == 'max' and current_metric > self.best_metric)
-			
+			is_better = (self.metric_mode == "min" and current_metric < self.best_metric) or (
+				self.metric_mode == "max" and current_metric > self.best_metric
+			)
+
 			if is_better:
 				self.best_metric = current_metric
 				self.best_epoch = self.current_epoch
 				torch.save(self.model.state_dict(), self.best_model_path)
 				self.epochs_no_improve = 0
-				metrics_dict['best_metric'] = f'{self.best_metric:.4f}'
+				metrics_dict["best_metric"] = f"{self.best_metric:.4f}"
 			else:
 				self.epochs_no_improve += 1
 
@@ -265,12 +287,13 @@ class Trainer:
 					self.scheduler.step(val_loss)
 				else:
 					self.scheduler.step()
-			
+
 			# Check for early stopping
 			if self.epochs_no_improve >= self.early_stopping_patience:
 				print(f"\nEarly stopping triggered after {self.epochs_no_improve} epochs with no improvement.")
 				break
-				
+
+		pbar.close()
 		self.writer.close()
 		print(f"\nTraining complete. Best model from epoch {self.best_epoch} saved to {self.best_model_path}")
 
@@ -280,9 +303,9 @@ class Trainer:
 
 	def test(self, test_loader, model_to_test=None, device=None):
 		print("Starting evaluation on test set...")
-		
+
 		eval_device = device if device else self.device
-		
+
 		if model_to_test:
 			model = model_to_test.to(eval_device)
 		else:
@@ -290,29 +313,36 @@ class Trainer:
 
 		model.eval()
 
-		all_labels = []
-		all_predictions = []
+		all_file_labels = []
+		all_file_predictions = []
 
 		with torch.no_grad():
 			for inputs, labels in tqdm(test_loader, desc="[Testing]"):
-				inputs, labels = inputs.to(self.device), labels.to(self.device)
-				with autocast(self.device.type, enabled=self.use_amp):
-					outputs = self.model(inputs)
+				inputs = inputs.to(eval_device)
+				true_file_label = labels[0].to(eval_device)  # All labels in `labels` are the same for this file
 
-				_, predicted = torch.max(outputs.data, 1)
-				all_labels.extend(labels.cpu().numpy())
-				all_predictions.extend(predicted.cpu().numpy())
+				with autocast(device_type=eval_device.type, enabled=self.use_amp):
+					outputs = model(inputs)  # outputs are (num_chunks, num_classes)
 
-		accuracy = accuracy_score(all_labels, all_predictions)
-		precision = precision_score(all_labels, all_predictions, average='weighted', zero_division=0)
-		recall = recall_score(all_labels, all_predictions, average='weighted', zero_division=0)
-		f1 = f1_score(all_labels, all_predictions, average='weighted', zero_division=0)
-		
+					# Aggregate chunk outputs (logits) to get a single prediction for the file
+					aggregated_output = outputs.mean(dim=0)  # (num_classes)
+
+				# Get file-level prediction
+				_, predicted_file_label = torch.max(aggregated_output.unsqueeze(0).data, 1)
+
+				all_file_labels.append(true_file_label.item())
+				all_file_predictions.append(predicted_file_label.item())
+
+		accuracy = accuracy_score(all_file_labels, all_file_predictions)
+		precision = precision_score(all_file_labels, all_file_predictions, average="weighted", zero_division=0)
+		recall = recall_score(all_file_labels, all_file_predictions, average="weighted", zero_division=0)
+		f1 = f1_score(all_file_labels, all_file_predictions, average="weighted", zero_division=0)
+
 		print("\n--- Test Set Metrics ---")
 		print(f"Accuracy: {accuracy:.4f}")
 		print(f"Precision: {precision:.4f}")
 		print(f"Recall: {recall:.4f}")
 		print(f"F1 Score: {f1:.4f}")
 		print("------------------------")
-		
+
 		return accuracy, precision, recall, f1

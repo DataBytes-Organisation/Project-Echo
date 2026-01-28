@@ -123,6 +123,8 @@
         </div>
       </div>
     </div>
+    <div id="footer"></div>
+    </div>
   </div>
 
   <!-- Load Sidebar & Header Components -->
@@ -131,6 +133,7 @@
       console.log("Loading sidebar and header...");
       $("#sidebar").load("/admin/component/sidebar-component.html", function() { $.getScript('/admin/js/sidebarmenu.js'); });
       $("#header").load("/admin/component/header-component.html");
+      $("#footer").load("/admin/component/footer-component.html");
     });
   </script>
 

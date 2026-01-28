@@ -1,5 +1,10 @@
 name: efficientnet_v2
+norm_choice: freeze_bn
+
 params:
   model_name: "efficientnet_v2_s" # From torchvision
   pretrained: true
   num_classes: ${data.num_classes}
+  use_arcface: true
+  trainable_blocks: -1
+  replace_silu_with_relu: false

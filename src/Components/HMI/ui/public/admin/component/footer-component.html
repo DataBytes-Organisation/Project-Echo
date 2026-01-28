@@ -1,0 +1,115 @@
+<!-- ================= Footer Component ================= -->
+
+<style>
+  :root {
+    --echo-green: #2F6E4F;
+    --echo-green-dark: #26583f;
+  }
+
+  .app-footer {
+    width: 100%;
+    margin-top: 1.25rem;
+  }
+
+  .app-footer__surface {
+    background: #ffffff;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 14px;
+    padding: 0.9rem 1.25rem;
+  }
+
+  .app-footer__inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .app-footer__brand {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #1f2a37;
+  }
+
+  .app-footer__meta {
+    font-size: 0.82rem;
+    color: #6b7280;
+    margin-top: 0.15rem;
+  }
+
+  .app-footer__links {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    flex-wrap: wrap;
+  }
+
+  .app-footer__links a {
+    font-size: 0.85rem;
+    color: #6b7280;
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: color 0.12s ease, border-color 0.12s ease;
+  }
+
+  .app-footer__links a:hover {
+    color: var(--echo-green);
+    border-bottom-color: rgba(47, 110, 79, 0.35);
+  }
+
+  .app-footer__divider {
+    color: #d1d5db;
+    font-size: 0.75rem;
+  }
+
+  @media (max-width: 768px) {
+    .app-footer__inner {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+  }
+</style>
+
+<footer class="app-footer">
+  <div class="app-footer__surface">
+    <div class="app-footer__inner">
+
+      <!-- Left -->
+      <div>
+        <div class="app-footer__brand">Project Echo</div>
+        <div class="app-footer__meta">
+          Admin Console • v1.0.0 • © <span id="footerYear"></span>
+        </div>
+      </div>
+
+      <!-- Right -->
+      <nav class="app-footer__links">
+        <a href="#">Privacy Policy</a>
+        <span class="app-footer__divider">•</span>
+
+        <a href="#">Cookie Policy</a>
+        <span class="app-footer__divider">•</span>
+
+        <a href="#">Terms of Use</a>
+        <span class="app-footer__divider">•</span>
+
+        <a href="#">Legal Disclaimer</a>
+        <span class="app-footer__divider">•</span>
+
+        <a href="#">Help</a>
+      </nav>
+
+    </div>
+  </div>
+
+  <script>
+    document.getElementById("footerYear").textContent =
+      new Date().getFullYear();
+  </script>
+</footer>
+
+<!-- ================= End Footer ================= -->

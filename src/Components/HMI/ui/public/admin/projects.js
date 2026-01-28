@@ -2,8 +2,9 @@ $(document).ready(function () {
   // ================================================================
   // Layout Includes
   // ================================================================
-  $("#sidebar").load("./admin/component/sidebar-component.html");
-  $("#header").load("./admin/component/header-component.html");
+  $("#sidebar").load("/admin/component/sidebar-component.html");
+  $("#header").load("/admin/component/header-component.html");
+  $("#footer").load("/admin/component/footer-component.html");
 
   // ================================================================
   // DATA SETUP
