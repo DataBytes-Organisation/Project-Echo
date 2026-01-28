@@ -14,17 +14,20 @@ services:
     build:
       context: ./api
     image: rb-echo-api
+    
     ports:
       - "9001:9000"
       
     environment:
-      - MONGO_URI=mongodb://db:27017
-      - MONGO_DB=project_echo
+    - MONGO_URI=mongodb://db:27017
+    - MONGO_DB=EchoNet
     depends_on:
-      - db
+    - db
+
 
   db:
     build:
       context: ./MongoDb
     image: rb-echo-db
+
     

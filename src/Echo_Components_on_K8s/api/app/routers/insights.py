@@ -6,7 +6,7 @@ import pymongo
 
 router = APIRouter(prefix="/insights", tags=["insights"])
 
-MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017")
+MONGO_URI = os.getenv("MONGO_URI", "mongodb://db:27017")
 MONGO_DB = os.getenv("MONGO_DB", "project_echo")
 
 _client = pymongo.MongoClient(MONGO_URI)

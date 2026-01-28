@@ -1,6 +1,9 @@
 import pymongo
 # import mongoose
 import os
+from pymongo import MongoClient
+import os
+
 
 # please use echonet credentials here, this connection string is just a placeholder
 connection_string=f"mongodb://modelUser:EchoNetAccess2023@{os.getenv('DB_HOST')}:27017/EchoNet"
