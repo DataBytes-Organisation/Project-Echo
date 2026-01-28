@@ -209,6 +209,10 @@ class Trainer:
 		all_file_labels = []
 		all_file_predictions = []
 
+		s = 1.0
+		if self.metric_loss_module is not None and hasattr(self.metric_loss_module, "s"):
+			s = self.metric_loss_module.s
+
 		with torch.no_grad():
 			for inputs, labels in dataloader:  # Here, inputs are all chunks for one file
 				inputs = inputs.to(self.device)
@@ -222,9 +226,12 @@ class Trainer:
 					# Mean of logits is a common approach for test-time augmentation / chunk aggregation
 					aggregated_output = outputs.mean(dim=0)  # (num_classes)
 
+					# scale the raw cosine average before Loss or Softmax
+					scaled_output = aggregated_output * s
+
 					# Calculate loss for the file using the aggregated output and the true file label
 					# Unsqueeze aggregated_output and true_file_label to match (batch_size, num_classes) and (batch_size) for criterion
-					loss = self.criterion(aggregated_output.unsqueeze(0), true_file_label.unsqueeze(0))
+					loss = self.criterion(scaled_output.unsqueeze(0), true_file_label.unsqueeze(0))
 
 				total_file_loss += loss.item()  # Accumulate file-level loss
 
@@ -316,6 +323,10 @@ class Trainer:
 		all_file_labels = []
 		all_file_predictions = []
 
+		s = 1.0
+		if self.metric_loss_module is not None and hasattr(self.metric_loss_module, "s"):
+			s = self.metric_loss_module.s
+
 		with torch.no_grad():
 			for inputs, labels in tqdm(test_loader, desc="[Testing]"):
 				inputs = inputs.to(eval_device)
@@ -327,8 +338,10 @@ class Trainer:
 					# Aggregate chunk outputs (logits) to get a single prediction for the file
 					aggregated_output = outputs.mean(dim=0)  # (num_classes)
 
+					scaled_output = aggregated_output * s
+
 				# Get file-level prediction
-				_, predicted_file_label = torch.max(aggregated_output.unsqueeze(0).data, 1)
+				_, predicted_file_label = torch.max(scaled_output.unsqueeze(0).data, 1)
 
 				all_file_labels.append(true_file_label.item())
 				all_file_predictions.append(predicted_file_label.item())
