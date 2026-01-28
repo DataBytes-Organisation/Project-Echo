@@ -2,191 +2,187 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Sensor Health Management</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Project Echo – Admin Dashboard</title>
+
   <link rel="stylesheet" href="style.css" />
+  <script src="script.js" defer></script>
+  <script src="charts.js" defer></script>
 </head>
 <body>
-<div class="app-container">
-  <div class="app-header">
-    <h1>Sensor Health Management</h1>
-    <div class="badge">Web Prototype</div>
-  </div>
 
-  <div class="nav">
-    <button class="active" onclick="showPage('dashboard')">Dashboard</button>
-    <button onclick="showPage('sensor-health')">Sensor Health</button>
-    <button onclick="showPage('alerts')">Alerts by Exception</button>
-    <button onclick="showPage('reboot')">Reboot</button>
-    <button onclick="showPage('settings')">Adjust Settings</button>
-    <button onclick="showPage('projects')">Add Project</button>
-  </div>
+<div class="layout">
 
-  <div id="dashboard" class="page active">
-    <h2>Overview</h2>
-    <p class="section-description">
-      High-level summary of sensor health, alerts and active projects.
-    </p>
-    <table>
-      <tr><th>Metric</th><th>Value</th><th>Status</th></tr>
-      <tr><td>Total Sensors</td><td>128</td><td><span class="pill pill-ok">Healthy</span></td></tr>
-      <tr><td>Active Alerts</td><td>5</td><td><span class="pill pill-warn">Attention</span></td></tr>
-      <tr><td>Projects</td><td>7</td><td><span class="pill pill-ok">Running</span></td></tr>
-    </table>
-  </div>
-
-  <div id="sensor-health" class="page">
-    <h2>Sensor Health Management</h2>
-    <p class="section-description">
-      Real-time status of sensors, battery and connectivity.
-    </p>
-    <table>
-      <tr>
-        <th>Sensor ID</th><th>Project</th><th>Status</th><th>Battery</th><th>Last Contact</th>
-      </tr>
-      <tr>
-        <td>SEN-01</td><td>Rainforest A</td>
-        <td><span class="pill pill-ok">Online</span></td><td>87%</td><td>2 min ago</td>
-      </tr>
-      <tr>
-        <td>SEN-14</td><td>Rainforest A</td>
-        <td><span class="pill pill-warn">Degraded</span></td><td>21%</td><td>15 min ago</td>
-      </tr>
-      <tr>
-        <td>SEN-77</td><td>Savannah Trial</td>
-        <td><span class="pill pill-bad">Offline</span></td><td>—</td><td>2 h ago</td>
-      </tr>
-    </table>
-  </div>
-
-  <div id="alerts" class="page">
-    <h2>Alerts by Exception</h2>
-    <p class="section-description">
-      Low battery, offline, not functioning, and last-audio issues.
-    </p>
-    <table>
-      <tr>
-        <th>Sensor ID</th><th>Alert Type</th><th>Details</th><th>Last Audio</th>
-      </tr>
-      <tr>
-        <td>SEN-14</td>
-        <td><span class="pill pill-warn">Low Battery</span></td>
-        <td>Battery 21% – threshold 25%</td>
-        <td>32 min ago</td>
-      </tr>
-      <tr>
-        <td>SEN-77</td>
-        <td><span class="pill pill-bad">Offline</span></td>
-        <td>No contact for 2 h</td>
-        <td>2 h 5 min ago</td>
-      </tr>
-      <tr>
-        <td>SEN-88</td>
-        <td><span class="pill pill-bad">Last audio missing</span></td>
-        <td>No audio in last 6 h</td>
-        <td>6 h ago</td>
-      </tr>
-    </table>
-  </div>
-
-  <div id="reboot" class="page">
-    <h2>Reboot Sensors</h2>
-    <p class="section-description">
-      Queue a reboot for specific sensors.
-    </p>
-    <div class="form-grid">
-      <div>
-        <label for="reboot-sensor">Sensor ID(s)</label>
-        <input id="reboot-sensor" placeholder="e.g. SEN-77, SEN-14" />
-        <p class="note">Comma-separated list allowed.</p>
-      </div>
-      <div>
-        <label for="reboot-reason">Reason</label>
-        <input id="reboot-reason" placeholder="e.g. frozen, config update" />
-      </div>
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <img src="icons/echo.svg" class="brand-logo" alt="Echo logo" />
     </div>
-    <button class="btn-primary" onclick="fakeReboot()">Reboot Now</button>
-    <button class="btn-secondary">View Reboot History</button>
-    <p id="reboot-message" class="note"></p>
-  </div>
 
-  <div id="settings" class="page">
-    <h2>Adjust Settings</h2>
-    <p class="section-description">
-      Configure recording and alert behaviour for sensors.
-    </p>
-    <div class="form-grid">
-      <div>
-        <label for="settings-sensors">Target Sensors / Group</label>
-        <input id="settings-sensors" placeholder="e.g. all in Rainforest A" />
+    <nav class="sidebar-menu">
+      <div class="nav-section">
+        <div class="nav-title">MENU</div>
+
+        <button class="nav-link" type="button" data-view="dashboard">
+          <span class="nav-icon">▦</span>
+          <span class="nav-text">Dashboard</span>
+        </button>
+
+        <!-- Accordion Parent -->
+        <button class="nav-link nav-accordion" type="button"
+                aria-expanded="false"
+                aria-controls="sensor-accordion"
+                data-accordion="sensor">
+          <span class="nav-icon">📡</span>
+          <span class="nav-text">Sensor Health Management</span>
+          <span class="nav-caret">▾</span>
+        </button>
+
+        <!-- Accordion Children (no page navigation) -->
+        <div class="nav-children" id="sensor-accordion">
+          <button class="nav-sublink" type="button" data-view="sensor-health">Sensor Health</button>
+          <button class="nav-sublink" type="button" data-view="alerts">Alerts</button>
+          <button class="nav-sublink" type="button" data-view="reboot">Reboot</button>
+          <button class="nav-sublink" type="button" data-view="settings">Settings</button>
+          <button class="nav-sublink" type="button" data-view="projects">Add a Project</button>
+        </div>
       </div>
-      <div>
-        <label for="record-interval">Recording Interval</label>
-        <select id="record-interval">
-          <option>30 seconds</option>
-          <option>1 minute</option>
-          <option>5 minutes</option>
-          <option>10 minutes</option>
-        </select>
-      </div>
-      <div>
-        <label for="sensitivity">Sensitivity</label>
-        <select id="sensitivity">
-          <option>Low</option>
-          <option selected>Medium</option>
-          <option>High</option>
-        </select>
-      </div>
-      <div>
-        <label for="battery-threshold">Low Battery Threshold (%)</label>
-        <input id="battery-threshold" type="number" value="25" min="1" max="100" />
-      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <span class="footer-dot"></span>
+      <span class="footer-text">ECHO</span>
     </div>
-    <label for="settings-notes">Configuration Notes</label>
-    <textarea id="settings-notes"
-      placeholder="Describe why these settings are being changed..."></textarea>
-    <br><br>
-    <button class="btn-primary" onclick="fakeSaveSettings()">Save Settings</button>
-    <button class="btn-secondary">Reset to Defaults</button>
-    <p id="settings-message" class="note"></p>
-  </div>
+  </aside>
 
-  <div id="projects" class="page">
-    <h2>Add a Project</h2>
-    <p class="section-description">
-      Create a project and assign sensors to it (this fulfils “Able to add a project”).
-    </p>
-    <div class="form-grid">
-      <div>
-        <label for="project-name">Project Name</label>
-        <input id="project-name" placeholder="e.g. Echo – Amazon North 2025" />
+  <!-- Mobile backdrop -->
+  <div class="mobile-backdrop" id="mobile-backdrop"></div>
+
+  <!-- MAIN -->
+  <main class="main">
+    <header class="page-header">
+      <div></div>
+      <div class="page-header-actions">
+        <button class="icon-button" id="menu-toggle" aria-label="Open menu">☰</button>
+        <button class="icon-button" id="theme-toggle" aria-label="Toggle theme">🌙</button>
       </div>
-      <div>
-        <label for="project-location">Location</label>
-        <input id="project-location" placeholder="e.g. Amazon Basin, Zone A3" />
-      </div>
-      <div>
-        <label for="project-start">Start Date</label>
-        <input id="project-start" type="date" />
-      </div>
-      <div>
-        <label for="project-end">End Date</label>
-        <input id="project-end" type="date" />
-      </div>
+    </header>
+
+    <!-- Content root (views load here) -->
+    <div id="view-root">
+      <div class="dashboard-shell">
+
+      <!-- HERO HEADER -->
+      <section class="hero-header">
+        <h1>Project echo</h1>
+        <p class="subtitle">wildlife sound monitoring & sensor management</p>
+
+        <div class="hero-actions">
+          <button class="btn-primary">View Projects</button>
+          <button class="btn-secondary">Learn More</button>
+        </div>
+      </section>
+
+
+
+      <!-- KPI CARDS -->
+      <section class="kpi-grid">
+        <div class="kpi-card">
+          <p>ACTIVE PROJECTS</p>
+          <h3>7</h3>
+        </div>
+
+        <div class="kpi-card">
+          <p>REGISTERED ECOLOGISTS</p>
+          <h3>69</h3>
+        </div>
+
+        <div class="kpi-card">
+          <p>SENSORS DEPLOYED</p>
+          <h3>420</h3>
+        </div>
+      </section>
+
+
+
+      <!-- PROJECT HIGHLIGHTS -->
+      <section class="card">
+        <h3>Active Projects</h3>
+        <p class="card-subtitle">Overview of ongoing conservation deployments</p>
+
+        <div class="form-grid">
+
+          <div class="card">
+            <h3>Rainforest A</h3>
+            <p class="note">
+              Amazon Basin — Zone A1<br>
+              32 active sensors
+            </p>
+            <span class="pill pill-success">ACTIVE</span>
+          </div>
+
+          <div class="card">
+            <h3>Savannah Trial</h3>
+            <p class="note">
+              Serengeti — West Ridge<br>
+              18 active sensors
+            </p>
+            <span class="pill pill-success">ACTIVE</span>
+          </div>
+
+          <div class="card">
+            <h3>Wetlands 2025</h3>
+            <p class="note">
+              New Plymouth — Zone Delta<br>
+              12 sensors in queue
+            </p>
+            <span class="pill pill-warning">PLANNING</span>
+          </div>
+
+        </div>
+      </section>
+
+
+
+      <!-- FOOTER COLUMNS -->
+      <section class="footer-columns">
+
+        <div>
+          <h4>Wildlife Sound Monitor</h4>
+          <ul>
+            <li>Automated biodiversity tracking</li>
+            <li>24/7 acoustic scanning</li>
+            <li>Data-driven conservation</li>
+          </ul>
+        </div>
+
+        <div>
+          <h4>Quick Links</h4>
+          <ul>
+            <li>Home</li>
+            <li>Projects</li>
+            <li>Deployment Guide</li>
+            <li>Documentation</li>
+          </ul>
+        </div>
+
+        <div>
+          <h4>Resources</h4>
+          <ul>
+            <li>API Reference</li>
+            <li>Support</li>
+            <li>Terms</li>
+            <li>Privacy Policy</li>
+          </ul>
+        </div>
+
+      </section>
+
+    </div><!-- END dashboard-shell -->
     </div>
-    <label for="project-description">Description</label>
-    <textarea id="project-description"
-      placeholder="Briefly describe the purpose and scope..."></textarea>
-    <br><br>
-    <label for="project-sensors">Assign Sensors</label>
-    <input id="project-sensors" placeholder="e.g. SEN-01–SEN-32" />
-    <p class="note">IDs, ranges or group names.</p>
+  </main>
 
-    <button class="btn-primary" onclick="fakeCreateProject()">Create Project</button>
-    <button class="btn-secondary">Cancel</button>
-    <p id="project-message" class="note"></p>
-  </div>
 </div>
 
-<script src="script.js"></script>
 </body>
 </html>
