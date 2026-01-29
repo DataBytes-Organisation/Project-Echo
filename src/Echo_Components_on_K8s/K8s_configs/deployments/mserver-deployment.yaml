@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: mserver
-          image: 
+          image: australia-southeast2-docker.pkg.dev/sit-23t1-project-echo-25288b9/project-echo/mserver:latest
           ports:
             - containerPort: 8080
           envFrom:

@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: hmi
-          image: gcr.io/sit-23t1-project-echo-25288b9/rb-echo-hmi
+          image: australia-southeast2-docker.pkg.dev/sit-23t1-project-echo-25288b9/project-echo/rb-echo-hmi:latest
           ports:
             - containerPort: 8080
           envFrom:
