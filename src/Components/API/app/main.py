@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import (
+from src.Components.API.app.routers import (
     audio_upload_router,
     species_predictor,
     auth_router,
@@ -10,8 +10,8 @@ from app.routers import (
     two_factor,
     public,
     iot,
-    detections,   # WebSocket router
-    admin         # Admin dashboard router
+    detections,
+    admin
 )
 
 # ✅ Create FastAPI app with metadata
