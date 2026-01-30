@@ -97,23 +97,53 @@
     },
     {
         "Bird": "Alisterus scapularis",
-        "description": []
+        "description": [
+            "Common Name: Australian King Parrot.",
+            "A large, brightly coloured parrot native to eastern Australia.",
+            "Males have a striking red head and chest with green wings and a long blue-tipped tail.",
+            "Females are mostly green with a red belly, allowing them to camouflage better.",
+            "Often seen in rainforests, woodlands, and suburban areas where they feed on seeds, fruits, and flowers."
+        ]
     },
     {
         "Bird": "Alauda Arvensis",
-        "description": []
+        "description": [
+            "Common Name: Eurasian Skylark.",
+            "Known for its beautiful, continuous singing while hovering high in the air.",
+            "Brown, streaked plumage provides camouflage in open grasslands and farmlands.",
+            "Feeds on seeds, insects, and small invertebrates.",
+            "Introduced to Australia in the 19th century and now common in southern regions."
+        ]
     },
     {
         "Bird": "Amytornis purnelli",
-        "description": []
+        "description": [
+            "Common Name: Purnell’s Grasswren.",
+            "A small, secretive bird found in rocky, arid regions of central Australia.",
+            "Brownish-grey plumage with streaks helps it blend into spinifex grass.",
+            "Known for running quickly across the ground rather than flying.",
+            "Feeds mainly on insects, seeds, and small arthropods."
+        ]
     },
     {
         "Bird": "Anas superciliosa",
-        "description": []
+        "description": [
+            "Common Name: Pacific Black Duck.",
+            "A common freshwater duck with dark brown plumage and a pale facial stripe.",
+            "Recognised by its iridescent blue wing patch visible in flight.",
+            "Highly adaptable and found in lakes, rivers, wetlands, and even urban parks.",
+            "Feeds on aquatic plants, insects, and small crustaceans."
+        ]
     },
     {
         "Bird": "Anhinga novaehollandiae",
-        "description": []
+        "description": [
+            "Common Name: Australasian Darter.",
+            "Large waterbird known for its long neck and spear-like bill.",
+            "Often called the 'snakebird' because its long neck sticks out while its body stays underwater.",
+            "Feeds mainly on fish, which it catches by impaling with its sharp bill.",
+            "Frequently seen drying its wings outstretched after diving."
+        ]
     },
     {
         "Bird": "Anseranas semipalmata",
