@@ -27,9 +27,10 @@ class EventSchema(BaseModel):
     timestamp: datetime  # Event timestamp
     sensorId: constr(min_length=1)  # Non-empty string for sensor ID
     species: constr(min_length=1)  # Non-empty string for species name
-    microphoneLLA: conlist(float, min_items=3, max_items=3)  # List of exactly 3 floats for microphone location
-    animalEstLLA: conlist(float, min_items=3, max_items=3)  # List of exactly 3 floats for estimated animal location
-    animalTrueLLA: conlist(float, min_items=3, max_items=3)  # List of exactly 3 floats for true animal location
+    microphoneLLA: List[float] = Field(..., min_items=3, max_items=3)  # List of exactly 3 floats for microphone location
+    #microphoneLLA: List[float] = Field(..., min_items=3, max_items=3) #updated 19/01/26
+    animalEstLLA: List[float] = Field(..., min_items=3, max_items=3)  # List of exactly 3 floats for estimated animal location
+    animalTrueLLA: List[float] = Field(..., min_items=3, max_items=3)  # List of exactly 3 floats for true animal location
     animalLLAUncertainty: int  # Uncertainty value
     audioClip: str  # Audio clip data
     confidence: condecimal(gt=0, lt=100)  # Confidence value between 0 and 100
@@ -60,7 +61,7 @@ class MovementSchema(BaseModel):
     timestamp: datetime  # Movement timestamp
     species: constr(min_length=1)  # Non-empty string for species name
     animalId: constr(min_length=1)  # Non-empty string for animal ID
-    animalTrueLLA: conlist(float, min_items=3, max_items=3)  # List of exactly 3 floats for true animal location
+    animalTrueLLA: List[float] = Field(..., min_items=3, max_items=3)  # List of exactly 3 floats for true animal location
 
     # Configuration and schema example
     class Config:
@@ -79,7 +80,7 @@ class MovementSchema(BaseModel):
 # Schema to validate microphone location data
 class MicrophoneSchema(BaseModel):
     sensorId: constr(min_length=1)  # Non-empty string for sensor ID
-    microphoneLLA: conlist(float, min_items=3, max_items=3)  # List of exactly 3 floats for microphone location
+    microphoneLLA: List[float] = Field(..., min_items=3, max_items=3)  # List of exactly 3 floats for microphone location
 
     # Configuration and schema example
     class Config:
@@ -302,9 +303,9 @@ class ResetPasswordSchema(BaseModel):
 class RecordingData(BaseModel):
     timestamp: datetime  # Timestamp for recording
     sensorId: str  # Sensor ID
-    microphoneLLA: conlist(float, min_items=3, max_items=3)  # List of 3 floats for microphone location
-    animalEstLLA: conlist(float, min_items=3, max_items=3)  # List of 3 floats for estimated animal location
-    animalTrueLLA: conlist(float, min_items=3, max_items=3)  # List of 3 floats for true animal location
+    microphoneLLA: List[float] = Field(..., min_items=3, max_items=3)  # List of 3 floats for microphone location
+    animalEstLLA: List[float] = Field(..., min_items=3, max_items=3)  # List of 3 floats for estimated animal location
+    animalTrueLLA: List[float] = Field(..., min_items=3, max_items=3)  # List of 3 floats for true animal location
     animalLLAUncertainty: condecimal(gt=0)  # Uncertainty greater than 0
     audioClip: str  # Audio clip data
     mode: str  # Recording mode
@@ -335,3 +336,72 @@ class TwoFactorVerifySchema(BaseModel):
         }
         schema_extra = {}
 
+
+class DetectionCreate(EventSchema):
+    pass
+
+
+class Detection(EventSchema):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+        schema_extra = {
+            "example": {
+                "_id": "651f2a9f4d1f1b1c3e2a4567",
+                "timestamp": "2023-03-22T13:45:12.000Z",
+                "sensorId": "2",
+                "species": "Sus Scrofa",
+                "microphoneLLA": [-33.1101, 150.0567, 23],
+                "animalEstLLA": [-33.1105, 150.0569, 23],
+                "animalTrueLLA": [-33.1106, 150.0570, 23],
+                "animalLLAUncertainty": 10,
+                "audioClip": "some audio_base64 data",
+                "confidence": 99.4,
+                "sampleRate": 48000
+            }
+        }
+
+class DetectionCreate(EventSchema):
+    pass
+
+class Detection(EventSchema):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+
+    class config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+        schema_extra = {
+            "example": {
+                "_id": "651f2a9f4d1f1b1c3e2a4567",
+                "timestamp": "2023-03-22T13:45:12.000Z",
+                "sensorId": "2",
+                "species": "Sus Scrofa",
+                "microphoneLLA": [-33.1101, 150.0567, 23],
+                "animalEstLLA": [-33.1105, 150.0569, 23],
+                "animalTrueLLA": [-33.1106, 150.0570, 23],
+                "animalLLAUncertainty": 10,
+                "audioClip": "some audio_base64 data",
+                "confidence": 99.4,
+                "sampleRate": 48000
+            }
+        }
+
+class DetectionListResponses(BaseModel):
+    items: List[Detection]
+    total: int
+    page: int
+    page_size: int
+
+    class config:
+        allow_population_by_fiels_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+
+
+# Backwards/expected import name used by app.routers.detections
+class DetectionListResponse(DetectionListResponses):
+    pass

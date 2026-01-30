@@ -24,6 +24,16 @@ Nodes = db.nodes
 Components = db.components
 Commands = db.commands
 
+# Sensor Health (Admin)
+SensorSettings = db.sensor_settings
+SensorReboots = db.sensor_reboots
+
+SensorSettings.create_index([("_id", pymongo.ASCENDING)], name="idx_sensor_settings_id")
+SensorReboots.create_index(
+    [("sensorId", pymongo.ASCENDING), ("requestedAt", pymongo.DESCENDING)],
+    name="idx_sensor_reboots_sensor_requestedAt_desc",
+)
+
 # User DB connection (env first, then service hostname)
 # legacy (kept for reference):
 # User_connection_string = "mongodb://root:root_password@ts-mongodb-cont/UserSample?authSource=admin"
@@ -66,3 +76,15 @@ AUS_STATES = ["victoria", "newsouthwales", "tasmania", "queensland", "southaustr
 # Update Database Setup (t2.2025)
 AudioUploads = db.audio_uploads
 Predictions = db.predictions
+Detections = db.detections
+
+Detections.create_index([("species", pymongo.ASCENDING)], name = "idx_species")
+Detections.create_index([("timestamp", pymongo.DESCENDING)], name = "idx_timestamp_desc")
+Detections.create_index(
+    [("species", pymongo.ASCENDING), ("timestamp", pymongo.DESCENDING)],
+    name="idx_species_timestamp_desc"
+)
+Detections.create_index(
+    [("microphoneLLA.0", pymongo.ASCENDING), ("microphoneLLA.1", pymongo.ASCENDING)],
+    name="idx_microphone_lat_lon"
+)
