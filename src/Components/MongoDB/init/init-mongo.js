@@ -20,6 +20,7 @@ apidb.createCollection("microphones");
 apidb.createCollection("movements");
 apidb.createCollection("species");
 apidb.createCollection("nodes");
+apidb.createCollection("s223856998_sampledata");
 
 //const eventsData = JSON.parse(cat('/docker-entrypoint-initdb.d/events.json'));
 //db.events.insertMany(eventsData);
@@ -35,6 +36,12 @@ apidb.species.insertMany(speciesData);
 
 const nodesData = JSON.parse(cat('/docker-entrypoint-initdb.d/all-nodes-seed.json'));
 apidb.nodes.insertMany(nodesData);
+
+const s223856998SampleData = JSON.parse(
+  cat('/docker-entrypoint-initdb.d/s223856998_sampledata-seed.json')
+);
+
+apidb.s223856998_sampledata.insertMany(s223856998SampleData);
 
 // ----------------------------------------------
 // BULK UPDATE OPERATION
