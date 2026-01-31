@@ -8,6 +8,25 @@ import tensorflow as tf
 from scipy import signal
 from omegaconf import OmegaConf
 
+def get_scale_factor(cfg):
+	"""
+	Determines the scaling factor 's' based on the training configuration.
+	"""
+	metric_loss_type = cfg.training.get("use_arcface", None)
+
+	scale_factor = 1.0
+
+	if metric_loss_type == "arcface":
+		scale_factor = cfg.training.arcface.s
+		print(f"  [i] Detected ArcFace training. Setting scale factor s={scale_factor}")
+	elif metric_loss_type == "circle":
+		scale_factor = cfg.training.circle.s
+		print(f"  [i] Detected CircleLoss training. Setting scale factor s={scale_factor}")
+	else:
+		print("  [i] No metric loss detected (Standard Linear). Scale factor s=1.0")
+		scale_factor = 1.0
+
+	return scale_factor
 
 def preprocess_with_librosa(waveform: np.ndarray, pp_data: dict) -> np.ndarray:
 	"""
@@ -77,6 +96,7 @@ def main(args):
 		sys.exit(1)
 
 	cfg = OmegaConf.load(config_path)
+	scale_factor = get_scale_factor(cfg)
 	print(f"  [i] Loaded configuration for model '{cfg.model.name}'.")
 
 	tflite_model_path = model_dir / f"{cfg.model.name}.tflite"
@@ -168,6 +188,7 @@ def main(args):
 				interpreter.set_tensor(input_details["index"], spectrogram)
 				interpreter.invoke()
 				logits = interpreter.get_tensor(output_details["index"])
+				logits = logits * scale_factor
 
 				probabilities = tf.nn.softmax(logits[0]).numpy()
 				top_prob = np.max(probabilities)
