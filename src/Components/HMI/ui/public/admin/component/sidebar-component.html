@@ -6,6 +6,10 @@
   #sidebarnav a:hover{background:#F0F7F2;color:var(--ink)}
   /* visible focus ring for accessibility */
   #sidebarnav a:focus{outline:2px solid rgba(47,110,79,0.12);outline-offset:2px}
+  /* Submenu visuals: smaller font, muted color, inset by 20px */
+  #sidebarnav .first-level > li > a.sub-link{ display:block; padding-left:36px; font-size:13px; color:var(--muted); height:36px; line-height:36px; text-decoration:none; font-weight:500; }
+  #sidebarnav .first-level > li > a.sub-link:hover{ background:#F7FBF7; color:var(--ink); }
+  #sidebarnav .first-level > li > a.sub-link.active{ color:var(--primary); background:transparent; font-weight:600; }
 </style>
 <aside class="left-sidebar" aria-label="Admin sidebar">
   <div>
@@ -65,10 +69,27 @@
           <a href="/admin/admin-nodes.html" style="display:block;padding:0 16px;height:40px;line-height:40px;color:#1F2D23;text-decoration:none;font-weight:500;font-size:14px;">Node Network</a>
         </li>
         <li>
-          <a href="/admin/sensor-health.html" style="display:block;padding:0 16px;height:40px;line-height:40px;color:#1F2D23;text-decoration:none;font-weight:500;font-size:14px;">Sensor Health Management</a>
+          <a class="has-arrow" href="/admin/sensor-health.html" aria-expanded="false" style="display:block;padding:0 16px;height:40px;line-height:40px;color:#1F2D23;text-decoration:none;font-weight:500;font-size:14px;">Sensor Health Management</a>
+          <ul class="collapse first-level" style="list-style:none;margin:0;padding:0;">
+            <li>
+              <a href="/admin/sensor-health.html" class="sub-link">Sensor Health</a>
+            </li>
+            <li>
+              <a href="/admin/sensor_health/alerts.html" class="sub-link">Alerts</a>
+            </li>
+            <li>
+              <a href="/admin/sensor_health/reboot.html" class="sub-link">Reboot</a>
+            </li>
+            <li>
+              <a href="/admin/sensor_health/settings.html" class="sub-link">Settings</a>
+            </li>
+          </ul>
         </li>
         <li>
           <a href="/admin/notifications.html" style="display:block;padding:0 16px;height:40px;line-height:40px;color:#1F2D23;text-decoration:none;font-weight:500;font-size:14px;">Notifications</a>
+        </li>
+        <li>
+          <a href="/admin/feedback.html" style="display:block;padding:0 16px;height:40px;line-height:40px;color:#1F2D23;text-decoration:none;font-weight:500;font-size:14px;">Feedback</a>
         </li>
         <li>
           <a href="/admin/hmi-data-insights.html" style="display:block;padding:0 16px;height:40px;line-height:40px;color:#1F2D23;text-decoration:none;font-weight:500;font-size:14px;">Data Insights</a>

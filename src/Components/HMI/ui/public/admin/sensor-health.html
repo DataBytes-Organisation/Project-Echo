@@ -3,57 +3,25 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Project Echo – Admin Dashboard</title>
+  <title>Sensor Health – Project Echo</title>
 
-  <link rel="stylesheet" href="style.css" />
-  <script src="script.js" defer></script>
-  <script src="charts.js" defer></script>
+  <link rel="stylesheet" type="text/css" href="/admin/css/styles.min.css" />
+  <link rel="stylesheet" href="/admin/css/icons/tabler-icons/tabler-icons.css" />
+  <link rel="stylesheet" href="/admin/sensor_health/style.css" />
+  <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script type="text/javascript" src="/admin/js/app.min.js"></script>
+  <script src="/admin/sensor_health/script.js" defer></script>
+  <script src="/admin/sensor_health/charts.js" defer></script>
 </head>
 <body>
+  <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
+    data-sidebar-position="fixed" data-header-position="fixed">
+    <div id="sidebar"></div>
+    <div class="body-wrapper">
+      <div id="header"></div>
+      <div class="container-fluid">
+        <div class="sensor-page">
 
-<div class="layout">
-
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="sidebar-brand">
-      <img src="icons/echo.svg" class="brand-logo" alt="Echo logo" />
-    </div>
-
-    <nav class="sidebar-menu">
-      <div class="nav-section">
-        <div class="nav-title">MENU</div>
-
-        <button class="nav-link" type="button" data-view="dashboard">
-          <span class="nav-icon">▦</span>
-          <span class="nav-text">Dashboard</span>
-        </button>
-
-        <!-- Accordion Parent -->
-        <button class="nav-link nav-accordion" type="button"
-                aria-expanded="false"
-                aria-controls="sensor-accordion"
-                data-accordion="sensor">
-          <span class="nav-icon">📡</span>
-          <span class="nav-text">Sensor Health Management</span>
-          <span class="nav-caret">▾</span>
-        </button>
-
-        <!-- Accordion Children (no page navigation) -->
-        <div class="nav-children" id="sensor-accordion">
-          <button class="nav-sublink" type="button" data-view="sensor-health">Sensor Health</button>
-          <button class="nav-sublink" type="button" data-view="alerts">Alerts</button>
-          <button class="nav-sublink" type="button" data-view="reboot">Reboot</button>
-          <button class="nav-sublink" type="button" data-view="settings">Settings</button>
-          <button class="nav-sublink" type="button" data-view="projects">Add a Project</button>
-        </div>
-      </div>
-    </nav>
-
-    <div class="sidebar-footer">
-      <span class="footer-dot"></span>
-      <span class="footer-text">ECHO</span>
-    </div>
-  </aside>
 
   <!-- Mobile backdrop -->
   <div class="mobile-backdrop" id="mobile-backdrop"></div>
@@ -63,8 +31,6 @@
     <header class="page-header">
       <div></div>
       <div class="page-header-actions">
-        <button class="icon-button" id="menu-toggle" aria-label="Open menu">☰</button>
-        <button class="icon-button" id="theme-toggle" aria-label="Toggle theme">🌙</button>
       </div>
     </header>
 
@@ -179,10 +145,18 @@
       </section>
 
     </div><!-- END dashboard-shell -->
+    </div> <!-- END dashboard-shell -->
+        </div>
+      <div id="footer"></div>
     </div>
-  </main>
+  </div>
 
-</div>
-
+  <script>
+    $(document).ready(function() {
+      $("#sidebar").load("/admin/component/sidebar-component.html", function() { $.getScript('/admin/js/sidebarmenu.js'); });
+      $("#header").load("/admin/component/header-component.html");
+      $("#footer").load("/admin/component/footer-component.html");
+    });
+  </script>
 </body>
 </html>
