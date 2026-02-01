@@ -1,5 +1,5 @@
 {
-  "openapi": "3.0.2",
+  "openapi": "3.1.0",
   "info": {
     "title": "Project Echo API",
     "description": "\n    Project Echo is an IoT-based system designed to record and analyze audio data for species identification and ecosystem monitoring.\n\n    This API provides endpoints to:\n    - Upload audio files\n    - Simulate audio responses\n    - Interface with HMI and audio engine modules\n    ",
@@ -56,8 +56,8 @@
           {
             "required": true,
             "schema": {
-              "title": "Timestamp",
-              "type": "integer"
+              "type": "integer",
+              "title": "Timestamp"
             },
             "name": "timestamp",
             "in": "query"
@@ -65,8 +65,8 @@
           {
             "required": true,
             "schema": {
-              "title": "Lat",
-              "type": "number"
+              "type": "number",
+              "title": "Lat"
             },
             "name": "lat",
             "in": "query"
@@ -74,8 +74,8 @@
           {
             "required": true,
             "schema": {
-              "title": "Lon",
-              "type": "number"
+              "type": "number",
+              "title": "Lon"
             },
             "name": "lon",
             "in": "query"
@@ -114,8 +114,8 @@
           {
             "required": true,
             "schema": {
-              "title": "Start",
-              "type": "string"
+              "type": "string",
+              "title": "Start"
             },
             "name": "start",
             "in": "query"
@@ -123,8 +123,8 @@
           {
             "required": true,
             "schema": {
-              "title": "End",
-              "type": "string"
+              "type": "string",
+              "title": "End"
             },
             "name": "end",
             "in": "query"
@@ -163,8 +163,8 @@
           {
             "required": true,
             "schema": {
-              "title": "Id",
-              "type": "string"
+              "type": "string",
+              "title": "Id"
             },
             "name": "id",
             "in": "query"
@@ -203,8 +203,8 @@
           {
             "required": true,
             "schema": {
-              "title": "Start",
-              "type": "string"
+              "type": "string",
+              "title": "Start"
             },
             "name": "start",
             "in": "query"
@@ -212,8 +212,8 @@
           {
             "required": true,
             "schema": {
-              "title": "End",
-              "type": "string"
+              "type": "string",
+              "title": "End"
             },
             "name": "end",
             "in": "query"
@@ -334,8 +334,8 @@
           {
             "required": true,
             "schema": {
-              "title": "Control",
-              "type": "string"
+              "type": "string",
+              "title": "Control"
             },
             "name": "control",
             "in": "query"
@@ -491,8 +491,8 @@
           {
             "required": true,
             "schema": {
-              "title": "Jwttoken",
-              "type": "string"
+              "type": "string",
+              "title": "Jwttoken"
             },
             "name": "jwtToken",
             "in": "query"
@@ -570,8 +570,8 @@
           "content": {
             "application/json": {
               "schema": {
-                "title": "Request Dict",
-                "type": "object"
+                "type": "object",
+                "title": "Request Dict"
               }
             }
           },
@@ -615,8 +615,8 @@
           "content": {
             "application/json": {
               "schema": {
-                "title": "Request Dict",
-                "type": "object"
+                "type": "object",
+                "title": "Request Dict"
               }
             }
           },
@@ -660,8 +660,8 @@
           {
             "required": true,
             "schema": {
-              "title": "Oldpw",
-              "type": "string"
+              "type": "string",
+              "title": "Oldpw"
             },
             "name": "oldpw",
             "in": "query"
@@ -669,8 +669,8 @@
           {
             "required": true,
             "schema": {
-              "title": "Newpw",
-              "type": "string"
+              "type": "string",
+              "title": "Newpw"
             },
             "name": "newpw",
             "in": "query"
@@ -678,8 +678,8 @@
           {
             "required": true,
             "schema": {
-              "title": "Cfm Newpw",
-              "type": "string"
+              "type": "string",
+              "title": "Cfm Newpw"
             },
             "name": "cfm_newpw",
             "in": "query"
@@ -734,7 +734,10 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "type": "object",
+                  "title": "Response Checkadmin Hmi Admin Dashboard Post"
+                }
               }
             }
           },
@@ -791,8 +794,8 @@
           {
             "required": true,
             "schema": {
-              "title": "Field",
-              "type": "string"
+              "type": "string",
+              "title": "Field"
             },
             "name": "field",
             "in": "query"
@@ -800,8 +803,8 @@
           {
             "required": true,
             "schema": {
-              "title": "New",
-              "type": "string"
+              "type": "string",
+              "title": "New"
             },
             "name": "new",
             "in": "query"
@@ -947,8 +950,8 @@
           {
             "required": true,
             "schema": {
-              "title": "Algorithm Type",
-              "type": "string"
+              "type": "string",
+              "title": "Algorithm Type"
             },
             "name": "algorithm_type",
             "in": "path"
@@ -987,8 +990,8 @@
           {
             "required": true,
             "schema": {
-              "title": "User Id",
-              "type": "string"
+              "type": "string",
+              "title": "User Id"
             },
             "name": "user_id",
             "in": "path"
@@ -1030,8 +1033,8 @@
           {
             "required": true,
             "schema": {
-              "title": "User Id",
-              "type": "string"
+              "type": "string",
+              "title": "User Id"
             },
             "name": "user_id",
             "in": "path"
@@ -1085,8 +1088,8 @@
           {
             "required": true,
             "schema": {
-              "title": "User Id",
-              "type": "string"
+              "type": "string",
+              "title": "User Id"
             },
             "name": "user_id",
             "in": "path"
@@ -1094,8 +1097,8 @@
           {
             "required": true,
             "schema": {
-              "title": "Species",
-              "type": "string"
+              "type": "string",
+              "title": "Species"
             },
             "name": "species",
             "in": "path"
@@ -1158,8 +1161,8 @@
           {
             "required": true,
             "schema": {
-              "title": "Username",
-              "type": "string"
+              "type": "string",
+              "title": "Username"
             },
             "name": "username",
             "in": "path"
@@ -1167,8 +1170,8 @@
           {
             "required": false,
             "schema": {
-              "title": "Visit Duration",
               "type": "number",
+              "title": "Visit Duration",
               "default": 5.0
             },
             "name": "visit_duration",
@@ -1247,8 +1250,8 @@
           {
             "required": false,
             "schema": {
-              "title": "Species",
               "type": "string",
+              "title": "Species",
               "default": ""
             },
             "name": "species",
@@ -1257,8 +1260,8 @@
           {
             "required": false,
             "schema": {
-              "title": "Event Start",
               "type": "string",
+              "title": "Event Start",
               "default": ""
             },
             "name": "event_start",
@@ -1267,8 +1270,8 @@
           {
             "required": false,
             "schema": {
-              "title": "Event End",
               "type": "string",
+              "title": "Event End",
               "default": ""
             },
             "name": "event_end",
@@ -1277,8 +1280,8 @@
           {
             "required": false,
             "schema": {
-              "title": "Microphonella 0",
-              "type": "number"
+              "type": "number",
+              "title": "Microphonella 0"
             },
             "name": "microphoneLLA_0",
             "in": "query"
@@ -1286,8 +1289,8 @@
           {
             "required": false,
             "schema": {
-              "title": "Microphonella 1",
-              "type": "number"
+              "type": "number",
+              "title": "Microphonella 1"
             },
             "name": "microphoneLLA_1",
             "in": "query"
@@ -1295,8 +1298,8 @@
           {
             "required": false,
             "schema": {
-              "title": "Microphonella 2",
-              "type": "number"
+              "type": "number",
+              "title": "Microphonella 2"
             },
             "name": "microphoneLLA_2",
             "in": "query"
@@ -1393,11 +1396,11 @@
           "content": {
             "application/json": {
               "schema": {
-                "title": "Microphones",
-                "type": "array",
                 "items": {
                   "$ref": "#/components/schemas/MicrophoneSchema"
-                }
+                },
+                "type": "array",
+                "title": "Microphones"
               }
             }
           },
@@ -1522,8 +1525,8 @@
           {
             "required": false,
             "schema": {
-              "title": "Start Time",
-              "type": "number"
+              "type": "number",
+              "title": "Start Time"
             },
             "name": "start_time",
             "in": "query"
@@ -1531,8 +1534,8 @@
           {
             "required": false,
             "schema": {
-              "title": "End Time",
-              "type": "number"
+              "type": "number",
+              "title": "End Time"
             },
             "name": "end_time",
             "in": "query"
@@ -1540,8 +1543,8 @@
           {
             "required": false,
             "schema": {
-              "title": "Species",
-              "type": "string"
+              "type": "string",
+              "title": "Species"
             },
             "name": "species",
             "in": "query"
@@ -1549,8 +1552,8 @@
           {
             "required": false,
             "schema": {
-              "title": "Microphone Id",
-              "type": "string"
+              "type": "string",
+              "title": "Microphone Id"
             },
             "name": "microphone_id",
             "in": "query"
@@ -1608,8 +1611,8 @@
           {
             "required": true,
             "schema": {
-              "title": "Node Id",
-              "type": "string"
+              "type": "string",
+              "title": "Node Id"
             },
             "name": "node_id",
             "in": "path"
@@ -1648,8 +1651,8 @@
           {
             "required": true,
             "schema": {
-              "title": "Node Id",
-              "type": "string"
+              "type": "string",
+              "title": "Node Id"
             },
             "name": "node_id",
             "in": "path"
@@ -1688,8 +1691,8 @@
           {
             "required": true,
             "schema": {
-              "title": "Node Id",
-              "type": "string"
+              "type": "string",
+              "title": "Node Id"
             },
             "name": "node_id",
             "in": "path"
@@ -1728,8 +1731,8 @@
           {
             "required": true,
             "schema": {
-              "title": "Node Id",
-              "type": "string"
+              "type": "string",
+              "title": "Node Id"
             },
             "name": "node_id",
             "in": "path"
@@ -1768,8 +1771,8 @@
           {
             "required": true,
             "schema": {
-              "title": "Node Id",
-              "type": "string"
+              "type": "string",
+              "title": "Node Id"
             },
             "name": "node_id",
             "in": "path"
@@ -1808,8 +1811,8 @@
           {
             "required": true,
             "schema": {
-              "title": "Node Id",
-              "type": "string"
+              "type": "string",
+              "title": "Node Id"
             },
             "name": "node_id",
             "in": "path"
@@ -2208,8 +2211,8 @@
           {
             "required": false,
             "schema": {
-              "title": "Limit",
               "type": "integer",
+              "title": "Limit",
               "default": 10
             },
             "name": "limit",
@@ -2344,8 +2347,8 @@
             "description": "Filter by species name (exact match)",
             "required": false,
             "schema": {
-              "title": "Species",
               "type": "string",
+              "title": "Species",
               "description": "Filter by species name (exact match)"
             },
             "name": "species",
@@ -2355,10 +2358,10 @@
             "description": "Filter detections from this timestamp (inclusive, ISO 8601)",
             "required": false,
             "schema": {
-              "title": "Start Time",
               "type": "string",
-              "description": "Filter detections from this timestamp (inclusive, ISO 8601)",
-              "format": "date-time"
+              "format": "date-time",
+              "title": "Start Time",
+              "description": "Filter detections from this timestamp (inclusive, ISO 8601)"
             },
             "name": "start_time",
             "in": "query"
@@ -2367,10 +2370,10 @@
             "description": "Filter detections up to this timestamp (inclusive, ISO 8601)",
             "required": false,
             "schema": {
-              "title": "End Time",
               "type": "string",
-              "description": "Filter detections up to this timestamp (inclusive, ISO 8601)",
-              "format": "date-time"
+              "format": "date-time",
+              "title": "End Time",
+              "description": "Filter detections up to this timestamp (inclusive, ISO 8601)"
             },
             "name": "end_time",
             "in": "query"
@@ -2379,8 +2382,8 @@
             "description": "Latitude for location filter (requires lon & radius_km)",
             "required": false,
             "schema": {
-              "title": "Lat",
               "type": "number",
+              "title": "Lat",
               "description": "Latitude for location filter (requires lon & radius_km)"
             },
             "name": "lat",
@@ -2390,8 +2393,8 @@
             "description": "Longitude for location filter (requires lat & radius_km)",
             "required": false,
             "schema": {
-              "title": "Lon",
               "type": "number",
+              "title": "Lon",
               "description": "Longitude for location filter (requires lat & radius_km)"
             },
             "name": "lon",
@@ -2401,8 +2404,8 @@
             "description": "Radius in kilometres for location filter (requires lat & lon)",
             "required": false,
             "schema": {
-              "title": "Radius Km",
               "type": "number",
+              "title": "Radius Km",
               "description": "Radius in kilometres for location filter (requires lat & lon)"
             },
             "name": "radius_km",
@@ -2412,9 +2415,9 @@
             "description": "Page number (1-based)",
             "required": false,
             "schema": {
-              "title": "Page",
-              "minimum": 1.0,
               "type": "integer",
+              "minimum": 1.0,
+              "title": "Page",
               "description": "Page number (1-based)",
               "default": 1
             },
@@ -2425,10 +2428,10 @@
             "description": "Number of detections per page (max 100)",
             "required": false,
             "schema": {
-              "title": "Page Size",
+              "type": "integer",
               "maximum": 100.0,
               "minimum": 1.0,
-              "type": "integer",
+              "title": "Page Size",
               "description": "Number of detections per page (max 100)",
               "default": 20
             },
@@ -2442,7 +2445,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DetectionListResponse"
+                  "$ref": "#/components/schemas/DetectionListResponses"
                 }
               }
             }
@@ -2511,8 +2514,8 @@
             "description": "MongoDB ObjectId of the detection",
             "required": true,
             "schema": {
-              "title": "Detection Id",
               "type": "string",
+              "title": "Detection Id",
               "description": "MongoDB ObjectId of the detection"
             },
             "name": "detection_id",
@@ -2553,8 +2556,8 @@
             "description": "MongoDB ObjectId of the detection",
             "required": true,
             "schema": {
-              "title": "Detection Id",
               "type": "string",
+              "title": "Detection Id",
               "description": "MongoDB ObjectId of the detection"
             },
             "name": "detection_id",
@@ -2593,8 +2596,8 @@
             "description": "MongoDB ObjectId of the detection",
             "required": true,
             "schema": {
-              "title": "Detection Id",
               "type": "string",
+              "title": "Detection Id",
               "description": "MongoDB ObjectId of the detection"
             },
             "name": "detection_id",
@@ -2605,8 +2608,8 @@
           "content": {
             "application/json": {
               "schema": {
-                "title": "Updates",
                 "type": "object",
+                "title": "Updates",
                 "description": "Partial update payload"
               }
             }
@@ -2641,91 +2644,157 @@
   "components": {
     "schemas": {
       "AddressSchema": {
-        "title": "AddressSchema",
+        "properties": {
+          "country": {
+            "type": "string",
+            "title": "Country"
+          },
+          "state": {
+            "type": "string",
+            "title": "State"
+          }
+        },
+        "type": "object",
         "required": [
           "country"
         ],
-        "type": "object",
-        "properties": {
-          "country": {
-            "title": "Country",
-            "type": "string"
-          },
-          "state": {
-            "title": "State",
-            "type": "string"
-          }
-        }
+        "title": "AddressSchema"
       },
       "AnimalNotificationSchema": {
-        "title": "AnimalNotificationSchema",
+        "properties": {
+          "species": {
+            "type": "string",
+            "title": "Species"
+          },
+          "confidence": {
+            "type": "number",
+            "title": "Confidence"
+          },
+          "common": {
+            "type": "string",
+            "title": "Common"
+          }
+        },
+        "type": "object",
         "required": [
           "species",
           "confidence",
           "common"
         ],
-        "type": "object",
-        "properties": {
-          "species": {
-            "title": "Species",
-            "type": "string"
-          },
-          "confidence": {
-            "title": "Confidence",
-            "type": "number"
-          },
-          "common": {
-            "title": "Common",
-            "type": "string"
-          }
-        },
+        "title": "AnimalNotificationSchema",
         "example": {
           "species": "Sus scrofa",
           "common": "Wild Boar"
         }
       },
       "Body_predict_predict_post": {
-        "title": "Body_predict_predict_post",
+        "properties": {
+          "audio": {
+            "type": "string",
+            "format": "binary",
+            "title": "Audio"
+          },
+          "upload_id": {
+            "type": "string",
+            "title": "Upload Id"
+          },
+          "user_id": {
+            "type": "string",
+            "title": "User Id"
+          }
+        },
+        "type": "object",
         "required": [
           "audio"
         ],
-        "type": "object",
-        "properties": {
-          "audio": {
-            "title": "Audio",
-            "type": "string",
-            "format": "binary"
-          },
-          "upload_id": {
-            "title": "Upload Id",
-            "type": "string"
-          },
-          "user_id": {
-            "title": "User Id",
-            "type": "string"
-          }
-        }
+        "title": "Body_predict_predict_post"
       },
       "Body_upload_audio_api_audio_upload_post": {
-        "title": "Body_upload_audio_api_audio_upload_post",
+        "properties": {
+          "file": {
+            "type": "string",
+            "format": "binary",
+            "title": "File"
+          },
+          "user_id": {
+            "type": "string",
+            "title": "User Id"
+          }
+        },
+        "type": "object",
         "required": [
           "file"
         ],
-        "type": "object",
-        "properties": {
-          "file": {
-            "title": "File",
-            "type": "string",
-            "format": "binary"
-          },
-          "user_id": {
-            "title": "User Id",
-            "type": "string"
-          }
-        }
+        "title": "Body_upload_audio_api_audio_upload_post"
       },
       "Detection": {
-        "title": "Detection",
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "sensorId": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Sensorid"
+          },
+          "species": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Species"
+          },
+          "microphoneLLA": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 3,
+            "title": "Microphonella"
+          },
+          "animalEstLLA": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 3,
+            "title": "Animalestlla"
+          },
+          "animalTrueLLA": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 3,
+            "title": "Animaltruella"
+          },
+          "animalLLAUncertainty": {
+            "type": "integer",
+            "title": "Animalllauncertainty"
+          },
+          "audioClip": {
+            "type": "string",
+            "title": "Audioclip"
+          },
+          "confidence": {
+            "type": "number",
+            "exclusiveMaximum": 100.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Confidence"
+          },
+          "sampleRate": {
+            "type": "integer",
+            "title": "Samplerate"
+          },
+          "_id": {
+            "type": "string",
+            "title": " Id"
+          }
+        },
+        "type": "object",
         "required": [
           "timestamp",
           "sensorId",
@@ -2738,73 +2807,7 @@
           "confidence",
           "sampleRate"
         ],
-        "type": "object",
-        "properties": {
-          "timestamp": {
-            "title": "Timestamp",
-            "type": "string",
-            "format": "date-time"
-          },
-          "sensorId": {
-            "title": "Sensorid",
-            "minLength": 1,
-            "type": "string"
-          },
-          "species": {
-            "title": "Species",
-            "minLength": 1,
-            "type": "string"
-          },
-          "microphoneLLA": {
-            "title": "Microphonella",
-            "maxItems": 3,
-            "minItems": 3,
-            "type": "array",
-            "items": {
-              "type": "number"
-            }
-          },
-          "animalEstLLA": {
-            "title": "Animalestlla",
-            "maxItems": 3,
-            "minItems": 3,
-            "type": "array",
-            "items": {
-              "type": "number"
-            }
-          },
-          "animalTrueLLA": {
-            "title": "Animaltruella",
-            "maxItems": 3,
-            "minItems": 3,
-            "type": "array",
-            "items": {
-              "type": "number"
-            }
-          },
-          "animalLLAUncertainty": {
-            "title": "Animalllauncertainty",
-            "type": "integer"
-          },
-          "audioClip": {
-            "title": "Audioclip",
-            "type": "string"
-          },
-          "confidence": {
-            "title": "Confidence",
-            "exclusiveMaximum": 100.0,
-            "exclusiveMinimum": 0.0,
-            "type": "number"
-          },
-          "sampleRate": {
-            "title": "Samplerate",
-            "type": "integer"
-          },
-          "_id": {
-            "title": " Id",
-            "type": "string"
-          }
-        },
+        "title": "Detection",
         "example": {
           "timestamp": "2023-03-22T13:45:12.000Z",
           "sensorId": "2",
@@ -2831,7 +2834,69 @@
         }
       },
       "DetectionCreate": {
-        "title": "DetectionCreate",
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "sensorId": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Sensorid"
+          },
+          "species": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Species"
+          },
+          "microphoneLLA": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 3,
+            "title": "Microphonella"
+          },
+          "animalEstLLA": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 3,
+            "title": "Animalestlla"
+          },
+          "animalTrueLLA": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 3,
+            "title": "Animaltruella"
+          },
+          "animalLLAUncertainty": {
+            "type": "integer",
+            "title": "Animalllauncertainty"
+          },
+          "audioClip": {
+            "type": "string",
+            "title": "Audioclip"
+          },
+          "confidence": {
+            "type": "number",
+            "exclusiveMaximum": 100.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Confidence"
+          },
+          "sampleRate": {
+            "type": "integer",
+            "title": "Samplerate"
+          }
+        },
+        "type": "object",
         "required": [
           "timestamp",
           "sensorId",
@@ -2844,69 +2909,7 @@
           "confidence",
           "sampleRate"
         ],
-        "type": "object",
-        "properties": {
-          "timestamp": {
-            "title": "Timestamp",
-            "type": "string",
-            "format": "date-time"
-          },
-          "sensorId": {
-            "title": "Sensorid",
-            "minLength": 1,
-            "type": "string"
-          },
-          "species": {
-            "title": "Species",
-            "minLength": 1,
-            "type": "string"
-          },
-          "microphoneLLA": {
-            "title": "Microphonella",
-            "maxItems": 3,
-            "minItems": 3,
-            "type": "array",
-            "items": {
-              "type": "number"
-            }
-          },
-          "animalEstLLA": {
-            "title": "Animalestlla",
-            "maxItems": 3,
-            "minItems": 3,
-            "type": "array",
-            "items": {
-              "type": "number"
-            }
-          },
-          "animalTrueLLA": {
-            "title": "Animaltruella",
-            "maxItems": 3,
-            "minItems": 3,
-            "type": "array",
-            "items": {
-              "type": "number"
-            }
-          },
-          "animalLLAUncertainty": {
-            "title": "Animalllauncertainty",
-            "type": "integer"
-          },
-          "audioClip": {
-            "title": "Audioclip",
-            "type": "string"
-          },
-          "confidence": {
-            "title": "Confidence",
-            "exclusiveMaximum": 100.0,
-            "exclusiveMinimum": 0.0,
-            "type": "number"
-          },
-          "sampleRate": {
-            "title": "Samplerate",
-            "type": "integer"
-          }
-        },
+        "title": "DetectionCreate",
         "example": {
           "timestamp": "2023-03-22T13:45:12.000Z",
           "sensorId": "2",
@@ -2933,61 +2936,123 @@
         }
       },
       "DetectionListResponses": {
-        "title": "DetectionListResponses",
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/Detection"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "page_size": {
+            "type": "integer",
+            "title": "Page Size"
+          }
+        },
+        "type": "object",
         "required": [
           "items",
           "total",
           "page",
           "page_size"
         ],
-        "type": "object",
-        "properties": {
-          "items": {
-            "title": "Items",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Detection"
-            }
-          },
-          "total": {
-            "title": "Total",
-            "type": "integer"
-          },
-          "page": {
-            "title": "Page",
-            "type": "integer"
-          },
-          "page_size": {
-            "title": "Page Size",
-            "type": "integer"
-          }
-        }
+        "title": "DetectionListResponses"
       },
       "EmailNotifications": {
-        "title": "EmailNotifications",
+        "properties": {
+          "species": {
+            "type": "string",
+            "title": "Species"
+          },
+          "last_sent": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Last Sent"
+          }
+        },
+        "type": "object",
         "required": [
           "species",
           "last_sent"
         ],
-        "type": "object",
-        "properties": {
-          "species": {
-            "title": "Species",
-            "type": "string"
-          },
-          "last_sent": {
-            "title": "Last Sent",
-            "type": "string",
-            "format": "date-time"
-          }
-        },
+        "title": "EmailNotifications",
         "example": {
           "species": "Sus scrofa",
           "last_sent": "2024-09-15T10:30:00Z"
         }
       },
       "EventSchema": {
-        "title": "EventSchema",
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "sensorId": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Sensorid"
+          },
+          "species": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Species"
+          },
+          "microphoneLLA": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 3,
+            "title": "Microphonella"
+          },
+          "animalEstLLA": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 3,
+            "title": "Animalestlla"
+          },
+          "animalTrueLLA": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 3,
+            "title": "Animaltruella"
+          },
+          "animalLLAUncertainty": {
+            "type": "integer",
+            "title": "Animalllauncertainty"
+          },
+          "audioClip": {
+            "type": "string",
+            "title": "Audioclip"
+          },
+          "confidence": {
+            "type": "number",
+            "exclusiveMaximum": 100.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Confidence"
+          },
+          "sampleRate": {
+            "type": "integer",
+            "title": "Samplerate"
+          }
+        },
+        "type": "object",
         "required": [
           "timestamp",
           "sensorId",
@@ -3000,69 +3065,7 @@
           "confidence",
           "sampleRate"
         ],
-        "type": "object",
-        "properties": {
-          "timestamp": {
-            "title": "Timestamp",
-            "type": "string",
-            "format": "date-time"
-          },
-          "sensorId": {
-            "title": "Sensorid",
-            "minLength": 1,
-            "type": "string"
-          },
-          "species": {
-            "title": "Species",
-            "minLength": 1,
-            "type": "string"
-          },
-          "microphoneLLA": {
-            "title": "Microphonella",
-            "maxItems": 3,
-            "minItems": 3,
-            "type": "array",
-            "items": {
-              "type": "number"
-            }
-          },
-          "animalEstLLA": {
-            "title": "Animalestlla",
-            "maxItems": 3,
-            "minItems": 3,
-            "type": "array",
-            "items": {
-              "type": "number"
-            }
-          },
-          "animalTrueLLA": {
-            "title": "Animaltruella",
-            "maxItems": 3,
-            "minItems": 3,
-            "type": "array",
-            "items": {
-              "type": "number"
-            }
-          },
-          "animalLLAUncertainty": {
-            "title": "Animalllauncertainty",
-            "type": "integer"
-          },
-          "audioClip": {
-            "title": "Audioclip",
-            "type": "string"
-          },
-          "confidence": {
-            "title": "Confidence",
-            "exclusiveMaximum": 100.0,
-            "exclusiveMinimum": 0.0,
-            "type": "number"
-          },
-          "sampleRate": {
-            "title": "Samplerate",
-            "type": "integer"
-          }
-        },
+        "title": "EventSchema",
         "example": {
           "timestamp": "2023-03-22T13:45:12.000Z",
           "sensorId": "2",
@@ -3089,83 +3092,83 @@
         }
       },
       "ForgotPasswordSchema": {
-        "title": "ForgotPasswordSchema",
+        "properties": {
+          "user": {
+            "type": "string",
+            "title": "User"
+          }
+        },
+        "type": "object",
         "required": [
           "user"
         ],
-        "type": "object",
-        "properties": {
-          "user": {
-            "title": "User",
-            "type": "string"
-          }
-        }
+        "title": "ForgotPasswordSchema"
       },
       "GuestSignupSchema": {
-        "title": "GuestSignupSchema",
+        "properties": {
+          "username": {
+            "type": "string",
+            "title": "Username"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "password": {
+            "type": "string",
+            "title": "Password"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          }
+        },
+        "type": "object",
         "required": [
           "username",
           "email",
           "password",
           "timestamp"
         ],
-        "type": "object",
-        "properties": {
-          "username": {
-            "title": "Username",
-            "type": "string"
-          },
-          "email": {
-            "title": "Email",
-            "type": "string"
-          },
-          "password": {
-            "title": "Password",
-            "type": "string"
-          },
-          "timestamp": {
-            "title": "Timestamp",
-            "type": "string",
-            "format": "date-time"
-          }
-        }
+        "title": "GuestSignupSchema"
       },
       "HTTPValidationError": {
-        "title": "HTTPValidationError",
-        "type": "object",
         "properties": {
           "detail": {
-            "title": "Detail",
-            "type": "array",
             "items": {
               "$ref": "#/components/schemas/ValidationError"
-            }
+            },
+            "type": "array",
+            "title": "Detail"
           }
-        }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
       },
       "MicrophoneSchema": {
-        "title": "MicrophoneSchema",
+        "properties": {
+          "sensorId": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Sensorid"
+          },
+          "microphoneLLA": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 3,
+            "title": "Microphonella"
+          }
+        },
+        "type": "object",
         "required": [
           "sensorId",
           "microphoneLLA"
         ],
-        "type": "object",
-        "properties": {
-          "sensorId": {
-            "title": "Sensorid",
-            "minLength": 1,
-            "type": "string"
-          },
-          "microphoneLLA": {
-            "title": "Microphonella",
-            "maxItems": 3,
-            "minItems": 3,
-            "type": "array",
-            "items": {
-              "type": "number"
-            }
-          }
-        },
+        "title": "MicrophoneSchema",
         "example": {
           "sensorId": "2",
           "microphoneLLA": [
@@ -3176,40 +3179,40 @@
         }
       },
       "MovementSchema": {
-        "title": "MovementSchema",
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "species": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Species"
+          },
+          "animalId": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Animalid"
+          },
+          "animalTrueLLA": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 3,
+            "title": "Animaltruella"
+          }
+        },
+        "type": "object",
         "required": [
           "timestamp",
           "species",
           "animalId",
           "animalTrueLLA"
         ],
-        "type": "object",
-        "properties": {
-          "timestamp": {
-            "title": "Timestamp",
-            "type": "string",
-            "format": "date-time"
-          },
-          "species": {
-            "title": "Species",
-            "minLength": 1,
-            "type": "string"
-          },
-          "animalId": {
-            "title": "Animalid",
-            "minLength": 1,
-            "type": "string"
-          },
-          "animalTrueLLA": {
-            "title": "Animaltruella",
-            "maxItems": 3,
-            "minItems": 3,
-            "type": "array",
-            "items": {
-              "type": "number"
-            }
-          }
-        },
+        "title": "MovementSchema",
         "example": {
           "timestamp": "2023-03-22T13:45:12.000Z",
           "species": "Sus Scrofa",
@@ -3222,25 +3225,80 @@
         }
       },
       "OTPVerifyRequest": {
-        "title": "OTPVerifyRequest",
+        "properties": {
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "otp": {
+            "type": "string",
+            "title": "Otp"
+          }
+        },
+        "type": "object",
         "required": [
           "email",
           "otp"
         ],
-        "type": "object",
-        "properties": {
-          "email": {
-            "title": "Email",
-            "type": "string"
-          },
-          "otp": {
-            "title": "Otp",
-            "type": "string"
-          }
-        }
+        "title": "OTPVerifyRequest"
       },
       "RecordingData": {
-        "title": "RecordingData",
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "sensorId": {
+            "type": "string",
+            "title": "Sensorid"
+          },
+          "microphoneLLA": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 3,
+            "title": "Microphonella"
+          },
+          "animalEstLLA": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 3,
+            "title": "Animalestlla"
+          },
+          "animalTrueLLA": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 3,
+            "title": "Animaltruella"
+          },
+          "animalLLAUncertainty": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Animalllauncertainty"
+          },
+          "audioClip": {
+            "type": "string",
+            "title": "Audioclip"
+          },
+          "mode": {
+            "type": "string",
+            "title": "Mode"
+          },
+          "audioFile": {
+            "type": "string",
+            "title": "Audiofile"
+          }
+        },
+        "type": "object",
         "required": [
           "timestamp",
           "sensorId",
@@ -3252,65 +3310,45 @@
           "mode",
           "audioFile"
         ],
-        "type": "object",
-        "properties": {
-          "timestamp": {
-            "title": "Timestamp",
-            "type": "string",
-            "format": "date-time"
-          },
-          "sensorId": {
-            "title": "Sensorid",
-            "type": "string"
-          },
-          "microphoneLLA": {
-            "title": "Microphonella",
-            "maxItems": 3,
-            "minItems": 3,
-            "type": "array",
-            "items": {
-              "type": "number"
-            }
-          },
-          "animalEstLLA": {
-            "title": "Animalestlla",
-            "maxItems": 3,
-            "minItems": 3,
-            "type": "array",
-            "items": {
-              "type": "number"
-            }
-          },
-          "animalTrueLLA": {
-            "title": "Animaltruella",
-            "maxItems": 3,
-            "minItems": 3,
-            "type": "array",
-            "items": {
-              "type": "number"
-            }
-          },
-          "animalLLAUncertainty": {
-            "title": "Animalllauncertainty",
-            "exclusiveMinimum": 0.0,
-            "type": "number"
-          },
-          "audioClip": {
-            "title": "Audioclip",
-            "type": "string"
-          },
-          "mode": {
-            "title": "Mode",
-            "type": "string"
-          },
-          "audioFile": {
-            "title": "Audiofile",
-            "type": "string"
-          }
-        }
+        "title": "RecordingData"
       },
       "RequestSchema": {
-        "title": "RequestSchema",
+        "properties": {
+          "username": {
+            "type": "string",
+            "title": "Username"
+          },
+          "animal": {
+            "type": "string",
+            "title": "Animal"
+          },
+          "requestingToChange": {
+            "type": "string",
+            "title": "Requestingtochange"
+          },
+          "initial": {
+            "type": "string",
+            "title": "Initial"
+          },
+          "modified": {
+            "type": "string",
+            "title": "Modified"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Date"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          }
+        },
+        "type": "object",
         "required": [
           "username",
           "animal",
@@ -3321,127 +3359,150 @@
           "date",
           "status"
         ],
-        "type": "object",
-        "properties": {
-          "username": {
-            "title": "Username",
-            "type": "string"
-          },
-          "animal": {
-            "title": "Animal",
-            "type": "string"
-          },
-          "requestingToChange": {
-            "title": "Requestingtochange",
-            "type": "string"
-          },
-          "initial": {
-            "title": "Initial",
-            "type": "string"
-          },
-          "modified": {
-            "title": "Modified",
-            "type": "string"
-          },
-          "source": {
-            "title": "Source",
-            "type": "string"
-          },
-          "date": {
-            "title": "Date",
-            "type": "string",
-            "format": "date-time"
-          },
-          "status": {
-            "title": "Status",
-            "type": "string"
-          }
-        }
+        "title": "RequestSchema"
       },
       "ResetPasswordSchema": {
-        "title": "ResetPasswordSchema",
+        "properties": {
+          "user": {
+            "type": "string",
+            "title": "User"
+          },
+          "password": {
+            "type": "string",
+            "title": "Password"
+          },
+          "otp": {
+            "type": "integer",
+            "title": "Otp"
+          }
+        },
+        "type": "object",
         "required": [
           "user",
           "password",
           "otp"
         ],
-        "type": "object",
-        "properties": {
-          "user": {
-            "title": "User",
-            "type": "string"
-          },
-          "password": {
-            "title": "Password",
-            "type": "string"
-          },
-          "otp": {
-            "title": "Otp",
-            "type": "integer"
-          }
-        }
+        "title": "ResetPasswordSchema"
       },
       "SignInRequest": {
-        "title": "SignInRequest",
+        "properties": {
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "password": {
+            "type": "string",
+            "title": "Password"
+          }
+        },
+        "type": "object",
         "required": [
           "email",
           "password"
         ],
-        "type": "object",
-        "properties": {
-          "email": {
-            "title": "Email",
-            "type": "string"
-          },
-          "password": {
-            "title": "Password",
-            "type": "string"
-          }
-        }
+        "title": "SignInRequest"
       },
       "TwoFactorVerifySchema": {
-        "title": "TwoFactorVerifySchema",
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "title": "User Id"
+          },
+          "otp": {
+            "type": "string",
+            "title": "Otp"
+          }
+        },
+        "type": "object",
         "required": [
           "user_id",
           "otp"
         ],
-        "type": "object",
-        "properties": {
-          "user_id": {
-            "title": "User Id",
-            "type": "string"
-          },
-          "otp": {
-            "title": "Otp",
-            "type": "string"
-          }
-        }
+        "title": "TwoFactorVerifySchema"
       },
       "UserLoginSchema": {
-        "title": "UserLoginSchema",
+        "properties": {
+          "username": {
+            "type": "string",
+            "title": "Username"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "password": {
+            "type": "string",
+            "title": "Password"
+          }
+        },
+        "type": "object",
         "required": [
           "username",
           "email",
           "password"
         ],
-        "type": "object",
-        "properties": {
-          "username": {
-            "title": "Username",
-            "type": "string"
-          },
-          "email": {
-            "title": "Email",
-            "type": "string"
-          },
-          "password": {
-            "title": "Password",
-            "type": "string"
-          }
-        }
+        "title": "UserLoginSchema"
       },
       "UserSignupSchema": {
-        "title": "UserSignupSchema",
+        "properties": {
+          "username": {
+            "type": "string",
+            "title": "Username"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8,
+            "title": "Password"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "roles": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Roles"
+          },
+          "gender": {
+            "type": "string",
+            "title": "Gender"
+          },
+          "DoB": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Dob"
+          },
+          "address": {
+            "$ref": "#/components/schemas/AddressSchema"
+          },
+          "organization": {
+            "type": "string",
+            "title": "Organization"
+          },
+          "phonenumber": {
+            "type": "string",
+            "title": "Phonenumber"
+          },
+          "notificationAnimals": {
+            "items": {
+              "$ref": "#/components/schemas/AnimalNotificationSchema"
+            },
+            "type": "array",
+            "title": "Notificationanimals",
+            "default": []
+          },
+          "emailNotifications": {
+            "items": {
+              "$ref": "#/components/schemas/EmailNotifications"
+            },
+            "type": "array",
+            "title": "Emailnotifications",
+            "default": []
+          }
+        },
+        "type": "object",
         "required": [
           "username",
           "password",
@@ -3452,91 +3513,40 @@
           "address",
           "organization"
         ],
-        "type": "object",
-        "properties": {
-          "username": {
-            "title": "Username",
-            "type": "string"
-          },
-          "password": {
-            "title": "Password",
-            "minLength": 8,
-            "type": "string"
-          },
-          "email": {
-            "title": "Email",
-            "type": "string"
-          },
-          "roles": {
-            "title": "Roles",
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "gender": {
-            "title": "Gender",
-            "type": "string"
-          },
-          "DoB": {
-            "title": "Dob",
-            "type": "string",
-            "format": "date-time"
-          },
-          "address": {
-            "$ref": "#/components/schemas/AddressSchema"
-          },
-          "organization": {
-            "title": "Organization",
-            "type": "string"
-          },
-          "phonenumber": {
-            "title": "Phonenumber",
-            "type": "string"
-          },
-          "notificationAnimals": {
-            "title": "Notificationanimals",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/AnimalNotificationSchema"
-            },
-            "default": []
-          },
-          "emailNotifications": {
-            "title": "Emailnotifications",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/EmailNotifications"
-            },
-            "default": []
-          }
-        }
+        "title": "UserSignupSchema"
       },
       "ValidationError": {
-        "title": "ValidationError",
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
         "required": [
           "loc",
           "msg",
           "type"
         ],
-        "type": "object",
-        "properties": {
-          "loc": {
-            "title": "Location",
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "msg": {
-            "title": "Message",
-            "type": "string"
-          },
-          "type": {
-            "title": "Error Type",
-            "type": "string"
-          }
-        }
+        "title": "ValidationError"
       }
     },
     "securitySchemes": {
