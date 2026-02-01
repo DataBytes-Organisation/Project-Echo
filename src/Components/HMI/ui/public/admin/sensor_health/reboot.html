@@ -3,30 +3,25 @@
 <head>
   <meta charset="UTF-8" />
   <title>Reboot Sensors – Project Echo</title>
+  <link rel="stylesheet" type="text/css" href="/admin/css/styles.min.css" />
+  <link rel="stylesheet" href="/admin/css/icons/tabler-icons/tabler-icons.css" />
   <link rel="stylesheet" href="/admin/sensor_health/style.css" />
+  <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script type="text/javascript" src="/admin/js/app.min.js"></script>
   <script src="/admin/sensor_health/script.js" defer></script>
 </head>
 <body>
-<div class="layout">
-  <aside class="sidebar"><div class="sidebar-brand"><img src="/admin/images/logos/echo-icon.png" class="brand-logo" alt="Echo logo" /></div>
-    <nav class="sidebar-menu">
-      <div class="nav-section">
-        <div class="nav-title">MENU</div>
-        <a class="nav-link" href="/admin/dashboard.html"><span class="nav-icon">▦</span><span class="nav-text">Dashboard</span></a>
-        <a class="nav-link" href="/admin/sensor-health.html"><span class="nav-icon">📡</span><span class="nav-text">Sensor Health</span></a>
-        <a class="nav-link" href="/admin/sensor_health/alerts.html"><span class="nav-icon">🔔</span><span class="nav-text">Alerts</span></a>
-        <a class="nav-link active" href="/admin/sensor_health/reboot.html"><span class="nav-icon">⟲</span><span class="nav-text">Reboot</span></a>
-        <a class="nav-link" href="/admin/sensor_health/settings.html"><span class="nav-icon">⚙</span><span class="nav-text">Settings</span></a>
-        <a class="nav-link" href="/admin/sensor_health/add-project.html"><span class="nav-icon">➕</span><span class="nav-text">Add a Project</span></a>
-      </div>
-    </nav>
-
-    <div class="sidebar-footer"> v1.0 • Admin Console </div>
-  </aside>
-  <div class="mobile-backdrop" id="mobile-backdrop"></div>
-  <main class="main">
-    <header class="page-header"><div></div><div class="page-header-actions"><button class="icon-button" id="menu-toggle">☰</button><button class="icon-button" id="theme-toggle">🌙</button></div></header>
-    <div class="dashboard-shell">
+  <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
+    data-sidebar-position="fixed" data-header-position="fixed">
+    <!-- Sidebar Start -->
+    <div id="sidebar"></div>
+    <!--  Sidebar End -->
+    <!--  Main wrapper -->
+    <div class="body-wrapper">
+      <div id="header"></div>
+      <div class="container-fluid">
+        <div class="sensor-page">
+          <div class="dashboard-shell">
       <section class="hero-header"><h1>Reboot sensors</h1><p class="subtitle">queue reboot commands for malfunctioning or frozen devices</p></section>
       <section class="card"><h3>Queue a reboot</h3><p class="card-subtitle">Send a reboot instruction to one or more sensors.</p>
         <div class="form-grid"><div><label for="reboot-sensor">Sensor IDs</label><input id="reboot-sensor" placeholder="e.g. SEN-01, SEN-14, SEN-77"></div><div><label for="reboot-reason">Reason</label><input id="reboot-reason" placeholder="e.g. frozen board, config update"></div></div>
@@ -38,8 +33,18 @@
           <tr><td colspan="3">Loading…</td></tr>
         </tbody></table>
       </section>
+    </div> <!-- END dashboard-shell -->
+        </div>
+      <div id="footer"></div>
     </div>
-  </main>
-</div>
+  </div>
+
+  <script>
+    $(document).ready(function() {
+      $("#sidebar").load("/admin/component/sidebar-component.html", function() { $.getScript('/admin/js/sidebarmenu.js'); });
+      $("#header").load("/admin/component/header-component.html");
+      $("#footer").load("/admin/component/footer-component.html");
+    });
+  </script>
 </body>
 </html>
