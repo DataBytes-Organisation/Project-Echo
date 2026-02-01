@@ -33,6 +33,7 @@ def on_message(client, userdata, msg):
     json_filename = f"data_{timestamp}.json"
     with open(os.path.join(JSON_DIR, json_filename), "w") as f:
         json.dump(payload["health_data"], f)
+        json.dump(payload["gps_data"], f)
     print(f"Saved JSON: {json_filename}")
 
     print("Writing audio data")

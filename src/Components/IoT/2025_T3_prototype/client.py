@@ -2,6 +2,7 @@ import os
 import sounddevice as sd
 import numpy as np
 import paho.mqtt.client as mqtt
+from gps3 import gps3
 import time
 import wave
 import psutil
@@ -15,7 +16,7 @@ TOPIC = "iot/data/test"
 
 os.makedirs(AUDIO_DIR, exist_ok=True)
 
-sd.default.device = (2, None)
+sd.default.device = (1, None)
 
 print("Connecting to MQTT Broker...")
 client = mqtt.Client()
@@ -43,13 +44,35 @@ def record_audio(duration=5, samplerate=44100):
     print("Recording complete", filename)
     return filepath
 
+
 def get_health_report():
     return {
         "cpu": psutil.cpu_percent(),
         "ram": psutil.virtual_memory().percent,
         "disk": psutil.disk_usage("/").percent,
-        "uptime": psutil.boot_time()
+        "uptime": time.time() - psutil.boot_time()
     }
+
+def get_gps_reading():
+    gps_socket = gps3.GPSDSocket()
+    data_stream = gps3.DataStream()
+
+    gps_socket.connect()
+    gps_socket.watch()
+
+    for new_data in gps_socket:
+        if new_data:
+            data_stream.unpack(new_data)
+
+            lat = data_stream.TPV.get('lat')
+            lon = data_stream.TPV.get('lon')
+            mode = data_stream.TPV.get('mode')
+
+            if mode == 3 and lat != 'n/a' and lon != 'n/a':
+                print("GPS FIX:", lat, lon)
+                return {"lat": lat, "lon": lon}
+
+    return None
 
 def send_data():
     audio_file = record_audio()
@@ -59,10 +82,13 @@ def send_data():
     
     health_data = get_health_report()
 
+    gps_data = get_gps_reading()
+
     audio_b64 = base64.b64encode(audio_bytes).decode('ascii')
 
     payload = {
         "health_data": health_data,
+        "gps_data": gps_data,
         "audio_file": audio_b64
     }
 
