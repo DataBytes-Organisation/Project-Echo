@@ -13,7 +13,7 @@ exports.guestsignup = async (req) => {
     timestamp: req.timestamp
   };
   try {
-    const axiosResponse = await axios.post('http://ts-api-cont:9000/hmi/guestsignup',schema)
+    const axiosResponse = await axios.post('http://api-service:9000/hmi/guestsignup',schema)
   
     if (axiosResponse.status === 201) {
       return { status: 'success' }
@@ -57,7 +57,7 @@ exports.signout = async (req, res, next) => {
 //     try {
 //         const jwtToken = req.session.jwtToken;
         
-//         const axiosResponse = await axios.delete('http://ts-api-cont:9000/hmi/delete-account', {
+//         const axiosResponse = await axios.delete('http://api-service:9000/hmi/delete-account', {
 //             headers: {
 //                 Authorization: `Bearer ${jwtToken}`
 //             }
