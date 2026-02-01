@@ -29,11 +29,8 @@
       <section class="card"><h3>Alert Severity Overview</h3><p class="card-subtitle">Distribution of active alerts</p><canvas id="alertsChart" height="120"></canvas></section>
       <section class="card"><h3>Active Alerts</h3><p class="card-subtitle">Sensors requiring immediate or near-term attention</p>
         <table><thead><tr><th>Sensor</th><th>Issue</th><th>Details</th><th>Last Audio</th></tr></thead>
-        <tbody>
-          <tr><td>SEN-14</td><td><span class="pill pill-warning">Low Battery</span></td><td>Battery at 21% (threshold 25%)</td><td>32m ago</td></tr>
-          <tr><td>SEN-77</td><td><span class="pill pill-danger">Offline</span></td><td>No contact for 2 hours</td><td>2h 5m ago</td></tr>
-          <tr><td>SEN-88</td><td><span class="pill pill-danger">No Audio</span></td><td>No audio in last 6 hours</td><td>6h ago</td></tr>
-          <tr><td>SEN-104</td><td><span class="pill pill-warning">Degraded</span></td><td>Packet loss detected (18%)</td><td>22m ago</td></tr>
+        <tbody id="alerts-tbody">
+          <tr><td colspan="4">Loading…</td></tr>
         </tbody></table>
       </section>
     </div>

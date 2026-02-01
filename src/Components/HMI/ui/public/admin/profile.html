@@ -125,6 +125,7 @@
     $(document).ready(function() {
       $("#sidebar").load("/admin/component/sidebar-component.html", function() { $.getScript('/admin/js/sidebarmenu.js'); });
       $("#header").load("/admin/component/header-component.html");
+      $("#footer").load("/admin/component/footer-component.html");
 
       // User data mapping based on login table
       const userData = {
@@ -291,4 +292,6 @@
     });
   </script>
 </body>
+<div id="footer"></div>
+</div>
 </html>

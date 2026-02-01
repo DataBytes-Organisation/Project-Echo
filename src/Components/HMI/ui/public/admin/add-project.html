@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Add Project – Project Echo</title>
+
+  <link rel="stylesheet" href="style.css" />
+  <script src="script.js" defer></script>
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- ============================
+       SIDEBAR
+       ============================ -->
+  <aside class="sidebar">
+  <div class="sidebar-brand">
+    <img src="icons/echo.svg" class="brand-logo" alt="Echo logo" />
+  </div>
+
+  <nav class="sidebar-menu">
+
+    <div class="nav-section">
+      <div class="nav-title">MENU</div>
+
+      <a class="nav-link active" href="index.html">
+        <span class="nav-icon">▦</span>
+        <span class="nav-text">Dashboard</span>
+      </a>
+
+      <a class="nav-link" href="sensor-health.html">
+        <span class="nav-icon">📡</span>
+        <span class="nav-text">Sensor Health</span>
+      </a>
+
+      <a class="nav-link" href="alerts.html">
+        <span class="nav-icon">🔔</span>
+        <span class="nav-text">Alerts</span>
+      </a>
+
+      <a class="nav-link" href="reboot.html">
+        <span class="nav-icon">⟲</span>
+        <span class="nav-text">Reboot</span>
+      </a>
+
+      <a class="nav-link" href="settings.html">
+        <span class="nav-icon">⚙</span>
+        <span class="nav-text">Settings</span>
+      </a>
+
+      <a class="nav-link" href="add-project.html">
+        <span class="nav-icon">➕</span>
+        <span class="nav-text">Add a Project</span>
+      </a>
+
+    </div>
+
+  </nav>
+
+  <div class="sidebar-footer">
+    <span class="footer-dot"></span>
+    <span class="footer-text">ECHO</span>
+  </div>
+</aside>
+
+    <div class="sidebar-footer">
+      v1.0 • Admin Console
+    </div>
+  </aside>
+
+  <div class="mobile-backdrop" id="mobile-backdrop"></div>
+
+
+
+  <!-- ============================
+       MAIN AREA
+       ============================ -->
+  <main class="main">
+
+    <header class="page-header">
+      <div></div>
+      <div class="page-header-actions">
+        <button class="icon-button" id="menu-toggle">☰</button>
+        <button class="icon-button" id="theme-toggle">🌙</button>
+      </div>
+    </header>
+
+
+    <!-- ============================
+         DASHBOARD SHELL
+         ============================ -->
+    <div class="dashboard-shell">
+
+      <!-- PAGE HERO -->
+      <section class="hero-header">
+        <h1>Create project</h1>
+        <p class="subtitle">add a new deployment area and assign sensors to it</p>
+      </section>
+
+      <p id="project-message" class="note"></p>
+
+
+
+      <!-- PROJECT FORM -->
+      <section class="card">
+        <h3>Project details</h3>
+        <p class="card-subtitle">Fill in the core information for the project.</p>
+
+        <div class="form-grid">
+          <div>
+            <label for="project-name">Project name</label>
+            <input id="project-name" placeholder="e.g. Echo – Amazon North 2025" />
+          </div>
+
+          <div>
+            <label for="project-location">Location</label>
+            <input id="project-location" placeholder="e.g. Amazon Basin, Zone A3" />
+          </div>
+
+          <div>
+            <label for="project-start">Start date</label>
+            <input id="project-start" type="date" />
+          </div>
+
+          <div>
+            <label for="project-end">End date</label>
+            <input id="project-end" type="date" />
+          </div>
+        </div>
+
+        <label for="project-description">Description</label>
+        <textarea id="project-description" placeholder="Briefly describe the project scope and habitat..."></textarea>
+
+      </section>
+
+
+
+      <!-- SENSOR ASSIGNMENT -->
+      <section class="card">
+        <h3>Assign sensors</h3>
+        <p class="card-subtitle">Specify sensor IDs, ID ranges, or group names.</p>
+
+        <label for="project-sensors">Sensor IDs</label>
+        <input id="project-sensors" placeholder="e.g. SEN-01–SEN-32 or Rainforest Group A" />
+
+        <p class="note">Use commas, ranges (e.g. SEN-01–SEN-20), or group names.</p>
+
+        <button class="btn-primary" onclick="fakeCreateProject()">Create project</button>
+        <button class="btn-secondary" onclick="window.location='index.html'">Cancel</button>
+      </section>
+
+    </div><!-- /dashboard-shell -->
+
+  </main>
+</div>
+
+</body>
+</html>

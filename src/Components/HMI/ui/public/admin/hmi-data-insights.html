@@ -430,12 +430,15 @@
 
       </div> <!-- /container-fluid -->
     </div> <!-- /body-wrapper -->
+    <div id="footer"></div>
+    </div>
   </div> <!-- /page-wrapper -->
 
   <!-- Load sidebar + header -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script type="text/javascript" src="/admin/js/sidebarmenu.js"></script>
   <script type="text/javascript" src="/admin/js/app.min.js"></script>
+  
   <script type="text/javascript">
     $(document).ready(function() {
       $("#sidebar").load("/admin/component/sidebar-component.html", function() {
@@ -444,6 +447,7 @@
       });
 
       $("#header").load("/admin/component/header-component.html");
+      $("#footer").load("/admin/component/footer-component.html");
     });
   </script>
 
