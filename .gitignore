@@ -22,3 +22,4 @@ src/Components/HMI/ui/node_modules/*
 # audio recording from IOT Nodes
 src/Components/IoT/management_application/audioLocal
 src/Components/IoT/management_application/audioUpload
+src/Components/API/app/main.py

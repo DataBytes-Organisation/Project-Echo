@@ -447,3 +447,7 @@ class Project(ProjectBase):
 class ProjectListResponse(BaseModel):
     items: List[Project]
     total: int
+
+# Backwards/expected import name used by app.routers.detections
+class DetectionListResponse(DetectionListResponses):
+    pass

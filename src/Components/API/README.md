@@ -26,3 +26,8 @@ Head to localhost:9000/docs to read the documentation for API
 
 # 1. Update Engine to run 24/7 with continuous processing
 # 2. WebSocket for real-time detections
+
+# https://docs.google.com/document/d/1VxjDyqtyD9dx48-H1Za72js-g5GKcAFMDSzD3KdIQa0/edit?usp=sharing 
+
+# Backend API for Sensor Health 
+
