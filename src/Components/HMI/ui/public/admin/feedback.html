@@ -8,6 +8,7 @@
   <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
+  <link type="text/css" rel="stylesheet" href="/admin/css/styles.min.css" />
 
   <style>
     :root{
@@ -34,7 +35,8 @@
       color:var(--text);
     }
 
-    .page-wrapper{ padding: 1.5rem; max-width: 1150px; margin: 0 auto; }
+    /* Scoped container for feedback page content to avoid overriding global admin layout */
+    .feedback-content{ padding: 1.5rem; max-width: 1150px; margin: 0 auto; }
     .card{
       border-radius: var(--radius);
       border: 1px solid var(--border);
@@ -67,8 +69,8 @@
       border-radius: 14px;
     }
     .form-control:focus, .form-select:focus{
-      border-color: rgba(13,110,253,.55);
-      box-shadow: 0 0 0 .2rem rgba(13,110,253,.15);
+      border-color: rgba(47,110,79,.55);
+      box-shadow: 0 0 0 .2rem rgba(47,110,79,.15);
     }
 
     .section-title{ font-weight: 700; }
@@ -106,10 +108,10 @@
     }
     .chip input{ display:none; }
     .chip.active{
-      border-color: rgba(13,110,253,.35);
-      background: rgba(13,110,253,.08);
-      color: var(--brand);
-      box-shadow: 0 8px 20px rgba(13,110,253,.10);
+      border-color: rgba(47,110,79,.35);
+      background: rgba(47,110,79,.08);
+      color: var(--echo-green, #2F6E4F);
+      box-shadow: 0 8px 20px rgba(47,110,79,.10);
     }
 
     .severity-btn{
@@ -149,8 +151,8 @@
       transition: border-color .15s ease, background .15s ease;
     }
     .dropzone.drag{
-      border-color: rgba(13,110,253,.65);
-      background: rgba(13,110,253,.06);
+      border-color: rgba(47,110,79,.65);
+      background: rgba(47,110,79,.06);
     }
     .file-item{
       display:flex;
@@ -172,9 +174,10 @@
 
     .btn-primary{
       border-radius: 14px;
-      background: linear-gradient(135deg, var(--brand), #4f8bff);
+      background: linear-gradient(135deg, var(--echo-green, #2F6E4F), #376e53);
       border: none;
-      box-shadow: 0 10px 24px rgba(13,110,253,.22);
+      box-shadow: 0 10px 24px rgba(47,110,79,.18);
+      color: #ffffff;
     }
     .btn-outline-secondary{ border-radius: 14px; }
     .btn-outline-danger{ border-radius: 14px; }
@@ -199,10 +202,16 @@
     .req{ color: var(--danger); }
     .spinner-border{ width: 1.1rem; height: 1.1rem; }
   </style>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 
 <body>
-<div class="page-wrapper">
+  <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full" data-sidebar-position="fixed" data-header-position="fixed">
+    <div id="sidebar"></div>
+    <div class="body-wrapper">
+      <div id="header"></div>
+      <div class="container-fluid">
+        <div class="feedback-content">
 
   <!-- TOP HERO -->
   <div class="hero mb-4">
@@ -223,6 +232,15 @@
           <i class="bi bi-arrow-left me-1"></i> Back
         </a>
       </div>
+    </div>
+  </div>
+
+  <!-- Page Toolbar -->
+  <div class="page-toolbar mb-3 d-flex justify-content-between align-items-center">
+    <div class="toolbar-left"></div>
+    <div class="toolbar-right">
+      <button class="btn btn-primary me-2" id="toolbarSubmit" type="button"><i class="bi bi-send me-1"></i> Submit Feedback</button>
+      <button class="btn btn-outline-danger" id="toolbarClear" type="button"><i class="bi bi-trash3 me-1"></i> Clear</button>
     </div>
   </div>
 
@@ -424,10 +442,20 @@
       </div>
     </div>
 
-  </div>
-</div>
+        </div> <!-- .feedback-content -->
+      </div> <!-- .container-fluid -->
+    </div> <!-- .body-wrapper -->
+  </div> <!-- .page-wrapper -->
 
 <script>
+  $(document).ready(function() {
+    $("#sidebar").load("/admin/component/sidebar-component.html", function() { $.getScript('/admin/js/sidebarmenu.js'); });
+    $("#header").load("/admin/component/header-component.html");
+    // toolbar hookups
+    document.getElementById('toolbarSubmit')?.addEventListener('click', () => document.getElementById('submitBtn').click());
+    document.getElementById('toolbarClear')?.addEventListener('click', () => document.getElementById('clearBtn').click());
+  });
+
   const form = document.getElementById("feedbackForm");
   const successBanner = document.getElementById("successBanner");
   const errorBanner = document.getElementById("errorBanner");
