@@ -22,6 +22,7 @@ ENV PATH="/opt/venv/bin:$PATH"
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt 
 
+
 # Runtime stage - slim final image
 FROM ${BASE_IMAGE}
 
@@ -37,7 +38,7 @@ ENV PATH="/opt/venv/bin:$PATH"
 
 COPY . /app
 
-EXPOSE 8080
+EXPOSE 9000
 
 # Start the API using uvicorn
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "9000"]

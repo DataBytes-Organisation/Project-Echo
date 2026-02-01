@@ -34,7 +34,7 @@ module.exports = function (app) {
 
   
       try {
-        const axiosResponse = await axios.post('http://ts-api-cont:9000/hmi/signup',schema)
+        const axiosResponse = await axios.post('http://api-service:9000/hmi/signup',schema)
       
         if (axiosResponse.status === 201) {
           console.log('Status Code: ' + axiosResponse.status + ' ' + axiosResponse.statusText)
@@ -56,7 +56,7 @@ module.exports = function (app) {
     let email = req.body.email;
       
     try {
-      const axiosResponse = await axios.post('http://ts-api-cont:9000/hmi/signin',{
+      const axiosResponse = await axios.post('http://api-service:9000/hmi/signin',{
         username: uname,
         email: email,
         password: pw
@@ -126,7 +126,7 @@ module.exports = function (app) {
     // let email = req.body.email;
       
     try {
-      const axiosResponse = await axios.post('http://ts-api-cont:9000/2fa/verify',{
+      const axiosResponse = await axios.post('http://api-service:9000/2fa/verify',{
         user_id: user_id,
         otp: otp
       });
@@ -179,7 +179,7 @@ module.exports = function (app) {
     // console.log(account)
     
     // try {
-    //   const axiosResponse = await axios.post('http://ts-api-cont:9000/hmi/forgot-password', {
+    //   const axiosResponse = await axios.post('http://api-service:9000/hmi/forgot-password', {
     //     user: account
     //   });
       
@@ -211,7 +211,7 @@ module.exports = function (app) {
     console.log(account)
     
     try {
-      const axiosResponse = await axios.post('http://ts-api-cont:9000/hmi/forgot-password', {
+      const axiosResponse = await axios.post('http://api-service:9000/hmi/forgot-password', {
         user: account
       });
       
@@ -246,7 +246,7 @@ module.exports = function (app) {
     // let _otp_ = req.body.otp;
 
     try {
-      const axiosResponse = await axios.post('http://ts-api-cont:9000/hmi/reset-password',{
+      const axiosResponse = await axios.post('http://api-service:9000/hmi/reset-password',{
         username: uname,
         password: pw
         // otp : _otp_

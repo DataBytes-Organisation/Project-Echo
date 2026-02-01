@@ -3,8 +3,10 @@ kind: ConfigMap
 metadata:
   name: api-env
 data:
-  DB_HOST: value
+  DB_HOST: mongodb-service
   DB_USER: modelUser
   DB_USER_PASS: EchoNetAccess2023
   DB_ROOT_USER: root
   DB_ROOT_USER_PASS: root_password
+  MONGODB_URI: "mongodb://modelUser:EchoNetAccess2023@mongodb-service:27017/EchoNet"
+  USER_MONGODB_URI: "mongodb://root:root_password@mongodb-service:27017/UserSample?authSource=admin"

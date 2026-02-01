@@ -490,7 +490,11 @@ app.post('/api/applyAlgorithm', (req, res) => {
 require('./routes/auth.routes')(app);
 require('./routes/user.routes')(app);
 require('./routes/map.routes')(app);
-app.get('*', checkUserSession);
+//updated 2026/01/26 to serve mongodb api endpoints to admin folder for data integration
+app.get(
+  ['/admin/*', '/map', '/requests', '/notifications'],
+  checkUserSession
+);
 app.get("/verify-otp", (req, res) => {
   res.sendFile(path.join(__dirname, 'public/verify-otp.html'));
 });
@@ -510,7 +514,7 @@ app.get("/", async (req, res) => {
     }
   })
 
-  if (role.toLowerCase().includes("admin")) {
+  if (role && role.toLowerCase().includes("admin")) {
     res.redirect("/admin-dashboard")
   } else {
     res.redirect("/map")
@@ -533,6 +537,13 @@ app.get("/admin-nodes-temp", (req, res) => {
 app.get("/admin-compute", (req, res) => {
   return res.sendFile(path.join(__dirname, 'public/admin/cloud-compute.html'));
 });
+//api-explorer page
+app.get("/admin-api-explorer", (req, res) => {
+  return res.sendFile(
+    path.join(__dirname, "public/admin/api-explorer.html")
+  );
+});
+
 
 app.get("/admin-projects", (req, res) => {
   return res.sendFile(path.join(__dirname, 'public/admin/projects.html'));
@@ -572,7 +583,7 @@ app.post("/api/submit", async (req, res) => {
   schema.date = new Date();
   try {
     console.log("Request submission data: ", JSON.stringify(schema));
-    const axiosResponse = await axios.post('http://ts-api-cont:9000/hmi/api/submit', JSON.stringify(schema), { headers: {"Authorization" : `Bearer ${token}`, 'Content-Type': 'application/json'}})
+    const axiosResponse = await axios.post('http://api-service:9000/hmi/api/submit', JSON.stringify(schema), { headers: {"Authorization" : `Bearer ${token}`, 'Content-Type': 'application/json'}})
     //If successful return a 201 status code
     if (axiosResponse.status === 201) {
       console.log('Status Code: ' + axiosResponse.status + ' ' + axiosResponse.statusText)
@@ -620,7 +631,7 @@ app.patch('/api/requests/:id', async (req, res) => {
   })
   try {
     console.log("Admin Request update data: ", JSON.stringify(schema));
-    const axiosResponse = await axios.patch('http://ts-api-cont:9000/hmi/api/requests', JSON.stringify(schema), { headers: {"Authorization" : `Bearer ${token}`, 'Content-Type': 'application/json'}})
+    const axiosResponse = await axios.patch('http://api-service:9000/hmi/api/requests', JSON.stringify(schema), { headers: {"Authorization" : `Bearer ${token}`, 'Content-Type': 'application/json'}})
     if (axiosResponse.status === 200) {
       console.log('Status Code: ' + axiosResponse.status + ' ' + axiosResponse.statusText)
       res.status(200).send(`<script> window.location.href = "/login"; alert("Request data updated successfully");</script>`);
@@ -651,7 +662,7 @@ app.patch('/api/updateConservationStatus/:animal', async (req, res) => {
   })
   try {
     console.log("Admin update species data: ", JSON.stringify(schema));
-    const axiosResponse = await axios.patch('http://ts-api-cont:9000/hmi/api/updateConservationStatus', JSON.stringify(schema), { headers: {"Authorization" : `Bearer ${token}`, 'Content-Type': 'application/json'}})
+    const axiosResponse = await axios.patch('http://api-service:9000/hmi/api/updateConservationStatus', JSON.stringify(schema), { headers: {"Authorization" : `Bearer ${token}`, 'Content-Type': 'application/json'}})
     if (axiosResponse.status === 200) {
       console.log('Status Code: ' + axiosResponse.status + ' ' + axiosResponse.statusText)
       res.status(200).send(`<script> window.location.href = "/login"; alert("Species Data updated successfully");</script>`);
@@ -677,7 +688,7 @@ app.get('/api/requests', async (req, res) => {
       }
     })
 
-    const axiosResponse = await axios.get('http://ts-api-cont:9000/hmi/requests', { headers: {"Authorization" : `Bearer ${token}`}})
+    const axiosResponse = await axios.get('http://api-service:9000/hmi/requests', { headers: {"Authorization" : `Bearer ${token}`}})
   
     if (axiosResponse.status === 200) {
       res.json(axiosResponse.data);
@@ -778,9 +789,36 @@ app.post('/suspendUser', async (req, res) => {
 
 //Page direction to the map
 // Proxy route for IoT nodes API
+// Proxy routes for Sensor Health API
+async function proxyToApi(req, res) {
+  try {
+    const url = `http://ts-api-cont:9000${req.originalUrl}`;
+    const response = await axios({
+      method: req.method,
+      url,
+      params: req.query,
+      data: req.body,
+      validateStatus: () => true,
+    });
+
+    res.status(response.status);
+    // axios may return undefined data for 204
+    if (typeof response.data === 'undefined') {
+      return res.end();
+    }
+    return res.send(response.data);
+  } catch (error) {
+    console.error('Error proxying to API:', error);
+    return res.status(500).json({ error: 'Error proxying to API' });
+  }
+}
+
+app.all('/sensors', proxyToApi);
+app.all('/sensors/*', proxyToApi);
+
 app.get('/iot/nodes', async (req, res) => {
   try {
-    const response = await axios.get('http://ts-api-cont:9000/iot/nodes');
+    const response = await axios.get('http://api-service:9000/iot/nodes');
     res.json(response.data);
   } catch (error) {
     console.error('Error fetching IoT nodes:', error);

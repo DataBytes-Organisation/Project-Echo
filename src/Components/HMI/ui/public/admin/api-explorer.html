@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Echo Admin – API Explorer</title>
+
+  <link rel="shortcut icon" type="image/png" href="/admin/images/logos/favicon.png" />
+  <link type="text/css" rel="stylesheet" href="/admin/css/styles.min.css" />
+
+  <!-- Bootstrap -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+
+  <!-- Icons -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+  />
+
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <!-- Sidebar + App JS -->
+  <script src="/admin/js/sidebarmenu.js"></script>
+  <script src="/admin/js/app.min.js"></script>
+
+  <!-- Simplebar -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.css" />
+  <script src="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.min.js"></script>
+</head>
+
+<body>
+  <!-- Page Wrapper -->
+  <div
+    class="page-wrapper"
+    id="main-wrapper"
+    data-layout="vertical"
+    data-navbarbg="skin6"
+    data-sidebartype="full"
+    data-sidebar-position="fixed"
+    data-header-position="fixed"
+  >
+    <!-- Sidebar -->
+    <div id="sidebar"></div>
+
+    <!-- Main Content -->
+    <div class="body-wrapper">
+      <div id="header"></div>
+
+      <div class="container-fluid">
+
+        <!-- Header Row -->
+        <div class="d-flex align-items-start justify-content-between flex-wrap gap-2 mb-3">
+          <div>
+            <h5 class="fw-semibold mb-1">API Explorer</h5>
+            <div class="text-muted">
+              Test API endpoints and check their status / health.
+            </div>
+          </div>
+
+          <div class="text-end">
+            <span class="badge bg-secondary" id="statusBadge">Status: not checked</span>
+            <div class="text-muted small mt-1" id="lastChecked">Last checked: —</div>
+            <div class="text-muted small" id="respTime">Response time: —</div>
+          </div>
+        </div>
+
+        <!-- Main Card -->
+        <div class="card">
+          <div class="card-body">
+
+            <!-- Endpoint Builder -->
+            <div class="row g-3 mb-3">
+              <div class="col-12 col-lg-3">
+                <label class="form-label">Start (epoch)</label>
+                <input type="text" class="form-control" id="startTs" value="1763654400" />
+              </div>
+
+              <div class="col-12 col-lg-3">
+                <label class="form-label">End (epoch)</label>
+                <input type="text" class="form-control" id="endTs" value="1763740800" />
+              </div>
+
+              <div class="col-12 col-lg-2 d-grid">
+                <label class="form-label invisible">Build</label>
+                <button class="btn btn-outline-primary" id="buildBtn">
+                  Build Endpoint
+                </button>
+              </div>
+
+              <div class="col-12 col-lg-4">
+                <label class="form-label">Endpoint</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="endpoint"
+                  value="/movement_time/1763654400/1763740800"
+                />
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="d-flex gap-2 flex-wrap mb-3">
+              <button class="btn btn-primary" id="testBtn">Test</button>
+              <button class="btn btn-outline-secondary" id="clearBtn">Clear Output</button>
+            </div>
+
+            <!-- Content Row -->
+            <div class="row g-3">
+
+              <!-- Endpoint List -->
+              <div class="col-12 col-lg-4">
+                <div class="fw-semibold mb-2">Available now</div>
+                <div class="list-group mb-3">
+                  <button
+                    class="list-group-item list-group-item-action"
+                    data-ep="/movement_time/1763654400/1763740800"
+                  >
+                    GET /movement_time/&lt;start&gt;/&lt;end&gt;
+                    <span class="badge bg-success ms-2">known</span>
+                  </button>
+                </div>
+
+                <div class="fw-semibold mb-2">Coming next sprint</div>
+                <div class="list-group">
+                  <button class="list-group-item list-group-item-action" data-ep="/health">
+                    GET /health
+                    <span class="badge bg-secondary ms-2">placeholder</span>
+                  </button>
+                  <button class="list-group-item list-group-item-action" data-ep="/nodes">
+                    GET /nodes
+                    <span class="badge bg-secondary ms-2">placeholder</span>
+                  </button>
+                  <button class="list-group-item list-group-item-action" data-ep="/devices">
+                    GET /devices
+                    <span class="badge bg-secondary ms-2">placeholder</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Response -->
+              <div class="col-12 col-lg-8">
+                <div class="fw-semibold mb-2">Response</div>
+                <pre
+                  class="p-3 bg-light rounded border"
+                  id="output"
+                  style="min-height: 320px; overflow:auto;"
+                >Click "Test" to send a request.</pre>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Load sidebar / header / footer -->
+  <script type="text/javascript">
+    $(document).ready(function () {
+      $("#sidebar").load("/admin/component/sidebar-component.html", function () {
+        $.getScript("/admin/js/sidebarmenu.js");
+      });
+      $("#header").load("/admin/component/header-component.html");
+      $("#footer").load("/admin/component/footer-component.html");
+    });
+  </script>
+
+  <!-- Page Logic -->
+  <script src="./js/api-explorer.js"></script>
+
+  <div id="footer"></div>
+</body>
+</html>
