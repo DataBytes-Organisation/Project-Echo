@@ -11,6 +11,7 @@ from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel, Field, EmailStr
 from bson import ObjectId
 from typing import Optional, List
+from app.routers import insights
 import datetime
 import pymongo
 
@@ -52,6 +53,8 @@ app.include_router(sensors.router, tags=['sensors'], prefix='/sensors')
 app.include_router(species_predictor.router, tags=["predict"])
 app.include_router(auth_router.router, tags=["auth"], prefix="/api")
 app.include_router(live.router) #Websocket 
+
+app.include_router(insights.router, tags=["insights"])
 
 # --- Root Endpoint ---
 @app.get("/", response_description="API Root")
