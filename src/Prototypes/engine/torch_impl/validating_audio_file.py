@@ -10,7 +10,7 @@ import argparse
 import librosa
 from scipy import signal
 import math
-import pandas as pd  # Added: Required for gr.BarPlot
+import pandas as pd
 from model import Model
 
 # --- Load Assets on Startup ---
@@ -23,14 +23,36 @@ ASSETS = {
 	"pp_data": None,
 	"input_details": None,
 	"output_details": None,
+	"scale_factor": 1.0,
 	"error": None,
 }
 
 
+def get_scale_factor(cfg):
+	"""
+	Determines the scaling factor 's' based on the training configuration.
+	"""
+	metric_loss_type = cfg.training.get("use_arcface", None)
+
+	scale_factor = 1.0
+
+	if metric_loss_type == "arcface":
+		scale_factor = cfg.training.arcface.s
+		print(f"  [i] Detected ArcFace training. Setting scale factor s={scale_factor}")
+	elif metric_loss_type == "circle":
+		scale_factor = cfg.training.circle.s
+		print(f"  [i] Detected CircleLoss training. Setting scale factor s={scale_factor}")
+	else:
+		print("  [i] No metric loss detected (Standard Linear). Scale factor s=1.0")
+		scale_factor = 1.0
+
+	return scale_factor
+
+
 def preprocess_with_librosa(waveform: np.ndarray, pp_data: dict) -> np.ndarray:
 	"""
-	A torch-free preprocessor for audio data that uses a dictionary of
-	pre-computed data (including filter bank).
+	A torch-free preprocessor for audio data.
+	Returns a 2D spectrogram (Freq, Time) in float32.
 	"""
 	sample_rate = pp_data["sample_rate"]
 	target_duration_samples = int(pp_data["audio_clip_duration"] * sample_rate)
@@ -65,30 +87,32 @@ def preprocess_with_librosa(waveform: np.ndarray, pp_data: dict) -> np.ndarray:
 	melspec_db = librosa.power_to_db(mel_spectrogram, ref=1.0, amin=1e-10, top_db=top_db)
 
 	normalized_spec = (melspec_db + top_db) / top_db
-	return normalized_spec
+
+	# Force float32 to ensure compatibility with TFLite/PyTorch
+	return normalized_spec.astype(np.float32)
 
 
 # --- Backend Functions ---
 
 
-def handle_audio_upload(audio_input):
-	if audio_input is None:
+def handle_audio_upload(filepath):
+	"""
+	Handles audio upload by loading via librosa.load, exactly matching CLI behavior.
+	"""
+	if filepath is None:
 		return None, 0, gr.update(visible=False), "Upload an audio file to begin.", None
 
 	cfg = ASSETS["cfg"]
 	pp_data = ASSETS["pp_data"]
-
-	sr, audio_data = audio_input
-
 	target_sr = pp_data["sample_rate"]
-	if sr != target_sr:
-		gr.Info(f"Resampling audio from {sr}Hz to {target_sr}Hz using librosa...")
-		audio_data = librosa.resample(y=audio_data.astype(np.float32), orig_sr=sr, target_sr=target_sr)
 
-	if audio_data.ndim > 1:
-		audio_data = audio_data.mean(axis=1)
+	try:
+		gr.Info(f"Loading and processing audio at {target_sr}Hz...")
+		# Load exactly as the CLI script does: Resample, Mono, Float32, Normalize
+		audio_data, _ = librosa.load(filepath, sr=target_sr, mono=True)
+	except Exception as e:
+		return None, 0, gr.update(visible=False), f"Error loading audio: {str(e)}", None
 
-	# Return None for the plot output to clear it on new upload
 	return (
 		audio_data.astype(np.float32),
 		0,
@@ -109,6 +133,7 @@ def process_single_chunk(model_type, full_audio, offset, threshold):
 	class_names = ASSETS["class_names"]
 	target_width = ASSETS["target_width"]
 	pp_data = ASSETS["pp_data"]
+	scale_factor = ASSETS["scale_factor"]
 
 	clip_duration_s = pp_data["audio_clip_duration"]
 	sample_rate = pp_data["sample_rate"]
@@ -135,15 +160,17 @@ def process_single_chunk(model_type, full_audio, offset, threshold):
 		tflite_interpreter = ASSETS["tflite_interpreter"]
 		input_details = ASSETS["input_details"]
 		output_details = ASSETS["output_details"]
-		# NHWC format for TFLite
+
+		# Explicitly construct 4D Input: (1, Freq, Time, 1) to match CLI
 		spectrogram_np = spectrogram[np.newaxis, ..., np.newaxis]
+
 		tflite_interpreter.set_tensor(input_details["index"], spectrogram_np)
 		tflite_interpreter.invoke()
 		logits = tflite_interpreter.get_tensor(output_details["index"])
 
 	elif model_type == "PyTorch":
 		pytorch_model = ASSETS["pytorch_model"]
-		# NCHW format for PyTorch
+		# Explicitly construct 4D Input: (1, 1, Freq, Time)
 		spectrogram_torch = torch.from_numpy(spectrogram[np.newaxis, np.newaxis, ...]).float()
 		with torch.no_grad():
 			logits = pytorch_model(spectrogram_torch).cpu().numpy()
@@ -151,6 +178,16 @@ def process_single_chunk(model_type, full_audio, offset, threshold):
 	if logits is None:
 		return full_audio, offset, "Error during model inference.", None, gr.update(visible=False)
 
+	# --- Debugging Info to Console ---
+	print(f"[Debug] Logits range BEFORE scaling: Min={logits.min():.4f}, Max={logits.max():.4f}")
+	print(f"[Debug] Applying scale factor: {scale_factor}")
+	# ---------------------------------
+
+	# --- Apply Scaling (Circle/ArcFace) ---
+	logits = logits * scale_factor
+	# --------------------------------------
+
+	# Stable Softmax
 	exp_logits = np.exp(logits - np.max(logits))
 	probabilities = exp_logits / np.sum(exp_logits)
 	probabilities = probabilities[0]
@@ -223,6 +260,7 @@ with gr.Blocks() as demo:
 
 		cfg = OmegaConf.load(config_path)
 		ASSETS["cfg"] = cfg
+		ASSETS["scale_factor"] = get_scale_factor(cfg)
 
 		with open(class_names_path, "r") as f:
 			ASSETS["class_names"] = [line.strip() for line in f.readlines() if line.strip()]
@@ -239,7 +277,7 @@ with gr.Blocks() as demo:
 			ASSETS["output_details"] = interpreter.get_output_details()[0]
 			ASSETS["target_width"] = ASSETS["input_details"]["shape"][2]
 			model_choices.append("TFLite")
-			gr.Info("TFLite model loaded successfully.")
+			gr.Info(f"TFLite model loaded. Scale factor: {ASSETS['scale_factor']}")
 		else:
 			gr.Warning(f"TFLite model not found at '{tflite_model_path}'.")
 
@@ -257,7 +295,7 @@ with gr.Blocks() as demo:
 			pytorch_model.eval()
 			ASSETS["pytorch_model"] = pytorch_model
 			model_choices.append("PyTorch")
-			gr.Info("PyTorch model loaded successfully.")
+			gr.Info(f"PyTorch model loaded. Scale factor: {ASSETS['scale_factor']}")
 
 			if not ASSETS["target_width"] and ASSETS["tflite_interpreter"] is None:
 				gr.Warning("Could not determine target input width from TFLite model. This may cause errors.")
@@ -284,7 +322,7 @@ with gr.Blocks() as demo:
 			with gr.Column(scale=1):
 				gr.Markdown("### 1. Upload & Configure")
 				model_selector = gr.Radio(model_choices, label="Model Type", value=default_model)
-				audio_input = gr.Audio(type="numpy", label="Upload Audio File")
+				audio_input = gr.Audio(type="filepath", label="Upload Audio File")
 				threshold_slider = gr.Slider(
 					minimum=0.0, maximum=1.0, value=0.01, step=0.05, label="Confidence Threshold"
 				)
