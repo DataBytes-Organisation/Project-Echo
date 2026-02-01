@@ -1,0 +1,10 @@
+psutil
+sounddevice
+numpy
+librosa
+opencv-python
+requests
+pyserial
+gps3
+tflite-runtime
+flask

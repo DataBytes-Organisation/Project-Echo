@@ -51,18 +51,108 @@ function showMessage(elementId, message, type = "success") {
   setTimeout(() => { el.style.opacity = 1; el.style.transition = "opacity .4s"; }, 30);
 }
 
-function fakeReboot() {
-  const sensors = document.getElementById("reboot-sensor")?.value.trim();
-  const reason = document.getElementById("reboot-reason")?.value.trim();
-  if (!sensors) { showMessage("reboot-message", "Please enter at least one sensor ID.", "warning"); return; }
-  showMessage("reboot-message", `Reboot queued for ${sensors}. Reason: ${reason || "No reason provided"}.`);
+async function apiFetch(path, options = {}) {
+  const response = await fetch(path, {
+    headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
+    ...options,
+  });
+
+  if (!response.ok) {
+    const text = await response.text().catch(() => '');
+    throw new Error(text || `Request failed: ${response.status}`);
+  }
+
+  const contentType = response.headers.get('content-type') || '';
+  if (contentType.includes('application/json')) {
+    return response.json();
+  }
+  return response.text();
 }
 
-function fakeSaveSettings() {
-  const interval = document.getElementById("record-interval")?.value;
+function formatMinutesAgo(mins) {
+  if (mins === null || typeof mins === 'undefined') return '—';
+  const m = Number(mins);
+  if (!Number.isFinite(m)) return '—';
+  if (m < 60) return `${m}m ago`;
+  const h = Math.floor(m / 60);
+  const r = m % 60;
+  return r ? `${h}h ${r}m ago` : `${h}h ago`;
+}
+
+function pillHtml(status) {
+  const s = String(status || '').trim();
+  let cls = 'pill-warning';
+  if (s === 'Online') cls = 'pill-success';
+  if (s === 'Offline') cls = 'pill-danger';
+  return `<span class="pill ${cls}">${s || 'Unknown'}</span>`;
+}
+
+async function rebootSensors() {
+  const sensorsRaw = document.getElementById("reboot-sensor")?.value.trim();
+  const reason = document.getElementById("reboot-reason")?.value.trim();
+  if (!sensorsRaw) {
+    showMessage("reboot-message", "Please enter at least one sensor ID.", "warning");
+    return;
+  }
+
+  const sensors = sensorsRaw
+    .split(',')
+    .map(s => s.trim())
+    .filter(Boolean);
+
+  try {
+    const results = [];
+    for (const sensorId of sensors) {
+      const res = await apiFetch(`/sensors/${encodeURIComponent(sensorId)}/reboot`, {
+        method: 'POST',
+        body: JSON.stringify({ reason: reason || null }),
+      });
+      results.push(res);
+    }
+    showMessage("reboot-message", `Reboot queued for ${sensors.join(', ')}.`, "success");
+    await loadRecentRebootHistory();
+  } catch (e) {
+    showMessage("reboot-message", `Failed to queue reboot: ${e.message}`, "danger");
+  }
+}
+
+function intervalLabelToSeconds(label) {
+  const text = String(label || '').toLowerCase();
+  if (text.includes('30')) return 30;
+  if (text.includes('10')) return 600;
+  if (text.includes('5')) return 300;
+  return 60;
+}
+
+function secondsToIntervalLabel(seconds) {
+  const s = Number(seconds);
+  if (s === 30) return '30 seconds';
+  if (s === 300) return '5 minutes';
+  if (s === 600) return '10 minutes';
+  return '1 minute';
+}
+
+async function saveSettings() {
+  const intervalLabel = document.getElementById("record-interval")?.value;
   const sensitivity = document.getElementById("sensitivity")?.value;
-  const battery = document.getElementById("battery-threshold")?.value;
-  showMessage("settings-message", `Settings saved: ${interval}, ${sensitivity} sensitivity, battery alert at ${battery}%.`);
+  const battery = Number(document.getElementById("battery-threshold")?.value);
+
+  try {
+    const payload = {
+      recordIntervalSeconds: intervalLabelToSeconds(intervalLabel),
+      sensitivity: sensitivity || 'Medium',
+      batteryThresholdPct: Number.isFinite(battery) ? battery : 25,
+    };
+
+    await apiFetch(`/sensors/__default__/settings`, {
+      method: 'PUT',
+      body: JSON.stringify({ settings: payload }),
+    });
+
+    showMessage("settings-message", `Settings saved.`, "success");
+  } catch (e) {
+    showMessage("settings-message", `Failed to save settings: ${e.message}`, "danger");
+  }
 }
 
 function fakeCreateProject() {
@@ -107,4 +197,157 @@ document.addEventListener('DOMContentLoaded', function() {
     const observer = new MutationObserver(() => ensureSensorSidebar());
     observer.observe(navSection, { childList: true });
   }
+});
+
+// ---- Page-specific data wiring ----
+async function loadSensorHealthPage() {
+  const tbody = document.getElementById('sensor-overview-tbody');
+  if (!tbody) return;
+
+  const statusFilter = document.getElementById('sensor-status-filter');
+  const projectFilter = document.getElementById('sensor-project-filter');
+
+  let lastItems = [];
+
+  function render() {
+    const statusVal = statusFilter?.value || 'All';
+    const projectVal = projectFilter?.value || 'All Projects';
+
+    const filtered = lastItems.filter(item => {
+      if (statusVal !== 'All' && item.status !== statusVal) return false;
+      if (projectVal !== 'All Projects' && (item.project || '—') !== projectVal) return false;
+      return true;
+    });
+
+    tbody.innerHTML = '';
+    if (!filtered.length) {
+      tbody.innerHTML = '<tr><td colspan="5">No sensors match the current filter.</td></tr>';
+      return;
+    }
+
+    for (const item of filtered) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${item.sensorId}</td>
+        <td>${item.project || '—'}</td>
+        <td>${pillHtml(item.status)}</td>
+        <td>${typeof item.batteryPct === 'number' ? `${item.batteryPct}%` : '—'}</td>
+        <td>${formatMinutesAgo(item.lastSeenMinutesAgo)}</td>
+      `;
+      tbody.appendChild(tr);
+    }
+  }
+
+  async function refresh() {
+    try {
+      const data = await apiFetch('/sensors/updates');
+      lastItems = Array.isArray(data.items) ? data.items : [];
+
+      // Populate project filter options dynamically
+      if (projectFilter) {
+        const projects = Array.from(new Set(lastItems.map(i => i.project).filter(Boolean))).sort();
+        const current = projectFilter.value;
+        projectFilter.innerHTML = '<option>All Projects</option>' + projects.map(p => `<option>${p}</option>`).join('');
+        if ([...projectFilter.options].some(o => o.value === current)) {
+          projectFilter.value = current;
+        }
+      }
+
+      render();
+    } catch (e) {
+      tbody.innerHTML = `<tr><td colspan="5">Failed to load sensors: ${e.message}</td></tr>`;
+    }
+  }
+
+  statusFilter?.addEventListener('change', render);
+  projectFilter?.addEventListener('change', render);
+
+  await refresh();
+  setInterval(refresh, 15000);
+}
+
+async function loadAlertsPage() {
+  const tbody = document.getElementById('alerts-tbody');
+  if (!tbody) return;
+  try {
+    const data = await apiFetch('/sensors/alerts');
+    const items = Array.isArray(data.items) ? data.items : [];
+    tbody.innerHTML = '';
+    if (!items.length) {
+      tbody.innerHTML = '<tr><td colspan="4">No active alerts.</td></tr>';
+      return;
+    }
+    for (const alert of items) {
+      const tr = document.createElement('tr');
+      const sevPill = pillHtml(alert.issue);
+      tr.innerHTML = `
+        <td>${alert.sensorId}</td>
+        <td>${sevPill}</td>
+        <td>${alert.details || ''}</td>
+        <td>${formatMinutesAgo(alert.lastAudioMinutesAgo)}</td>
+      `;
+      tbody.appendChild(tr);
+    }
+  } catch (e) {
+    tbody.innerHTML = `<tr><td colspan="4">Failed to load alerts: ${e.message}</td></tr>`;
+  }
+}
+
+async function loadRecentRebootHistory() {
+  const tbody = document.getElementById('reboot-history-tbody');
+  if (!tbody) return;
+  try {
+    const data = await apiFetch('/sensors/reboots/recent?limit=50');
+    const items = Array.isArray(data.items) ? data.items : [];
+    tbody.innerHTML = '';
+    if (!items.length) {
+      tbody.innerHTML = '<tr><td colspan="3">No reboot history yet.</td></tr>';
+      return;
+    }
+    for (const r of items) {
+      const t = r.requestedAt ? new Date(r.requestedAt).toLocaleString() : '—';
+      const status = String(r.status || 'Queued');
+      const cls = status.toLowerCase().includes('fail') ? 'pill-danger' : (status.toLowerCase().includes('success') ? 'pill-success' : 'pill-warning');
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${r.sensorId}</td>
+        <td><span class="pill ${cls}">${status}</span></td>
+        <td>${t}</td>
+      `;
+      tbody.appendChild(tr);
+    }
+  } catch (e) {
+    tbody.innerHTML = `<tr><td colspan="3">Failed to load reboot history: ${e.message}</td></tr>`;
+  }
+}
+
+async function loadSettingsPage() {
+  const interval = document.getElementById('record-interval');
+  const sensitivity = document.getElementById('sensitivity');
+  const battery = document.getElementById('battery-threshold');
+  if (!interval || !sensitivity || !battery) return;
+
+  try {
+    const data = await apiFetch('/sensors/__default__/settings');
+    const settings = data.settings || {};
+    const intervalLabel = secondsToIntervalLabel(settings.recordIntervalSeconds);
+
+    // Set values if present
+    interval.value = intervalLabel;
+    sensitivity.value = settings.sensitivity || 'Medium';
+    battery.value = Number(settings.batteryThresholdPct || 25);
+  } catch (e) {
+    showMessage('settings-message', `Failed to load settings: ${e.message}`, 'danger');
+  }
+}
+
+// Keep existing onclick bindings working
+window.fakeReboot = rebootSensors;
+window.fakeSaveSettings = saveSettings;
+
+document.addEventListener('DOMContentLoaded', () => {
+  loadSensorHealthPage();
+  loadAlertsPage();
+  loadRecentRebootHistory();
+  loadSettingsPage();
 });

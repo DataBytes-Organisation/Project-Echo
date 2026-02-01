@@ -327,6 +327,9 @@
         </div>
       </div>
     </div>
+    <div class="container-fluid">
+      <div id="footer"></div>
+    </div>
 
     <!-- Bootstrap JS bundle (needed for modal) -->
     <script
@@ -335,14 +338,6 @@
       crossorigin="anonymous"
     ></script>
     <script src="/admin/projects.js"></script>
-    <script type="text/javascript">
-      $(document).ready(function() {
-        $("#sidebar").load("/admin/component/sidebar-component.html", function() {
-          $.getScript('/admin/js/sidebarmenu.js');
-        });
-        $("#header").load("/admin/component/header-component.html");
-      });
-    </script>
   </body>
 </html>
 

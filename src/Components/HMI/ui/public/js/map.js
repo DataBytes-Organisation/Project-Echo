@@ -33,7 +33,7 @@ async function initMap() {
 
 async function loadNodes() {
     try {
-        const response = await fetch('http://ts-api-cont:9000/nodes');
+        const response = await fetch('http://api-service:9000/nodes');
         const nodes = await response.json();
         
         // Clear existing markers

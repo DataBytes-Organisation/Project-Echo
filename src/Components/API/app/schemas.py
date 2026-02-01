@@ -1,6 +1,6 @@
 ## app.schemas.py
 from datetime import datetime
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Any
 from pydantic import BaseModel, Field, validator, constr, conlist, condecimal
 from bson.objectid import ObjectId
 from app.database import GENDER, STATES_CODE, AUS_STATES
@@ -335,3 +335,119 @@ class TwoFactorVerifySchema(BaseModel):
         }
         schema_extra = {}
 
+
+class DetectionCreate(EventSchema):
+    pass
+
+
+class Detection(EventSchema):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+        schema_extra = {
+            "example": {
+                "_id": "651f2a9f4d1f1b1c3e2a4567",
+                "timestamp": "2023-03-22T13:45:12.000Z",
+                "sensorId": "2",
+                "species": "Sus Scrofa",
+                "microphoneLLA": [-33.1101, 150.0567, 23],
+                "animalEstLLA": [-33.1105, 150.0569, 23],
+                "animalTrueLLA": [-33.1106, 150.0570, 23],
+                "animalLLAUncertainty": 10,
+                "audioClip": "some audio_base64 data",
+                "confidence": 99.4,
+                "sampleRate": 48000
+            }
+        }
+
+class DetectionCreate(EventSchema):
+    pass
+
+class Detection(EventSchema):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+
+    class config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+        schema_extra = {
+            "example": {
+                "_id": "651f2a9f4d1f1b1c3e2a4567",
+                "timestamp": "2023-03-22T13:45:12.000Z",
+                "sensorId": "2",
+                "species": "Sus Scrofa",
+                "microphoneLLA": [-33.1101, 150.0567, 23],
+                "animalEstLLA": [-33.1105, 150.0569, 23],
+                "animalTrueLLA": [-33.1106, 150.0570, 23],
+                "animalLLAUncertainty": 10,
+                "audioClip": "some audio_base64 data",
+                "confidence": 99.4,
+                "sampleRate": 48000
+            }
+        }
+
+class DetectionListResponses(BaseModel):
+    items: List[Detection]
+    total: int
+    page: int
+    page_size: int
+
+    class config:
+        allow_population_by_fiels_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+
+class BudgetRule(BaseModel):
+    service: str = Field(..., min_length=1)
+    monthly_limit: int = Field(..., ge=0)
+
+
+class BudgetConfig(BaseModel):
+    rules: list[BudgetRule] = []
+
+
+class BudgetUsageOut(BaseModel):
+    service: str
+    monthly_limit: int
+    month_key: str
+    used: int
+    remaining: int
+
+
+class ServicePauseIn(BaseModel):
+    service: str = Field(..., min_length=1)
+    paused: bool
+
+
+class ServicePauseOut(BaseModel):
+    service: str
+    paused: bool
+    updated_at: datetime
+
+class ProjectBase(BaseModel):
+    name: str = Field(..., min_length=1)
+    description: Optional[str] = None
+    location: Optional[str] = None
+    status: str = Field(..., min_length=1)
+    sensorIds: List[str] = Field(default_factory=list)
+    ecologists: List[str] = Field(default_factory=list)
+
+class ProjectCreate(ProjectBase):
+    pass
+
+class ProjectUpdate(ProjectBase):
+    pass
+
+class Project(ProjectBase):
+    id: str
+
+class ProjectListResponse(BaseModel):
+    items: List[Project]
+    total: int
+
+# Backwards/expected import name used by app.routers.detections
+class DetectionListResponse(DetectionListResponses):
+    pass
