@@ -71,8 +71,8 @@
       border-radius: 14px;
     }
     .form-control:focus, .form-select:focus{
-      border-color: rgba(13,110,253,.55);
-      box-shadow: 0 0 0 .2rem rgba(13,110,253,.15);
+      border-color: rgba(47,110,79,.55);
+      box-shadow: 0 0 0 .2rem rgba(47,110,79,.15);
     }
 
     .section-title{ font-weight: 700; }
@@ -110,10 +110,10 @@
     }
     .chip input{ display:none; }
     .chip.active{
-      border-color: rgba(13,110,253,.35);
-      background: rgba(13,110,253,.08);
-      color: var(--brand);
-      box-shadow: 0 8px 20px rgba(13,110,253,.10);
+      border-color: rgba(47,110,79,.35);
+      background: rgba(47,110,79,.08);
+      color: var(--echo-green, #2F6E4F);
+      box-shadow: 0 8px 20px rgba(47,110,79,.10);
     }
 
     .severity-btn{
@@ -153,8 +153,8 @@
       transition: border-color .15s ease, background .15s ease;
     }
     .dropzone.drag{
-      border-color: rgba(13,110,253,.65);
-      background: rgba(13,110,253,.06);
+      border-color: rgba(47,110,79,.65);
+      background: rgba(47,110,79,.06);
     }
     .file-item{
       display:flex;
@@ -203,6 +203,7 @@
     .req{ color: var(--danger); }
     .spinner-border{ width: 1.1rem; height: 1.1rem; }
   </style>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 
 <body>
@@ -237,6 +238,15 @@
           <i class="bi bi-arrow-left me-1"></i> Back
         </a>
       </div>
+    </div>
+  </div>
+
+  <!-- Page Toolbar -->
+  <div class="page-toolbar mb-3 d-flex justify-content-between align-items-center">
+    <div class="toolbar-left"></div>
+    <div class="toolbar-right">
+      <button class="btn btn-primary me-2" id="toolbarSubmit" type="button"><i class="bi bi-send me-1"></i> Submit Feedback</button>
+      <button class="btn btn-outline-danger" id="toolbarClear" type="button"><i class="bi bi-trash3 me-1"></i> Clear</button>
     </div>
   </div>
 
@@ -438,10 +448,20 @@
       </div>
     </div>
 
-  </div>
-</div>
+        </div> <!-- .feedback-content -->
+      </div> <!-- .container-fluid -->
+    </div> <!-- .body-wrapper -->
+  </div> <!-- .page-wrapper -->
 
 <script>
+  $(document).ready(function() {
+    $("#sidebar").load("/admin/component/sidebar-component.html", function() { $.getScript('/admin/js/sidebarmenu.js'); });
+    $("#header").load("/admin/component/header-component.html");
+    // toolbar hookups
+    document.getElementById('toolbarSubmit')?.addEventListener('click', () => document.getElementById('submitBtn').click());
+    document.getElementById('toolbarClear')?.addEventListener('click', () => document.getElementById('clearBtn').click());
+  });
+
   const form = document.getElementById("feedbackForm");
   const successBanner = document.getElementById("successBanner");
   const errorBanner = document.getElementById("errorBanner");
