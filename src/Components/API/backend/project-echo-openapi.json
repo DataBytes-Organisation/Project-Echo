@@ -1493,6 +1493,227 @@
         }
       }
     },
+    "/api/admin/budget/limits": {
+      "get": {
+        "tags": [
+          "admin",
+          "admin-budget"
+        ],
+        "summary": "Get current budget limits config",
+        "operationId": "get_limits_endpoint_api_admin_budget_limits_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "admin",
+          "admin-budget"
+        ],
+        "summary": "Set budget limits config (rules)",
+        "operationId": "set_limits_endpoint_api_admin_budget_limits_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "items": {
+                  "type": "object"
+                },
+                "type": "array",
+                "title": "Rules",
+                "description": "List of budget rules"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/budget/usage": {
+      "get": {
+        "tags": [
+          "admin",
+          "admin-budget"
+        ],
+        "summary": "Get current usage for a service (optionally month)",
+        "operationId": "get_usage_endpoint_api_admin_budget_usage_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Service"
+            },
+            "name": "service",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Month Key"
+            },
+            "name": "month_key",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/services/{service}/status": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Get Pause Status",
+        "operationId": "get_pause_status_api_admin_services__service__status_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Service"
+            },
+            "name": "service",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServicePauseOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/services/pause": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Pause Or Resume Service",
+        "operationId": "pause_or_resume_service_api_admin_services_pause_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServicePauseIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServicePauseOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/services": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "List Services Status",
+        "operationId": "list_services_status_api_admin_services_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ServicePauseOut"
+                  },
+                  "type": "array",
+                  "title": "Response List Services Status Api Admin Services Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/public/public-test": {
       "get": {
         "tags": [
@@ -2241,6 +2462,116 @@
         }
       }
     },
+    "/insights/overview": {
+      "get": {
+        "tags": [
+          "insights",
+          "insights"
+        ],
+        "summary": "Insights Overview",
+        "operationId": "insights_overview_insights_overview_get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Start"
+            },
+            "name": "start",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "End"
+            },
+            "name": "end",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/insights/species": {
+      "get": {
+        "tags": [
+          "insights",
+          "insights"
+        ],
+        "summary": "Insights Species",
+        "operationId": "insights_species_insights_species_get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 50.0,
+              "minimum": 1.0,
+              "title": "Limit",
+              "default": 10
+            },
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/": {
+      "get": {
+        "summary": "Show Home",
+        "operationId": "show_home__get",
+        "responses": {
+          "200": {
+            "description": "API Root",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/signin": {
       "post": {
         "tags": [
@@ -2313,22 +2644,6 @@
                 "schema": {
                   "$ref": "#/components/schemas/HTTPValidationError"
                 }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/": {
-      "get": {
-        "summary": "Show Home",
-        "operationId": "show_home__get",
-        "responses": {
-          "200": {
-            "description": "API Root",
-            "content": {
-              "application/json": {
-                "schema": {}
               }
             }
           }
@@ -2624,6 +2939,46 @@
                 "schema": {
                   "$ref": "#/components/schemas/Detection"
                 }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/detections/predict": {
+      "post": {
+        "tags": [
+          "detections"
+        ],
+        "summary": "Run species prediction (budget-controlled)",
+        "operationId": "predict_endpoint_detections_predict_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "title": "Payload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
               }
             }
           },
@@ -3383,6 +3738,49 @@
           "otp"
         ],
         "title": "ResetPasswordSchema"
+      },
+      "ServicePauseIn": {
+        "properties": {
+          "service": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Service"
+          },
+          "paused": {
+            "type": "boolean",
+            "title": "Paused"
+          }
+        },
+        "type": "object",
+        "required": [
+          "service",
+          "paused"
+        ],
+        "title": "ServicePauseIn"
+      },
+      "ServicePauseOut": {
+        "properties": {
+          "service": {
+            "type": "string",
+            "title": "Service"
+          },
+          "paused": {
+            "type": "boolean",
+            "title": "Paused"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "service",
+          "paused",
+          "updated_at"
+        ],
+        "title": "ServicePauseOut"
       },
       "SignInRequest": {
         "properties": {

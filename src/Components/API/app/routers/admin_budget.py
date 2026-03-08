@@ -6,7 +6,7 @@ from app.services.budget import (
     set_budget_limits,
     get_budget_limits,
     get_usage,
-    reset_usage,
+    # reset_usage,
 )
 
 router = APIRouter(
@@ -46,11 +46,11 @@ def get_usage_endpoint(service: str, month_key: Optional[str] = None):
     return get_usage(service=service, month_key=month_key)
 
 
-@router.post(
-    "/usage/reset",
-    summary="Reset usage counter for a service (optionally month)",
-    dependencies=[Depends(pause_guard("admin_budget"))],
-)
-def reset_usage_endpoint(service: str, month_key: Optional[str] = None):
-    return reset_usage(service=service, month_key=month_key)
+# @router.post(
+#     "/usage/reset",
+#     summary="Reset usage counter for a service (optionally month)",
+#     dependencies=[Depends(pause_guard("admin_budget"))],
+# )
+# def reset_usage_endpoint(service: str, month_key: Optional[str] = None):
+#     return reset_usage(service=service, month_key=month_key)
 
