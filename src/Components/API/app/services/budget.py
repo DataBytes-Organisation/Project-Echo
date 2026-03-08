@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 from fastapi import HTTPException, status
 from app.database import AdminBudgets
+from typing import Optional
 
 
 def _month_key(dt: datetime) -> str:
@@ -31,7 +32,7 @@ def _get_limit_for(service: str) -> int:
     return 0
 
 
-def get_usage(service: str, when: datetime | None = None) -> dict:
+def get_usage(service: str, when: Optional[datetime] = None) -> dict:
     when = when or datetime.now(timezone.utc)
     mk = _month_key(when)
 
