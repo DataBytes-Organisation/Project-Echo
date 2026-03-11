@@ -464,8 +464,17 @@
         "description": []
     },
     {
-        "Bird": "Corvus bennetti",
-        "description": []
+      "species": "Corvus bennetti",
+      "common": "Little Crow",
+      "summary": "Corvus bennetti, commonly known as the Little Crow, is a species of bird belonging to the Corvidae family. It is a small-sized crow found in various regions of Australia, including the southern coastal regions of Western Australia, South Australia, Victoria, New South Wales, and Queensland.",
+      "description": [
+        "The Little Crow measures approximately 36-43 cm in length and has a wingspan of 75-85 cm. They have a glossy black plumage with a slender bill, and their eyes are brown. The males are usually slightly larger than the females.",
+        "The Littttle Crow is known for its distinctive and melodious calls, which are complex and varied. They are highly social birds that often gather in large flocks, and they are opportunistic feeders, feeding on insects, fruits, seeds, small animals, and carrion.",
+        "Interestingly, the Little Crow has been observed exhibiting tool use behavior, where it uses sticks to pry insects out of bark or crevices. This behavior is relatively rare among birds and is considered a sign of high intelligence.",
+        "The Little Crow is not considered to be a threatened species, although its population may be declining in some regions due to habitat loss and fragmentation.",
+        ""
+      ],
+      "img": ""
     },
     {
         "Bird": "Corvus coronoides",
@@ -731,8 +740,16 @@
             ]
         },
         {
-            "Bird": "Anthochaera carunculata",
-            "description": []
+        "species": "Anthochaera carunculata",
+        "common": "Red wattlebird",
+        "summary": "Anthochaera carunculata or Red wattlebird a large honeyeater native to southeastern Australia.",
+        "description": [
+            "They are known for their prominent red caruncle (a fleshy ornament) on their throat.",
+            "Red wattlebirds use their long bills to extract nectar and insects from flowers.",
+            "They are noisy and territorial birds, defending their favorite feeding spots from others.",
+            "Their population has declined due to loss of habitat and competition with introduced bird species."
+        ],
+        "img": ""
         },
         {
             "Bird": "Anthus novaeseelandiae",
