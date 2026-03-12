@@ -1,9 +1,9 @@
 const { verifySignUp, client } = require("../middleware");
 const axios = require('axios');
+require('dotenv').config();
+const API_BASE_URL = `http://${process.env.API_HOST || 'localhost'}:9000`;
 
-
-// const MESSAGE_API_URL = 'http://localhost:9000/hmi';
-const MESSAGE_API_URL = 'http://api-service:9000/hmi';
+const MESSAGE_API_URL = `${API_BASE_URL}/hmi`;
 let token;
 // client.get('JWT', (err, storedToken) => {
 //   if (err) {
