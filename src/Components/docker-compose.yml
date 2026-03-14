@@ -57,6 +57,7 @@ services:
     tty: true
     environment:
       - NODE_ENV=development
+      - API_HOST=ts-api-cont
 
 
   echo_mqtt:
