@@ -38,11 +38,11 @@
         "Bird": "Acanthiza lineata",
         "description": [
             "The Striated thornbill is named for the distinctive markings on its wings and back.",
-            "These birds are found throughout southeastern mainland Australia, from southern Queensland to eastern South Australia, inhabiting open forests and woodlands dominated by eucalypts",
-            "These birds are highly territorial and aggressive towards other bird species.",
-            "Young Striated thornbills remain in the nest for up to 3 weeks after hatching, and are fed by both parents.",
-            "They have a varied diet that includes insects, nectar, and fruit.",
-            "The Striated Thornbill can often be seen in small flocks outside the breeding season and may feed in mixed groups with other small insect-eating birds​ "
+			"These birds are found throughout southeastern mainland Australia, from southern Queensland to eastern South Australia, inhabiting open forests and woodlands dominated by eucalypts",
+			"These birds are highly territorial and aggressive towards other bird species.",
+			"Young Striated thornbills remain in the nest for up to 3 weeks after hatching, and are fed by both parents.",
+			"They have a varied diet that includes insects, nectar, and fruit.",
+			"The Striated Thornbill can often be seen in small flocks outside the breeding season and may feed in mixed groups with other small insect-eating birds​ "
         ]
     },
     {
@@ -137,11 +137,10 @@
     {
         "Bird": "Alauda Arvensis",
         "description": [
-            "Common Name: Eurasian Skylark.",
-            "Known for its beautiful, continuous singing while hovering high in the air.",
-            "Brown, streaked plumage provides camouflage in open grasslands and farmlands.",
-            "Feeds on seeds, insects, and small invertebrates.",
-            "Introduced to Australia in the 19th century and now common in southern regions."
+            "These birds are known for their beautiful songs and can often be heard singing while flying high in the sky.",
+			"Eurasian Skylarks have brownish upperparts, a streaked breast, and a white belly.",
+			"They are ground-nesting birds and lay 2-5 eggs in a simple scrape in the ground.",
+			"Eurasian Skylarks feed on insects, seeds, and other small invertebrates."
         ]
     },
     {
@@ -256,7 +255,14 @@
     },
     {
         "Bird": "Atrapsalta encaustica",
-        "description": []
+		"description": [
+			"They are known for their distinctive vocalizations, which can reach up to 120 decibels.",
+			"Black Squeakers are often found in woodlands and forests, where they feed on sap and plant fluids.",
+			"They spend most of their life underground as nymphs, before emerging as adults during the warmer months.",
+			"These cicadas play an important ecological role by providing a food source for many bird and mammal species."
+		]
+
+		
     },
     {
         "Bird": "Auscala spinosa",
@@ -573,9 +579,11 @@
         {
             "Bird": "Acanthiza apicalis",
             "description": [
-                "Small insectivorous bird, about 10 cm (3.9 inches) in length.",
-                "Common Name: Inland Thornbill.",
-                "Brownish-grey plumage with streaked underparts and a pale eye-ring."
+                "The Inland thornbill is named for its preference for arid inland habitats of Australia.",
+				"They have a distinctive high-pitched call that can be heard from a long distance.",
+				"These small birds are skilled at hopping along branches and twigs in search of food.",
+				"The Inland thornbill is threatened by habitat loss due to land clearing for agriculture.",
+				"They are monogamous and form lasting pairs, with both partners involved in nest building and caring for young."
             ]
         },
         {
@@ -589,9 +597,12 @@
         {
             "Bird": "Acanthiza lineata",
             "description": [
-                "Small thornbill species, about 10–11 cm (4–4.3 inches) in length.",
-                "Common Name: Striated Thornbill.",
-                "Olive-brown upperparts, streaked underparts, and a pale face with fine markings."
+                "The Striated thornbill is named for the distinctive markings on its wings and back.",
+        	"These birds are found throughout southeastern mainland Australia, from southern Queensland to eastern South Australia, inhabiting open forests and woodlands dominated by eucalypts",
+        	"These birds are highly territorial and aggressive towards other bird species.",
+        	"Young Striated thornbills remain in the nest for up to 3 weeks after hatching, and are fed by both parents.",
+        	"They have a varied diet that includes insects, nectar, and fruit.",
+        	"The Striated Thornbill can often be seen in small flocks outside the breeding season and may feed in mixed groups with other small insect-eating birds​ "
             ]
         },
         {
@@ -661,9 +672,10 @@
         {
             "Bird": "Acrocephalus australis",
             "description": [
-                "Small warbler, around 15–18 cm (5.9–7.1 inches) in length.",
-                "Common Name: Australian Reed Warbler.",
-                "Brown upperparts, pale underparts, and a loud, melodic song."
+                "They primarily inhabit wetlands and reed beds.",
+				"Australian reed warblers have a distinctive chirping call.",
+				"They are an important food source for predators such as snakes and raptors.",
+				"The male and female of this species look similar in appearance."
             ]
         },
         {
