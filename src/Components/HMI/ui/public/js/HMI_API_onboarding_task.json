@@ -236,15 +236,15 @@
     },
     {
         "Bird": "Aquila audax",
-        "description": []
+        "description": ["The wedge-tailed eagle is the largest bird of prey in Australia, with a distinctive long, diamond-shaped tail, dark brown plumage, and a wingspan that can reach up to 2.3 metres."]
     },
     {
         "Bird": "Artamus cinereus",
-        "description": []
+        "description": ["The black-faced woodswallow is a small, stocky bird native to Australia, recognised by its grey-brown plumage, black face mask, and habit of clustering together on exposed perches."]
     },
     {
         "Bird": "Artamus cyanopterus",
-        "description": []
+        "description": ["The dusky woodswallow is a medium-sized Australian bird with smoky brown plumage and distinctive blue-grey wings, commonly seen in open forests and woodlands where it catches insects in flight."]
     },
     {
         "Bird": "Artamus minor",
