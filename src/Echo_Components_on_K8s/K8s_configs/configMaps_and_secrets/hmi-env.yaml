@@ -7,6 +7,6 @@ data:
   DB_USER_PASS: EchoNetAccess2023
   DB_ROOT_USER: root
   DB_ROOT_USER_PASS: root_password
-  REDIS_HOST: value
-  DB_HOST: value
-  API_HOST: value
+  REDIS_HOST: echo-redis
+  DB_HOST: mongodb-service
+  API_HOST: api-service

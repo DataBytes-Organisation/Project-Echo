@@ -3,6 +3,11 @@
 *.pyc
 *.hdf5
 *.env
+.ipynb_checkpoints/
+*.pb
+*.data*
+*.index
+*.db
 
 tensorboard_logs/
 logs/
@@ -22,3 +27,4 @@ src/Components/HMI/ui/node_modules/*
 # audio recording from IOT Nodes
 src/Components/IoT/management_application/audioLocal
 src/Components/IoT/management_application/audioUpload
+src/Components/API/app/main.py

@@ -1,9 +1,9 @@
 const { verifySignUp, client } = require("../middleware");
 const axios = require('axios');
+require('dotenv').config();
+const API_BASE_URL = `http://${process.env.API_HOST || 'localhost'}:9000`;
 
-
-// const MESSAGE_API_URL = 'http://localhost:9000/hmi';
-const MESSAGE_API_URL = 'http://ts-api-cont:9000/hmi';
+const MESSAGE_API_URL = `${API_BASE_URL}/hmi`;
 let token;
 // client.get('JWT', (err, storedToken) => {
 //   if (err) {
@@ -87,4 +87,25 @@ module.exports = function(app) {
     res.send(response.data);
     next()
   })
+  
+    app.get(`/movement_time/:start/:end`, async (req, res, next) => {
+    const start = req.params.start;
+    const end = req.params.end;
+    const response = await axios.get(
+      `${MESSAGE_API_URL}/movement_time?start=${start}&end=${end}`
+    );
+    res.send(response.data || []);
+  });
+
+  app.get(`/movement_time_daily/:start/:end`, async (req, res, next) => {
+    const start = req.params.start;
+    const end = req.params.end;
+
+    const response = await axios.get(
+      `${MESSAGE_API_URL}/movement_time_daily?start=${start}&end=${end}`
+    );
+
+    res.send(response.data || []);
+  });
+
 }

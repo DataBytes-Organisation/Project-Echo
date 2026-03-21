@@ -47,6 +47,21 @@ $(function () {
       }
     });
     $("#sidebarnav >li >a.has-arrow").on("click", function (e) {
-      e.preventDefault();
+      var href = $(this).attr('href') || '';
+      // prevent navigation for void or empty href so parent can still be a link
+      if (href === '' || href.indexOf('javascript:void(0)') === 0) {
+        e.preventDefault();
+        return;
+      }
+
+      // if the link points to the current page, prevent navigation so it toggles/collapses
+      try {
+        var linkUrl = new URL(href, window.location.origin);
+        if (linkUrl.pathname === window.location.pathname) {
+          e.preventDefault();
+        }
+      } catch (err) {
+        // ignore malformed URL
+      }
     });
   });

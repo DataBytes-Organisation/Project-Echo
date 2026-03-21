@@ -6,11 +6,13 @@ from fastapi import FastAPI, Body, HTTPException, status, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import species_predictor
 from app.routers import auth_router
+from app.routers import admin_budget, admin_services
 from fastapi.responses import Response, JSONResponse
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel, Field, EmailStr
 from bson import ObjectId
 from typing import Optional, List
+from app.routers import insights
 import datetime
 import pymongo
 import json 
@@ -24,7 +26,12 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:8080"],  # 可根据实际需求配置
 )
+# Routers
+from .routers import add_csv_output_option, audio_upload_router
+from app.routers import species_predictor, auth_router, hmi, engine, sim, two_factor, public, iot, live, sensors #Websocket
 
+from app.routers import projects
+app.include_router(projects.router)
 
 from app.routers import hmi, engine, sim, iot
 
@@ -65,7 +72,8 @@ app.include_router(hmi.router, tags=['hmi'], prefix='/hmi')
 app.include_router(engine.router, tags=['engine'], prefix='/engine')
 app.include_router(sim.router, tags=['sim'], prefix='/sim')
 app.include_router(two_factor.router)
-
+app.include_router(admin_budget.router, tags=["admin"], prefix="/api")
+app.include_router(admin_services.router, tags=["admin"], prefix="/api")
 
 app.include_router(public.router, tags=['public'], prefix='/public')
 
@@ -80,17 +88,23 @@ print(f" database names: {client.list_database_names()}")
 '''
 
 app.include_router(iot.router, tags=['iot'], prefix='/iot')
+app.include_router(sensors.router, tags=['sensors'], prefix='/sensors')
 app.include_router(species_predictor.router, tags=["predict"])
 
 
 
 # ✅ Root endpoint
+app.include_router(insights.router, tags=["insights"])
+
+# --- Root Endpoint ---
 @app.get("/", response_description="API Root")
 def show_home():
     return 'Welcome to echo api, move to /docs for more'
     return 'Welcome to Project Echo API. Visit /docs for interactive documentation.'
 
 app.include_router(auth_router.router, tags=["auth"], prefix="/api")
+from app.routers import detections
+app.include_router(detections.router)
 
 # ✅ /openapi-export - fetch live OpenAPI spec
 @app.get("/openapi-export", include_in_schema=False)

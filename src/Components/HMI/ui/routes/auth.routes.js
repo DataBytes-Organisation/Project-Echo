@@ -4,6 +4,8 @@ const emailcontroller = require('../controller/email.controller');
 //const cntroller = require("../public/js/routes");
 const axios = require('axios');
 const redis = require("redis")
+require('dotenv').config();
+const API_BASE_URL = `http://${process.env.API_HOST || 'localhost'}:9000`;
 
 module.exports = function (app) {
   app.use(function (req, res, next) {
@@ -34,7 +36,7 @@ module.exports = function (app) {
 
   
       try {
-        const axiosResponse = await axios.post('http://ts-api-cont:9000/hmi/signup',schema)
+        const axiosResponse = await axios.post(`${API_BASE_URL}/hmi/signup`,schema)
       
         if (axiosResponse.status === 201) {
           console.log('Status Code: ' + axiosResponse.status + ' ' + axiosResponse.statusText)
@@ -56,7 +58,7 @@ module.exports = function (app) {
     let email = req.body.email;
       
     try {
-      const axiosResponse = await axios.post('http://ts-api-cont:9000/hmi/signin',{
+      const axiosResponse = await axios.post(`${API_BASE_URL}/hmi/signin`,{
         username: uname,
         email: email,
         password: pw
@@ -126,7 +128,7 @@ module.exports = function (app) {
     // let email = req.body.email;
       
     try {
-      const axiosResponse = await axios.post('http://ts-api-cont:9000/2fa/verify',{
+      const axiosResponse = await axios.post(`${API_BASE_URL}/2fa/verify`,{
         user_id: user_id,
         otp: otp
       });
@@ -211,7 +213,7 @@ module.exports = function (app) {
     console.log(account)
     
     try {
-      const axiosResponse = await axios.post('http://ts-api-cont:9000/hmi/forgot-password', {
+      const axiosResponse = await axios.post(`${API_BASE_URL}/hmi/forgot-password`, {
         user: account
       });
       
@@ -246,7 +248,7 @@ module.exports = function (app) {
     // let _otp_ = req.body.otp;
 
     try {
-      const axiosResponse = await axios.post('http://ts-api-cont:9000/hmi/reset-password',{
+      const axiosResponse = await axios.post(`${API_BASE_URL}/hmi/reset-password`,{
         username: uname,
         password: pw
         // otp : _otp_
