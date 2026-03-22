@@ -736,23 +736,42 @@
         },
         {
             "Bird": "Anthus novaeseelandiae",
-            "description": []
+            "description": [        "Commonly known as the Australasian pipit",
+        "A small ground-dwelling songbird found in open grasslands and fields",
+        "Brown streaked plumage helps with camouflage",
+        "Feeds mainly on insects and small invertebrates"]
         },
         {
             "Bird": "Antigone antigone",
-            "description": []
+            "description": [        "Known as the Sarus crane",
+        "The tallest flying bird in the world",
+        "Native to parts of India, Southeast Asia, and northern Australia",
+        "Recognizable by its grey body and red head and neck",
+        "Often found in wetlands and agricultural fields"]
         },
         {
             "Bird": "Antigone rubicunda",
-            "description": []
+            "description": [        "Commonly called the Brolga",
+        "A large crane species native to Australia and New Guinea",
+        "Famous for its elaborate courtship dance",
+        "Grey plumage with a red head",
+        "Typically inhabits wetlands and grasslands"]
         },
         {
             "Bird": "Aphelocephala leucopsis",
-            "description": []
+            "description": [        "Known as the Southern whiteface",
+        "A small passerine bird endemic to Australia",
+        "Recognizable by its white face and grey-brown body",
+        "Lives in arid and semi-arid regions",
+        "Feeds on insects and seeds"]
         },
         {
             "Bird": "ApocritaÂ sp.",
-            "description": []
+            "description": [        "Refers to a subgroup of insects within the order Hymenoptera",
+        "Includes ants, bees, and wasps",
+        "Characterized by a narrow waist between thorax and abdomen",
+        "Highly diverse with many species playing important ecological roles",
+        "Not a bird; classification likely represents an insect species"]
         },
         {
             "Bird": "Aprosmictus erythropterus",
