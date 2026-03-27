@@ -381,16 +381,31 @@
         ]
     },
     {
-        "Bird": "Cervus Unicolour",
-        "description": []
+        "Bird": "Cervus unicolour",
+        "description": [
+            "Type: Mammal.",
+            "Common Name: Sambar Deer.",
+            "A large deer species native to South and Southeast Asia.",
+            "Typically found in forests near water sources."
+          ]
     },
     {
         "Bird": "Ceyx azureus",
-        "description": []
+        "description": [
+            "Type: Bird.",
+            "Common Name: Azure Kingfisher.",
+            "A small, brightly coloured kingfisher found near rivers and streams.",
+            "Feeds on fish, insects, and small aquatic animals."
+          ]
     },
     {
         "Bird": "Conopophila albogularis",
-        "description": []
+        "description": [
+            "Type: Bird.",
+            "Common Name: White-throated Honeyeater.",
+            "A small Australian bird found in woodlands and forests.",
+            "Feeds on nectar, insects, and small fruits."
+          ]
     },
     {
         "Bird": "Cophixalus bombiens",
@@ -461,7 +476,12 @@
     },
     {
         "Bird": "Cormobates leucophaea",
-        "description": []
+        "description": [
+            "Type: Bird.",
+            "Common Name: White-throated Treecreeper.",
+            "A small bird native to eastern Australia.",
+            "Climbs tree trunks searching for insects."
+          ]
     },
     {
         "Bird": "Corvus bennetti",
