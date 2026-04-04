@@ -187,28 +187,40 @@
         ]
     },
     {
-        "Bird": "Anthus novaeseelandiae",
-        "description": [
-            "Common Name: Australasian Pipit.",
-            "A small, ground-dwelling bird found in open grassy habitats across Australia and New Zealand.",
-            "Has a slender build with streaked brown plumage and constantly pumps its tail when walking."
-        ]
+      "species": "Anthus novaeseelandiae",
+      "common": "Australian pipit",
+      "summary": "Anthus novaeseelandiae or Australian pipit is a small, brown-colored bird found throughout most of Australia.",
+      "description": [
+        "They have a long, slender bill for probing invertebrates in the soil.",
+        "Pipits are often seen perched on fence posts or flying low over open grassland.",
+        "They have a distinctive territorial song, which they sing from a high perch.",
+        "Australian pipits are not considered threatened, but their populations may be affected by habitat loss."
+      ],
+      "img": ""
     },
     {
-        "Bird": "Antigone antigone",
-        "description": [
-            "Common Name: Sarus Crane.",
-            "The world’s tallest flying bird, known for its elegant walk and loud trumpeting calls.",
-            "Mostly found in wetlands and grasslands, often forming lifelong pair bonds."
-        ]
+      "species": "Antigone antigone",
+      "common": "Sarus crane",
+      "summary": "Antigone antigone or Sarus crane is a large, graceful bird found in parts of Asia and Australia.",
+      "description": [
+        "They have a distinctive red head and neck, with blue-gray wings and body.",
+        "Sarus cranes are highly territorial and form strong bonds with their mates.",
+        "They feed mainly on plant material and insects found in wetland habitats.",
+        "Sarus cranes are regarded as a vulnerable species because of the significant threat posed to their populations by human-caused wetlands loss."
+      ],
+      "img": ""
     },
     {
-        "Bird": "Antigone rubicunda",
-        "description": [
-            "Common Name: Brolga.",
-            "Large, grey crane native to Australia, famous for its beautiful and elaborate mating dance.",
-            "Inhabits wetland areas and feeds on plants, insects, and small animals."
-        ]
+      "species": "Antigone rubicunda",
+      "common": "Brolga",
+      "summary": "Antigone rubicunda or Brolga is a large species of crane native to Australia and New Guinea.",
+      "description": [
+        "They are known for their elaborate dances, which are often performed in pairs or groups.",
+        "Brolgas can live up to 30 years in the wild.",
+        "They are omnivorous, feeding on a variety of animals and plants.",
+        "Brolgas are one of the official symbols of the state of Queensland."
+      ],
+      "img": ""
     },
     {
         "Bird": "Aphelocephala leucopsis",
@@ -464,8 +476,17 @@
         "description": []
     },
     {
-        "Bird": "Corvus bennetti",
-        "description": []
+      "species": "Corvus bennetti",
+      "common": "Little Crow",
+      "summary": "Corvus bennetti, commonly known as the Little Crow, is a species of bird belonging to the Corvidae family. It is a small-sized crow found in various regions of Australia, including the southern coastal regions of Western Australia, South Australia, Victoria, New South Wales, and Queensland.",
+      "description": [
+        "The Little Crow measures approximately 36-43 cm in length and has a wingspan of 75-85 cm. They have a glossy black plumage with a slender bill, and their eyes are brown. The males are usually slightly larger than the females.",
+        "The Littttle Crow is known for its distinctive and melodious calls, which are complex and varied. They are highly social birds that often gather in large flocks, and they are opportunistic feeders, feeding on insects, fruits, seeds, small animals, and carrion.",
+        "Interestingly, the Little Crow has been observed exhibiting tool use behavior, where it uses sticks to pry insects out of bark or crevices. This behavior is relatively rare among birds and is considered a sign of high intelligence.",
+        "The Little Crow is not considered to be a threatened species, although its population may be declining in some regions due to habitat loss and fragmentation.",
+        ""
+      ],
+      "img": ""
     },
     {
         "Bird": "Corvus coronoides",
@@ -731,8 +752,16 @@
             ]
         },
         {
-            "Bird": "Anthochaera carunculata",
-            "description": []
+        "species": "Anthochaera carunculata",
+        "common": "Red wattlebird",
+        "summary": "Anthochaera carunculata or Red wattlebird a large honeyeater native to southeastern Australia.",
+        "description": [
+            "They are known for their prominent red caruncle (a fleshy ornament) on their throat.",
+            "Red wattlebirds use their long bills to extract nectar and insects from flowers.",
+            "They are noisy and territorial birds, defending their favorite feeding spots from others.",
+            "Their population has declined due to loss of habitat and competition with introduced bird species."
+        ],
+        "img": ""
         },
         {
             "Bird": "Anthus novaeseelandiae",
