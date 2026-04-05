@@ -23,6 +23,22 @@
       <div class="container-fluid">
         <div class="sensor-page">
           <div class="dashboard-shell">
+            <div class="admin-page-status">
+              <div class="admin-error-banner d-none" role="alert" aria-live="polite">
+                <div class="admin-error-banner__content">
+                  <i class="ti ti-alert-circle"></i>
+                  <span>Something went wrong while loading this page.</span>
+                </div>
+                <button type="button" class="admin-error-banner__dismiss" aria-label="Dismiss error message">
+                  <i class="ti ti-x"></i>
+                </button>
+              </div>
+          
+              <div class="admin-loading-spinner d-none" role="status" aria-live="polite">
+                <div class="spinner-border text-danger" aria-hidden="true"></div>
+                <span class="admin-loading-spinner__text">Loading...</span>
+              </div>
+            </div>
       <section class="hero-header"><h1>Alerts</h1><p class="subtitle">real-time detection of issues across deployed sensors</p></section>
       <section class="card"><h3>Alert Severity Overview</h3><p class="card-subtitle">Distribution of active alerts</p><canvas id="alertsChart" height="120"></canvas></section>
       <section class="card"><h3>Active Alerts</h3><p class="card-subtitle">Sensors requiring immediate or near-term attention</p>
