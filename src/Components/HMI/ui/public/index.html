@@ -18,14 +18,6 @@
     <!-- Bootstrap -->
 		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
 		<script src="https://kit.fontawesome.com/8aa980d912.js" crossorigin="anonymous"></script>
-
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD"
-      crossorigin="anonymous"
-    />
-
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
@@ -161,7 +153,7 @@
               <label for="citationSneeded">Source:&nbsp;&nbsp;&nbsp; </label> <input type="text" id="citationSneeded" name="citationSneeded"> <br>
               <p>Please enter a link to a reliable source that backs up your claim to make this edit.</p>
 
-              <label for="important" id="important">Important:&nbsp;&nbsp;&nbsp; </label> <p id="currentConservationStatus" name="important">Spamming or intentionally abusing this functionality will not be tolerated and will result in your account being either suspended or banned.</p>
+              <label for="important" id="important">Important:&nbsp;&nbsp;&nbsp; </label> <p id="importantMessage" name="important">Spamming or intentionally abusing this functionality will not be tolerated and will result in your account being either suspended or banned.</p>
               <button id="submitEditButton">Submit</button>
               <button id="closeFormButton">Close</button>
             </form>
@@ -269,14 +261,14 @@
               </div>
               
               <div class="dropdown">
-                <button class="btn btn-secondary dropdown-toggle btn-no-background" id="contact_us_toggle">
+                <button class="btn btn-secondary dropdown-toggle btn-no-background" id="contact_us_toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                   Contact Us
                 </button>
                 <div class="dropdown-menu faq-content" id="contact_us_content" aria-labelledby="contact_us_toggle">
                   <h2>Send a Message to Project Echo</h2>
                   <p>
                     You can submit your query or feedback using the form below:
-                    <form method="post" action="/send_email" method="POST">
+                    <form method="POST" action="/send_email">
                       <div class="form-group row">
                           <div>
                               <input type="text" class="form-control" id="email"
@@ -716,9 +708,9 @@
                   </div>
                 </div>             
               </div>
-                <h2 id="audioHeader"style="margin-top: 20px !important;">Audio</h2>
+                <h2 id="animalAudioHeader" style="margin-top: 20px !important;">Audio</h2>
 
-                <div id="audioControl" class="audio_component">
+                <div id="animalAudioControl" class="audio_component">
                   <span><i id="animalAudioI" class="fa fa-volume-up fa-2x" style="color:rgba(247, 186, 206, 0.6);" onclick="{toggleAudio()}"></i></span>
                   <div class="audioContainer">
                     <div class="box box1"></div>
@@ -813,8 +805,8 @@
               </div>
               <h2 style="margin-top: 20px !important;">Record Live Audio</h2>
               <div id="audio_recording_container">
-                <i id="record_audio_button" class="toggle-button btn btn-secondary btn-no-background select-all-btn" onclick="{record()}" aria-hidden="true">Record</i>
-                <div id="recording_contorls_container" class="recording_controls controls_item_row hide">
+                <button type="button" id="record_audio_button" class="toggle-button btn btn-secondary btn-no-background select-all-btn" onclick="record()">Record</button>
+                <div id="recording_controls_container" class="recording_controls controls_item_row hide">
                     <i id="cancel_recording_button" class="toggle-button btn btn-secondary btn-no-background select-all-btn" onclick="{cancelRecording()}" aria-hidden="true">Cancel</i>
                     <div id="recording_info" class="controls_item_row">
                         <i id="recording_indicator" class="fa fa-circle" aria-hidden="true"></i>
@@ -826,9 +818,9 @@
                     <p id="audio_playback_indicator" class="playback_indicator hide">Audio is playing<span>.</span><span>.</span><span>.</span></p>
                 </div>
               </div>
-              <h2 id="audioHeader"style="margin-top: 20px !important;">Recording Playback</h2>
+              <h2 id="recordingPlaybackHeader" style="margin-top: 20px !important;">Recording Playback</h2>
               <div id="audio_playback_container">
-                <div id="audioControl" class="audio_component">
+                <div id="recordingAudioControl" class="audio_component">
                   <span><i id="recordingI" class="fa fa-volume-up fa-2x" style="color:rgba(247, 186, 206, 0.6);" onclick="{toggleRecordingAudio()}"></i></span>
                   <div class="audioContainer">
                     <div class="boxR box1"></div>
@@ -854,7 +846,7 @@
                   </div>
                 </div>
               </div>
-              <h2 id="audioHeader"style="margin-top: 20px !important;">Recording Simulation</h2>
+              <h2 id="recordingSimulationHeader" style="margin-top: 20px !important;">Recording Simulation</h2>
               <div id="recording_simulation_master_container">
                 <div id="recording_export_container" style="margin-top: 10px !important;" class="recording_controls controls_item_row">
                   <!--i id="save_recording_button" style="width:100px !important" class="toggle-button btn btn-secondary btn-no-background select-all-btn" onclick="{saveRecordingEvent()}" aria-hidden="true">Save</i-->
@@ -988,10 +980,10 @@
 
 
             <div class="dropdown">
-              <button class="btn btn-secondary dropdown-toggle btn-no-background" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+              <button class="btn btn-secondary dropdown-toggle btn-no-background" type="button" id="dropdownAnimalVocalizations" data-bs-toggle="dropdown" aria-expanded="false">
                 Animal Vocalizations
               </button>
-              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <div class="dropdown-menu" aria-labelledby="dropdownAnimalVocalizations">
                 <div class="row">
                   <div class="col">
 
@@ -1056,10 +1048,10 @@
             </div>
 
             <div class="dropdown">
-              <button class="btn btn-secondary dropdown-toggle btn-no-background" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+              <button class="btn btn-secondary dropdown-toggle btn-no-background" type="button" id="dropdownAnimalSimulation" data-bs-toggle="dropdown" aria-expanded="false">
                 Animal Simulation
               </button>
-              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <div class="dropdown-menu" aria-labelledby="dropdownAnimalSimulation">
                 <div class="row">
                   <div class="col">
 
@@ -1126,10 +1118,10 @@
             </div>
 
             <div class="dropdown">
-              <button class="btn btn-secondary dropdown-toggle btn-no-background" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+              <button class="btn btn-secondary dropdown-toggle btn-no-background" type="button" id="dropdownMicrophones" data-bs-toggle="dropdown" aria-expanded="false">
                 Microphones
               </button>
-              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <div class="dropdown-menu" aria-labelledby="dropdownMicrophones">
                 <div class="row">
                   <div class="col">
                     <div class="form-check">
@@ -1174,10 +1166,12 @@
       return temp.innerHTML;
     }
 
-    document.querySelector('form').addEventListener('submit', function (event) {
-      event.preventDefault(); // Prevents the form from submitting and reloading the page
-      // Handle the form submission with JavaScript
-    });
+    const editFormElement = document.getElementById('editForm');
+    if (editFormElement) {
+      editFormElement.addEventListener('submit', function (event) {
+        event.preventDefault();
+      });
+    }
 
     document.getElementById('searchInput').addEventListener('input', function (e) {
       this.value = sanitizeInput(this.value); // Sanitize every input
@@ -1210,8 +1204,8 @@
 
       // Fetch selected animals from the backend on page load
       function loadSelectedAnimalsFromBackend() {
-        token = localStorage.getItem('token');  // JWT token from localStorage
-        userId = localStorage.getItem('userId'); // userId from localStorage
+        const token = localStorage.getItem('token');  // JWT token from localStorage
+        const userId = localStorage.getItem('userId'); // userId from localStorage
 
         const backendUrl = 'http://localhost:9000';
         fetch(`${backendUrl}/hmi/users/${userId}/notifications`, {
@@ -1403,8 +1397,8 @@
 
       // Persist the notification to the backend
       function saveNotificationToBackend(animal) {
-        token = localStorage.getItem('token');  // JWT token
-        userId = localStorage.getItem('userId'); // User ID
+        const token = localStorage.getItem('token');  // JWT token
+        const userId = localStorage.getItem('userId'); // User ID
 
         const backendUrl = 'http://localhost:9000'
         fetch(`${backendUrl}/hmi/users/${userId}/notifications`, {
@@ -1434,8 +1428,8 @@
 
       //Remove the notification from the backend
       function removeNotificationFromBackend(animal) {
-        token = localStorage.getItem('token');  // JWT token
-        userId = localStorage.getItem('userId'); // User ID
+        const token = localStorage.getItem('token');  // JWT token
+        const userId = localStorage.getItem('userId'); // User ID
         const backendUrl = 'http://localhost:9000'
         fetch(`${backendUrl}/hmi/users/${userId}/notifications/${animal.species}`, {
           method: 'DELETE',
@@ -1508,16 +1502,6 @@
             showOnly(animal)
           };
 
-          // Create "Unhide all" button
-          const unHideAllButton = document.createElement('button');
-          unHideAllButton.textContent = 'Hide';
-          unHideAllButton.className = 'btn btn-hide';
-          unHideAllButton.style.color = 'red'
-
-          unHideAllButton.onclick = () => {
-            console.log("Unhide all button clicked for", animal.common);
-            unHideAll(animal)
-          };
           li.appendChild(showOnlyButton);
           //li.appendChild(unHideAllButton);
           //li.appendChild(showButton);
@@ -1608,8 +1592,8 @@
               const animalName = feature.get('animalSpecies').toLowerCase();
               //console.log(animalName,animal)
               if (animalName.includes(animal)) {
-                key = feature.get('eventId') + feature.get('animalSpecies').toLowerCase();
-                url = iconDicts[key];
+                const key = feature.get('eventId') + feature.get('animalSpecies').toLowerCase();
+                const url = iconDicts[key];
                 console.log(iconDicts);
                 feature.setStyle(visibleStyle(url)); //Show animal
                 console.log("Showing ", animalName);
@@ -1636,7 +1620,7 @@
               const animalName = feature.get('animalSpecies').toLowerCase();
               //console.log(animalName,animal)
               if (feature.get('animalSpecies').toLowerCase() == animal) {
-                key = feature.get('eventId') + feature.get('animalSpecies').toLowerCase();
+                const key = feature.get('eventId') + feature.get('animalSpecies').toLowerCase();
                 iconDicts[key] = feature.get('animalIcon');
 
                 feature.setStyle(new ol.style.Style({ display: 'none' })); // Hide animal
@@ -1667,7 +1651,7 @@
               //console.log(animalName,animal)
               displayedAnimals.add(animal.species.toLowerCase());
               if (displayedAnimals.has(animalName)) {
-                key = feature.get('eventId') + feature.get('animalSpecies').toLowerCase();
+                const key = feature.get('eventId') + feature.get('animalSpecies').toLowerCase();
                 //const listItem = document.createElement('li');
                 //listItem.textContent = feature.get('animalSpecies');
                 feature.setStyle(visibleStyle(feature.get('animalIcon')));
@@ -1675,7 +1659,7 @@
                 //listContainer.appendChild(listItem);
                 console.log("Not hiding ", animalName);
               } else {
-                key = feature.get('eventId') + feature.get('animalSpecies').toLowerCase();
+                const key = feature.get('eventId') + feature.get('animalSpecies').toLowerCase();
                 iconDicts[key] = feature.get('animalIcon');
                 feature.setStyle(new ol.style.Style({ display: 'none' })); // Hide animal
                 console.log("Hiding ", animalName)
@@ -1755,8 +1739,8 @@
               if (displayedAnimals.has(animalName)) {
                 console.log("Not Unhiding ", animalName)
               } else {
-                key = feature.get('eventId') + feature.get('animalSpecies').toLowerCase();
-                url = iconDicts[key];
+                const key = feature.get('eventId') + feature.get('animalSpecies').toLowerCase();
+                const url = iconDicts[key];
                 console.log(iconDicts);
                 feature.setStyle(visibleStyle(url)); //Show animal
                 console.log("Showing ", animalName)
@@ -1839,6 +1823,12 @@
       }
       // Update the quantity with the chosen donation amount
       cart[0].quantity = donorAmount;
+
+      if (!username || !email) {
+        alert("User details are still loading. Please try again in a moment.");
+        return;
+      }
+
       var options = payment(username, donorAmount * 100, email);
       var rzp1 = new Razorpay(options);
 
@@ -2437,7 +2427,7 @@
         }
       }
       //console.log("Current filter state:  ", filterState);
-      updateLayers(filterState)
+      updateLayers(hmiState, filterState)
     }
 
     function microphoneDisplay() {
@@ -2486,31 +2476,8 @@
         })
       }
 
-      updateLayers(filterState)
+      updateLayers(hmiState, filterState)
     }
-
-    // Get all the dropdowns on the page
-    const dropdowns = document.querySelectorAll(".dropdown");
-    //console.log('dropdowns: ', dropdowns)
-
-    // Add a click event listener to each dropdown
-    dropdowns.forEach((dropdown) => {
-      const button = dropdown.querySelector(".dropdown-toggle");
-      const menu = dropdown.querySelector(".dropdown-menu");
-      const inputs = dropdown.querySelectorAll(".form-check-input");
-
-      // Toggle the 'show' class on the menu and button when clicked
-      button.addEventListener("click", () => {
-
-        menu.classList.toggle("show");
-        button.classList.toggle("show");
-
-      });
-
-
-    });
-
-
 
   </script>
 
@@ -2659,8 +2626,7 @@
     //Live mode and date range picker
 
     const toggleSwitch = document.querySelector('#liveModeToggle');
-    const simulatorSwitch = document.querySelector('#simulatorToggle');
-
+    
     const pastDataContainer = document.querySelector('.past-data-container');
     //console.log("Live mode enabled");
 
@@ -2749,7 +2715,7 @@
 
     function dataCleansing(json_data) {
       //Escape if there is no data
-      if (json_data === null | typeof json_data === undefined | json_data.length === 0) {
+      if (json_data === null || typeof json_data === "undefined" || json_data.length === 0) {
         return null
       }
       //Add date column with converted timestamp value
@@ -2822,7 +2788,7 @@
 
       console.log(`Download selected time range ${datepickerStart} - ${datepickerEnd}`)
       retrieveTruthEventsInTimeRange(datepickerStart, datepickerEnd).then((res) => {
-        if (res.data === null | typeof res.data === undefined | res.data.length === 0) {
+        if (res.data === null || typeof res.data === "undefined" || res.data.length === 0) {
           ErrDisplay("There is no result");
           data = sampleJSONmovementEvents
         } else {
@@ -2925,6 +2891,7 @@
       setTheme(savedTheme);
     });
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76A2z02tPqdjQnYhA4M6JbWh2nFfXnE2CkzAJ6Digw1kPxD6Z9SqnX+0Gooy2cV" crossorigin="anonymous"></script>
 </body>
 
 </html>
