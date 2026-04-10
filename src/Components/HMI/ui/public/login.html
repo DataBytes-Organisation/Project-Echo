@@ -104,7 +104,7 @@
                     <!--                    </div>-->
 
                     <!-- <div class="g-recaptcha" data-sitekey="6LdD2lIsAAAAAMF9ArlGZr3aIJ4iCZx17wIxVCiu" -->
-									  <div class="g-recaptcha" data-sitekey="6LdKhsUpAAAAAOyJT8u_gBte7HBoFKUvO0-bz_2v" data-action="LOGIN"
+									  <div class="g-recaptcha" data-sitekey="<%= process.env.RECAPTCHA_SITE_KEY %>" data-action="LOGIN"
                         data-callback="checkCaptcha"></div>
                     <button id="login-form-container-submit" type="submit" class="btn10 animate disabled"
                         disabled><span>Login</span></button>
@@ -304,7 +304,9 @@
 
     </script>
     <script>
+        let recaptchaToken = "";
         function checkCaptcha(token) {
+            recaptchaToken = token;
             document.getElementById('login-form-container-submit').disabled = false;
             document.getElementById('login-form-container-submit').classList.remove("disabled");
         }
@@ -398,7 +400,8 @@
                 body: JSON.stringify({
                     username: username,
                     password: password,
-                    email: email
+                    email: email,
+                    recaptchaToken: recaptchaToken
                 })
             });
 

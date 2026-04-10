@@ -56,8 +56,25 @@ module.exports = function (app) {
     let pw = req.body.password;
 
     let email = req.body.email;
+    let recaptchaToken = req.body.recaptchaToken;
+    if (!recaptchaToken) {
+      return res.status(400).json({ message: "Captcha is required" });
+    }
       
     try {
+      const verifyUrl = `https://www.google.com/recaptcha/api/siteverify`;
+
+      const captchaRes = await axios.post(verifyUrl, null, {
+        params: {
+          secret: process.env.RECAPTCHA_SECRET_KEY,
+          response: recaptchaToken
+        }
+      });
+
+      if (!captchaRes.data.success) {
+        return res.status(400).json({ message: "Captcha verification failed" });
+      }
+
       const axiosResponse = await axios.post(`${API_BASE_URL}/hmi/signin`,{
         username: uname,
         email: email,

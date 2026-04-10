@@ -303,8 +303,14 @@ app.post('/api/save-razorpay-payment', async (req, res) => {
 
 app.use(express.static(path.join(__dirname, 'public'), { index: path.join(__dirname, 'public/login.html')}))
 
-var corsOptions = {
-  origin: [ "http://localhost:8081", "*"]
+// var corsOptions = {
+//   origin: [ "http://localhost:8081", "*"]
+// };
+
+const corsOptions = {
+  origin: process.env.CORS_ORIGINS
+    ? process.env.CORS_ORIGINS.split(",")
+    : []
 };
 
 app.use(cors(corsOptions))

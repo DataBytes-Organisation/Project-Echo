@@ -56,6 +56,10 @@ module.exports = function(app) {
   app.get(`/audio/:id`, async (req, res, next) => {
     const id = req.params.id;
     //console.log(`${MESSAGE_API_URL}/audio?id=${id}`);
+
+    const isValid = /^[a-zA-Z0-9-]+$/.test(id);
+    if(!isValid) return res.status(400).json({ error: "Invalid ID format" });
+    
     const response = await axios.get(`${MESSAGE_API_URL}/audio?id=${id}`);
     res.send(response.data);
     next()
