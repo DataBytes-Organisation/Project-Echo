@@ -26,12 +26,11 @@
     {
         "Bird": "Acanthiza chrysorrhoa",
         "description": [
-            "This bird is named for the bright yellow patch of feathers on its rump.",
-            "They can survive in a range of habitats, from forests to semi-arid scrublands.",
-            "Yellow-rumped thornbills are known for their energetic, acrobatic movements as they forage for insects.",
-            "They have been observed making use of tools, such as using sticks to pry open bark to expose insects.",
-            "This thornbill has a clutch size of only 2-4 eggs, and they often lay multiple clutches per year.",
-            "They are commonly found throughout eastern and southeastern Australia, including Tasmania, as well as in southern parts of the Northern Territory and Western Australia."
+            "It gets its name from the bright yellow patch above its tail (the “rump”), which is especially visible when it flicks its tail upward.",
+            "This bird is widespread across southern and eastern Australia, commonly found in open woodlands, grasslands, and even suburban areas.",
+            "Yellow-rumped Thornbills often live and move in small family groups, cooperating to forage and defend territory.",
+            "It mainly feeds on insects and small arthropods, which it picks off leaves, bark, and the ground.",
+            "Its nest is a dome-shaped structure with a false “entrance” on top, likely used to confuse predators."
         ]
     },
     {
@@ -108,30 +107,28 @@
     {
         "Bird": "Aegotheles cristatus",
         "description": [
-            "A tiny nocturnal bird found in open woodland and scrub around Australia.",
-            "The Australian Owlet-nightjar is the smallest night bird in Australia that earns charming nicknames such as moth owl, fairy owl.",
-            "They have gray upperparts and white-grey barred chest and belly with a pattern on their face.",
-            "Hunts flying insects such as moths, beetles and grasshoppers specially at night."
+            "Nocturnal bird active at night, resting in tree hollows during the day.",
+            "Excellent camouflage with bark-like grey plumage.",
+            "Feeds mainly on insects caught in flight.",
+            "Found across most of Australia in wooded areas."
         ]
     },
     {
         "Bird": "Aidemosyne modesta",
         "description": [
-            "Male bird has a plum coloured and shaped forehead with a brown body that contains white scalloped markings.",
-            "Plum headed Finch is also known as cherry finch and who is native to eastern Australia.",
-            "Females are plainer obvious red coloured birds who usually lay 4-6 white eggs per clutch on round woven grass nests .",
-            "Usually travel in small flocks and feeds on grass seeds and occassionally having insects as a dietery supplement.",
-            "Typically found in dry savannas, grasslands, and open shrublands, often near water sources in northeastern Australia."
+            "Small finch native to dry inland Australia.",
+            "Males have a distinctive plum-coloured head.",
+            "Feeds mainly on grass seeds.",
+            "Often seen in small flocks on the ground."
         ]
     },
     {
         "Bird": "Alisterus scapularis",
         "description": [
-            "Common Name: Australian King Parrot.",
-            "A large, brightly coloured parrot native to eastern Australia.",
-            "Males have a striking red head and chest with green wings and a long blue-tipped tail.",
-            "Females are mostly green with a red belly, allowing them to camouflage better.",
-            "Often seen in rainforests, woodlands, and suburban areas where they feed on seeds, fruits, and flowers."
+            "Large, colourful parrot native to eastern Australia.",
+            "Males are bright red and green; females mostly green.",
+            "Feeds on seeds, fruits, and berries.",
+            "Common in forests, rainforests, and gardens."
         ]
     },
     {
@@ -597,9 +594,10 @@
         {
             "Bird": "Acanthiza nana",
             "description": [
-                "Tiny passerine bird, approximately 9–10 cm (3.5–3.9 inches) long.",
-                "Common Name: Yellow Thornbill.",
-                "Bright yellow underparts, olive-brown upperparts, and a slender, pointed bill."
+                "One of Australia’s smallest birds.",
+                "Olive-yellow plumage helps it blend into foliage.",
+                "Feeds on insects in trees and shrubs.",
+                "Common in forests, woodlands, and urban parks."
             ]
         },
         {
