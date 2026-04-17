@@ -57,15 +57,33 @@
     },
     {
         "Bird": "Acanthiza pusilla",
-        "description": []
+        "description": [
+            "The brown thornbill is a tiny passerine bird commonly found in coastal and inland regions of southeastern Australia.",
+            "It has subtle brown and grey tones that help it blend easily into bushy environments.",
+            "This species actively hunts insects by moving quickly through foliage and branches.",
+            "They often live in small groups and communicate with soft, high-pitched calls.",
+            "Their nests are small, enclosed structures usually hidden in dense vegetation."
+        ]
     },
     {
         "Bird": "Acanthiza reguloides",
-        "description": []
+        "description": [
+            "The buff-rumped thornbill is a small bird native to eastern parts of Australia.",
+            "It is identifiable by its light-colored rump and relatively plain body markings.",
+            "These birds are highly social and are frequently seen moving together in flocks.",
+            "They feed mainly on insects, picking them from leaves and bark.",
+            "Group members often cooperate in raising chicks within shared territories."
+        ]
     },
     {
         "Bird": "Acanthiza uropygialis",
-        "description": []
+        "description": [
+            "The chestnut-rumped thornbill inhabits dry and open woodland areas across Australia.",
+            "It features a noticeable reddish-brown patch near the tail region.",
+            "This species is well adapted to arid climates and sparse vegetation.",
+            "They forage mostly on the ground or low shrubs in search of insects.",
+            "Their nests are carefully concealed to protect against predators in open habitats."
+        ]
     },
     {
         "Bird": "Acanthorhynchus tenuirostris",
