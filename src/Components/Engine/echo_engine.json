@@ -22,5 +22,8 @@
     "BUCKET_NAME": "project_echo_bucket_1",
     "MODEL_SERVER": "http://ts-echo-model-cont:8501/v1/models/echo_model/versions/1:predict",
     "WEATHER_SERVER": "http://ts-echo-model-cont:8501/v1/models/weather_model/versions/1:predict",
-    "DB_HOSTNAME": "ts-mongodb-cont"
+    "DB_HOSTNAME": "ts-mongodb-cont",
+    "IOT_MQTT_BROKER": "broker.hivemq.com",
+    "IOT_MQTT_PORT": 1883,
+    "IOT_MQTT_TOPIC": "iot/data/test"
 }

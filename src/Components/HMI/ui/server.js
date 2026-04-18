@@ -12,6 +12,7 @@ const bcrypt = require('bcryptjs');
 client.connect();
 const cors = require('cors');
 require('dotenv').config();
+const API_BASE_URL = `http://${process.env.API_HOST || 'localhost'}:9000`;
 const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY);
 const axios = require('axios');
 const { MongoClient, ObjectId } = require('mongodb');
@@ -349,7 +350,7 @@ app.get('/cumulativeDonations', async (req, res) => {
 // =======================
 // Save Razorpay Payment to MongoDB
 // =======================
-const donationClient = new MongoClient(process.env.MONGODB_URI || "mongodb://root:root_password@ts-mongodb-cont:27017", {
+const donationClient = new MongoClient(process.env.MONGODB_URI || `mongodb://root:root_password@${process.env.DB_HOST || 'localhost'}:27017`, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 });
@@ -675,7 +676,7 @@ app.post("/api/submit", async (req, res) => {
   schema.date = new Date();
   try {
     console.log("Request submission data: ", JSON.stringify(schema));
-    const axiosResponse = await axios.post('http://api-service:9000/hmi/api/submit', JSON.stringify(schema), { headers: {"Authorization" : `Bearer ${token}`, 'Content-Type': 'application/json'}})
+    const axiosResponse = await axios.post(`${API_BASE_URL}/hmi/api/submit`, JSON.stringify(schema), { headers: {"Authorization" : `Bearer ${token}`, 'Content-Type': 'application/json'}})
     //If successful return a 201 status code
     if (axiosResponse.status === 201) {
       console.log('Status Code: ' + axiosResponse.status + ' ' + axiosResponse.statusText)
@@ -723,7 +724,7 @@ app.patch('/api/requests/:id', async (req, res) => {
   })
   try {
     console.log("Admin Request update data: ", JSON.stringify(schema));
-    const axiosResponse = await axios.patch('http://api-service:9000/hmi/api/requests', JSON.stringify(schema), { headers: {"Authorization" : `Bearer ${token}`, 'Content-Type': 'application/json'}})
+    const axiosResponse = await axios.patch(`${API_BASE_URL}/hmi/api/requests`, JSON.stringify(schema), { headers: {"Authorization" : `Bearer ${token}`, 'Content-Type': 'application/json'}})
     if (axiosResponse.status === 200) {
       console.log('Status Code: ' + axiosResponse.status + ' ' + axiosResponse.statusText)
       res.status(200).send(`<script> window.location.href = "/login"; alert("Request data updated successfully");</script>`);
@@ -754,7 +755,7 @@ app.patch('/api/updateConservationStatus/:animal', async (req, res) => {
   })
   try {
     console.log("Admin update species data: ", JSON.stringify(schema));
-    const axiosResponse = await axios.patch('http://api-service:9000/hmi/api/updateConservationStatus', JSON.stringify(schema), { headers: {"Authorization" : `Bearer ${token}`, 'Content-Type': 'application/json'}})
+    const axiosResponse = await axios.patch(`${API_BASE_URL}/hmi/api/updateConservationStatus`, JSON.stringify(schema), { headers: {"Authorization" : `Bearer ${token}`, 'Content-Type': 'application/json'}})
     if (axiosResponse.status === 200) {
       console.log('Status Code: ' + axiosResponse.status + ' ' + axiosResponse.statusText)
       res.status(200).send(`<script> window.location.href = "/login"; alert("Species Data updated successfully");</script>`);
@@ -780,7 +781,7 @@ app.get('/api/requests', async (req, res) => {
       }
     })
 
-    const axiosResponse = await axios.get('http://api-service:9000/hmi/requests', { headers: {"Authorization" : `Bearer ${token}`}})
+    const axiosResponse = await axios.get(`${API_BASE_URL}/hmi/requests`, { headers: {"Authorization" : `Bearer ${token}`}})
   
     if (axiosResponse.status === 200) {
       res.json(axiosResponse.data);
@@ -823,7 +824,7 @@ app.get("/welcome", async (req,res) => {
 })
 
 // MongoDB connection URI
-const uri = process.env.MONGO_URI || "mongodb://localhost:27017";
+const uri = process.env.MONGO_URI || `mongodb://root:root_password@${process.env.DB_HOST || 'localhost'}:27017`;
 
 // Function to suspend or block a user by email or user ID
 const suspendOrBlockUser = async (identifier, action) => {
@@ -884,7 +885,7 @@ app.post('/suspendUser', async (req, res) => {
 // Proxy routes for Sensor Health API
 async function proxyToApi(req, res) {
   try {
-    const url = `http://ts-api-cont:9000${req.originalUrl}`;
+    const url = `${API_BASE_URL}${req.originalUrl}`;
     const response = await axios({
       method: req.method,
       url,
@@ -910,7 +911,7 @@ app.all('/sensors/*', proxyToApi);
 
 app.get('/iot/nodes', async (req, res) => {
   try {
-    const response = await axios.get('http://api-service:9000/iot/nodes');
+    const response = await axios.get(`${API_BASE_URL}/iot/nodes`);
     res.json(response.data);
   } catch (error) {
     console.error('Error fetching IoT nodes:', error);

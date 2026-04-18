@@ -1,5 +1,7 @@
 const {client} = require("../middleware")
 const axios = require('axios');
+require('dotenv').config();
+const API_BASE_URL = `http://${process.env.API_HOST || 'localhost'}:9000`;
 
 
 const nodemailer = require("nodemailer");
@@ -13,7 +15,7 @@ exports.guestsignup = async (req) => {
     timestamp: req.timestamp
   };
   try {
-    const axiosResponse = await axios.post('http://api-service:9000/hmi/guestsignup',schema)
+    const axiosResponse = await axios.post(`${API_BASE_URL}/hmi/guestsignup`,schema)
   
     if (axiosResponse.status === 201) {
       return { status: 'success' }

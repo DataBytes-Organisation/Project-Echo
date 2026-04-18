@@ -3,6 +3,11 @@
 *.pyc
 *.hdf5
 *.env
+.ipynb_checkpoints/
+*.pb
+*.data*
+*.index
+*.db
 
 tensorboard_logs/
 logs/

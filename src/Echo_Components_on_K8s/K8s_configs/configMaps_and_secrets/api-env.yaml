@@ -10,3 +10,5 @@ data:
   DB_ROOT_USER_PASS: root_password
   MONGODB_URI: "mongodb://modelUser:EchoNetAccess2023@mongodb-service:27017/EchoNet"
   USER_MONGODB_URI: "mongodb://root:root_password@mongodb-service:27017/UserSample?authSource=admin"
+  MAIL_STARTTLS: "true"
+  MAIL_SSL_TLS: "false"
