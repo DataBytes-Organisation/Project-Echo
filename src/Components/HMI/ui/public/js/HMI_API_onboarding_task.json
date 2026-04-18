@@ -280,23 +280,54 @@
     },
     {
         "Bird": "Barnardius zonarius",
-        "description": []
+        "description": [
+            "Common Name: Australian Ringneck.",
+            "A medium-sized parrot native to Australia, found across a wide range of habitats including woodlands, farmlands, and scrublands.",
+            "Recognised by its bright green plumage, yellow collar around the neck, and a distinctive blue-green tail.",
+            "Feeds on seeds, fruits, nectar, and insects, often foraging on the ground or in trees.",
+            "Known for its loud, chattering calls and strong, direct flight."
+        ]
     },
     {
         "Bird": "Biziura lobata",
-        "description": []
+        "description": [
+            "Common Name: Musk Duck.",
+                    "A large, dark-plumed diving duck native to southern Australia, found in deep freshwater lakes and swamps.",
+                    "Males are distinguished by a distinctive leathery lobe hanging beneath the bill and produce a strong musk-like odour.",
+                    "An expert diver, rarely seen on land, spending most of its time on the water.",
+                    "Males perform elaborate courtship displays involving splashing, whistling, and kicking water."
+                
+        ]
     },
     {
         "Bird": "Burhinus grallarius",
-        "description": []
+        "description": [
+            "Common Name: Bush Stone-curlew.",
+                    "A large, ground-dwelling bird endemic to Australia, recognised by its long legs, large yellow eyes, and streaked brown plumage.",
+                    "Primarily nocturnal, known for its eerie wailing calls heard at night.",
+                    "Relies heavily on camouflage, freezing motionless among leaf litter and grass when threatened.",
+                    "Feeds on insects, small reptiles, frogs, and seeds by foraging on the ground."
+        ]
     },
     {
         "Bird": "Cacatua galerita",
-        "description": []
+        "description": [
+            "Common Name: Sulphur-crested Cockatoo.",
+                    "A large white cockatoo with a striking bright yellow erectile crest, native to eastern and northern Australia.",
+                    "Highly intelligent and vocal, often seen in large, noisy flocks in urban and rural areas.",
+                    "Feeds on seeds, nuts, roots, and berries, using its powerful bill to crack open hard food.",
+                    "Can live up to 70 years in captivity, making it one of the longest-lived parrot species."
+        ]
     },
     {
         "Bird": "Cacatua sanguinea",
-        "description": []
+        "description": [
+            "Common Name: Little Corella.",
+                    "A medium-sized white cockatoo with a pale blue eye-ring and a short crest, found across arid and semi-arid Australia.",
+                    "Highly social and playful, often forming very large, noisy flocks near water sources.",
+                    "Feeds on seeds, corms, and bulbs, often digging in the ground with its bill.",
+                    "Considered an agricultural pest in some regions due to its habit of feeding on crops."
+        ]
     },
     {
         "Bird": "Cacomantis flabelliformis",
