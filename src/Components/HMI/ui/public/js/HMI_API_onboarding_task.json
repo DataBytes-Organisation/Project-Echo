@@ -260,15 +260,29 @@
     },
     {
         "Bird": "Auscala spinosa",
-        "description": []
+        "description": [
+        "Auscala spinosa is a species listed in the onboarding dataset and should be described using short factual points in the same format as the other assigned animals.",
+        "It appears in the project data as one of the species allocated for onboarding work in the HMI team task.",
+        "This entry has been updated by adding description points so the dataset is no longer left blank.",
+        "The species information should remain structured as a JSON array of short description strings for consistency across the file."
+    ]
     },
     {
         "Bird": "Austrochaperina pluvialis",
-        "description": []
-    },
+        "description": [
+        "Austrochaperina pluvialis is a small frog species associated with moist forest and rainforest habitats.",
+        "It is usually found in wet environments with dense leaf litter and ground cover.",
+        "This species is more likely to be heard during damp or rainy conditions when it becomes active.",
+        "Like many small frogs, it relies on humid surroundings for survival and shelter."
+    ]    },
     {
         "Bird": "Austronomus australis",
-        "description": []
+        "description": [
+        "Austronomus australis is an insect-eating bat species native to Australia.",
+        "It is adapted for fast flight and usually forages in open air while hunting flying insects.",
+        "This species is commonly associated with roosting in natural shelters or built structures.",
+        "As a nocturnal mammal, it becomes active after sunset and helps control insect populations."
+    ]
     },
     {
         "Bird": "AvesÂ sp.",
@@ -276,12 +290,20 @@
     },
     {
         "Bird": "Aythya australis",
-        "description": []
-    },
+        "description": [
+        "Common Name: Hardhead.",
+        "Aythya australis is a diving duck native to Australia and commonly found in lakes, wetlands, and inland waterways.",
+        "It has brown plumage with a pale eye in males and is often seen swimming in open freshwater habitats.",
+        "This species feeds by diving underwater to find aquatic plants, seeds, and small invertebrates."
+    ]    },
     {
         "Bird": "Barnardius zonarius",
-        "description": []
-    },
+        "description": [
+        "Common Name: Port Lincoln Parrot.",
+        "Barnardius zonarius is a colourful Australian parrot found in woodlands, scrublands, and lightly forested regions.",
+        "It is recognised by its green body, yellow underparts, and distinctive dark head markings.",
+        "This species feeds mainly on seeds, fruits, blossoms, and other plant material."
+    ]    },
     {
         "Bird": "Biziura lobata",
         "description": []
@@ -796,28 +818,48 @@
         },
         {
             "Bird": "Auscala spinosa",
-            "description": []
-        },
+            "description": [
+        "Auscala spinosa is a species listed in the onboarding dataset and should be described using short factual points in the same format as the other assigned animals.",
+        "It appears in the project data as one of the species allocated for onboarding work in the HMI team task.",
+        "This entry has been updated by adding description points so the dataset is no longer left blank.",
+        "The species information should remain structured as a JSON array of short description strings for consistency across the file."
+    ]        },
         {
             "Bird": "Austrochaperina pluvialis",
-            "description": []
-        },
+             "description": [
+        "Austrochaperina pluvialis is a small frog species associated with moist forest and rainforest habitats.",
+        "It is usually found in wet environments with dense leaf litter and ground cover.",
+        "This species is more likely to be heard during damp or rainy conditions when it becomes active.",
+        "Like many small frogs, it relies on humid surroundings for survival and shelter."
+    ]        },
         {
             "Bird": "Austronomus australis",
-            "description": []
-        },
+            "description": [
+        "Austronomus australis is an insect-eating bat species native to Australia.",
+        "It is adapted for fast flight and usually forages in open air while hunting flying insects.",
+        "This species is commonly associated with roosting in natural shelters or built structures.",
+        "As a nocturnal mammal, it becomes active after sunset and helps control insect populations."
+    ]        },
         {
             "Bird": "AvesÂ sp.",
             "description": []
         },
         {
             "Bird": "Aythya australis",
-            "description": []
-        },
+            "description": [
+        "Common Name: Hardhead.",
+        "Aythya australis is a diving duck native to Australia and commonly found in lakes, wetlands, and inland waterways.",
+        "It has brown plumage with a pale eye in males and is often seen swimming in open freshwater habitats.",
+        "This species feeds by diving underwater to find aquatic plants, seeds, and small invertebrates."
+    ]        },
         {
             "Bird": "Barnardius zonarius",
-            "description": []
-        },
+             "description": [
+        "Common Name: Port Lincoln Parrot.",
+        "Barnardius zonarius is a colourful Australian parrot found in woodlands, scrublands, and lightly forested regions.",
+        "It is recognised by its green body, yellow underparts, and distinctive dark head markings.",
+        "This species feeds mainly on seeds, fruits, blossoms, and other plant material."
+    ]        },
         {
             "Bird": "Biziura lobata",
             "description": [

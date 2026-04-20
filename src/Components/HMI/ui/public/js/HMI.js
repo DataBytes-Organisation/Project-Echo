@@ -7,10 +7,6 @@ import { retrieveTruthEventsInTimeRange, retrieveVocalizationEventsInTimeRange,
   setSimModeAnimal, setSimModeRecording, setSimModeRecordingV2, stopSimulator } from "./routes.js";
 import { addIoTNodesToMap } from "./nodes-overlay.js";
 
-  //import data from "./sample_data.json" assert { type: 'json' }; Browser assertions not yet supported in all browsers, alternative method used instead.
-
-
-// import { parse } from 'json2csv';
 
 
 var markups = ["elephant.png", "monkey.png", "tiger.png"];
@@ -55,7 +51,7 @@ export function convertCSV(json) {
       return JSON.stringify(row[fieldName], replacer)
     }).join(',')
   })
-  csv.unshift(fields.join(',')) // add header column
+  csv.unshift(fields.join(',')) 
   csv = csv.join('\r\n');
   return csv
 }
@@ -97,15 +93,13 @@ function getIconName(status, type){
 //var sample_data = data.data; For assertion method
 var sample_data = []; // For the universal method
 fetch("./js/sample_data.json").then(res => res.json()).then(data => sample_data = data.data);
-// Went from 4 lines to 1. This method works on all browsers according to previous tests.
+
 var animal_data = [];
 
 export var animal_toggled = false;
 
-//For Demo purposes only
-//This plays an awful quailty audio test string
+
 document.addEventListener('click', function() {
-  //playAudioString(getAudioTestString());  
 });
 
 
@@ -123,29 +117,21 @@ export function initialiseHMI(hmiState) {
   }
   
   addVectorLayerTopDown(hmiState, "mic_layer");
-  /*
-  addVectorLayerTopDown(hmiState, "mic_layer");
-  addVectorLayerTopDown(hmiState, "mic_layer_1");
-  addVectorLayerTopDown(hmiState, "mic_layer_2");
-  addVectorLayerTopDown(hmiState, "mic_layer_3");
-  addVectorLayerTopDown(hmiState, "mic_layer_4");
-  addVectorLayerTopDown(hmiState, "mic_layer_5");
-  addVectorLayerTopDown(hmiState, "mic_layer_6");
-  addVectorLayerTopDown(hmiState, "mic_layer_7");
-  addVectorLayerTopDown(hmiState, "mic_layer_8");
-  addVectorLayerTopDown(hmiState, "mic_layer_9");
-  */
+ 
   addAllTruthFeatures(hmiState);
   addAllVocalizationFeatures(hmiState);
 
   createMapClickEvent(hmiState);
 
-  retrieveMicrophones().then((res) => {
-    updateMicrophoneLayer(hmiState, res.data);
-    stepMicAnimation(hmiState);
-    // Add IoT nodes to the map after microphones are loaded
-    addIoTNodesToMap(hmiState);
-  })
+ retrieveMicrophones().then((res) => {
+  updateMicrophoneLayer(hmiState, res.data);
+  stepMicAnimation(hmiState);
+}).catch((error) => {
+  console.warn("Microphone API failed, continuing with fallback setup.", error);
+});
+
+// Always add IoT nodes, even if microphone API fails
+addIoTNodesToMap(hmiState);
   addmicrophones(hmiState);
   stepMicAnimation(hmiState);
   queueSimUpdate(hmiState);
@@ -345,14 +331,7 @@ export function clearMicrophoneLayer(){
   layer.getSource().clear();
 }
 
-/*function commonNameFix(common){
-  if (common == "orange footed scrubfowl"){
-    return "orange-footed scrubfowl"
-  }
-  else{
-    return common;
-  }
-}*/
+
 
 export function convertJSONtoAnimalMovementEvent(hmiState, data){
   let movementEvent = {};
@@ -1950,3 +1929,4 @@ document.addEventListener('modeSwitch', function(event){
     stopSimulator();
   }
 });
+
