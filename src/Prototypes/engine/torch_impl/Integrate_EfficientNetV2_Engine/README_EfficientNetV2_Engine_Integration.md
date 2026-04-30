@@ -258,6 +258,186 @@ This prepares the model inference flow for real MQTT integration later.
 
 ---
 
+### 8. ONNX Export for Saved EfficientNetV2 Model
+
+An ONNX export script was created:
+
+```text
+export_saved_efficientnetv2_to_onnx.py
+```
+
+This script exports the saved EfficientNetV2 model from the current training and inference workflow. Unlike the earlier reference export script, this version loads the trained checkpoint from:
+
+```text
+_trained_models/efficientnetv2_project_echo.pt
+```
+
+The script rebuilds the EfficientNetV2 architecture using the saved checkpoint information, loads the trained weights, and exports the model to ONNX using the expected input shape:
+
+```text
+[1, 1, 128, 313]
+```
+
+The ONNX model was saved as:
+
+```text
+_trained_models/efficientnetv2_project_echo.onnx
+```
+
+Output summary:
+
+```text
+Loading saved EfficientNetV2 model...
+Model loaded successfully.
+Model name: efficientnetv2_rw_s
+Number of classes: 123
+Exporting to ONNX...
+ONNX model saved to:
+_trained_models/efficientnetv2_project_echo.onnx
+Checking ONNX model...
+Opset: 13
+ONNX export completed successfully.
+```
+
+### Purpose
+
+This step prepares the trained EfficientNetV2 model for conversion into a deployment-friendly format. ONNX acts as the intermediate format between PyTorch and TensorFlow/TFLite.
+
+---
+
+### 9. TFLite Conversion
+
+A conversion script was created:
+
+```text
+convert_saved_efficientnetv2_onnx_to_tflite.py
+```
+
+This script converts the exported ONNX model into a TensorFlow SavedModel and then into a TFLite model.
+
+The conversion flow is:
+
+```text
+Saved PyTorch EfficientNetV2 model
+    ↓
+ONNX model
+    ↓
+TensorFlow SavedModel
+    ↓
+TFLite model
+```
+
+The following outputs were generated:
+
+```text
+_trained_models/
+    efficientnetv2_project_echo.onnx
+    efficientnetv2_project_echo_saved_model/
+    efficientnetv2_project_echo.tflite
+```
+
+Output summary:
+
+```text
+Loading ONNX model...
+Converting ONNX to TensorFlow SavedModel...
+TensorFlow SavedModel saved to:
+_trained_models/efficientnetv2_project_echo_saved_model
+Converting TensorFlow SavedModel to TFLite...
+TFLite model saved to:
+_trained_models/efficientnetv2_project_echo.tflite
+TFLite conversion completed successfully. File size: 85.19 MB
+```
+
+### Purpose
+
+This step validates that the selected EfficientNetV2 model can be converted into a TFLite format. This is important for production or edge deployment, because TFLite models are generally more suitable for lightweight inference than PyTorch models.
+
+---
+
+### 10. TFLite Inference Validation
+
+A TFLite validation script was created:
+
+```text
+validate_efficientnetv2_tflite_inference.py
+```
+
+This script validates the converted TFLite model using the same class mapping and preprocessing configuration used by the PyTorch predictor.
+
+The script performs:
+
+1. Single audio PyTorch vs TFLite comparison.
+2. TFLite input and output shape inspection.
+3. TFLite prediction on a real dataset audio file.
+4. Dataset-based TFLite validation using 50 labelled audio files.
+5. CSV and JSON output export.
+
+TFLite input details confirmed:
+
+```text
+Input shape: [1, 1, 128, 313]
+Input dtype: float32
+```
+
+TFLite output details confirmed:
+
+```text
+Output shape: [1, 123]
+Output dtype: float32
+```
+
+Single audio comparison used:
+
+```text
+Acanthiza chrysorrhoa/region_3.650-4.900.mp3
+```
+
+PyTorch result:
+
+```text
+Predicted label: Acanthiza chrysorrhoa
+Confidence: 0.9337119460105896
+```
+
+TFLite result:
+
+```text
+Predicted label: Acanthiza chrysorrhoa
+Confidence: 0.9337119460105896
+```
+
+Comparison summary:
+
+```text
+PyTorch label: Acanthiza chrysorrhoa
+TFLite label: Acanthiza chrysorrhoa
+Labels match: True
+PyTorch confidence: 0.9337119460105896
+TFLite confidence: 0.9337119460105896
+```
+
+Dataset-based TFLite validation result:
+
+```text
+Total files tested: 50
+Correct predictions: 47
+TFLite validation accuracy: 0.94
+```
+
+The outputs were saved as:
+
+```text
+efficientnetv2_tflite_single_audio_comparison.json
+efficientnetv2_tflite_dataset_validation_results.csv
+```
+
+### Purpose
+
+This confirms that the converted TFLite model can run inference successfully and gives matching results with the PyTorch model for the tested sample audio. It also confirms that TFLite dataset validation matches the previous PyTorch dataset validation result of 47 correct predictions out of 50.
+
+---
+
 ## Validation Flow Completed
 
 The completed validation flow is:
@@ -265,7 +445,7 @@ The completed validation flow is:
 ```text
 Training notebook
     ↓
-Saved EfficientNetV2 model
+Saved EfficientNetV2 PyTorch model
     ↓
 Reusable predictor file
     ↓
@@ -276,9 +456,15 @@ Dataset validation
 JSON-style validation
     ↓
 MQTT message handler validation
+    ↓
+ONNX export
+    ↓
+TensorFlow SavedModel conversion
+    ↓
+TFLite conversion
+    ↓
+TFLite inference validation
 ```
-
----
 
 ## Current Status
 
@@ -292,16 +478,18 @@ Single audio inference validation
 Dataset validation
 JSON-style inference validation
 MQTT message handler validation
+ONNX export
+TensorFlow SavedModel conversion
+TFLite conversion
+TFLite inference validation
 ```
 
 Not completed yet:
 
 ```text
 Direct connection to the real Engine pipeline
-Live MQTT broker integration
+Live MQTT broker integration through the real Engine flow
 ```
-
----
 
 ## Important Notes
 
@@ -309,6 +497,6 @@ The current work focuses on creating a functioning Engine-compatible inference p
 
 The dataset validation currently tested 50 files. The first validation scan mainly covered the first dataset folders, so future validation can be improved by randomly sampling files across more species classes.
 
-The `.pt` model file may be large, so it should not be committed to GitHub unless the team confirms that model files should be stored in the repository. If needed, model files can be shared through external storage or Git LFS.
+The TFLite model was successfully generated with a file size of 85.19 MB. Because model artifacts such as `.pt`, `.onnx`, `.tflite`, and TensorFlow SavedModel folders are large, the team should confirm whether these should be committed directly to GitHub or managed using Git LFS or external storage.
 
 ---
