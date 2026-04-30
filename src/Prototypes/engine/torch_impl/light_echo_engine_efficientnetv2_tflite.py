@@ -461,7 +461,29 @@ class EchoEngine():
             image = None
             sample_rate = 0
 
-            if(audio_event['audioFile'] == "Recording_Mode"): # classic model
+            if audio_event["audioFile"] == "EfficientNetV2_TFLite_Mode":
+                print("EfficientNetV2_TFLite_Mode")
+
+                audio_clip = self.string_to_audio(audio_event["audioClip"])
+
+                predicted_class, predicted_probability, processed_audio, sample_rate, top_predictions = (
+                    self.efficientnetv2_tflite_predict_from_audio_bytes(audio_clip)
+                )
+
+                audio_event["audioClip"] = self.audio_to_string(processed_audio)
+
+                print(f"Predicted class : {predicted_class}")
+                print(f"Predicted probability : {predicted_probability}")
+                print(f"Top predictions : {top_predictions}")
+
+                self.echo_api_send_detection_event(
+                    audio_event,
+                    sample_rate,
+                    predicted_class,
+                    predicted_probability
+                )
+
+            elif(audio_event['audioFile'] == "Recording_Mode"): # classic model
                 # convert to string representation of audio to binary for processing
                 print("Recording_Mode")
                 audio_clip = self.string_to_audio(audio_event['audioClip'])
