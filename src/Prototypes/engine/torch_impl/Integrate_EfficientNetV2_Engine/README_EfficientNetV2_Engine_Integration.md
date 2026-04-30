@@ -438,6 +438,86 @@ This confirms that the converted TFLite model can run inference successfully and
 
 ---
 
+### 11. Engine-Side TFLite Message Path Validation
+
+A safe copy of the real Engine file was created:
+
+```text
+light_echo_engine_efficientnetv2_tflite.py
+```
+
+This copied file was used so the original Engine file could remain unchanged while testing the EfficientNetV2 TFLite integration.
+
+The copied Engine file was updated to:
+
+1. Load the existing Engine configuration and credentials.
+2. Load the EfficientNetV2 TFLite model.
+3. Load the class mapping file.
+4. Load the preprocessing configuration file.
+5. Preprocess raw audio bytes using the EfficientNetV2 settings.
+6. Run local TFLite inference inside the Engine file.
+7. Add a new `EfficientNetV2_TFLite_Mode` path inside `on_message()`.
+
+The Engine copy successfully loaded the EfficientNetV2 TFLite model.
+
+Model loading output:
+
+```text
+EfficientNetV2 TFLite model loaded successfully.
+EfficientNetV2 input shape: [  1   1 128 313]
+EfficientNetV2 output shape: [  1 123]
+```
+
+The local audio-bytes inference function was tested using:
+
+```text
+Acanthiza chrysorrhoa/region_3.650-4.900.mp3
+```
+
+Local audio-bytes inference result:
+
+```text
+Predicted class: Acanthiza chrysorrhoa
+Predicted probability: 93.37
+Sample rate: 32000
+Processed audio length: 160000
+```
+
+A fake MQTT message was then created and passed directly into `on_message()` to simulate the Engine receiving an MQTT audio message.
+
+Fake MQTT message test result:
+
+```text
+Recieved audio message, processing via engine model...
+2026-04-30T10:00:00
+EfficientNetV2_TFLite_Mode
+Predicted class : Acanthiza chrysorrhoa
+Predicted probability : 93.37
+```
+
+Top prediction:
+
+```text
+Acanthiza chrysorrhoa
+Confidence: 0.9337119460105896
+```
+
+The final API send step failed locally because `ts-api-cont` is a Docker service name and is not available when running from Jupyter.
+
+Local API error:
+
+```text
+HTTPConnectionPool(host='ts-api-cont', port=9000): Max retries exceeded with url: /engine/event
+```
+
+This does not affect the model inference result because the prediction was already completed successfully before the API send step.
+
+### Purpose
+
+This validates that the copied real Engine message flow can call the EfficientNetV2 TFLite inference path from an MQTT-style payload. It confirms that raw audio from the message can be decoded, preprocessed, passed through the local TFLite model, and converted into a predicted species label with confidence.
+
+---
+
 ## Validation Flow Completed
 
 The completed validation flow is:
@@ -464,6 +544,10 @@ TensorFlow SavedModel conversion
 TFLite conversion
     ↓
 TFLite inference validation
+    ↓
+Engine-side EfficientNetV2 TFLite inference path
+    ↓
+Fake MQTT message validation through on_message()
 ```
 
 ## Current Status
@@ -482,13 +566,17 @@ ONNX export
 TensorFlow SavedModel conversion
 TFLite conversion
 TFLite inference validation
+Engine-side EfficientNetV2 TFLite inference path
+Fake MQTT message validation through on_message()
 ```
 
 Not completed yet:
 
 ```text
-Direct connection to the real Engine pipeline
-Live MQTT broker integration through the real Engine flow
+Run the copied Engine inside the full local Docker/system environment
+Send a real MQTT audio message using EfficientNetV2_TFLite_Mode
+Confirm the prediction result is sent successfully to the API/database
+Decide whether to merge the EfficientNetV2 TFLite path into the original Engine file
 ```
 
 ## Important Notes
@@ -498,5 +586,13 @@ The current work focuses on creating a functioning Engine-compatible inference p
 The dataset validation currently tested 50 files. The first validation scan mainly covered the first dataset folders, so future validation can be improved by randomly sampling files across more species classes.
 
 The TFLite model was successfully generated with a file size of 85.19 MB. Because model artifacts such as `.pt`, `.onnx`, `.tflite`, and TensorFlow SavedModel folders are large, the team should confirm whether these should be committed directly to GitHub or managed using Git LFS or external storage.
+
+The current Engine-side integration was tested using a safe copied Engine file, `light_echo_engine_efficientnetv2_tflite.py`, so the original `light_echo_engine.py` remains unchanged.
+
+The copied Engine successfully loaded the EfficientNetV2 TFLite model and processed a fake MQTT-style message through `on_message()`. The model inference completed successfully, but the final API send step failed locally because `ts-api-cont` is only available inside the Docker/system network.
+
+The EfficientNetV2 TFLite path currently uses a new message mode called `EfficientNetV2_TFLite_Mode`. Any real MQTT message used for full-system testing must include this value in the `audioFile` field.
+
+The next validation should be completed inside the full local system or Docker environment so the Engine can access MQTT, API, and database services properly.
 
 ---
