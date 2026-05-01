@@ -1,18 +1,12 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException, Form
 from fastapi.responses import JSONResponse
 from typing import Optional
-from app.database import Predictions
 import datetime
 import re
+from app.database import Predictions
+from app.services.predictions import predict_uploaded_audio
 
 router = APIRouter()
-
-# Placeholder prediction
-def predict_species(audio_file: UploadFile):
-    return {
-        "species": "Crimson Rosella",
-        "confidence": 0.92
-    }
 
 @router.post("/predict")
 async def predict(
@@ -31,23 +25,20 @@ async def predict(
         else:
             raise HTTPException(status_code=400, detail="Invalid upload_id format")
 
-    prediction = predict_species(audio)
-
-    # Persist prediction result
     try:
-        doc = {
-            "filename": audio.filename,
-            "predicted_species": prediction["species"],
-            "confidence": prediction["confidence"],
-            "timestamp": datetime.datetime.utcnow(),
-            "user_id": user_id,
-        }
-        if valid_upload_id:
-            doc["upload_id"] = valid_upload_id
-
-        Predictions.insert_one(doc)
+        audio_bytes = await audio.read()
+        if not audio_bytes:
+            raise HTTPException(status_code=400, detail="Empty audio file provided")
+        prediction = predict_uploaded_audio(
+            filename=audio.filename,
+            audio_bytes=audio_bytes,
+            user_id=user_id,
+            upload_id=valid_upload_id,
+        )
+    except HTTPException:
+        raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to store prediction: {e}")
+        raise HTTPException(status_code=500, detail=f"Prediction failed: {e}")
 
     return JSONResponse(content=prediction)
 

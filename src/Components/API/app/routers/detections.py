@@ -7,6 +7,7 @@ from app.schemas import Detection, DetectionCreate, DetectionListResponses
 from app import detections as detections_service
 from app.middleware.pause_guard import pause_guard
 from app.services.budget import enforce_and_consume
+from app.services.predictions import predict_from_payload
 
 router = APIRouter(
     prefix="/detections",
@@ -110,4 +111,4 @@ def delete_detection_endpoint(
 def predict_endpoint(payload: Dict[str, Any] = Body(...)):
     enforce_and_consume("species_predictor", cost=5)
 
-    return {"status": "not_implemented_here", "received": payload}
+    return predict_from_payload(payload)
