@@ -518,6 +518,57 @@ This validates that the copied real Engine message flow can call the EfficientNe
 
 ---
 
+### 12. Prototype Docker Engine Validation
+
+The EfficientNetV2 TFLite Engine file was also tested inside the Docker-based system environment using the prototype Engine path.
+
+The Docker Compose Engine build context was temporarily pointed to the prototype Engine folder:
+
+```text
+src/Prototypes/engine/torch_impl
+```
+
+The Engine Dockerfile was updated to run:
+
+```text
+light_echo_engine_efficientnetv2_tflite.py
+```
+
+A smaller Engine-specific requirements file was created to avoid installing unnecessary training and benchmarking packages inside the Engine container. This requirements file only includes the packages needed for Engine-side inference, such as TensorFlow, Librosa, NumPy, Paho MQTT, Requests, PyMongo, Google Cloud Storage, Pandas, scikit-learn, SoundFile, Geopy, and DiskCache.
+
+After rebuilding the Engine container, the EfficientNetV2 TFLite model loaded successfully inside Docker.
+
+Docker Engine output:
+
+```text
+Python Version           :  3.9.23
+TensorFlow Version       :  2.10.0
+Librosa Version          :  0.9.2
+Echo Engine configuration successfully loaded
+Echo Engine credentials successfully loaded
+Found echo store database names: ['EchoNet']
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+EfficientNetV2 TFLite model loaded successfully.
+EfficientNetV2 input shape: [  1   1 128 313]
+EfficientNetV2 output shape: [  1 123]
+Engine started.
+```
+
+This confirms that the EfficientNetV2 TFLite model, class mapping, preprocessing configuration, TensorFlow Lite interpreter, and required Docker dependencies are available inside the Engine container.
+
+The Engine then attempted to connect to the MQTT broker:
+
+```text
+DEBUG: Attempting to connect to Broker at: mqtt-broker:1883
+CONNECTION ERROR: [Errno -2] Name or service not known
+```
+
+This MQTT connection issue is related to Docker Compose service naming or MQTT broker networking. It is not caused by the EfficientNetV2 model or the TFLite inference code, because the model had already loaded successfully before the MQTT connection step.
+
+### Purpose
+
+This step validates that the EfficientNetV2 TFLite inference setup can run inside a Docker Engine container. It confirms the Docker-level model loading and dependency setup. The remaining blocker is the MQTT broker connection inside the wider system environment, which should be handled through Docker Compose service/network configuration.
+
 ## Validation Flow Completed
 
 The completed validation flow is:
@@ -548,6 +599,8 @@ TFLite inference validation
 Engine-side EfficientNetV2 TFLite inference path
     ↓
 Fake MQTT message validation through on_message()
+    ↓
+Prototype Docker Engine model loading validation
 ```
 
 ## Current Status
@@ -568,15 +621,18 @@ TFLite conversion
 TFLite inference validation
 Engine-side EfficientNetV2 TFLite inference path
 Fake MQTT message validation through on_message()
+Prototype Docker Engine model loading validation
+Engine-specific Docker requirements setup
+EfficientNetV2 TFLite model successfully loaded inside Docker
 ```
 
 Not completed yet:
 
 ```text
-Run the copied Engine inside the full local Docker/system environment
-Send a real MQTT audio message using EfficientNetV2_TFLite_Mode
+Resolve MQTT broker hostname/service-name issue in Docker Compose
+Send a real MQTT audio message through the Docker Engine container
 Confirm the prediction result is sent successfully to the API/database
-Decide whether to merge the EfficientNetV2 TFLite path into the original Engine file
+Decide whether to migrate the validated prototype changes into the real Components Engine path
 ```
 
 ## Important Notes
@@ -591,8 +647,6 @@ The current Engine-side integration was tested using a safe copied Engine file, 
 
 The copied Engine successfully loaded the EfficientNetV2 TFLite model and processed a fake MQTT-style message through `on_message()`. The model inference completed successfully, but the final API send step failed locally because `ts-api-cont` is only available inside the Docker/system network.
 
-The EfficientNetV2 TFLite path currently uses a new message mode called `EfficientNetV2_TFLite_Mode`. Any real MQTT message used for full-system testing must include this value in the `audioFile` field.
-
-The next validation should be completed inside the full local system or Docker environment so the Engine can access MQTT, API, and database services properly.
+The prototype Docker Engine validation also confirmed that the EfficientNetV2 TFLite model loads successfully inside the Docker Engine container with the expected input shape `[1, 1, 128, 313]` and output shape `[1, 123]`. The Engine reached the MQTT connection stage, but the broker hostname `mqtt-broker` could not be resolved, which is a Docker Compose networking/service-name issue rather than a model integration issue.
 
 ---
