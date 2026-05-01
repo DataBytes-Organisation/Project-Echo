@@ -461,10 +461,10 @@ class EchoEngine():
             image = None
             sample_rate = 0
 
-            if audio_event["audioFile"] == "EfficientNetV2_TFLite_Mode":
-                print("EfficientNetV2_TFLite_Mode")
+            if(audio_event['audioFile'] == "Recording_Mode"):
+                print("Recording_Mode - EfficientNetV2 TFLite real system path")
 
-                audio_clip = self.string_to_audio(audio_event["audioClip"])
+                audio_clip = self.string_to_audio(audio_event['audioClip'])
 
                 predicted_class, predicted_probability, processed_audio, sample_rate, top_predictions = (
                     self.efficientnetv2_tflite_predict_from_audio_bytes(audio_clip)
@@ -483,58 +483,6 @@ class EchoEngine():
                     predicted_probability
                 )
 
-            elif(audio_event['audioFile'] == "Recording_Mode"): # classic model
-                # convert to string representation of audio to binary for processing
-                print("Recording_Mode")
-                audio_clip = self.string_to_audio(audio_event['audioClip'])
-            
-                image, audio_clip, sample_rate = self.combined_pipeline(audio_clip, "Recording_Mode")
-            
-                # update the audio event with the re-sampled audio
-                audio_event["audioClip"] = self.audio_to_string(audio_clip)
-
-                image = tf.expand_dims(image, 0)
-
-                image = tf.transpose(image, perm=[0, 3, 1, 2])  # [1, 1, 224, 224]
-
-                image_list = image.numpy().tolist()
-
-                # Run the model via tensorflow serve
-                data = json.dumps({"signature_name": "serving_default", "inputs": image_list})
-                url = self.config['MODEL_SERVER']
-                headers = {"content-type": "application/json"}
-                json_response = requests.post(url, data=data, headers=headers)
-                
-                model_result = json.loads(json_response.text)
-
-                # Then handle different response formats:
-                if 'outputs' in model_result:
-                    predictions = model_result['outputs'][0]
-                elif 'error' in model_result:
-                    print(f"[ERROR] Server error: {model_result['error']}")
-                    raise Exception(model_result['error'])
-                else:
-                    print(f"[ERROR] Unexpected format: {model_result}")
-                    raise KeyError(f"Available keys: {list(model_result.keys())}")
-                    
-                # Predict class and probability using the prediction function
-                predicted_class, predicted_probability = self.predict_class(predictions)
-
-                print(f'Predicted class : {predicted_class}')
-                print(f'Predicted probability : {predicted_probability}')
-            
-                # populate the database with the result
-                self.echo_api_send_detection_event(
-                    audio_event,
-                    sample_rate,
-                    predicted_class,
-                    predicted_probability)
-                    
-            
-                image = tf.expand_dims(image, 0) 
-            
-                image_list = image.numpy().tolist()
-
             else: # simulate animals mode
                 # convert to string representation of audio to binary for processing
                 audio_clip = self.string_to_audio(audio_event['audioClip'])
@@ -547,7 +495,6 @@ class EchoEngine():
                     cam = melspectrogram_to_cam.convert(image)
                 else:
                     cam = None
-
 
                 # update the audio event with the re-sampled audio
                 audio_event["audioClip"] = self.audio_to_string(audio_clip)
