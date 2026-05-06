@@ -496,38 +496,25 @@ class EchoEngine():
                 else:
                     cam = None
 
-                # update the audio event with the re-sampled audio
-                audio_event["audioClip"] = self.audio_to_string(audio_clip)
+               # Decode original base64 WAV audio from MQTT message before modifying audioClip
+                original_audio_bytes = self.string_to_audio(audio_event["audioClip"])
                 
-                image = tf.expand_dims(image, 0) 
-            
-                image_list = image.numpy().tolist()
-            
-                # Run the model via tensorflow serve
-                data = json.dumps({"signature_name": "serving_default", "inputs": image_list})
-                url = self.config['MODEL_SERVER']
-                headers = {"content-type": "application/json"}
-                json_response = requests.post(url, data=data, headers=headers)
-                model_result   = json.loads(json_response.text)
-                predictions = model_result['outputs'][0]
-                    
-                # Predict class and probability using the prediction function
-                predicted_class, predicted_probability = self.predict_class(predictions)
-
-                print(f'Predicted class : {predicted_class}')
-                print(f'Predicted probability : {predicted_probability}')
-            
-                # populate the database with the result
+                # Run EfficientNetV2 TFLite model locally
+                predicted_class, predicted_probability, processed_audio, sample_rate, top_predictions = (
+                    self.efficientnetv2_tflite_predict_from_audio_bytes(original_audio_bytes)
+                )
+                
+                print(f'Predicted class : {predicted_class}', flush=True)
+                print(f'Predicted probability : {predicted_probability}', flush=True)
+                print(f'Top predictions : {top_predictions}', flush=True)
+                
+                # Send detection result
                 self.echo_api_send_detection_event(
                     audio_event,
                     sample_rate,
                     predicted_class,
-                    predicted_probability)
-            
-                image = tf.expand_dims(image, 0) 
-            
-                image_list = image.numpy().tolist()
-            
+                    predicted_probability
+                )
         except Exception as e:
             # Catch the exception and print it to the console
             print(f"An error occurred: {e}", flush=True)
