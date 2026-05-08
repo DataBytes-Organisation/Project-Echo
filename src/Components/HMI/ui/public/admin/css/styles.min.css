@@ -16868,3 +16868,92 @@ ul {
 .timeline-widget .timeline-item .timeline-badge.badge-primary {
   border: 2px solid #5d87ff;
 }
+
+/* =========================
+   CUSTOM ADMIN UI (Echo Task)
+   ========================= */
+
+   .admin-page-status {
+    margin-bottom: 24px;
+  }
+  
+  .admin-error-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    width: 100%;
+    padding: 14px 18px;
+    margin-bottom: 16px;
+    background-color: #fbf2ef;
+    border: 1px solid #fa896b;
+    border-radius: 7px;
+    color: #c86e56;
+    box-shadow: rgba(145, 158, 171, 0.08) 0px 4px 12px -2px;
+  }
+  
+  .admin-error-banner__content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .admin-error-banner__content i {
+    font-size: 18px;
+    line-height: 1;
+  }
+  
+  .admin-error-banner__content span {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+  
+  .admin-error-banner__dismiss {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: #c86e56;
+    cursor: pointer;
+  }
+  
+  .admin-error-banner__dismiss i {
+    font-size: 18px;
+    line-height: 1;
+  }
+  
+  .admin-error-banner__dismiss:hover {
+    background-color: rgba(250, 137, 107, 0.12);
+  }
+  
+  .admin-loading-spinner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 14px 18px;
+    background-color: #ffffff;
+    border: 1px solid #ebf1f6;
+    border-radius: 7px;
+    box-shadow: rgba(145, 158, 171, 0.08) 0px 4px 12px -2px;
+  }
+  
+  .admin-loading-spinner .spinner-border {
+    width: 1.25rem;
+    height: 1.25rem;
+    border-width: 0.18em;
+    flex-shrink: 0;
+  }
+  
+  .admin-loading-spinner__text {
+    font-size: 14px;
+    font-weight: 600;
+    color: #5a6a85;
+    line-height: 1.4;
+  }
