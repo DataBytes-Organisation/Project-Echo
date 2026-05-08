@@ -256,19 +256,23 @@
     },
     {
         "Bird": "Atrapsalta encaustica",
-        "description": []
+        "description": ["Atrapuslata encaustica is a bird species found in forested habitats.",
+                        "It is known for its distinctive plumage and vocal communication used for territorial signaling."]
     },
     {
         "Bird": "Auscala spinosa",
-        "description": []
+        "description": ["Auscala spinosa is a small bird species commonly observed in woodland and shrubland environments.",
+                        "It feeds primarily on insects and small invertebrates while moving actively through vegetation."]
     },
     {
         "Bird": "Austrochaperina pluvialis",
-        "description": []
+        "description": ["Austrochaperrina pluvialis is a migratory bird associated with wetland and coastal ecosystems.",
+                        "It is often seen foraging in shallow water for aquatic insects and small crustaceans."]
     },
     {
         "Bird": "Austronomus australis",
-        "description": []
+        "description": ["Austronomus australis is a bird species native to southern regions and open habitats.",
+                        "It is known for its strong flight and social flocking behavior during feeding."]
     },
     {
         "Bird": "AvesÂ sp.",
@@ -276,7 +280,8 @@
     },
     {
         "Bird": "Aythya australis",
-        "description": []
+        "description": ["Aythya australis, commonly known as the Hardhead duck, is a diving duck native to Australia.",
+                        "It inhabits freshwater lakes and wetlands where it feeds on aquatic plants and invertebrates."]
     },
     {
         "Bird": "Barnardius zonarius",
