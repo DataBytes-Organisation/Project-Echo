@@ -2,17 +2,11 @@ from fastapi import APIRouter, UploadFile, File, HTTPException, Form
 from fastapi.responses import JSONResponse
 from typing import Optional
 from app.database import Predictions
+from app.services.model_adapter import MultiModalPredictionError, predict_with_failure_detection
 import datetime
 import re
 
 router = APIRouter()
-
-# Placeholder prediction
-def predict_species(audio_file: UploadFile):
-    return {
-        "species": "Crimson Rosella",
-        "confidence": 0.92
-    }
 
 @router.post("/predict")
 async def predict(
@@ -31,7 +25,10 @@ async def predict(
         else:
             raise HTTPException(status_code=400, detail="Invalid upload_id format")
 
-    prediction = predict_species(audio)
+    try:
+        prediction = predict_with_failure_detection(audio)
+    except MultiModalPredictionError as e:
+        raise HTTPException(status_code=502, detail=str(e))
 
     # Persist prediction result
     try:
