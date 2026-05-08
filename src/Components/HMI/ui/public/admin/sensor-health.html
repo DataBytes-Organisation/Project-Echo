@@ -22,138 +22,122 @@
       <div class="container-fluid">
         <div class="sensor-page">
 
-
+  
   <!-- Mobile backdrop -->
   <div class="mobile-backdrop" id="mobile-backdrop"></div>
 
   <!-- MAIN -->
   <main class="main">
     <header class="page-header">
-      <div></div>
-      <div class="page-header-actions">
+      <div>
+        <h1 style="margin-bottom: 4px;">Sensor Health</h1>
+          <p class="card-subtitle" style="margin-bottom: 0;">
+            Monitor live device health, system performance, GPS location, and recent audio activity from the IoT stream.
+          </p>
       </div>
+      <div class="page-header-actions"></div>
     </header>
 
     <!-- Content root (views load here) -->
-    <div id="view-root">
+     <div id="view-root">
       <div class="dashboard-shell">
 
-      <!-- HERO HEADER -->
-      <section class="hero-header">
-        <h1>Project echo</h1>
-        <p class="subtitle">wildlife sound monitoring & sensor management</p>
-
-        <div class="hero-actions">
-          <button class="btn-primary">View Projects</button>
-          <button class="btn-secondary">Learn More</button>
-        </div>
-      </section>
-
-
-
-      <!-- KPI CARDS -->
-      <section class="kpi-grid">
-        <div class="kpi-card">
-          <p>ACTIVE PROJECTS</p>
-          <h3>7</h3>
-        </div>
-
-        <div class="kpi-card">
-          <p>REGISTERED ECOLOGISTS</p>
-          <h3>69</h3>
-        </div>
-
-        <div class="kpi-card">
-          <p>SENSORS DEPLOYED</p>
-          <h3>420</h3>
-        </div>
-      </section>
-
-
-
-      <!-- PROJECT HIGHLIGHTS -->
-      <section class="card">
-        <h3>Active Projects</h3>
-        <p class="card-subtitle">Overview of ongoing conservation deployments</p>
-
-        <div class="form-grid">
-
-          <div class="card">
-            <h3>Rainforest A</h3>
-            <p class="note">
-              Amazon Basin — Zone A1<br>
-              32 active sensors
-            </p>
-            <span class="pill pill-success">ACTIVE</span>
+        <!-- Summary cards -->
+         <section class="kpi-grid">
+          <div class="kpi-card">
+            <p>SENSOR MONITORING</p>
+            <h3>Live</h3>
           </div>
-
-          <div class="card">
-            <h3>Savannah Trial</h3>
-            <p class="note">
-              Serengeti — West Ridge<br>
-              18 active sensors
-            </p>
-            <span class="pill pill-success">ACTIVE</span>
+          
+          <div class="kpi-card">
+            <p>DATA SOURCE</p>
+             <h3>MQTT</h3>
           </div>
-
-          <div class="card">
-            <h3>Wetlands 2025</h3>
-            <p class="note">
-              New Plymouth — Zone Delta<br>
-              12 sensors in queue
-            </p>
-            <span class="pill pill-warning">PLANNING</span>
+          
+          <div class="kpi-card">
+            <p>AUTO REFRESH</p>
+            <h3>15s</h3>
           </div>
-
-        </div>
-      </section>
+        </section>
 
 
-
-      <!-- FOOTER COLUMNS -->
-      <section class="footer-columns">
-
-        <div>
-          <h4>Wildlife Sound Monitor</h4>
-          <ul>
-            <li>Automated biodiversity tracking</li>
-            <li>24/7 acoustic scanning</li>
-            <li>Data-driven conservation</li>
-          </ul>
-        </div>
-
-        <div>
-          <h4>Quick Links</h4>
-          <ul>
-            <li>Home</li>
-            <li>Projects</li>
-            <li>Deployment Guide</li>
-            <li>Documentation</li>
-          </ul>
-        </div>
-
-        <div>
-          <h4>Resources</h4>
-          <ul>
-            <li>API Reference</li>
-            <li>Support</li>
-            <li>Terms</li>
-            <li>Privacy Policy</li>
-          </ul>
-        </div>
-
-      </section>
-
-    </div><!-- END dashboard-shell -->
-    </div> <!-- END dashboard-shell -->
-        </div>
-      <div id="footer"></div>
+        <!-- Sensor overview table -->
+         <section class="card">
+          <h3>Sensor Overview</h3>
+            <p class="card-subtitle">
+              This table displays the latest live sensor information received from the MQTT broker.
+            </p>
+          
+          <div class="form-grid" style="margin-bottom: 16px;">
+            <div>
+              <label for="sensor-status-filter">Filter by Status</label>
+              <select id="sensor-status-filter">
+                <option>All</option>
+                <option>Online</option>
+                <option>Offline</option>
+                <option>Warning</option>
+              </select>
+            </div>
+          
+            </div>
+              <div class="table-responsive">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Sensor ID</th>
+                      <th>Status</th>
+                      <th>CPU</th>
+                      <th>RAM</th>
+                      <th>Disk</th>
+                      <th>Uptime</th>
+                      <th>GPS</th>
+                      <th>Last Audio</th>
+                    </tr>
+                  </thead>
+                  <tbody id="sensor-overview-tbody">
+                    <tr>
+                      <td colspan="8">Loading sensor data...</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+            
+            <section class="card">
+              <h3>Live Data Notes</h3>
+              <p class="card-subtitle">
+                The current dashboard is connected to real-time MQTT-fed sensor data supplied by the IoT team.
+              </p>
+              
+              <div class="form-grid">
+                <div class="card">
+                  <h3>Current Available Fields</h3>
+                  <p class="note">
+                    The live payload currently includes CPU usage, RAM usage, disk usage, uptime, GPS coordinates, and the most recent saved audio file.
+                  </p>
+                </div>
+                
+                <div class="card">
+                  <h3>Future Extensions</h3>
+                  <p class="note">
+                    Additional sensor fields such as ambient light, temperature, battery, connectivity, or other health indicators can be added later as the IoT pipeline expands.
+                  </p>
+                </div>
+              </div>
+            </section>
+            </div>
+          </div>
+        </main>
+      </div>
     </div>
+
+    <div id="footer"></div>
   </div>
+</div>
 
   <script>
     $(document).ready(function() {
-      $("#sidebar").load("/admin/component/sidebar-component.html", function() { $.getScript('/admin/js/sidebarmenu.js'); });
+      $("#sidebar").load("/admin/component/sidebar-component.html", function() {$.getScript('/admin/js/sidebarmenu.js');});
       $("#header").load("/admin/component/header-component.html");
       $("#footer").load("/admin/component/footer-component.html");
     });
