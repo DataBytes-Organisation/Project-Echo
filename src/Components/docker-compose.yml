@@ -11,6 +11,8 @@ services:
     image: ts-echo-model
     container_name: ts-echo-model-cont
     command: --model_config_file=/models/models.config
+    env_file:
+      - .env
     networks:
       - echo-net
     ports:
@@ -26,6 +28,8 @@ services:
       dockerfile: light_engine.Dockerfile
     image: ts-echo-engine
     container_name: ts-echo-engine-cont
+    env_file:
+      - .env
     networks:
       - echo-net
     volumes:
@@ -40,8 +44,8 @@ services:
       dockerfile: HMI.Dockerfile
     image: ts-echo-hmi
     container_name: ts-echo-hmi-cont
-    # env_file:
-    #   - .env
+    env_file:
+      - .env
     networks:
       - echo-net
     volumes:
@@ -55,9 +59,7 @@ services:
       - echo-redis
     stdin_open: true
     tty: true
-    environment:
-      - NODE_ENV=development
-      - API_HOST=ts-api-cont
+
 
 
   echo_mqtt:
@@ -105,9 +107,8 @@ services:
       - ./API:/app # Mount the API's src directory to /app in the container
       - credentials_volume:/root/.config/gcloud/
       - weather_data:/app/weather_data  # Add a volume for weather data
-    environment:
-      MAIL_STARTTLS: "true"
-      MAIL_SSL_TLS: "false"
+    env_file:
+      - .env
 
 
     stdin_open: false
@@ -120,11 +121,13 @@ services:
     restart: always
     ports:
       - 8888:8081
+    env_file:
+      - .env
     environment:
-      ME_CONFIG_MONGODB_SERVER: ts-mongodb-cont
+      ME_CONFIG_MONGODB_SERVER: ${DB_HOST}
       ME_CONFIG_MONGODB_ENABLE_ADMIN: "true"
-      ME_CONFIG_MONGODB_ADMINUSERNAME: root
-      ME_CONFIG_MONGODB_ADMINPASSWORD: root_password
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${DB_ROOT_USER}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${DB_ROOT_USER_PASS}
     depends_on:
       - echo_store
     networks:
@@ -139,10 +142,12 @@ services:
     container_name: ts-mongodb-cont
     networks:
       - echo-net
+    env_file:
+      - .env
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: root_password
-      MONGO_INITDB_DATABASE: EchoNet
+      MONGO_INITDB_ROOT_USERNAME: ${DB_ROOT_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${DB_ROOT_USER_PASS}
+      MONGO_INITDB_DATABASE: ${DB_NAME}
     ports:
       - "27017:27017"
     volumes:
