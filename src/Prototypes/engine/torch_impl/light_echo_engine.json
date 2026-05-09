@@ -15,7 +15,7 @@
     "MODEL_INPUT_IMAGE_WIDTH": 224,
     "MODEL_INPUT_IMAGE_HEIGHT": 224,
     "MODEL_INPUT_IMAGE_CHANNELS": 1,
-    "MQTT_CLIENT_URL": "mqtt-broker",
+    "MQTT_CLIENT_URL": "ts-mqtt-server-cont",
     "MQTT_CLIENT_PORT": 1883,
     "MQTT_PUBLISH_URL": "projectecho/engine/2",
     "GCLOUD_PROJECT": "sit-23t1-project-echo-25288b9",

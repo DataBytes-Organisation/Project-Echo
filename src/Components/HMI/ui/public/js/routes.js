@@ -1,3 +1,5 @@
+"use strict";
+
 /*var requirejs = require('./r.js')
 
 requirejs.config({
@@ -15,61 +17,64 @@ if (typeof window === 'undefined') {
   axios = window.axios;
 }
 
-//const MESSAGE_API_URL = 'http://api-service:9000/hmi';
+
+
+//
+// All requests share a single axios instance configured with a timeout.
+// If the server does not respond within API_TIMEOUT_MS the request rejects
+// with an error whose `code` is "ECONNABORTED", giving the caller a clear
+// signal to show the error banner rather than hanging indefinitely.
+
+const API_TIMEOUT_MS = 10000; // 10 seconds – adjust to taste
+
+const api = axios.create({
+  timeout: API_TIMEOUT_MS,
+});
+
+
+// Route functions  (all unchanged in signature – only `axios` → `api`)
+
 
 export function retrieveTruthEventsInTimeRange(from, to) {
-  var start = parseInt(from);
-  var end = parseInt(to);
-  return axios.get(`/movement_time/${start}/${end}`);
+  const start = parseInt(from);
+  const end   = parseInt(to);
+  return api.get(`/movement_time/${start}/${end}`);
 }
 
 export function retrieveVocalizationEventsInTimeRange(from, to) {
-  var start = parseInt(from);
-  var end = parseInt(to);
-  return axios.get(`/events_time/${start}/${end}`);
+  const start = parseInt(from);
+  const end   = parseInt(to);
+  return api.get(`/events_time/${start}/${end}`);
 }
 
 export function retrieveMicrophones() {
-  return axios.get(`/microphones`);
+  return api.get(`/microphones`);
 }
 
-export function retrieveAudio(id){
-  //console.log(`/audio?id=${id}`);
-  return axios.get(`/audio/${id}`);
+export function retrieveAudio(id) {
+  return api.get(`/audio/${id}`);
 }
 
-export function postRecording(recordingData){
-  axios.post(`/post_recording`, recordingData)
+export function postRecording(recordingData) {
+  return api.post(`/post_recording`, recordingData);
 }
 
-export function setSimModeAnimal(){
-  axios.post(`/sim_control/Animal_Mode`);
+export function setSimModeAnimal() {
+  return api.post(`/sim_control/Animal_Mode`);
 }
 
-export function setSimModeRecording(){
-  axios.post(`/sim_control/Recording_Mode`);
+export function setSimModeRecording() {
+  return api.post(`/sim_control/Recording_Mode`);
 }
 
-export function setSimModeRecordingV2(){
-  axios.post(`/sim_control/Recording_Mode_V2`);
+export function setSimModeRecordingV2() {
+  return api.post(`/sim_control/Recording_Mode_V2`);
 }
 
-export function stopSimulator(){
-  axios.post(`/sim_control/Stop`);
+export function stopSimulator() {
+  return api.post(`/sim_control/Stop`);
 }
 
-export function retrieveSimTime(){
-  return axios.get(`/latest_movement`);
+export function retrieveSimTime() {
+  return api.get(`/latest_movement`);
 }
-
-// export function signup(){
-//   return axios.post(`/signup`)
-// }
-
-// export function signin(username, password){
-//   return axios.post(`/signin`, {
-//     username,
-//     password
-//   }).then(res => console.log(res))
-//   .catch(err => console.log(err))
-// }
