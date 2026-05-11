@@ -718,31 +718,14 @@
               </div>
                 <h2 id="audioHeader"style="margin-top: 20px !important;">Audio</h2>
 
-                <div id="audioControl" class="audio_component">
-                  <span><i id="animalAudioI" class="fa fa-volume-up fa-2x" style="color:rgba(247, 186, 206, 0.6);" onclick="{toggleAudio()}"></i></span>
-                  <div class="audioContainer">
-                    <div class="box box1"></div>
-                    <div class="box box2"></div>
-                    <div class="box box3"></div>
-                    <div class="box box4"></div>
-                    <div class="box box5"></div>
-                    <div class="box box6"></div>
-                    <div class="box box7"></div>
-                    <div class="box box8"></div>
-                    <div class="box box9"></div>
-                    <div class="box box10"></div>
-                    <div class="box box1"></div>
-                    <div class="box box2"></div>
-                    <div class="box box3"></div>
-                    <div class="box box4"></div>
-                    <div class="box box5"></div>
-                    <div class="box box6"></div>
-                    <div class="box box7"></div>
-                    <div class="box box8"></div>
-                    <div class="box box9"></div>
-                    <div class="box box10"></div>
-                  </div>
-                </div>
+              <audio id="spectrogram-audio"></audio>
+
+                //spectrogram audio player
+              <div id="spectrogram-container">
+                <canvas id="spectrogram-canvas"></canvas>
+                <div id="spectrogram-playhead"></div>
+                <div id="spectrogram-play-btn"></div>
+              </div>
                 <p style="margin-top: 40px !important;">
                   Is the information above inaccurate? <br>
                   Request to make an edit.
