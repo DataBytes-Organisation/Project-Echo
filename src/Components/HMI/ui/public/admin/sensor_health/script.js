@@ -1,6 +1,5 @@
-/* Project Echo — moved sensor health script.js
-   Handles sidebar toggle, theme, sensor-health data wiring,
-   and shared admin loading/error state support
+/* Project Echo — Sensor Health script.js
+   Handles sidebar toggle, theme, actions and live sensor UI helpers
 */
 
 const menuToggle = document.getElementById("menu-toggle");
@@ -69,13 +68,7 @@ function hidePageError() {
 function showMessage(elementId, message, type = "success") {
   const el = document.getElementById(elementId);
   if (!el) return;
-
-  const colors = {
-    success: "var(--primary)",
-    warning: "var(--warning)",
-    danger: "var(--danger)"
-  };
-
+  const colors = {success: "var(--primary)", warning: "var(--warning)", danger: "var(--danger)"};
   el.style.color = colors[type] || colors.success;
   el.style.marginTop = "10px";
   el.style.fontWeight = "600";
@@ -92,10 +85,7 @@ function showMessage(elementId, message, type = "success") {
 // ================================================================
 async function apiFetch(path, options = {}) {
   const response = await fetch(path, {
-    headers: {
-      "Content-Type": "application/json",
-      ...(options.headers || {})
-    },
+    headers: { "Content-Type": "application/json", ...(options.headers || {}) },
     ...options,
   });
 
@@ -112,30 +102,48 @@ async function apiFetch(path, options = {}) {
   return response.text();
 }
 
-// ================================================================
-// Formatting helpers
-// ================================================================
-function formatMinutesAgo(mins) {
-  if (mins === null || typeof mins === "undefined") return "—";
-
-  const m = Number(mins);
-  if (!Number.isFinite(m)) return "—";
-
-  if (m < 60) return `${m}m ago`;
-
-  const h = Math.floor(m / 60);
-  const r = m % 60;
-  return r ? `${h}h ${r}m ago` : `${h}h ago`;
-}
-
 function pillHtml(status) {
   const s = String(status || "").trim();
   let cls = "pill-warning";
-
-  if (s === "Online") cls = "pill-success";
-  if (s === "Offline") cls = "pill-danger";
-
+  if (s === "Online" || s === "Success") cls = "pill-success";
+  else if (s === "Offline" || s === "Failed") cls = "pill-danger";
+  else if (
+    s === "Warning" ||
+    s === "Queued" ||
+    s === "High CPU" ||
+    s === "High RAM" ||
+    s === "High Disk"
+  ) {
+    cls = "pill-warning";
+  }
   return `<span class="pill ${cls}">${s || "Unknown"}</span>`;
+}
+
+function formatPercent(value) {
+  const num = Number(value);
+  if (!Number.isFinite(num)) return "—";
+  return `${num}%`;
+}
+
+function formatGps(gps) {
+  if (!gps || typeof gps !== "object") return "—";
+  const lat = gps.lat;
+  const lon = gps.lon;
+  if (lat === null || lat === undefined || lon === null || lon === undefined) {
+    return "—";
+  }
+  return `${lat}, ${lon}`;
+}
+
+function formatUptime(seconds) {
+  const total = Number(seconds);
+  if (!Number.isFinite(total) || total < 0) return "—";
+  const days = Math.floor(total / 86400);
+  const hours = Math.floor((total % 86400) / 3600);
+  const mins = Math.floor((total % 3600) / 60);
+  if (days > 0) return `${days}d ${hours}h ${mins}m`;
+  if (hours > 0) return `${hours}h ${mins}m`;
+  return `${mins}m`;
 }
 
 // ================================================================
@@ -153,21 +161,18 @@ async function rebootSensors() {
 
   const sensors = sensorsRaw
     .split(",")
-    .map(s => s.trim())
+    .map((s) => s.trim())
     .filter(Boolean);
 
   hidePageError();
   showPageLoading();
 
   try {
-    const results = [];
-
     for (const sensorId of sensors) {
-      const res = await apiFetch(`/sensors/${encodeURIComponent(sensorId)}/reboot`, {
+      await apiFetch(`/sensors/${encodeURIComponent(sensorId)}/reboot`, {
         method: "POST",
         body: JSON.stringify({ reason: reason || null }),
       });
-      results.push(res);
     }
 
     showMessage("reboot-message", `Reboot queued for ${sensors.join(", ")}.`, "success");
@@ -222,7 +227,7 @@ async function saveSettings() {
       body: JSON.stringify({ settings: payload }),
     });
 
-    showMessage("settings-message", `Settings saved.`, "success");
+    showMessage("settings-message", "Settings saved.", "success");
   } catch (e) {
     showMessage("settings-message", `Failed to save settings: ${e.message}`, "danger");
     showPageError(`Failed to save settings: ${e.message}`);
@@ -241,17 +246,15 @@ function fakeCreateProject() {
 
   if (!name || !loc) {
     showMessage("project-message", "Project name and location are required.", "warning");
-    showPageError("Project name and location are required.");
     return;
   }
 
-  hidePageError();
-  showMessage("project-message", `Project "${name}" created successfully. Assigned sensors: ${sensors || "None"}.`);
+  showMessage(
+    "project-message",
+    `Project "${name}" created successfully. Assigned sensors: ${sensors || "None"}.`
+  );
 }
 
-// ================================================================
-// Simple page fade-ins
-// ================================================================
 document.querySelectorAll(".card").forEach((card) => {
   card.style.opacity = 0;
   setTimeout(() => {
@@ -269,9 +272,7 @@ if (shell) {
   }, 80);
 }
 
-// ================================================================
-// Sidebar safety
-// ================================================================
+// Ensure sidebar nav always contains expected links
 function ensureSensorSidebar() {
   const sidebar = document.querySelector(".sidebar .nav-section");
   if (!sidebar) return;
@@ -285,7 +286,7 @@ function ensureSensorSidebar() {
     { href: "/admin/sensor_health/add-project.html", icon: "➕", text: "Add a Project" }
   ];
 
-  required.forEach(item => {
+  required.forEach((item) => {
     if (!sidebar.querySelector(`a[href="${item.href}"]`)) {
       const a = document.createElement("a");
       a.className = "nav-link";
@@ -296,9 +297,8 @@ function ensureSensorSidebar() {
   });
 }
 
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
   ensureSensorSidebar();
-
   const navSection = document.querySelector(".sidebar .nav-section");
   if (navSection) {
     const observer = new MutationObserver(() => ensureSensorSidebar());
@@ -314,35 +314,34 @@ async function loadSensorHealthPage() {
   if (!tbody) return;
 
   const statusFilter = document.getElementById("sensor-status-filter");
-  const projectFilter = document.getElementById("sensor-project-filter");
-
   let lastItems = [];
 
   function render() {
     const statusVal = statusFilter?.value || "All";
-    const projectVal = projectFilter?.value || "All Projects";
 
-    const filtered = lastItems.filter(item => {
+    const filtered = lastItems.filter((item) => {
       if (statusVal !== "All" && item.status !== statusVal) return false;
-      if (projectVal !== "All Projects" && (item.project || "—") !== projectVal) return false;
       return true;
     });
 
     tbody.innerHTML = "";
 
     if (!filtered.length) {
-      tbody.innerHTML = '<tr><td colspan="5">No sensors match the current filter.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="8">No live sensor data available.</td></tr>';
       return;
     }
 
     for (const item of filtered) {
       const tr = document.createElement("tr");
       tr.innerHTML = `
-        <td>${item.sensorId}</td>
-        <td>${item.project || "—"}</td>
+        <td>${item.sensorId || "—"}</td>
         <td>${pillHtml(item.status)}</td>
-        <td>${typeof item.batteryPct === "number" ? `${item.batteryPct}%` : "—"}</td>
-        <td>${formatMinutesAgo(item.lastSeenMinutesAgo)}</td>
+        <td>${formatPercent(item.cpu)}</td>
+        <td>${formatPercent(item.ram)}</td>
+        <td>${formatPercent(item.disk)}</td>
+        <td>${formatUptime(item.uptime)}</td>
+        <td>${formatGps(item.gps)}</td>
+        <td>${item.lastAudio || "—"}</td>
       `;
       tbody.appendChild(tr);
     }
@@ -355,30 +354,13 @@ async function loadSensorHealthPage() {
     try {
       const data = await apiFetch("/sensors/updates");
       lastItems = Array.isArray(data.items) ? data.items : [];
-
-      if (projectFilter) {
-        const projects = Array.from(new Set(lastItems.map(i => i.project).filter(Boolean))).sort();
-        const current = projectFilter.value;
-        projectFilter.innerHTML =
-          '<option>All Projects</option>' +
-          projects.map(p => `<option>${p}</option>`).join("");
-
-        if ([...projectFilter.options].some(o => o.value === current)) {
-          projectFilter.value = current;
-        }
-      }
-
       render();
     } catch (e) {
-      tbody.innerHTML = `<tr><td colspan="5">Failed to load sensors: ${e.message}</td></tr>`;
-      showPageError(`Failed to load sensors: ${e.message}`);
-    } finally {
-      hidePageLoading();
+      tbody.innerHTML = `<tr><td colspan="8">Failed to load sensors: ${e.message}</td></tr>`;
     }
   }
 
   statusFilter?.addEventListener("change", render);
-  projectFilter?.addEventListener("change", render);
 
   await refresh();
   setInterval(refresh, 15000);
@@ -397,9 +379,7 @@ async function loadAlertsPage() {
   try {
     const data = await apiFetch("/sensors/alerts");
     const items = Array.isArray(data.items) ? data.items : [];
-
     tbody.innerHTML = "";
-
     if (!items.length) {
       tbody.innerHTML = '<tr><td colspan="4">No active alerts.</td></tr>';
       return;
@@ -409,10 +389,10 @@ async function loadAlertsPage() {
       const tr = document.createElement("tr");
       const sevPill = pillHtml(alert.issue);
       tr.innerHTML = `
-        <td>${alert.sensorId}</td>
+        <td>${alert.sensorId || "—"}</td>
         <td>${sevPill}</td>
         <td>${alert.details || ""}</td>
-        <td>${formatMinutesAgo(alert.lastAudioMinutesAgo)}</td>
+        <td>${alert.lastAudioMinutesAgo !== undefined ? alert.lastAudioMinutesAgo : "—"}</td>
       `;
       tbody.appendChild(tr);
     }
@@ -437,9 +417,7 @@ async function loadRecentRebootHistory() {
   try {
     const data = await apiFetch("/sensors/reboots/recent?limit=50");
     const items = Array.isArray(data.items) ? data.items : [];
-
     tbody.innerHTML = "";
-
     if (!items.length) {
       tbody.innerHTML = '<tr><td colspan="3">No reboot history yet.</td></tr>';
       return;
@@ -448,10 +426,7 @@ async function loadRecentRebootHistory() {
     for (const r of items) {
       const t = r.requestedAt ? new Date(r.requestedAt).toLocaleString() : "—";
       const status = String(r.status || "Queued");
-      const cls = status.toLowerCase().includes("fail")
-        ? "pill-danger"
-        : (status.toLowerCase().includes("success") ? "pill-success" : "pill-warning");
-
+      const cls = status.toLowerCase().includes("fail") ? "pill-danger" : status.toLowerCase().includes("success") ? "pill-success" : "pill-warning";
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td>${r.sensorId}</td>
@@ -475,7 +450,6 @@ async function loadSettingsPage() {
   const interval = document.getElementById("record-interval");
   const sensitivity = document.getElementById("sensitivity");
   const battery = document.getElementById("battery-threshold");
-
   if (!interval || !sensitivity || !battery) return;
 
   hidePageError();
@@ -491,9 +465,6 @@ async function loadSettingsPage() {
     battery.value = Number(settings.batteryThresholdPct || 25);
   } catch (e) {
     showMessage("settings-message", `Failed to load settings: ${e.message}`, "danger");
-    showPageError(`Failed to load settings: ${e.message}`);
-  } finally {
-    hidePageLoading();
   }
 }
 
@@ -504,9 +475,6 @@ window.fakeReboot = rebootSensors;
 window.fakeSaveSettings = saveSettings;
 window.fakeCreateProject = fakeCreateProject;
 
-// ================================================================
-// Init page-specific loaders
-// ================================================================
 document.addEventListener("DOMContentLoaded", () => {
   loadSensorHealthPage();
   loadAlertsPage();
