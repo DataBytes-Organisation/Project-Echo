@@ -16875,7 +16875,12 @@ ul {
 
    .admin-page-status {
     margin-bottom: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
+  
+  /* ---- Error Banner ---- */
   
   .admin-error-banner {
     display: flex;
@@ -16883,77 +16888,117 @@ ul {
     justify-content: space-between;
     gap: 16px;
     width: 100%;
-    padding: 14px 18px;
+    max-width: 600px;
+    padding: 14px 16px 14px 20px;
     margin-bottom: 16px;
-    background-color: #fbf2ef;
-    border: 1px solid #fa896b;
-    border-radius: 7px;
-    color: #c86e56;
-    box-shadow: rgba(145, 158, 171, 0.08) 0px 4px 12px -2px;
+    background-color: #fff2f2;
+    border: 1px solid #ffb3b3;
+    border-left: 4px solid #e03131;
+    border-radius: 9px;
+    color: #c92a2a;
+    box-shadow:
+      rgba(224, 49, 49, 0.12) 0px 4px 16px,
+      rgba(145, 158, 171, 0.06) 0px 1px 4px;
+    animation: adminBannerFadeIn 0.25s ease;
   }
   
   .admin-error-banner__content {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
+    min-width: 0;
   }
   
   .admin-error-banner__content i {
-    font-size: 18px;
+    font-size: 20px;
     line-height: 1;
+    flex-shrink: 0;
+    color: #e03131;
   }
   
   .admin-error-banner__content span {
     font-size: 14px;
-    font-weight: 600;
-    line-height: 1.4;
+    font-weight: 700;
+    line-height: 1.45;
+    color: #c92a2a;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   
   .admin-error-banner__dismiss {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
     padding: 0;
     border: none;
     border-radius: 6px;
     background: transparent;
-    color: #c86e56;
+    color: #e03131;
     cursor: pointer;
+    flex-shrink: 0;
+    opacity: 0.55;
+    transition: opacity 0.15s ease, background-color 0.15s ease;
   }
   
   .admin-error-banner__dismiss i {
-    font-size: 18px;
+    font-size: 15px;
     line-height: 1;
   }
   
   .admin-error-banner__dismiss:hover {
-    background-color: rgba(250, 137, 107, 0.12);
+    background-color: rgba(224, 49, 49, 0.10);
+    opacity: 1;
   }
   
+  /* ---- Loading Spinner ---- */
+  
   .admin-loading-spinner {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 12px;
     width: 100%;
-    padding: 14px 18px;
-    background-color: #ffffff;
-    border: 1px solid #ebf1f6;
-    border-radius: 7px;
-    box-shadow: rgba(145, 158, 171, 0.08) 0px 4px 12px -2px;
+    max-width: 600px;
+    padding: 14px 16px 14px 20px;
+    margin-bottom: 16px;
+    background-color: #f0f7f4;
+    border: 1px solid #a8cfc0;
+    border-left: 4px solid #2F6E4F;
+    border-radius: 9px;
+    box-shadow:
+      rgba(47, 110, 79, 0.12) 0px 4px 16px,
+      rgba(145, 158, 171, 0.06) 0px 1px 4px;
+    animation: adminBannerFadeIn 0.25s ease;
   }
   
   .admin-loading-spinner .spinner-border {
-    width: 1.25rem;
-    height: 1.25rem;
-    border-width: 0.18em;
+    width: 1.1rem;
+    height: 1.1rem;
+    border-width: 0.16em;
     flex-shrink: 0;
+    color: #2F6E4F;
   }
   
   .admin-loading-spinner__text {
     font-size: 14px;
-    font-weight: 600;
-    color: #5a6a85;
+    font-weight: 700;
+    color: #26583f;
     line-height: 1.4;
+    letter-spacing: 0.01em;
+  }
+  
+  /* ---- Shared animation ---- */
+  
+  @keyframes adminBannerFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
