@@ -99,8 +99,100 @@ app.get('/api/users/:id/status', isAdmin, async (req, res) => {
   }
 });
 // Use helmet middleware to set security headers
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      useDefaults: true,
+      directives: {
+        defaultSrc: ["'self'"],
 
-// app.use(helmet());
+        scriptSrc: [
+          "'self'",
+          "'unsafe-inline'",
+          "https://cdn.jsdelivr.net",
+          "https://cdnjs.cloudflare.com",
+          "https://code.jquery.com",
+          "https://kit.fontawesome.com",
+          "https://www.google.com",
+          "https://www.gstatic.com",
+          "https://www.recaptcha.net"
+        ],
+
+        scriptSrcElem: [
+          "'self'",
+          "'unsafe-inline'",
+          "https://cdn.jsdelivr.net",
+          "https://cdnjs.cloudflare.com",
+          "https://code.jquery.com",
+          "https://kit.fontawesome.com",
+          "https://www.google.com",
+          "https://www.gstatic.com",
+          "https://www.recaptcha.net"
+        ],
+
+        scriptSrcAttr: ["'unsafe-inline'"],
+
+        styleSrc: [
+          "'self'",
+          "'unsafe-inline'",
+          "https://cdn.jsdelivr.net",
+          "https://fonts.googleapis.com",
+          "https://cdnjs.cloudflare.com"
+        ],
+
+        styleSrcElem: [
+          "'self'",
+          "'unsafe-inline'",
+          "https://cdn.jsdelivr.net",
+          "https://fonts.googleapis.com",
+          "https://cdnjs.cloudflare.com"
+        ],
+
+        fontSrc: [
+          "'self'",
+          "https://fonts.gstatic.com",
+          "https://cdn.jsdelivr.net",
+          "https://cdnjs.cloudflare.com",
+          "https://kit.fontawesome.com",
+          "https://ka-f.fontawesome.com",
+          "data:"
+        ],
+
+        imgSrc: [
+          "'self'",
+          "data:",
+          "blob:",
+          "https:"
+        ],
+
+        connectSrc: [
+          "'self'",
+          "ws:",
+          "wss:",
+          "http://localhost:8080",
+          "http://localhost:9000",
+          "http://localhost:8000",
+          "https://cdn.jsdelivr.net",
+          "https://cdnjs.cloudflare.com",
+          "https://www.google.com",
+          "https://www.gstatic.com",
+          "https://www.recaptcha.net",
+          "https://ka-f.fontawesome.com"
+        ],
+
+        frameSrc: [
+          "'self'",
+          "https://js.stripe.com",
+          "https://www.google.com",
+          "https://www.recaptcha.net"
+        ],
+
+        objectSrc: ["'none'"],
+        upgradeInsecureRequests: null
+      }
+    }
+  })
+);
 // Function to sanitize and normalize file paths
 // function sanitizeFilePath(filePath) {
 //   // Use path.normalize to ensure the path is in normalized form
@@ -146,8 +238,12 @@ app.post("/api/create-checkout-session", async (req, res) => {
       metadata: {
       type: "One-Time"
       },
-      success_url: "http://localhost:8080/donation-success?session_id={CHECKOUT_SESSION_ID}", //`${process.env.CLIENT_URL}`,
-      cancel_url: "http://localhost:8080"//`${process.env.CLIENT_URL}`,
+      
+      // CLIENT_URL is set in the .env file.
+      // For local development, use 'http://localhost:8080'.
+      // On the live server, set this to the public URL of the site.
+      success_url: `${process.env.CLIENT_URL}/donation-success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.CLIENT_URL}`,
     })
     console.log("two");
     res.json({ url: session.url })
