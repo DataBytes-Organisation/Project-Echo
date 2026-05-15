@@ -1,0 +1,15 @@
+{
+    "target_sr": 32000,
+    "duration_s": 5.0,
+    "n_mels": 128,
+    "hop_length": 512,
+    "fmin": 20,
+    "fmax": 14000,
+    "feature_type": "mel_spectrogram_db",
+    "normalisation": "per_sample_standardisation",
+    "input_shape": [
+        1,
+        128,
+        "time"
+    ]
+}
