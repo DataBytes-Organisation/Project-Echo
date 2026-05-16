@@ -238,8 +238,12 @@ app.post("/api/create-checkout-session", async (req, res) => {
       metadata: {
       type: "One-Time"
       },
-      success_url: "http://localhost:8080/donation-success?session_id={CHECKOUT_SESSION_ID}", //`${process.env.CLIENT_URL}`,
-      cancel_url: "http://localhost:8080"//`${process.env.CLIENT_URL}`,
+      
+      // CLIENT_URL is set in the .env file.
+      // For local development, use 'http://localhost:8080'.
+      // On the live server, set this to the public URL of the site.
+      success_url: `${process.env.CLIENT_URL}/donation-success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.CLIENT_URL}`,
     })
     console.log("two");
     res.json({ url: session.url })
