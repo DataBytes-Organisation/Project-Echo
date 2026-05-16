@@ -1,5 +1,5 @@
 /* Project Echo — Sensor Health script.js
-   Handles sidebar toggle, theme, actions and live sensor UI helpers
+   Sprint 2: UI enhancement and live status monitoring
 */
 
 const menuToggle = document.getElementById("menu-toggle");
@@ -18,14 +18,15 @@ if (mobileBackdrop) {
 }
 
 const themeToggle = document.getElementById("theme-toggle");
+
 function setTheme(darkMode) {
   if (darkMode) {
     document.documentElement.setAttribute("data-theme", "dark");
-    themeToggle && (themeToggle.textContent = "☀️");
+    if (themeToggle) themeToggle.textContent = "☀️";
     localStorage.setItem("echo-theme", "dark");
   } else {
     document.documentElement.removeAttribute("data-theme");
-    themeToggle && (themeToggle.textContent = "🌙");
+    if (themeToggle) themeToggle.textContent = "🌙";
     localStorage.setItem("echo-theme", "light");
   }
 }
@@ -42,13 +43,23 @@ if (themeToggle) {
 function showMessage(elementId, message, type = "success") {
   const el = document.getElementById(elementId);
   if (!el) return;
-  const colors = {success: "var(--primary)", warning: "var(--warning)", danger: "var(--danger)"};
+
+  const colors = {
+    success: "var(--primary)",
+    warning: "var(--warning)",
+    danger: "var(--danger)"
+  };
+
   el.style.color = colors[type] || colors.success;
   el.style.marginTop = "10px";
   el.style.fontWeight = "600";
   el.textContent = message;
   el.style.opacity = 0;
-  setTimeout(() => { el.style.opacity = 1; el.style.transition = "opacity .4s"; }, 30);
+
+  setTimeout(() => {
+    el.style.opacity = 1;
+    el.style.transition = "opacity .4s";
+  }, 30);
 }
 
 async function apiFetch(path, options = {}) {
@@ -66,24 +77,26 @@ async function apiFetch(path, options = {}) {
   if (contentType.includes("application/json")) {
     return response.json();
   }
+
   return response.text();
 }
 
-function pillHtml(status) {
+function pillHtml(status, batteryPct) {
   const s = String(status || "").trim();
-  let cls = "pill-warning";
-  if (s === "Online" || s === "Success") cls = "pill-success";
-  else if (s === "Offline" || s === "Failed") cls = "pill-danger";
-  else if (
-    s === "Warning" ||
-    s === "Queued" ||
-    s === "High CPU" ||
-    s === "High RAM" ||
-    s === "High Disk"
-  ) {
-    cls = "pill-warning";
+
+  if (typeof batteryPct === "number" && batteryPct < 20) {
+    return `<span class="pill pill-warning">Low Battery</span>`;
   }
-  return `<span class="pill ${cls}">${s || "Unknown"}</span>`;
+
+  if (s === "Online" || s === "Success") {
+    return `<span class="pill pill-success">${s}</span>`;
+  }
+
+  if (s === "Offline" || s === "Failed") {
+    return `<span class="pill pill-danger">${s}</span>`;
+  }
+
+  return `<span class="pill pill-warning">${s || "Unknown"}</span>`;
 }
 
 function formatPercent(value) {
@@ -92,25 +105,46 @@ function formatPercent(value) {
   return `${num}%`;
 }
 
+function formatBattery(value) {
+  const num = Number(value);
+  if (!Number.isFinite(num)) return "—";
+
+  const lowClass = num < 20 ? "battery-low" : "";
+  return `<span class="${lowClass}">${num}%</span>`;
+}
+
 function formatGps(gps) {
   if (!gps || typeof gps !== "object") return "—";
+
   const lat = gps.lat;
   const lon = gps.lon;
+
   if (lat === null || lat === undefined || lon === null || lon === undefined) {
     return "—";
   }
+
   return `${lat}, ${lon}`;
 }
 
 function formatUptime(seconds) {
   const total = Number(seconds);
   if (!Number.isFinite(total) || total < 0) return "—";
+
   const days = Math.floor(total / 86400);
   const hours = Math.floor((total % 86400) / 3600);
   const mins = Math.floor((total % 3600) / 60);
+
   if (days > 0) return `${days}d ${hours}h ${mins}m`;
   if (hours > 0) return `${hours}h ${mins}m`;
   return `${mins}m`;
+}
+
+function updateLastUpdated() {
+  const el = document.getElementById("last-updated-at");
+  if (!el) return;
+
+  const now = new Date();
+  el.textContent = `Last updated at: ${now.toLocaleTimeString()}`;
 }
 
 async function rebootSensors() {
@@ -214,10 +248,10 @@ if (shell) {
   }, 80);
 }
 
-// Ensure sidebar nav always contains expected links
 function ensureSensorSidebar() {
   const sidebar = document.querySelector(".sidebar .nav-section");
   if (!sidebar) return;
+
   const required = [
     { href: "/admin/dashboard.html", icon: "▦", text: "Dashboard" },
     { href: "/admin/sensor-health.html", icon: "📡", text: "Sensor Health" },
@@ -253,28 +287,50 @@ async function loadSensorHealthPage() {
   if (!tbody) return;
 
   const statusFilter = document.getElementById("sensor-status-filter");
+  const searchInput = document.getElementById("sensor-search-input");
+
   let lastItems = [];
 
   function render() {
     const statusVal = statusFilter?.value || "All";
+    const searchVal = (searchInput?.value || "").trim().toLowerCase();
 
     const filtered = lastItems.filter((item) => {
-      if (statusVal !== "All" && item.status !== statusVal) return false;
-      return true;
+      const sensorId = String(item.sensorId || "").toLowerCase();
+      const batteryPct = Number(item.batteryPct);
+
+      const matchesSearch = !searchVal || sensorId.includes(searchVal);
+
+      let matchesStatus = true;
+      if (statusVal === "Online") {
+        matchesStatus = item.status === "Online";
+      } else if (statusVal === "Offline") {
+        matchesStatus = item.status === "Offline";
+      } else if (statusVal === "Low Battery") {
+        matchesStatus = Number.isFinite(batteryPct) && batteryPct < 20;
+      }
+
+      return matchesSearch && matchesStatus;
     });
 
     tbody.innerHTML = "";
 
     if (!filtered.length) {
-      tbody.innerHTML = '<tr><td colspan="8">No live sensor data available.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="9">No sensors match the current search or filter.</td></tr>';
       return;
     }
 
     for (const item of filtered) {
       const tr = document.createElement("tr");
+
+      if (typeof item.batteryPct === "number" && item.batteryPct < 20) {
+        tr.classList.add("sensor-row-low-battery");
+      }
+
       tr.innerHTML = `
         <td>${item.sensorId || "—"}</td>
-        <td>${pillHtml(item.status)}</td>
+        <td>${pillHtml(item.status, item.batteryPct)}</td>
+        <td>${formatBattery(item.batteryPct)}</td>
         <td>${formatPercent(item.cpu)}</td>
         <td>${formatPercent(item.ram)}</td>
         <td>${formatPercent(item.disk)}</td>
@@ -282,6 +338,7 @@ async function loadSensorHealthPage() {
         <td>${formatGps(item.gps)}</td>
         <td>${item.lastAudio || "—"}</td>
       `;
+
       tbody.appendChild(tr);
     }
   }
@@ -290,13 +347,15 @@ async function loadSensorHealthPage() {
     try {
       const data = await apiFetch("/sensors/updates");
       lastItems = Array.isArray(data.items) ? data.items : [];
+      updateLastUpdated();
       render();
     } catch (e) {
-      tbody.innerHTML = `<tr><td colspan="8">Failed to load sensors: ${e.message}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="9">Failed to load sensors: ${e.message}</td></tr>`;
     }
   }
 
   statusFilter?.addEventListener("change", render);
+  searchInput?.addEventListener("input", render);
 
   await refresh();
   setInterval(refresh, 15000);
@@ -309,19 +368,23 @@ async function loadAlertsPage() {
     const data = await apiFetch("/sensors/alerts");
     const items = Array.isArray(data.items) ? data.items : [];
     tbody.innerHTML = "";
+
     if (!items.length) {
       tbody.innerHTML = '<tr><td colspan="4">No active alerts.</td></tr>';
       return;
     }
+
     for (const alert of items) {
       const tr = document.createElement("tr");
       const sevPill = pillHtml(alert.issue);
+
       tr.innerHTML = `
         <td>${alert.sensorId || "—"}</td>
         <td>${sevPill}</td>
         <td>${alert.details || ""}</td>
         <td>${alert.lastAudioMinutesAgo !== undefined ? alert.lastAudioMinutesAgo : "—"}</td>
       `;
+
       tbody.appendChild(tr);
     }
   } catch (e) {
@@ -336,14 +399,21 @@ async function loadRecentRebootHistory() {
     const data = await apiFetch("/sensors/reboots/recent?limit=50");
     const items = Array.isArray(data.items) ? data.items : [];
     tbody.innerHTML = "";
+
     if (!items.length) {
       tbody.innerHTML = '<tr><td colspan="3">No reboot history yet.</td></tr>';
       return;
     }
+
     for (const r of items) {
       const t = r.requestedAt ? new Date(r.requestedAt).toLocaleString() : "—";
       const status = String(r.status || "Queued");
-      const cls = status.toLowerCase().includes("fail") ? "pill-danger" : status.toLowerCase().includes("success") ? "pill-success" : "pill-warning";
+      const cls = status.toLowerCase().includes("fail")
+        ? "pill-danger"
+        : status.toLowerCase().includes("success")
+        ? "pill-success"
+        : "pill-warning";
+
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td>${r.sensorId}</td>
@@ -376,7 +446,6 @@ async function loadSettingsPage() {
   }
 }
 
-// Keep existing onclick bindings working
 window.fakeReboot = rebootSensors;
 window.fakeSaveSettings = saveSettings;
 

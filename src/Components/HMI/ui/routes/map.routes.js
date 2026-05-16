@@ -170,27 +170,61 @@ module.exports = function (app) {
     }
   });
 
+  // Sprint 2 demo/test seed route
   app.get("/sensors/test-seed", (req, res) => {
-  latestSensorData = {
-    health_data: {
-      cpu: 37,
-      ram: 48,
-      disk: 62,
-      uptime: 15432
-    },
-    gps_data: {
-      lat: -38.1499,
-      lon: 144.3617
-    },
-    savedAudio: "test_audio.wav"
-  };
+    latestSensorData = {
+      items: [
+        {
+          sensorId: "LIVE-001",
+          status: "Online",
+          batteryPct: 78,
+          cpu: 37,
+          ram: 48,
+          disk: 62,
+          uptime: 15432,
+          gps: {
+            lat: -38.1499,
+            lon: 144.3617,
+          },
+          lastAudio: "audio_sensor_001.wav",
+        },
+        {
+          sensorId: "LIVE-002",
+          status: "Offline",
+          batteryPct: 55,
+          cpu: 0,
+          ram: 0,
+          disk: 0,
+          uptime: 0,
+          gps: {
+            lat: -38.1605,
+            lon: 144.3502,
+          },
+          lastAudio: "—",
+        },
+        {
+          sensorId: "LIVE-003",
+          status: "Online",
+          batteryPct: 15,
+          cpu: 52,
+          ram: 63,
+          disk: 70,
+          uptime: 28765,
+          gps: {
+            lat: -38.1422,
+            lon: 144.3728,
+          },
+          lastAudio: "audio_sensor_003.wav",
+        },
+      ],
+    };
 
-  res.json({
-    success: true,
-    message: "Test sensor payload seeded successfully.",
-    latestSensorData
+    res.json({
+      success: true,
+      message: "Test sensor payload seeded successfully.",
+      latestSensorData,
+    });
   });
-});
 
   // Sensor Health live routes
   app.get("/sensors/updates", async (req, res) => {
@@ -199,11 +233,18 @@ module.exports = function (app) {
         return res.json({ items: [] });
       }
 
-      res.json({
+      // If Sprint 2 seeded/demo data exists, return directly
+      if (Array.isArray(latestSensorData.items)) {
+        return res.json({ items: latestSensorData.items });
+      }
+
+      // Otherwise treat it as live MQTT payload structure
+      return res.json({
         items: [
           {
             sensorId: "LIVE-001",
             status: "Online",
+            batteryPct: 18, // temporary fallback until real battery field is available
             cpu: latestSensorData.health_data?.cpu,
             ram: latestSensorData.health_data?.ram,
             disk: latestSensorData.health_data?.disk,
@@ -225,31 +266,69 @@ module.exports = function (app) {
         return res.json({ items: [] });
       }
 
+      let sourceItems = [];
+
+      if (Array.isArray(latestSensorData.items)) {
+        sourceItems = latestSensorData.items;
+      } else {
+        sourceItems = [
+          {
+            sensorId: "LIVE-001",
+            status: "Online",
+            batteryPct: 18,
+            cpu: latestSensorData.health_data?.cpu,
+            ram: latestSensorData.health_data?.ram,
+            disk: latestSensorData.health_data?.disk,
+            uptime: latestSensorData.health_data?.uptime,
+            gps: latestSensorData.gps_data,
+            lastAudio: latestSensorData.savedAudio || null,
+          },
+        ];
+      }
+
       const items = [];
 
-      if (latestSensorData.health_data?.cpu > 90) {
-        items.push({
-          sensorId: "LIVE-001",
-          issue: "High CPU",
-          details: `CPU usage ${latestSensorData.health_data.cpu}%`,
-        });
-      }
+      sourceItems.forEach((sensor) => {
+        if (sensor.status === "Offline") {
+          items.push({
+            sensorId: sensor.sensorId,
+            issue: "Offline",
+            details: "Sensor is currently offline.",
+          });
+        }
 
-      if (latestSensorData.health_data?.ram > 90) {
-        items.push({
-          sensorId: "LIVE-001",
-          issue: "High RAM",
-          details: `RAM usage ${latestSensorData.health_data.ram}%`,
-        });
-      }
+        if (typeof sensor.batteryPct === "number" && sensor.batteryPct < 20) {
+          items.push({
+            sensorId: sensor.sensorId,
+            issue: "Low Battery",
+            details: `Battery level is ${sensor.batteryPct}%.`,
+          });
+        }
 
-      if (latestSensorData.health_data?.disk > 90) {
-        items.push({
-          sensorId: "LIVE-001",
-          issue: "High Disk",
-          details: `Disk usage ${latestSensorData.health_data.disk}%`,
-        });
-      }
+        if (typeof sensor.cpu === "number" && sensor.cpu > 90) {
+          items.push({
+            sensorId: sensor.sensorId,
+            issue: "High CPU",
+            details: `CPU usage ${sensor.cpu}%`,
+          });
+        }
+
+        if (typeof sensor.ram === "number" && sensor.ram > 90) {
+          items.push({
+            sensorId: sensor.sensorId,
+            issue: "High RAM",
+            details: `RAM usage ${sensor.ram}%`,
+          });
+        }
+
+        if (typeof sensor.disk === "number" && sensor.disk > 90) {
+          items.push({
+            sensorId: sensor.sensorId,
+            issue: "High Disk",
+            details: `Disk usage ${sensor.disk}%`,
+          });
+        }
+      });
 
       res.json({ items });
     } catch (error) {
