@@ -19,7 +19,6 @@
   <link rel="shortcut icon" type="image/png" href="/admin/images/logos/favicon.png" />
   <link type="text/css" rel="stylesheet" href="/admin/css/styles.min.css" />
 
-  <!-- Font Awesome (icons) -->
   <script
     type="text/javascript"
     src="https://kit.fontawesome.com/8aa980d912.js"
@@ -37,6 +36,9 @@
     href="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.css"
   />
   <script src="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.min.js"></script>
+
+  <!-- Shared admin page state -->
+  <script type="text/javascript" src="/admin/js/admin-page-state.js"></script>
 
   <style>
     body {
@@ -142,325 +144,312 @@
     data-sidebar-position="fixed"
     data-header-position="fixed"
   >
-    <!-- Sidebar Start -->
     <div id="sidebar"></div>
-    <!--  Sidebar End -->
 
-    <!--  Main wrapper -->
     <div class="body-wrapper">
       <div id="header"></div>
 
       <div class="container-fluid">
-
-    <!-- PAGE HEADER -->
-    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
-      <div class="mb-3 mb-md-0">
-        <h2 class="fw-semibold mb-1">Data Insights</h2>
-        <p class="text-muted mb-0">
-          Explore detection trends and species activity for Project Echo.
-        </p>
-      </div>
-
-      <div class="d-flex flex-wrap justify-content-end gap-2">
-        <!-- Export buttons -->
-        <button class="btn btn-outline-secondary btn-sm" id="downloadCsvBtn">
-          <i class="bi bi-file-earmark-spreadsheet me-1"></i> Download CSV
-        </button>
-        <button class="btn btn-outline-secondary btn-sm" id="downloadPdfBtn">
-          <i class="bi bi-file-earmark-pdf me-1"></i> Download PDF
-        </button>
-
-        <!-- Quick range buttons -->
-        <div class="d-flex gap-2 ms-md-2">
-          <button class="btn btn-outline-secondary btn-sm btn-range active" data-range="7">
-            Last 7 days
-          </button>
-          <button class="btn btn-outline-secondary btn-sm btn-range" data-range="30">
-            Last 30 days
-          </button>
-          <button class="btn btn-outline-secondary btn-sm btn-range" data-range="all">
-            All time
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- FILTER CARD -->
-    <div class="card shadow-soft mb-4">
-      <div class="card-body">
-        <h6 class="fw-semibold mb-3">Custom date &amp; time range</h6>
-        <form class="row g-3 align-items-end" id="filterForm">
-          <div class="col-md-3">
-            <label for="fromDate" class="form-label">From date</label>
-            <input type="date" class="form-control" id="fromDate" />
-          </div>
-          <div class="col-md-3">
-            <label for="toDate" class="form-label">To date</label>
-            <input type="date" class="form-control" id="toDate" />
-          </div>
-          <div class="col-md-2">
-            <label for="fromTime" class="form-label">From time</label>
-            <input type="time" class="form-control" id="fromTime" />
-          </div>
-          <div class="col-md-2">
-            <label for="toTime" class="form-label">To time</label>
-            <input type="time" class="form-control" id="toTime" />
-          </div>
-          <div class="col-md-2">
-            <button
-              type="button"
-              class="btn btn-primary w-100"
-              id="applyFiltersBtn"
-            >
-              Apply filters
+        <div class="admin-page-status">
+          <div class="admin-error-banner d-none" role="alert" aria-live="polite">
+            <div class="admin-error-banner__content">
+              <i class="ti ti-alert-circle"></i>
+              <span>Something went wrong while loading this page.</span>
+            </div>
+            <button type="button" class="admin-error-banner__dismiss" aria-label="Dismiss error message">
+              <i class="ti ti-x"></i>
             </button>
           </div>
-        </form>
-      </div>
-    </div>
 
-    <!-- SUMMARY CARDS -->
-    <div class="row g-4 mb-4">
-      <div class="col-md-3">
-        <div class="card shadow-soft h-100">
-          <div class="card-body">
-            <p class="text-muted mb-1 small">Total detections</p>
-            <h3 class="fw-semibold mb-2" id="totalDetections">1,284</h3>
-            <span class="badge badge-soft-success small">
-              <i class="bi bi-arrow-up-right me-1"></i>+12.5% from last period
-            </span>
+          <div class="admin-loading-spinner d-none" role="status" aria-live="polite">
+            <div class="spinner-border text-danger" aria-hidden="true"></div>
+            <span class="admin-loading-spinner__text">Loading...</span>
           </div>
         </div>
-      </div>
 
-      <div class="col-md-3">
-        <div class="card shadow-soft h-100">
-          <div class="card-body">
-            <p class="text-muted mb-1 small">Active species</p>
-            <h3 class="fw-semibold mb-2" id="activeSpecies">12</h3>
-            <span class="badge badge-soft-success small">
-              <i class="bi bi-arrow-up-right me-1"></i>+8.2% from last period
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-3">
-        <div class="card shadow-soft h-100">
-          <div class="card-body">
-            <p class="text-muted mb-1 small">Peak activity time</p>
-            <h3 class="fw-semibold mb-2" id="peakTime">6:00 PM</h3>
-            <span class="badge badge-soft-primary small">
-              <i class="bi bi-activity me-1"></i>Most detections
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-3">
-        <div class="card shadow-soft h-100">
-          <div class="card-body">
-            <p class="text-muted mb-1 small">Avg. daily detections</p>
-            <h3 class="fw-semibold mb-2" id="avgDaily">43</h3>
-            <span class="badge badge-soft-danger small">
-              <i class="bi bi-arrow-down-right me-1"></i>-3.1% from last period
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- CHARTS ROW -->
-    <div class="row g-4">
-      <!-- Line chart card -->
-      <div class="col-lg-8">
-        <div class="card shadow-soft">
-          <div class="card-header bg-white border-0 pb-0">
-            <div class="d-flex justify-content-between align-items-center">
-              <div>
-                <h5 class="mb-1">Detections over time</h5>
-                <p class="text-muted mb-0 small">
-                  Timeline of detections for the selected range.
-                </p>
-              </div>
-              <div class="btn-group btn-group-sm" role="group">
-                <button
-                  type="button"
-                  class="btn btn-outline-success btn-species active"
-                  data-species="all"
-                >
-                  All species
-                </button>
-                <button
-                  type="button"
-                  class="btn btn-outline-success btn-species"
-                  data-species="deer"
-                >
-                  Deer
-                </button>
-                <button
-                  type="button"
-                  class="btn btn-outline-success btn-species"
-                  data-species="bear"
-                >
-                  Bear
-                </button>
-                <button
-                  type="button"
-                  class="btn btn-outline-success btn-species"
-                  data-species="wolf"
-                >
-                  Wolf
-                </button>
-              </div>
-            </div>
-          </div>
-          <div class="card-body">
-            <div class="chart-container">
-              <canvas id="detectionsChart"></canvas>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Bar chart card -->
-      <div class="col-lg-4">
-        <div class="card shadow-soft h-100">
-          <div class="card-header bg-white border-0 pb-0">
-            <h5 class="mb-1">Detections by species</h5>
-            <p class="text-muted mb-0 small">
-              Distribution of detections in the selected period.
+        <!-- PAGE HEADER -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+          <div class="mb-3 mb-md-0">
+            <h2 class="fw-semibold mb-1">Data Insights</h2>
+            <p class="text-muted mb-0">
+              Explore detection trends and species activity for Project Echo.
             </p>
           </div>
-          <div class="card-body">
-            <div class="chart-container">
-              <canvas id="speciesChart"></canvas>
+
+          <div class="d-flex flex-wrap justify-content-end gap-2">
+            <button class="btn btn-outline-secondary btn-sm" id="downloadCsvBtn">
+              <i class="bi bi-file-earmark-spreadsheet me-1"></i> Download CSV
+            </button>
+            <button class="btn btn-outline-secondary btn-sm" id="downloadPdfBtn">
+              <i class="bi bi-file-earmark-pdf me-1"></i> Download PDF
+            </button>
+
+            <div class="d-flex gap-2 ms-md-2">
+              <button class="btn btn-outline-secondary btn-sm btn-range active" data-range="7">
+                Last 7 days
+              </button>
+              <button class="btn btn-outline-secondary btn-sm btn-range" data-range="30">
+                Last 30 days
+              </button>
+              <button class="btn btn-outline-secondary btn-sm btn-range" data-range="all">
+                All time
+              </button>
             </div>
           </div>
         </div>
+
+        <!-- FILTER CARD -->
+        <div class="card shadow-soft mb-4">
+          <div class="card-body">
+            <h6 class="fw-semibold mb-3">Custom date &amp; time range</h6>
+            <form class="row g-3 align-items-end" id="filterForm">
+              <div class="col-md-3">
+                <label for="fromDate" class="form-label">From date</label>
+                <input type="date" class="form-control" id="fromDate" />
+              </div>
+              <div class="col-md-3">
+                <label for="toDate" class="form-label">To date</label>
+                <input type="date" class="form-control" id="toDate" />
+              </div>
+              <div class="col-md-2">
+                <label for="fromTime" class="form-label">From time</label>
+                <input type="time" class="form-control" id="fromTime" />
+              </div>
+              <div class="col-md-2">
+                <label for="toTime" class="form-label">To time</label>
+                <input type="time" class="form-control" id="toTime" />
+              </div>
+              <div class="col-md-2">
+                <button
+                  type="button"
+                  class="btn btn-primary w-100"
+                  id="applyFiltersBtn"
+                >
+                  Apply filters
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- SUMMARY CARDS -->
+        <div class="row g-4 mb-4">
+          <div class="col-md-3">
+            <div class="card shadow-soft h-100">
+              <div class="card-body">
+                <p class="text-muted mb-1 small">Total detections</p>
+                <h3 class="fw-semibold mb-2" id="totalDetections">1,284</h3>
+                <span class="badge badge-soft-success small">
+                  <i class="bi bi-arrow-up-right me-1"></i>+12.5% from last period
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-3">
+            <div class="card shadow-soft h-100">
+              <div class="card-body">
+                <p class="text-muted mb-1 small">Active species</p>
+                <h3 class="fw-semibold mb-2" id="activeSpecies">12</h3>
+                <span class="badge badge-soft-success small">
+                  <i class="bi bi-arrow-up-right me-1"></i>+8.2% from last period
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-3">
+            <div class="card shadow-soft h-100">
+              <div class="card-body">
+                <p class="text-muted mb-1 small">Peak activity time</p>
+                <h3 class="fw-semibold mb-2" id="peakTime">6:00 PM</h3>
+                <span class="badge badge-soft-primary small">
+                  <i class="bi bi-activity me-1"></i>Most detections
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-3">
+            <div class="card shadow-soft h-100">
+              <div class="card-body">
+                <p class="text-muted mb-1 small">Avg. daily detections</p>
+                <h3 class="fw-semibold mb-2" id="avgDaily">43</h3>
+                <span class="badge badge-soft-danger small">
+                  <i class="bi bi-arrow-down-right me-1"></i>-3.1% from last period
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CHARTS ROW -->
+        <div class="row g-4">
+          <div class="col-lg-8">
+            <div class="card shadow-soft">
+              <div class="card-header bg-white border-0 pb-0">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <h5 class="mb-1">Detections over time</h5>
+                    <p class="text-muted mb-0 small">
+                      Timeline of detections for the selected range.
+                    </p>
+                  </div>
+                  <div class="btn-group btn-group-sm" role="group">
+                    <button type="button" class="btn btn-outline-success btn-species active" data-species="all">
+                      All species
+                    </button>
+                    <button type="button" class="btn btn-outline-success btn-species" data-species="deer">
+                      Deer
+                    </button>
+                    <button type="button" class="btn btn-outline-success btn-species" data-species="bear">
+                      Bear
+                    </button>
+                    <button type="button" class="btn btn-outline-success btn-species" data-species="wolf">
+                      Wolf
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="chart-container">
+                  <canvas id="detectionsChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-4">
+            <div class="card shadow-soft h-100">
+              <div class="card-header bg-white border-0 pb-0">
+                <h5 class="mb-1">Detections by species</h5>
+                <p class="text-muted mb-0 small">
+                  Distribution of detections in the selected period.
+                </p>
+              </div>
+              <div class="card-body">
+                <div class="chart-container">
+                  <canvas id="speciesChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RECENT ACTIVITY & SYSTEM STATUS -->
+        <div class="row g-4 mt-4">
+          <div class="col-lg-6">
+            <div class="card shadow-soft h-100">
+              <div class="card-body">
+                <h5 class="mb-1">Recent Activity</h5>
+                <p class="text-muted small mb-3">Latest wildlife detections</p>
+
+                <div class="activity-item d-flex justify-content-between align-items-center">
+                  <div>
+                    <div class="fw-semibold">White-tailed Deer</div>
+                    <div class="text-muted small">Zone A-3</div>
+                  </div>
+                  <div class="text-muted small">2 minutes ago</div>
+                </div>
+
+                <div class="activity-item d-flex justify-content-between align-items-center">
+                  <div>
+                    <div class="fw-semibold">Black Bear</div>
+                    <div class="text-muted small">Zone B-1</div>
+                  </div>
+                  <div class="text-muted small">15 minutes ago</div>
+                </div>
+
+                <div class="activity-item d-flex justify-content-between align-items-center">
+                  <div>
+                    <div class="fw-semibold">Gray Wolf</div>
+                    <div class="text-muted small">Zone C-2</div>
+                  </div>
+                  <div class="text-muted small">1 hour ago</div>
+                </div>
+
+                <div class="activity-item d-flex justify-content-between align-items-center">
+                  <div>
+                    <div class="fw-semibold">Red Fox</div>
+                    <div class="text-muted small">Zone A-1</div>
+                  </div>
+                  <div class="text-muted small">2 hours ago</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="card shadow-soft h-100">
+              <div class="card-body">
+                <h5 class="mb-1">System Status</h5>
+                <p class="text-muted small mb-3">Camera network health</p>
+
+                <div class="status-item d-flex justify-content-between align-items-center">
+                  <div>
+                    <div class="fw-semibold">Zone A</div>
+                    <div class="text-muted small">6/6 online</div>
+                  </div>
+                  <span class="status-pill status-ok">Operational</span>
+                </div>
+
+                <div class="status-item d-flex justify-content-between align-items-center">
+                  <div>
+                    <div class="fw-semibold">Zone B</div>
+                    <div class="text-muted small">8/8 online</div>
+                  </div>
+                  <span class="status-pill status-ok">Operational</span>
+                </div>
+
+                <div class="status-item d-flex justify-content-between align-items-center">
+                  <div>
+                    <div class="fw-semibold">Zone C</div>
+                    <div class="text-muted small">7/8 online</div>
+                  </div>
+                  <span class="status-pill status-warning">Warning</span>
+                </div>
+
+                <div class="status-item d-flex justify-content-between align-items-center">
+                  <div>
+                    <div class="fw-semibold">Zone D</div>
+                    <div class="text-muted small">4/4 online</div>
+                  </div>
+                  <span class="status-pill status-ok">Operational</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
 
-    <!-- RECENT ACTIVITY & SYSTEM STATUS -->
-    <div class="row g-4 mt-4">
-      <!-- Recent Activity -->
-      <div class="col-lg-6">
-        <div class="card shadow-soft h-100">
-          <div class="card-body">
-            <h5 class="mb-1">Recent Activity</h5>
-            <p class="text-muted small mb-3">Latest wildlife detections</p>
-
-            <div class="activity-item d-flex justify-content-between align-items-center">
-              <div>
-                <div class="fw-semibold">White-tailed Deer</div>
-                <div class="text-muted small">Zone A-3</div>
-              </div>
-              <div class="text-muted small">2 minutes ago</div>
-            </div>
-
-            <div class="activity-item d-flex justify-content-between align-items-center">
-              <div>
-                <div class="fw-semibold">Black Bear</div>
-                <div class="text-muted small">Zone B-1</div>
-              </div>
-              <div class="text-muted small">15 minutes ago</div>
-            </div>
-
-            <div class="activity-item d-flex justify-content-between align-items-center">
-              <div>
-                <div class="fw-semibold">Gray Wolf</div>
-                <div class="text-muted small">Zone C-2</div>
-              </div>
-              <div class="text-muted small">1 hour ago</div>
-            </div>
-
-            <div class="activity-item d-flex justify-content-between align-items-center">
-              <div>
-                <div class="fw-semibold">Red Fox</div>
-                <div class="text-muted small">Zone A-1</div>
-              </div>
-              <div class="text-muted small">2 hours ago</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- System Status -->
-      <div class="col-lg-6">
-        <div class="card shadow-soft h-100">
-          <div class="card-body">
-            <h5 class="mb-1">System Status</h5>
-            <p class="text-muted small mb-3">Camera network health</p>
-
-            <div class="status-item d-flex justify-content-between align-items-center">
-              <div>
-                <div class="fw-semibold">Zone A</div>
-                <div class="text-muted small">6/6 online</div>
-              </div>
-              <span class="status-pill status-ok">Operational</span>
-            </div>
-
-            <div class="status-item d-flex justify-content-between align-items-center">
-              <div>
-                <div class="fw-semibold">Zone B</div>
-                <div class="text-muted small">8/8 online</div>
-              </div>
-              <span class="status-pill status-ok">Operational</span>
-            </div>
-
-            <div class="status-item d-flex justify-content-between align-items-center">
-              <div>
-                <div class="fw-semibold">Zone C</div>
-                <div class="text-muted small">7/8 online</div>
-              </div>
-              <span class="status-pill status-warning">Warning</span>
-            </div>
-
-            <div class="status-item d-flex justify-content-between align-items-center">
-              <div>
-                <div class="fw-semibold">Zone D</div>
-                <div class="text-muted small">4/4 online</div>
-              </div>
-              <span class="status-pill status-ok">Operational</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-      </div> <!-- /container-fluid -->
-    </div> <!-- /body-wrapper -->
     <div id="footer"></div>
-    </div>
-  </div> <!-- /page-wrapper -->
+  </div>
 
-  <!-- Load sidebar + header -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script type="text/javascript" src="/admin/js/sidebarmenu.js"></script>
   <script type="text/javascript" src="/admin/js/app.min.js"></script>
-  
+
   <script type="text/javascript">
     $(document).ready(function() {
       $("#sidebar").load("/admin/component/sidebar-component.html", function() {
-        // Re-run sidebar init so handlers and active-link logic apply to loaded markup
         $.getScript('/admin/js/sidebarmenu.js');
       });
-
       $("#header").load("/admin/component/header-component.html");
       $("#footer").load("/admin/component/footer-component.html");
     });
+
+    const pageState = createAdminPageState();
+    pageState.resetPageState();
   </script>
 
-  <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- jsPDF for PDF export -->
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 
   <script>
     document.addEventListener("DOMContentLoaded", function () {
-      // ----------------- helpers -----------------
       function generateDateLabels(days) {
         const labels = [];
         const today = new Date();
@@ -480,8 +469,7 @@
         );
       }
 
-      // ----------------- initial setup -----------------
-      let currentRange = 7; // days
+      let currentRange = 7;
       let currentSpecies = "all";
 
       const detectionsCtx = document
@@ -491,11 +479,9 @@
         .getElementById("speciesChart")
         .getContext("2d");
 
-      // initial labels & data
       let labels = generateDateLabels(currentRange);
       let detectionsData = generateRandomData(labels.length, 60, 30);
 
-      // line chart: detections over time
       const detectionsChart = new Chart(detectionsCtx, {
         type: "line",
         data: {
@@ -525,18 +511,12 @@
             },
           },
           scales: {
-            x: {
-              grid: { display: false },
-            },
-            y: {
-              beginAtZero: true,
-              grid: { color: "#eef1f7" },
-            },
+            x: { grid: { display: false } },
+            y: { beginAtZero: true, grid: { color: "#eef1f7" } },
           },
         },
       });
 
-      // bar chart: detections by species
       const speciesChart = new Chart(speciesCtx, {
         type: "bar",
         data: {
@@ -567,18 +547,12 @@
             },
           },
           scales: {
-            x: {
-              grid: { display: false },
-            },
-            y: {
-              beginAtZero: true,
-              grid: { color: "#eef1f7" },
-            },
+            x: { grid: { display: false } },
+            y: { beginAtZero: true, grid: { color: "#eef1f7" } },
           },
         },
       });
 
-      // ----------------- chart refresh logic -----------------
       function refreshCharts() {
         const baseBySpecies = {
           all: 60,
@@ -606,7 +580,6 @@
         speciesChart.update();
       }
 
-      // ----------------- quick range buttons -----------------
       document.querySelectorAll(".btn-range").forEach((btn) => {
         btn.addEventListener("click", () => {
           document
@@ -620,7 +593,6 @@
         });
       });
 
-      // ----------------- species filter buttons -----------------
       document.querySelectorAll(".btn-species").forEach((btn) => {
         btn.addEventListener("click", () => {
           document
@@ -633,7 +605,6 @@
         });
       });
 
-      // ----------------- Apply filters button -----------------
       document
         .getElementById("applyFiltersBtn")
         .addEventListener("click", () => {
@@ -649,11 +620,9 @@
             toTime,
           });
 
-          // In future: call backend API here with these filters.
           refreshCharts();
         });
 
-      // ----------------- CSV DOWNLOAD -----------------
       function downloadCSV() {
         let csv = "Date,Detections\n";
         labels.forEach((label, idx) => {
@@ -674,7 +643,6 @@
         .getElementById("downloadCsvBtn")
         .addEventListener("click", downloadCSV);
 
-      // ----------------- PDF DOWNLOAD -----------------
       const { jsPDF } = window.jspdf;
 
       function downloadPDF() {

@@ -19,7 +19,7 @@ RUN apt-get update && apt-get install -y \
 # Install Python Packages Safely
 COPY requirements.txt ./
 RUN python3 -m pip install --upgrade pip && \
-    pip install --no-cache-dir "numpy<2.0" "tensorflow==2.15.0" -r requirements.txt
+    pip install --no-cache-dir "numpy==1.23.5" "tensorflow==2.10.0" -r requirements.txt
 
 # 4. Install Google Cloud SDK
 RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list \
@@ -34,10 +34,11 @@ RUN mkdir -p /root/.config/gcloud/
 
 # 5. Copy Application Code AND Credentials
 WORKDIR /app
-COPY ./light_echo_engine.py ./
+COPY ./light_echo_engine_efficientnetv2_tflite.py ./
 COPY ./light_echo_engine.json ./
 COPY ./light_echo_credentials.json ./
 COPY ./helpers ./helpers
+COPY ./Integrate_EfficientNetV2_Engine ./Integrate_EfficientNetV2_Engine
 
 # 6. Run the Engine
-CMD ["python", "light_echo_engine.py"]
+CMD ["python", "light_echo_engine_efficientnetv2_tflite.py"]

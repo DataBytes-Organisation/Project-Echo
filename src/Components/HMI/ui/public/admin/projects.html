@@ -25,7 +25,7 @@
       crossorigin="anonymous"
     />
 
-    <!-- Icons & utilities (shared across admin) -->
+    <!-- Icons & utilities -->
     <script
       src="https://kit.fontawesome.com/8aa980d912.js"
       crossorigin="anonymous"
@@ -35,7 +35,7 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
     />
 
-    <!-- Date / range picker (shared) -->
+    <!-- Date / range picker -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
     <link
       rel="stylesheet"
@@ -43,21 +43,23 @@
     />
     <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 
-    <!-- jQuery (required for this page) -->
+    <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <!-- Admin layout scripts -->
     <script src="/admin/js/sidebarmenu.js"></script>
     <script src="/admin/js/app.min.js"></script>
 
-    <!-- Charts & scroll helpers (shared) -->
+    <!-- Charts & scroll helpers -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.css"
     />
     <script src="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.min.js"></script>
-    <script src="/admin/js/dashboard.js"></script>
+
+    <!-- Shared admin page state -->
+    <script src="/admin/js/admin-page-state.js"></script>
 
     <!-- Page-specific styles -->
     <link rel="stylesheet" href="/admin/projects.css" />
@@ -79,53 +81,52 @@
         <div id="header"></div>
 
         <div class="container-fluid">
+          <div class="admin-page-status">
+            <div class="admin-error-banner d-none" role="alert" aria-live="polite">
+              <div class="admin-error-banner__content">
+                <i class="ti ti-alert-circle"></i>
+                <span>Something went wrong while loading this page.</span>
+              </div>
+              <button type="button" class="admin-error-banner__dismiss" aria-label="Dismiss error message">
+                <i class="ti ti-x"></i>
+              </button>
+            </div>
+
+            <div class="admin-loading-spinner d-none" role="status" aria-live="polite">
+              <div class="spinner-border text-danger" aria-hidden="true"></div>
+              <span class="admin-loading-spinner__text">Loading...</span>
+            </div>
+          </div>
+
           <div class="wildlife-dashboard-wrapper">
             <div class="wildlife-max-width">
-              <!-- Page title -->
               <section class="wildlife-hero">
                 <h1 class="wildlife-hero-title">Project Echo Management</h1>
               </section>
 
-              <!-- Stats row -->
               <section class="mb-4">
                 <div class="row g-3">
                   <div class="col-md-4">
                     <div class="wild-card">
                       <div class="wild-stat-label">Active Projects</div>
-                      <div
-                        class="wild-stat-value"
-                        id="activeProjectsCount"
-                      >
-                        0
-                      </div>
+                      <div class="wild-stat-value" id="activeProjectsCount">0</div>
                     </div>
                   </div>
                   <div class="col-md-4">
                     <div class="wild-card">
                       <div class="wild-stat-label">Ecologists</div>
-                      <div
-                        class="wild-stat-value"
-                        id="totalEcologistsCount"
-                      >
-                        0
-                      </div>
+                      <div class="wild-stat-value" id="totalEcologistsCount">0</div>
                     </div>
                   </div>
                   <div class="col-md-4">
                     <div class="wild-card">
                       <div class="wild-stat-label">Sensors Deployed</div>
-                      <div
-                        class="wild-stat-value"
-                        id="sensorsDeployedCount"
-                      >
-                        0
-                      </div>
+                      <div class="wild-stat-value" id="sensorsDeployedCount">0</div>
                     </div>
                   </div>
                 </div>
               </section>
 
-              <!-- Projects -->
               <section id="projectsSection">
                 <div class="wild-projects-header">
                   <div>
@@ -152,7 +153,7 @@
       </div>
     </div>
 
-      <!-- Create / Edit Project Modal -->
+    <!-- Create / Edit Project Modal -->
     <div
       class="modal fade"
       id="projectModal"
@@ -179,12 +180,7 @@
               <input type="hidden" id="projectId" value="" />
 
               <div class="mb-3">
-                <label
-                  class="form-label"
-                  for="projectName"
-                >
-                  Project Name
-                </label>
+                <label class="form-label" for="projectName">Project Name</label>
                 <input
                   type="text"
                   class="form-control"
@@ -195,12 +191,7 @@
               </div>
 
               <div class="mb-3">
-                <label
-                  class="form-label"
-                  for="projectDescription"
-                >
-                  Description
-                </label>
+                <label class="form-label" for="projectDescription">Description</label>
                 <textarea
                   class="form-control"
                   id="projectDescription"
@@ -211,12 +202,7 @@
 
               <div class="row g-3">
                 <div class="col-md-6">
-                  <label
-                    class="form-label"
-                    for="projectLocation"
-                  >
-                    Location
-                  </label>
+                  <label class="form-label" for="projectLocation">Location</label>
                   <input
                     type="text"
                     class="form-control"
@@ -226,28 +212,15 @@
                 </div>
 
                 <div class="col-md-3">
-                  <label
-                    class="form-label"
-                    for="projectStatus"
-                  >
-                    Status
-                  </label>
-                  <select
-                    class="form-select"
-                    id="projectStatus"
-                  >
+                  <label class="form-label" for="projectStatus">Status</label>
+                  <select class="form-select" id="projectStatus">
                     <option value="active" selected>Active</option>
                     <option value="planning">Planning</option>
                   </select>
                 </div>
 
                 <div class="col-md-3">
-                  <label
-                    class="form-label"
-                    for="projectSensors"
-                  >
-                    Sensors
-                  </label>
+                  <label class="form-label" for="projectSensors">Sensors</label>
                   <input
                     type="number"
                     min="0"
@@ -260,31 +233,17 @@
 
               <hr class="my-4" />
 
-              <!-- Ecologist assignment -->
               <div class="row g-3">
                 <div class="col-md-6">
-                  <label
-                    class="form-label"
-                    for="projectEcologists"
-                  >
-                    Assign Ecologists
-                  </label>
-                  <select
-                    class="form-select"
-                    id="projectEcologists"
-                    multiple
-                  >
-                    <!-- options populated via JS -->
-                  </select>
+                  <label class="form-label" for="projectEcologists">Assign Ecologists</label>
+                  <select class="form-select" id="projectEcologists" multiple></select>
                   <div class="form-text">
                     Hold Ctrl / Cmd to select multiple ecologists.
                   </div>
                 </div>
 
                 <div class="col-md-6">
-                  <label class="form-label">
-                    Ecologists on this project
-                  </label>
+                  <label class="form-label">Ecologists on this project</label>
                   <div
                     id="selectedEcologistsList"
                     class="border rounded p-2 small bg-light"
@@ -306,7 +265,6 @@
               </button>
 
               <div>
-                <!-- Create / Edit Project Modal -->
                 <button
                   type="button"
                   class="btn btn-secondary"
@@ -327,11 +285,11 @@
         </div>
       </div>
     </div>
+
     <div class="container-fluid">
       <div id="footer"></div>
     </div>
 
-    <!-- Bootstrap JS bundle (needed for modal) -->
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
       integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
@@ -340,4 +298,3 @@
     <script src="/admin/projects.js"></script>
   </body>
 </html>
-
