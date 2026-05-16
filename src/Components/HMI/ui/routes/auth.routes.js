@@ -221,7 +221,7 @@ module.exports = function (app) {
         console.log('Status Code: ' + axiosResponse.status + ' ' + axiosResponse.statusText)
         console.log("Server's response: ", axiosResponse.data);
 
-        enquiry = `Your new OTP is ${axiosResponse.data.otp} and click here to reset password :- http://localhost:8080/forgotPassword`
+        enquiry = `Your new OTP is ${axiosResponse.data.otp} and click here to reset password :- ${process.env.CLIENT_URL}/forgotPassword`
         
         await emailcontroller.send_enquiry(axiosResponse.data.email, 'Recovery Password', enquiry)
 

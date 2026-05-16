@@ -22,8 +22,8 @@ services:
 
   echo_engine:
     build:
-      context: ./Engine
-      dockerfile: Engine.Dockerfile
+      context: ../Prototypes/engine/torch_impl
+      dockerfile: light_engine.Dockerfile
     image: ts-echo-engine
     container_name: ts-echo-engine-cont
     networks:

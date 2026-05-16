@@ -1,0 +1,13 @@
+# Raspberry Pi / edge device dependencies
+# Install with: pip install -r requirements.txt
+#
+# tflite-runtime is the lightweight TFLite package for RPi (no full TF needed).
+# If running on a dev machine with TensorFlow installed, tflite-runtime can be
+# omitted and the fallback import in iot_edge_client.py will use tensorflow.lite.
+
+tflite-runtime
+numpy
+librosa
+sounddevice
+paho-mqtt==1.6.1
+gps3          # optional — only needed if --use-gps flag is used
