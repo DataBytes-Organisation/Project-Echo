@@ -12,7 +12,7 @@ const bcrypt = require('bcryptjs');
 client.connect();
 const cors = require('cors');
 require('dotenv').config();
-const API_BASE_URL = `http://${process.env.API_HOST || 'localhost'}:9000`;
+const API_BASE_URL = `http://${process.env.API_HOST || 'localhost'}:9001`;
 const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY);
 const axios = require('axios');
 const { MongoClient, ObjectId } = require('mongodb');
@@ -146,8 +146,8 @@ app.post("/api/create-checkout-session", async (req, res) => {
       metadata: {
       type: "One-Time"
       },
-      success_url: "http://localhost:8080/donation-success?session_id={CHECKOUT_SESSION_ID}", //`${process.env.CLIENT_URL}`,
-      cancel_url: "http://localhost:8080"//`${process.env.CLIENT_URL}`,
+      success_url: "http://localhost:9001/donation-success?session_id={CHECKOUT_SESSION_ID}", //`${process.env.CLIENT_URL}`,
+      cancel_url: "http://localhost:9001"//`${process.env.CLIENT_URL}`,
     })
     console.log("two");
     res.json({ url: session.url })
@@ -258,7 +258,7 @@ app.get('/cumulativeDonations', async (req, res) => {
 // =======================
 // Save Razorpay Payment to MongoDB
 // =======================
-const donationClient = new MongoClient(process.env.MONGODB_URI || `mongodb://root:root_password@${process.env.DB_HOST || 'localhost'}:27017`, {
+const donationClient = new MongoClient(process.env.MONGODB_URI || `mongodb://${process.env.DB_HOST || 'localhost'}:27017`, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 });
@@ -732,8 +732,7 @@ app.get("/welcome", async (req,res) => {
 })
 
 // MongoDB connection URI
-const uri = process.env.MONGO_URI || `mongodb://root:root_password@${process.env.DB_HOST || 'localhost'}:27017`;
-
+const uri = process.env.MONGO_URI || `mongodb://${process.env.DB_HOST || 'localhost'}:27017`;
 // Function to suspend or block a user by email or user ID
 const suspendOrBlockUser = async (identifier, action) => {
     const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
@@ -802,20 +801,31 @@ async function proxyToApi(req, res) {
       validateStatus: () => true,
     });
 
+    if (res.headersSent) return;
+
     res.status(response.status);
-    // axios may return undefined data for 204
-    if (typeof response.data === 'undefined') {
-      return res.end();
-    }
+    if (typeof response.data === 'undefined') return res.end();
     return res.send(response.data);
   } catch (error) {
-    console.error('Error proxying to API:', error);
-    return res.status(500).json({ error: 'Error proxying to API' });
+    console.error('Error proxying to API:', error.message);
+    if (!res.headersSent) {
+      return res.status(502).json({ error: 'API unavailable' });
+    }
   }
 }
 
 app.all('/sensors', proxyToApi);
 app.all('/sensors/*', proxyToApi);
+// Proxy all remaining API routes to the Python backend
+app.all('/movement_time/*', proxyToApi);
+app.all('/events_time/*', proxyToApi);
+app.all('/microphones', proxyToApi);
+app.all('/microphones/*', proxyToApi);
+app.all('/latest_movement', proxyToApi);
+app.all('/audio/*', proxyToApi);
+app.all('/post_recording', proxyToApi);
+app.all('/sim_control/*', proxyToApi);
+app.all('/hmi/*', proxyToApi);
 
 app.get('/iot/nodes', async (req, res) => {
   try {
