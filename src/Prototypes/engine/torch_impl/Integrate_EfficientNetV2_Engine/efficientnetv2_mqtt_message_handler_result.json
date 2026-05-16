@@ -1,0 +1,40 @@
+{
+    "device_id": "sensor_001",
+    "input_timestamp": "2026-04-27T15:30:00",
+    "processed_timestamp": "2026-04-27T19:18:01",
+    "model": "EfficientNetV2",
+    "input_audio": "C:\\Deakin\\ProjectEcho\\Project-Echo\\src\\Prototypes\\data\\data_files\\Acanthiza chrysorrhoa\\region_3.650-4.900.mp3",
+    "prediction": {
+        "label": "Acanthiza chrysorrhoa",
+        "class_index": 0,
+        "confidence": 0.9337119460105896
+    },
+    "top_predictions": [
+        {
+            "index": 0,
+            "label": "Acanthiza chrysorrhoa",
+            "confidence": 0.9337119460105896
+        },
+        {
+            "index": 47,
+            "label": "Dicaeum hirundinaceum",
+            "confidence": 0.02223811112344265
+        },
+        {
+            "index": 3,
+            "label": "Acanthiza pusilla",
+            "confidence": 0.007062176708132029
+        },
+        {
+            "index": 5,
+            "label": "Acanthiza uropygialis",
+            "confidence": 0.006129274610430002
+        },
+        {
+            "index": 103,
+            "label": "Rhipidura rufifrons",
+            "confidence": 0.0059699914418160915
+        }
+    ],
+    "status": "success"
+}

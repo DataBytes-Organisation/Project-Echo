@@ -9,8 +9,9 @@ sys.path.append(MODEL_DIR)
 
 from panns_cnn14 import PannsCNN14ArcFace
 
-CHECKPOINT_PATH = r"/Users/dinalfernando/Project-Echo/src/Prototypes/engine/torch_impl/model/cnn14/Cnn14_mAP=0.431.pth"
-ONNX_OUTPUT_PATH = r"/Users/dinalfernando/Project-Echo/src/Prototypes/engine/torch_impl/model/cnn14/cnn14.onnx"
+CHECKPOINT_PATH = r"\src\Prototypes\engine\torch_impl\model\cnn14\Cnn14_mAP=0.431.pth"
+ONNX_OUTPUT_PATH = r"\src\Prototypes\engine\torch_impl\model\cnn14\cnn14.onnx"
+
 
 DEVICE = "cpu"
 NUM_CLASSES = 123
@@ -42,6 +43,7 @@ torch.onnx.export(
     input_names=["input"],
     output_names=["output"],
     dynamic_axes={"input": {0: "batch_size"}, "output": {0: "batch_size"}},
+    dynamo=False,
 )
 
 m = onnx.load(ONNX_OUTPUT_PATH)
