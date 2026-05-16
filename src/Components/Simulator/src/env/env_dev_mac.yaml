@@ -1,0 +1,46 @@
+
+# conda env remove -vv -n dev
+# conda env create -vv -f dev.yaml
+
+# In c:\ProgramData\pip\pip.ini
+#
+# [global]
+# extra-index-url = https://download.pytorch.org/whl/cu117
+
+# [install]
+# trusted-host = download.pytorch.org
+
+name: sim
+channels:
+ - conda-forge
+ - nvidia
+ - pytorch
+ - defaults
+dependencies:
+ - python=3.8.16
+ - pip
+ - ipykernel
+ - go
+ - git
+ - ffmpeg
+ - sox
+ - pip:
+    - google-cloud
+    - google-cloud-storage
+    - matplotlib
+    - notebook
+    - numpy
+    - pandas
+    - pydot
+    - pydub
+    - pyproj
+    - scikit-image
+    - scikit-learn
+    - scipy
+    - unzip
+    - geopy
+    - folium
+    - shapely
+    - ipympl
+    - paho-mqtt
+    - asyncio-mqtt

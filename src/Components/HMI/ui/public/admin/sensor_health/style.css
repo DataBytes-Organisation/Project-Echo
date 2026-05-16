@@ -1,0 +1,69 @@
+/* ============================================================
+  PROJECT ECHO — FULL UI SYSTEM (sensor health styles)
+  Moved into /admin/sensor_health/ for admin integration
+*/
+:root {
+  --page: #F5F1EA;
+  --bg: #FFFFFF;
+  --ink: #1F2D23;
+  --muted: #6F7B74;
+  --border: #E4E1D9;
+  --shadow-card: 0 18px 40px rgba(15, 23, 42, .12);
+  --primary: #2F6E4F;
+  --primary-hover: #25553D;
+  --success: #2F6E4F;
+  --warning: #D29B38;
+  --danger: #C8473C;
+  --accent: #DDECE3;
+  --radius-window: 24px;
+  --radius: 8px;
+  --sp1: 8px;
+  --sp2: 16px;
+  --sp3: 24px;
+  --font: "Inter", system-ui, sans-serif;
+}
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+html, body { margin:0; padding:0; font-family:var(--font); background:var(--page); color:var(--ink); }
+
+.sidebar{ width:250px; background:#WHITE; border-right:1px solid #E6E6E6; padding:18px 14px; display:flex; flex-direction:column; }
+.brand-logo{ width:64px; height:64px; object-fit:contain; border-radius:999px; }
+.sidebar-menu{ display:flex; flex-direction:column; gap:14px; overflow:auto; padding-right:4px; }
+.nav-section{ display:flex; flex-direction:column; gap:6px; }
+.nav-title{ font-size:10px; letter-spacing:.12em; font-weight:700; color:#9AA0A6; padding:2px 8px; text-transform:uppercase; }
+.nav-link{ position:relative; display:flex; align-items:center; gap:10px; padding:8px 10px 8px 12px; border-radius:10px; text-decoration:none; color:#374151; font-size:13px; transition:background .15s ease, color .15s ease; }
+.nav-link:hover{ background:#F6F7F9; }
+.nav-icon{ width:22px; height:22px; display:inline-flex; align-items:center; justify-content:center; font-size:14px; color:#6B7280; }
+.nav-link.active{ background:#FFF2F6; color:#111827; font-weight:600; }
+
+.layout { display:flex; min-height:100vh; }
+.main { flex:1; padding:24px 32px; display:flex; flex-direction:column; }
+.page-header { display:flex; align-items:center; margin-bottom:var(--sp2); }
+.page-header-actions { margin-left:auto; display:flex; align-items:center; gap:10px; }
+.icon-button { width:36px; height:36px; border-radius:999px; border:none; background:transparent; cursor:pointer; font-size:18px; color:var(--muted); }
+.dashboard-shell { background:var(--page); border-radius:var(--radius-window); padding:40px; box-shadow:var(--shadow-card); max-width:1100px; margin:0 auto; width:100%; }
+.hero-header { text-align:center; margin-bottom:var(--sp3); }
+.hero-header h1 { margin:0; font-size:32px; color:var(--ink); }
+.card { background:#FFFFFF; border:1px solid var(--border); border-radius:20px; padding:var(--sp2) var(--sp3); margin-bottom:var(--sp2); box-shadow:var(--shadow-card); }
+.card h3 { margin:0; font-size:20px; color:var(--ink); }
+.card-subtitle { margin:4px 0 16px 0; font-size:13px; color:var(--muted); }
+
+table { width:100%; border-collapse:collapse; font-size:14px; }
+th { text-align:left; padding:12px 8px; font-weight:600; border-bottom:1px solid var(--border); color:var(--ink); }
+td { padding:12px 8px; border-bottom:1px solid var(--border); }
+tbody tr:hover { background:#FAFAFA; }
+
+.form-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(220px,1fr)); gap:var(--sp2); }
+label { font-size:13px; color:var(--muted); margin-bottom:4px; display:inline-block; }
+input, select, textarea { width:100%; padding:8px 12px; height:38px; border:1px solid var(--border); border-radius:var(--radius); font-size:14px; color:var(--ink); background:#FFFFFF; }
+
+.btn-primary, .btn-secondary { padding:8px 20px; border-radius:999px; font-size:14px; cursor:pointer; border:1px solid transparent; }
+.btn-primary { background:var(--primary); color:#FFF; }
+.pill { padding:2px 10px; border-radius:999px; font-size:12px; font-weight:600; }
+.pill-success { background: rgba(47, 110, 79, 0.15); color: var(--success); }
+.pill-warning { background: rgba(210, 155, 56, 0.20); color: var(--warning); }
+.pill-danger { background: rgba(200, 71, 60, 0.18); color: var(--danger); }
+
+@media (max-width:960px){ .sidebar{ position:fixed; top:0; bottom:0; left:-260px; transition:left .2s ease; z-index:50; } body.sidebar-open .sidebar{ left:0; } }

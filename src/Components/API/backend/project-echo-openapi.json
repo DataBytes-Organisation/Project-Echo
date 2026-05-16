@@ -1,0 +1,3961 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Project Echo API",
+    "description": "\n    Project Echo is an IoT-based system designed to record and analyze audio data for species identification and ecosystem monitoring.\n\n    This API provides endpoints to:\n    - Upload audio files\n    - Simulate audio responses\n    - Interface with HMI and audio engine modules\n    ",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/audio/upload": {
+      "post": {
+        "tags": [
+          "audio"
+        ],
+        "summary": "Upload Audio",
+        "operationId": "upload_audio_api_audio_upload_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_upload_audio_api_audio_upload_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/hmi/weather": {
+      "get": {
+        "tags": [
+          "hmi"
+        ],
+        "summary": "Get Weather",
+        "operationId": "get_weather_hmi_weather_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Timestamp"
+            },
+            "name": "timestamp",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "type": "number",
+              "title": "Lat"
+            },
+            "name": "lat",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "type": "number",
+              "title": "Lon"
+            },
+            "name": "lon",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get weather data for the day and location provided",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/hmi/events_time": {
+      "get": {
+        "tags": [
+          "hmi"
+        ],
+        "summary": "Show Event From Time",
+        "operationId": "show_event_from_time_hmi_events_time_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Start"
+            },
+            "name": "start",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "End"
+            },
+            "name": "end",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get detection events within certain duration",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/hmi/audio": {
+      "get": {
+        "tags": [
+          "hmi"
+        ],
+        "summary": "Show Audio",
+        "operationId": "show_audio_hmi_audio_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            },
+            "name": "id",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "returns audio given ID",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/hmi/movement_time": {
+      "get": {
+        "tags": [
+          "hmi"
+        ],
+        "summary": "Show Event From Time",
+        "operationId": "show_event_from_time_hmi_movement_time_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Start"
+            },
+            "name": "start",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "End"
+            },
+            "name": "end",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get true animal movement data within certain duration",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/hmi/microphones": {
+      "get": {
+        "tags": [
+          "hmi"
+        ],
+        "summary": "List Microphones",
+        "operationId": "list_microphones_hmi_microphones_get",
+        "responses": {
+          "200": {
+            "description": "returns location of all microphones",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/hmi/latest_movement": {
+      "get": {
+        "tags": [
+          "hmi"
+        ],
+        "summary": "Latest Movememnt",
+        "operationId": "latest_movememnt_hmi_latest_movement_get",
+        "responses": {
+          "200": {
+            "description": "returns the latest simluated movement message",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/hmi/api/submit": {
+      "post": {
+        "tags": [
+          "hmi"
+        ],
+        "summary": "Submit Request",
+        "operationId": "submit_request_hmi_api_submit_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestSchema"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWTBearer": []
+          }
+        ]
+      }
+    },
+    "/hmi/sim_control": {
+      "post": {
+        "tags": [
+          "hmi"
+        ],
+        "summary": "Post Control",
+        "operationId": "post_control_hmi_sim_control_post",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Control"
+            },
+            "name": "control",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/hmi/post_recording": {
+      "post": {
+        "tags": [
+          "hmi"
+        ],
+        "summary": "Post Recording",
+        "operationId": "post_recording_hmi_post_recording_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecordingData"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/hmi/signup": {
+      "post": {
+        "tags": [
+          "hmi"
+        ],
+        "summary": "Signup",
+        "operationId": "signup_hmi_signup_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserSignupSchema"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/hmi/signin": {
+      "post": {
+        "tags": [
+          "hmi"
+        ],
+        "summary": "Signin",
+        "operationId": "signin_hmi_signin_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserLoginSchema"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/hmi/signout": {
+      "post": {
+        "tags": [
+          "hmi"
+        ],
+        "summary": "Signout",
+        "operationId": "signout_hmi_signout_post",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Jwttoken"
+            },
+            "name": "jwtToken",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/hmi/guestsignup": {
+      "post": {
+        "tags": [
+          "hmi"
+        ],
+        "summary": "Guestsignup",
+        "operationId": "guestsignup_hmi_guestsignup_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GuestSignupSchema"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/hmi/api/requests": {
+      "patch": {
+        "tags": [
+          "hmi"
+        ],
+        "summary": "Update Request Status",
+        "operationId": "update_request_status_hmi_api_requests_patch",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "title": "Request Dict"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWTBearer": []
+          }
+        ]
+      }
+    },
+    "/hmi/api/updateConservationStatus": {
+      "patch": {
+        "tags": [
+          "hmi"
+        ],
+        "summary": "Update Request Status",
+        "operationId": "update_request_status_hmi_api_updateConservationStatus_patch",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "title": "Request Dict"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWTBearer": []
+          }
+        ]
+      }
+    },
+    "/hmi/ChangePassword": {
+      "post": {
+        "tags": [
+          "hmi"
+        ],
+        "summary": "Passwordchange",
+        "operationId": "passwordchange_hmi_ChangePassword_post",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Oldpw"
+            },
+            "name": "oldpw",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Newpw"
+            },
+            "name": "newpw",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Cfm Newpw"
+            },
+            "name": "cfm_newpw",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWTBearer": []
+          }
+        ]
+      }
+    },
+    "/hmi/admin-dashboard": {
+      "post": {
+        "tags": [
+          "hmi"
+        ],
+        "summary": "Checkadmin",
+        "operationId": "checkAdmin_hmi_admin_dashboard_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserLoginSchema"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "Response Checkadmin Hmi Admin Dashboard Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWTBearer": []
+          }
+        ]
+      }
+    },
+    "/hmi/requests": {
+      "get": {
+        "tags": [
+          "hmi"
+        ],
+        "summary": "Getrequests",
+        "operationId": "getRequests_hmi_requests_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWTBearer": []
+          }
+        ]
+      }
+    },
+    "/hmi/change-credential": {
+      "post": {
+        "tags": [
+          "hmi"
+        ],
+        "summary": "Changecredential",
+        "operationId": "changeCredential_hmi_change_credential_post",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Field"
+            },
+            "name": "field",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "New"
+            },
+            "name": "new",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWTBearer": []
+          }
+        ]
+      }
+    },
+    "/hmi/delete-account": {
+      "delete": {
+        "tags": [
+          "hmi"
+        ],
+        "summary": "Deleteaccount",
+        "operationId": "deleteaccount_hmi_delete_account_delete",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWTBearer": []
+          }
+        ]
+      }
+    },
+    "/hmi/forgot-password": {
+      "post": {
+        "tags": [
+          "hmi"
+        ],
+        "summary": "Forgotpassword",
+        "operationId": "forgotpassword_hmi_forgot_password_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForgotPasswordSchema"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/hmi/reset-password": {
+      "post": {
+        "tags": [
+          "hmi"
+        ],
+        "summary": "Forgotpassword",
+        "operationId": "forgotpassword_hmi_reset_password_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordSchema"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/hmi/filter_algorithm/{algorithm_type}": {
+      "get": {
+        "tags": [
+          "hmi"
+        ],
+        "summary": "Filter Name",
+        "operationId": "filter_name_hmi_filter_algorithm__algorithm_type__get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Algorithm Type"
+            },
+            "name": "algorithm_type",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "returns the running filter algorithm name",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/hmi/users/{user_id}/notifications": {
+      "get": {
+        "tags": [
+          "hmi"
+        ],
+        "summary": "Get User Notifications",
+        "operationId": "get_user_notifications_hmi_users__user_id__notifications_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "User Id"
+            },
+            "name": "user_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWTBearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "hmi"
+        ],
+        "summary": "Add Animal To Notifications",
+        "operationId": "add_animal_to_notifications_hmi_users__user_id__notifications_post",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "User Id"
+            },
+            "name": "user_id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnimalNotificationSchema"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWTBearer": []
+          }
+        ]
+      }
+    },
+    "/hmi/users/{user_id}/notifications/{species}": {
+      "delete": {
+        "tags": [
+          "hmi"
+        ],
+        "summary": "Remove Animal From Notifications",
+        "operationId": "remove_animal_from_notifications_hmi_users__user_id__notifications__species__delete",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "User Id"
+            },
+            "name": "user_id",
+            "in": "path"
+          },
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Species"
+            },
+            "name": "species",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWTBearer": []
+          }
+        ]
+      }
+    },
+    "/hmi/users": {
+      "get": {
+        "tags": [
+          "hmi"
+        ],
+        "summary": "Get All Users",
+        "operationId": "get_all_users_hmi_users_get",
+        "responses": {
+          "200": {
+            "description": "Get all users with visit data",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/hmi/users/{username}/visit": {
+      "post": {
+        "tags": [
+          "hmi"
+        ],
+        "summary": "Increment User Visit",
+        "operationId": "increment_user_visit_hmi_users__username__visit_post",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Username"
+            },
+            "name": "username",
+            "in": "path"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "number",
+              "title": "Visit Duration",
+              "default": 5.0
+            },
+            "name": "visit_duration",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Increment user visit count and time",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/engine/event": {
+      "post": {
+        "tags": [
+          "engine"
+        ],
+        "summary": "Create Event",
+        "operationId": "create_event_engine_event_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EventSchema"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/engine/animal_records": {
+      "get": {
+        "tags": [
+          "engine"
+        ],
+        "summary": "List Species Data",
+        "operationId": "list_species_data_engine_animal_records_get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Species",
+              "default": ""
+            },
+            "name": "species",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Event Start",
+              "default": ""
+            },
+            "name": "event_start",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Event End",
+              "default": ""
+            },
+            "name": "event_end",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "number",
+              "title": "Microphonella 0"
+            },
+            "name": "microphoneLLA_0",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "number",
+              "title": "Microphonella 1"
+            },
+            "name": "microphoneLLA_1",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "number",
+              "title": "Microphonella 2"
+            },
+            "name": "microphoneLLA_2",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get all record of animals",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/engine/algorithms_data": {
+      "get": {
+        "tags": [
+          "engine"
+        ],
+        "summary": "Filter Name",
+        "operationId": "filter_name_engine_algorithms_data_get",
+        "responses": {
+          "200": {
+            "description": "returns the running list of algorithm data",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sim/movement": {
+      "post": {
+        "tags": [
+          "sim"
+        ],
+        "summary": "Create Movement",
+        "operationId": "create_movement_sim_movement_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MovementSchema"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sim/microphones": {
+      "post": {
+        "tags": [
+          "sim"
+        ],
+        "summary": "Create Microphones",
+        "operationId": "create_microphones_sim_microphones_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "items": {
+                  "$ref": "#/components/schemas/MicrophoneSchema"
+                },
+                "type": "array",
+                "title": "Microphones"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/2fa/generate": {
+      "post": {
+        "tags": [
+          "2FA Authentication"
+        ],
+        "summary": "Generate 2Fa Code",
+        "description": "Generate a 2FA code for a validated user and send it via SMS",
+        "operationId": "generate_2fa_code_2fa_generate_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/2fa/verify": {
+      "post": {
+        "tags": [
+          "2FA Authentication"
+        ],
+        "summary": "Verify 2Fa Code",
+        "description": "Verify a 2FA code and issue a JWT token if valid",
+        "operationId": "verify_2fa_code_2fa_verify_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TwoFactorVerifySchema"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/budget/limits": {
+      "get": {
+        "tags": [
+          "admin",
+          "admin-budget"
+        ],
+        "summary": "Get current budget limits config",
+        "operationId": "get_limits_endpoint_api_admin_budget_limits_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "admin",
+          "admin-budget"
+        ],
+        "summary": "Set budget limits config (rules)",
+        "operationId": "set_limits_endpoint_api_admin_budget_limits_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "items": {
+                  "type": "object"
+                },
+                "type": "array",
+                "title": "Rules",
+                "description": "List of budget rules"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/budget/usage": {
+      "get": {
+        "tags": [
+          "admin",
+          "admin-budget"
+        ],
+        "summary": "Get current usage for a service (optionally month)",
+        "operationId": "get_usage_endpoint_api_admin_budget_usage_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Service"
+            },
+            "name": "service",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Month Key"
+            },
+            "name": "month_key",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/services/{service}/status": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Get Pause Status",
+        "operationId": "get_pause_status_api_admin_services__service__status_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Service"
+            },
+            "name": "service",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServicePauseOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/services/pause": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Pause Or Resume Service",
+        "operationId": "pause_or_resume_service_api_admin_services_pause_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServicePauseIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServicePauseOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/services": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "List Services Status",
+        "operationId": "list_services_status_api_admin_services_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ServicePauseOut"
+                  },
+                  "type": "array",
+                  "title": "Response List Services Status Api Admin Services Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/public/public-test": {
+      "get": {
+        "tags": [
+          "public"
+        ],
+        "summary": "Public Test",
+        "description": "A simple test endpoint to confirm that the public router is loaded successfully.",
+        "operationId": "public_test_public_public_test_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/public/filter-data": {
+      "get": {
+        "tags": [
+          "public"
+        ],
+        "summary": "Filter Data",
+        "description": "Provides a public, no-authentication data filtering interface.\nOptional query parameters include:\n- start_time: float, Unix timestamp (in seconds)\n- end_time: float, Unix timestamp (in seconds)\n- species: str, species name\n- microphone_id: str, sensor ID\n\nReturns data filtered based on the given criteria.",
+        "operationId": "filter_data_public_filter_data_get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "type": "number",
+              "title": "Start Time"
+            },
+            "name": "start_time",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "number",
+              "title": "End Time"
+            },
+            "name": "end_time",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Species"
+            },
+            "name": "species",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Microphone Id"
+            },
+            "name": "microphone_id",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/iot/nodes": {
+      "get": {
+        "tags": [
+          "iot"
+        ],
+        "summary": "Get Nodes",
+        "operationId": "get_nodes_iot_nodes_get",
+        "responses": {
+          "200": {
+            "description": "List all nodes",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/iot/nodes/{node_id}": {
+      "get": {
+        "tags": [
+          "iot"
+        ],
+        "summary": "Get Node",
+        "operationId": "get_node_iot_nodes__node_id__get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Node Id"
+            },
+            "name": "node_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get a single node by ID",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/iot/nodes/{node_id}/components": {
+      "get": {
+        "tags": [
+          "iot"
+        ],
+        "summary": "Get Node Components",
+        "operationId": "get_node_components_iot_nodes__node_id__components_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Node Id"
+            },
+            "name": "node_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get components for a node",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/iot/nodes/{node_id}/connections": {
+      "get": {
+        "tags": [
+          "iot"
+        ],
+        "summary": "Get Node Connections",
+        "operationId": "get_node_connections_iot_nodes__node_id__connections_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Node Id"
+            },
+            "name": "node_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get connections for a node",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/iot/nodes/{node_id}/register": {
+      "put": {
+        "tags": [
+          "iot"
+        ],
+        "summary": "Register Node",
+        "operationId": "register_node_iot_nodes__node_id__register_put",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Node Id"
+            },
+            "name": "node_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Register a node",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/iot/nodes/{node_id}/heartbeat": {
+      "put": {
+        "tags": [
+          "iot"
+        ],
+        "summary": "Update Node Connection",
+        "operationId": "update_node_connection_iot_nodes__node_id__heartbeat_put",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Node Id"
+            },
+            "name": "node_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Update node's last message and connection status",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/iot/nodes/{node_id}/updates": {
+      "post": {
+        "tags": [
+          "iot"
+        ],
+        "summary": "Update Node Data",
+        "operationId": "update_node_data_iot_nodes__node_id__updates_post",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Node Id"
+            },
+            "name": "node_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Update node's components data",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sensors/updates": {
+      "get": {
+        "tags": [
+          "sensors"
+        ],
+        "summary": "Get Sensor Updates",
+        "operationId": "get_sensor_updates_sensors_updates_get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 5000.0,
+              "minimum": 1.0,
+              "title": "Limit",
+              "default": 500
+            },
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Derived sensor health updates",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sensors/alerts": {
+      "get": {
+        "tags": [
+          "sensors"
+        ],
+        "summary": "Get Sensor Alerts",
+        "operationId": "get_sensor_alerts_sensors_alerts_get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 5000.0,
+              "minimum": 1.0,
+              "title": "Limit",
+              "default": 500
+            },
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Derived alerts from sensor health",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sensors/{sensor_id}/settings": {
+      "get": {
+        "tags": [
+          "sensors"
+        ],
+        "summary": "Get Sensor Settings",
+        "operationId": "get_sensor_settings_sensors__sensor_id__settings_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Sensor Id"
+            },
+            "name": "sensor_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get sensor settings (sensor-specific or global defaults)",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "sensors"
+        ],
+        "summary": "Put Sensor Settings",
+        "operationId": "put_sensor_settings_sensors__sensor_id__settings_put",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Sensor Id"
+            },
+            "name": "sensor_id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "title": "Payload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Upsert sensor settings",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sensors/{sensor_id}/reboot": {
+      "post": {
+        "tags": [
+          "sensors"
+        ],
+        "summary": "Queue Reboot",
+        "operationId": "queue_reboot_sensors__sensor_id__reboot_post",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Sensor Id"
+            },
+            "name": "sensor_id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "title": "Payload",
+                "default": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Queue a reboot command (records intent only)",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sensors/{sensor_id}/reboots": {
+      "get": {
+        "tags": [
+          "sensors"
+        ],
+        "summary": "Get Reboot History",
+        "operationId": "get_reboot_history_sensors__sensor_id__reboots_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Sensor Id"
+            },
+            "name": "sensor_id",
+            "in": "path"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200.0,
+              "minimum": 1.0,
+              "title": "Limit",
+              "default": 50
+            },
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Reboot history for a sensor",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sensors/reboots/recent": {
+      "get": {
+        "tags": [
+          "sensors"
+        ],
+        "summary": "Get Recent Reboots",
+        "operationId": "get_recent_reboots_sensors_reboots_recent_get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200.0,
+              "minimum": 1.0,
+              "title": "Limit",
+              "default": 50
+            },
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Recent reboot history across all sensors",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/predict": {
+      "post": {
+        "tags": [
+          "predict"
+        ],
+        "summary": "Predict",
+        "operationId": "predict_predict_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_predict_predict_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/predictions/recent": {
+      "get": {
+        "tags": [
+          "predict"
+        ],
+        "summary": "Recent Predictions",
+        "operationId": "recent_predictions_predictions_recent_get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "title": "Limit",
+              "default": 10
+            },
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/insights/overview": {
+      "get": {
+        "tags": [
+          "insights",
+          "insights"
+        ],
+        "summary": "Insights Overview",
+        "operationId": "insights_overview_insights_overview_get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Start"
+            },
+            "name": "start",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "End"
+            },
+            "name": "end",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/insights/species": {
+      "get": {
+        "tags": [
+          "insights",
+          "insights"
+        ],
+        "summary": "Insights Species",
+        "operationId": "insights_species_insights_species_get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 50.0,
+              "minimum": 1.0,
+              "title": "Limit",
+              "default": 10
+            },
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/": {
+      "get": {
+        "summary": "Show Home",
+        "operationId": "show_home__get",
+        "responses": {
+          "200": {
+            "description": "API Root",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/signin": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Signin",
+        "operationId": "signin_api_signin_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignInRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/verify-otp": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Verify Otp",
+        "operationId": "verify_otp_api_verify_otp_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OTPVerifyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/detections": {
+      "get": {
+        "tags": [
+          "detections"
+        ],
+        "summary": "List detections with pagination and filtering",
+        "operationId": "list_detections_endpoint_detections_get",
+        "parameters": [
+          {
+            "description": "Filter by species name (exact match)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Species",
+              "description": "Filter by species name (exact match)"
+            },
+            "name": "species",
+            "in": "query"
+          },
+          {
+            "description": "Filter detections from this timestamp (inclusive, ISO 8601)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Start Time",
+              "description": "Filter detections from this timestamp (inclusive, ISO 8601)"
+            },
+            "name": "start_time",
+            "in": "query"
+          },
+          {
+            "description": "Filter detections up to this timestamp (inclusive, ISO 8601)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "title": "End Time",
+              "description": "Filter detections up to this timestamp (inclusive, ISO 8601)"
+            },
+            "name": "end_time",
+            "in": "query"
+          },
+          {
+            "description": "Latitude for location filter (requires lon & radius_km)",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "title": "Lat",
+              "description": "Latitude for location filter (requires lon & radius_km)"
+            },
+            "name": "lat",
+            "in": "query"
+          },
+          {
+            "description": "Longitude for location filter (requires lat & radius_km)",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "title": "Lon",
+              "description": "Longitude for location filter (requires lat & radius_km)"
+            },
+            "name": "lon",
+            "in": "query"
+          },
+          {
+            "description": "Radius in kilometres for location filter (requires lat & lon)",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "title": "Radius Km",
+              "description": "Radius in kilometres for location filter (requires lat & lon)"
+            },
+            "name": "radius_km",
+            "in": "query"
+          },
+          {
+            "description": "Page number (1-based)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1.0,
+              "title": "Page",
+              "description": "Page number (1-based)",
+              "default": 1
+            },
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "description": "Number of detections per page (max 100)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100.0,
+              "minimum": 1.0,
+              "title": "Page Size",
+              "description": "Number of detections per page (max 100)",
+              "default": 20
+            },
+            "name": "page_size",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DetectionListResponses"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "detections"
+        ],
+        "summary": "Create a new detection",
+        "operationId": "create_detection_endpoint_detections_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DetectionCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Detection"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/detections/{detection_id}": {
+      "get": {
+        "tags": [
+          "detections"
+        ],
+        "summary": "Get a single detection by id",
+        "operationId": "get_detection_endpoint_detections__detection_id__get",
+        "parameters": [
+          {
+            "description": "MongoDB ObjectId of the detection",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Detection Id",
+              "description": "MongoDB ObjectId of the detection"
+            },
+            "name": "detection_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Detection"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "detections"
+        ],
+        "summary": "Delete a detection by id",
+        "operationId": "delete_detection_endpoint_detections__detection_id__delete",
+        "parameters": [
+          {
+            "description": "MongoDB ObjectId of the detection",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Detection Id",
+              "description": "MongoDB ObjectId of the detection"
+            },
+            "name": "detection_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "detections"
+        ],
+        "summary": "Update fields of a detection",
+        "operationId": "update_detection_endpoint_detections__detection_id__patch",
+        "parameters": [
+          {
+            "description": "MongoDB ObjectId of the detection",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Detection Id",
+              "description": "MongoDB ObjectId of the detection"
+            },
+            "name": "detection_id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "title": "Updates",
+                "description": "Partial update payload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Detection"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/detections/predict": {
+      "post": {
+        "tags": [
+          "detections"
+        ],
+        "summary": "Run species prediction (budget-controlled)",
+        "operationId": "predict_endpoint_detections_predict_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "title": "Payload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AddressSchema": {
+        "properties": {
+          "country": {
+            "type": "string",
+            "title": "Country"
+          },
+          "state": {
+            "type": "string",
+            "title": "State"
+          }
+        },
+        "type": "object",
+        "required": [
+          "country"
+        ],
+        "title": "AddressSchema"
+      },
+      "AnimalNotificationSchema": {
+        "properties": {
+          "species": {
+            "type": "string",
+            "title": "Species"
+          },
+          "confidence": {
+            "type": "number",
+            "title": "Confidence"
+          },
+          "common": {
+            "type": "string",
+            "title": "Common"
+          }
+        },
+        "type": "object",
+        "required": [
+          "species",
+          "confidence",
+          "common"
+        ],
+        "title": "AnimalNotificationSchema",
+        "example": {
+          "species": "Sus scrofa",
+          "common": "Wild Boar"
+        }
+      },
+      "Body_predict_predict_post": {
+        "properties": {
+          "audio": {
+            "type": "string",
+            "format": "binary",
+            "title": "Audio"
+          },
+          "upload_id": {
+            "type": "string",
+            "title": "Upload Id"
+          },
+          "user_id": {
+            "type": "string",
+            "title": "User Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "audio"
+        ],
+        "title": "Body_predict_predict_post"
+      },
+      "Body_upload_audio_api_audio_upload_post": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "format": "binary",
+            "title": "File"
+          },
+          "user_id": {
+            "type": "string",
+            "title": "User Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "title": "Body_upload_audio_api_audio_upload_post"
+      },
+      "Detection": {
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "sensorId": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Sensorid"
+          },
+          "species": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Species"
+          },
+          "microphoneLLA": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 3,
+            "title": "Microphonella"
+          },
+          "animalEstLLA": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 3,
+            "title": "Animalestlla"
+          },
+          "animalTrueLLA": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 3,
+            "title": "Animaltruella"
+          },
+          "animalLLAUncertainty": {
+            "type": "integer",
+            "title": "Animalllauncertainty"
+          },
+          "audioClip": {
+            "type": "string",
+            "title": "Audioclip"
+          },
+          "confidence": {
+            "type": "number",
+            "exclusiveMaximum": 100.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Confidence"
+          },
+          "sampleRate": {
+            "type": "integer",
+            "title": "Samplerate"
+          },
+          "_id": {
+            "type": "string",
+            "title": " Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "timestamp",
+          "sensorId",
+          "species",
+          "microphoneLLA",
+          "animalEstLLA",
+          "animalTrueLLA",
+          "animalLLAUncertainty",
+          "audioClip",
+          "confidence",
+          "sampleRate"
+        ],
+        "title": "Detection",
+        "example": {
+          "timestamp": "2023-03-22T13:45:12.000Z",
+          "sensorId": "2",
+          "species": "Sus Scrofa",
+          "microphoneLLA": [
+            -33.1101,
+            150.0567,
+            23
+          ],
+          "animalEstLLA": [
+            -33.1105,
+            150.0569,
+            23
+          ],
+          "animalTrueLLA": [
+            -33.1106,
+            150.057,
+            23
+          ],
+          "animalLLAUncertainty": 10,
+          "audioClip": "some audio_base64 data",
+          "confidence": 99.4,
+          "sampleRate": 48000
+        }
+      },
+      "DetectionCreate": {
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "sensorId": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Sensorid"
+          },
+          "species": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Species"
+          },
+          "microphoneLLA": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 3,
+            "title": "Microphonella"
+          },
+          "animalEstLLA": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 3,
+            "title": "Animalestlla"
+          },
+          "animalTrueLLA": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 3,
+            "title": "Animaltruella"
+          },
+          "animalLLAUncertainty": {
+            "type": "integer",
+            "title": "Animalllauncertainty"
+          },
+          "audioClip": {
+            "type": "string",
+            "title": "Audioclip"
+          },
+          "confidence": {
+            "type": "number",
+            "exclusiveMaximum": 100.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Confidence"
+          },
+          "sampleRate": {
+            "type": "integer",
+            "title": "Samplerate"
+          }
+        },
+        "type": "object",
+        "required": [
+          "timestamp",
+          "sensorId",
+          "species",
+          "microphoneLLA",
+          "animalEstLLA",
+          "animalTrueLLA",
+          "animalLLAUncertainty",
+          "audioClip",
+          "confidence",
+          "sampleRate"
+        ],
+        "title": "DetectionCreate",
+        "example": {
+          "timestamp": "2023-03-22T13:45:12.000Z",
+          "sensorId": "2",
+          "species": "Sus Scrofa",
+          "microphoneLLA": [
+            -33.1101,
+            150.0567,
+            23
+          ],
+          "animalEstLLA": [
+            -33.1105,
+            150.0569,
+            23
+          ],
+          "animalTrueLLA": [
+            -33.1106,
+            150.057,
+            23
+          ],
+          "animalLLAUncertainty": 10,
+          "audioClip": "some audio_base64 data",
+          "confidence": 99.4,
+          "sampleRate": 48000
+        }
+      },
+      "DetectionListResponses": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/Detection"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "page_size": {
+            "type": "integer",
+            "title": "Page Size"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "page",
+          "page_size"
+        ],
+        "title": "DetectionListResponses"
+      },
+      "EmailNotifications": {
+        "properties": {
+          "species": {
+            "type": "string",
+            "title": "Species"
+          },
+          "last_sent": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Last Sent"
+          }
+        },
+        "type": "object",
+        "required": [
+          "species",
+          "last_sent"
+        ],
+        "title": "EmailNotifications",
+        "example": {
+          "species": "Sus scrofa",
+          "last_sent": "2024-09-15T10:30:00Z"
+        }
+      },
+      "EventSchema": {
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "sensorId": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Sensorid"
+          },
+          "species": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Species"
+          },
+          "microphoneLLA": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 3,
+            "title": "Microphonella"
+          },
+          "animalEstLLA": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 3,
+            "title": "Animalestlla"
+          },
+          "animalTrueLLA": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 3,
+            "title": "Animaltruella"
+          },
+          "animalLLAUncertainty": {
+            "type": "integer",
+            "title": "Animalllauncertainty"
+          },
+          "audioClip": {
+            "type": "string",
+            "title": "Audioclip"
+          },
+          "confidence": {
+            "type": "number",
+            "exclusiveMaximum": 100.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Confidence"
+          },
+          "sampleRate": {
+            "type": "integer",
+            "title": "Samplerate"
+          }
+        },
+        "type": "object",
+        "required": [
+          "timestamp",
+          "sensorId",
+          "species",
+          "microphoneLLA",
+          "animalEstLLA",
+          "animalTrueLLA",
+          "animalLLAUncertainty",
+          "audioClip",
+          "confidence",
+          "sampleRate"
+        ],
+        "title": "EventSchema",
+        "example": {
+          "timestamp": "2023-03-22T13:45:12.000Z",
+          "sensorId": "2",
+          "species": "Sus Scrofa",
+          "microphoneLLA": [
+            -33.1101,
+            150.0567,
+            23
+          ],
+          "animalEstLLA": [
+            -33.1105,
+            150.0569,
+            23
+          ],
+          "animalTrueLLA": [
+            -33.1106,
+            150.057,
+            23
+          ],
+          "animalLLAUncertainty": 10,
+          "audioClip": "some audio_base64 data",
+          "confidence": 99.4,
+          "sampleRate": 48000
+        }
+      },
+      "ForgotPasswordSchema": {
+        "properties": {
+          "user": {
+            "type": "string",
+            "title": "User"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user"
+        ],
+        "title": "ForgotPasswordSchema"
+      },
+      "GuestSignupSchema": {
+        "properties": {
+          "username": {
+            "type": "string",
+            "title": "Username"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "password": {
+            "type": "string",
+            "title": "Password"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          }
+        },
+        "type": "object",
+        "required": [
+          "username",
+          "email",
+          "password",
+          "timestamp"
+        ],
+        "title": "GuestSignupSchema"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "MicrophoneSchema": {
+        "properties": {
+          "sensorId": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Sensorid"
+          },
+          "microphoneLLA": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 3,
+            "title": "Microphonella"
+          }
+        },
+        "type": "object",
+        "required": [
+          "sensorId",
+          "microphoneLLA"
+        ],
+        "title": "MicrophoneSchema",
+        "example": {
+          "sensorId": "2",
+          "microphoneLLA": [
+            -33.1106,
+            150.057,
+            23
+          ]
+        }
+      },
+      "MovementSchema": {
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "species": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Species"
+          },
+          "animalId": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Animalid"
+          },
+          "animalTrueLLA": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 3,
+            "title": "Animaltruella"
+          }
+        },
+        "type": "object",
+        "required": [
+          "timestamp",
+          "species",
+          "animalId",
+          "animalTrueLLA"
+        ],
+        "title": "MovementSchema",
+        "example": {
+          "timestamp": "2023-03-22T13:45:12.000Z",
+          "species": "Sus Scrofa",
+          "animalId": "1",
+          "animalTrueLLA": [
+            -33.1106,
+            150.057,
+            23
+          ]
+        }
+      },
+      "OTPVerifyRequest": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "otp": {
+            "type": "string",
+            "title": "Otp"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email",
+          "otp"
+        ],
+        "title": "OTPVerifyRequest"
+      },
+      "RecordingData": {
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "sensorId": {
+            "type": "string",
+            "title": "Sensorid"
+          },
+          "microphoneLLA": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 3,
+            "title": "Microphonella"
+          },
+          "animalEstLLA": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 3,
+            "title": "Animalestlla"
+          },
+          "animalTrueLLA": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 3,
+            "title": "Animaltruella"
+          },
+          "animalLLAUncertainty": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Animalllauncertainty"
+          },
+          "audioClip": {
+            "type": "string",
+            "title": "Audioclip"
+          },
+          "mode": {
+            "type": "string",
+            "title": "Mode"
+          },
+          "audioFile": {
+            "type": "string",
+            "title": "Audiofile"
+          }
+        },
+        "type": "object",
+        "required": [
+          "timestamp",
+          "sensorId",
+          "microphoneLLA",
+          "animalEstLLA",
+          "animalTrueLLA",
+          "animalLLAUncertainty",
+          "audioClip",
+          "mode",
+          "audioFile"
+        ],
+        "title": "RecordingData"
+      },
+      "RequestSchema": {
+        "properties": {
+          "username": {
+            "type": "string",
+            "title": "Username"
+          },
+          "animal": {
+            "type": "string",
+            "title": "Animal"
+          },
+          "requestingToChange": {
+            "type": "string",
+            "title": "Requestingtochange"
+          },
+          "initial": {
+            "type": "string",
+            "title": "Initial"
+          },
+          "modified": {
+            "type": "string",
+            "title": "Modified"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Date"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "username",
+          "animal",
+          "requestingToChange",
+          "initial",
+          "modified",
+          "source",
+          "date",
+          "status"
+        ],
+        "title": "RequestSchema"
+      },
+      "ResetPasswordSchema": {
+        "properties": {
+          "user": {
+            "type": "string",
+            "title": "User"
+          },
+          "password": {
+            "type": "string",
+            "title": "Password"
+          },
+          "otp": {
+            "type": "integer",
+            "title": "Otp"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user",
+          "password",
+          "otp"
+        ],
+        "title": "ResetPasswordSchema"
+      },
+      "ServicePauseIn": {
+        "properties": {
+          "service": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Service"
+          },
+          "paused": {
+            "type": "boolean",
+            "title": "Paused"
+          }
+        },
+        "type": "object",
+        "required": [
+          "service",
+          "paused"
+        ],
+        "title": "ServicePauseIn"
+      },
+      "ServicePauseOut": {
+        "properties": {
+          "service": {
+            "type": "string",
+            "title": "Service"
+          },
+          "paused": {
+            "type": "boolean",
+            "title": "Paused"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "service",
+          "paused",
+          "updated_at"
+        ],
+        "title": "ServicePauseOut"
+      },
+      "SignInRequest": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "password": {
+            "type": "string",
+            "title": "Password"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email",
+          "password"
+        ],
+        "title": "SignInRequest"
+      },
+      "TwoFactorVerifySchema": {
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "title": "User Id"
+          },
+          "otp": {
+            "type": "string",
+            "title": "Otp"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_id",
+          "otp"
+        ],
+        "title": "TwoFactorVerifySchema"
+      },
+      "UserLoginSchema": {
+        "properties": {
+          "username": {
+            "type": "string",
+            "title": "Username"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "password": {
+            "type": "string",
+            "title": "Password"
+          }
+        },
+        "type": "object",
+        "required": [
+          "username",
+          "email",
+          "password"
+        ],
+        "title": "UserLoginSchema"
+      },
+      "UserSignupSchema": {
+        "properties": {
+          "username": {
+            "type": "string",
+            "title": "Username"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8,
+            "title": "Password"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "roles": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Roles"
+          },
+          "gender": {
+            "type": "string",
+            "title": "Gender"
+          },
+          "DoB": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Dob"
+          },
+          "address": {
+            "$ref": "#/components/schemas/AddressSchema"
+          },
+          "organization": {
+            "type": "string",
+            "title": "Organization"
+          },
+          "phonenumber": {
+            "type": "string",
+            "title": "Phonenumber"
+          },
+          "notificationAnimals": {
+            "items": {
+              "$ref": "#/components/schemas/AnimalNotificationSchema"
+            },
+            "type": "array",
+            "title": "Notificationanimals",
+            "default": []
+          },
+          "emailNotifications": {
+            "items": {
+              "$ref": "#/components/schemas/EmailNotifications"
+            },
+            "type": "array",
+            "title": "Emailnotifications",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "username",
+          "password",
+          "email",
+          "roles",
+          "gender",
+          "DoB",
+          "address",
+          "organization"
+        ],
+        "title": "UserSignupSchema"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    },
+    "securitySchemes": {
+      "JWTBearer": {
+        "type": "http",
+        "scheme": "bearer"
+      },
+      "HTTPBearer": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  }
+}

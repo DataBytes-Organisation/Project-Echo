@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Settings – Project Echo</title>
+  <link rel="stylesheet" type="text/css" href="/admin/css/styles.min.css" />
+  <link rel="stylesheet" href="/admin/css/icons/tabler-icons/tabler-icons.css" />
+  <link rel="stylesheet" href="/admin/sensor_health/style.css" />
+  <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script type="text/javascript" src="/admin/js/app.min.js"></script>
+  <script src="/admin/sensor_health/script.js" defer></script>
+</head>
+<body>
+  <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
+    data-sidebar-position="fixed" data-header-position="fixed">
+    <!-- Sidebar Start -->
+    <div id="sidebar"></div>
+    <!--  Sidebar End -->
+    <!--  Main wrapper -->
+    <div class="body-wrapper">
+      <div id="header"></div>
+      <div class="container-fluid">
+        <div class="sensor-page">
+          <div class="dashboard-shell">
+      <section class="hero-header"><h1>Settings</h1><p class="subtitle">configure recording behaviour and alert thresholds</p></section>
+      <p id="settings-message" class="note"></p>
+      <section class="card"><h3>Recording & alert settings</h3><p class="card-subtitle">Adjust global defaults for sensor recording interval, sensitivity and low-battery alerts.</p>
+        <div class="form-grid"><div><label for="record-interval">Recording interval</label><select id="record-interval"><option>30 seconds</option><option selected>1 minute</option><option>5 minutes</option><option>10 minutes</option></select></div>
+        <div><label for="sensitivity">Sensitivity</label><select id="sensitivity"><option>Low</option><option selected>Medium</option><option>High</option></select></div>
+        <div><label for="battery-threshold">Battery warning threshold (%)</label><input id="battery-threshold" type="number" value="25" min="1" max="100" /></div></div>
+        <button class="btn-primary" onclick="fakeSaveSettings()">Save settings</button>
+      </section>
+    </div> <!-- END dashboard-shell -->
+        </div>
+      <div id="footer"></div>
+    </div>
+  </div>
+
+  <script>
+    $(document).ready(function() {
+      $("#sidebar").load("/admin/component/sidebar-component.html", function() { $.getScript('/admin/js/sidebarmenu.js'); });
+      $("#header").load("/admin/component/header-component.html");
+      $("#footer").load("/admin/component/footer-component.html");
+    });
+  </script>
+</body>
+</html>

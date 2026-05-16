@@ -1,0 +1,19 @@
+INSTRUCTIONS :
+
+Hi everyone,
+
+Please fill in the description for the bird assigned to you int he HMI_API_onboarding_task.json. Youc can filnd the allocated bird in the Google Sheet and finally, commit the changes to GitHub.
+
+Github naming convention - 
+
+Abbreviations are:
+EAPI -> Echo API
+EHMI ->  Echo HMI
+
+For example, in my onboarding task for API team, my initial would be "AR" and the branch objective is "Onboarding-Task" thus my branch name is:
+ 
+EAPI/AR/Onboarding-Task
+ 
+Please make your own branches from the main and do not create your own fork of the repo.
+
+📄 Sheet Link: https://docs.google.com/spreadsheets/d/1N5EfIDJRueiYu2PkTgQ39KMzm4Y5jraFLj9sokHMJTM/edit?usp=sharing

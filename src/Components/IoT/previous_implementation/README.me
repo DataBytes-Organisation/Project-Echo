@@ -1,0 +1,25 @@
+# Echo Device Management Application
+
+## Overview
+
+This project provides a comprehensive device management system for field-deployed Echo IoT devices. The system enables remote control, monitoring, audio capture, secure communication, and device onboarding through MQTT etc.
+
+## Setup and Usage
+
+Run `setup_py.sh` on client Pi to:
+
+- Create a Python virtual environment.
+- Install dependencies
+- Generate SSH key pair with correct permissions.
+- Set up auto-boot 
+
+Then:
+- Run `onboarding_server.py` which listens for MQTT onboarding requests.
+- Run `onboarding_client.py` to perform MQTT-based device onboarding.
+
+### `client_pi.py`
+- Retrieves health data, location and records audio
+- Runs audio file through lightweight model to get species confidence level
+
+#### Flask Server (`server_main.py`):
+- Receives POST uploads of health data, location and species confidence from devices.

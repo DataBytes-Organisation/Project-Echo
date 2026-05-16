@@ -1,0 +1,17 @@
+[
+    {
+      "id": 1,
+      "fileName": "forest_audio_1.mp3",
+      "date": "2025-04-03",
+      "audioUrl": "/audios/forest_audio_1.mp3",
+      "detectedAnimals": ["Koala", "Kookaburra", "Possum"]
+    },
+    {
+      "id": 2,
+      "fileName": "riverbank_audio_2.mp3",
+      "date": "2025-04-02",
+      "audioUrl": "/audios/riverbank_audio_2.mp3",
+      "detectedAnimals": ["Frog", "Platypus"]
+    }
+  ]
+  

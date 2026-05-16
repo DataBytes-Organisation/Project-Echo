@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>User Visits</title>
+  <style>
+    table { border-collapse: collapse; width: 50%; }
+    th, td { border: 1px solid black; padding: 8px; text-align: left; }
+    th { background-color: #f2f2f2; }
+  </style>
+</head>
+<body>
+  <h1>User Visits</h1>
+  <table id="userTable">
+    <tr><th>User</th><th>Visit Count</th><th>Total Time (min)</th></tr>
+  </table>
+  <script>
+    fetch('http://localhost:9000/hmi/users')
+      .then(response => response.json())
+      .then(users => {
+        const table = document.getElementById("userTable");
+        if (!Array.isArray(users)) users = [users];
+        users.forEach(user => {
+          const row = table.insertRow();
+          row.insertCell().textContent = user.username || "Unknown"; // Changed from user.name to user.username
+          row.insertCell().textContent = user.visits || 0;
+          row.insertCell().textContent = user.totalTime || 0;
+        });
+      })
+      .catch(error => {
+        console.error('Error fetching users:', error);
+        const table = document.getElementById("userTable");
+        const row = table.insertRow();
+        row.insertCell().textContent = "Error loading data";
+        row.insertCell().textContent = "-";
+        row.insertCell().textContent = "-";
+      });
+  </script>
+</body>
+</html>

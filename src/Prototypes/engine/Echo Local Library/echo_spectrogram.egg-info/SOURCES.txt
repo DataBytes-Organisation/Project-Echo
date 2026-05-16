@@ -1,0 +1,9 @@
+README.md
+setup.py
+echo_spectrogram/__init__.py
+echo_spectrogram/myfunctions.py
+echo_spectrogram.egg-info/PKG-INFO
+echo_spectrogram.egg-info/SOURCES.txt
+echo_spectrogram.egg-info/dependency_links.txt
+echo_spectrogram.egg-info/requires.txt
+echo_spectrogram.egg-info/top_level.txt

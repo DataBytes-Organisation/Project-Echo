@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@google-cloud/recaptcha-enterprise": "^5.7.0"
+  }
+}

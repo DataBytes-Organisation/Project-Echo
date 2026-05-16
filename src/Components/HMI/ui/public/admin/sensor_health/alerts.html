@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Alerts – Project Echo</title>
+  <link rel="stylesheet" type="text/css" href="/admin/css/styles.min.css" />
+  <link rel="stylesheet" href="/admin/css/icons/tabler-icons/tabler-icons.css" />
+  <link rel="stylesheet" href="/admin/sensor_health/style.css" />
+  <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script type="text/javascript" src="/admin/js/app.min.js"></script>
+  <script src="/admin/sensor_health/script.js" defer></script>
+  <script src="/admin/sensor_health/charts.js" defer></script>
+</head>
+<body>
+  <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
+    data-sidebar-position="fixed" data-header-position="fixed">
+    <!-- Sidebar Start -->
+    <div id="sidebar"></div>
+    <!--  Sidebar End -->
+    <!--  Main wrapper -->
+    <div class="body-wrapper">
+      <div id="header"></div>
+      <div class="container-fluid">
+        <div class="sensor-page">
+          <div class="dashboard-shell">
+      <section class="hero-header"><h1>Alerts</h1><p class="subtitle">real-time detection of issues across deployed sensors</p></section>
+      <section class="card"><h3>Alert Severity Overview</h3><p class="card-subtitle">Distribution of active alerts</p><canvas id="alertsChart" height="120"></canvas></section>
+      <section class="card"><h3>Active Alerts</h3><p class="card-subtitle">Sensors requiring immediate or near-term attention</p>
+        <table><thead><tr><th>Sensor</th><th>Issue</th><th>Details</th><th>Last Audio</th></tr></thead>
+        <tbody id="alerts-tbody">
+          <tr><td colspan="4">Loading…</td></tr>
+        </tbody></table>
+      </section>
+    </div> <!-- END dashboard-shell -->
+        </div>
+      <div id="footer"></div>
+    </div>
+  </div>
+
+  <script>
+    $(document).ready(function() {
+      $("#sidebar").load("/admin/component/sidebar-component.html", function() { $.getScript('/admin/js/sidebarmenu.js'); });
+      $("#header").load("/admin/component/header-component.html");
+      $("#footer").load("/admin/component/footer-component.html");
+    });
+  </script>
+</body>
+</html>
