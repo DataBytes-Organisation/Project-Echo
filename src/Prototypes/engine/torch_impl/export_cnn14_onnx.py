@@ -12,6 +12,7 @@ from panns_cnn14 import PannsCNN14ArcFace
 CHECKPOINT_PATH = r"\src\Prototypes\engine\torch_impl\model\cnn14\Cnn14_mAP=0.431.pth"
 ONNX_OUTPUT_PATH = r"\src\Prototypes\engine\torch_impl\model\cnn14\cnn14.onnx"
 
+
 DEVICE = "cpu"
 NUM_CLASSES = 123
 
