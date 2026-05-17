@@ -11,7 +11,7 @@ class SystemManager:
         self.sim_running = False
         self.sim_task = None
         self.command_queue = asyncio.Queue()
-        self.sim_mode = "Animal Mode"
+        self.sim_mode = "Animal_Mode"
 
         self.topic_handlers = {
             str("Simulator_Controls"): self.on_message,
@@ -109,7 +109,7 @@ class SystemManager:
             print(f"Simulator got command {command}", flush=True)
             
             if str(command) == str("Start"):
-                await self.start_sim()
+                await self.start_sim(self.sim_mode)
 
             elif str(command) == str("Stop"):
                 await self.stop_sim()
