@@ -2886,3 +2886,194 @@ z-index: 1;
     transform: scale(1);
   }
 }
+
+/* ================================
+   Sprint 2 Detection Animation CSS
+   ================================ */
+
+.notification-success {
+  border-left: 5px solid #4caf50;
+}
+
+.notification-error {
+  border-left: 5px solid #ff4444;
+}
+
+.notification-info {
+  border-left: 5px solid #ffd700;
+}
+
+.latest-detection-panel {
+  position: fixed;
+  right: 20px;
+  bottom: 120px;
+  width: 260px;
+  background: rgba(10, 10, 25, 0.92);
+  color: rgba(247, 186, 206, 1);
+  border: 1px solid rgba(247, 186, 206, 0.5);
+  border-radius: 12px;
+  padding: 15px;
+  z-index: 1200;
+  font-family: 'Roboto', sans-serif;
+  box-shadow: 0 0 18px rgba(255, 215, 0, 0.25);
+}
+
+.latest-detection-panel h4 {
+  margin: 0 0 8px 0;
+  color: #ffd700;
+  font-size: 18px;
+}
+
+.latest-detection-panel p {
+  margin: 4px 0;
+  font-size: 14px;
+}
+
+.detection-flash {
+  animation: detectionFlash 1.2s ease-in-out;
+}
+
+@keyframes detectionFlash {
+  0% {
+    background: rgba(255, 215, 0, 0.95);
+    color: black;
+    transform: scale(1.04);
+  }
+
+  50% {
+    background: rgba(255, 215, 0, 0.45);
+    color: white;
+  }
+
+  100% {
+    background: rgba(10, 10, 25, 0.92);
+    color: rgba(247, 186, 206, 1);
+    transform: scale(1);
+  }
+}
+
+.detection-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: #ff3333;
+  color: white;
+  font-size: 11px;
+  min-width: 18px;
+  height: 18px;
+  padding: 2px 5px;
+  border-radius: 999px;
+  font-weight: bold;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1300;
+}
+
+
+#live-detection-panel{
+    margin-top:20px;
+    width:100%;
+}
+
+.detection-stats{
+    display:flex;
+    gap:15px;
+    margin-bottom:20px;
+}
+
+.stat-card{
+    flex:1;
+    background:rgba(0,0,0,0.45);
+    border:1px solid rgba(0,255,170,0.25);
+    border-radius:12px;
+    padding:15px;
+    backdrop-filter: blur(10px);
+    box-shadow:0 0 15px rgba(0,255,170,0.15);
+    text-align:center;
+}
+
+.stat-number{
+    display:block;
+    font-size:28px;
+    font-weight:bold;
+    color:#00ffaa;
+}
+
+.stat-label{
+    color:white;
+    font-size:13px;
+}
+
+#timeline-container{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    max-height:400px;
+    overflow-y:auto;
+    padding-right:5px;
+}
+
+.timeline-card{
+    background:rgba(255,255,255,0.05);
+    border-left:4px solid #00ffaa;
+    padding:14px;
+    border-radius:10px;
+    animation:slideIn 0.4s ease;
+    box-shadow:0 0 12px rgba(0,255,170,0.12);
+}
+
+.timeline-header{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:6px;
+}
+
+.timeline-animal{
+    color:#00ffaa;
+    font-weight:bold;
+    font-size:16px;
+}
+
+.timeline-time{
+    color:#bbbbbb;
+    font-size:12px;
+}
+
+.timeline-location{
+    color:white;
+    font-size:14px;
+}
+
+.timeline-node{
+    margin-top:6px;
+    color:#ffcc70;
+    font-size:13px;
+}
+
+@keyframes slideIn{
+    from{
+        opacity:0;
+        transform:translateX(30px);
+    }
+    to{
+        opacity:1;
+        transform:translateX(0);
+    }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+#notification {
+  animation: fadeIn 0.4s ease;
+}

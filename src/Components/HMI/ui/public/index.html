@@ -15,7 +15,7 @@
       src="./js/ol.js"
     ></script>
 
-    <!-- Bootstrap -->
+    <!-- Bootstrap --
 		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
 		<script src="https://kit.fontawesome.com/8aa980d912.js" crossorigin="anonymous"></script>
 
@@ -393,6 +393,27 @@
               <form action="/api/notifications/animals" method="POST">
                 <div id="notification-contents">
                   <h2>Animal Notifications</h2>
+                  <h2>Live Detection Timeline</h2>
+
+<div id="live-detection-panel">
+
+  <div class="detection-stats">
+    <div class="stat-card">
+      <span class="stat-number" id="totalDetections">0</span>
+      <span class="stat-label">Total Detections</span>
+    </div>
+
+    <div class="stat-card">
+      <span class="stat-number" id="activeNodes">5</span>
+      <span class="stat-label">Active Nodes</span>
+    </div>
+  </div>
+
+  <div id="timeline-container">
+
+  </div>
+
+</div>
 
                   <!-- Animal Search and Selection -->
                   <div class="markup_form">
@@ -2622,10 +2643,46 @@ notificationClose.addEventListener('click', hideNotification);
     simulatorOl.addEventListener("click", openSIMULATOR)
 
     window.onload = function () {
-      console.log("Website loaded!");
-      initialiseHMI(hmiState);
-      //sim is usually on by default, but this functionality is disabled during development
-    };
+
+    console.log("Website loaded!");
+
+    initialiseHMI(hmiState);
+
+    setInterval(() => {
+
+        const animals = [
+            "Koala",
+            "Frogmouth",
+            "Kangaroo",
+            "Possum",
+            "Tasmanian Devil",
+            "Sugar Glider",
+            "Wombat"
+        ];
+
+        const randomAnimal =
+            animals[Math.floor(Math.random() * animals.length)];
+
+        const randomNode =
+            "NODE-" + Math.floor(Math.random() * 5 + 1);
+
+        const currentTime =
+            new Date().toLocaleTimeString();
+
+        showNotification(
+            `${randomAnimal} detected by ${randomNode}`
+        );
+
+        document.getElementById("notification-text").innerHTML = `
+    <strong>Latest Detection</strong><br>
+    Animal: ${randomAnimal}<br>
+    Node: ${randomNode}<br>
+    Type: sensor<br>
+    Time: ${currentTime}
+`;
+
+    }, 5000);
+};
 
     //Microphone show/hide
     function updateMics() {

@@ -130,7 +130,6 @@ export function initialiseHMI(hmiState) {
   console.warn("Microphone API failed, continuing with fallback setup.", error);
 });
 
-// Always add IoT nodes, even if microphone API fails
 addIoTNodesToMap(hmiState);
   addmicrophones(hmiState);
   stepMicAnimation(hmiState);
@@ -1369,11 +1368,7 @@ export function updateTimeOffset(hmiState){
     else{
       hmiState.simUpdateDelay = newDelay;
     }
-    // Multiply by 1000 to convert to milliseconds
-    /*const utcDate = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
-      date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
-    hmiState.simTime = utcDate;*/
-    //console.log(hmiState.simUpdateDelay);
+  
   });
   }catch(error){
     console.log(failed);
