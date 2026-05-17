@@ -212,11 +212,10 @@
     },
     {
         "Bird": "Aphelocephala leucopsis",
-        "description": [
-            "Common Name: Southern Whiteface.",
-            "A small bird native to Australia, easily identified by its distinctive white face and grey-brown body.",
-            "Lives in dry woodlands and feeds mainly on seeds and insects."
-        ]
+        "description": ["Common Name: Southern Whiteface.",
+                        "Is a small, sturdy, insectivorous bird (10 to 12 cm) found in arid Australian shrublands.",
+                        "Distinguished by a stark white forehead, pale eye, and stubby finch-like bill.",
+                        "These gray-brown birds have darker wings, whitish underparts with reddish-brown flanks, and are known for a rapid, twittering call."]
     },
     {
         "Bird": "ApocritaÂ sp.",
@@ -228,11 +227,9 @@
     },
     {
         "Bird": "Aprosmictus erythropterus",
-        "description": [ "Also known as the Red-winged Parrot, found in northern and eastern Australia.",
-                         "Males are bright green with red wing patches and a blue rump; females are duller.",
-                         "They feed on seeds, nectar, fruits, and blossoms in woodlands and savannas.",
-                         "Known for their swift flight and sharp, noisy calls.",
-                         "Nesting occurs in tree hollows, often in pairs or small flocks."]
+        "description": ["Common Name: Red-winged Parrot.",
+                        "Is a 30 to 33 cm, stout, primarily green Australian parrot, distinguished by its large, brilliant red shoulder patches and bright yellow-tipped tail.",
+                        "Males feature a bright lime-green body, black back, and deep blue rump. They are common in woodlands and near water."]
     },
     {
         "Bird": "Aquila audax",
@@ -248,16 +245,26 @@
     },
     {
         "Bird": "Artamus minor",
-        "description": []
+        "description": ["Common Name: Little Woodswallow.",
+                        "Chunky bird with broad, triangular wings and short, decurved bill.",
+                        "Dark brownish-gray plumage, lacking white in primaries (compare larger Dusky Woodswallow).",
+                        "Tail black with white tip broken by black at the center. Grayish underwings contrast with dark belly in flight, though not to the degree seen in other woodswallows.",
+                        "Usually in small flocks, foraging high above rocky cliffs and gorges, or huddled together when perched."]
     },
     {
         "Bird": "Artamus superciliosus",
-        "description": []
+        "description": ["Common Name: White-browed Woodswallow.",
+                        "Chunky bird with broad, triangular wings and short, decurved bill.",
+                        "Male dark gray above, dark orange-brown below, with dark gray face and throat and white eyebrow.",
+                        "Female similar in pattern but less richly colored. Whitish underwings contrast powerfully with dark underparts in flight.",
+                        "Often forages very high up in enormous flocks, sometimes mixed in with Masked Woodswallows."]
     },
     {
         "Bird": "Atrapsalta encaustica",
-        "description": ["Atrapuslata encaustica is a bird species found in forested habitats.",
-                        "It is known for its distinctive plumage and vocal communication used for territorial signaling."]
+        "description": ["Common Name: Black Squeaker.",
+                        "A small Australian cicada species described in 1834.",
+                        "Known for its predominantly black, glossy appearance, it is found in open forests and heathlands in south-east Queensland and central New South Wales.",
+                        "It produces a distinct, high-pitched, two-part sip call."]
     },
     {
         "Bird": "Auscala spinosa",
