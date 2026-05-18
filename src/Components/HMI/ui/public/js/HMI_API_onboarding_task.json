@@ -212,11 +212,10 @@
     },
     {
         "Bird": "Aphelocephala leucopsis",
-        "description": [
-            "Common Name: Southern Whiteface.",
-            "A small bird native to Australia, easily identified by its distinctive white face and grey-brown body.",
-            "Lives in dry woodlands and feeds mainly on seeds and insects."
-        ]
+        "description": ["Common Name: Southern Whiteface.",
+                        "Is a small, sturdy, insectivorous bird (10 to 12 cm) found in arid Australian shrublands.",
+                        "Distinguished by a stark white forehead, pale eye, and stubby finch-like bill.",
+                        "These gray-brown birds have darker wings, whitish underparts with reddish-brown flanks, and are known for a rapid, twittering call."]
     },
     {
         "Bird": "ApocritaÂ sp.",
@@ -228,11 +227,9 @@
     },
     {
         "Bird": "Aprosmictus erythropterus",
-        "description": [ "Also known as the Red-winged Parrot, found in northern and eastern Australia.",
-                         "Males are bright green with red wing patches and a blue rump; females are duller.",
-                         "They feed on seeds, nectar, fruits, and blossoms in woodlands and savannas.",
-                         "Known for their swift flight and sharp, noisy calls.",
-                         "Nesting occurs in tree hollows, often in pairs or small flocks."]
+        "description": ["Common Name: Red-winged Parrot.",
+                        "Is a 30 to 33 cm, stout, primarily green Australian parrot, distinguished by its large, brilliant red shoulder patches and bright yellow-tipped tail.",
+                        "Males feature a bright lime-green body, black back, and deep blue rump. They are common in woodlands and near water."]
     },
     {
         "Bird": "Aquila audax",
@@ -248,16 +245,26 @@
     },
     {
         "Bird": "Artamus minor",
-        "description": []
+        "description": ["Common Name: Little Woodswallow.",
+                        "Chunky bird with broad, triangular wings and short, decurved bill.",
+                        "Dark brownish-gray plumage, lacking white in primaries (compare larger Dusky Woodswallow).",
+                        "Tail black with white tip broken by black at the center. Grayish underwings contrast with dark belly in flight, though not to the degree seen in other woodswallows.",
+                        "Usually in small flocks, foraging high above rocky cliffs and gorges, or huddled together when perched."]
     },
     {
         "Bird": "Artamus superciliosus",
-        "description": []
+        "description": ["Common Name: White-browed Woodswallow.",
+                        "Chunky bird with broad, triangular wings and short, decurved bill.",
+                        "Male dark gray above, dark orange-brown below, with dark gray face and throat and white eyebrow.",
+                        "Female similar in pattern but less richly colored. Whitish underwings contrast powerfully with dark underparts in flight.",
+                        "Often forages very high up in enormous flocks, sometimes mixed in with Masked Woodswallows."]
     },
     {
         "Bird": "Atrapsalta encaustica",
-        "description": ["Atrapuslata encaustica is a bird species found in forested habitats.",
-                        "It is known for its distinctive plumage and vocal communication used for territorial signaling."]
+        "description": ["Common Name: Black Squeaker.",
+                        "A small Australian cicada species described in 1834.",
+                        "Known for its predominantly black, glossy appearance, it is found in open forests and heathlands in south-east Queensland and central New South Wales.",
+                        "It produces a distinct, high-pitched, two-part sip call."]
     },
     {
         "Bird": "Auscala spinosa",
@@ -340,7 +347,7 @@
     },
     {
         "Bird": "Cacomantis variolosus",
-        "description": []
+        "description": ["Cacomantis variolosus, commonly known as the Brush Cuckoo, is a small and slim bird that is often heard before it is seen, mainly because of its soft and repetitive whistling call.It is commonly found across Australia and nearby regions, especially in forests, bushlands, and even in quiet suburban gardens where there are enough trees.One interesting thing about this bird is that it does not build its own nest.Instead, it lays its eggs in the nests of other smaller birds and lets them take care of its young. It mainly feeds on insects and prefers areas with good vegetation, which gives it both food and shelter.Even though it is not very brightly coloured, its presence is quite noticeable because of its unique and continuous call."]
     },
     {
         "Bird": "CaeliferaÂ sp.",
@@ -348,19 +355,19 @@
     },
     {
         "Bird": "Caligavis chrysops",
-        "description": []
+        "description": ["Caligavis chrysops, commonly known as the Yellow-faced Honeyeater, is a small and lively bird that can be easily recognised by the yellow stripe running across its face and its olive-green body.It is widely seen in eastern Australia and is quite adaptable, living in forests, woodlands, parks, and even suburban areas. This bird is always active and rarely stays in one place for long, as it moves quickly between trees in search of food.It mainly feeds on nectar from flowers, along with insects and small fruits, which also makes it helpful in pollination. Its constant movement and soft calls make it a common but interesting bird to observe in everyday surroundings."]
     },
     {
         "Bird": "Callocephalon fimbriatum",
-        "description": []
+        "description": [ "Callocephalon fimbriatum, commonly known as the Gang-gang Cockatoo, is a unique and easily recognisable bird found in the cooler forests and mountainous regions of southeastern Australia.The male stands out with its bright red head, while the rest of its body is covered in soft grey feathers. One of its most interesting features is its call, which sounds very similar to a creaking door, making it quite different from other birds.It usually feeds on seeds, berries, and insects and is often seen in small groups rather than large flocks. This bird prefers quiet forest areas, especially those with eucalyptus trees, and is known for its calm and gentle behaviour."]
     },
     {
         "Bird": "Calyptorhynchus banksii",
-        "description": []
+        "description": ["Calyptorhynchus banksii, commonly known as the Red-tailed Black Cockatoo, is a large and powerful bird that is well known for its striking appearance and loud calls.It has dark black feathers with bright red panels on its tail, which are especially visible when it is flying. This bird is found across many parts of Australia, mainly in woodlands and open forests.It feeds mostly on seeds, nuts, and fruits, using its strong beak to break them open with ease. These cockatoos are often seen flying in pairs or small groups and can be heard from a distance because of their deep and distinctive calls. They are slow flyers but very graceful in the air."]
     },
     {
         "Bird": "Calyptorhynchus lathami",
-        "description": []
+        "description": ["Calyptorhynchus lathami, commonly known as the Glossy Black Cockatoo, is a quieter and more reserved bird compared to other cockatoo species. It has dark brown to black feathers and is mainly found in eastern Australia, particularly in forests where casuarina trees grow.This bird has a very specific diet and feeds almost entirely on seeds from casuarina cones, which makes its habitat choice very important for survival.It is usually seen in pairs or small family groups and is known for its slow and steady movements rather than being noisy or active. Because of its calm nature and limited diet, it is not as commonly seen as other cockatoos."]
     },
     {
         "Bird": "Canis familiaris",

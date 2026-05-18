@@ -32,7 +32,6 @@ import requests
 import base64
 import io
 import json
-import base64
 import tempfile
 import pickle
 import math
@@ -514,7 +513,7 @@ class EchoEngine():
             "sampleRate": sample_rate
         }
 
-        url = 'http://ts-api-cont:9000/engine/event'
+        url = self.config['API_URL']
         x = requests.post(url, json = detection_event)
         print(x.text)
 
@@ -727,12 +726,41 @@ class EchoEngine():
     def on_iot_subscribe(self, client, userdata, mid, granted_qos):
         print(f"IoT MQTT Subscribed with mid {mid}, qos {granted_qos}")
 
+    def _handle_edge_prediction(self, payload: dict):
+        """Forward a pre-computed prediction from an edge-inference IoT device."""
+        gps_data = payload.get("gps_data", {})
+        lat = gps_data.get("lat")
+        lon = gps_data.get("lon")
+        if lat is None or lon is None:
+            print("Edge prediction missing GPS coordinates, skipping.")
+            return
+
+        lla = [lat, lon, 0.0]
+        audio_event = {
+            "timestamp":          payload.get("timestamp", str(int(time.time()))),
+            "sensorId":           payload.get("sensor_id", "unknown_edge_node"),
+            "microphoneLLA":      lla,
+            "animalEstLLA":       lla,
+            "animalTrueLLA":      lla,
+            "animalLLAUncertainty": payload.get("gps_uncertainty", 10.0),
+            "audioClip":          "",
+        }
+        species    = payload.get("species", "Unknown")
+        confidence = payload.get("confidence", 0.0)
+        print(f"Edge prediction received: {species} ({confidence}%)", flush=True)
+        self.echo_api_send_detection_event(audio_event, 0, species, confidence)
+
     def on_iot_message(self, client, userdata, msg):
-        print("Received IoT audio message...")
+        print("Received IoT message...")
         try:
             payload = json.loads(msg.payload)
 
-            # Validate required field
+            # Edge-inference path: device already ran the model, just forward to API
+            if payload.get("type") == "prediction":
+                self._handle_edge_prediction(payload)
+                return
+
+            # Server-inference path: raw audio, run ML pipeline here
             if "audio_file" not in payload or not payload["audio_file"]:
                 print("Invalid IoT payload: missing or empty audio_file.")
                 return

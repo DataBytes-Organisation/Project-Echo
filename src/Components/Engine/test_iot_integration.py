@@ -78,7 +78,7 @@ def _patched_open(path, *args, **kwargs):
 
 
 builtins.open = _patched_open
-from echo_engine import EchoEngine  # noqa: E402
+from echo_engine_iot import EchoEngine  # noqa: E402
 builtins.open = _real_open
 
 
