@@ -5,7 +5,7 @@ google-cloud-storage
 ipykernel
 librosa
 matplotlib
-paho-mqtt
+paho-mqtt==1.6.1
 xgboost
 numpy
 pandas

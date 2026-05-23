@@ -1,0 +1,80 @@
+{
+    "sample_audio": "C:\\Deakin\\ProjectEcho\\Project-Echo\\src\\Prototypes\\data\\data_files\\Acanthiza chrysorrhoa\\region_3.650-4.900.mp3",
+    "pytorch_result": {
+        "audio_path": "C:\\Deakin\\ProjectEcho\\Project-Echo\\src\\Prototypes\\data\\data_files\\Acanthiza chrysorrhoa\\region_3.650-4.900.mp3",
+        "predicted_index": 0,
+        "predicted_label": "Acanthiza chrysorrhoa",
+        "confidence": 0.9337119460105896,
+        "top_predictions": [
+            {
+                "index": 0,
+                "label": "Acanthiza chrysorrhoa",
+                "confidence": 0.9337119460105896
+            },
+            {
+                "index": 47,
+                "label": "Dicaeum hirundinaceum",
+                "confidence": 0.02223811112344265
+            },
+            {
+                "index": 3,
+                "label": "Acanthiza pusilla",
+                "confidence": 0.007062176708132029
+            },
+            {
+                "index": 5,
+                "label": "Acanthiza uropygialis",
+                "confidence": 0.006129274610430002
+            },
+            {
+                "index": 103,
+                "label": "Rhipidura rufifrons",
+                "confidence": 0.0059699914418160915
+            }
+        ]
+    },
+    "tflite_result": {
+        "audio_path": "C:\\Deakin\\ProjectEcho\\Project-Echo\\src\\Prototypes\\data\\data_files\\Acanthiza chrysorrhoa\\region_3.650-4.900.mp3",
+        "predicted_index": 0,
+        "predicted_label": "Acanthiza chrysorrhoa",
+        "confidence": 0.9337119460105896,
+        "top_predictions": [
+            {
+                "index": 0,
+                "label": "Acanthiza chrysorrhoa",
+                "confidence": 0.9337119460105896
+            },
+            {
+                "index": 47,
+                "label": "Dicaeum hirundinaceum",
+                "confidence": 0.022238129749894142
+            },
+            {
+                "index": 3,
+                "label": "Acanthiza pusilla",
+                "confidence": 0.007062216755002737
+            },
+            {
+                "index": 5,
+                "label": "Acanthiza uropygialis",
+                "confidence": 0.00612929742783308
+            },
+            {
+                "index": 103,
+                "label": "Rhipidura rufifrons",
+                "confidence": 0.005970010533928871
+            }
+        ],
+        "raw_output_shape": [
+            1,
+            123
+        ],
+        "tflite_input_shape": [
+            1,
+            1,
+            128,
+            313
+        ]
+    },
+    "labels_match": true
+}
