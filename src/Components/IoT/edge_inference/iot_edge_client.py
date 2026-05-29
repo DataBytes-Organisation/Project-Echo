@@ -162,7 +162,7 @@ def get_gps(fallback_lat: float, fallback_lon: float) -> dict:
                 lon  = data_stream.TPV.get("lon")
                 mode = data_stream.TPV.get("mode")
                 if mode == 3 and lat != "n/a" and lon != "n/a":
-                    return {"lat": float(lat), "lon": float(lon)}
+                    return {"lat": f"{float(lat):.4f}", "lon": f"{float(lon):.4f}"}
     except Exception:
         pass
     return {"lat": fallback_lat, "lon": fallback_lon}
@@ -196,17 +196,16 @@ def connect_mqtt(broker: str, port: int) -> mqtt.Client:
 # ---------------------------------------------------------------------------
 def build_payload(
     species: str, confidence: float, top5: list,
-    sensor_id: str, gps: dict, gps_uncertainty: float,
+    sensor_id: str, gps: dict,
 ) -> dict:
     return {
         "type":            "prediction",
-        "timestamp":       str(int(time.time())),
+        "timestamp":       time.strftime("%d-%m-%Y_%H-%M-%S"),
         "sensor_id":       sensor_id,
         "species":         species,
         "confidence":      confidence,
         "top5":            top5,
         "gps_data":        gps,
-        "gps_uncertainty": gps_uncertainty,
     }
 
 
@@ -221,7 +220,6 @@ def main():
     parser.add_argument("--sensor-id",       default="rpi_edge_node_1")
     parser.add_argument("--lat",             type=float, default=-37.8136)
     parser.add_argument("--lon",             type=float, default=144.9631)
-    parser.add_argument("--gps-uncertainty", type=float, default=10.0)
     parser.add_argument("--interval",        type=float, default=10.0,
                         help="Seconds between recordings (default: 10)")
     parser.add_argument("--use-gps",         action="store_true",
@@ -248,7 +246,7 @@ def main():
 
             payload = build_payload(
                 species, confidence, top5,
-                args.sensor_id, gps, args.gps_uncertainty,
+                args.sensor_id, gps, 
             )
             client.publish(args.topic, json.dumps(payload), qos=1)
             print(f"Published to {args.topic}\n", flush=True)

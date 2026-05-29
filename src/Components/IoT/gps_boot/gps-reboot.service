@@ -1,0 +1,12 @@
+[Unit]
+Description=GPS Initialisation Script
+After=multi-user.target
+
+[Service]
+Type=oneshot
+ExecStart=/home/pi/gps_reboot.sh
+RemainAfterExit=yes
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

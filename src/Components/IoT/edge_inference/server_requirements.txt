@@ -1,0 +1,9 @@
+# IoT server requirements
+# Install with: pip install -r requirements.txt
+
+tflite
+numpy<2
+librosa
+sounddevice
+paho-mqtt==1.6.1
+gps3

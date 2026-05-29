@@ -6,7 +6,7 @@
 # omitted and the fallback import in iot_edge_client.py will use tensorflow.lite.
 
 tflite-runtime
-numpy
+numpy<2
 librosa
 sounddevice
 paho-mqtt==1.6.1
