@@ -8,8 +8,13 @@
   <link rel="stylesheet" type="text/css" href="/admin/css/styles.min.css" />
   <link rel="stylesheet" href="/admin/css/icons/tabler-icons/tabler-icons.css" />
   <link rel="stylesheet" href="/admin/sensor_health/style.css" />
+
   <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script type="text/javascript" src="/admin/js/app.min.js"></script>
+
+  <!-- Shared admin page state -->
+  <script type="text/javascript" src="/admin/js/admin-page-state.js"></script>
+
   <script src="/admin/sensor_health/script.js" defer></script>
   <script src="/admin/sensor_health/charts.js" defer></script>
 </head>
@@ -29,6 +34,22 @@
       <div id="header"></div>
 
       <div class="container-fluid">
+        <div class="admin-page-status">
+          <div class="admin-error-banner d-none" role="alert" aria-live="polite">
+            <div class="admin-error-banner__content">
+              <i class="ti ti-alert-circle"></i>
+              <span>Something went wrong while loading this page.</span>
+            </div>
+            <button type="button" class="admin-error-banner__dismiss" aria-label="Dismiss error message">
+              <i class="ti ti-x"></i>
+            </button>
+          </div>
+
+          <div class="admin-loading-spinner d-none" role="status" aria-live="polite">
+            <div class="spinner-border text-danger" aria-hidden="true"></div>
+            <span class="admin-loading-spinner__text">Loading...</span>
+          </div>
+        </div>
         <div class="sensor-page">
 
           <!-- Mobile backdrop -->
@@ -169,6 +190,9 @@
       $("#header").load("/admin/component/header-component.html");
       $("#footer").load("/admin/component/footer-component.html");
     });
+
+    const pageState = createAdminPageState();
+    pageState.resetPageState();
   </script>
 </body>
 </html>

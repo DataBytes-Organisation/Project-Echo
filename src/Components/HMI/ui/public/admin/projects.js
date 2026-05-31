@@ -1,4 +1,7 @@
 $(document).ready(function () {
+  const pageState = createAdminPageState();
+  pageState.resetPageState();
+
   // ================================================================
   // Layout Includes
   // ================================================================
@@ -49,13 +52,31 @@ $(document).ready(function () {
     }
   ];
 
-  // Use in-memory data for now
   let projects = [...defaultProjects];
   let nextProjectId = projects.length + 1;
 
   // ================================================================
   // HELPERS
   // ================================================================
+  function delay(ms = 250) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  async function runWithPageState(action, errorMessage) {
+    pageState.hideError();
+    pageState.showLoading();
+
+    try {
+      await delay();
+      return await action();
+    } catch (error) {
+      console.error(error);
+      pageState.showError(errorMessage);
+      throw error;
+    } finally {
+      pageState.hideLoading();
+    }
+  }
 
   function getEcologistNameById(id) {
     const match = ecologists.find(e => e.id === id);
@@ -196,7 +217,6 @@ $(document).ready(function () {
   // ================================================================
   // EVENT BINDINGS
   // ================================================================
-
   $("#newProjectBtn").on("click", openProjectModalForNew);
 
   $("#projectEcologists").on("change", updateSelectedEcologistsPreview);
@@ -209,7 +229,7 @@ $(document).ready(function () {
     modal.show();
   });
 
-  $("#projectForm").on("submit", function (e) {
+  $("#projectForm").on("submit", async function (e) {
     e.preventDefault();
 
     const idVal = $("#projectId").val();
@@ -225,45 +245,69 @@ $(document).ready(function () {
     };
 
     if (!data.name) {
-      alert("Project name is required.");
+      pageState.showError("Project name is required.");
       return;
     }
 
-    if (isNew) {
-      // TODO (backend): POST /api/projects
-      data.id = nextProjectId++;
-      projects.push(data);
-    } else {
-      // TODO (backend): PUT /api/projects/:id
-      const id = Number(idVal);
-      const index = projects.findIndex(p => p.id === id);
-      if (index !== -1) {
-        projects[index] = { id, ...data };
-      }
-    }
+    try {
+      await runWithPageState(async () => {
+        if (isNew) {
+          // TODO (backend): POST /api/projects
+          data.id = nextProjectId++;
+          projects.push(data);
+        } else {
+          // TODO (backend): PUT /api/projects/:id
+          const id = Number(idVal);
+          const index = projects.findIndex(p => p.id === id);
+          if (index === -1) {
+            throw new Error("Project not found.");
+          }
+          projects[index] = { id, ...data };
+        }
 
-    closeModal();
-    renderProjects();
+        closeModal();
+        renderProjects();
+      }, "Failed to save project.");
+    } catch (error) {
+      // handled by runWithPageState
+    }
   });
 
-  $("#deleteProjectBtn").on("click", function () {
+  $("#deleteProjectBtn").on("click", async function () {
     const id = Number($("#projectId").val());
     if (!id) return;
 
     const confirmed = confirm("Delete this project? This cannot be undone.");
     if (!confirmed) return;
 
-    // TODO (backend): DELETE /api/projects/:id  
-    const index = projects.findIndex(p => p.id === id);
-    if (index !== -1) projects.splice(index, 1);
+    try {
+      await runWithPageState(async () => {
+        // TODO (backend): DELETE /api/projects/:id
+        const index = projects.findIndex(p => p.id === id);
+        if (index === -1) {
+          throw new Error("Project not found.");
+        }
 
-    closeModal();
-    renderProjects();
+        projects.splice(index, 1);
+        closeModal();
+        renderProjects();
+      }, "Failed to delete project.");
+    } catch (error) {
+      // handled by runWithPageState
+    }
   });
 
   // ================================================================
   // INITIAL RENDER
   // ================================================================
-  renderEcologistSelect();
-  renderProjects();
+  (async function initPage() {
+    try {
+      await runWithPageState(async () => {
+        renderEcologistSelect();
+        renderProjects();
+      }, "Failed to load project management data.");
+    } catch (error) {
+      // handled by runWithPageState
+    }
+  })();
 });

@@ -1,0 +1,29 @@
+{
+    "model": "EfficientNetV2",
+    "model_name": "efficientnetv2_rw_s",
+    "test_accuracy": 0.8724018475750578,
+    "f1_macro": 0.843222466600867,
+    "train_size": 6927,
+    "test_size": 1732,
+    "num_classes": 123,
+    "epochs": 3,
+    "batch_size": 16,
+    "learning_rate": 0.0001,
+    "training_history": [
+        {
+            "epoch": 1,
+            "train_loss": 2.679424368855033,
+            "train_accuracy": 0.42226071892594197
+        },
+        {
+            "epoch": 2,
+            "train_loss": 0.8290824525599289,
+            "train_accuracy": 0.8049660747798469
+        },
+        {
+            "epoch": 3,
+            "train_loss": 0.25007590935144036,
+            "train_accuracy": 0.9487512631730908
+        }
+    ]
+}

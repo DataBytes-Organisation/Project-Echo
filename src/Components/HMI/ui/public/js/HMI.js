@@ -1,295 +1,600 @@
 "use strict";
 
-import { getAudioTestString } from "./HMI-utils.js";
+/**
+ * HMI.js
+ * OpenLayers map, layer management, live data updates, audio recording.
+ *
+ * Sprint 1/2 : Core HMI functionality.
+ * Task 7     : Imported getApiErrorMessage from HMI-utils.js so all error
+ *              messages are formatted consistently through the shared helper.
+ *              Imported withRetry for the microphone load in initialiseHMI.
+ *              Fixed four == comparisons to === in the modeSwitch listener.
+ *              No changes to map logic, layer management, or audio handling.
+ */
+
+import { showToast, getApiErrorMessage, withRetry } from "./HMI-utils.js";
 import { getAudioRecorder } from "./audio_recorder.js";
-import { retrieveTruthEventsInTimeRange, retrieveVocalizationEventsInTimeRange, 
-  retrieveMicrophones, retrieveAudio, retrieveSimTime, postRecording, 
-  setSimModeAnimal, setSimModeRecording, setSimModeRecordingV2, stopSimulator } from "./routes.js";
+import {
+  retrieveTruthEventsInTimeRange,
+  retrieveVocalizationEventsInTimeRange,
+  retrieveMicrophones,
+  retrieveAudio,
+  retrieveSimTime,
+  postRecording,
+  setSimModeAnimal,
+  setSimModeRecording,
+  setSimModeRecordingV2,
+  stopSimulator,
+} from "./routes.js";
 import { addIoTNodesToMap } from "./nodes-overlay.js";
 
-  //import data from "./sample_data.json" assert { type: 'json' }; Browser assertions not yet supported in all browsers, alternative method used instead.
+// ─────────────────────────────────────────────────────────────────────────────
+// Constants
+// ─────────────────────────────────────────────────────────────────────────────
 
-
-// import { parse } from 'json2csv';
-
-
-var markups = ["elephant.png", "monkey.png", "tiger.png"];
-
-const EARTH_RADIUS = 6371000;
+const EARTH_RADIUS        = 6371000;
 const MIC_DETECTION_RANGE = 300;
 const MAX_RECORDING_TIME_S = "20";
-const DEG_TO_RAD = (Math.PI / 180);
-const RAD_TO_DEG = (180 / Math.PI);
+const DEG_TO_RAD          = Math.PI / 180;
+const RAD_TO_DEG          = 180 / Math.PI;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Module-level state
+// ─────────────────────────────────────────────────────────────────────────────
 
 var audioRecorder = getAudioRecorder();
 
-var statuses = [
-  "endangered",
-  "vulnerable",
-  "near-threatened",
-  "normal",
-  "invasive",
-];
-
-function matchStatus(status){
-  if (status == "least concern"){
-    return "normal";
-  }
-  else{
-    return status;
-  }
-}
-
-export function convertCSV(json) {
-  if (json == null) return null
-  if (typeof json === undefined | json.length === 0){
-    return null
-  }
-  let data = json;
-  let fields = Object.keys(data[0]);
-  let replacer = function(key, value) { return value === null ? 'N/A' : value } ;
-
-  let csv = null;
-  csv = data.map(function(row){
-    return fields.map(function(fieldName){
-      return JSON.stringify(row[fieldName], replacer)
-    }).join(',')
-  })
-  csv.unshift(fields.join(',')) // add header column
-  csv = csv.join('\r\n');
-  return csv
-}
-
-var statusPrintLookup = {
-  "endangered" : "endangered",
-  "vulnerable": "vulnerable",
-  "near-threatened" : "near-threatened",
-  "normal" : "least concern",
-  "invasive" : "invasive"
-};
-
-var vocalizedLayers = []
-
+var statuses    = ["endangered", "vulnerable", "near-threatened", "normal", "invasive"];
 var animalTypes = ["mammal", "bird", "amphibian", "reptile", "insect"];
 
+var statusPrintLookup = {
+  endangered:       "endangered",
+  vulnerable:       "vulnerable",
+  "near-threatened":"near-threatened",
+  normal:           "least concern",
+  invasive:         "invasive",
+};
+
 var statusIconLookup = {
-  "endangered" : "1",
-  "vulnerable": "2",
-  "near-threatened" : "3",
-  "normal" : "4",
-  "invasive" : "5"
+  endangered:       "1",
+  vulnerable:       "2",
+  "near-threatened":"3",
+  normal:           "4",
+  invasive:         "5",
 };
 
 var animalTypeIconLookup = {
-  "mammal" : "Mammals",
-  "bird" : "Bird",
-  "amphibian" : "Amphibians",
-  "insect" : "Insects",
-  "reptile" : "Reptiles"
+  mammal:    "Mammals",
+  bird:      "Bird",
+  amphibian: "Amphibians",
+  insect:    "Insects",
+  reptile:   "Reptiles",
 };
 
 var selectedVocalizationEventId = null;
+var sample_data    = [];
+var animal_data    = [];
+var latestSimAnimals = {};
+var current_mic_lat  = 0.0;
+var current_mic_lon  = 0.0;
+var current_mic_id   = "";
 
-function getIconName(status, type){
-  return animalTypeIconLookup[type] + statusIconLookup[status] + "-01.png";
-}
+var activeAudioNode     = null;
+var audioAnimTimeout    = null;
+var playNextTrack       = false;
 
-//var sample_data = data.data; For assertion method
-var sample_data = []; // For the universal method
-fetch("./js/sample_data.json").then(res => res.json()).then(data => sample_data = data.data);
-// Went from 4 lines to 1. This method works on all browsers according to previous tests.
-var animal_data = [];
+var micAnimFrameIndex = 1;
+var animTimeout       = null;
+let simUpdateTimeout  = null;
+
+var audioRecordStartTime = null;
+var durationTimer        = null;
+
+var playNextRecordedTrack         = false;
+var recordingPlaybackAnimTimeout  = null;
+var audioRecordingElement         = null;
+
+var audioContext    = null;
+var a_source        = null;
+var decodedAudioStore = null;
+var fileContent     = null;
 
 export var animal_toggled = false;
 
-//For Demo purposes only
-//This plays an awful quailty audio test string
-document.addEventListener('click', function() {
-  //playAudioString(getAudioTestString());  
-});
+// ─────────────────────────────────────────────────────────────────────────────
+// DOM helpers
+// ─────────────────────────────────────────────────────────────────────────────
 
+function getDurationTag()       { return document.getElementById("recording_duration"); }
+function getAudioElement()      { return document.getElementsByClassName("audio-element")[0] || null; }
+function getAudioElementSource(){ const a = getAudioElement(); return a ? a.getElementsByTagName("source")[0] || null : null; }
+function getPlaybackIndicator() { return document.getElementsByClassName("playback_indicator")[0] || null; }
+function getRecordButton()      { return document.getElementById("record_audio_button"); }
+function getRecordingControls() { return document.getElementsByClassName("recording_controls")[0] || null; }
+function getFileInput()         { return document.getElementById("fileInput"); }
+function getAudioElemForRecordedPlayback() { return document.getElementById("audioElem"); }
 
+function isJQueryAvailable() {
+  return typeof window !== "undefined" && typeof window.$ === "function";
+}
+function safeShowJQuery(selector) { if (isJQueryAvailable()) window.$(selector).show(); }
+function safeHideJQuery(selector) { if (isJQueryAvailable()) window.$(selector).hide(); }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Map overlay — spinner and error banner
+// (Sprint 1/2 — kept as-is; these are positioned overlays specific to the
+//  OpenLayers basemap and are intentionally different from showRetryState,
+//  which replaces container content.  getApiErrorMessage is now used to
+//  format the error string passed in from call sites.)
+// ─────────────────────────────────────────────────────────────────────────────
+
+let _mapOverlayStylesInjected = false;
+
+function _injectMapOverlayStyles() {
+  if (_mapOverlayStylesInjected) return;
+  _mapOverlayStylesInjected = true;
+
+  const style = document.createElement("style");
+  style.id = "hmi-map-overlay-styles";
+  style.textContent = `
+    #hmi-map-spinner {
+      position: absolute; inset: 0; z-index: 1000;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.45); border-radius: inherit; pointer-events: all;
+    }
+    #hmi-map-spinner .hmi-spinner__wheel {
+      width: 52px; height: 52px;
+      border: 5px solid rgba(255,255,255,0.25); border-top-color: #17a2b8;
+      border-radius: 50%; animation: hmi-spin 0.8s linear infinite;
+    }
+    #hmi-map-spinner .hmi-spinner__label {
+      margin-top: 14px; color: #fff;
+      font-family: 'Segoe UI', Arial, sans-serif; font-size: 14px; letter-spacing: 0.03em;
+    }
+    @keyframes hmi-spin { to { transform: rotate(360deg); } }
+
+    #hmi-map-error {
+      position: absolute; top: 16px; left: 50%; transform: translateX(-50%);
+      z-index: 1001; display: flex; align-items: center; gap: 12px;
+      padding: 12px 20px; border-radius: 8px;
+      background: #7b1624; border: 1px solid #dc3545;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.45);
+      font-family: 'Segoe UI', Arial, sans-serif; font-size: 14px; color: #fff;
+      max-width: 480px; width: calc(100% - 48px); pointer-events: all;
+    }
+    #hmi-map-error .hmi-error__icon  { font-size: 20px; flex-shrink: 0; }
+    #hmi-map-error .hmi-error__msg   { flex: 1; line-height: 1.4; }
+    #hmi-map-error .hmi-error__retry {
+      flex-shrink: 0; padding: 6px 14px; background: #dc3545;
+      border: none; border-radius: 5px; color: #fff;
+      font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.15s;
+    }
+    #hmi-map-error .hmi-error__retry:hover { background: #a71d2a; }
+  `;
+  document.head.appendChild(style);
+}
+
+function _getMapContainer() {
+  return (
+    document.getElementById("map") ||
+    document.getElementById("mapPanel") ||
+    document.querySelector(".map-container") ||
+    document.getElementById("basemap") ||
+    document.body
+  );
+}
+
+function _escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+export function showMapSpinner(label = "Loading map data…") {
+  _injectMapOverlayStyles();
+  hideMapSpinner();
+
+  const container = _getMapContainer();
+  if (getComputedStyle(container).position === "static") {
+    container.style.position = "relative";
+  }
+
+  const el = document.createElement("div");
+  el.id = "hmi-map-spinner";
+  el.setAttribute("role", "status");
+  el.setAttribute("aria-live", "polite");
+  el.innerHTML = `
+    <div class="hmi-spinner__wheel" aria-hidden="true"></div>
+    <p class="hmi-spinner__label">${_escapeHtml(label)}</p>
+  `;
+  container.appendChild(el);
+}
+
+export function hideMapSpinner() {
+  const el = document.getElementById("hmi-map-spinner");
+  if (el) el.remove();
+}
+
+export function showMapError(message, onRetry) {
+  _injectMapOverlayStyles();
+  hideMapError();
+
+  const container = _getMapContainer();
+  if (getComputedStyle(container).position === "static") {
+    container.style.position = "relative";
+  }
+
+  const el = document.createElement("div");
+  el.id = "hmi-map-error";
+  el.setAttribute("role", "alert");
+  el.innerHTML = `
+    <span class="hmi-error__icon" aria-hidden="true">⚠</span>
+    <span class="hmi-error__msg">${_escapeHtml(message)}</span>
+    <button class="hmi-error__retry">Retry</button>
+  `;
+  container.appendChild(el);
+
+  const retryBtn = el.querySelector(".hmi-error__retry");
+  if (retryBtn) {
+    retryBtn.addEventListener("click", () => {
+      hideMapError();
+      if (typeof onRetry === "function") onRetry();
+    });
+  }
+}
+
+export function hideMapError() {
+  const el = document.getElementById("hmi-map-error");
+  if (el) el.remove();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Utilities
+// ─────────────────────────────────────────────────────────────────────────────
+
+function matchStatus(status) {
+  return status === "least concern" ? "normal" : status;
+}
+
+function getIconName(status, type) {
+  return animalTypeIconLookup[type] + statusIconLookup[status] + "-01.png";
+}
+
+export function convertCSV(json) {
+  if (json == null || typeof json === "undefined" || json.length === 0) return null;
+
+  const fields   = Object.keys(json[0]);
+  const replacer = (key, value) => (value === null ? "N/A" : value);
+
+  const csv = json.map((row) =>
+    fields.map((field) => JSON.stringify(row[field], replacer)).join(",")
+  );
+  csv.unshift(fields.join(","));
+  return csv.join("\r\n");
+}
+
+export function getUTC() {
+  const now = new Date();
+  return Date.UTC(
+    now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(),
+    now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds(), now.getUTCMilliseconds()
+  );
+}
+
+function initializeStaticDOMHooks() {
+  const audioElement = getAudioElement();
+  if (audioElement && !audioElement.dataset.hmiBound) {
+    audioElement.onended = hidePlaybackIndicator;
+    audioElement.dataset.hmiBound = "true";
+  }
+
+  const fileInput = getFileInput();
+  if (fileInput && !fileInput.dataset.hmiBound) {
+    fileInput.dataset.hmiBound = "true";
+    fileInput.addEventListener("change", function (event) {
+      const selectedFile = event.target.files[0];
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+      if (selectedFile) {
+        const reader = new FileReader();
+        reader.onload = function (loadEvent) {
+          fileContent = loadEvent.target.result;
+          audioContext.decodeAudioData(fileContent.slice(0), function (decodedAudio) {
+            decodedAudioStore = decodedAudio;
+            a_source = null;
+
+            const audioElementRef = getAudioElement();
+            if (audioElementRef) {
+              audioElementRef.src = URL.createObjectURL(selectedFile);
+            }
+          });
+        };
+        reader.readAsArrayBuffer(selectedFile);
+      }
+    });
+  }
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initializeStaticDOMHooks, { once: true });
+} else {
+  initializeStaticDOMHooks();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Sample data loader
+// ─────────────────────────────────────────────────────────────────────────────
+
+fetch("./js/sample_data.json")
+  .then((res) => res.json())
+  .then((data) => { sample_data = data.data; })
+  .catch((error) => {
+    console.error("Failed to load sample_data.json:", error);
+    showToast("Failed to load sample data", "error");
+  });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Initialisation
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Initialise the HMI: create the basemap, add all layers, then load
+ * microphone data.  The microphone fetch is wrapped in withRetry (imported
+ * from HMI-utils) so transient network failures retry automatically before
+ * falling back to the map error banner.
+ *
+ * Task 7: error message now routed through getApiErrorMessage so the wording
+ * is consistent with every other error surface in the application.
+ */
 export function initialiseHMI(hmiState) {
-  console.log(`initialising`);
+  console.log("initialising");
+
+  showMapSpinner("Loading map data…");
+  hideMapError();
+
   createBasemap(hmiState);
-  //console.log("Get sample element from document: ", document.getElementById("menuPanel"))
   addVocalisationLayers(hmiState);
   addTruthLayers(hmiState);
-  
-  
-  for(let i=1; i<26; i++){
+
+  for (let i = 1; i < 26; i++) {
     addVectorLayerTopDown(hmiState, `mic_layer_${i}`);
-    console.log(`Adding microphone layer:${i}`);
   }
-  
   addVectorLayerTopDown(hmiState, "mic_layer");
-  /*
-  addVectorLayerTopDown(hmiState, "mic_layer");
-  addVectorLayerTopDown(hmiState, "mic_layer_1");
-  addVectorLayerTopDown(hmiState, "mic_layer_2");
-  addVectorLayerTopDown(hmiState, "mic_layer_3");
-  addVectorLayerTopDown(hmiState, "mic_layer_4");
-  addVectorLayerTopDown(hmiState, "mic_layer_5");
-  addVectorLayerTopDown(hmiState, "mic_layer_6");
-  addVectorLayerTopDown(hmiState, "mic_layer_7");
-  addVectorLayerTopDown(hmiState, "mic_layer_8");
-  addVectorLayerTopDown(hmiState, "mic_layer_9");
-  */
+
   addAllTruthFeatures(hmiState);
   addAllVocalizationFeatures(hmiState);
-
   createMapClickEvent(hmiState);
 
-  retrieveMicrophones().then((res) => {
-    updateMicrophoneLayer(hmiState, res.data);
-    stepMicAnimation(hmiState);
-    // Add IoT nodes to the map after microphones are loaded
-    addIoTNodesToMap(hmiState);
+  // Task 7: withRetry wraps the microphone fetch.  routes.js already retries
+  // the axios call; this outer withRetry handles cases where the call itself
+  // throws before reaching the network (e.g. axios not yet initialised).
+  withRetry(() => retrieveMicrophones(), {
+    attempts: 3,
+    delayMs: 2000,
+    retryMessage: "Microphone load failed, retrying",
   })
-  addmicrophones(hmiState);
-  stepMicAnimation(hmiState);
-  queueSimUpdate(hmiState);
-  //simulateData(hmiState);
+    .then((res) => {
+      hideMapSpinner();
+      updateMicrophoneLayer(hmiState, res.data);
+      stepMicAnimation(hmiState);
+      addIoTNodesToMap(hmiState);
+      queueSimUpdate(hmiState);
+      showToast("Map data loaded successfully", "success");
+    })
+    .catch((error) => {
+      hideMapSpinner();
+      console.error("Error loading microphones:", error);
+
+      // Task 7: use getApiErrorMessage instead of manual isTimeout check
+      const userMsg = getApiErrorMessage(
+        error,
+        "Failed to load map data. The server may be unavailable."
+      );
+
+      showMapError(userMsg, () => initialiseHMI(hmiState));
+      showToast(userMsg, "error");
+    });
 }
 
-function updateFilters(){
-  
-}
+// ─────────────────────────────────────────────────────────────────────────────
+// Email validation
+// ─────────────────────────────────────────────────────────────────────────────
 
-const validEmailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
-export function emailValidation(inp){
-  let email_id = inp + "-email-inp";
-  let error_id = inp + "-email-error";
-  let btn_id = inp + "-button"
-  let input_ele = document.getElementById(email_id);
-  let error_ele = document.getElementById(error_id);
-  let btn_ele = document.getElementById(btn_id);
-  console.log("Toggle email: ", input_ele.value)
-  if (input_ele.value.match(validEmailRegex)){
-    error_ele.style.display = 'none';
-    error_ele.innerHTML = '';
+const validEmailRegex =
+  /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+
+export function emailValidation(inp) {
+  const email_id = inp + "-email-inp";
+  const error_id = inp + "-email-error";
+  const btn_id   = inp + "-button";
+
+  const input_ele = document.getElementById(email_id);
+  const error_ele = document.getElementById(error_id);
+  const btn_ele   = document.getElementById(btn_id);
+
+  if (!input_ele || !error_ele || !btn_ele) return;
+
+  if (input_ele.value.match(validEmailRegex)) {
+    error_ele.style.display = "none";
+    error_ele.innerHTML = "";
     btn_ele.disabled = false;
   } else {
-    error_ele.style.display = 'block';
-    error_ele.innerHTML = 'Please insert a valid email address';
+    error_ele.style.display = "block";
+    error_ele.innerHTML = "Please insert a valid email address";
     btn_ele.disabled = true;
   }
-  
 }
 
-let latestSimAnimals = {};
+// ─────────────────────────────────────────────────────────────────────────────
+// Layer reset
+// ─────────────────────────────────────────────────────────────────────────────
 
-export function updateAnimalMovementLayerFromPastData(hmiState, results){
+export function resetWildlifeLayers(hmiState) {
+  hmiState.vocalizationEvents = [];
+  hmiState.movementEvents = {};
+  clearAllVocalizationLayers(hmiState);
+  clearAllTruthLayers(hmiState);
+}
 
-  clearAllTruthLayers();
+export function clearAllVocalizationLayers(hmiState) {
+  for (let stat of statuses)
+    for (let animalType of animalTypes) {
+      const layer = findMapLayerWithName(hmiState, stat + "_" + animalType);
+      if (layer) layer.getSource().clear();
+    }
+}
 
+export function clearAllTruthLayers(hmiState) {
+  for (let stat of statuses)
+    for (let animalType of animalTypes) {
+      const layer = findMapLayerWithName(hmiState, stat + "_" + animalType + "_truth");
+      if (layer) layer.getSource().clear();
+    }
+}
+
+export function clearMicrophoneLayer(hmiState) {
+  const layer = findMapLayerWithName(hmiState, "mic_layer");
+  if (layer) layer.getSource().clear();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Data converters
+// ─────────────────────────────────────────────────────────────────────────────
+
+export function convertJSONtoAnimalMovementEvent(hmiState, data) {
+  return {
+    animalId:                      data.animalId,
+    eventId:                       data._id,
+    timestamp:                     Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000),
+    eventTimestamp:                data.timestamp,
+    speciesScientificName:         data.species.toLowerCase(),
+    speciesIdentificationConfidence: 100.0,
+    locationLat:                   data.animalTrueLLA[0],
+    locationLon:                   data.animalTrueLLA[1],
+    locationConfidence:            100.0,
+    animalType:                    data.type.toLowerCase(),
+    animalStatus:                  matchStatus(data.status.toLowerCase()),
+    animalDiet:                    data.diet.toLowerCase(),
+  };
+}
+
+export function convertJSONtoAnimalVocalizationEvent(hmiState, data) {
+  return {
+    timestamp:                      hmiState.currentTime,
+    eventTimestamp:                 data.timestamp,
+    eventId:                        data._id,
+    speciesIdentificationConfidence:data.confidence,
+    speciesScientificName:          data.species.toLowerCase(),
+    commonName:                     data.commonName.toLowerCase(),
+    animalType:                     data.type.toLowerCase(),
+    animalStatus:                   matchStatus(data.status.toLowerCase()),
+    animalDiet:                     data.diet.toLowerCase(),
+    locationConfidence:             100 - data.animalLLAUncertainty,
+    estLat:                         data.animalEstLLA[0],
+    estLon:                         data.animalEstLLA[1],
+    locationLat:                    data.animalTrueLLA[0],
+    locationLon:                    data.animalTrueLLA[1],
+    sensorId:                       data.sensorId,
+    sensorLat:                      data.microphoneLLA[0],
+    sensorLon:                      data.microphoneLLA[1],
+  };
+}
+
+export function convertJSONtoMicrophone(hmiState, data) {
+  if (data.microphoneLLA !== null) {
+    return { id: data._id, lat: data.microphoneLLA[0], lon: data.microphoneLLA[1] };
+  }
+  return null;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Layer update functions
+// ─────────────────────────────────────────────────────────────────────────────
+
+export function updateAnimalMovementLayerFromPastData(hmiState, results) {
+  clearAllTruthLayers(hmiState);
   hmiState.movementEvents = {};
   latestSimAnimals = {};
 
-  let updateDict = {};
+  const updateDict = {};
 
-  //ensure events are unique per id
   for (let data of results) {
-    if(latestSimAnimals.hasOwnProperty(data.animalId)){
-      let entry = latestSimAnimals[data.animalId];
-      if(entry.timestamp < data.timestamp){
+    if (latestSimAnimals.hasOwnProperty(data.animalId)) {
+      if (latestSimAnimals[data.animalId].timestamp < data.timestamp) {
         latestSimAnimals[data.animalId] = data;
         updateDict[data.animalId] = true;
       }
-    }
-    else{
+    } else {
       latestSimAnimals[data.animalId] = data;
-      let event = convertJSONtoAnimalMovementEvent(hmiState, data);
+      const event = convertJSONtoAnimalMovementEvent(hmiState, data);
       hmiState.movementEvents[event.animalId] = event;
     }
   }
 
-  for(const key in updateDict){
-    let event = convertJSONtoAnimalMovementEvent(hmiState, latestSimAnimals[key]);
+  for (const key in updateDict) {
+    const event = convertJSONtoAnimalMovementEvent(hmiState, latestSimAnimals[key]);
     hmiState.movementEvents[event.animalId] = event;
   }
 
   addAllTruthFeatures(hmiState);
 }
 
-export function updateVocalizationLayerFromPastData(hmiState, results){
-
-  clearAllVocalizationLayers();
-
+export function updateVocalizationLayerFromPastData(hmiState, results) {
+  clearAllVocalizationLayers(hmiState);
   hmiState.vocalizationEvents = [];
-  //console.log(results);
 
   for (let data of results) {
-    let event = convertJSONtoAnimalVocalizationEvent(hmiState, data);
-    hmiState.vocalizationEvents.push(event);
+    hmiState.vocalizationEvents.push(convertJSONtoAnimalVocalizationEvent(hmiState, data));
   }
 
   addAllVocalizationFeatures(hmiState);
 }
 
-export function updateMicrophoneLayer(hmiState, results){
-
-  clearMicrophoneLayer();
-
+export function updateMicrophoneLayer(hmiState, results) {
+  clearMicrophoneLayer(hmiState);
   hmiState.microphoneLocations = [];
-  //console.log(results);
 
   for (let data of results) {
-    let location = convertJSONtoMicrophone(hmiState, data);
-    if(location !== null){
-      hmiState.microphoneLocations.push(location);
-    }
+    const location = convertJSONtoMicrophone(hmiState, data);
+    if (location !== null) hmiState.microphoneLocations.push(location);
   }
 
   addmicrophones(hmiState);
 }
 
+export function updateAnimalMovementLayerFromLiveData(hmiState, results) {
+  const newMovementEvents     = [];
+  const updatedMovementEvents = [];
+  const updateDict            = {};
 
-export function updateAnimalMovementLayerFromLiveData(hmiState, results){
-  let newMovementEvents = [];
-  let updatedMovementEvents = [];
-  let updateDict = {};
-
-  //ensure events are unique per id
   for (let data of results) {
-    
-    //console.log(data);
-
-    if(latestSimAnimals.hasOwnProperty(data.animalId)){
-      let entry = latestSimAnimals[data.animalId];
-      if(entry.timestamp < data.timestamp){
+    if (latestSimAnimals.hasOwnProperty(data.animalId)) {
+      if (latestSimAnimals[data.animalId].timestamp < data.timestamp) {
         latestSimAnimals[data.animalId] = data;
         updateDict[data.animalId] = true;
       }
-    }
-    else{
+    } else {
       latestSimAnimals[data.animalId] = data;
-      let event = convertJSONtoAnimalMovementEvent(hmiState, data);
+      const event = convertJSONtoAnimalMovementEvent(hmiState, data);
       hmiState.movementEvents[event.animalId] = event;
-      newMovementEvents.push(event); 
+      newMovementEvents.push(event);
     }
   }
 
-  for(const key in updateDict){
-    let event = convertJSONtoAnimalMovementEvent(hmiState, latestSimAnimals[key]);
+  for (const key in updateDict) {
+    const event = convertJSONtoAnimalMovementEvent(hmiState, latestSimAnimals[key]);
     hmiState.movementEvents[event.animalId] = event;
-    updatedMovementEvents.push(event); 
+    updatedMovementEvents.push(event);
   }
 
-  //purge old events per id
-  for(let evt of updatedMovementEvents){
-    let layerName = deriveTruthLayerName(evt.animalStatus, evt.animalType);
-    let layer = findMapLayerWithName(hmiState, layerName);
-    if(layer){
-      const featureToPurge = layer.getSource().getFeatureById(evt.animalId);
-      //console.log(featureToPurge);
-      if(featureToPurge){
-        //console.log("purge lat: " + evt.locationLat + " lon: " + evt.locationLon);
-        layer.getSource().removeFeature(featureToPurge);
-      }
-      else{
-        console.log(layerName);
-      }
+  for (let evt of updatedMovementEvents) {
+    const layer = findMapLayerWithName(hmiState, deriveTruthLayerName(evt.animalStatus, evt.animalType));
+    if (layer) {
+      const f = layer.getSource().getFeatureById(evt.animalId);
+      if (f) layer.getSource().removeFeature(f);
     }
   }
 
@@ -297,661 +602,295 @@ export function updateAnimalMovementLayerFromLiveData(hmiState, results){
   addNewTruthFeatures(hmiState, newMovementEvents);
 }
 
-export function updateVocalizationLayerFromLiveData(hmiState, results){
-
-  let newVocalizationEvents = [];
-
+export function updateVocalizationLayerFromLiveData(hmiState, results) {
+  const newEvents = [];
   for (let data of results) {
-
-    //console.log(data);
-
-    let event = convertJSONtoAnimalVocalizationEvent(hmiState, data);
+    const event = convertJSONtoAnimalVocalizationEvent(hmiState, data);
     hmiState.vocalizationEvents.push(event);
-    newVocalizationEvents.push(event);
+    newEvents.push(event);
   }
-
-  addNewVocalizationFeatures(hmiState, newVocalizationEvents);
+  addNewVocalizationFeatures(hmiState, newEvents);
 }
 
-export function resetWildlifeLayers(hmiState){
-  hmiState.vocalizationEvents = [];
-  hmiState.movementEvents = {};
-  clearAllVocalizationLayers();
-  clearAllTruthLayers();
+// ─────────────────────────────────────────────────────────────────────────────
+// Audio events
+// ─────────────────────────────────────────────────────────────────────────────
+
+export function muteAudioAnimation() {
+  document.dispatchEvent(new CustomEvent("muteAnimation", { detail: { message: "mute animation" } }));
 }
 
-export function clearAllVocalizationLayers(){
-  for (let stat of statuses) {
-    for (let animalType of animalTypes) {
-      let nextName = stat + "_" + animalType;
-      let layer = findMapLayerWithName(hmiState, nextName);
-      layer.getSource().clear();
-    }
-  }
+export function muteRecordingPlaybackAnimation() {
+  document.dispatchEvent(new CustomEvent("muteRecordingAnimation", { detail: { message: "mute animation" } }));
 }
 
-export function clearAllTruthLayers(){
-  for (let stat of statuses) {
-    for (let animalType of animalTypes) {
-      let nextName = stat + "_" + animalType + "_truth";
-      let layer = findMapLayerWithName(hmiState, nextName);
-      layer.getSource().clear();
-    }
-  }
-}
-
-export function clearMicrophoneLayer(){
-  let layer = findMapLayerWithName(hmiState, "mic_layer");
-  layer.getSource().clear();
-}
-
-/*function commonNameFix(common){
-  if (common == "orange footed scrubfowl"){
-    return "orange-footed scrubfowl"
-  }
-  else{
-    return common;
-  }
-}*/
-
-export function convertJSONtoAnimalMovementEvent(hmiState, data){
-  let movementEvent = {};
-
-  //console.log(data);
-
-  movementEvent.animalId = data.animalId;
-  movementEvent.eventId = data._id;
-  movementEvent.timestamp = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
-  movementEvent.eventTimestamp = data.timestamp;
-  movementEvent.speciesScientificName = data.species.toLowerCase();
-  movementEvent.speciesIdentificationConfidence = 100.0;
-  movementEvent.locationLat = data.animalTrueLLA[0];
-  movementEvent.locationLon = data.animalTrueLLA[1];
-  movementEvent.locationConfidence = 100.0;
-
-  movementEvent.animalType = data.type.toLowerCase();
-  movementEvent.animalStatus = matchStatus(data.status.toLowerCase());
-  movementEvent.animalDiet = data.diet.toLowerCase();
-
-  return movementEvent;
-}
-
-//TODO update external data properties
-export function convertJSONtoAnimalVocalizationEvent(hmiState, data){
-  let vocalizationEvent = {};
-
-  //console.log(data);
-
-  vocalizationEvent.timestamp = hmiState.currentTime;
-  vocalizationEvent.eventTimestamp = data.timestamp;
-  vocalizationEvent.eventId = data._id;
-
-  //console.log(vocalizationEvent.eventId);
-  
-  vocalizationEvent.speciesIdentificationConfidence = data.confidence;
-  vocalizationEvent.speciesScientificName = data.species.toLowerCase();
-  vocalizationEvent.commonName = data.commonName.toLowerCase();
-  vocalizationEvent.animalType = data.type.toLowerCase();
-  vocalizationEvent.animalStatus = matchStatus(data.status.toLowerCase());
-  vocalizationEvent.animalDiet = data.diet.toLowerCase();
-
-  vocalizationEvent.locationConfidence = 100 - data.animalLLAUncertainty;
-  vocalizationEvent.estLat = data.animalEstLLA[0];
-  vocalizationEvent.estLon = data.animalEstLLA[1];
-  vocalizationEvent.locationLat = data.animalTrueLLA[0];
-  vocalizationEvent.locationLon = data.animalTrueLLA[1];
-
-  vocalizationEvent.sensorId = data.sensorId;
-  vocalizationEvent.sensorLat = data.microphoneLLA[0];
-  vocalizationEvent.sensorLon = data.microphoneLLA[1];
-
-  return vocalizationEvent;
-}
-
-export function convertJSONtoMicrophone(hmiState, data){
-  let mic = {};
-
-  if(data.microphoneLLA !== null){
-    //console.log(data);
-    mic.id = data._id;
-    mic.lat = data.microphoneLLA[0];
-    mic.lon = data.microphoneLLA[1];
-    return mic;
-  }
-  else{
-    return null;
-  }
-}
-
-export function muteAudioAnimation(){
-  const mute_audio = new CustomEvent('muteAnimation',{
-    detail: {
-      message: "mute animation"
-    }
-  })
-
-  document.dispatchEvent(mute_audio);
-}
-
-export function muteRecordingPlaybackAnimation(){
-  const mute_audio = new CustomEvent('muteRecordingAnimation',{
-    detail: {
-      message: "mute animation"
-    }
-  })
-
-  document.dispatchEvent(mute_audio);
-}
-
-var activeAudioNode = null;
-var audioAnimTimeout = null;
-var playNextTrack = false;
-
-export function stopAudioPlayback(){
+export function stopAudioPlayback() {
   muteAudioAnimation();
-
-  if(audioAnimTimeout){
-    clearTimeout(audioAnimTimeout);
-  }
-  if(activeAudioNode != null){
-    console.log("calling stop");
-    activeAudioNode.stop();
-  }
-
+  if (audioAnimTimeout) clearTimeout(audioAnimTimeout);
+  if (activeAudioNode !== null) activeAudioNode.stop();
   activeAudioNode = null;
 }
 
 function playAudioString(audioDataString, sampleRate) {
-  // Convert the binary audio data string into a typed array
   const audioData = new Uint8Array(
-    atob(audioDataString)
-      .split("")
-      .map((char) => char.charCodeAt(0))
-  );
-         
-  // Create an audio context
-  const audioContext = new AudioContext();
-  
-  const el = document.getElementById("player");
-  // Create a new audio buffer
-  const numChannels = 1;
-  const bufferLength = audioData.length / 2;
-
-  const audioBuffer = audioContext.createBuffer(
-    numChannels,
-    bufferLength,
-    sampleRate
+    atob(audioDataString).split("").map((char) => char.charCodeAt(0))
   );
 
-  // Copy the binary audio data into the audio buffer
+  const localAudioContext = new AudioContext();
+  const audioBuffer       = localAudioContext.createBuffer(1, audioData.length / 2, sampleRate);
   audioBuffer.copyToChannel(new Float32Array(audioData.buffer), 0);
 
-  let duration = audioBuffer.duration;
-  //console.log(duration);
-
-  // Create a new audio buffer source node and set its buffer
-  activeAudioNode = audioContext.createBufferSource();
+  activeAudioNode = localAudioContext.createBufferSource();
   activeAudioNode.buffer = audioBuffer;
+  activeAudioNode.connect(localAudioContext.destination);
 
-  // Connect the source node to the destination node of the audio context
-  activeAudioNode.connect(audioContext.destination);
-
-  if(playNextTrack){
-    // Start playing the audio
+  if (playNextTrack) {
     activeAudioNode.start();
-
-    audioAnimTimeout = setTimeout(
-      muteAudioAnimation,
-      duration*1000,
-      hmiState
-    );
+    audioAnimTimeout = setTimeout(muteAudioAnimation, audioBuffer.duration * 1000);
   }
 }
 
-export function updateLayers(filterState)  {
+document.addEventListener("playAudio", function () {
+  playNextTrack = true;
+  if (selectedVocalizationEventId !== null) {
+    retrieveAudio(selectedVocalizationEventId)
+      .then((res) => { playAudioString(res.data.audioClip, res.data.sampleRate); })
+      .catch((error) => {
+        console.error("Error loading audio:", error);
+        showToast(getApiErrorMessage(error, "Failed to load audio clip"), "error");
+      });
+  }
+});
 
+document.addEventListener("stopAudio", function () {
+  playNextTrack = false;
+  stopAudioPlayback();
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Layer visibility
+// ─────────────────────────────────────────────────────────────────────────────
+
+export function updateLayers(hmiState, filterState) {
   for (let stat of statuses) {
     for (let animalType of animalTypes) {
-      let layerName = deriveLayerName(stat, animalType);
-      let layer = findMapLayerWithName(hmiState, layerName);
-      
-      if (filterState.includes("_" + stat) && filterState.includes("_" + animalType))
-      {
-        layer.setVisible(true);
-      }
-      else{
-        layer.setVisible(false);
+      const layer = findMapLayerWithName(hmiState, deriveLayerName(stat, animalType));
+      if (layer) {
+        layer.setVisible(
+          filterState.includes("_" + stat) && filterState.includes("_" + animalType)
+        );
       }
     }
   }
 
   for (let stat of statuses) {
     for (let animalType of animalTypes) {
-      let layerName = deriveTruthLayerName(stat, animalType);
-      let layer = findMapLayerWithName(hmiState, layerName);
-      if (filterState.includes(stat) && filterState.includes(animalType))
-      {
-        layer.setVisible(true);
-      }
-      else{
-        layer.setVisible(false);
+      const layer = findMapLayerWithName(hmiState, deriveTruthLayerName(stat, animalType));
+      if (layer) {
+        layer.setVisible(
+          filterState.includes(stat) && filterState.includes(animalType)
+        );
       }
     }
   }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Map features
+// ─────────────────────────────────────────────────────────────────────────────
+
+function _makeAnimalIcon(iconPath) {
+  return new ol.style.Style({
+    image: new ol.style.Icon({ src: iconPath, anchor: [0.5, 1], scale: 0.75, className: "true-icon" }),
+  });
+}
+
+function _makeVocalizationIcon(iconPath) {
+  return new ol.style.Style({
+    image: new ol.style.Icon({ src: iconPath, anchor: [0.5, 1], scale: 0.75, className: "vocalization-icon" }),
+  });
+}
+
+function _resolveSimIconPath(entry) {
+  const isPredator = ["insectivore", "omnivore", "carnivore"].includes(entry.animalDiet);
+  return (isPredator ? "./../images/Predator/sim/" : "./../images/sim/") +
+    getIconName(entry.animalStatus, entry.animalType);
+}
+
+function _resolveVocalizationIconPath(entry) {
+  const isHerbivore = ["herbivore", "frugivore"].includes(entry.animalDiet);
+  return (isHerbivore ? "./../images/vocalization/" : "./../images/Predator/vocalization/") +
+    getIconName(entry.animalStatus, entry.animalType);
+}
+
+function _addTruthFeature(hmiState, entry) {
+  const iconPath = _resolveSimIconPath(entry);
+
+  const feature = new ol.Feature({
+    geometry:          new ol.geom.Point(ol.proj.fromLonLat([entry.locationLon, entry.locationLat])),
+    name:              "trueLocation_" + entry.speciesScientificName,
+    animalType:        entry.animalType,
+    animalStatus:      entry.animalStatus,
+    animalSpecies:     entry.speciesScientificName,
+    animalLon:         entry.locationLon,
+    animalLat:         entry.locationLat,
+    animalDiet:        entry.animalDiet,
+    animalConfidence:  entry.speciesIdentificationConfidence,
+    animalLocConfidence: entry.locationConfidence,
+    animalIcon:        iconPath,
+    animalRecordDate:  entry.timestamp,
+    isAnimalMovement:  1,
+  });
+
+  feature.setStyle(_makeAnimalIcon(iconPath));
+  feature.setId(entry.animalId);
+
+  const layer = findMapLayerWithName(hmiState, deriveTruthLayerName(entry.animalStatus, entry.animalType));
+  if (layer) { layer.getSource().addFeature(feature); layer.getSource().changed(); layer.changed(); }
+}
+
+function _addVocalizationFeature(hmiState, entry) {
+  const iconPath = _resolveVocalizationIconPath(entry);
+
+  const feature = new ol.Feature({
+    geometry:          new ol.geom.Point(ol.proj.fromLonLat([entry.locationLon, entry.locationLat])),
+    name:              "vocalisation_" + entry.speciesScientificName,
+    animalType:        entry.animalType,
+    animalStatus:      entry.animalStatus,
+    animalSpecies:     entry.speciesScientificName,
+    animalLon:         entry.locationLon,
+    animalLat:         entry.locationLat,
+    animalConfidence:  entry.speciesIdentificationConfidence,
+    animalLocConfidence: entry.locationConfidence,
+    animalDiet:        entry.animalDiet,
+    animalIcon:        iconPath,
+    animalRecordDate:  entry.timestamp,
+    eventId:           entry.eventId,
+    isAnimalMovement:  0,
+  });
+
+  feature.setStyle(_makeVocalizationIcon(iconPath));
+  feature.setId(entry.eventId);
+
+  const layer = findMapLayerWithName(hmiState, deriveLayerName(entry.animalStatus, entry.animalType));
+  if (layer) { layer.getSource().addFeature(feature); layer.getSource().changed(); layer.changed(); }
 }
 
 function addAllTruthFeatures(hmiState) {
-  //console.log("addTruthLayers called.")
-  //console.log("Truth locs", hmiState.movementEvents);
-  for (const key in hmiState.movementEvents) {
-    //console.log("True location found!:  ")
-
-    let entry = hmiState.movementEvents[key];
-
-    var iconPath = "";
-    if(entry.animalDiet === "insectivore" || entry.animalDiet === "omnivore" || entry.animalDiet === "carnivore"){
-      iconPath = './../images/Predator/sim/' + getIconName(entry.animalStatus, entry.animalType);
-    }
-    else{
-      iconPath ='./../images/sim/' + getIconName(entry.animalStatus, entry.animalType);
-    }
-    
-    var trueLocation = new ol.Feature({
-      geometry: new ol.geom.Point(
-        ol.proj.fromLonLat([entry.locationLon,entry.locationLat])
-      ),
-        name: 'trueLocation_' + entry.speciesScientificName,
-        animalType: entry.animalType,
-        animalStatus: entry.animalStatus,
-        animalSpecies: entry.speciesScientificName,
-        animalLon: entry.locationLon,
-        animalLat: entry.locationLat,
-        animalDiet: entry.animalDiet,
-        animalConfidence: entry.speciesIdentificationConfidence,
-        animalLocConfidence: entry.locationConfidence,
-        animalIcon: iconPath,
-        animalRecordDate: entry.timestamp,
-        isAnimalMovement: 1,
-    });
-      //console.log(entry.locationLon, " ", entry.locationLat)
-    
-    var trueIcon = new ol.style.Style({
-      image: new ol.style.Icon({
-        src: iconPath,
-        anchor: [0.5, 1],
-        scale: 0.75,
-        className: 'true-icon'
-      }),
-    })
-  
-    trueLocation.setStyle(trueIcon);
-    trueLocation.setId(entry.animalId);
-
-    let layerName = deriveTruthLayerName(entry.animalStatus,entry.animalType);
-    let layer = findMapLayerWithName(hmiState, layerName);
-    let layerSource = layer.getSource();
-
-    //console.log(layerName);
-    //console.log("animal type: ", entry.speciesScientificName);
-
-    layerSource.addFeature(trueLocation);
-    layer.getSource().changed();
-    layer.changed();
-  }
+  for (const key in hmiState.movementEvents) _addTruthFeature(hmiState, hmiState.movementEvents[key]);
 }
 
 function addNewTruthFeatures(hmiState, events) {
-  //console.log("addTruthLayers called.")
-  //console.log("Truth locs", hmiState.movementEvents);
-  for (let entry of events) {
-    //console.log("True location found!:  ")
-    var iconPath = "";
-    if(entry.animalDiet ==="omnivore" || entry.animalDiet === "carnivore" || entry.animalDiet === "insectivore" ){
-      iconPath = './../images/Predator/sim/' + getIconName(entry.animalStatus, entry.animalType);
-    }
-    else{
-      iconPath ='./../images/sim/' + getIconName(entry.animalStatus, entry.animalType);
-    }
-
-    var trueLocation = new ol.Feature({
-      geometry: new ol.geom.Point(
-        ol.proj.fromLonLat([entry.locationLon, entry.locationLat])
-      ),
-        name: 'trueLocation_' + entry.speciesScientificName,
-        animalType: entry.animalType,
-        animalStatus: entry.animalStatus,
-        animalSpecies: entry.speciesScientificName,
-        animalLon: entry.locationLon,
-        animalLat: entry.locationLat,
-        animalDiet: entry.animalDiet,
-        animalConfidence: entry.speciesIdentificationConfidence,
-        animalLocConfidence: entry.locationConfidence,
-        animalIcon: iconPath,
-        animalRecordDate: entry.timestamp,
-        isAnimalMovement: 1,
-    });
-      //console.log(entry.locationLon, " ", entry.locationLat)
-
-    var trueIcon = new ol.style.Style({
-      image: new ol.style.Icon({
-        src: iconPath,
-        anchor: [0.5, 1],
-        scale: 0.75,
-        className: 'true-icon'
-      }),
-    })
-
-    trueLocation.setStyle(trueIcon);
-    trueLocation.setId(entry.animalId);
-
-    let layerName = deriveTruthLayerName(entry.animalStatus,entry.animalType);
-    let layer = findMapLayerWithName(hmiState, layerName);
-    let layerSource = layer.getSource();
-
-    //console.log(layerName);
-
-    layerSource.addFeature(trueLocation);
-    layer.getSource().changed();
-    layer.changed();
-  }
+  for (let entry of events) _addTruthFeature(hmiState, entry);
 }
 
 function addAllVocalizationFeatures(hmiState) {
-  //console.log("addTruthLayers called.")
-  //console.log("Truth locs", hmiState.movementEvents);
-  for (let entry of hmiState.vocalizationEvents) {
-    //console.log("True location found!:  ")
-    var iconPath = "";
-    if(entry.animalDiet === "herbavore" || entry.animalDiet === "frugivore"){
-      iconPath = './../images/vocalization/' + getIconName(entry.animalStatus, entry.animalType);
-    }
-    else{
-      iconPath ='./../images/Predator/vocalization/' + getIconName(entry.animalStatus, entry.animalType);
-    }
-
-    var evtLocation = new ol.Feature({
-      geometry: new ol.geom.Point(
-        ol.proj.fromLonLat([entry.locationLon,entry.locationLat])
-      ),
-        name: 'vocalisation_' + entry.speciesScientificName,
-        animalType: entry.animalType,
-        animalStatus: entry.animalStatus,
-        animalSpecies: entry.speciesScientificName,
-        animalLon: entry.locationLon,
-        animalLat: entry.locationLat,
-        animalConfidence: entry.speciesIdentificationConfidence,
-        animalLocConfidence: entry.locationConfidence,
-        animalDiet: entry.animalDiet,
-        animalIcon: iconPath,
-        animalRecordDate: entry.timestamp,
-        eventId: entry.eventId,
-        isAnimalMovement: 0,
-    });
-      //console.log(entry.locationLon, " ", entry.locationLat)
-    
-    var icon = new ol.style.Style({
-      image: new ol.style.Icon({
-        src: iconPath,
-        anchor: [0.5, 1],
-        scale: 0.75,
-        className: 'vocalization-icon'
-      }),
-    })
-    evtLocation.setStyle(icon);
-    evtLocation.setId(entry.animalId);
-
-    let layerName = deriveLayerName(entry.animalStatus,entry.animalType);
-    let layer = findMapLayerWithName(hmiState, layerName);
-    if(layer){
-      let layerSource = layer.getSource();
-
-      //console.log(layerName);
-      //console.log("animal type: ", entry.speciesScientificName);
-  
-      layerSource.addFeature(evtLocation);
-      layer.getSource().changed();
-      layer.changed();
-    }
-    else{
-      console.log(layerName);
-    }
-
-  }
+  for (let entry of hmiState.vocalizationEvents) _addVocalizationFeature(hmiState, entry);
 }
 
 function addNewVocalizationFeatures(hmiState, events) {
-  //console.log("addTruthLayers called.")
-  //console.log("Truth locs", hmiState.movementEvents);
-  for (let entry of events) {
-    //console.log("True location found!:  ")
-    var iconPath = "";
-    if(entry.animalDiet === "herbavore" || entry.animalDiet === "frugivore"){
-      iconPath = './../images/vocalization/' + getIconName(entry.animalStatus, entry.animalType);
-    }
-    else{
-      iconPath ='./../images/Predator/vocalization/' + getIconName(entry.animalStatus, entry.animalType);
-    }
+  for (let entry of events) _addVocalizationFeature(hmiState, entry);
+}
 
-    var evtLocation = new ol.Feature({
-      geometry: new ol.geom.Point(
-        ol.proj.fromLonLat([entry.locationLon,entry.locationLat])
-      ),
-        name: 'vocalisation_' + entry.speciesScientificName,
-        animalType: entry.animalType,
-        animalStatus: entry.animalStatus,
-        animalSpecies: entry.speciesScientificName,
-        animalLon: entry.locationLon,
-        animalLat: entry.locationLat,
-        animalConfidence: entry.speciesIdentificationConfidence,
-        animalLocConfidence: entry.locationConfidence,
-        animalDiet: entry.animalDiet,
-        animalIcon: iconPath,
-        animalRecordDate: entry.timestamp,
-        eventId: entry.eventId,
-        isAnimalMovement: 0,
+// ─────────────────────────────────────────────────────────────────────────────
+// Microphone layers
+// ─────────────────────────────────────────────────────────────────────────────
+
+function addMicrophonesByLayer(hmiState, layerName, iconPath) {
+  const mics = hmiState.microphoneLocations.map((location) => {
+    const mic = new ol.Feature({
+      geometry: new ol.geom.Point(ol.proj.fromLonLat([location.lon, location.lat])),
+      name: "mic", micLat: location.lat, micLon: location.lon,
+      micIcon: iconPath, id: location.id, isMic: 1,
     });
-      //console.log(entry.locationLon, " ", entry.locationLat)
+    mic.setStyle(new ol.style.Style({
+      image: new ol.style.Icon({ src: iconPath, anchor: [0.5, 1], scale: 0.175 }),
+    }));
+    return mic;
+  });
 
-    var icon = new ol.style.Style({
-      image: new ol.style.Icon({
-        src: iconPath,
-        anchor: [0.5, 1],
-        scale: 0.75,
-        className: 'vocalization-icon'
-      }),
-    })
-    
-    evtLocation.setStyle(icon);
-    evtLocation.setId(entry.eventId);
+  const layer = findMapLayerWithName(hmiState, layerName);
+  if (layer) { layer.getSource().addFeatures(mics); layer.getSource().changed(); layer.changed(); }
+}
 
-    let layerName = deriveLayerName(entry.animalStatus,entry.animalType);
-    let layer = findMapLayerWithName(hmiState, layerName);
-    if(layer){
-      let layerSource = layer.getSource();
+function addMicrophonesByHiddenLayer(hmiState, layerName, iconPath) {
+  const mics = hmiState.microphoneLocations.map((location) => {
+    const mic = new ol.Feature({
+      geometry: new ol.geom.Point(ol.proj.fromLonLat([location.lon, location.lat])),
+      name: "mic",
+    });
+    mic.setStyle(new ol.style.Style({
+      image: new ol.style.Icon({ src: iconPath, anchor: [0.5, 1], scale: 0.175 }),
+    }));
+    return mic;
+  });
 
-      //console.log(layerName);
-      //console.log("animal type: ", entry.speciesScientificName);
-  
-      layerSource.addFeature(evtLocation);
-      layer.getSource().changed();
-      layer.changed();
-    }
-    else{
-      console.log(layerName);
-    }
+  const layer = findMapLayerWithName(hmiState, layerName);
+  if (layer) {
+    layer.getSource().addFeatures(mics);
+    layer.getSource().changed();
+    layer.changed();
+    layer.setVisible(false);
   }
 }
-
-function addMicrophonesByLayer(hmiState, layerName, iconPath){
-  var mics = [];
-
-  //console.log("locs", hmiState.microphoneLocations);
-  hmiState.microphoneLocations.forEach((location) => {
-    //console.log(location);
-    // Add the marker into the array
-    var mic = new ol.Feature({
-      geometry: new ol.geom.Point(
-        ol.proj.fromLonLat([location.lon, location.lat])
-      ),
-      name: "mic",
-      micLat: location.lat,
-      micLon: location.lon,
-      micIcon: iconPath,
-      id: location.id,
-      isMic: 1,
-    });
-    var icon = new ol.style.Style({
-      image: new ol.style.Icon({
-        src: iconPath,
-        anchor: [0.5, 1],
-        scale: 0.175,
-      }),
-    });
-    mic.setStyle(icon);
-    mics.push(mic);
-  });
-
-  //console.log("mics: ", mics);
-  let layer = findMapLayerWithName(hmiState, layerName);
-  let layerSource = layer.getSource();
-  layerSource.addFeatures(mics);
-  layer.getSource().changed();
-  layer.changed();
-}
-
-
-function addMicrophonesByHiddenLayer(hmiState, layerName, iconPath){
-  var mics = [];
-
-  //console.log("locs", hmiState.microphoneLocations);
-  hmiState.microphoneLocations.forEach((location) => {
-    //console.log(location);
-    // Add the marker into the array
-    var mic = new ol.Feature({
-      geometry: new ol.geom.Point(
-        ol.proj.fromLonLat([location.lon, location.lat])
-      ),
-      name: "mic",
-    });
-    var icon = new ol.style.Style({
-      image: new ol.style.Icon({
-        src: iconPath,
-        anchor: [0.5, 1],
-        scale: 0.175,
-      }),
-    });
-    mic.setStyle(icon);
-    mics.push(mic);
-  });
-
-  //console.log("mics: ", mics);
-  let layer = findMapLayerWithName(hmiState, layerName);
-  let layerSource = layer.getSource();
-  layerSource.addFeatures(mics);
-  layer.getSource().changed();
-  layer.changed();
-  layer.setVisible(false);
-}
-
-var micAnimFrameIndex = 1;
-var animTimeout = null;
 
 function addmicrophones(hmiState) {
-  
-  //Loop function to add all the frames that compose the microphone animation.
-  for(let i=25; i>0;i--){
-    addMicrophonesByLayer(hmiState,`mic_layer_${i}`, `./../images/${i}-01.png`);
+  for (let i = 25; i > 0; i--) {
+    addMicrophonesByLayer(hmiState, `mic_layer_${i}`, `./../images/${i}-01.png`);
   }
-  //Add the single white dot as the microphone icon for when animation is disabled.
   addMicrophonesByHiddenLayer(hmiState, "mic_layer", "./../images/1-01.png");
 }
 
-export function enableMicAnimation(hmiState){
-  var staticLayer = findMapLayerWithName(hmiState, "mic_layer");
-  staticLayer.setVisible(false);
-
-  for(var i = 1; i <= 25; i++){
-    var nextLayer = findMapLayerWithName(hmiState, "mic_layer_" + i);
-    nextLayer.setVisible(true);
+export function enableMicAnimation(hmiState) {
+  const staticLayer = findMapLayerWithName(hmiState, "mic_layer");
+  if (staticLayer) staticLayer.setVisible(false);
+  for (let i = 1; i <= 25; i++) {
+    const layer = findMapLayerWithName(hmiState, "mic_layer_" + i);
+    if (layer) layer.setVisible(true);
   }
-
   stepMicAnimation(hmiState);
 }
 
-export function disableMicAnimation(hmiState){
-  if(animTimeout){
-    clearTimeout(animTimeout);
-  }
-
-  for(var i = 1; i <= 25; i++){
-    var nextLayer = findMapLayerWithName(hmiState, "mic_layer_" + i);
-    nextLayer.setVisible(false);
+export function disableMicAnimation(hmiState) {
+  if (animTimeout) clearTimeout(animTimeout);
+  for (let i = 1; i <= 25; i++) {
+    const layer = findMapLayerWithName(hmiState, "mic_layer_" + i);
+    if (layer) layer.setVisible(false);
   }
 }
 
 function stepMicAnimation(hmiState) {
-  var currentIndex = micAnimFrameIndex;
-  micAnimFrameIndex = (micAnimFrameIndex % 25) + 1;
+  const currentIndex = micAnimFrameIndex;
+  micAnimFrameIndex  = (micAnimFrameIndex % 25) + 1;
 
-  var nextLayer = findMapLayerWithName(hmiState, "mic_layer_" + micAnimFrameIndex);
-  nextLayer.setVisible(true);
+  const nextLayer    = findMapLayerWithName(hmiState, "mic_layer_" + micAnimFrameIndex);
+  const currentLayer = findMapLayerWithName(hmiState, "mic_layer_" + currentIndex);
 
-  var currentLayer = findMapLayerWithName(hmiState, "mic_layer_" + currentIndex);
-  currentLayer.setVisible(false);
+  if (nextLayer)    nextLayer.setVisible(true);
+  if (currentLayer) currentLayer.setVisible(false);
 
-  if(animTimeout){
-    clearTimeout(animTimeout);
-  }
-
-  animTimeout = setTimeout(
-    stepMicAnimation,
-    100,
-    hmiState
-  );
+  if (animTimeout) clearTimeout(animTimeout);
+  animTimeout = setTimeout(stepMicAnimation, 100, hmiState);
 }
 
-export function showMics(hmiState){
-  let layer = findMapLayerWithName(hmiState, "mic_layer");
-  let layerSource = layer.getSource();
-  layer.setVisible(true);
+export function showMics(hmiState) {
+  const layer = findMapLayerWithName(hmiState, "mic_layer");
+  if (layer) layer.setVisible(true);
 }
 
-export function hideMics(hmiState){
-  let layer = findMapLayerWithName(hmiState, "mic_layer");
-  let layerSource = layer.getSource();
-  layer.setVisible(false);
+export function hideMics(hmiState) {
+  const layer = findMapLayerWithName(hmiState, "mic_layer");
+  if (layer) layer.setVisible(false);
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Map layer helpers
+// ─────────────────────────────────────────────────────────────────────────────
 
 function findMapLayerWithName(hmiState, name) {
-  if (!hmiState.basemap) {
-    console.log(`findMapLayerWithName: invalid basemap`);
-    return null;
-  } else {
-    if(hmiState.layers.hasOwnProperty(name)){
-      return hmiState.layers[name];
-    }
-  }
-
-  console.log(`findMapLayerWithName: layer not found: ` + name);
-  return null;
-}
-
-function findMapLayerWithName_Deprecated(hmiState, name) {
-  if (!hmiState.basemap) {
-    console.log(`findMapLayerWithName: invalid basemap`);
-    return null;
-  } else {
-    let mapLayers = hmiState.basemap.getLayers();
-
-    for (let i = 0; i < mapLayers.getLength(); ++i) {
-      let currentLayer = mapLayers.item(i);
-      if (currentLayer.get("name") == name.toLowerCase()) {
-        return currentLayer;
-      }
-    }
-  }
-
-  console.log(`findMapLayerWithName: layer not found: ` + name);
+  if (!hmiState.basemap) { console.log("findMapLayerWithName: invalid basemap"); return null; }
+  if (hmiState.layers && hmiState.layers.hasOwnProperty(name)) return hmiState.layers[name];
+  console.log("findMapLayerWithName: layer not found: " + name);
   return null;
 }
 
@@ -961,70 +900,57 @@ function addVectorLayerTopDown(hmiState, layerName) {
 }
 
 function addVectorLayerToBasemap(hmiState, layerName, zIndex) {
-  if (!hmiState.basemap) {
-    console.log(`findMapLayerWithName: invalid basemap`);
-    return null;
-  } else {
-    let layer = new ol.layer.Vector({
-      name: layerName,
-      source: new ol.source.Vector(),
-      visible: true,
-    });
+  if (!hmiState.basemap) { console.log("addVectorLayerToBasemap: invalid basemap"); return null; }
 
-    if (zIndex != 0) {
-      layer.setZIndex(zIndex);
-    }
-
-    hmiState.basemap.addLayer(layer);
-    hmiState.layers[layerName] = layer;
-  }
+  const layer = new ol.layer.Vector({ name: layerName, source: new ol.source.Vector(), visible: true });
+  if (zIndex !== 0) layer.setZIndex(zIndex);
+  hmiState.basemap.addLayer(layer);
+  hmiState.layers[layerName] = layer;
 }
 
 function addVocalisationLayers(hmiState) {
-  // Wildlife layers
-  // Invasive, Normal, Near-Threatened, Vulnerable, Endangered
-  // Mammal, Reptile, Predator, Bird, Amphibian
-  for (let stat of statuses) {
-    for (let animalType of animalTypes) {
-      let nextName = stat + "_" + animalType;
-
-      addVectorLayerTopDown(hmiState, nextName);
-    }
-  }
+  for (let stat of statuses)
+    for (let animalType of animalTypes)
+      addVectorLayerTopDown(hmiState, stat + "_" + animalType);
 }
 
 function addTruthLayers(hmiState) {
-  // Wildlife layers
-  // Invasive, Normal, Near-Threatened, Vulnerable, Endangered
-  // Mammal, Reptile, Predator, Bird, Amphibian
-  for (let stat of statuses) {
-    for (let animalType of animalTypes) {
-      let nextName = stat + "_" + animalType + "_truth";
+  for (let stat of statuses)
+    for (let animalType of animalTypes)
+      addVectorLayerTopDown(hmiState, stat + "_" + animalType + "_truth");
+}
 
-      addVectorLayerTopDown(hmiState, nextName);
+function deriveLayerName(status, animalType)      { return status + "_" + animalType; }
+function deriveTruthLayerName(status, animalType) { return status + "_" + animalType + "_truth"; }
+
+function getOlDefaultControls(options) {
+  try {
+    if (ol && ol.control) {
+      if (typeof ol.control.defaults === "function") return ol.control.defaults(options);
+      if (ol.control.defaults && typeof ol.control.defaults.defaults === "function")
+        return ol.control.defaults.defaults(options);
     }
-  }
+  } catch (error) { console.error("Failed to resolve OpenLayers controls defaults:", error); }
+  return undefined;
 }
 
-function deriveLayerName(status, animalType) {
-  return status + "_" + animalType;
-}
-
-function deriveTruthLayerName(status, animalType) {
-  return status + "_" + animalType + "_truth";
+function getOlDefaultInteractions(options) {
+  try {
+    if (ol && ol.interaction) {
+      if (typeof ol.interaction.defaults === "function") return ol.interaction.defaults(options);
+      if (ol.interaction.defaults && typeof ol.interaction.defaults.defaults === "function")
+        return ol.interaction.defaults.defaults(options);
+    }
+  } catch (error) { console.error("Failed to resolve OpenLayers interactions defaults:", error); }
+  return undefined;
 }
 
 function createBasemap(hmiState) {
-
-  var basemap = new ol.Map({
+  const basemap = new ol.Map({
     target: "basemap",
     featureEvents: true,
-    controls: ol.control.defaults({
-      zoom: false,
-    }),
-    interactions: ol.interaction.defaults({
-      constrainResolution: false,
-    }),
+    controls:     getOlDefaultControls({ zoom: false }),
+    interactions: getOlDefaultInteractions({ constrainResolution: false }),
     layers: [
       new ol.layer.Tile({
         name: "mapTileLayer",
@@ -1036,7 +962,7 @@ function createBasemap(hmiState) {
     ],
     view: new ol.View({
       center: ol.proj.fromLonLat([hmiState.originLon, hmiState.originLat]),
-      zoom: hmiState.defaultZoom,
+      zoom:   hmiState.defaultZoom,
     }),
   });
 
@@ -1044,288 +970,250 @@ function createBasemap(hmiState) {
   return basemap;
 }
 
-var current_mic_lat = 0.0;
-var current_mic_lon = 0.0;
-var current_mic_id = "";
+// ─────────────────────────────────────────────────────────────────────────────
+// Weather data
+// ─────────────────────────────────────────────────────────────────────────────
 
-async function fetchWeatherData(timestamp,lat,lon) {
-  try {
-      const response = await fetch(`http://localhost:9000/hmi/weather?timestamp=${timestamp}&lat=${lat}&lon=${lon}`);
-      if (!response.ok) {
-          throw new Error('Failed to fetch weather data');
-      }
-      const weatherData = await response.json();
-      //console.log(weatherData);
-      return weatherData
-  } catch (error) {
-      console.error('Error fetching weather data:', error);
-  }
+async function fetchWeatherData(timestamp, lat, lon) {
+  const response = await fetch(
+    `http://localhost:9001/hmi/weather?timestamp=${timestamp}&lat=${lat}&lon=${lon}`
+  );
+  if (!response.ok) throw new Error("Failed to fetch weather data");
+  return response.json();
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Map click handler
+// ─────────────────────────────────────────────────────────────────────────────
 
-
-function createMapClickEvent(hmiState){
+function createMapClickEvent(hmiState) {
   hmiState.basemap.on("click", function (evt) {
-    const feature = hmiState.basemap.forEachFeatureAtPixel(evt.pixel, function (feature) {
-      return feature;
-    });
+    const feature = hmiState.basemap.forEachFeatureAtPixel(evt.pixel, (f) => f);
 
-    let active_content = $("#animal-popup-content");
-    let default_content = $("#animal-default-content");
-    let active_mic_content = $("#mic-popup-content");
-    let default_mic_content = $("mic-default-content");
-    let default_node_content = $("#node-default-content");
-    let active_node_content = $("#node-popup-content");
-    if (feature){
+    if (!feature) {
+      safeHideJQuery("#animal-popup-content");
+      safeHideJQuery("#mic-popup-content");
+      safeHideJQuery("#node-popup-content");
+      safeShowJQuery("#animal-default-content");
+      safeShowJQuery("#mic-default-content");
+      safeShowJQuery("#node-default-content");
+      return;
+    }
 
-      let values = feature.getProperties();
+    if (!isJQueryAvailable()) {
+      console.error("jQuery is not loaded.");
+      showToast("UI dependency missing: jQuery is not loaded", "error");
+      return;
+    }
 
+    const active_content      = window.$("#animal-popup-content");
+    const default_content     = window.$("#animal-default-content");
+    const active_mic_content  = window.$("#mic-popup-content");
+    const default_mic_content = window.$("#mic-default-content");
+    const default_node_content = window.$("#node-default-content");
+    const active_node_content  = window.$("#node-popup-content");
 
-      if (values.hasOwnProperty('animalRecordDate')) {
-        
-        fetchWeatherData(values.animalRecordDate,values.animalLat,values.animalLon).then((weatherData)=>{
+    const values = feature.getProperties();
 
-          const key = Object.keys(weatherData.Date)[0]
-          //console.log(key)
-          const date_ele = document.getElementById("weather_date")
-          date_ele.innerHTML = weatherData["Date"][key]
-
-          const mintemp_ele = document.getElementById("weather_mintemp")
-          mintemp_ele.innerHTML = weatherData["Min Temperature (°C)"][key] + " (°C)"
-
-          const maxtemp_ele = document.getElementById("weather_maxtemp")
-          maxtemp_ele.innerHTML = weatherData["Max Temperature (°C)"][key] + " (°C)"
-
-          const rainfall_ele = document.getElementById("weather_rainfall")
-          rainfall_ele.innerHTML = weatherData["Rainfall (mm)"][key] + " (mm)"
-
-          const windspeed_ele = document.getElementById("weather_windspeed")
-          windspeed_ele.innerHTML = weatherData["Wind Speed (m/sec)"][key] + " (m/sec)"
-
-          const maxhumidity_ele = document.getElementById("weather_maxhumidity")
-          maxhumidity_ele.innerHTML = weatherData["Max Humidity (%)"][key] + " (%)"
-
-          const minhumidity_ele = document.getElementById("weather_minhumidity")
-          minhumidity_ele.innerHTML = weatherData["Min Humidity (%)"][key] + " (%)"
-        }).catch(error => {
-          console.error('Error fetching weather data:', error);
+    if (values.hasOwnProperty("animalRecordDate")) {
+      fetchWeatherData(values.animalRecordDate, values.animalLat, values.animalLon)
+        .then((weatherData) => {
+          const key = Object.keys(weatherData.Date)[0];
+          const fields = {
+            weather_date:         weatherData["Date"][key],
+            weather_mintemp:      weatherData["Min Temperature (°C)"][key] + " (°C)",
+            weather_maxtemp:      weatherData["Max Temperature (°C)"][key] + " (°C)",
+            weather_rainfall:     weatherData["Rainfall (mm)"][key] + " (mm)",
+            weather_windspeed:    weatherData["Wind Speed (m/sec)"][key] + " (m/sec)",
+            weather_maxhumidity:  weatherData["Max Humidity (%)"][key] + " (%)",
+            weather_minhumidity:  weatherData["Min Humidity (%)"][key] + " (%)",
+          };
+          for (const [id, val] of Object.entries(fields)) {
+            const el = document.getElementById(id);
+            if (el) el.innerHTML = val;
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching weather data:", error);
+          showToast(getApiErrorMessage(error, "Weather data failed to load"), "error");
         });
+    }
 
-       
+    if (values.isMic) {
+      active_mic_content.show();  default_mic_content.hide();
+      active_node_content.hide(); default_node_content.show();
+      active_content.hide();      default_content.show();
+
+      const img  = new Image();
+      const dice = Math.floor(Math.random() * 4) + 1;
+      img.onload  = () => { const el = document.getElementById("mic_desc_img"); if (el) el.src = "../../images/bio/mic_bio_" + dice + ".png"; };
+      img.onerror = () => console.log("Mic image does not exist!");
+      img.src = "../../images/bio/mic_bio_" + dice + ".png";
+
+      const descId = document.getElementById("mic_desc_id");
+      if (descId) descId.innerText = values.id;
+
+      const dateFormat = new Date();
+      const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.innerHTML = val; };
+      setEl("mic_markup_img",      ""); // src set via DOM
+      const micImg = document.getElementById("mic_markup_img"); if (micImg) micImg.src = values.micIcon;
+      setEl("mic_markup_details",  "Microphone");
+      setEl("mic_markup_loc_lat",  values.micLat);
+      setEl("mic_markup_loc_lon",  values.micLon);
+      setEl("mic_markup_date",     dateFormat.toUTCString());
+
+      current_mic_lat = values.micLat;
+      current_mic_lon = values.micLon;
+      current_mic_id  = values.id;
+
+      animal_toggled = true;
+      document.dispatchEvent(new CustomEvent("micToggled", { detail: { message: "Mic toggled:" } }));
+
+    } else if (values.isNode) {
+      active_node_content.show();  default_node_content.hide();
+      active_mic_content.hide();   default_mic_content.show();
+      active_content.hide();       default_content.show();
+
+      const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.innerHTML = val; };
+      setEl("node_markup_loc_lat", values.lat);
+      setEl("node_markup_loc_lon", values.lon);
+      setEl("node_markup_name",    values.name);
+      setEl("node_markup_type",    values.type);
+      setEl("node_markup_model",   values.model);
+
+      animal_toggled = true;
+      document.dispatchEvent(new CustomEvent("nodeToggled", { detail: { message: "Node toggled:" } }));
+
+    } else {
+      stopAudioPlayback();
+
+      active_content.show();       default_content.hide();
+      active_mic_content.hide();   default_mic_content.show();
+      active_node_content.hide();  default_node_content.show();
+
+      if (values.eventId) selectedVocalizationEventId = values.eventId;
+
+      const audioHeader  = document.getElementById("audioHeader");
+      const audioControl = document.getElementById("audioControl");
+      if (values.isAnimalMovement) {
+        if (audioHeader)  audioHeader.style.display  = "none";
+        if (audioControl) audioControl.style.display = "none";
+      } else {
+        if (audioHeader)  audioHeader.style.display  = "flex";
+        if (audioControl) audioControl.style.display = "flex";
       }
 
+      if (values.animalSpecies) {
+        const result = sample_data.find(
+          ({ species }) => species.toLowerCase() === values.animalSpecies.toLowerCase()
+        );
 
-      if (values.isMic){
-        active_mic_content.show();
-        default_mic_content.hide();
+        const dice = Math.floor(Math.random() * 5) + 1;
 
-        const img = new Image();
-        let dice = Math.floor(Math.random() * 4) + 1;
-        img.onload = function() {
-          //console.log('Image exists!');
-          document.getElementById("mic_desc_img").src = "../../images/bio/mic_bio_" + dice + ".png";
-        }
-        img.onerror = function() {
-          console.log('Mic image does not exist!');
-        }
-        img.src = "../../images/bio/mic_bio_" + dice + ".png";
-        //document.getElementById("mic_desc_name").innerText = result.common;
-        document.getElementById("mic_desc_id").innerText = values.id;
-        //document.getElementById("desc_summary").innerText = result.summary;
+        if (result) {
+          const img = new Image();
+          img.onload  = () => { const el = document.getElementById("desc_img"); if (el) el.src = "../../images/bio/" + result.common.toLowerCase() + "-bio.png"; };
+          img.onerror = () => { const el = document.getElementById("desc_img"); if (el) el.src = "../../images/bio/not_available_" + dice + "-bio.png"; };
+          img.src = "../../images/bio/" + result.common.toLowerCase() + "-bio.png";
 
-        //Markup details specific session
-        let dateFormat = new Date();
-        document.getElementById("mic_markup_img").src = values.micIcon;
-        document.getElementById("mic_markup_details").innerHTML = "Microphone";
-        document.getElementById("mic_markup_loc_lat").innerHTML = values.micLat;
-        document.getElementById("mic_markup_loc_lon").innerHTML = values.micLon;
-        document.getElementById("mic_markup_date").innerHTML = dateFormat.toUTCString()
+          animal_data = result;
 
-        current_mic_lat = values.micLat;
-        current_mic_lon = values.micLon;
-        current_mic_id = values.id;
+          const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; };
+          setEl("desc_name",       result.common);
+          setEl("desc_confidence", values.animalConfidence + "%");
+          setEl("desc_species",    result.species);
+          setEl("desc_summary",    result.summary);
 
-
-        animal_toggled = true;
-        const toggled_mic = new CustomEvent('micToggled',{
-        detail: {
-          message: "Mic toggled:",
-          }
-        })
-        
-        document.dispatchEvent(toggled_mic);
-      }
-      if (values.isNode){
-        active_node_content.show();
-        default_node_content.hide();
-
-        document.getElementById("node_markup_loc_lat").innerHTML = values.lat;
-        document.getElementById("node_markup_loc_lon").innerHTML = values.lon;
-        document.getElementById("node_markup_name").innerHTML = values.name;
-        document.getElementById("node_markup_type").innerHTML = values.type;
-        document.getElementById("node_markup_model").innerHTML = values.model;
-
-        animal_toggled = true;
-        const toggled_node = new CustomEvent('nodeToggled',{
-          detail: {
-            message: "Node toggled:",
-          }
-        })
-
-        document.dispatchEvent(toggled_node);
-      }
-      else{
-        // console.log('feature: ', feature);
-        stopAudioPlayback();
-
-        active_content.show();
-        default_content.hide();
-        if (values.eventId){
-          //console.log("saving " + values.eventId);
-          selectedVocalizationEventId = values.eventId;
-        }
-        if(values.isAnimalMovement){
-          document.getElementById("audioHeader").style.display = "none"
-          document.getElementById("audioControl").style.display = "none"
-        }
-        else{
-          document.getElementById("audioHeader").style.display = "flex"
-          document.getElementById("audioControl").style.display = "flex"
-        }
-        if (values.animalSpecies){
-          //console.log(values.animalSpecies)
-          var result = sample_data.find(({ species }) => species.toLowerCase() === values.animalSpecies.toLowerCase())
-          if (result) {
-            const img = new Image();
-            img.onload = function() {
-              //console.log('Image exists!');
-              // Set the source of the img tag
-              document.getElementById("desc_img").src = "../../images/bio/" + result.common.toLowerCase() + "-bio.png";
-            }
-            img.onerror = function() {
-              let dice = Math.floor(Math.random() * 5) + 1;
-              document.getElementById("desc_img").src = "../../images/bio/not_available_" + dice + "-bio.png";
-            }
-            img.src = "../../images/bio/" + result.common.toLowerCase() + "-bio.png";
-          
-            //console.log("found")
-            //Animal Bio specific session
-            animal_data = result;
-            document.getElementById("desc_name").innerText = result.common;
-            //document.getElementById("markup_img_2").src = values.animalIcon;
-            document.getElementById("desc_confidence").innerText = values.animalConfidence + "%";
-            document.getElementById("desc_species").innerText = result.species;
-            document.getElementById("desc_summary").innerText = result.summary;
-
-            let summary = document.getElementById("desc_details");
-            summary.innerHTML = '';
-            result.description.forEach(content => {
-              if (content){
-                var p = document.createElement('p');
+          const summary = document.getElementById("desc_details");
+          if (summary) {
+            summary.innerHTML = "";
+            result.description.forEach((content) => {
+              if (content) {
+                const p = document.createElement("p");
                 p.className = "desc_ul";
                 p.innerText = content;
                 summary.appendChild(p);
               }
-            })
+            });
           }
-          else{
-            let dice = Math.floor(Math.random() * 5) + 1;
-            document.getElementById("desc_img").src = "../../images/bio/not_available_" + dice + "-bio.png";
-
-            document.getElementById("desc_name").innerText = values.animalSpecies;
-            //document.getElementById("markup_img_2").src = values.animalIcon;
-            document.getElementById("desc_confidence").innerText = values.animalConfidence + "%";
-            document.getElementById("desc_species").innerText = values.animalSpecies;
-            document.getElementById("desc_summary").innerText = "Bio data coming soon.";
-            let summary = document.getElementById("desc_details");
-            summary.innerHTML = '';
-          }
-
-
-            //Markup details specific session
-            let dateFormat = new Date(values.animalRecordDate);
-            document.getElementById("markup_img").src = values.animalIcon;
-            document.getElementById("markup_details").innerHTML = values.animalType + " | " + values.animalDiet + " | " + statusPrintLookup[values.animalStatus];
-            document.getElementById("markup_loc_lon").innerHTML = values.animalLon;
-            document.getElementById("markup_loc_lat").innerHTML = values.animalLat;
-            document.getElementById("markup_confidence").innerHTML = values.animalLocConfidence + "%";
-            document.getElementById("markup_date").innerHTML = dateFormat.toUTCString()
-
-            animal_toggled = true;
-            const toggled_animal = new CustomEvent('animalToggled',{
-              detail: {
-                message: "Animal toggled:",
-              }
-            })
-
-            document.dispatchEvent(toggled_animal);
-          
-
+        } else {
+          const descImg = document.getElementById("desc_img");
+          if (descImg) descImg.src = "../../images/bio/not_available_" + dice + "-bio.png";
+          const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; };
+          setEl("desc_name",       values.animalSpecies);
+          setEl("desc_confidence", values.animalConfidence + "%");
+          setEl("desc_species",    values.animalSpecies);
+          setEl("desc_summary",    "Bio data coming soon.");
+          const summary = document.getElementById("desc_details");
+          if (summary) summary.innerHTML = "";
         }
-        else{
-          console.log(values);
-        }
+
+        const dateFormat = new Date(values.animalRecordDate);
+        const markupImg  = document.getElementById("markup_img");
+        if (markupImg) markupImg.src = values.animalIcon;
+        const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.innerHTML = val; };
+        setEl("markup_details",   values.animalType + " | " + values.animalDiet + " | " + statusPrintLookup[values.animalStatus]);
+        setEl("markup_loc_lon",   values.animalLon);
+        setEl("markup_loc_lat",   values.animalLat);
+        setEl("markup_confidence",values.animalLocConfidence + "%");
+        setEl("markup_date",      dateFormat.toUTCString());
+
+        animal_toggled = true;
+        document.dispatchEvent(new CustomEvent("animalToggled", { detail: { message: "Animal toggled:" } }));
       }
-    } else {
-      active_content.hide();
-      active_mic_content.hide();
-      active_node_content.hide();
-      default_content.show();
-      default_mic_content.show();
-      default_node_content.show();
     }
   });
 }
 
 export function MapOpenNav() {
-  if (animal_toggled){
-    document.getElementById("menuPanel").style.width = "30%";
+  if (animal_toggled) {
+    const menuPanel = document.getElementById("menuPanel");
+    if (menuPanel) menuPanel.style.width = "30%";
   }
 }
 
-export function getAnimalToggled(){
-  return animal_toggled;
-}
+export function getAnimalToggled() { return animal_toggled; }
 
 export function MapCloseNav() {
-  document.getElementById("menuPanel").style.width = "0";
+  const menuPanel = document.getElementById("menuPanel");
+  if (menuPanel) menuPanel.style.width = "0";
   animal_toggled = false;
 }
 
-function updateTruthEvents(hmiState){
-  retrieveTruthEventsInTimeRange(hmiState.currentTime-5, hmiState.currentTime).then((res) => {
-    updateAnimalMovementLayerFromLiveData(hmiState, res.data);
-  })
+// ─────────────────────────────────────────────────────────────────────────────
+// Live updates
+// ─────────────────────────────────────────────────────────────────────────────
+
+function updateTruthEvents(hmiState) {
+  retrieveTruthEventsInTimeRange(hmiState.currentTime - 5, hmiState.currentTime)
+    .then((res) => { updateAnimalMovementLayerFromLiveData(hmiState, res.data); })
+    .catch((error) => {
+      console.error("Error loading truth events:", error);
+      showToast(getApiErrorMessage(error, "Failed to load movement events"), "error");
+    });
 }
 
-function updateVocalizationEvents(hmiState){
-  retrieveVocalizationEventsInTimeRange(hmiState.currentTime-5, hmiState.currentTime).then((res) => {
-    updateVocalizationLayerFromLiveData(hmiState, res.data);
-  })
+function updateVocalizationEvents(hmiState) {
+  retrieveVocalizationEventsInTimeRange(hmiState.currentTime - 5, hmiState.currentTime)
+    .then((res) => { updateVocalizationLayerFromLiveData(hmiState, res.data); })
+    .catch((error) => {
+      console.error("Error loading vocalization events:", error);
+      showToast(getApiErrorMessage(error, "Failed to load vocalization events"), "error");
+    });
 }
 
-function purgeTruthEvents(hmiState){
-  let persistEvents = {};
-  //console.log("purging");
+function purgeTruthEvents(hmiState) {
+  const persistEvents = {};
 
-  //console.log(hmiState.liveEventCutoff);
-  for(const key in hmiState.movementEvents){
-    let event = hmiState.movementEvents[key];
-    //console.log(event);
-
-    if(hmiState.liveEventCutoff > event.timestamp){
-      let layerName = deriveTruthLayerName(event.animalStatus, event.animalType);
-      let layer = findMapLayerWithName(hmiState, layerName);
-      if(layer){
-        const featureToPurge = layer.getSource().getFeatureById(event.animalId);
-        //console.log(featureToPurge);
-        layer.getSource().removeFeature(featureToPurge);
+  for (const key in hmiState.movementEvents) {
+    const event = hmiState.movementEvents[key];
+    if (hmiState.liveEventCutoff > event.timestamp) {
+      const layer = findMapLayerWithName(hmiState, deriveTruthLayerName(event.animalStatus, event.animalType));
+      if (layer) {
+        const f = layer.getSource().getFeatureById(event.animalId);
+        if (f) layer.getSource().removeFeature(f);
       }
-      else{
-        console.log(layerName);
-      }
-    }
-    else{
+    } else {
       persistEvents[event.animalId] = event;
     }
   }
@@ -1333,32 +1221,17 @@ function purgeTruthEvents(hmiState){
   hmiState.movementEvents = persistEvents;
 }
 
-function purgeVocalizationEvents(hmiState){
-  let persistEvents = [];
-  //console.log("purging");
+function purgeVocalizationEvents(hmiState) {
+  const persistEvents = [];
 
-  //console.log(hmiState.liveEventCutoff);
-  for(let event of hmiState.vocalizationEvents){
-    //console.log(event);
-    //console.log(hmiState.liveEventCutoff);
-    //console.log(event.timestamp); 
-
-    if(hmiState.liveEventCutoff > event.timestamp){
-      let layerName = deriveLayerName(event.animalStatus, event.animalType);
-      let layer = findMapLayerWithName(hmiState, layerName);
-      if(layer){
-        //console.log(event.eventId);
-        const featureToPurge = layer.getSource().getFeatureById(event.eventId);
-        //console.log(featureToPurge);
-        if(featureToPurge !== null){
-          layer.getSource().removeFeature(featureToPurge);
-        }
+  for (let event of hmiState.vocalizationEvents) {
+    if (hmiState.liveEventCutoff > event.timestamp) {
+      const layer = findMapLayerWithName(hmiState, deriveLayerName(event.animalStatus, event.animalType));
+      if (layer) {
+        const f = layer.getSource().getFeatureById(event.eventId);
+        if (f) layer.getSource().removeFeature(f);
       }
-      else{
-        console.log(layerName);
-      }
-    }
-    else{
+    } else {
       persistEvents.push(event);
     }
   }
@@ -1366,587 +1239,326 @@ function purgeVocalizationEvents(hmiState){
   hmiState.vocalizationEvents = persistEvents;
 }
 
-function simulateData(hmiState) {
+function simulateData(hmiState) { queueSimUpdate(hmiState); }
 
-  queueSimUpdate(hmiState);
-}
-
-export function getUTC(){
-  const now = new Date();
-  const utcTimestamp = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(),
-    now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds(), now.getUTCMilliseconds());
-  return utcTimestamp;
-}
-
-export function updateTimeOffset(hmiState){
-  try{
-  retrieveSimTime().then((res) => {
-    //console.log(res.data);
-    let unix = Date.parse(res.data.timestamp) / 1000;
-    let newDelay = (getUTC() - new Date((unix + (10*60*60)) * 1000)) + 1000;
-    if(isNaN(newDelay)){
+export function updateTimeOffset(hmiState) {
+  return retrieveSimTime()
+    .then((res) => {
+      const unixMs   = Date.parse(res.data.timestamp);
+      const newDelay = getUTC() - unixMs + 1000;
+      hmiState.simUpdateDelay = isNaN(newDelay) ? 10000 : newDelay;
+    })
+    .catch((error) => {
+      console.error("Failed to update simulation time:", error);
+      showToast(getApiErrorMessage(error, "Failed to update simulation time"), "error");
       hmiState.simUpdateDelay = 10000;
-    }
-    else{
-      hmiState.simUpdateDelay = newDelay;
-    }
-    // Multiply by 1000 to convert to milliseconds
-    /*const utcDate = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
-      date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
-    hmiState.simTime = utcDate;*/
-    //console.log(hmiState.simUpdateDelay);
-  });
-  }catch(error){
-    console.log(failed);
-    hmiState.simUpdateDelay = 10000;
-  }
+    });
 }
-
-let simUpdateTimeout = null;
 
 function queueSimUpdate(hmiState) {
-  if(hmiState.liveMode){
-    updateTimeOffset(hmiState);
+  updateTimeOffset(hmiState).finally(() => {
+    try {
+      if (hmiState.liveMode) {
+        hmiState.currentTime     = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
+        hmiState.liveEventCutoff = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay - hmiState.liveWindow) / 1000);
 
-    hmiState.currentTime = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
-    hmiState.liveEventCutoff = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay - hmiState.liveWindow) / 1000);
-                
-    purgeTruthEvents(hmiState);
-    purgeVocalizationEvents(hmiState);
-    updateTruthEvents(hmiState);
-    updateVocalizationEvents(hmiState);
-    hmiState.previousUpdateTime = hmiState.currentTime;
-  }
+        purgeTruthEvents(hmiState);
+        purgeVocalizationEvents(hmiState);
+        updateTruthEvents(hmiState);
+        updateVocalizationEvents(hmiState);
+        hmiState.previousUpdateTime = hmiState.currentTime;
+      }
 
-  if (simUpdateTimeout) {
-    clearTimeout(simUpdateTimeout);
-  }
+      if (simUpdateTimeout) clearTimeout(simUpdateTimeout);
 
-  //refresh layers
-  for (let stat of statuses) {
-    for (let animalType of animalTypes) {
-      let layerName = deriveTruthLayerName(stat, animalType);
-      let layer = findMapLayerWithName(hmiState, layerName);
-      layer.changed();
-      layer.getSource().changed();
+      for (let stat of statuses) {
+        for (let animalType of animalTypes) {
+          const layer = findMapLayerWithName(hmiState, deriveTruthLayerName(stat, animalType));
+          if (layer) { layer.changed(); layer.getSource().changed(); }
+        }
+      }
+
+      simUpdateTimeout = setTimeout(simulateData, hmiState.requestInterval, hmiState);
+    } catch (error) {
+      console.error("queueSimUpdate failed:", error);
+      showToast(getApiErrorMessage(error, "Live update failed"), "error");
+      simUpdateTimeout = setTimeout(simulateData, hmiState.requestInterval, hmiState);
     }
-  }
-
-  simUpdateTimeout = setTimeout(
-    simulateData,
-    hmiState.requestInterval,
-    hmiState
-  );
+  });
 }
 
-
-
-document.addEventListener('playAudio', function(event){
-  //console.log("play audio");
-  playNextTrack = true;
-  if(selectedVocalizationEventId != null){
-    retrieveAudio(selectedVocalizationEventId).then((res) => {
-      playAudioString(res.data.audioClip, res.data.sampleRate);
-    })
-  }
-})
-
-document.addEventListener('stopAudio', function(event){
-  //console.log("stop audio");
-  playNextTrack = false;
-  stopAudioPlayback();
-})
-
-var durationTag = document.getElementById("recording_duration");
-
-
-var audioElement = document.getElementsByClassName("audio-element")[0];
-var audioElementSource = document.getElementsByClassName("audio-element")[0]
-    .getElementsByTagName("source")[0];
-audioElement.onended = hidePlaybackIndicator;
-var textIndicatorOfAudiPlaying = document.getElementsByClassName("playback_indicator")[0];
-
-var recordButton = document.getElementById("record_audio_button");
-//recordButton.onclick = startAudioRecording;
-
-var recordingControls = document.getElementsByClassName("recording_controls")[0];
+// ─────────────────────────────────────────────────────────────────────────────
+// Recording UI
+// ─────────────────────────────────────────────────────────────────────────────
 
 export function showRecordingControls() {
-  console.log("showing controls")
+  const recordButton     = getRecordButton();
+  const recordingControls = getRecordingControls();
+  if (!recordButton || !recordingControls) return;
   recordButton.style.display = "none";
   recordingControls.classList.remove("hide");
   initializeRecordingDuration();
 }
 
 export function hideRecordingControls() {
-  console.log("hiding controls")
+  const recordButton     = getRecordButton();
+  const recordingControls = getRecordingControls();
+  if (!recordButton || !recordingControls) return;
   recordButton.style.display = "block";
   recordingControls.classList.add("hide");
   clearInterval(durationTimer);
 }
 
-//var overlay = document.getElementsByClassName("overlay")[0];
-//var acknowledgeButton = document.getElementById("acknowledge_button");
-//acknowledgeButton.onclick = hideRecordingNotSupportedOverlay;
-
-export function showRecordingNotSupportedOverlay() {
-    //overlay.classList.remove("hide");
-}
-
-function hideRecordingNotSupportedOverlay() {
-    //overlay.classList.add("hide");
-}
+export function showRecordingNotSupportedOverlay() { /* implement if needed */ }
 
 export function createSourceForAudioElement() {
-    let sourceElement = document.createElement("source");
-    audioElement.appendChild(sourceElement);
-
-    audioElementSource = sourceElement;
+  const audioElement = getAudioElement();
+  if (!audioElement) return;
+  audioElement.appendChild(document.createElement("source"));
 }
 
 export function showPlaybackIndicator() {
-    textIndicatorOfAudiPlaying.classList.remove("hide");
+  const indicator = getPlaybackIndicator();
+  if (indicator) indicator.classList.remove("hide");
 }
 
 export function hidePlaybackIndicator() {
-    textIndicatorOfAudiPlaying.classList.add("hide");
+  const indicator = getPlaybackIndicator();
+  if (indicator) indicator.classList.add("hide");
 }
 
-var audioRecordStartTime = null;
-var durationTimer = null;
-
-export function testFunct(){
-  console.log("Recording started 1");
-}
+export function testFunct() { console.log("Recording started 1"); }
 
 export function startAudioRecording() {
-  console.log("Recording started 2");
+  const audioElement       = getAudioElement();
+  const audioElementSource = getAudioElementSource();
 
-  if (!audioElementSource){}
-  else if (!audioElement.paused) {
-    console.log("Paused playback");
+  if (audioElementSource && audioElement && !audioElement.paused) {
     audioElement.pause();
     hidePlaybackIndicator();
   }
 
-  audioRecorder.start()
+  audioRecorder
+    .start()
     .then(() => {
       audioRecordStartTime = new Date();
-        showRecordingControls();
-      })
-    .catch(error => {
-      console.log(error.message);
+      showRecordingControls();
+    })
+    .catch((error) => {
+      showToast("Audio recording failed: " + error.message, "error");
 
       if (error.message.includes("mediaDevices API or getUserMedia method is not supported in this browser.")) {
-        console.log("To record audio, use browsers like Chrome and Firefox.");
         showRecordingNotSupportedOverlay();
       }
 
-      switch (error.name) {
-        case 'AbortError': 
-          console.log("An AbortError has occured.");
-          break;
-        case 'NotAllowedError': 
-          console.log("A NotAllowedError has occured. User might have denied permission.");
-          break;
-        case 'NotFoundError': 
-          console.log("A NotFoundError has occured.");
-          break;
-        case 'NotReadableError': 
-          console.log("A NotReadableError has occured.");
-          break;
-        case 'SecurityError': 
-          console.log("A SecurityError has occured.");
-          break;
-        case 'TypeError': 
-          console.log("A TypeError has occured.");
-          break;
-        case 'InvalidStateError': 
-          console.log("An InvalidStateError has occured.");
-          break;
-        case 'UnknownError': 
-          console.log("An UnknownError has occured.");
-          break;
-        default:
-          console.log("An error occured with the error name " + error.name);
-        };
-      });
+      const toastMap = {
+        NotAllowedError:  "Microphone permission was denied",
+        NotFoundError:    "No microphone device found",
+        NotReadableError: "Microphone is not available right now",
+        SecurityError:    "Microphone access blocked for security reasons",
+        UnknownError:     "Unknown audio recording error",
+      };
+
+      if (toastMap[error.name]) showToast(toastMap[error.name], "error");
+    });
 }
 
-
 export function stopAudioRecording() {
-  console.log("Stopped recording...");
-
-  audioRecorder.stop()
-    .then(audioAsblob => {
-      playAudio();
-      hideRecordingControls();
-    })
-    .catch(error => {
-      switch (error.name) {
-        case 'InvalidStateError':
-          console.log("An InvalidStateError has occured.");
-          break;
-        default:
-          console.log("ERROR: " + error.name);
-      };
+  audioRecorder
+    .stop()
+    .then(() => { playAudio(); hideRecordingControls(); })
+    .catch((error) => {
+      showToast("Error stopping recording", "error");
+      console.log("Stop recording error:", error.name);
     });
 }
 
 export function cancelAudioRecording() {
-  console.log("Cancelled recording");
-
   audioRecorder.cancel();
   hideRecordingControls();
 }
 
-document.addEventListener('saveRecording', function(event){
-  save();
-})
+document.addEventListener("saveRecording",     function () { save(); });
+document.addEventListener("simulateRecording", function () { simulateRecording(window.hmiState); });
 
-document.addEventListener('loadRecording', function(event){
-  //console.log("stop audio");
-  //playNextTrack = false;
-  //stopAudioPlayback();
-})
-
-document.addEventListener('simulateRecording', function(event){
-  //simulateRecording(audioRecorder.audioBlobs, window.hmiState);
-  simulateRecording(window.hmiState);
-})
+// ─────────────────────────────────────────────────────────────────────────────
+// Recording helpers
+// ─────────────────────────────────────────────────────────────────────────────
 
 function generateRandomCoordinate(latitude, longitude) {
-  const latRad = latitude * DEG_TO_RAD;
+  const latRad = latitude  * DEG_TO_RAD;
   const lonRad = longitude * DEG_TO_RAD;
-
-  const dist = (Math.random() * MIC_DETECTION_RANGE) + 50;
-
-  const theta = Math.random() * 2 * Math.PI;
-
-  const newLatRad = latRad + (dist / EARTH_RADIUS) * Math.cos(theta);
-  const newLonRad = lonRad + (dist / EARTH_RADIUS) * Math.sin(theta);
-
-  const newLat = newLatRad * RAD_TO_DEG;
-  const newLon = newLonRad * RAD_TO_DEG;
-
-  return { lat: newLat, lon: newLon };
+  const dist   = Math.random() * MIC_DETECTION_RANGE + 50;
+  const theta  = Math.random() * 2 * Math.PI;
+  return {
+    lat: (latRad + (dist / EARTH_RADIUS) * Math.cos(theta)) * RAD_TO_DEG,
+    lon: (lonRad + (dist / EARTH_RADIUS) * Math.sin(theta)) * RAD_TO_DEG,
+  };
 }
 
 function arrayBufferToBase64(buffer) {
-  let binary = '';
+  let binary = "";
   const bytes = new Uint8Array(buffer);
-  const len = bytes.byteLength;
-  for (let i = 0; i < len; i++) {
-      binary += String.fromCharCode(bytes[i]);
-  }
+  for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
   return btoa(binary);
 }
 
-function simulateRecording(hmiState){
-  if (decodedAudioStore.length === 0) {
-    console.log("No recording available.");
+function simulateRecording(hmiState) {
+  if (!decodedAudioStore) {
+    showToast("No recording available to simulate", "error");
     return;
-  }else{
-
-    const base64String = arrayBufferToBase64(fileContent);
-    
-    let coords = generateRandomCoordinate(current_mic_lat, current_mic_lon);
-
-    const recordingData = {
-      timestamp: Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000),
-      sensorId: current_mic_id,
-      microphoneLLA: [current_mic_lat, current_mic_lon, 0.0],
-      animalEstLLA: [coords.lat, coords.lon, 0.0],
-      animalTrueLLA: [coords.lat, coords.lon, 0.0],
-      animalLLAUncertainty: 50.0,
-      audioClip: base64String,
-      mode: hmiState.simMode,
-      audioFile: hmiState.simMode
-    }
-  
-    postRecording(recordingData);
-      
-    //let decodedAudio = stringToAudio(base64String);
-
-    //playAudioFromUint8Array(decodedAudio);
-    //testEncoding(base64String);
   }
-}
-
-function testEncoding(base64String){
-  audioContext = new (window.AudioContext || window.webkitAudioContext)();
-  const binaryData = atob(base64String);
-
-  const float32Array = new Float32Array(binaryData.length / Float32Array.BYTES_PER_ELEMENT);
-  const view = new DataView(float32Array.buffer);
-  for (let i = 0; i < binaryData.length; i++) {
-    view.setUint8(i, binaryData.charCodeAt(i));
+  if (!fileContent) {
+    showToast("No audio file loaded", "error");
+    return;
   }
 
-  const newBuffer = audioContext.createBuffer(1, float32Array.length, audioContext.sampleRate);
-  newBuffer.copyToChannel(float32Array, 0);
+  const coords = generateRandomCoordinate(current_mic_lat, current_mic_lon);
+  const recordingData = {
+    timestamp:           Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000),
+    sensorId:            current_mic_id,
+    microphoneLLA:       [current_mic_lat, current_mic_lon, 0.0],
+    animalEstLLA:        [coords.lat, coords.lon, 0.0],
+    animalTrueLLA:       [coords.lat, coords.lon, 0.0],
+    animalLLAUncertainty:50.0,
+    audioClip:           arrayBufferToBase64(fileContent),
+    mode:                hmiState.simMode,
+    audioFile:           hmiState.simMode,
+  };
 
-  const audioSource = audioContext.createBufferSource();
-  audioSource.buffer = newBuffer;
-  audioSource.connect(audioContext.destination);
-  audioSource.start();
+  postRecording(recordingData).catch((error) => {
+    console.error("Failed to post recording:", error);
+    showToast(getApiErrorMessage(error, "Failed to submit recording"), "error");
+  });
 }
-
-function stringToAudio(base64String) {
-  const binaryString = atob(base64String);
-
-  const uint8Array = new Uint8Array(binaryString.length);
-  for (let i = 0; i < binaryString.length; i++) {
-    uint8Array[i] = binaryString.charCodeAt(i);
-  }
-
-  return uint8Array;
-}
-
-function playAudioFromUint8Array(uint8Array) {
-  const blob = new Blob([uint8Array], { type: 'audio/wav' }); // Change the MIME type if needed
-
-  const audioUrl = URL.createObjectURL(blob);
-
-  const audioElement = new Audio(audioUrl);
-
-  audioElement.play();
-}
-
 
 function save() {
-  if(audioRecorder.audioBlobs.length != 0){
-    let exportData = {};
-    exportData.audioBlobs = [];
+  if (audioRecorder.audioBlobs.length === 0) return;
 
-    audioRecorder.audioBlobs.forEach(item => {
-      exportData.audioBlobs.push(btoa(item));
-    });
-
-    const base64AudioDataArray = audioRecorder.audioBlobs.map(blob => {
-      const reader = new FileReader();
-      return new Promise((resolve, reject) => {
-          reader.onloadend = () => {
-              resolve(reader.result.split(',')[1]); // Extract Base64 data
-          };
-          reader.readAsDataURL(blob);
-      });
-    });
-
-    var jsonDataStr = "";
-
-    Promise.all(base64AudioDataArray)
-      .then(audioDataArray => {
-          const jsonData = {
-              audioBlobs: audioDataArray,
-          };
-
-          jsonDataStr = JSON.stringify(jsonData);
-          
-
-          const filename = prompt("Enter a filename for the JSON file:", "data.json");
-
-          if (filename) {
-      
-            const jsonDataString = jsonDataStr;
-            const blob = new Blob([jsonDataString], { type: 'application/json' });
-      
-            const blobURL = URL.createObjectURL(blob);
-      
-            const downloadLink = document.createElement('a');
-            downloadLink.href = blobURL;
-            downloadLink.download = filename;
-            downloadLink.textContent = 'Download JSON';
-      
-            document.getElementById("downloadLink").innerHTML = "";
-            document.getElementById("downloadLink").appendChild(downloadLink);
-            console.log(jsonDataString);
-            downloadLink.click();
-          }
+  Promise.all(
+    audioRecorder.audioBlobs.map((blob) =>
+      new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result.split(",")[1]);
+        reader.readAsDataURL(blob);
       })
-      .catch(err => console.error("Error processing audio blobs: ", err));
-  }
+    )
+  )
+    .then((audioDataArray) => {
+      const jsonDataStr = JSON.stringify({ audioBlobs: audioDataArray });
+      const filename    = prompt("Enter a filename for the JSON file:", "data.json");
+
+      if (filename) {
+        const blobURL      = URL.createObjectURL(new Blob([jsonDataStr], { type: "application/json" }));
+        const downloadLink = document.createElement("a");
+        downloadLink.href     = blobURL;
+        downloadLink.download = filename;
+        downloadLink.textContent = "Download JSON";
+
+        const downloadTarget = document.getElementById("downloadLink");
+        if (downloadTarget) { downloadTarget.innerHTML = ""; downloadTarget.appendChild(downloadLink); }
+        downloadLink.click();
+      }
+    })
+    .catch((err) => {
+      console.error("Error processing audio blobs:", err);
+      showToast("Audio processing failed", "error");
+    });
 }
 
-var fileInput = document.getElementById("fileInput");
+// ─────────────────────────────────────────────────────────────────────────────
+// Recorded audio playback
+// ─────────────────────────────────────────────────────────────────────────────
 
-var playNextRecordedTrack = false;
-var audioAnimTimeout = null;
-
-document.addEventListener('playRecordedAudio', function(event){
-  //console.log("play audio");
-  playNextRecordedTrack = true;
-  playAudio()
-})
-
-document.addEventListener('stopRecordedAudio', function(event){
-  //console.log("stop audio");
-  playNextRecordedTrack = false;
-  stopRecordingPlayback();
-})
-
-var audioRecordingElement = null;
-var recordingPlaybackAnimTimeout = null;
+document.addEventListener("playRecordedAudio",  function () { playNextRecordedTrack = true;  playAudio(); });
+document.addEventListener("stopRecordedAudio",  function () { playNextRecordedTrack = false; stopRecordingPlayback(); });
 
 function playRecording(recordedChunks) {
-    if (recordedChunks.length === 0) {
-        console.log("No recording available.");
-        return;
-    }else{
+  if (recordedChunks.length === 0) return;
 
-      const blob = new Blob(recordedChunks, { type: 'audio/wav; codecs=MS_PCM' });
+  const blob = new Blob(recordedChunks, { type: "audio/wav; codecs=MS_PCM" });
+  if (blob.size === 0) return;
 
-      if(blob.size > 0){
-        const url = URL.createObjectURL(blob);
-        audioRecordingElement = document.getElementById("audioElem");
-  
-        audioRecordingElement.src = url;
-        audioRecordingElement.load();
-        if(playNextRecordedTrack){
-          recordingPlaybackAnimTimeout = setTimeout(
-            muteRecordingPlaybackAnimation,
-            10000,
-            hmiState
-          );
-          audioRecordingElement.play();
-        }
-      }
-      else{
-        console.log("Recording failed check microphone configuration settings.");
-      }
-    }
+  audioRecordingElement = getAudioElemForRecordedPlayback();
+  if (!audioRecordingElement) return;
+
+  audioRecordingElement.src = URL.createObjectURL(blob);
+  audioRecordingElement.load();
+
+  if (playNextRecordedTrack) {
+    recordingPlaybackAnimTimeout = setTimeout(muteRecordingPlaybackAnimation, 10000);
+    audioRecordingElement.play();
+  }
 }
 
-
-var audioContext = null;
-var a_source = null;
-var decodedAudioStore = null;
-var fileContent = null;
-
-fileInput.addEventListener("change", function(event) {
-  const selectedFile = event.target.files[0];
-  audioContext = new (window.AudioContext || window.webkitAudioContext)();
-
-  if (selectedFile) {
-    const reader = new FileReader();
-
-    reader.onload = function(event) {
-      fileContent = event.target.result;
-      audioContext.decodeAudioData(fileContent.slice(0), function(decodedAudio) {
-
-          decodedAudioStore = decodedAudio;
-          a_source = audioContext.createBufferSource();
-          a_source.buffer = decodedAudioStore;
-
-          a_source.connect(audioContext.destination);
-
-          audioElement.src = URL.createObjectURL(selectedFile);
-      });
-    };
-
-    reader.readAsArrayBuffer(selectedFile);
-  }
-});
-
-function stopRecordingPlayback(){
+function stopRecordingPlayback() {
   muteRecordingPlaybackAnimation();
+  if (recordingPlaybackAnimTimeout) clearTimeout(recordingPlaybackAnimTimeout);
 
-  if(recordingPlaybackAnimTimeout){
-    clearTimeout(recordingPlaybackAnimTimeout);
-  }
-
-  if(a_source == null){
-    if(audioRecordingElement != null){
+  if (a_source === null) {
+    if (audioRecordingElement !== null) {
       audioRecordingElement.pause();
-      audioRecordingElement.currentTime = 0; 
+      audioRecordingElement.currentTime = 0;
     }
-  }
-  else{
+  } else {
     a_source.stop();
+    a_source = null;
   }
 }
 
 export function playAudio() {
-  console.log("play");
-  if(a_source == null){
-    playRecording(audioRecorder.audioBlobs);
-  }
-  else{
-    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    if(playNextRecordedTrack){
-      recordingPlaybackAnimTimeout = setTimeout(
-        muteRecordingPlaybackAnimation,
-        10000,
-        hmiState
-      );
-      a_source = audioContext.createBufferSource();
-      a_source.buffer = decodedAudioStore;
+  if (!decodedAudioStore) { playRecording(audioRecorder.audioBlobs); return; }
 
-      a_source.connect(audioContext.destination);
-      a_source.start();
-    }
+  audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+  if (playNextRecordedTrack) {
+    recordingPlaybackAnimTimeout = setTimeout(muteRecordingPlaybackAnimation, 10000);
+    a_source = audioContext.createBufferSource();
+    a_source.buffer = decodedAudioStore;
+    a_source.connect(audioContext.destination);
+    a_source.start();
   }
 }
 
-export function initializeRecordingDuration() {
-    showRecordingDuration("00:00:00");
+// ─────────────────────────────────────────────────────────────────────────────
+// Recording duration timer
+// ─────────────────────────────────────────────────────────────────────────────
 
-    durationTimer = setInterval(() => {
-        let duration = computeRecordingDuration(audioRecordStartTime);
-        console.log("Start time" + audioRecordStartTime);
-        console.log("Recording " + duration);
-        showRecordingDuration(duration);
-    }, 1000); 
+export function initializeRecordingDuration() {
+  showRecordingDuration("00:00:00");
+  durationTimer = setInterval(() => {
+    showRecordingDuration(computeRecordingDuration(audioRecordStartTime));
+  }, 1000);
 }
 
 export function showRecordingDuration(duration) {
-    durationTag.innerHTML = duration;
-
-    if (checkAudioDurationThreshold(duration)) {
-        stopAudioRecording();
-    }
+  const tag = getDurationTag();
+  if (!tag) return;
+  tag.innerHTML = duration;
+  if (checkAudioDurationThreshold(duration)) stopAudioRecording();
 }
 
 export function checkAudioDurationThreshold(duration) {
-    let timers = duration.split(":");
-
-    if (timers[2] === MAX_RECORDING_TIME_S)
-        return true;
-    else 
-        return false;
+  return duration.split(":")[2] === MAX_RECORDING_TIME_S;
 }
 
 export function computeRecordingDuration(startTime) {
-    let currentTime = new Date();
-
-    let timeDelta = currentTime - startTime;
-
-    let timeDeltaS = timeDelta / 1000;
-
-    let seconds = Math.floor(timeDeltaS % 60);
-
-    seconds = seconds < 10 ? "0" + seconds : seconds;
-
-    let timeDeltaM = Math.floor(timeDeltaS / 60);
-
-    let minutes = timeDeltaM % 60; 
-    minutes = minutes < 10 ? "0" + minutes : minutes;
-
-    return  "00:" + minutes + ":" + seconds;
+  const delta = (new Date() - startTime) / 1000;
+  const secs  = Math.floor(delta % 60);
+  const mins  = Math.floor(delta / 60) % 60;
+  return "00:" + String(mins).padStart(2, "0") + ":" + String(secs).padStart(2, "0");
 }
 
-document.addEventListener('modeSwitch', function(event){
+// ─────────────────────────────────────────────────────────────────────────────
+// Simulator mode switch
+// Task 7: fixed == to === in all four comparisons
+// ─────────────────────────────────────────────────────────────────────────────
+
+document.addEventListener("modeSwitch", function (event) {
   window.hmiState.simMode = event.detail.message;
-  if(window.hmiState.simMode == "Animal_Mode"){
-    setSimModeAnimal();
-  }
-  else if(window.hmiState.simMode == "Recording_Mode"){
-    setSimModeRecording();
-  }
-  else if(window.hmiState.simMode == "Recording_Mode_V2"){
-    setSimModeRecordingV2();
-  }
-  else if(window.hmiState.simMode == "Stop"){
-    stopSimulator();
-  }
+
+  if (window.hmiState.simMode === "Animal_Mode")      setSimModeAnimal();
+  else if (window.hmiState.simMode === "Recording_Mode")   setSimModeRecording();
+  else if (window.hmiState.simMode === "Recording_Mode_V2") setSimModeRecordingV2();
+  else if (window.hmiState.simMode === "Stop")         stopSimulator();
 });

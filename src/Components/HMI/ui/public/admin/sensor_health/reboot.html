@@ -3,48 +3,114 @@
 <head>
   <meta charset="UTF-8" />
   <title>Reboot Sensors – Project Echo</title>
+
   <link rel="stylesheet" type="text/css" href="/admin/css/styles.min.css" />
   <link rel="stylesheet" href="/admin/css/icons/tabler-icons/tabler-icons.css" />
   <link rel="stylesheet" href="/admin/sensor_health/style.css" />
+
   <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script type="text/javascript" src="/admin/js/app.min.js"></script>
+
+  <!-- Shared admin page state -->
+  <script type="text/javascript" src="/admin/js/admin-page-state.js"></script>
+
   <script src="/admin/sensor_health/script.js" defer></script>
 </head>
 <body>
-  <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
-    data-sidebar-position="fixed" data-header-position="fixed">
-    <!-- Sidebar Start -->
+  <div
+    class="page-wrapper"
+    id="main-wrapper"
+    data-layout="vertical"
+    data-navbarbg="skin6"
+    data-sidebartype="full"
+    data-sidebar-position="fixed"
+    data-header-position="fixed"
+  >
     <div id="sidebar"></div>
-    <!--  Sidebar End -->
-    <!--  Main wrapper -->
+
     <div class="body-wrapper">
       <div id="header"></div>
+
       <div class="container-fluid">
         <div class="sensor-page">
           <div class="dashboard-shell">
-      <section class="hero-header"><h1>Reboot sensors</h1><p class="subtitle">queue reboot commands for malfunctioning or frozen devices</p></section>
-      <section class="card"><h3>Queue a reboot</h3><p class="card-subtitle">Send a reboot instruction to one or more sensors.</p>
-        <div class="form-grid"><div><label for="reboot-sensor">Sensor IDs</label><input id="reboot-sensor" placeholder="e.g. SEN-01, SEN-14, SEN-77"></div><div><label for="reboot-reason">Reason</label><input id="reboot-reason" placeholder="e.g. frozen board, config update"></div></div>
-        <button class="btn-primary" onclick="fakeReboot()">Reboot now</button>
-        <p id="reboot-message" class="note"></p>
-      </section>
-      <section class="card"><h3>Reboot history</h3><p class="card-subtitle">Recent reboot attempts and their outcomes.</p>
-        <table><thead><tr><th>Sensor</th><th>Status</th><th>Time</th></tr></thead><tbody id="reboot-history-tbody">
-          <tr><td colspan="3">Loading…</td></tr>
-        </tbody></table>
-      </section>
-    </div> <!-- END dashboard-shell -->
+            <div class="admin-page-status">
+              <div class="admin-error-banner d-none" role="alert" aria-live="polite">
+                <div class="admin-error-banner__content">
+                  <i class="ti ti-alert-circle"></i>
+                  <span>Something went wrong while loading this page.</span>
+                </div>
+                <button type="button" class="admin-error-banner__dismiss" aria-label="Dismiss error message">
+                  <i class="ti ti-x"></i>
+                </button>
+              </div>
+
+              <div class="admin-loading-spinner d-none" role="status" aria-live="polite">
+                <div class="spinner-border text-danger" aria-hidden="true"></div>
+                <span class="admin-loading-spinner__text">Loading...</span>
+              </div>
+            </div>
+
+            <section class="hero-header">
+              <h1>Reboot sensors</h1>
+              <p class="subtitle">queue reboot commands for malfunctioning or frozen devices</p>
+            </section>
+
+            <section class="card">
+              <h3>Queue a reboot</h3>
+              <p class="card-subtitle">Send a reboot instruction to one or more sensors.</p>
+
+              <div class="form-grid">
+                <div>
+                  <label for="reboot-sensor">Sensor IDs</label>
+                  <input id="reboot-sensor" placeholder="e.g. SEN-01, SEN-14, SEN-77">
+                </div>
+                <div>
+                  <label for="reboot-reason">Reason</label>
+                  <input id="reboot-reason" placeholder="e.g. frozen board, config update">
+                </div>
+              </div>
+
+              <button class="btn-primary" onclick="fakeReboot()">Reboot now</button>
+              <p id="reboot-message" class="note"></p>
+            </section>
+
+            <section class="card">
+              <h3>Reboot history</h3>
+              <p class="card-subtitle">Recent reboot attempts and their outcomes.</p>
+
+              <table>
+                <thead>
+                  <tr>
+                    <th>Sensor</th>
+                    <th>Status</th>
+                    <th>Time</th>
+                  </tr>
+                </thead>
+                <tbody id="reboot-history-tbody">
+                  <tr><td colspan="3">Loading…</td></tr>
+                </tbody>
+              </table>
+            </section>
+          </div>
         </div>
-      <div id="footer"></div>
+
+        <div id="footer"></div>
+      </div>
     </div>
   </div>
 
   <script>
     $(document).ready(function() {
-      $("#sidebar").load("/admin/component/sidebar-component.html", function() { $.getScript('/admin/js/sidebarmenu.js'); });
+      $("#sidebar").load("/admin/component/sidebar-component.html", function() {
+        $.getScript('/admin/js/sidebarmenu.js');
+      });
       $("#header").load("/admin/component/header-component.html");
       $("#footer").load("/admin/component/footer-component.html");
     });
+
+    const pageState = createAdminPageState();
+    pageState.resetPageState();
   </script>
 </body>
 </html>
