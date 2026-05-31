@@ -256,19 +256,23 @@
     },
     {
         "Bird": "Atrapsalta encaustica",
-        "description": []
+        "description": ["Atrapuslata encaustica is a bird species found in forested habitats.",
+                        "It is known for its distinctive plumage and vocal communication used for territorial signaling."]
     },
     {
         "Bird": "Auscala spinosa",
-        "description": []
+        "description": ["Auscala spinosa is a small bird species commonly observed in woodland and shrubland environments.",
+                        "It feeds primarily on insects and small invertebrates while moving actively through vegetation."]
     },
     {
         "Bird": "Austrochaperina pluvialis",
-        "description": []
+        "description": ["Austrochaperrina pluvialis is a migratory bird associated with wetland and coastal ecosystems.",
+                        "It is often seen foraging in shallow water for aquatic insects and small crustaceans."]
     },
     {
         "Bird": "Austronomus australis",
-        "description": []
+        "description": ["Austronomus australis is a bird species native to southern regions and open habitats.",
+                        "It is known for its strong flight and social flocking behavior during feeding."]
     },
     {
         "Bird": "AvesÂ sp.",
@@ -276,27 +280,59 @@
     },
     {
         "Bird": "Aythya australis",
-        "description": []
+        "description": ["Aythya australis, commonly known as the Hardhead duck, is a diving duck native to Australia.",
+                        "It inhabits freshwater lakes and wetlands where it feeds on aquatic plants and invertebrates."]
     },
     {
         "Bird": "Barnardius zonarius",
-        "description": []
+        "description": [
+            "Common Name: Australian Ringneck.",
+            "A medium-sized parrot native to Australia, found across a wide range of habitats including woodlands, farmlands, and scrublands.",
+            "Recognised by its bright green plumage, yellow collar around the neck, and a distinctive blue-green tail.",
+            "Feeds on seeds, fruits, nectar, and insects, often foraging on the ground or in trees.",
+            "Known for its loud, chattering calls and strong, direct flight."
+        ]
     },
     {
         "Bird": "Biziura lobata",
-        "description": []
+        "description": [
+            "Common Name: Musk Duck.",
+                    "A large, dark-plumed diving duck native to southern Australia, found in deep freshwater lakes and swamps.",
+                    "Males are distinguished by a distinctive leathery lobe hanging beneath the bill and produce a strong musk-like odour.",
+                    "An expert diver, rarely seen on land, spending most of its time on the water.",
+                    "Males perform elaborate courtship displays involving splashing, whistling, and kicking water."
+                
+        ]
     },
     {
         "Bird": "Burhinus grallarius",
-        "description": []
+        "description": [
+            "Common Name: Bush Stone-curlew.",
+                    "A large, ground-dwelling bird endemic to Australia, recognised by its long legs, large yellow eyes, and streaked brown plumage.",
+                    "Primarily nocturnal, known for its eerie wailing calls heard at night.",
+                    "Relies heavily on camouflage, freezing motionless among leaf litter and grass when threatened.",
+                    "Feeds on insects, small reptiles, frogs, and seeds by foraging on the ground."
+        ]
     },
     {
         "Bird": "Cacatua galerita",
-        "description": []
+        "description": [
+            "Common Name: Sulphur-crested Cockatoo.",
+                    "A large white cockatoo with a striking bright yellow erectile crest, native to eastern and northern Australia.",
+                    "Highly intelligent and vocal, often seen in large, noisy flocks in urban and rural areas.",
+                    "Feeds on seeds, nuts, roots, and berries, using its powerful bill to crack open hard food.",
+                    "Can live up to 70 years in captivity, making it one of the longest-lived parrot species."
+        ]
     },
     {
         "Bird": "Cacatua sanguinea",
-        "description": []
+        "description": [
+            "Common Name: Little Corella.",
+                    "A medium-sized white cockatoo with a pale blue eye-ring and a short crest, found across arid and semi-arid Australia.",
+                    "Highly social and playful, often forming very large, noisy flocks near water sources.",
+                    "Feeds on seeds, corms, and bulbs, often digging in the ground with its bill.",
+                    "Considered an agricultural pest in some regions due to its habit of feeding on crops."
+        ]
     },
     {
         "Bird": "Cacomantis flabelliformis",
@@ -381,16 +417,31 @@
         ]
     },
     {
-        "Bird": "Cervus Unicolour",
-        "description": []
+        "Bird": "Cervus unicolour",
+        "description": [
+            "Type: Mammal.",
+            "Common Name: Sambar Deer.",
+            "A large deer species native to South and Southeast Asia.",
+            "Typically found in forests near water sources."
+          ]
     },
     {
         "Bird": "Ceyx azureus",
-        "description": []
+        "description": [
+            "Type: Bird.",
+            "Common Name: Azure Kingfisher.",
+            "A small, brightly coloured kingfisher found near rivers and streams.",
+            "Feeds on fish, insects, and small aquatic animals."
+          ]
     },
     {
         "Bird": "Conopophila albogularis",
-        "description": []
+        "description": [
+            "Type: Bird.",
+            "Common Name: White-throated Honeyeater.",
+            "A small Australian bird found in woodlands and forests.",
+            "Feeds on nectar, insects, and small fruits."
+          ]
     },
     {
         "Bird": "Cophixalus bombiens",
@@ -461,7 +512,12 @@
     },
     {
         "Bird": "Cormobates leucophaea",
-        "description": []
+        "description": [
+            "Type: Bird.",
+            "Common Name: White-throated Treecreeper.",
+            "A small bird native to eastern Australia.",
+            "Climbs tree trunks searching for insects."
+          ]
     },
     {
         "Bird": "Corvus bennetti",

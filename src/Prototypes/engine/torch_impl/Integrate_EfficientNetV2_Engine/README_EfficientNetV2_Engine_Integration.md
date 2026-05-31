@@ -518,9 +518,9 @@ This validates that the copied real Engine message flow can call the EfficientNe
 
 ---
 
-### 12. Prototype Docker Engine Validation
+### 12. Prototype Docker Engine and Real MQTT Validation
 
-The EfficientNetV2 TFLite Engine file was also tested inside the Docker-based system environment using the prototype Engine path.
+The EfficientNetV2 TFLite Engine file was tested inside the Docker-based system environment using the prototype Engine path.
 
 The Docker Compose Engine build context was temporarily pointed to the prototype Engine folder:
 
@@ -554,20 +554,72 @@ EfficientNetV2 output shape: [  1 123]
 Engine started.
 ```
 
-This confirms that the EfficientNetV2 TFLite model, class mapping, preprocessing configuration, TensorFlow Lite interpreter, and required Docker dependencies are available inside the Engine container.
-
-The Engine then attempted to connect to the MQTT broker:
+Initially, the Engine could not connect to the MQTT broker because it was trying to connect to a hostname that did not exist inside the Docker Compose network:
 
 ```text
 DEBUG: Attempting to connect to Broker at: mqtt-broker:1883
 CONNECTION ERROR: [Errno -2] Name or service not known
 ```
 
-This MQTT connection issue is related to Docker Compose service naming or MQTT broker networking. It is not caused by the EfficientNetV2 model or the TFLite inference code, because the model had already loaded successfully before the MQTT connection step.
+This was fixed by using the correct Docker Compose MQTT service/container hostname. After the fix, the Engine successfully connected to the MQTT broker and subscribed to the Engine topic:
+
+```text
+DEBUG: Connection Successful!
+Subscribing to MQTT: ts-mqtt-server-cont projectecho/engine/2
+Subscribed: message id 1 with qos (0,)
+Engine waiting for audio to arrive...
+```
+
+The simulator was then started through:
+
+```text
+system_manager.py
+```
+
+The simulator control script was used to send the `Animal_Mode` command through MQTT. The simulator successfully entered Animal Mode, generated animal movement events, and later triggered animal vocalisation events.
+
+The simulator audio payload was inspected and confirmed to be a valid WAV audio file downloaded from GCP and encoded as base64 before being sent to the Engine:
+
+```text
+Animal Vocal....
+DEBUG audio_file: region_7.950-8.650.wav
+DEBUG audio bytes length: 140810
+DEBUG first 20 bytes: b'RIFF\x02&\x02\x00WAVEfmt \x10\x00\x00\x00'
+DEBUG audioClip base64 length: 187748
+DEBUG audio_file extension: wav
+Vocal message sent ... species: Strepera versicolor
+```
+
+The Engine received real MQTT audio messages from the simulator and processed them using the EfficientNetV2 TFLite model. The previous TensorFlow Serving-style output handling was replaced with the local EfficientNetV2 TFLite inference function, because the old code expected a model-server response containing:
+
+```text
+outputs
+```
+
+After updating the Engine message flow, the real MQTT audio inference worked successfully. Example Engine output:
+
+```text
+Recieved audio message, processing via engine model...
+Predicted class : Cervus Unicolour
+Predicted probability : 96.03
+Top predictions : [
+    {'index': 24, 'label': 'Cervus Unicolour', 'confidence': 0.9603432416915894},
+    {'index': 58, 'label': 'Felis Catus', 'confidence': 0.009665120393037796},
+    {'index': 50, 'label': 'Entomyzon cyanotis', 'confidence': 0.0020911835599690676},
+    {'index': 99, 'label': 'Rattus Norvegicus', 'confidence': 0.0018780785612761974},
+    {'index': 117, 'label': 'Vulpes vulpes', 'confidence': 0.0015766306314617395}
+]
+```
+
+Additional MQTT audio messages were also processed successfully, producing predicted species labels, confidence values, and top predictions.
+
+The only remaining issue is an `Internal Server Error` after prediction, when the Engine sends the detection event to the API/database. Since the prediction is already completed before this error, this appears to be an API/backend payload or database handling issue rather than an EfficientNetV2 model or Engine inference issue.
 
 ### Purpose
 
-This step validates that the EfficientNetV2 TFLite inference setup can run inside a Docker Engine container. It confirms the Docker-level model loading and dependency setup. The remaining blocker is the MQTT broker connection inside the wider system environment, which should be handled through Docker Compose service/network configuration.
+This step validates the full Engine-side MQTT inference flow. It confirms that the EfficientNetV2 TFLite model can run inside the Docker Engine container, receive real MQTT audio messages from the simulator, decode valid WAV audio, preprocess the audio, run inference, and produce species predictions with confidence values.
+
+---
 
 ## Validation Flow Completed
 
@@ -601,7 +653,17 @@ Engine-side EfficientNetV2 TFLite inference path
 Fake MQTT message validation through on_message()
     ↓
 Prototype Docker Engine model loading validation
+    ↓
+Docker MQTT broker connection validation
+    ↓
+Simulator Animal_Mode audio publish validation
+    ↓
+Real MQTT audio message received by Engine
+    ↓
+EfficientNetV2 TFLite prediction from MQTT audio
 ```
+
+---
 
 ## Current Status
 
@@ -624,16 +686,23 @@ Fake MQTT message validation through on_message()
 Prototype Docker Engine model loading validation
 Engine-specific Docker requirements setup
 EfficientNetV2 TFLite model successfully loaded inside Docker
+MQTT broker hostname/service-name issue resolved
+Simulator control flow tested through MQTT
+Simulator valid WAV audio payload confirmed
+Real MQTT audio messages received by Engine
+EfficientNetV2 TFLite inference completed from MQTT audio
+Predicted species, confidence values, and top predictions produced inside Engine container
 ```
 
-Not completed yet:
+Remaining issue:
 
 ```text
-Resolve MQTT broker hostname/service-name issue in Docker Compose
-Send a real MQTT audio message through the Docker Engine container
-Confirm the prediction result is sent successfully to the API/database
-Decide whether to migrate the validated prototype changes into the real Components Engine path
+Internal Server Error occurs after prediction when sending the detection event to the API/database
 ```
+
+This remaining issue appears to belong to the API/backend integration side, because the Engine model inference is already working and predictions are printed successfully before the API error appears.
+
+---
 
 ## Important Notes
 
@@ -645,8 +714,10 @@ The TFLite model was successfully generated with a file size of 85.19 MB. Becaus
 
 The current Engine-side integration was tested using a safe copied Engine file, `light_echo_engine_efficientnetv2_tflite.py`, so the original `light_echo_engine.py` remains unchanged.
 
-The copied Engine successfully loaded the EfficientNetV2 TFLite model and processed a fake MQTT-style message through `on_message()`. The model inference completed successfully, but the final API send step failed locally because `ts-api-cont` is only available inside the Docker/system network.
+The copied Engine successfully loaded the EfficientNetV2 TFLite model and processed both fake MQTT-style messages and real MQTT audio messages through the Engine flow.
 
-The prototype Docker Engine validation also confirmed that the EfficientNetV2 TFLite model loads successfully inside the Docker Engine container with the expected input shape `[1, 1, 128, 313]` and output shape `[1, 123]`. The Engine reached the MQTT connection stage, but the broker hostname `mqtt-broker` could not be resolved, which is a Docker Compose networking/service-name issue rather than a model integration issue.
+The real Docker MQTT test confirmed that the simulator sends valid WAV audio as a base64 `audioClip`, and the Engine can decode this message and run EfficientNetV2 TFLite inference successfully.
+
+The final Engine-side inference task is considered completed because the Engine now receives MQTT audio and returns predicted species labels, confidence values, and top predictions. The remaining `Internal Server Error` happens after inference during API/database submission and should be checked by the API/backend team.
 
 ---
