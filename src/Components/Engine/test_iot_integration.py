@@ -55,8 +55,9 @@ _ENGINE_CONFIG = {
     "MODEL_INPUT_IMAGE_CHANNELS": 3,
     "MQTT_CLIENT_URL": "localhost", "MQTT_CLIENT_PORT": 1883,
     "MQTT_PUBLISH_URL": "projectecho/engine/2",
-    "MODEL_SERVER": "http://localhost:8501/v1/models/echo_model:predict",
-    "WEATHER_SERVER": "http://localhost:8501/v1/models/weather_model:predict",
+    "API_URL": "http://ts-api-cont:9000/engine/event",
+    "MODEL_SERVER": "http://ts-echo-model-cont:8501/v1/models/echo_model/versions/1:predict",
+    "WEATHER_SERVER": "http://ts-echo-model-cont:8501/v1/models/weather_model/versions/1:predict",
     "GCLOUD_PROJECT": "test", "BUCKET_NAME": "test", "DB_HOSTNAME": "localhost",
     "IOT_MQTT_BROKER": "broker.hivemq.com",
     "IOT_MQTT_PORT": 1883,
@@ -176,7 +177,7 @@ class TestIoTMessageHandler(unittest.TestCase):
         # requests.post to model server
         mock_resp = MagicMock()
         mock_resp.text = json.dumps({"outputs": [[0.1, 0.9]]})
-        self.requests_patcher = patch("echo_engine.requests.post", return_value=mock_resp)
+        self.requests_patcher = patch("echo_engine_iot.requests.post", return_value=mock_resp)
         self.mock_post = self.requests_patcher.start()
 
     def tearDown(self):
