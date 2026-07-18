@@ -21,6 +21,9 @@ COPY requirements.txt ./
 # RUN python3 -m pip install --upgrade pip && \
 #     pip install --no-cache-dir "numpy==1.23.5" "tensorflow==2.10.0" -r requirements.txt
 
+RUN python3 -m pip install --upgrade pip \
+    && pip install --no-cache-dir -r requirements.txt
+
 # 4. Install Google Cloud SDK
 RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list \
 	&& curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg \
