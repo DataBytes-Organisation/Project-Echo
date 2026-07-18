@@ -22,7 +22,7 @@ services:
 
   echo_engine:
     build:
-      context: ../Prototypes/engine/torch_impl
+      context: ../Archive/Prototypes/engine/torch_impl
       dockerfile: light_engine.Dockerfile
     image: ts-echo-engine
     container_name: ts-echo-engine-cont
@@ -49,7 +49,7 @@ services:
       - /usr/src/app/ui/node_modules
       - credentials_volume:/root/.config/gcloud/
     ports:
-      - "8080:8080"
+      - "3000:8080"
     restart: on-failure
     depends_on:
       - echo-redis
@@ -58,6 +58,10 @@ services:
     environment:
       - NODE_ENV=development
       - API_HOST=ts-api-cont
+      - REDIS_HOST=echo-redis
+      - DB_HOST=ts-mongodb-cont
+      - MONGODB_URI=mongodb://root:root_password@ts-mongodb-cont:27017/EchoNet?authSource=admin
+      - MONGO_URI=mongodb://root:root_password@ts-mongodb-cont:27017/EchoNet?authSource=admin
 
 
   echo_mqtt:

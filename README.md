@@ -216,17 +216,59 @@ This will reduce errors caused by manual installation of conflicting dependency 
 ```
 ## Repository File Structure
 
-We have organized the repository to streamline collaboration and ease of access:
-
-- **`Design/`**: Contains design documents and diagrams.
-- **`Echo/`**: The core package implementation.
-- **`Requirements/`**: Dependency-related files (`requirements.txt`, `setup.py`).
-- **`Research/`**: Reports, datasets, and experiment results.
-- **`src/`**: Source code for various project components.
-- **`Tutorials/`**: Example usage notebooks.
+```
+Project-Echo/
+├── README.md                      - Project overview and usage guide
+├── requirements.txt               - Python package dependencies
+├── setup.py                       - Python package setup
+├── Dockerfile                     - Root-level container definition
+│
+├── notebooks/                     - Jupyter notebooks organised by topic
+│   ├── augmentation/              - SpecAugment and knowledge distillation
+│   ├── benchmarking/              - Benchmarking and experimentation suite
+│   ├── classification/            - Bird/species classification models
+│   ├── ensemble/                  - Ensemble learning approaches
+│   ├── examples/                  - pip package usage examples
+│   ├── preprocessing/             - Audio/image conversion pipelines
+│   ├── simulation/                - Microphone network simulation
+│   └── weather/                   - Weather detection via spectral centroid
+│
+├── scripts/                       - Standalone Python scripts
+│   ├── benchmarking/              - ResNet/PANNs benchmarking frameworks
+│   ├── training/                  - TensorFlow training scripts
+│   └── utils/                     - Utility and file-indexing scripts
+│
+├── docs/                          - Documentation
+│   ├── tasks/                     - Task submission PDFs
+│   ├── sprints/                   - Sprint task lists and notes
+│   ├── Engine_Documentation.md    - Detailed engine module docs
+│   └── INSTALL.md                 - Installation guide
+│
+├── assets/                        - Loose design/submission artifacts
+│   ├── SubmissionOverview.html/.jsx
+│   ├── submissions.json
+│   ├── artifacts.zip
+│   └── project-echo-hmi.zip
+│
+├── src/                           - Source code for all system components
+│   ├── Components/
+│   │   ├── API/                   - FastAPI backend
+│   │   ├── Engine/                - ML inference engine
+│   │   ├── HMI/                   - Frontend (Node.js/Express + HMI_style.css)
+│   │   ├── IoT/                   - Edge device clients and onboarding
+│   │   ├── MQTT-Server/           - MQTT broker configuration
+│   │   ├── MongoDB/               - Database init and Dockerfiles
+│   │   └── Simulator/             - Synthetic sensor data simulator
+│   └── Echo_Components_on_K8s/    - Kubernetes deployment configs (GKE)
+│
+├── Echo/                          - Installable pip package (Echo.load_model / Echo.predict)
+├── Research/                      - Literature reviews, research notes, audio processing
+├── Design/                        - System design documents and diagrams
+├── Tutorials/                     - Tutorial notebooks
+├── experiments/                   - MLflow experiment runs
+└── Requirements/                  - Additional requirements files
+```
 
 ---
 
 *This README document provides an overview of Project Echo, an academic initiative at Deakin University during Trimester 1 of 2024. It outlines the project's goals, structure, evaluation criteria, support mechanisms, and feedback processes.*
-
-
