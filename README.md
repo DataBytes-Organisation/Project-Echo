@@ -28,7 +28,7 @@ Initially, we have implemented distinct subdirectories for research and document
 
 Furthermore, within our file structure, we have introduced the 'src' folder, which serves as the repository for our source code. Within the 'src' folder, `Components/` holds one subdirectory per microservice (API, Engine, HMI, IoT, MongoDB, MQTT-Server, Simulator, Store, Data_Scripts) — each owned by its respective team and following the FastAPI-style layout used by the API service as its reference.
 
-By maintaining this structured file hierarchy, we aim to enhance our productivity and collaboration while minimizing confusion and time wastage in locating essential files. See the full tree below.
+By maintaining this structured file hierarchy, we aim to enhance our productivity and collaboration while minimizing confusion and time wastage in locating essential files. See the [Full Directory Tree](#full-directory-tree) section below.
 
 ## Installation Guide
 
@@ -210,13 +210,14 @@ This will reduce errors caused by manual installation of conflicting dependency 
   numba>=0.56.0
 
 ```
-## Repository File Structure
+## Full Directory Tree
 
 ```
 Project-Echo/
 ├── README.md                      - Project overview and usage guide
 ├── requirements.txt               - Python package dependencies
 ├── setup.py                       - Python package setup
+├── Echo/                          - Installable pip package (Echo.load_model / Echo.predict)
 │
 ├── data/                          - Small, git-trackable sample datasets and test fixtures
 │   ├── weather/                   - Sample BOM weather station CSV
