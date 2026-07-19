@@ -1,3 +1,7 @@
+Owned by the data/store team: database seeding, audio scraping/cleaning,
+and Google Cloud Storage sync. For standalone movement/vegetation
+processing scripts, see `src/Components/Data_Scripts/` instead.
+
 ## Project Otways Dataset
 
 There are currently 5 versions of this dataset up on Google Cloud Storage. They are as the following:
