@@ -235,6 +235,7 @@ Project-Echo/
 │   ├── sprints/                   - Sprint task lists and notes
 │   ├── research/                  - Literature reviews, research notes, audio processing
 │   ├── experiments/               - MLflow/DVC experiment tracking demos
+│   ├── tutorials/                 - Onboarding guides and reference tutorials
 │   ├── Engine_Documentation.md    - Detailed engine module docs
 │   ├── REQUIREMENTS.md            - Use-case analysis and requirements
 │   ├── PORTS.md                   - Canonical port reference for every service
@@ -253,8 +254,6 @@ Project-Echo/
 │       ├── simulator/             - Synthetic sensor data simulator
 │       ├── store/                 - Database seeding, audio scraping/cleaning
 │       └── data_scripts/          - Standalone movement/vegetation analysis scripts
-│
-└── tutorials/                     - Onboarding guides and reference tutorials
 ```
 
 All folder names are lowercase by convention. Large local-only artifacts
