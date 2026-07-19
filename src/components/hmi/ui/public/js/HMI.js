@@ -713,13 +713,13 @@ function _makeVocalizationIcon(iconPath) {
 
 function _resolveSimIconPath(entry) {
   const isPredator = ["insectivore", "omnivore", "carnivore"].includes(entry.animalDiet);
-  return (isPredator ? "./../images/Predator/sim/" : "./../images/sim/") +
+  return (isPredator ? "./../images/predator/sim/" : "./../images/sim/") +
     getIconName(entry.animalStatus, entry.animalType);
 }
 
 function _resolveVocalizationIconPath(entry) {
   const isHerbivore = ["herbivore", "frugivore"].includes(entry.animalDiet);
-  return (isHerbivore ? "./../images/vocalization/" : "./../images/Predator/vocalization/") +
+  return (isHerbivore ? "./../images/vocalization/" : "./../images/predator/vocalization/") +
     getIconName(entry.animalStatus, entry.animalType);
 }
 

@@ -129,7 +129,7 @@ Engine waiting for audio to arrive...
 For hands-on learning, complete the onboarding notebook:
 
 ```bash
-cd "Tutorials/Onboarding Task"
+cd "tutorials/onboarding task"
 jupyter notebook onboarding_updated.ipynb
 ```
 

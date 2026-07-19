@@ -26,7 +26,7 @@ In order to ensure clarity and ease of locating files within our project, we hav
 
 Initially, we have implemented distinct subdirectories for research and documentation purposes. This separation allows for efficient management of project-related materials and facilitates easy access when needed.
 
-Furthermore, within our file structure, we have introduced the 'src' folder, which serves as the repository for our source code. Within the 'src' folder, `Components/` holds one subdirectory per microservice (API, Engine, HMI, IoT, MongoDB, MQTT-Server, Simulator, Store, Data_Scripts) — each owned by its respective team and following the FastAPI-style layout used by the API service as its reference.
+Furthermore, within our file structure, we have introduced the 'src' folder, which serves as the repository for our source code. Within the 'src' folder, `components/` holds one subdirectory per microservice (api, engine, hmi, iot, mongodb, mqtt-server, simulator, store, data_scripts) — each owned by its respective team and following the FastAPI-style layout used by the api service as its reference. All folder names are lowercase by convention.
 
 By maintaining this structured file hierarchy, we aim to enhance our productivity and collaboration while minimizing confusion and time wastage in locating essential files. See the [Full Directory Tree](#full-directory-tree) section below.
 
@@ -114,12 +114,12 @@ python code:
 
 ```bash
 import os
-import Echo
+import echo
 
 path_to_raw_audio_file = '/path/to/your/audio_file.mp3'
 
-my_model = Echo.load_model()
-classification = Echo.predict(my_model, path_to_raw_audio_file, traverse_path=False)
+my_model = echo.load_model()
+classification = echo.predict(my_model, path_to_raw_audio_file, traverse_path=False)
 
 print(classification)
 ```
@@ -130,7 +130,7 @@ To analyze all audio files in a directory, use:
 ```bash
 path_to_audio_directory = '/path/to/your/audio_directory/'
 
-classification = Echo.predict(my_model, path_to_audio_directory, traverse_path=True)
+classification = echo.predict(my_model, path_to_audio_directory, traverse_path=True)
 print(classification)
 ```
 
@@ -216,13 +216,14 @@ This will reduce errors caused by manual installation of conflicting dependency 
 Project-Echo/
 ├── README.md                      - Project overview and usage guide
 ├── requirements.txt               - Python package dependencies
-├── setup.py                       - Python package setup
-├── Echo/                          - Installable pip package (Echo.load_model / Echo.predict)
+├── setup.py                       - Python package setup (src-layout: package_dir={"":"src"})
 │
 ├── data/                          - Small, git-trackable sample datasets and test fixtures
 │   ├── weather/                   - Sample BOM weather station CSV
 │   ├── samples/                   - Sample audio/CSV fixtures used across teams
-│   └── test_fixtures/             - Fixtures for manual/API testing
+│   ├── test_fixtures/             - Fixtures for manual/API testing
+│   ├── assets/                    - Submission/design artifacts (zips, overview html/json)
+│   └── design/                    - System design documents and diagrams
 │
 ├── scripts/                       - Standalone Python scripts
 │   ├── benchmarking/              - ResNet/PANNs benchmarking frameworks
@@ -239,32 +240,27 @@ Project-Echo/
 │   ├── PORTS.md                   - Canonical port reference for every service
 │   └── INSTALL.md                 - Installation guide
 │
-├── assets/                        - Loose design/submission artifacts
-│   ├── SubmissionOverview.html/.jsx
-│   ├── submissions.json
-│   ├── artifacts.zip
-│   └── project-echo-hmi.zip
-│
 ├── src/                           - Source code for all system components
-│   └── Components/
-│       ├── API/                   - FastAPI backend; app/{routers,services,middleware}
+│   ├── echo/                      - Installable pip package (echo.load_model / echo.predict)
+│   └── components/
+│       ├── api/                   - FastAPI backend; app/{routers,services,middleware}
 │       │                           is the reference layout new services should mirror
-│       ├── Engine/                - ML inference engine
-│       ├── HMI/                   - Frontend (Node.js/Express), served on port 3000
-│       ├── IoT/                   - Edge device clients and onboarding
-│       ├── MQTT-Server/           - MQTT broker configuration
-│       ├── MongoDB/               - Database init and Dockerfiles
-│       ├── Simulator/             - Synthetic sensor data simulator
-│       ├── Store/                 - Database seeding, audio scraping/cleaning
-│       └── Data_Scripts/          - Standalone movement/vegetation analysis scripts
+│       ├── engine/                - ML inference engine
+│       ├── hmi/                   - Frontend (Node.js/Express), served on port 3000
+│       ├── iot/                   - Edge device clients and onboarding
+│       ├── mqtt-server/           - MQTT broker configuration
+│       ├── mongodb/               - Database init and Dockerfiles
+│       ├── simulator/             - Synthetic sensor data simulator
+│       ├── store/                 - Database seeding, audio scraping/cleaning
+│       └── data_scripts/          - Standalone movement/vegetation analysis scripts
 │
-├── Design/                        - System design documents and diagrams
-└── Tutorials/                     - Onboarding guides and reference tutorials
+└── tutorials/                     - Onboarding guides and reference tutorials
 ```
 
-Large local-only artifacts (model weights, mel-spectrogram caches, legacy
-prototype work under `src/Archive`) live under the gitignored `.data/`
-folder rather than in the tracked tree above.
+All folder names are lowercase by convention. Large local-only artifacts
+(model weights, mel-spectrogram caches, legacy prototype work formerly
+under `src/Archive`) live under the gitignored `.data/` folder rather
+than in the tracked tree above.
 
 ---
 
