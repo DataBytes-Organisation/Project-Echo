@@ -26,13 +26,9 @@ In order to ensure clarity and ease of locating files within our project, we hav
 
 Initially, we have implemented distinct subdirectories for research and documentation purposes. This separation allows for efficient management of project-related materials and facilitates easy access when needed.
 
-Furthermore, within our file structure, we have introduced the 'src' folder, which serves as the repository for our source code. Within the 'src' folder, you will find subdirectories dedicated to components and prototypes. These subdivisions aid in categorizing and managing our source code effectively.
+Furthermore, within our file structure, we have introduced the 'src' folder, which serves as the repository for our source code. Within the 'src' folder, `Components/` holds one subdirectory per microservice (API, Engine, HMI, IoT, MongoDB, MQTT-Server, Simulator, Store, Data_Scripts) — each owned by its respective team and following the FastAPI-style layout used by the API service as its reference.
 
-Additionally, within the components and prototypes subdirectories, you will discover individual folders corresponding to the specific components of our project. This granular classification ensures that each aspect of our project is appropriately organized and accessible.
-
-By maintaining this structured file hierarchy, we aim to enhance our productivity and collaboration while minimizing confusion and time wastage in locating essential files.
-
-![Project Echo File Structure](https://github.com/DataBytes-Organisation/Project-Echo/assets/95070150/e8aaf728-c80f-42c1-af07-40651438c002)
+By maintaining this structured file hierarchy, we aim to enhance our productivity and collaboration while minimizing confusion and time wastage in locating essential files. See the full tree below.
 
 ## Installation Guide
 
@@ -221,17 +217,11 @@ Project-Echo/
 ├── README.md                      - Project overview and usage guide
 ├── requirements.txt               - Python package dependencies
 ├── setup.py                       - Python package setup
-├── Dockerfile                     - Root-level container definition
 │
-├── notebooks/                     - Jupyter notebooks organised by topic
-│   ├── augmentation/              - SpecAugment and knowledge distillation
-│   ├── benchmarking/              - Benchmarking and experimentation suite
-│   ├── classification/            - Bird/species classification models
-│   ├── ensemble/                  - Ensemble learning approaches
-│   ├── examples/                  - pip package usage examples
-│   ├── preprocessing/             - Audio/image conversion pipelines
-│   ├── simulation/                - Microphone network simulation
-│   └── weather/                   - Weather detection via spectral centroid
+├── data/                          - Small, git-trackable sample datasets and test fixtures
+│   ├── weather/                   - Sample BOM weather station CSV
+│   ├── samples/                   - Sample audio/CSV fixtures used across teams
+│   └── test_fixtures/             - Fixtures for manual/API testing
 │
 ├── scripts/                       - Standalone Python scripts
 │   ├── benchmarking/              - ResNet/PANNs benchmarking frameworks
@@ -242,6 +232,8 @@ Project-Echo/
 │   ├── tasks/                     - Task submission PDFs
 │   ├── sprints/                   - Sprint task lists and notes
 │   ├── Engine_Documentation.md    - Detailed engine module docs
+│   ├── REQUIREMENTS.md            - Use-case analysis and requirements
+│   ├── PORTS.md                   - Canonical port reference for every service
 │   └── INSTALL.md                 - Installation guide
 │
 ├── assets/                        - Loose design/submission artifacts
@@ -251,23 +243,27 @@ Project-Echo/
 │   └── project-echo-hmi.zip
 │
 ├── src/                           - Source code for all system components
-│   ├── Components/
-│   │   ├── API/                   - FastAPI backend
-│   │   ├── Engine/                - ML inference engine
-│   │   ├── HMI/                   - Frontend (Node.js/Express + HMI_style.css)
-│   │   ├── IoT/                   - Edge device clients and onboarding
-│   │   ├── MQTT-Server/           - MQTT broker configuration
-│   │   ├── MongoDB/               - Database init and Dockerfiles
-│   │   └── Simulator/             - Synthetic sensor data simulator
-│   └── Echo_Components_on_K8s/    - Kubernetes deployment configs (GKE)
+│   └── Components/
+│       ├── API/                   - FastAPI backend; app/{routers,services,middleware}
+│       │                           is the reference layout new services should mirror
+│       ├── Engine/                - ML inference engine
+│       ├── HMI/                   - Frontend (Node.js/Express), served on port 3000
+│       ├── IoT/                   - Edge device clients and onboarding
+│       ├── MQTT-Server/           - MQTT broker configuration
+│       ├── MongoDB/               - Database init and Dockerfiles
+│       ├── Simulator/             - Synthetic sensor data simulator
+│       ├── Store/                 - Database seeding, audio scraping/cleaning
+│       └── Data_Scripts/          - Standalone movement/vegetation analysis scripts
 │
-├── Echo/                          - Installable pip package (Echo.load_model / Echo.predict)
 ├── Research/                      - Literature reviews, research notes, audio processing
 ├── Design/                        - System design documents and diagrams
-├── Tutorials/                     - Tutorial notebooks
-├── experiments/                   - MLflow experiment runs
-└── Requirements/                  - Additional requirements files
+├── Tutorials/                     - Onboarding guides and reference tutorials
+└── experiments/                   - MLflow/DVC experiment tracking demos
 ```
+
+Large local-only artifacts (model weights, mel-spectrogram caches, legacy
+prototype work under `src/Archive`) live under the gitignored `.data/`
+folder rather than in the tracked tree above.
 
 ---
 

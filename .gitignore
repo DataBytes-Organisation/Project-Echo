@@ -3,12 +3,21 @@
 *.pyc
 *.hdf5
 *.env
+.env.*
+!.env.example
+!.env_example
 .ipynb_checkpoints/
 __pycache__/
 *.pb
 *.index
 *.db
 *.tmp.driveupload
+*.log
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+.idea/
 
 # Local data / archived / stale files (kept locally, not tracked by git)
 .data/
@@ -34,8 +43,7 @@ venv/
 src/Components/Engine/models/*
 
 # Node.js dependencies
-src/Prototypes/hmi/ui/node_modules/*
-src/Components/HMI/ui/node_modules/*
+node_modules/
 
 # Audio recordings from IoT nodes
 src/Components/IoT/management_application/audioLocal
