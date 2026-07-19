@@ -12,7 +12,7 @@ import serial
 from gps3 import gps3
 from tflite_runtime.interpreter import Interpreter
 
-SERVER_URL = "http://192.168.1.122:5000/upload"
+SERVER_URL = "http://192.168.1.122:5001/upload"
 SAMPLE_RATE = 16000
 DURATION = 5
 N_MFCC = 40
