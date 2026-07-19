@@ -12,7 +12,7 @@ const bcrypt = require('bcryptjs');
 client.connect();
 const cors = require('cors');
 require('dotenv').config();
-const API_BASE_URL = `http://${process.env.API_HOST || 'localhost'}:9001`;
+const API_BASE_URL = `http://${process.env.API_HOST || 'localhost'}:9000`;
 const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY);
 const axios = require('axios');
 const { MongoClient, ObjectId } = require('mongodb');
@@ -238,8 +238,8 @@ app.post("/api/create-checkout-session", async (req, res) => {
       metadata: {
       type: "One-Time"
       },
-      success_url: "http://localhost:9001/donation-success?session_id={CHECKOUT_SESSION_ID}", //`${process.env.CLIENT_URL}`,
-      cancel_url: "http://localhost:9001"//`${process.env.CLIENT_URL}`,
+      success_url: "http://localhost:9000/donation-success?session_id={CHECKOUT_SESSION_ID}", //`${process.env.CLIENT_URL}`,
+      cancel_url: "http://localhost:9000"//`${process.env.CLIENT_URL}`,
     })
     console.log("two");
     res.json({ url: session.url })

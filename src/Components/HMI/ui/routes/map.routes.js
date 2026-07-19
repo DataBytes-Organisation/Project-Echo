@@ -1,7 +1,7 @@
 const { verifySignUp, client } = require("../middleware");
 const axios = require('axios');
 require('dotenv').config();
-const API_BASE_URL = `http://${process.env.API_HOST || 'localhost'}:9001`;
+const API_BASE_URL = `http://${process.env.API_HOST || 'localhost'}:9000`;
 const MESSAGE_API_URL = `${API_BASE_URL}/hmi`;
 
 // Module-scoped sensor state. Set by your MQTT handler elsewhere;
