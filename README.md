@@ -232,6 +232,8 @@ Project-Echo/
 ├── docs/                          - Documentation
 │   ├── tasks/                     - Task submission PDFs
 │   ├── sprints/                   - Sprint task lists and notes
+│   ├── research/                  - Literature reviews, research notes, audio processing
+│   ├── experiments/               - MLflow/DVC experiment tracking demos
 │   ├── Engine_Documentation.md    - Detailed engine module docs
 │   ├── REQUIREMENTS.md            - Use-case analysis and requirements
 │   ├── PORTS.md                   - Canonical port reference for every service
@@ -256,10 +258,8 @@ Project-Echo/
 │       ├── Store/                 - Database seeding, audio scraping/cleaning
 │       └── Data_Scripts/          - Standalone movement/vegetation analysis scripts
 │
-├── Research/                      - Literature reviews, research notes, audio processing
 ├── Design/                        - System design documents and diagrams
-├── Tutorials/                     - Onboarding guides and reference tutorials
-└── experiments/                   - MLflow/DVC experiment tracking demos
+└── Tutorials/                     - Onboarding guides and reference tutorials
 ```
 
 Large local-only artifacts (model weights, mel-spectrogram caches, legacy
