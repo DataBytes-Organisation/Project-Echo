@@ -1,6 +1,6 @@
 # Port Reference
 
-Canonical port assignments for every service in `src/Components/docker-compose.yml`.
+Canonical port assignments for every service in `src/components/docker-compose.yml`.
 
 | Service | Port(s) | Notes |
 |---|---|---|

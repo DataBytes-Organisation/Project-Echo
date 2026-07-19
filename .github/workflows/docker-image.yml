@@ -4,12 +4,12 @@ on:
   push:
     branches: [ "main", "fix/reduce_docker_size" ]
     paths:
-      - 'src/Components/**/*'
+      - 'src/components/**/*'
       - '.github/workflows/**/*'
   pull_request:
     branches: [ "main" ]
     paths:
-      - 'src/Components/**/*'
+      - 'src/components/**/*'
 
 jobs:
   build:
@@ -44,12 +44,12 @@ jobs:
     
     - name: Build containers
       run: |
-        cd src/Components
+        cd src/components
         docker compose -f docker-compose.test.yml build --no-cache --force-rm
         
     - name: Start containers
       run: |
-        cd src/Components
+        cd src/components
         docker compose -f docker-compose.test.yml up -d
     
     - name: Wait for containers to be ready
@@ -57,7 +57,7 @@ jobs:
       
     - name: Check running containers
       run: |
-        cd src/Components
+        cd src/components
         RUNNING_CONTAINERS=$(docker-compose ps | grep 'Up' | wc -l)
         if [ "$RUNNING_CONTAINERS" -eq 9 ]; then
           echo "All containers are up and running."
@@ -68,5 +68,5 @@ jobs:
   
     - name: Stop and remove containers
       run: |
-        cd src/Components
+        cd src/components
         docker-compose down

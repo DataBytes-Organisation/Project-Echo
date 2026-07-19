@@ -24,8 +24,8 @@ The diagram describes the flow of information between components at a high level
 
 3. Ensure that docker desktop is running.
 
-4. Ensure there is a trained a model in the following folder: `Project-Echo/src/Components/Engine/models/echo_model/1/`. A new model can be used by running the _optimised_engine_pipeline.ipynb_ notebook.  
-   A model is available on the teams site [here](https://deakin365.sharepoint.com/:f:/r/sites/DataBytes2/Shared%20Documents/Project%20Echo/Echo%20Model?csf=1&web=1&e=6feqbC). Extract the .zip and paste the _echo_model_ folder in the following location `Project-Echo/src/Components/Engine/models/`
+4. Ensure there is a trained a model in the following folder: `Project-Echo/src/components/engine/models/echo_model/1/`. A new model can be used by running the _optimised_engine_pipeline.ipynb_ notebook.  
+   A model is available on the teams site [here](https://deakin365.sharepoint.com/:f:/r/sites/DataBytes2/Shared%20Documents/Project%20Echo/Echo%20Model?csf=1&web=1&e=6feqbC). Extract the .zip and paste the _echo_model_ folder in the following location `Project-Echo/src/components/engine/models/`
 
 5. Open your terminal in your miniconda3/Anaconda environment and use the command line to move to the components directory
 
@@ -41,7 +41,7 @@ docker-compose up --build
 
 7. All components should start and you should see something like the following running in the Docker Containers:
 
-<img src="https://github.com/DataBytes-Organisation/Project-Echo/blob/main/src/Components/DockerContainers.png?raw=true" width="450" height=auto>
+<img src="https://github.com/DataBytes-Organisation/Project-Echo/blob/main/src/components/DockerContainers.png?raw=true" width="450" height=auto>
 <br/><br/>
 
 ### Authenticating with GCP buckets:

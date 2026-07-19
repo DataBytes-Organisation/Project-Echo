@@ -3,7 +3,7 @@ version: "3.8"
 services:
   model_server:
     build:
-      context: ./Engine
+      context: ./engine
       dockerfile: Model.Dockerfile
       args:
         BASE_IMAGE: tensorflow/serving:latest
@@ -22,7 +22,7 @@ services:
 
   echo_hmi:
     build:
-      context: ./HMI
+      context: ./hmi
       dockerfile: HMI.Dockerfile
     image: ts-echo-hmi
     container_name: ts-echo-hmi-cont
@@ -31,7 +31,7 @@ services:
     networks:
       - echo-net
     volumes:
-      - ./HMI/ui:/usr/src/app/ui # Mount the HMI/ui directory to /usr/src/app/ui in the container
+      - ./hmi/ui:/usr/src/app/ui # Mount the hmi/ui directory to /usr/src/app/ui in the container
       - /usr/src/app/ui/node_modules
       - credentials_volume:/root/.config/gcloud/
     ports:
@@ -52,7 +52,7 @@ services:
 
   echo_mqtt:
     build:
-      context: ./MQTT-Server
+      context: ./mqtt-server
       dockerfile: MQTT.Dockerfile
     image: ts-mqtt-server
     container_name: ts-mqtt-server-cont
@@ -67,14 +67,14 @@ services:
 
   echo_simulator:
     build:
-      context: ./Simulator
+      context: ./simulator
       dockerfile: Simulator.Dockerfile
     image: ts-simulator
     container_name: ts-simulator-cont
     networks:
       - echo-net
     volumes:
-      - ./Simulator/src:/app # Mount the Simulator's src directory to /app in the container
+      - ./simulator/src:/app # Mount the simulator's src directory to /app in the container
       - credentials_volume:/root/.config/gcloud/
     stdin_open: false
     tty: true
@@ -82,7 +82,7 @@ services:
 
   echo_api:
     build:
-      context: ./API
+      context: ./api
       dockerfile: API.Dockerfile
     image: ts-api
     container_name: ts-api-cont
@@ -91,7 +91,7 @@ services:
     ports:
       - "9000:9000"
     volumes:
-      - ./API:/app # Mount the API's src directory to /app in the container
+      - ./api:/app # Mount the api's src directory to /app in the container
       - credentials_volume:/root/.config/gcloud/
       - weather_data:/app/weather_data  # Add a volume for weather data
     environment:
@@ -121,7 +121,7 @@ services:
 
   echo_store:
     build:
-      context: MongoDB/
+      context: mongodb/
       dockerfile: MongoDB.Dockerfile
     restart: always
     image: ts-mongodb
@@ -154,14 +154,14 @@ services:
 
   echo_iot_management:
     build:
-      context: ./IoT/management_application
+      context: ./iot/management_application
       dockerfile: Dockerfile
     image: ts-iot-management
     container_name: ts-iot-management-cont
     networks:
       - echo-net
     volumes:
-      - ./IoT/management_application:/app
+      - ./iot/management_application:/app
     stdin_open: false
     tty: true
 

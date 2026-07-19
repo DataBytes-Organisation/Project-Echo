@@ -4,7 +4,7 @@ Unit tests for IoT MQTT integration in echo_engine.py
 Mocks heavy dependencies (TensorFlow, librosa, MQTT, GCP, etc.) so tests
 run without the full Docker stack or GPU.
 
-Run from src/Components/Engine/:
+Run from src/components/engine/:
     python -m pytest test_iot_integration.py -v
 """
 

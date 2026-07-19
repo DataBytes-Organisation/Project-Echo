@@ -40,14 +40,14 @@ venv/
 .venv/
 
 # Engine model weights (large binary files)
-src/Components/Engine/models/*
+src/components/engine/models/*
 
 # Node.js dependencies
 node_modules/
 
 # Audio recordings from IoT nodes
-src/Components/IoT/management_application/audioLocal
-src/Components/IoT/management_application/audioUpload
+src/components/iot/management_application/audioLocal
+src/components/iot/management_application/audioUpload
 
 # API main (environment-specific generated file)
-src/Components/API/app/main.py
+src/components/api/app/main.py

@@ -18,7 +18,7 @@ Project Echo is a bioacoustics classification system designed to detect and clas
 
 ### What is the Engine?
 
-The Engine (`src/Components/Engine`) is the production-ready core processing unit responsible for:
+The Engine (`src/components/engine`) is the production-ready core processing unit responsible for:
 
 1. **Real-time Audio Processing**: Subscribes to MQTT topics and receives audio clips from IoT sensors
 2. **Feature Extraction**: Converts raw audio into Mel spectrograms optimized for CNN input
@@ -38,7 +38,7 @@ IoT Sensors → MQTT Broker → Echo Engine → TensorFlow Serving → MongoDB
 ### Codebase Structure
 
 > **Important:** The codebase contains two distinct implementations:
-> - **Stable Engine** (`src/Components/Engine`): Production-ready implementation covered in this document
+> - **Stable Engine** (`src/components/engine`): Production-ready implementation covered in this document
 > - **Prototype Engine** (`src/Prototypes/engine/torch_impl`): Experimental PyTorch-based implementation for future IoT/TFLite deployment
 
 This documentation focuses on the **Stable Engine**.
@@ -84,7 +84,7 @@ cd Project-Echo
 **2. Navigate to Engine Directory**
 
 ```bash
-cd src/Components/Engine
+cd src/components/engine
 ```
 
 **3. Install Python Dependencies**
@@ -336,7 +336,7 @@ def weather_pipeline(self, audio_clip):
 ### File Structure
 
 ```
-src/Components/Engine/
+src/components/engine/
 ├── echo_engine.py              # Main application entry point
 ├── echo_engine.json            # Configuration (audio params, endpoints)
 ├── echo_credentials.json       # Database credentials (gitignored)
@@ -1178,7 +1178,7 @@ Press `Q` to quit the window.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                     PRODUCTION (src/Components/Engine)           │
+│                     PRODUCTION (src/components/engine)           │
 │                                                                 │
 │   IoT Sensors → MQTT → Echo Engine → TF Serving → MongoDB       │
 │                              ↑                                  │
@@ -1207,7 +1207,7 @@ Press `Q` to quit the window.
 1. **Train in Prototypes** → Export TFLite model
 2. **Test with Light Engine** → Validate accuracy
 3. **Benchmark** → Measure latency/throughput
-4. **Deploy to Production** → Copy to `src/Components/Engine/models/`
+4. **Deploy to Production** → Copy to `src/components/engine/models/`
 
 ---
 

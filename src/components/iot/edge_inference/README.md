@@ -30,21 +30,21 @@ Both modes are supported simultaneously on the same MQTT topic. The engine detec
 
 | File | Purpose |
 |---|---|
-| `src/Components/IoT/edge_inference/iot_edge_client.py` | RPi script — records audio, runs TFLite, publishes prediction |
-| `src/Components/IoT/edge_inference/requirements.txt` | RPi Python dependencies |
-| `src/Components/IoT/edge_inference/README.md` | This file |
+| `src/components/iot/edge_inference/iot_edge_client.py` | RPi script — records audio, runs TFLite, publishes prediction |
+| `src/components/iot/edge_inference/requirements.txt` | RPi Python dependencies |
+| `src/components/iot/edge_inference/README.md` | This file |
 
 ### Modified files
 
 | File | Change |
 |---|---|
-| `src/Components/Engine/echo_engine_iot.py` | Added `_handle_edge_prediction()` method; `on_iot_message()` now routes on `payload["type"]` |
-| `src/Components/Engine/echo_engine_iot.py` | Removed duplicate `import base64` |
-| `src/Components/Engine/echo_engine_iot.py` | Hardcoded API URL replaced with `self.config['API_URL']` |
-| `src/Components/Engine/echo_engine.json` | Added `"API_URL"` field |
-| `src/Components/Engine/Engine.Dockerfile` | Now copies `echo_engine_iot.py` as `echo_engine.py` so IoT engine runs in Docker |
-| `src/Components/Engine/requirements.txt` | Added `scikit-learn` (was imported but missing) |
-| `src/Components/Engine/test_iot_integration.py` | Updated import to `from echo_engine_iot import EchoEngine` so tests run locally |
+| `src/components/engine/echo_engine_iot.py` | Added `_handle_edge_prediction()` method; `on_iot_message()` now routes on `payload["type"]` |
+| `src/components/engine/echo_engine_iot.py` | Removed duplicate `import base64` |
+| `src/components/engine/echo_engine_iot.py` | Hardcoded API URL replaced with `self.config['API_URL']` |
+| `src/components/engine/echo_engine.json` | Added `"API_URL"` field |
+| `src/components/engine/Engine.Dockerfile` | Now copies `echo_engine_iot.py` as `echo_engine.py` so IoT engine runs in Docker |
+| `src/components/engine/requirements.txt` | Added `scikit-learn` (was imported but missing) |
+| `src/components/engine/test_iot_integration.py` | Updated import to `from echo_engine_iot import EchoEngine` so tests run locally |
 | `src/Prototypes/engine/torch_impl/light_echo_engine.json` | Fixed `MQTT_CLIENT_URL` from `"mqtt-broker"` → `"ts-mqtt-server-cont"` (was causing DNS failure) |
 | `src/Prototypes/engine/torch_impl/requirements.txt` | Added `paho-mqtt==1.6.1`, `pymongo`, `geopy`, `google-cloud-storage` |
 
@@ -175,7 +175,7 @@ python iot_edge_client.py \
 Unit tests cover payload validation, happy-path handler, config keys, and startup order. They mock all heavy dependencies so no Docker stack or GPU is needed.
 
 ```bash
-cd src/Components/Engine
+cd src/components/engine
 python -m pytest test_iot_integration.py -v
 ```
 
@@ -196,7 +196,7 @@ test_iot_integration.py::TestIoTMessageHandler::...                             
 Publish a synthetic test event from any machine to verify the engine picks it up:
 
 ```bash
-cd src/Components/Engine
+cd src/components/engine
 python test_iot_publisher.py
 ```
 

@@ -8,7 +8,7 @@ The `.env` file holds environment-specific settings such as the website address 
 
 ## Initial Setup
 
-1. Navigate to the HMI UI folder: `src/Components/HMI/ui/`
+1. Navigate to the HMI UI folder: `src/components/hmi/ui/`
 2. Create a new file named `.env` (copy from `.env.example` if it exists).
 3. Add the following variables:
 

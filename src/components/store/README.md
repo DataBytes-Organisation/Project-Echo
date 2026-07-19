@@ -1,6 +1,6 @@
 Owned by the data/store team: database seeding, audio scraping/cleaning,
 and Google Cloud Storage sync. For standalone movement/vegetation
-processing scripts, see `src/Components/Data_Scripts/` instead.
+processing scripts, see `src/components/data_scripts/` instead.
 
 ## Project Otways Dataset
 
