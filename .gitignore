@@ -43,7 +43,3 @@ src/Components/IoT/management_application/audioUpload
 
 # API main (environment-specific generated file)
 src/Components/API/app/main.py
-
-# Prototype data files (large datasets)
-src/Archive/Prototypes/data/data_files/
-src/Archive/Prototypes/data/data_files/_feature_cache/
