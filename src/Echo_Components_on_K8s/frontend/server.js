@@ -46,7 +46,7 @@ function testApi() {
       } else {
         console.log(
           "API did not return a string. Instead, it returned:",
-          response.data
+          response.data,
         );
       }
     })
@@ -72,7 +72,7 @@ db.mongoose
     {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-    }
+    },
   )
   .then(() => {
     console.log("Successfully connect to MongoDB.");
@@ -84,7 +84,7 @@ db.mongoose
   .catch((err) => {
     console.log(
       "ConnString: ",
-      `mongodb://${db_root}:${db_root_pwd}@${db_host}/UserSample?authSource=admin`
+      `mongodb://${db_root}:${db_root_pwd}@${db_host}/UserSample?authSource=admin`,
     );
     console.error("Connection error", err);
     // process.exit();
@@ -113,10 +113,9 @@ function initial() {
 
       //   console.log("added 'admin' to roles collection");
       // });
-      const roleData = require(path.join(
-        __dirname,
-        "user-sample/role-seed.json"
-      ));
+      const roleData = require(
+        path.join(__dirname, "user-sample/role-seed.json"),
+      );
 
       Role.insertMany(roleData);
     }
@@ -223,10 +222,9 @@ app.get("/cumulativeDonations", async (req, res) => {
 function initRequests() {
   Request.estimatedDocumentCount((err, count) => {
     if (!err && count === 0) {
-      const requestData = require(path.join(
-        __dirname,
-        "user-sample/request-seed.json"
-      ));
+      const requestData = require(
+        path.join(__dirname, "user-sample/request-seed.json"),
+      );
       Request.insertMany(requestData);
     }
   });
@@ -235,10 +233,9 @@ function initRequests() {
 function initUsers() {
   User.estimatedDocumentCount((err, count) => {
     if (!err && count === 0) {
-      const userData = require(path.join(
-        __dirname,
-        "user-sample/user-seed.json"
-      ));
+      const userData = require(
+        path.join(__dirname, "user-sample/user-seed.json"),
+      );
       User.insertMany(userData);
     }
   });
@@ -341,7 +338,7 @@ app.use(
     onSanitize: ({ req, key }) => {
       console.warn(`[DryRun] This request[${key}] will be sanitized`, req);
     },
-  })
+  }),
 );
 
 //const serveIndex = require('serve-index');
@@ -352,7 +349,7 @@ app.use(
     name: "echo-session",
     keys: ["COOKIE_SECRET"], // should use as secret environment variable
     httpOnly: true,
-  })
+  }),
 );
 
 const nodemailer = require("nodemailer");
@@ -407,7 +404,7 @@ app.post("/send_email", async (req, res) => {
           // stream as an attachment
           filename: "image.png",
           content: fs.createReadStream(
-            path.join(__dirname, "public/images/tabIcons/logo.png")
+            path.join(__dirname, "public/images/tabIcons/logo.png"),
           ),
           cid: "logo@echo.hmi", //same cid value as in the html
         },
@@ -494,7 +491,7 @@ app.post("/request_access", async (req, res) => {
               // stream as an attachment
               filename: "image.png",
               content: fs.createReadStream(
-                path.join(__dirname, "public/images/tabIcons/logo.png")
+                path.join(__dirname, "public/images/tabIcons/logo.png"),
               ),
               cid: "logo@echo.hmi", //same cid value as in the html
             },
@@ -615,7 +612,7 @@ app.patch("/api/requests/:id", async (req, res) => {
     const updatedRequest = await Request.findByIdAndUpdate(
       requestId,
       { $set: { status: newStatus } },
-      { new: true } // Return the updated document
+      { new: true }, // Return the updated document
     );
 
     if (!updatedRequest) {
@@ -651,7 +648,7 @@ app.patch("/api/updateConservationStatus/:animal", async (req, res) => {
       {
         collation: { locale: "en", strength: 2 }, // Case-insensitive collation
         returnOriginal: false, // Set this to false to get the updated document
-      }
+      },
     );
     if (result.value) {
       // If a matching document is found and updated, print it to the console
@@ -696,7 +693,7 @@ app.get("/api/requests", async (req, res) => {
     console.log("Current token: ", token);
     const axiosResponse = await axios.get(
       "http://localhost:9000/hmi/requests",
-      { headers: { Authorization: `Bearer ${token}` } }
+      { headers: { Authorization: `Bearer ${token}` } },
     );
 
     if (axiosResponse.status === 200) {
@@ -721,7 +718,7 @@ app.get("/welcome", async (req, res) => {
         console.log("Stored Token:", storedToken);
         return storedToken;
       }
-    })
+    }),
   );
   res.sendFile(path.join(__dirname, "public/index.html"));
 });

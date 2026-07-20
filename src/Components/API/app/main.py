@@ -1,3 +1,7 @@
+from app.routers import species_predictor, auth_router, hmi, engine, sim, two_factor, public, iot, live, sensors  # Websocket
+from app.routers import detections
+from app.routers import hmi, engine, sim, iot
+from app.routers import projects
 import os
 # from Components.API.app.routers import add_csv_output_option, audio_upload_router
 from .routers import add_csv_output_option, audio_upload_router
@@ -15,7 +19,7 @@ from typing import Optional, List
 from app.routers import insights
 import datetime
 import pymongo
-import json 
+import json
 
 from app.routers import hmi, engine, sim, two_factor
 from app.routers import public
@@ -27,13 +31,9 @@ app.add_middleware(
     allow_origins=["http://localhost:9000"],  # 可根据实际需求配置
 )
 # Routers
-from .routers import add_csv_output_option, audio_upload_router
-from app.routers import species_predictor, auth_router, hmi, engine, sim, two_factor, public, iot, live, sensors #Websocket
 
-from app.routers import projects
 app.include_router(projects.router)
 
-from app.routers import hmi, engine, sim, iot
 
 # ✅ Add metadata here
 app = FastAPI(
@@ -92,21 +92,24 @@ app.include_router(sensors.router, tags=['sensors'], prefix='/sensors')
 app.include_router(species_predictor.router, tags=["predict"])
 
 
-
 # ✅ Root endpoint
 app.include_router(insights.router, tags=["insights"])
 
 # --- Root Endpoint ---
+
+
 @app.get("/", response_description="API Root")
 def show_home():
     return 'Welcome to echo api, move to /docs for more'
     return 'Welcome to Project Echo API. Visit /docs for interactive documentation.'
 
+
 app.include_router(auth_router.router, tags=["auth"], prefix="/api")
-from app.routers import detections
 app.include_router(detections.router)
 
 # ✅ /openapi-export - fetch live OpenAPI spec
+
+
 @app.get("/openapi-export", include_in_schema=False)
 async def get_openapi_spec():
     """
@@ -116,6 +119,8 @@ async def get_openapi_spec():
     return app.openapi()
 
 # ✅ /spec/summary - for OpenAPI spec verification/debug
+
+
 @app.get("/spec/summary", tags=["debug"], include_in_schema=False)
 async def get_spec_summary():
     """
@@ -130,18 +135,22 @@ async def get_spec_summary():
     }
 
 # ✅ Save OpenAPI spec to file when app starts
+
+
 def export_openapi_to_file():
     """
     Saves the OpenAPI spec to a file on startup.
     Creates the 'backend' folder if it doesn't exist.
     """
     output_dir = "backend"
-    os.makedirs(output_dir, exist_ok=True)  # creates the folder if it doesn't exist
+    # creates the folder if it doesn't exist
+    os.makedirs(output_dir, exist_ok=True)
     output_path = os.path.join(output_dir, "project-echo-openapi.json")
 
     with open(output_path, "w") as f:
         json.dump(app.openapi(), f, indent=2)
 
     print(f"✅ OpenAPI spec exported to {output_path}")
+
 
 export_openapi_to_file()

@@ -80,8 +80,9 @@ services:
 
   echo_simulator:
     build:
-      context: ./Simulator
-      dockerfile: Simulator.Dockerfile
+      # Use repository root as build context so Data/ files are available
+      context: ../..
+      dockerfile: src/Components/Simulator/Simulator.Dockerfile
     image: ts-simulator
     container_name: ts-simulator-cont
     networks:

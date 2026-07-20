@@ -17,7 +17,8 @@ app = FastAPI()
 # Add the CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:9000"],  # Replace with your own allowed origins
+    # Replace with your own allowed origins
+    allow_origins=["http://localhost:9000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -29,9 +30,10 @@ dotenv.load_dotenv()
 id = os.getenv("DB_USERNAME")
 password = os.getenv("DB_PASSWORD")
 
-connection_string=f"mongodb+srv://{id}:{password}@cluster0.gu2idc8.mongodb.net/test"
+connection_string = f"mongodb+srv://{id}:{password}@cluster0.gu2idc8.mongodb.net/test"
 client = pymongo.MongoClient(connection_string)
 db = client['EchoNet']
+
 
 @app.get("/", response_description="api-root")
 def show_home():
@@ -40,14 +42,16 @@ def show_home():
 
 @app.get("/events_time", response_description="Get detection events within certain duration")
 def show_event_from_time(start: str, end: str):
-    datetime_start = datetime.datetime.fromtimestamp(int(start), datetime.timezone.utc)
-    datetime_end = datetime.datetime.fromtimestamp(int(end), datetime.timezone.utc)
+    datetime_start = datetime.datetime.fromtimestamp(
+        int(start), datetime.timezone.utc)
+    datetime_end = datetime.datetime.fromtimestamp(
+        int(end), datetime.timezone.utc)
     print(datetime_start)
     print(datetime_end)
     aggregate = [
         {
-            '$match':{'timestamp': {'$lt' : datetime_end, '$gte' : datetime_start }}
-            
+            '$match': {'timestamp': {'$lt': datetime_end, '$gte': datetime_start}}
+
         },
         {
             '$lookup': {
@@ -58,41 +62,46 @@ def show_event_from_time(start: str, end: str):
             }
         },
         {
-            "$replaceRoot": { "newRoot": { "$mergeObjects": [ { "$arrayElemAt": [ "$info", 0 ] }, "$$ROOT" ] } }
+            "$replaceRoot": {"newRoot": {"$mergeObjects": [{"$arrayElemAt": ["$info", 0]}, "$$ROOT"]}}
         },
         {
-            '$project': { "audioClip": 0, "sampleRate": 0, "fileFormat": 0}
+            '$project': {"audioClip": 0, "sampleRate": 0, "fileFormat": 0}
         },
         {
             "$addFields": {
-            "timestamp": { "$toLong": "$timestamp" }}
-        }       
+                "timestamp": {"$toLong": "$timestamp"}}
+        }
 
     ]
-    events = serializers.eventSpeciesListEntity(db["events"].aggregate(aggregate))
+    events = serializers.eventSpeciesListEntity(
+        db["events"].aggregate(aggregate))
     return events
+
 
 @app.get("/audio", response_description="returns audio given ID")
 def show_audio(id: str):
     aggregate = [
         {
-            '$match':{'_id': ObjectId(id)}
+            '$match': {'_id': ObjectId(id)}
         },
         {
-            '$project': { "audioClip": 1}
+            '$project': {"audioClip": 1}
         }
     ]
     results = list(db["events"].aggregate(aggregate))
     audio = serializers.audioListEntity(results)[0]
     return audio
 
+
 @app.get("/movement_time", response_description="Get true animal movement data within certain duration")
 def show_event_from_time(start: str, end: str):
-    datetime_start = datetime.datetime.fromtimestamp(int(start), datetime.timezone.utc)
-    datetime_end = datetime.datetime.fromtimestamp(int(end), datetime.timezone.utc)
+    datetime_start = datetime.datetime.fromtimestamp(
+        int(start), datetime.timezone.utc)
+    datetime_end = datetime.datetime.fromtimestamp(
+        int(end), datetime.timezone.utc)
     aggregate = [
         {
-            '$match':{'timestamp': {'$lt' : datetime_end, '$gte' : datetime_start }}
+            '$match': {'timestamp': {'$lt': datetime_end, '$gte': datetime_start}}
         },
         {
             '$lookup': {
@@ -103,19 +112,21 @@ def show_event_from_time(start: str, end: str):
             }
         },
         {
-            "$replaceRoot": { "newRoot": { "$mergeObjects": [ { "$arrayElemAt": [ "$info", 0 ] }, "$$ROOT" ] } }
+            "$replaceRoot": {"newRoot": {"$mergeObjects": [{"$arrayElemAt": ["$info", 0]}, "$$ROOT"]}}
         },
-        { "$project": { "info": 0 } },
+        {"$project": {"info": 0}},
         {
             "$addFields":
             {
-            "timestamp": { "$toLong": "$timestamp" }
+                "timestamp": {"$toLong": "$timestamp"}
             }
-        }       
+        }
 
     ]
-    events = serializers.movementListEntity(db["movements"].aggregate(aggregate))
+    events = serializers.movementListEntity(
+        db["movements"].aggregate(aggregate))
     return events
+
 
 @app.get("/microphones", response_description="returns location of all microphones")
 def list_microphones():
@@ -123,8 +134,8 @@ def list_microphones():
         {
             "$group":
             {
-            "_id": "$sensorId",
-            "microphoneLLA": { "$first": "$microphoneLLA" }
+                "_id": "$sensorId",
+                "microphoneLLA": {"$first": "$microphoneLLA"}
             }
         }
     ]

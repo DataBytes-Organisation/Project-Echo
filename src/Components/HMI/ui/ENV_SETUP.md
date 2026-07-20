@@ -2,6 +2,7 @@
 
 This guide explains how to configure the `.env` file for the HMI service so it works correctly both locally and on the live server.
 CLIENT_URL=http://localhost:9000
+
 ## What is `.env`?
 
 The `.env` file holds environment-specific settings such as the website address (`CLIENT_URL`) and the backend API host (`API_HOST`). The same code is used everywhere — only the `.env` file changes between local and live environments.
@@ -33,6 +34,7 @@ Then restart the server so the new value takes effect.
 ## Verification
 
 After updating, the connection status badge on the admin dashboard will display:
+
 - `Running in Local Mode — API connected successfully.` when running locally.
 - `Running in Live Mode — API connected successfully.` when running on the live server.
 - `Live server URL not configured yet, running in local fallback mode.` if `CLIENT_URL` is empty or misconfigured.
