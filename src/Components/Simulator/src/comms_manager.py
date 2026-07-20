@@ -225,7 +225,7 @@ class CommsManager():
             logger1.info(f'Found species : {species.getName()}')
 
         # load a test json file containing audio data
-        with open('src\Prototypes\data\database\sample_data\events.json', 'r') as file:
+        with open('src/Prototypes/data/database/sample_data/events.json', 'r') as file:
             test_json = json.load(file)
             msg = test_json[0]
             logger1.info(f' Loaded message timestamp: {msg["timestamp"]}')
