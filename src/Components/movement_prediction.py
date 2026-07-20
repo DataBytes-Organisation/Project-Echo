@@ -2,9 +2,11 @@ import json
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
+import os
 
-# Load the cleaned movement data from the new file
-cleaned_data_file = r"C:\Users\ragul\OneDrive\Documents\Project-Echo\src\Components\MongoDB\init\cleaned_animal_movements.json"
+# Load the cleaned movement data from the shared Data folder
+root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+cleaned_data_file = os.path.join(root_dir, 'Data', 'MongoDB', 'init', 'cleaned_animal_movements.json')
 
 with open(cleaned_data_file, 'r') as f:
     cleaned_data = json.load(f)

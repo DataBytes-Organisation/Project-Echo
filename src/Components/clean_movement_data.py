@@ -1,7 +1,9 @@
 import json
+import os
 
 # Path to the original data file (movements.json)
-original_data_file = r"C:\Users\ragul\OneDrive\Documents\Project-Echo\src\Components\MongoDB\init\movements.json"
+root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+original_data_file = os.path.join(root_dir, 'Data', 'MongoDB', 'init', 'movements.json')
 
 # Load the original data from the JSON file
 with open(original_data_file, 'r') as f:
@@ -20,8 +22,8 @@ for record in original_data:
     else:
         print(f"Invalid coordinate data: {record['animalTrueLLA']}")
 
-# Save the cleaned data to a new JSON file
-cleaned_data_file = r"C:\Users\ragul\OneDrive\Documents\Project-Echo\src\Components\MongoDB\init\cleaned_animal_movements.json"
+# Save the cleaned data to a new JSON file in the shared Data folder
+cleaned_data_file = os.path.join(root_dir, 'Data', 'MongoDB', 'init', 'cleaned_animal_movements.json')
 with open(cleaned_data_file, 'w') as f:
     json.dump(cleaned_data, f, indent=4)
 

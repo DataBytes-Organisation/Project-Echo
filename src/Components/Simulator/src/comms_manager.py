@@ -37,7 +37,8 @@ class CommsManager():
        
         # Load the project echo credentials into a dictionary
         try:
-            file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'echo_credentials.json')
+            root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', '..'))
+            file_path = os.path.join(root_dir, 'Data', 'Simulator', 'echo_credentials.json')
             with open(file_path, 'r') as f:
                 self.credentials = json.load(f)
             print(f"Echo Simulator credentials successfully loaded", flush=True)

@@ -1,8 +1,12 @@
 import json
 import matplotlib.pyplot as plt
+import os
 
-# Load movement data (update the file path if needed)
-with open(r"C:\Users\ragul\OneDrive\Documents\Project-Echo\src\Data\Animals\animal_movements.json") as f:
+# Load movement data from the shared Data folder
+root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+file_path = os.path.join(root_dir, 'Data', 'Animals', 'animal_movements.json')
+
+with open(file_path, 'r') as f:
     data = json.load(f)
 
 # Plot movement data for each animal

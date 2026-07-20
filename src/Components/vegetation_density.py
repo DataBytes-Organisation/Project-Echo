@@ -1,8 +1,10 @@
 import json
 import matplotlib.pyplot as plt
+import os
 
-# Load vegetation data (update the file path if needed)
-with open(r"C:\Users\ragul\OneDrive\Documents\Project-Echo\src\Components\vegetation_density.json") as f:
+# Load vegetation data from the shared Data folder
+root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+with open(os.path.join(root_dir, 'Data', 'Components', 'vegetation_density.json'), 'r') as f:
     data = json.load(f)
 
 regions = [item["region"] for item in data]

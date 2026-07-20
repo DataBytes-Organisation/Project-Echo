@@ -1,12 +1,15 @@
 import pandas as pd
+import os
 
-# Paths to the Excel files
+# Paths to the Excel files in the shared Data folder
+root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+base_data_dir = os.path.join(root_dir, 'Data', 'Components', 'HMI', 'AI')
 excel_files = [
-    r"C:\Users\ragul\OneDrive\Documents\Project-Echo\src\Components\HMI\AI\bio_master_A.xlsx",
-    r"C:\Users\ragul\OneDrive\Documents\Project-Echo\src\Components\HMI\AI\bio_master_B.xlsx",
-    r"C:\Users\ragul\OneDrive\Documents\Project-Echo\src\Components\HMI\AI\bio_master_C.xlsx",
-    r"C:\Users\ragul\OneDrive\Documents\Project-Echo\src\Components\HMI\AI\bio_master_D.xlsx",
-    r"C:\Users\ragul\OneDrive\Documents\Project-Echo\src\Components\HMI\AI\bio_master_E.xlsx"
+    os.path.join(base_data_dir, 'bio_master_A.xlsx'),
+    os.path.join(base_data_dir, 'bio_master_B.xlsx'),
+    os.path.join(base_data_dir, 'bio_master_C.xlsx'),
+    os.path.join(base_data_dir, 'bio_master_D.xlsx'),
+    os.path.join(base_data_dir, 'bio_master_E.xlsx')
 ]
 
 # Initialize empty list to hold DataFrames

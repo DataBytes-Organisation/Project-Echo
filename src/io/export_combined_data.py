@@ -2,13 +2,15 @@ import pandas as pd
 import json
 import os
 
-# Paths to the Excel files for animal data
+# Paths to the Excel files for animal data in the shared Data folder
+root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+base_data_dir = os.path.join(root_dir, 'Data', 'Components', 'HMI', 'AI')
 animal_data_files = [
-    r"C:\Users\ragul\OneDrive\Documents\Project-Echo\src\Components\HMI\AI\bio_master_A.xlsx",
-    r"C:\Users\ragul\OneDrive\Documents\Project-Echo\src\Components\HMI\AI\bio_master_B.xlsx",
-    r"C:\Users\ragul\OneDrive\Documents\Project-Echo\src\Components\HMI\AI\bio_master_C.xlsx",
-    r"C:\Users\ragul\OneDrive\Documents\Project-Echo\src\Components\HMI\AI\bio_master_D.xlsx",
-    r"C:\Users\ragul\OneDrive\Documents\Project-Echo\src\Components\HMI\AI\bio_master_E.xlsx"
+    os.path.join(base_data_dir, 'bio_master_A.xlsx'),
+    os.path.join(base_data_dir, 'bio_master_B.xlsx'),
+    os.path.join(base_data_dir, 'bio_master_C.xlsx'),
+    os.path.join(base_data_dir, 'bio_master_D.xlsx'),
+    os.path.join(base_data_dir, 'bio_master_E.xlsx')
 ]
 
 # Initialize an empty DataFrame to hold all animal data
@@ -25,8 +27,8 @@ for file in animal_data_files:
 # Print columns of animal data
 print("Animal Data Columns:", all_animal_data.columns)
 
-# Load the movement data from JSON
-movements_file = r"C:\Users\ragul\OneDrive\Documents\Project-Echo\src\Components\MongoDB\init\movements.json"
+# Load the movement data from JSON in the shared Data folder
+movements_file = os.path.join(root_dir, 'Data', 'MongoDB', 'init', 'movements.json')
 if os.path.exists(movements_file):
     with open(movements_file, 'r') as f:
         movements_data = json.load(f)
