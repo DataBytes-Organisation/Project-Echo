@@ -7,6 +7,6 @@ spec:
     app: hmi
   ports:
     - protocol: TCP
-      port: 8080
-      targetPort: 8080
+      port: 9000
+      targetPort: 9000
   type: LoadBalancer

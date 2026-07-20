@@ -84,7 +84,7 @@ Follow the terminal to check progress. When complete, you will see frequent mess
 
 ### Access the HMI:
 
-13. Navigate to http://localhost:8080/ in **Chrome** to view the sim. Refresh 4–5 times to ensure the sim is running correctly, until the microphones are overlaid on the simulated animals.
+13. Navigate to http://localhost:9000/ in **Chrome** to view the sim. Refresh 4–5 times to ensure the sim is running correctly, until the microphones are overlaid on the simulated animals.
 
 Everytime the page is refreshed a new sim request is sent.
 Toggling the _Simulator_ or _Live Mode_ will also restart the sim.

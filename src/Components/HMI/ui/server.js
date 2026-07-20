@@ -23,7 +23,7 @@ const { MongoClient, ObjectId } = require('mongodb');
 //const {createCaptchaSync} = require("captcha-canvas");
 
 
-const port = 8080;
+const port = 9000;
 
 const rootDirectory = __dirname; // This assumes the root directory is the current directory
 
@@ -169,7 +169,7 @@ app.use(
           "'self'",
           "ws:",
           "wss:",
-          "http://localhost:8080",
+          "http://localhost:9000",
           "http://localhost:9000",
           "http://localhost:8000",
           "https://cdn.jsdelivr.net",

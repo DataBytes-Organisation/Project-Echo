@@ -24,7 +24,7 @@ app = FastAPI()
 # Add the CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:8080"],  # 可根据实际需求配置
+    allow_origins=["http://localhost:9000"],  # 可根据实际需求配置
 )
 # Routers
 from .routers import add_csv_output_option, audio_upload_router

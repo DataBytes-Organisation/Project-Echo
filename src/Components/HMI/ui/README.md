@@ -15,4 +15,4 @@ D:\Echo\Project-Echo\src\Prototypes\him\ui\>npm install
 
 Double click ui\server.bat to run
 
-The site will be running at localhost:8080
+The site will be running at localhost:9000
