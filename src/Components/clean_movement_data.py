@@ -3,7 +3,8 @@ import os
 
 # Path to the original data file (movements.json)
 root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-original_data_file = os.path.join(root_dir, 'Data', 'MongoDB', 'init', 'movements.json')
+original_data_file = os.path.join(
+    root_dir, 'Data', 'MongoDB', 'init', 'movements.json')
 
 # Load the original data from the JSON file
 with open(original_data_file, 'r') as f:
@@ -15,7 +16,8 @@ for record in original_data:
     # Ensure 'animalTrueLLA' contains valid coordinates
     if isinstance(record["animalTrueLLA"], list) and len(record["animalTrueLLA"]) == 3:
         # Only keep the lat and lon, remove the altitude (third value)
-        cleaned_coordinates = record["animalTrueLLA"][:2]  # Exclude the altitude (third value)
+        # Exclude the altitude (third value)
+        cleaned_coordinates = record["animalTrueLLA"][:2]
         cleaned_record = record.copy()
         cleaned_record["animalTrueLLA"] = cleaned_coordinates
         cleaned_data.append(cleaned_record)
@@ -23,9 +25,9 @@ for record in original_data:
         print(f"Invalid coordinate data: {record['animalTrueLLA']}")
 
 # Save the cleaned data to a new JSON file in the shared Data folder
-cleaned_data_file = os.path.join(root_dir, 'Data', 'MongoDB', 'init', 'cleaned_animal_movements.json')
+cleaned_data_file = os.path.join(
+    root_dir, 'Data', 'MongoDB', 'init', 'cleaned_animal_movements.json')
 with open(cleaned_data_file, 'w') as f:
     json.dump(cleaned_data, f, indent=4)
 
 print(f"Cleaned data saved to {cleaned_data_file}")
- 

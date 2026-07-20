@@ -30,4 +30,3 @@ all_data.to_csv('animals_data.csv', index=False)
 all_data.to_json('animals_data.json', orient='records', lines=True)
 
 print("Data exported successfully!")
-

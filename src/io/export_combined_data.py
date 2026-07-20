@@ -28,7 +28,8 @@ for file in animal_data_files:
 print("Animal Data Columns:", all_animal_data.columns)
 
 # Load the movement data from JSON in the shared Data folder
-movements_file = os.path.join(root_dir, 'Data', 'MongoDB', 'init', 'movements.json')
+movements_file = os.path.join(
+    root_dir, 'Data', 'MongoDB', 'init', 'movements.json')
 if os.path.exists(movements_file):
     with open(movements_file, 'r') as f:
         movements_data = json.load(f)
@@ -44,10 +45,12 @@ print("Movement Data Columns:", movements_df.columns)
 
 # Select relevant columns
 all_animal_data = all_animal_data[["Animal", "Common Name", "JSON"]]
-movements_df = movements_df[["species", "timestamp", "animalId", "animalTrueLLA"]]
+movements_df = movements_df[["species",
+                             "timestamp", "animalId", "animalTrueLLA"]]
 
 # Combine animal data and movement data
-combined_data = pd.merge(all_animal_data, movements_df, left_on="Animal", right_on="species", how="left")
+combined_data = pd.merge(all_animal_data, movements_df,
+                         left_on="Animal", right_on="species", how="left")
 
 # Export combined data to CSV
 combined_data.to_csv('combined_animal_data.csv', index=False)

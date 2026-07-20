@@ -11,10 +11,10 @@ regions = [item["region"] for item in data]
 densities = [item["density"] for item in data]
 
 # Create a bar chart
-plt.bar(regions, densities, color=['green' if d > 60 else 'yellow' for d in densities])
+plt.bar(regions, densities, color=[
+        'green' if d > 60 else 'yellow' for d in densities])
 plt.title('Vegetation Density by Region')
 plt.xlabel('Regions')
 plt.ylabel('Density (%)')
 plt.savefig('vegetation_density.png')
 plt.show()
- 
