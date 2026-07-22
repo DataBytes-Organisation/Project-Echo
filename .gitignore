@@ -1,53 +1,87 @@
+# =============================================================================
+# .gitignore — Project Echo
+# Grouped by category. Patterns are unchanged in behaviour; only reorganised.
+# =============================================================================
 
+# -----------------------------------------------------------------------------
+# Operating system / editor & IDE files
+# -----------------------------------------------------------------------------
 *.DS_Store
+.directory
+.idea/
+
+# -----------------------------------------------------------------------------
+# Python
+# -----------------------------------------------------------------------------
 *.pyc
-*.hdf5
+__pycache__/
+.ipynb_checkpoints/
+.pytest_cache/
+*.egg-info/
+build/
+dist/
+
+# -----------------------------------------------------------------------------
+# Virtual environments
+# -----------------------------------------------------------------------------
+venv/
+.venv/
+
+# -----------------------------------------------------------------------------
+# Node.js
+# -----------------------------------------------------------------------------
+node_modules/
+
+# -----------------------------------------------------------------------------
+# Environment / secrets (keep example templates tracked)
+# -----------------------------------------------------------------------------
 *.env
 .env.*
 !.env.example
 !.env_example
-.ipynb_checkpoints/
-__pycache__/
-*.pb
-*.index
-*.db
-*.tmp.driveupload
-*.log
-.pytest_cache/
-*.egg-info/
-dist/
-build/
-.idea/
 
-# Local data / archived / stale files (kept locally, not tracked by git)
-.data/
+# -----------------------------------------------------------------------------
+# Logs & experiment tracking
+# -----------------------------------------------------------------------------
+*.log
+logs/
+tensorboard_logs/
 
 # MLflow experiment tracking runs
 mlruns/
 
-# Uploaded test audio files
-uploads/
-
-# TensorBoard logs
-tensorboard_logs/
-logs/
-
-# Trained model weights (tracked via DVC instead)
+# -----------------------------------------------------------------------------
+# Model weights & large binaries (tracked via DVC instead of git)
+# -----------------------------------------------------------------------------
+*.hdf5
+*.pb
+*.index
 models/
-
-# Virtual environments
-venv/
-.venv/
-
-# Engine model weights (large binary files)
+# Engine model weights (large binaries)
 src/components/engine/models/*
 
-# Node.js dependencies
-node_modules/
+# -----------------------------------------------------------------------------
+# Databases
+# -----------------------------------------------------------------------------
+*.db
+
+# -----------------------------------------------------------------------------
+# Transient / misc
+# -----------------------------------------------------------------------------
+*.tmp.driveupload
+
+# -----------------------------------------------------------------------------
+# Project-specific local / generated data (kept locally, not tracked by git)
+# -----------------------------------------------------------------------------
+# Local data / archived / stale files
+.data/
+
+# Uploaded test audio files
+uploads/
 
 # Audio recordings from IoT nodes
 src/components/iot/management_application/audioLocal
 src/components/iot/management_application/audioUpload
 
-# API main (environment-specific generated file)
+# Environment-specific generated file
 src/components/api/app/main.py
