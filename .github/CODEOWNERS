@@ -1,0 +1,154 @@
+# CODEOWNERS for Project-Echo
+# Generated from docs/REPOSITORY_OWNERSHIP.md (four-team ownership model:
+# Engine / Backend / HMI / IoT) and populated from Team_Structure.pdf
+# (DataBytes "Company Objectives and Structure", T2 2026 — Project Echo roster,
+# pp. 33-34). See REPOSITORY_OWNERSHIP.md for the reasoning behind each path
+# assignment.
+#
+# ---------------------------------------------------------------------------
+# HANDLE STATUS — READ BEFORE RELYING ON THIS FILE
+# ---------------------------------------------------------------------------
+#   Handles come in two forms below:
+#     @s2XXXXXXXX          — the roster username from Team_Structure.pdf. These
+#                            are taken verbatim from the document; confirm each
+#                            is the person's actual GitHub username before this
+#                            file is trusted (they may be Deakin/OnTrack IDs).
+#     @first-last  (TODO)  — a NAME-BASED PLACEHOLDER for a member the document
+#                            gives no username for. NOT a real GitHub account —
+#                            GitHub silently ignores it. Swap in the real handle.
+#
+#   Personal-account forks (this repo) cannot own GitHub "teams" — only orgs
+#   can — so owners are listed as individual usernames. The canonical repo is
+#   github.com/DataBytes-Organisation/Project-Echo; if/when this lands there,
+#   consider replacing each per-team list with a team slug
+#   (e.g. @DataBytes-Organisation/project-echo-engine) to avoid repeating long
+#   member lists on every rule.
+#
+#   To keep the file readable, cross-team router rules and all-team shared
+#   documents are assigned to each involved team's LEAD (one representative)
+#   rather than the full roster. Full rosters are used on each team's own paths.
+#
+# GitHub evaluates rules top-to-bottom and the LAST matching pattern wins,
+# so keep broad/default rules first and more specific overrides below them.
+#
+# ===========================================================================
+# PROJECT ECHO ROSTER (Team_Structure.pdf, pp. 33-34)  name -> handle
+# ===========================================================================
+# Engine (AI/ML)
+#   Krish Warnakulasuriya (Project Lead) ....... @krish-warnakulasuriya  (TODO)
+#   Dinal Fernando (Senior Lead) ............... @dinal-fernando         (TODO)
+#   Sriram Bharadwaz ........................... @sriram-bharadwaz       (TODO)
+#   Manisha Choudhry ........................... @manisha-choudhry       (TODO)
+#   Oh Fu Sheng (Junior Lead) .................. @oh-fu-sheng            (TODO)
+#   Kiernan Nguyen (Junior Operations Lead) .... @kiernan-nguyen         (TODO)
+#   Raveesha Prasandi Somawansa ................ @raveesha-somawansa     (TODO)
+#   Siva Manoj Kumar Nekkanti .................. @siva-manoj-nekkanti    (TODO)
+#   Nolan Nguyen ............................... @nolan-nguyen           (TODO)
+#   Deepanshi Kathpal (Junior Lead) ............ @deepanshi-kathpal      (TODO)
+#   Tharrun Satish (Junior Lead) ............... @s225565588
+#   Anand Gutta (Junior Lead) .................. @s225794722
+#   Hoang Lam Vu (Junior Lead) ................. @s224136322
+#   Maneesh Kumar Maddini ...................... @s225716349
+#   Praveen Wannakuwatte ....................... @s224781659
+# Backend
+#   Sohan Udugampolage Perera (Senior Lead) .... @s225039013
+#   Mack Turley (Junior Lead) .................. @s224876985
+#   Nanda Kishore Dabbara (Junior Lead) ........ @s225784013
+#   Ashan Vimodh Dadallage ..................... @s225077399
+#   Madhav Mehta ............................... @s225640432
+#   Mansi Umeshbhai Patel ...................... @s225712174
+#   Jay Gorisetty .............................. @jay-gorisetty          (TODO)
+#   Sabita Bhandari ............................ @sabita-bhandari        (TODO)
+#   Nguyen Gia Khang Trieu ..................... @nguyen-gia-khang-trieu (TODO)
+#   Jayden Borg ................................ @jayden-borg            (TODO)
+#   Jamie Zhi .................................. @jamie-zhi              (TODO)
+#   Thomas Pham ................................ @thomas-pham            (TODO)
+# HMI (Frontend)
+#   Balaseiteja Ganesu (Senior Lead) ........... @balaseiteja-ganesu     (TODO)
+#   Mustafa Al Husaini ......................... @s224313679
+#   Ruhansee Nethusa Padukkage ................. @s225136379
+#   Alexander Michael Petkvovski ............... @alexander-petkvovski   (TODO)
+#   Kan Do ..................................... @kan-do                 (TODO)
+#   Kim Guech Taing ............................ @kim-guech-taing        (TODO)
+#   Oh Wen Yi .................................. @oh-wen-yi              (TODO)
+#   Vamshi Gollapelly .......................... @vamshi-gollapelly      (TODO)
+# IoT
+#   Surya Wijaya ............................... @s225522532
+#   Daniel John Maglione ....................... @s224422607
+#   Surya Krishna Chaitanya Dangety ............ @s226058031
+#   Nick McCallum (Senior Lead) ................ @nick-mccallum          (TODO)
+#   Hashmeet Singh Dhillon (Junior Lead) ....... @hashmeet-singh-dhillon (TODO)
+# ===========================================================================
+
+# ---------------------------------------------------------------------------
+# Default owner — fallback for anything not matched by a more specific rule.
+# Uses each team's lead (Project Lead + the three team senior leads).
+# ---------------------------------------------------------------------------
+*                                           @krish-warnakulasuriya @s225039013 @balaseiteja-ganesu @nick-mccallum
+
+# ---------------------------------------------------------------------------
+# Backend team
+# ---------------------------------------------------------------------------
+/src/components/api/                       @s225039013 @s224876985 @s225784013 @s225077399 @s225640432 @s225712174 @jay-gorisetty @sabita-bhandari @nguyen-gia-khang-trieu @jayden-borg @jamie-zhi @thomas-pham
+/src/components/mongodb/                   @s225039013 @s224876985 @s225784013 @s225077399 @s225640432 @s225712174 @jay-gorisetty @sabita-bhandari @nguyen-gia-khang-trieu @jayden-borg @jamie-zhi @thomas-pham
+/src/components/mqtt-server/               @s225039013 @s224876985 @s225784013 @s225077399 @s225640432 @s225712174 @jay-gorisetty @sabita-bhandari @nguyen-gia-khang-trieu @jayden-borg @jamie-zhi @thomas-pham
+/src/components/docker-compose.yml         @s225039013 @s224876985 @s225784013 @s225077399 @s225640432 @s225712174 @jay-gorisetty @sabita-bhandari @nguyen-gia-khang-trieu @jayden-borg @jamie-zhi @thomas-pham
+/src/components/docker-compose.test.yml    @s225039013 @s224876985 @s225784013 @s225077399 @s225640432 @s225712174 @jay-gorisetty @sabita-bhandari @nguyen-gia-khang-trieu @jayden-borg @jamie-zhi @thomas-pham
+/.github/workflows/                        @s225039013 @s224876985 @s225784013 @s225077399 @s225640432 @s225712174 @jay-gorisetty @sabita-bhandari @nguyen-gia-khang-trieu @jayden-borg @jamie-zhi @thomas-pham
+/docs/PORTS.md                             @s225039013 @s224876985 @s225784013 @s225077399 @s225640432 @s225712174 @jay-gorisetty @sabita-bhandari @nguyen-gia-khang-trieu @jayden-borg @jamie-zhi @thomas-pham
+/docs/INSTALL.md                           @s225039013 @s224876985 @s225784013 @s225077399 @s225640432 @s225712174 @jay-gorisetty @sabita-bhandari @nguyen-gia-khang-trieu @jayden-borg @jamie-zhi @thomas-pham
+/docs/Dockerfile_Optimization_Guide.md     @s225039013 @s224876985 @s225784013 @s225077399 @s225640432 @s225712174 @jay-gorisetty @sabita-bhandari @nguyen-gia-khang-trieu @jayden-borg @jamie-zhi @thomas-pham
+/data/test_fixtures/                       @s225039013 @s224876985 @s225784013 @s225077399 @s225640432 @s225712174 @jay-gorisetty @sabita-bhandari @nguyen-gia-khang-trieu @jayden-borg @jamie-zhi @thomas-pham
+
+# ---------------------------------------------------------------------------
+# Engine team
+# ---------------------------------------------------------------------------
+/src/components/engine/                    @krish-warnakulasuriya @dinal-fernando @sriram-bharadwaz @manisha-choudhry @oh-fu-sheng @kiernan-nguyen @raveesha-somawansa @siva-manoj-nekkanti @nolan-nguyen @deepanshi-kathpal @s225565588 @s225794722 @s224136322 @s225716349 @s224781659
+/src/components/simulator/                 @krish-warnakulasuriya @dinal-fernando @sriram-bharadwaz @manisha-choudhry @oh-fu-sheng @kiernan-nguyen @raveesha-somawansa @siva-manoj-nekkanti @nolan-nguyen @deepanshi-kathpal @s225565588 @s225794722 @s224136322 @s225716349 @s224781659
+/src/components/store/                     @krish-warnakulasuriya @dinal-fernando @sriram-bharadwaz @manisha-choudhry @oh-fu-sheng @kiernan-nguyen @raveesha-somawansa @siva-manoj-nekkanti @nolan-nguyen @deepanshi-kathpal @s225565588 @s225794722 @s224136322 @s225716349 @s224781659
+/src/components/data_scripts/              @krish-warnakulasuriya @dinal-fernando @sriram-bharadwaz @manisha-choudhry @oh-fu-sheng @kiernan-nguyen @raveesha-somawansa @siva-manoj-nekkanti @nolan-nguyen @deepanshi-kathpal @s225565588 @s225794722 @s224136322 @s225716349 @s224781659
+/src/echo/                                 @krish-warnakulasuriya @dinal-fernando @sriram-bharadwaz @manisha-choudhry @oh-fu-sheng @kiernan-nguyen @raveesha-somawansa @siva-manoj-nekkanti @nolan-nguyen @deepanshi-kathpal @s225565588 @s225794722 @s224136322 @s225716349 @s224781659
+/docs/Engine_Documentation.md              @krish-warnakulasuriya @dinal-fernando @sriram-bharadwaz @manisha-choudhry @oh-fu-sheng @kiernan-nguyen @raveesha-somawansa @siva-manoj-nekkanti @nolan-nguyen @deepanshi-kathpal @s225565588 @s225794722 @s224136322 @s225716349 @s224781659
+/docs/experiments/                         @krish-warnakulasuriya @dinal-fernando @sriram-bharadwaz @manisha-choudhry @oh-fu-sheng @kiernan-nguyen @raveesha-somawansa @siva-manoj-nekkanti @nolan-nguyen @deepanshi-kathpal @s225565588 @s225794722 @s224136322 @s225716349 @s224781659
+/docs/research/                            @krish-warnakulasuriya @dinal-fernando @sriram-bharadwaz @manisha-choudhry @oh-fu-sheng @kiernan-nguyen @raveesha-somawansa @siva-manoj-nekkanti @nolan-nguyen @deepanshi-kathpal @s225565588 @s225794722 @s224136322 @s225716349 @s224781659
+/scripts/benchmarking/                     @krish-warnakulasuriya @dinal-fernando @sriram-bharadwaz @manisha-choudhry @oh-fu-sheng @kiernan-nguyen @raveesha-somawansa @siva-manoj-nekkanti @nolan-nguyen @deepanshi-kathpal @s225565588 @s225794722 @s224136322 @s225716349 @s224781659
+/scripts/training/                         @krish-warnakulasuriya @dinal-fernando @sriram-bharadwaz @manisha-choudhry @oh-fu-sheng @kiernan-nguyen @raveesha-somawansa @siva-manoj-nekkanti @nolan-nguyen @deepanshi-kathpal @s225565588 @s225794722 @s224136322 @s225716349 @s224781659
+/.dvc/                                     @krish-warnakulasuriya @dinal-fernando @sriram-bharadwaz @manisha-choudhry @oh-fu-sheng @kiernan-nguyen @raveesha-somawansa @siva-manoj-nekkanti @nolan-nguyen @deepanshi-kathpal @s225565588 @s225794722 @s224136322 @s225716349 @s224781659
+/.dvcignore                                @krish-warnakulasuriya @dinal-fernando @sriram-bharadwaz @manisha-choudhry @oh-fu-sheng @kiernan-nguyen @raveesha-somawansa @siva-manoj-nekkanti @nolan-nguyen @deepanshi-kathpal @s225565588 @s225794722 @s224136322 @s225716349 @s224781659
+/requirements.txt                          @krish-warnakulasuriya @dinal-fernando @sriram-bharadwaz @manisha-choudhry @oh-fu-sheng @kiernan-nguyen @raveesha-somawansa @siva-manoj-nekkanti @nolan-nguyen @deepanshi-kathpal @s225565588 @s225794722 @s224136322 @s225716349 @s224781659
+/setup.py                                  @krish-warnakulasuriya @dinal-fernando @sriram-bharadwaz @manisha-choudhry @oh-fu-sheng @kiernan-nguyen @raveesha-somawansa @siva-manoj-nekkanti @nolan-nguyen @deepanshi-kathpal @s225565588 @s225794722 @s224136322 @s225716349 @s224781659
+/data/samples/                             @krish-warnakulasuriya @dinal-fernando @sriram-bharadwaz @manisha-choudhry @oh-fu-sheng @kiernan-nguyen @raveesha-somawansa @siva-manoj-nekkanti @nolan-nguyen @deepanshi-kathpal @s225565588 @s225794722 @s224136322 @s225716349 @s224781659
+/data/weather/                             @krish-warnakulasuriya @dinal-fernando @sriram-bharadwaz @manisha-choudhry @oh-fu-sheng @kiernan-nguyen @raveesha-somawansa @siva-manoj-nekkanti @nolan-nguyen @deepanshi-kathpal @s225565588 @s225794722 @s224136322 @s225716349 @s224781659
+
+# ---------------------------------------------------------------------------
+# HMI team
+# ---------------------------------------------------------------------------
+/src/components/hmi/                       @balaseiteja-ganesu @alexander-petkvovski @kan-do @kim-guech-taing @oh-wen-yi @vamshi-gollapelly @s224313679 @s225136379
+/data/design/                              @balaseiteja-ganesu @alexander-petkvovski @kan-do @kim-guech-taing @oh-wen-yi @vamshi-gollapelly @s224313679 @s225136379
+/data/assets/                              @balaseiteja-ganesu @alexander-petkvovski @kan-do @kim-guech-taing @oh-wen-yi @vamshi-gollapelly @s224313679 @s225136379
+
+# ---------------------------------------------------------------------------
+# IoT team
+# ---------------------------------------------------------------------------
+/src/components/iot/                       @nick-mccallum @hashmeet-singh-dhillon @s225522532 @s224422607 @s226058031
+
+# ---------------------------------------------------------------------------
+# Cross-team API routers — Backend owns the router layer, but the team the
+# route talks to should also sign off on contract changes. Assigned to each
+# involved team's lead to keep the required-reviewer set small.
+# ---------------------------------------------------------------------------
+/src/components/api/app/routers/engine.py  @s225039013 @krish-warnakulasuriya
+/src/components/api/app/routers/hmi.py     @s225039013 @balaseiteja-ganesu
+/src/components/api/app/routers/iot.py     @s225039013 @nick-mccallum
+/src/components/api/app/routers/sim.py     @s225039013 @krish-warnakulasuriya
+
+# ---------------------------------------------------------------------------
+# Shared / all-teams documents — assigned to each team's lead (Engine /
+# Backend / HMI / IoT) rather than every member.
+# ---------------------------------------------------------------------------
+/README.md                                 @krish-warnakulasuriya @s225039013 @balaseiteja-ganesu @nick-mccallum
+/docs/REQUIREMENTS.md                      @krish-warnakulasuriya @s225039013 @balaseiteja-ganesu @nick-mccallum
+/docs/sprints/                             @krish-warnakulasuriya @s225039013 @balaseiteja-ganesu @nick-mccallum
+/docs/tasks/                               @krish-warnakulasuriya @s225039013 @balaseiteja-ganesu @nick-mccallum
+/docs/tutorials/                           @krish-warnakulasuriya @s225039013 @balaseiteja-ganesu @nick-mccallum
+/scripts/utils/                            @krish-warnakulasuriya @s225039013
