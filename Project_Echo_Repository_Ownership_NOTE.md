@@ -10,7 +10,7 @@ so it still refers to directories that no longer exist, e.g.:
 
 **Use the current, maintained version instead:**
 
-➡️ [`docs/REPOSITORY_OWNERSHIP.md`](docs/REPOSITORY_OWNERSHIP.md)
+➡️ [`docs/architecture/REPOSITORY_OWNERSHIP.md`](docs/architecture/REPOSITORY_OWNERSHIP.md)
 
 That document reflects the current tracked tree and is the source the
 [`.github/CODEOWNERS`](.github/CODEOWNERS) file is generated from. The PDF is

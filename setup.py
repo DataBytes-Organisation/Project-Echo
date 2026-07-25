@@ -10,8 +10,10 @@ setup(
     readme="README.md",
     python_requires=">=3.7",
     author="Deakin University 2022 T3 Project Echo DataByte Capstone A Team",
-    package_dir={"": "src"},
-    packages=find_packages(where="src", exclude=["tests*"]),
+    # Krish's structure: the shared `echo` package lives under
+    # src/production/infrastructure/ (see MIGRATION_KRISH_STRUCTURE.md).
+    package_dir={"": "src/production/infrastructure"},
+    packages=find_packages(where="src/production/infrastructure", exclude=["tests*"]),
     install_requires=[
         str(r)
         for r in pkg_resources.parse_requirements(

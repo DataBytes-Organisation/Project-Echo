@@ -216,44 +216,55 @@ This will reduce errors caused by manual installation of conflicting dependency 
 Project-Echo/
 ├── README.md                      - Project overview and usage guide
 ├── requirements.txt               - Python package dependencies
-├── setup.py                       - Python package setup (src-layout: package_dir={"":"src"})
+├── setup.py                       - Python package setup (echo pkg under src/production/infrastructure)
 │
-├── data/                          - Small, git-trackable sample datasets and test fixtures
-│   ├── weather/                   - Sample BOM weather station CSV
-│   ├── samples/                   - Sample audio/CSV fixtures used across teams
-│   ├── test_fixtures/             - Fixtures for manual/API testing
-│   ├── assets/                    - Submission/design artifacts (zips, overview html/json)
-│   └── design/                    - System design documents and diagrams
-│
-├── scripts/                       - Standalone Python scripts
-│   ├── benchmarking/              - ResNet/PANNs benchmarking frameworks
-│   ├── training/                  - TensorFlow training scripts
-│   └── utils/                     - Utility and file-indexing scripts
+├── src/                           - All source code
+│   ├── production/                - Active production/runtime code
+│   │   ├── backend/               - FastAPI backend; app/{routers,services,middleware}
+│   │   │                            is the reference layout new services should mirror
+│   │   ├── engine/                - ML inference engine
+│   │   ├── hmi/                   - Frontend (Node.js/Express), served on port 3000
+│   │   ├── iot/                   - Edge device clients and onboarding
+│   │   ├── simulator/             - Synthetic sensor data simulator
+│   │   └── infrastructure/        - Shared infra & support: mongodb/, mqtt-server/,
+│   │                                store/, echo/ (installable pip package)
+│   │
+│   ├── prototypes/                - Experimental, research, non-production work
+│   │   ├── backend/               - Backend experiments
+│   │   ├── engine/                - Engine research: benchmarking/ (+ pytorch, augmentation,
+│   │   │                            event_detection, weather_noise, ensemble_overlap)
+│   │   ├── hmi/                   - HMI prototypes
+│   │   ├── iot/                   - IoT prototypes
+│   │   ├── simulator/             - Simulator prototypes
+│   │   └── computer_vision/       - CV research/prototypes
+│   │
+│   ├── data_tools/                - Data processing, inventory, and helper scripts
+│   │   ├── data_scripts/          - Movement/vegetation analysis scripts
+│   │   ├── training/              - TensorFlow training scripts
+│   │   └── utils/                 - Utility and file-indexing scripts
+│   │
+│   ├── deployment/                - Deployment assets, separated from source code
+│   │   ├── docker/                - docker-compose*.yml, dockerScript.py, package.json
+│   │   └── kubernetes/            - Kubernetes deployment files (consolidation pending)
+│   │
+│   └── tests/                     - Unit, integration, or system tests (placeholder)
 │
 ├── docs/                          - Documentation
-│   ├── tasks/                     - Task submission PDFs
-│   ├── sprints/                   - Sprint task lists and notes
-│   ├── research/                  - Literature reviews, research notes, audio processing
-│   ├── experiments/               - MLflow/DVC experiment tracking demos
-│   ├── tutorials/                 - Onboarding guides and reference tutorials
-│   ├── Engine_Documentation.md    - Detailed engine module docs
-│   ├── REQUIREMENTS.md            - Use-case analysis and requirements
-│   ├── PORTS.md                   - Canonical port reference for every service
-│   └── INSTALL.md                 - Installation guide
+│   ├── architecture/              - System structure & design (Engine_Documentation.md,
+│   │                                PORTS.md, Dockerfile_Optimization_Guide.md,
+│   │                                REPOSITORY_OWNERSHIP.md)
+│   ├── team-guides/               - Onboarding & usage (INSTALL.md, REQUIREMENTS.md,
+│   │                                sprints/, tasks/)
+│   └── research/                  - Literature reviews, research notes, experiments/
 │
-├── src/                           - Source code for all system components
-│   ├── echo/                      - Installable pip package (echo.load_model / echo.predict)
-│   └── components/
-│       ├── api/                   - FastAPI backend; app/{routers,services,middleware}
-│       │                           is the reference layout new services should mirror
-│       ├── engine/                - ML inference engine
-│       ├── hmi/                   - Frontend (Node.js/Express), served on port 3000
-│       ├── iot/                   - Edge device clients and onboarding
-│       ├── mqtt-server/           - MQTT broker configuration
-│       ├── mongodb/               - Database init and Dockerfiles
-│       ├── simulator/             - Synthetic sensor data simulator
-│       ├── store/                 - Database seeding, audio scraping/cleaning
-│       └── data_scripts/          - Standalone movement/vegetation analysis scripts
+├── tutorials/                     - Learning guides and step-by-step instructions
+│
+└── models-and-data/               - Models & datasets (target: DVC/external, not normal Git;
+    ├── weather/                     git-tracked samples/fixtures live here for now)
+    ├── samples/                   - Sample audio/CSV fixtures used across teams
+    ├── test_fixtures/             - Fixtures for manual/API testing
+    ├── assets/                    - Submission/design artifacts (zips, overview html/json)
+    └── design/                    - System design documents and diagrams
 ```
 
 All folder names are lowercase by convention. Large local-only artifacts

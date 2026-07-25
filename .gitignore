@@ -58,7 +58,7 @@ mlruns/
 *.index
 models/
 # Engine model weights (large binaries)
-src/components/engine/models/*
+src/production/engine/models/*
 
 # -----------------------------------------------------------------------------
 # Databases
@@ -73,15 +73,12 @@ src/components/engine/models/*
 # -----------------------------------------------------------------------------
 # Project-specific local / generated data (kept locally, not tracked by git)
 # -----------------------------------------------------------------------------
-# Local data / archived / stale files
-.data/
-
 # Uploaded test audio files
 uploads/
 
 # Audio recordings from IoT nodes
-src/components/iot/management_application/audioLocal
-src/components/iot/management_application/audioUpload
+src/production/iot/management_application/audioLocal
+src/production/iot/management_application/audioUpload
 
 # Environment-specific generated file
-src/components/api/app/main.py
+src/production/backend/app/main.py

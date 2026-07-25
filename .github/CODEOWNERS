@@ -1,8 +1,8 @@
 # CODEOWNERS for Project-Echo
-# Generated from docs/REPOSITORY_OWNERSHIP.md (four-team ownership model:
+# Generated from docs/architecture/REPOSITORY_OWNERSHIP.md (four-team ownership model:
 # Engine / Backend / HMI / IoT) and populated from Team_Structure.pdf
 # (DataBytes "Company Objectives and Structure", T2 2026 — Project Echo roster,
-# pp. 33-34). See REPOSITORY_OWNERSHIP.md for the reasoning behind each path
+# pp. 33-34). See docs/architecture/REPOSITORY_OWNERSHIP.md for the reasoning behind each path
 # assignment.
 #
 # ---------------------------------------------------------------------------
@@ -87,68 +87,88 @@
 *                                           @krish-warnakulasuriya @s225039013 @balaseiteja-ganesu @nick-mccallum
 
 # ---------------------------------------------------------------------------
+# Krish-structure tree defaults (production / prototypes split) — added during
+# the repository reorganisation (see docs/architecture/MIGRATION_KRISH_STRUCTURE.md).
+# These are BROAD rules and must stay ABOVE the specific per-file/per-subdir
+# rules below, which override them (GitHub: last matching rule wins). Many of
+# these dirs are placeholders today; ownership is set now so new work lands
+# with a reviewer instead of the default owners.
+# ---------------------------------------------------------------------------
+# prototypes/ defaults to Engine (research); per-team overrides follow.
+/src/prototypes/                    @krish-warnakulasuriya @dinal-fernando @sriram-bharadwaz @manisha-choudhry @oh-fu-sheng @kiernan-nguyen @raveesha-somawansa @siva-manoj-nekkanti @nolan-nguyen @deepanshi-kathpal @s225565588 @s225794722 @s224136322 @s225716349 @s224781659
+/src/prototypes/backend/            @s225039013 @s224876985 @s225784013 @s225077399 @s225640432 @s225712174 @jay-gorisetty @sabita-bhandari @nguyen-gia-khang-trieu @jayden-borg @jamie-zhi @thomas-pham
+/src/prototypes/hmi/                @balaseiteja-ganesu @alexander-petkvovski @kan-do @kim-guech-taing @oh-wen-yi @vamshi-gollapelly @s224313679 @s225136379
+/src/prototypes/iot/                @nick-mccallum @hashmeet-singh-dhillon @s225522532 @s224422607 @s226058031
+# data_tools/ (data processing + helper scripts) — Engine.
+/src/data_tools/                    @krish-warnakulasuriya @dinal-fernando @sriram-bharadwaz @manisha-choudhry @oh-fu-sheng @kiernan-nguyen @raveesha-somawansa @siva-manoj-nekkanti @nolan-nguyen @deepanshi-kathpal @s225565588 @s225794722 @s224136322 @s225716349 @s224781659
+# deployment/ (docker + kubernetes assets) — Backend.
+/src/deployment/                    @s225039013 @s224876985 @s225784013 @s225077399 @s225640432 @s225712174 @jay-gorisetty @sabita-bhandari @nguyen-gia-khang-trieu @jayden-borg @jamie-zhi @thomas-pham
+# tests/ — shared across the four team leads.
+/src/tests/                         @krish-warnakulasuriya @s225039013 @balaseiteja-ganesu @nick-mccallum
+
+# ---------------------------------------------------------------------------
 # Backend team
 # ---------------------------------------------------------------------------
-/src/components/api/                       @s225039013 @s224876985 @s225784013 @s225077399 @s225640432 @s225712174 @jay-gorisetty @sabita-bhandari @nguyen-gia-khang-trieu @jayden-borg @jamie-zhi @thomas-pham
-/src/components/mongodb/                   @s225039013 @s224876985 @s225784013 @s225077399 @s225640432 @s225712174 @jay-gorisetty @sabita-bhandari @nguyen-gia-khang-trieu @jayden-borg @jamie-zhi @thomas-pham
-/src/components/mqtt-server/               @s225039013 @s224876985 @s225784013 @s225077399 @s225640432 @s225712174 @jay-gorisetty @sabita-bhandari @nguyen-gia-khang-trieu @jayden-borg @jamie-zhi @thomas-pham
-/src/components/docker-compose.yml         @s225039013 @s224876985 @s225784013 @s225077399 @s225640432 @s225712174 @jay-gorisetty @sabita-bhandari @nguyen-gia-khang-trieu @jayden-borg @jamie-zhi @thomas-pham
-/src/components/docker-compose.test.yml    @s225039013 @s224876985 @s225784013 @s225077399 @s225640432 @s225712174 @jay-gorisetty @sabita-bhandari @nguyen-gia-khang-trieu @jayden-borg @jamie-zhi @thomas-pham
+/src/production/backend/                       @s225039013 @s224876985 @s225784013 @s225077399 @s225640432 @s225712174 @jay-gorisetty @sabita-bhandari @nguyen-gia-khang-trieu @jayden-borg @jamie-zhi @thomas-pham
+/src/production/infrastructure/mongodb/                   @s225039013 @s224876985 @s225784013 @s225077399 @s225640432 @s225712174 @jay-gorisetty @sabita-bhandari @nguyen-gia-khang-trieu @jayden-borg @jamie-zhi @thomas-pham
+/src/production/infrastructure/mqtt-server/               @s225039013 @s224876985 @s225784013 @s225077399 @s225640432 @s225712174 @jay-gorisetty @sabita-bhandari @nguyen-gia-khang-trieu @jayden-borg @jamie-zhi @thomas-pham
+/src/deployment/docker/docker-compose.yml         @s225039013 @s224876985 @s225784013 @s225077399 @s225640432 @s225712174 @jay-gorisetty @sabita-bhandari @nguyen-gia-khang-trieu @jayden-borg @jamie-zhi @thomas-pham
+/src/deployment/docker/docker-compose.test.yml    @s225039013 @s224876985 @s225784013 @s225077399 @s225640432 @s225712174 @jay-gorisetty @sabita-bhandari @nguyen-gia-khang-trieu @jayden-borg @jamie-zhi @thomas-pham
 /.github/workflows/                        @s225039013 @s224876985 @s225784013 @s225077399 @s225640432 @s225712174 @jay-gorisetty @sabita-bhandari @nguyen-gia-khang-trieu @jayden-borg @jamie-zhi @thomas-pham
-/docs/PORTS.md                             @s225039013 @s224876985 @s225784013 @s225077399 @s225640432 @s225712174 @jay-gorisetty @sabita-bhandari @nguyen-gia-khang-trieu @jayden-borg @jamie-zhi @thomas-pham
-/docs/INSTALL.md                           @s225039013 @s224876985 @s225784013 @s225077399 @s225640432 @s225712174 @jay-gorisetty @sabita-bhandari @nguyen-gia-khang-trieu @jayden-borg @jamie-zhi @thomas-pham
-/docs/Dockerfile_Optimization_Guide.md     @s225039013 @s224876985 @s225784013 @s225077399 @s225640432 @s225712174 @jay-gorisetty @sabita-bhandari @nguyen-gia-khang-trieu @jayden-borg @jamie-zhi @thomas-pham
-/data/test_fixtures/                       @s225039013 @s224876985 @s225784013 @s225077399 @s225640432 @s225712174 @jay-gorisetty @sabita-bhandari @nguyen-gia-khang-trieu @jayden-borg @jamie-zhi @thomas-pham
+/docs/architecture/PORTS.md                             @s225039013 @s224876985 @s225784013 @s225077399 @s225640432 @s225712174 @jay-gorisetty @sabita-bhandari @nguyen-gia-khang-trieu @jayden-borg @jamie-zhi @thomas-pham
+/docs/team-guides/INSTALL.md                           @s225039013 @s224876985 @s225784013 @s225077399 @s225640432 @s225712174 @jay-gorisetty @sabita-bhandari @nguyen-gia-khang-trieu @jayden-borg @jamie-zhi @thomas-pham
+/docs/architecture/Dockerfile_Optimization_Guide.md     @s225039013 @s224876985 @s225784013 @s225077399 @s225640432 @s225712174 @jay-gorisetty @sabita-bhandari @nguyen-gia-khang-trieu @jayden-borg @jamie-zhi @thomas-pham
+/models-and-data/test_fixtures/                       @s225039013 @s224876985 @s225784013 @s225077399 @s225640432 @s225712174 @jay-gorisetty @sabita-bhandari @nguyen-gia-khang-trieu @jayden-borg @jamie-zhi @thomas-pham
 
 # ---------------------------------------------------------------------------
 # Engine team
 # ---------------------------------------------------------------------------
-/src/components/engine/                    @krish-warnakulasuriya @dinal-fernando @sriram-bharadwaz @manisha-choudhry @oh-fu-sheng @kiernan-nguyen @raveesha-somawansa @siva-manoj-nekkanti @nolan-nguyen @deepanshi-kathpal @s225565588 @s225794722 @s224136322 @s225716349 @s224781659
-/src/components/simulator/                 @krish-warnakulasuriya @dinal-fernando @sriram-bharadwaz @manisha-choudhry @oh-fu-sheng @kiernan-nguyen @raveesha-somawansa @siva-manoj-nekkanti @nolan-nguyen @deepanshi-kathpal @s225565588 @s225794722 @s224136322 @s225716349 @s224781659
-/src/components/store/                     @krish-warnakulasuriya @dinal-fernando @sriram-bharadwaz @manisha-choudhry @oh-fu-sheng @kiernan-nguyen @raveesha-somawansa @siva-manoj-nekkanti @nolan-nguyen @deepanshi-kathpal @s225565588 @s225794722 @s224136322 @s225716349 @s224781659
-/src/components/data_scripts/              @krish-warnakulasuriya @dinal-fernando @sriram-bharadwaz @manisha-choudhry @oh-fu-sheng @kiernan-nguyen @raveesha-somawansa @siva-manoj-nekkanti @nolan-nguyen @deepanshi-kathpal @s225565588 @s225794722 @s224136322 @s225716349 @s224781659
-/src/echo/                                 @krish-warnakulasuriya @dinal-fernando @sriram-bharadwaz @manisha-choudhry @oh-fu-sheng @kiernan-nguyen @raveesha-somawansa @siva-manoj-nekkanti @nolan-nguyen @deepanshi-kathpal @s225565588 @s225794722 @s224136322 @s225716349 @s224781659
-/docs/Engine_Documentation.md              @krish-warnakulasuriya @dinal-fernando @sriram-bharadwaz @manisha-choudhry @oh-fu-sheng @kiernan-nguyen @raveesha-somawansa @siva-manoj-nekkanti @nolan-nguyen @deepanshi-kathpal @s225565588 @s225794722 @s224136322 @s225716349 @s224781659
-/docs/experiments/                         @krish-warnakulasuriya @dinal-fernando @sriram-bharadwaz @manisha-choudhry @oh-fu-sheng @kiernan-nguyen @raveesha-somawansa @siva-manoj-nekkanti @nolan-nguyen @deepanshi-kathpal @s225565588 @s225794722 @s224136322 @s225716349 @s224781659
+/src/production/engine/                    @krish-warnakulasuriya @dinal-fernando @sriram-bharadwaz @manisha-choudhry @oh-fu-sheng @kiernan-nguyen @raveesha-somawansa @siva-manoj-nekkanti @nolan-nguyen @deepanshi-kathpal @s225565588 @s225794722 @s224136322 @s225716349 @s224781659
+/src/production/simulator/                 @krish-warnakulasuriya @dinal-fernando @sriram-bharadwaz @manisha-choudhry @oh-fu-sheng @kiernan-nguyen @raveesha-somawansa @siva-manoj-nekkanti @nolan-nguyen @deepanshi-kathpal @s225565588 @s225794722 @s224136322 @s225716349 @s224781659
+/src/production/infrastructure/store/                     @krish-warnakulasuriya @dinal-fernando @sriram-bharadwaz @manisha-choudhry @oh-fu-sheng @kiernan-nguyen @raveesha-somawansa @siva-manoj-nekkanti @nolan-nguyen @deepanshi-kathpal @s225565588 @s225794722 @s224136322 @s225716349 @s224781659
+/src/data_tools/data_scripts/              @krish-warnakulasuriya @dinal-fernando @sriram-bharadwaz @manisha-choudhry @oh-fu-sheng @kiernan-nguyen @raveesha-somawansa @siva-manoj-nekkanti @nolan-nguyen @deepanshi-kathpal @s225565588 @s225794722 @s224136322 @s225716349 @s224781659
+/src/production/infrastructure/echo/                                 @krish-warnakulasuriya @dinal-fernando @sriram-bharadwaz @manisha-choudhry @oh-fu-sheng @kiernan-nguyen @raveesha-somawansa @siva-manoj-nekkanti @nolan-nguyen @deepanshi-kathpal @s225565588 @s225794722 @s224136322 @s225716349 @s224781659
+/docs/architecture/Engine_Documentation.md              @krish-warnakulasuriya @dinal-fernando @sriram-bharadwaz @manisha-choudhry @oh-fu-sheng @kiernan-nguyen @raveesha-somawansa @siva-manoj-nekkanti @nolan-nguyen @deepanshi-kathpal @s225565588 @s225794722 @s224136322 @s225716349 @s224781659
+/docs/research/experiments/                         @krish-warnakulasuriya @dinal-fernando @sriram-bharadwaz @manisha-choudhry @oh-fu-sheng @kiernan-nguyen @raveesha-somawansa @siva-manoj-nekkanti @nolan-nguyen @deepanshi-kathpal @s225565588 @s225794722 @s224136322 @s225716349 @s224781659
 /docs/research/                            @krish-warnakulasuriya @dinal-fernando @sriram-bharadwaz @manisha-choudhry @oh-fu-sheng @kiernan-nguyen @raveesha-somawansa @siva-manoj-nekkanti @nolan-nguyen @deepanshi-kathpal @s225565588 @s225794722 @s224136322 @s225716349 @s224781659
-/scripts/benchmarking/                     @krish-warnakulasuriya @dinal-fernando @sriram-bharadwaz @manisha-choudhry @oh-fu-sheng @kiernan-nguyen @raveesha-somawansa @siva-manoj-nekkanti @nolan-nguyen @deepanshi-kathpal @s225565588 @s225794722 @s224136322 @s225716349 @s224781659
-/scripts/training/                         @krish-warnakulasuriya @dinal-fernando @sriram-bharadwaz @manisha-choudhry @oh-fu-sheng @kiernan-nguyen @raveesha-somawansa @siva-manoj-nekkanti @nolan-nguyen @deepanshi-kathpal @s225565588 @s225794722 @s224136322 @s225716349 @s224781659
+/src/prototypes/engine/benchmarking/                     @krish-warnakulasuriya @dinal-fernando @sriram-bharadwaz @manisha-choudhry @oh-fu-sheng @kiernan-nguyen @raveesha-somawansa @siva-manoj-nekkanti @nolan-nguyen @deepanshi-kathpal @s225565588 @s225794722 @s224136322 @s225716349 @s224781659
+/src/data_tools/training/                         @krish-warnakulasuriya @dinal-fernando @sriram-bharadwaz @manisha-choudhry @oh-fu-sheng @kiernan-nguyen @raveesha-somawansa @siva-manoj-nekkanti @nolan-nguyen @deepanshi-kathpal @s225565588 @s225794722 @s224136322 @s225716349 @s224781659
 /.dvc/                                     @krish-warnakulasuriya @dinal-fernando @sriram-bharadwaz @manisha-choudhry @oh-fu-sheng @kiernan-nguyen @raveesha-somawansa @siva-manoj-nekkanti @nolan-nguyen @deepanshi-kathpal @s225565588 @s225794722 @s224136322 @s225716349 @s224781659
 /.dvcignore                                @krish-warnakulasuriya @dinal-fernando @sriram-bharadwaz @manisha-choudhry @oh-fu-sheng @kiernan-nguyen @raveesha-somawansa @siva-manoj-nekkanti @nolan-nguyen @deepanshi-kathpal @s225565588 @s225794722 @s224136322 @s225716349 @s224781659
 /requirements.txt                          @krish-warnakulasuriya @dinal-fernando @sriram-bharadwaz @manisha-choudhry @oh-fu-sheng @kiernan-nguyen @raveesha-somawansa @siva-manoj-nekkanti @nolan-nguyen @deepanshi-kathpal @s225565588 @s225794722 @s224136322 @s225716349 @s224781659
 /setup.py                                  @krish-warnakulasuriya @dinal-fernando @sriram-bharadwaz @manisha-choudhry @oh-fu-sheng @kiernan-nguyen @raveesha-somawansa @siva-manoj-nekkanti @nolan-nguyen @deepanshi-kathpal @s225565588 @s225794722 @s224136322 @s225716349 @s224781659
-/data/samples/                             @krish-warnakulasuriya @dinal-fernando @sriram-bharadwaz @manisha-choudhry @oh-fu-sheng @kiernan-nguyen @raveesha-somawansa @siva-manoj-nekkanti @nolan-nguyen @deepanshi-kathpal @s225565588 @s225794722 @s224136322 @s225716349 @s224781659
-/data/weather/                             @krish-warnakulasuriya @dinal-fernando @sriram-bharadwaz @manisha-choudhry @oh-fu-sheng @kiernan-nguyen @raveesha-somawansa @siva-manoj-nekkanti @nolan-nguyen @deepanshi-kathpal @s225565588 @s225794722 @s224136322 @s225716349 @s224781659
+/models-and-data/samples/                             @krish-warnakulasuriya @dinal-fernando @sriram-bharadwaz @manisha-choudhry @oh-fu-sheng @kiernan-nguyen @raveesha-somawansa @siva-manoj-nekkanti @nolan-nguyen @deepanshi-kathpal @s225565588 @s225794722 @s224136322 @s225716349 @s224781659
+/models-and-data/weather/                             @krish-warnakulasuriya @dinal-fernando @sriram-bharadwaz @manisha-choudhry @oh-fu-sheng @kiernan-nguyen @raveesha-somawansa @siva-manoj-nekkanti @nolan-nguyen @deepanshi-kathpal @s225565588 @s225794722 @s224136322 @s225716349 @s224781659
 
 # ---------------------------------------------------------------------------
 # HMI team
 # ---------------------------------------------------------------------------
-/src/components/hmi/                       @balaseiteja-ganesu @alexander-petkvovski @kan-do @kim-guech-taing @oh-wen-yi @vamshi-gollapelly @s224313679 @s225136379
-/data/design/                              @balaseiteja-ganesu @alexander-petkvovski @kan-do @kim-guech-taing @oh-wen-yi @vamshi-gollapelly @s224313679 @s225136379
-/data/assets/                              @balaseiteja-ganesu @alexander-petkvovski @kan-do @kim-guech-taing @oh-wen-yi @vamshi-gollapelly @s224313679 @s225136379
+/src/production/hmi/                       @balaseiteja-ganesu @alexander-petkvovski @kan-do @kim-guech-taing @oh-wen-yi @vamshi-gollapelly @s224313679 @s225136379
+/models-and-data/design/                              @balaseiteja-ganesu @alexander-petkvovski @kan-do @kim-guech-taing @oh-wen-yi @vamshi-gollapelly @s224313679 @s225136379
+/models-and-data/assets/                              @balaseiteja-ganesu @alexander-petkvovski @kan-do @kim-guech-taing @oh-wen-yi @vamshi-gollapelly @s224313679 @s225136379
 
 # ---------------------------------------------------------------------------
 # IoT team
 # ---------------------------------------------------------------------------
-/src/components/iot/                       @nick-mccallum @hashmeet-singh-dhillon @s225522532 @s224422607 @s226058031
+/src/production/iot/                       @nick-mccallum @hashmeet-singh-dhillon @s225522532 @s224422607 @s226058031
 
 # ---------------------------------------------------------------------------
 # Cross-team API routers — Backend owns the router layer, but the team the
 # route talks to should also sign off on contract changes. Assigned to each
 # involved team's lead to keep the required-reviewer set small.
 # ---------------------------------------------------------------------------
-/src/components/api/app/routers/engine.py  @s225039013 @krish-warnakulasuriya
-/src/components/api/app/routers/hmi.py     @s225039013 @balaseiteja-ganesu
-/src/components/api/app/routers/iot.py     @s225039013 @nick-mccallum
-/src/components/api/app/routers/sim.py     @s225039013 @krish-warnakulasuriya
+/src/production/backend/app/routers/engine.py  @s225039013 @krish-warnakulasuriya
+/src/production/backend/app/routers/hmi.py     @s225039013 @balaseiteja-ganesu
+/src/production/backend/app/routers/iot.py     @s225039013 @nick-mccallum
+/src/production/backend/app/routers/sim.py     @s225039013 @krish-warnakulasuriya
 
 # ---------------------------------------------------------------------------
 # Shared / all-teams documents — assigned to each team's lead (Engine /
 # Backend / HMI / IoT) rather than every member.
 # ---------------------------------------------------------------------------
 /README.md                                 @krish-warnakulasuriya @s225039013 @balaseiteja-ganesu @nick-mccallum
-/docs/REQUIREMENTS.md                      @krish-warnakulasuriya @s225039013 @balaseiteja-ganesu @nick-mccallum
-/docs/sprints/                             @krish-warnakulasuriya @s225039013 @balaseiteja-ganesu @nick-mccallum
-/docs/tasks/                               @krish-warnakulasuriya @s225039013 @balaseiteja-ganesu @nick-mccallum
-/docs/tutorials/                           @krish-warnakulasuriya @s225039013 @balaseiteja-ganesu @nick-mccallum
-/scripts/utils/                            @krish-warnakulasuriya @s225039013
+/docs/team-guides/REQUIREMENTS.md                      @krish-warnakulasuriya @s225039013 @balaseiteja-ganesu @nick-mccallum
+/docs/team-guides/sprints/                             @krish-warnakulasuriya @s225039013 @balaseiteja-ganesu @nick-mccallum
+/docs/team-guides/tasks/                               @krish-warnakulasuriya @s225039013 @balaseiteja-ganesu @nick-mccallum
+/tutorials/                           @krish-warnakulasuriya @s225039013 @balaseiteja-ganesu @nick-mccallum
+/src/data_tools/utils/                            @krish-warnakulasuriya @s225039013
