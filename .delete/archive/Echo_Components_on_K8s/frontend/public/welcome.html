@@ -1,0 +1,362 @@
+<div id="welcome-menu">
+  <h3 style="text-align: left; color: white">Filter Menu</h3>
+  <div class="toggle-switch-container">
+    <label for="toggle-switch" class="toggle-label">Live Mode:</label>
+    <label class="toggle-switch">
+      <input id="liveModeToggle" type="checkbox" checked />
+      <span class="slider round"></span>
+    </label>
+  </div>
+
+  <div class="past-data-container">
+    <div class="past-data-header">View Past Data:</div>
+    <div class="time-range-picker">
+      <input
+        type="text"
+        id="datetime-range"
+        name="datetime-range"
+        style="width: 100%"
+        value=""
+      />
+    </div>
+  </div>
+  <div class="dropdown">
+    <button
+      class="btn btn-secondary dropdown-toggle btn-no-background"
+      type="button"
+      id="dropdownMenuButton"
+      data-bs-toggle="dropdown"
+      aria-expanded="false"
+    >
+      Animal Vocalizations
+    </button>
+    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+      <div class="row">
+        <div class="col">
+          <div class="form-check">
+            <input
+              class="form-check-input v"
+              type="checkbox"
+              value=""
+              id="_reptile"
+              onchange="updateFilter('_reptile')"
+              checked
+            />
+            <label class="form-check-label" for="_reptile">Reptile</label>
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input v"
+              type="checkbox"
+              value=""
+              id="_bird"
+              onchange="updateFilter('_bird')"
+              checked
+            />
+            <label class="form-check-label" for="_bird">Bird</label>
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input v"
+              type="checkbox"
+              value=""
+              id="_mammal"
+              onchange="updateFilter('_mammal')"
+              checked
+            />
+            <label class="form-check-label" for="_mammal">Mammal</label>
+          </div>
+
+          <div class="form-check">
+            <input
+              class="form-check-input v"
+              type="checkbox"
+              value=""
+              id="_insect"
+              onchange="updateFilter('_insect')"
+              checked
+            />
+            <label class="form-check-label" for="_insect">Insect</label>
+          </div>
+
+          <div class="form-check">
+            <input
+              class="form-check-input v"
+              type="checkbox"
+              value=""
+              id="_amphibian"
+              onchange="updateFilter('_amphibian')"
+              checked
+            />
+            <label class="form-check-label" for="_amphibian">Amphibian</label>
+          </div>
+
+          <div class="form-check">
+            <button
+              onclick="{selectAll('_all')}"
+              class="toggle-button btn btn-secondary btn-no-background select-all-btn"
+            >
+              Select All
+            </button>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="form-check">
+            <input
+              class="form-check-input v endangered"
+              type="checkbox"
+              value=""
+              id="_endangered"
+              onchange="updateFilter('_endangered')"
+              checked
+            />
+            <label class="form-check-label" for="_endangered" onchange=""
+              >Endangered</label
+            >
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input v vulnerable"
+              type="checkbox"
+              value=""
+              id="_vulnerable"
+              onchange="updateFilter('_vulnerable')"
+              checked
+            />
+            <label class="form-check-label" for="_vulnerable">Vunerable</label>
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input v nearthreatened"
+              type="checkbox"
+              value=""
+              id="_nearthreatened"
+              onchange="updateFilter('_nearthreatened')"
+              checked
+            />
+            <label class="form-check-label" for="_nearThreatened"
+              >Near Threatened</label
+            >
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input v normal"
+              type="checkbox"
+              value=""
+              id="_normal"
+              onchange="updateFilter('_normal')"
+              checked
+            />
+            <label class="form-check-label" for="_normal">Normal</label>
+          </div>
+
+          <div class="form-check">
+            <input
+              class="form-check-input v invasive"
+              type="checkbox"
+              value=""
+              id="_invasive"
+              onchange="updateFilter('_invasive')"
+              checked
+            />
+            <label class="form-check-label" for="_invasive">Invasive</label>
+          </div>
+
+          <div class="form-check">
+            <button
+              onclick="{selectAll('_clear')}"
+              class="toggle-button btn btn-secondary btn-no-background select-all-btn"
+            >
+              Clear All
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dropdown">
+    <button
+      class="btn btn-secondary dropdown-toggle btn-no-background"
+      type="button"
+      id="dropdownMenuButton"
+      data-bs-toggle="dropdown"
+      aria-expanded="false"
+    >
+      Animal Simulation
+    </button>
+    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+      <div class="row">
+        <div class="col">
+          <div class="form-check">
+            <input
+              class="form-check-input s"
+              type="checkbox"
+              value=""
+              id="reptile"
+              onchange="{updateFilter('reptile')}"
+              checked
+            />
+            <label class="form-check-label" for="reptile">Reptile</label>
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input s"
+              type="checkbox"
+              value=""
+              id="bird"
+              onchange="{updateFilter('bird')}"
+              checked
+            />
+            <label class="form-check-label" for="bird">Bird</label>
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input s"
+              type="checkbox"
+              value=""
+              id="mammal"
+              onchange="{updateFilter('mammal')}"
+              checked
+            />
+            <label class="form-check-label" for="mammal">Mammal</label>
+          </div>
+
+          <div class="form-check">
+            <input
+              class="form-check-input s"
+              type="checkbox"
+              value=""
+              id="insect"
+              onchange="{updateFilter('insect')}"
+              checked
+            />
+            <label class="form-check-label" for="insect">Insect</label>
+          </div>
+
+          <div class="form-check">
+            <input
+              class="form-check-input s"
+              type="checkbox"
+              value=""
+              id="amphibian"
+              onchange="{updateFilter('amphibian')}"
+              checked
+            />
+            <label class="form-check-label" for="amphibian">Amphibian</label>
+          </div>
+
+          <div class="form-check">
+            <button
+              onclick="{selectAll('all')}"
+              class="toggle-button btn btn-secondary btn-no-background select-all-btn"
+            >
+              Select All
+            </button>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="form-check">
+            <input
+              class="form-check-input s endangered"
+              type="checkbox"
+              value=""
+              id="endangered"
+              onchange="{updateFilter('endangered')}"
+              checked
+            />
+            <label class="form-check-label" for="endangered">Endangered</label>
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input s vulnerable"
+              type="checkbox"
+              value=""
+              id="vulnerable"
+              onchange="{updateFilter('vulnerable')}"
+              checked
+            />
+            <label class="form-check-label" for="vulnerable">Vunerable</label>
+          </div>
+
+          <div class="form-check">
+            <input
+              class="form-check-input s nearthreatened"
+              type="checkbox"
+              value=""
+              id="nearthreatened"
+              onchange="{updateFilter('nearthreatened')}"
+              checked
+            />
+            <label class="form-check-label" for="nearthreatened"
+              >Near Threatened</label
+            >
+          </div>
+
+          <div class="form-check">
+            <input
+              class="form-check-input s normal"
+              type="checkbox"
+              value=""
+              id="normal"
+              onchange="{updateFilter('normal')}"
+              checked
+            />
+            <label class="form-check-label" for="Normal">Normal</label>
+          </div>
+
+          <div class="form-check">
+            <input
+              class="form-check-input s invasive"
+              type="checkbox"
+              value=""
+              id="invasive"
+              onchange="{updateFilter('invasive')}"
+              checked
+            />
+            <label class="form-check-label" for="invasive">Invasive</label>
+          </div>
+          <div class="form-check">
+            <button
+              onclick="selectAll('clear')"
+              class="toggle-button btn btn-secondary btn-no-background select-all-btn"
+            >
+              Clear All
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dropdown">
+    <button
+      class="btn btn-secondary dropdown-toggle btn-no-background"
+      type="button"
+      id="dropdownMenuButton"
+      data-bs-toggle="dropdown"
+      aria-expanded="false"
+    >
+      Microphones
+    </button>
+    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+      <div class="row">
+        <div class="col">
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              value=""
+              id="microphones"
+              onchange="{microphoneDisplay()}"
+              checked
+            />
+            <label class="form-check-label" for="microphones"
+              >Microphones
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

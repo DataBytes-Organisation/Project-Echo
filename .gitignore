@@ -8,7 +8,7 @@
 # -----------------------------------------------------------------------------
 *.DS_Store
 .directory
-.idea/
+.vscode/
 
 # -----------------------------------------------------------------------------
 # Python
@@ -48,7 +48,7 @@ logs/
 tensorboard_logs/
 
 # MLflow experiment tracking runs
-mlruns/
+# mlruns/
 
 # -----------------------------------------------------------------------------
 # Model weights & large binaries (tracked via DVC instead of git)

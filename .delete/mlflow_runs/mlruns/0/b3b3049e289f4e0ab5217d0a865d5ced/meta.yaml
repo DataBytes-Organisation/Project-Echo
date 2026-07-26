@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Project%20Echo/Project-Echo/mlruns/0/b3b3049e289f4e0ab5217d0a865d5ced/artifacts
+end_time: 1745128626104
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: b3b3049e289f4e0ab5217d0a865d5ced
+run_name: complex_random_forest
+run_uuid: b3b3049e289f4e0ab5217d0a865d5ced
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1745128618401
+status: 3
+tags: []
+user_id: ragul

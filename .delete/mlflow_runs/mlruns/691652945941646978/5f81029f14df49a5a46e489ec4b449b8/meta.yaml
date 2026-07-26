@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Project%20Echo/Project-Echo/mlruns/691652945941646978/5f81029f14df49a5a46e489ec4b449b8/artifacts
+end_time: 1744005677280
+entry_point_name: ''
+experiment_id: '691652945941646978'
+lifecycle_stage: active
+run_id: 5f81029f14df49a5a46e489ec4b449b8
+run_name: gentle-chimp-310
+run_uuid: 5f81029f14df49a5a46e489ec4b449b8
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1744005669252
+status: 3
+tags: []
+user_id: ragul

@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  raspberry-pi:
+    build: .
+    ports:
+      - "2222:2222"    # SSH access
+    devices:
+      - "/dev/snd:/dev/snd"  # Audio device passthrough for microphone
+    privileged: true
+    volumes:
+      - /dev/snd:/dev/snd
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+    environment:
+      - DISPLAY=${DISPLAY}
+      - PULSE_RUNTIME_PATH=/var/run/pulse
+    stdin_open: true
+    tty: true

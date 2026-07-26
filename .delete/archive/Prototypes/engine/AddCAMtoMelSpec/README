@@ -1,0 +1,11 @@
+# Trained model
+This model used the Falco_cenchroides, Dasyornis_broadbenti, Chlamydera_nuchalis, Chenonetta_jubata, Charadrius_ruficapillus audios from the bucket 2
+
+# Files
+CatTest - This is a CAM sample project from kaggle 
+Data - This is the 5 species audio but I just reamain the folder and audios need to be downloaded from bucket 2
+Model1 - This is the pre-trained model (empty folder because the size is too large to push it; Please use the notebook AddCAMel.ipynb to train data)
+AddCAMel.ipynb - This is the main file using cv2(opencv)
+AddCAMel-FromCat.ipynb - This is the main file using the CAM function from CatTest
+ToMelSpe.ipynb - This is used to get the mel spectrogram from one audio
+TestFunc.ipynb - This is the original source of CAM functions 

@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Project%20Echo/Project-Echo/mlruns/920891333870978634/58e12ccf41394894a6a6a8f0db1288e5/artifacts
+end_time: 1744690149918
+entry_point_name: ''
+experiment_id: '920891333870978634'
+lifecycle_stage: active
+run_id: 58e12ccf41394894a6a6a8f0db1288e5
+run_name: sedate-squid-395
+run_uuid: 58e12ccf41394894a6a6a8f0db1288e5
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1744690141128
+status: 3
+tags: []
+user_id: ragul

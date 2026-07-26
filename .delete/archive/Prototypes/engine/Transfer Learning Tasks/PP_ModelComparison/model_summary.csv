@@ -1,0 +1,7 @@
+Model,Total Parameters,Trainable Parameters,Non-Trainable Parameters,Initial Epoch Accuracy,Final Validation Accuracy,Training Time (minutes)
+EfficientNetV2B0,"6,070,470","6,009,862","60,608",0.4821,0.9026,148.96
+InceptionV3,"22,044,566","22,010,134","34,432",0.4590,0.8648,219.43
+MobileNetV2,"2,409,142","2,375,030","34,112",0.2754,0.9026,195.40
+MobileNetV3Large,"3,109,750","3,085,350","24,400",0.0932,0.7596,253.54
+MobileNetV3Small,"1,007,206","995,094","12,112",0.0736,0.0932,169.21
+ResNet50V2,"23,806,582","23,761,142","45,440",0.3924,0.8732,288.46
