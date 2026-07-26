@@ -8,7 +8,7 @@ There are a couple of containers which are defined by open source community whic
 
 The following diagram is taken from the Echo architecture document located [here](https://deakin365.sharepoint.com/:p:/r/sites/DataBytes2/Shared%20Documents/Project%20Echo/Architecture/Project%20Echo%20Architecture.pptx?d=wd9aa543f681b45f19357c86377de93d5&csf=1&web=1&e=25pLgW).
 
-![Component Interactions](ComponentInteractions.png)
+![Component Interactions](../deployment/docker/ComponentInteractions.png)
 
 The diagram describes the flow of information between components at a high level to provide an introduction to how these components interact. For a detailed explaination of the contents of messages please read the associated documentation for each component.
 
