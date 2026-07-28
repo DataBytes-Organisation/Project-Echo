@@ -8,6 +8,7 @@ librosa
 matplotlib
 numpy
 paho-mqtt==1.6.1
+scikit-learn
 pandas
 opencv-python
 pymongo[srv]
@@ -16,3 +17,4 @@ tensorflow==2.15.0
 xgboost
 # torch==1.9.0+cpu
 # torchvision==0.10.0+cpu
+diskcache

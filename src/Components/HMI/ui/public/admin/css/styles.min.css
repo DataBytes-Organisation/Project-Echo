@@ -16868,3 +16868,137 @@ ul {
 .timeline-widget .timeline-item .timeline-badge.badge-primary {
   border: 2px solid #5d87ff;
 }
+
+/* =========================
+   CUSTOM ADMIN UI (Echo Task)
+   ========================= */
+
+   .admin-page-status {
+    margin-bottom: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  /* ---- Error Banner ---- */
+  
+  .admin-error-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    width: 100%;
+    max-width: 600px;
+    padding: 14px 16px 14px 20px;
+    margin-bottom: 16px;
+    background-color: #fff2f2;
+    border: 1px solid #ffb3b3;
+    border-left: 4px solid #e03131;
+    border-radius: 9px;
+    color: #c92a2a;
+    box-shadow:
+      rgba(224, 49, 49, 0.12) 0px 4px 16px,
+      rgba(145, 158, 171, 0.06) 0px 1px 4px;
+    animation: adminBannerFadeIn 0.25s ease;
+  }
+  
+  .admin-error-banner__content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+  }
+  
+  .admin-error-banner__content i {
+    font-size: 20px;
+    line-height: 1;
+    flex-shrink: 0;
+    color: #e03131;
+  }
+  
+  .admin-error-banner__content span {
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.45;
+    color: #c92a2a;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .admin-error-banner__dismiss {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: #e03131;
+    cursor: pointer;
+    flex-shrink: 0;
+    opacity: 0.55;
+    transition: opacity 0.15s ease, background-color 0.15s ease;
+  }
+  
+  .admin-error-banner__dismiss i {
+    font-size: 15px;
+    line-height: 1;
+  }
+  
+  .admin-error-banner__dismiss:hover {
+    background-color: rgba(224, 49, 49, 0.10);
+    opacity: 1;
+  }
+  
+  /* ---- Loading Spinner ---- */
+  
+  .admin-loading-spinner {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    max-width: 600px;
+    padding: 14px 16px 14px 20px;
+    margin-bottom: 16px;
+    background-color: #f0f7f4;
+    border: 1px solid #a8cfc0;
+    border-left: 4px solid #2F6E4F;
+    border-radius: 9px;
+    box-shadow:
+      rgba(47, 110, 79, 0.12) 0px 4px 16px,
+      rgba(145, 158, 171, 0.06) 0px 1px 4px;
+    animation: adminBannerFadeIn 0.25s ease;
+  }
+  
+  .admin-loading-spinner .spinner-border {
+    width: 1.1rem;
+    height: 1.1rem;
+    border-width: 0.16em;
+    flex-shrink: 0;
+    color: #2F6E4F;
+  }
+  
+  .admin-loading-spinner__text {
+    font-size: 14px;
+    font-weight: 700;
+    color: #26583f;
+    line-height: 1.4;
+    letter-spacing: 0.01em;
+  }
+  
+  /* ---- Shared animation ---- */
+  
+  @keyframes adminBannerFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }

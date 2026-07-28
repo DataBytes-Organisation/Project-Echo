@@ -110,7 +110,13 @@ class CommsManager():
         
         # For now, send filename across for format information
         audio_file = sample_blob.name.split('/')[1]
-         
+
+        print("DEBUG audio_file:", audio_file, flush=True)
+        print("DEBUG audio bytes length:", len(audio), flush=True)
+        print("DEBUG first 20 bytes:", audio[:20], flush=True)
+        print("DEBUG audioClip base64 length:", len(audio_str), flush=True)
+        print("DEBUG audio_file extension:", audio_file.split(".")[-1], flush=True)
+                
         # Create the vocalisation event
         vocalisation_event = {
             "timestamp": timestamp.isoformat(),

@@ -10,6 +10,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
   <link rel="stylesheet" type="text/css" href="/admin/css/styles.min.css" />
   <link rel="stylesheet" href="/admin/css/icons/tabler-icons/tabler-icons.css" />
+
   <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script type="text/javascript" src="/admin/js/app.min.js"></script>
 
@@ -203,538 +204,462 @@
     .req{ color: var(--danger); }
     .spinner-border{ width: 1.1rem; height: 1.1rem; }
   </style>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 
 <body>
-  <!--  Body Wrapper -->
-  <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
-    data-sidebar-position="fixed" data-header-position="fixed">
-    <!-- Sidebar Start -->
+  <div
+    class="page-wrapper"
+    id="main-wrapper"
+    data-layout="vertical"
+    data-navbarbg="skin6"
+    data-sidebartype="full"
+    data-sidebar-position="fixed"
+    data-header-position="fixed"
+  >
     <div id="sidebar"></div>
-    <!--  Sidebar End -->
-    <!--  Main wrapper -->
+
     <div class="body-wrapper">
       <div id="header"></div>
+
       <div class="container-fluid">
         <div class="feedback-page">
 
-  <!-- TOP HERO -->
-  <div class="hero mb-4">
-    <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
-      <div>
-        <div class="d-flex align-items-center gap-2 mb-2">
-          <span class="soft-pill"><i class="bi bi-chat-dots me-1"></i> Client Feedback</span>
-          <span class="soft-pill" style="background:rgba(32,201,151,.10); color:var(--brand-2); border-color:rgba(32,201,151,.18)">
-            <i class="bi bi-shield-check me-1"></i> Trusted channel
-          </span>
-        </div>
-        <h2 class="fw-bold mb-1">Help us improve Project Echo</h2>
-        <p class="muted mb-0">Report bugs, request features, or share usability feedback. You’ll get an email confirmation after submitting.</p>
-      </div>
+          <div class="hero mb-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+              <div>
+                <div class="d-flex align-items-center gap-2 mb-2">
+                  <span class="soft-pill"><i class="bi bi-chat-dots me-1"></i> Client Feedback</span>
+                  <span class="soft-pill" style="background:rgba(32,201,151,.10); color:var(--brand-2); border-color:rgba(32,201,151,.18)">
+                    <i class="bi bi-shield-check me-1"></i> Trusted channel
+                  </span>
+                </div>
+                <h2 class="fw-bold mb-1">Help us improve Project Echo</h2>
+                <p class="muted mb-0">Report bugs, request features, or share usability feedback. You’ll get an email confirmation after submitting.</p>
+              </div>
 
-      <div class="d-flex gap-2">
-        <a href="/admin-dashboard" class="btn btn-outline-secondary btn-sm">
-          <i class="bi bi-arrow-left me-1"></i> Back
-        </a>
-      </div>
-    </div>
-  </div>
+              <div class="d-flex gap-2">
+                <a href="/admin-dashboard" class="btn btn-outline-secondary btn-sm">
+                  <i class="bi bi-arrow-left me-1"></i> Back
+                </a>
+              </div>
+            </div>
+          </div>
 
-  <!-- Page Toolbar -->
-  <div class="page-toolbar mb-3 d-flex justify-content-between align-items-center">
-    <div class="toolbar-left"></div>
-    <div class="toolbar-right">
-      <button class="btn btn-primary me-2" id="toolbarSubmit" type="button"><i class="bi bi-send me-1"></i> Submit Feedback</button>
-      <button class="btn btn-outline-danger" id="toolbarClear" type="button"><i class="bi bi-trash3 me-1"></i> Clear</button>
-    </div>
-  </div>
-
-  <!-- ALERTS -->
-  <div id="successBanner" class="success-banner">
-    <i class="bi bi-check-circle-fill me-2"></i>
-    Thank you! Your feedback has been sent. Please check your email for confirmation.
-  </div>
-  <div id="errorBanner" class="error-banner">
-    <i class="bi bi-exclamation-triangle-fill me-2"></i>
-    <span id="errorText">Something went wrong.</span>
-  </div>
-
-  <div class="row g-4">
-
-    <!-- LEFT: FORM -->
-    <div class="col-lg-8">
-      <div class="card">
-        <div class="card-body p-4">
-
-          <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+          <div class="page-toolbar mb-3 d-flex justify-content-between align-items-center">
+            <div></div>
             <div>
-              <h5 class="section-title mb-1">Submit feedback</h5>
-              <div class="hint">Fields marked with <span class="req">*</span> are required.</div>
-            </div>
-            <button type="button" id="clearBtn" class="btn btn-outline-danger btn-sm">
-              <i class="bi bi-trash3 me-1"></i> Clear
-            </button>
-          </div>
-
-          <form id="feedbackForm" novalidate>
-            <div class="row g-3">
-
-              <!-- EMAIL -->
-              <div class="col-md-6">
-                <label class="form-label">Your Email <span class="req">*</span></label>
-                <div class="input-group">
-                  <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-                  <input type="email" id="email" class="form-control" placeholder="name@example.com" required />
-                </div>
-                <div class="invalid-feedback">Please enter a valid email.</div>
-              </div>
-
-              <!-- TYPE -->
-              <div class="col-md-6">
-                <label class="form-label">Feedback Type <span class="req">*</span></label>
-                <select id="type" class="form-select" required>
-                  <option value="">Select type</option>
-                  <option value="Bug">Bug</option>
-                  <option value="Feature Request">Feature Request</option>
-                  <option value="Usability">Usability</option>
-                  <option value="Data Issue">Data Issue</option>
-                  <option value="Other">Other</option>
-                </select>
-                <div class="invalid-feedback">Please select a feedback type.</div>
-              </div>
-
-              <!-- QUICK TAGS -->
-              <div class="col-12">
-                <label class="form-label mb-2">Quick tags (optional)</label>
-                <div class="d-flex flex-wrap gap-2" id="tagWrap">
-                  <label class="chip"><input type="checkbox" value="Dashboard"><i class="bi bi-speedometer2"></i> Dashboard</label>
-                  <label class="chip"><input type="checkbox" value="Data Insights"><i class="bi bi-graph-up"></i> Data Insights</label>
-                  <label class="chip"><input type="checkbox" value="Login/Auth"><i class="bi bi-shield-lock"></i> Login/Auth</label>
-                  <label class="chip"><input type="checkbox" value="Maps"><i class="bi bi-map"></i> Maps</label>
-                  <label class="chip"><input type="checkbox" value="Performance"><i class="bi bi-lightning"></i> Performance</label>
-                  <label class="chip"><input type="checkbox" value="UI/UX"><i class="bi bi-palette2"></i> UI/UX</label>
-                </div>
-                <div class="hint mt-2">Tags help the team route feedback faster.</div>
-              </div>
-
-              <!-- SEVERITY -->
-              <div class="col-12">
-                <label class="form-label mb-2">Severity (optional)</label>
-                <div class="row g-2">
-                  <div class="col-md-4">
-                    <button type="button" class="w-100 severity-btn sev-low" data-sev="Low">
-                      <span class="sev-dot"></span><b>Low</b>
-                      <div class="hint mb-0">Minor issue</div>
-                    </button>
-                  </div>
-                  <div class="col-md-4">
-                    <button type="button" class="w-100 severity-btn sev-med" data-sev="Medium">
-                      <span class="sev-dot"></span><b>Medium</b>
-                      <div class="hint mb-0">Impacts workflow</div>
-                    </button>
-                  </div>
-                  <div class="col-md-4">
-                    <button type="button" class="w-100 severity-btn sev-high" data-sev="High">
-                      <span class="sev-dot"></span><b>High</b>
-                      <div class="hint mb-0">Blocking</div>
-                    </button>
-                  </div>
-                </div>
-                <input type="hidden" id="severity" value="" />
-              </div>
-
-              <!-- PAGE / URL -->
-              <div class="col-md-6">
-                <label class="form-label">Page / Screen (optional)</label>
-                <div class="input-group">
-                  <span class="input-group-text"><i class="bi bi-link-45deg"></i></span>
-                  <input type="text" id="page" class="form-control" placeholder="e.g., /admin-hmi-data-insights" />
-                </div>
-                <div class="hint mt-1">Where did you notice this? URL or screen name.</div>
-              </div>
-
-              <!-- CONTACT OK -->
-              <div class="col-md-6">
-                <label class="form-label">Follow-up (optional)</label>
-                <div class="d-flex align-items-center gap-2 mt-1">
-                  <input class="form-check-input mt-0" type="checkbox" id="okToContact" />
-                  <label class="form-check-label" for="okToContact">
-                    It’s okay to contact me about this feedback
-                  </label>
-                </div>
-                <div class="hint mt-1">We’ll only use your email for this feedback thread.</div>
-              </div>
-
-              <!-- MESSAGE -->
-              <div class="col-12">
-                <label class="form-label">Message <span class="req">*</span></label>
-                <textarea id="message" class="form-control" rows="6" placeholder="Tell us what happened / what you want to see..." maxlength="1000" required></textarea>
-                <div class="d-flex justify-content-between align-items-center mt-1">
-                  <div class="invalid-feedback d-block" id="messageErr" style="display:none;">Please add a message.</div>
-                  <div class="counter" id="charCount">0 / 1000</div>
-                </div>
-              </div>
-
-              <!-- ATTACHMENTS -->
-              <div class="col-12">
-                <label class="form-label">Attachments (optional)</label>
-
-                <div id="dropzone" class="dropzone">
-                  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
-                    <div>
-                      <div class="fw-semibold"><i class="bi bi-paperclip me-1"></i> Drag & drop screenshots here</div>
-                      <div class="hint mb-0">PNG/JPG/PDF — up to 3 files, 2MB each. (Demo: sent as filenames only unless you wire backend upload)</div>
-                    </div>
-                    <div>
-                      <input type="file" id="files" class="d-none" accept=".png,.jpg,.jpeg,.pdf" multiple />
-                      <button type="button" class="btn btn-outline-secondary btn-sm" id="browseBtn">
-                        <i class="bi bi-folder2-open me-1"></i> Browse
-                      </button>
-                    </div>
-                  </div>
-
-                  <div id="fileList"></div>
-                </div>
-              </div>
-
-            </div>
-
-            <!-- BUTTONS -->
-            <div class="mt-4 d-flex flex-wrap gap-2">
-              <button type="submit" class="btn btn-primary" id="submitBtn">
-                <span class="btn-text"><i class="bi bi-send me-1"></i> Submit Feedback</span>
-                <span class="btn-loading d-none"><span class="spinner-border me-2" role="status" aria-hidden="true"></span> Sending...</span>
+              <button class="btn btn-primary me-2" id="toolbarSubmit" type="button">
+                <i class="bi bi-send me-1"></i> Submit Feedback
               </button>
+              <button class="btn btn-outline-danger" id="toolbarClear" type="button">
+                <i class="bi bi-trash3 me-1"></i> Clear
+              </button>
+            </div>
+          </div>
 
-              <a href="/admin-dashboard" class="btn btn-outline-secondary">
-                Cancel
-              </a>
+          <div id="successBanner" class="success-banner">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            Thank you! Your feedback has been sent. Please check your email for confirmation.
+          </div>
+
+          <div id="errorBanner" class="error-banner">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <span id="errorText">Something went wrong.</span>
+          </div>
+
+          <div class="row g-4">
+            <div class="col-lg-8">
+              <div class="card">
+                <div class="card-body p-4">
+                  <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+                    <div>
+                      <h5 class="section-title mb-1">Submit feedback</h5>
+                      <div class="hint">Fields marked with <span class="req">*</span> are required.</div>
+                    </div>
+                    <button type="button" id="clearBtn" class="btn btn-outline-danger btn-sm">
+                      <i class="bi bi-trash3 me-1"></i> Clear
+                    </button>
+                  </div>
+
+                  <form id="feedbackForm" novalidate>
+                    <div class="row g-3">
+                      <div class="col-md-6">
+                        <label class="form-label">Your Email <span class="req">*</span></label>
+                        <div class="input-group">
+                          <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                          <input type="email" id="email" class="form-control" placeholder="name@example.com" required />
+                        </div>
+                        <div class="invalid-feedback">Please enter a valid email.</div>
+                      </div>
+
+                      <div class="col-md-6">
+                        <label class="form-label">Feedback Type <span class="req">*</span></label>
+                        <select id="type" class="form-select" required>
+                          <option value="">Select type</option>
+                          <option value="Bug">Bug</option>
+                          <option value="Feature Request">Feature Request</option>
+                          <option value="Usability">Usability</option>
+                          <option value="Data Issue">Data Issue</option>
+                          <option value="Other">Other</option>
+                        </select>
+                        <div class="invalid-feedback">Please select a feedback type.</div>
+                      </div>
+
+                      <div class="col-12">
+                        <label class="form-label mb-2">Quick tags (optional)</label>
+                        <div class="d-flex flex-wrap gap-2" id="tagWrap">
+                          <label class="chip"><input type="checkbox" value="Dashboard"><i class="bi bi-speedometer2"></i> Dashboard</label>
+                          <label class="chip"><input type="checkbox" value="Data Insights"><i class="bi bi-graph-up"></i> Data Insights</label>
+                          <label class="chip"><input type="checkbox" value="Login/Auth"><i class="bi bi-shield-lock"></i> Login/Auth</label>
+                          <label class="chip"><input type="checkbox" value="Maps"><i class="bi bi-map"></i> Maps</label>
+                          <label class="chip"><input type="checkbox" value="Performance"><i class="bi bi-lightning"></i> Performance</label>
+                          <label class="chip"><input type="checkbox" value="UI/UX"><i class="bi bi-palette2"></i> UI/UX</label>
+                        </div>
+                        <div class="hint mt-2">Tags help the team route feedback faster.</div>
+                      </div>
+
+                      <div class="col-12">
+                        <label class="form-label mb-2">Severity (optional)</label>
+                        <div class="row g-2">
+                          <div class="col-md-4">
+                            <button type="button" class="w-100 severity-btn sev-low" data-sev="Low">
+                              <span class="sev-dot"></span><b>Low</b>
+                              <div class="hint mb-0">Minor issue</div>
+                            </button>
+                          </div>
+                          <div class="col-md-4">
+                            <button type="button" class="w-100 severity-btn sev-med" data-sev="Medium">
+                              <span class="sev-dot"></span><b>Medium</b>
+                              <div class="hint mb-0">Impacts workflow</div>
+                            </button>
+                          </div>
+                          <div class="col-md-4">
+                            <button type="button" class="w-100 severity-btn sev-high" data-sev="High">
+                              <span class="sev-dot"></span><b>High</b>
+                              <div class="hint mb-0">Blocking</div>
+                            </button>
+                          </div>
+                        </div>
+                        <input type="hidden" id="severity" value="" />
+                      </div>
+
+                      <div class="col-md-6">
+                        <label class="form-label">Page / Screen (optional)</label>
+                        <div class="input-group">
+                          <span class="input-group-text"><i class="bi bi-link-45deg"></i></span>
+                          <input type="text" id="page" class="form-control" placeholder="e.g., /admin-hmi-data-insights" />
+                        </div>
+                        <div class="hint mt-1">Where did you notice this? URL or screen name.</div>
+                      </div>
+
+                      <div class="col-md-6">
+                        <label class="form-label">Follow-up (optional)</label>
+                        <div class="d-flex align-items-center gap-2 mt-1">
+                          <input class="form-check-input mt-0" type="checkbox" id="okToContact" />
+                          <label class="form-check-label" for="okToContact">
+                            It’s okay to contact me about this feedback
+                          </label>
+                        </div>
+                        <div class="hint mt-1">We’ll only use your email for this feedback thread.</div>
+                      </div>
+
+                      <div class="col-12">
+                        <label class="form-label">Message <span class="req">*</span></label>
+                        <textarea id="message" class="form-control" rows="6" placeholder="Tell us what happened / what you want to see..." maxlength="1000" required></textarea>
+                        <div class="d-flex justify-content-between align-items-center mt-1">
+                          <div class="invalid-feedback d-block" id="messageErr" style="display:none;">Please add a message.</div>
+                          <div class="counter" id="charCount">0 / 1000</div>
+                        </div>
+                      </div>
+
+                      <div class="col-12">
+                        <label class="form-label">Attachments (optional)</label>
+
+                        <div id="dropzone" class="dropzone">
+                          <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                            <div>
+                              <div class="fw-semibold"><i class="bi bi-paperclip me-1"></i> Drag & drop screenshots here</div>
+                              <div class="hint mb-0">PNG/JPG/PDF — up to 3 files, 2MB each. (Demo: sent as filenames only unless you wire backend upload)</div>
+                            </div>
+                            <div>
+                              <input type="file" id="files" class="d-none" accept=".png,.jpg,.jpeg,.pdf" multiple />
+                              <button type="button" class="btn btn-outline-secondary btn-sm" id="browseBtn">
+                                <i class="bi bi-folder2-open me-1"></i> Browse
+                              </button>
+                            </div>
+                          </div>
+
+                          <div id="fileList"></div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="mt-4 d-flex flex-wrap gap-2">
+                      <button type="submit" class="btn btn-primary" id="submitBtn">
+                        <span class="btn-text"><i class="bi bi-send me-1"></i> Submit Feedback</span>
+                        <span class="btn-loading d-none"><span class="spinner-border me-2" role="status" aria-hidden="true"></span> Sending...</span>
+                      </button>
+
+                      <a href="/admin-dashboard" class="btn btn-outline-secondary">
+                        Cancel
+                      </a>
+                    </div>
+                  </form>
+                </div>
+              </div>
             </div>
 
-            <hr class="my-4" />
+            <div class="col-lg-4">
+              <div class="preview-card">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                  <div class="fw-semibold"><i class="bi bi-eye me-1"></i> Preview</div>
+                  <span class="soft-pill" id="statusPill"><i class="bi bi-circle-fill me-1" style="font-size:.6rem"></i> Draft</span>
+                </div>
 
-    
-          </form>
-        </div>
-      </div>
-    </div>
+                <div class="kv"><div class="k">Email</div><div class="v text-end" id="pvEmail">—</div></div>
+                <div class="kv"><div class="k">Type</div><div class="v text-end" id="pvType">—</div></div>
+                <div class="kv"><div class="k">Tags</div><div class="v text-end" id="pvTags">—</div></div>
+                <div class="kv"><div class="k">Severity</div><div class="v text-end" id="pvSev">—</div></div>
+                <div class="kv"><div class="k">Page</div><div class="v text-end" id="pvPage">—</div></div>
+                <div class="kv"><div class="k">OK to contact</div><div class="v text-end" id="pvOk">—</div></div>
 
-    <!-- RIGHT: LIVE PREVIEW -->
-    <div class="col-lg-4">
-      <div class="preview-card">
-        <div class="d-flex align-items-center justify-content-between mb-2">
-          <div class="fw-semibold"><i class="bi bi-eye me-1"></i> Preview</div>
-          <span class="soft-pill" id="statusPill"><i class="bi bi-circle-fill me-1" style="font-size:.6rem"></i> Draft</span>
-        </div>
+                <div class="mt-3">
+                  <div class="k muted mb-1">Message</div>
+                  <div class="p-3" style="border:1px solid var(--border); border-radius:14px; background:#fbfdff; min-height:120px; white-space:pre-wrap;" id="pvMsg">Start typing…</div>
+                </div>
 
-        <div class="kv"><div class="k">Email</div><div class="v text-end" id="pvEmail">—</div></div>
-        <div class="kv"><div class="k">Type</div><div class="v text-end" id="pvType">—</div></div>
-        <div class="kv"><div class="k">Tags</div><div class="v text-end" id="pvTags">—</div></div>
-        <div class="kv"><div class="k">Severity</div><div class="v text-end" id="pvSev">—</div></div>
-        <div class="kv"><div class="k">Page</div><div class="v text-end" id="pvPage">—</div></div>
-        <div class="kv"><div class="k">OK to contact</div><div class="v text-end" id="pvOk">—</div></div>
-
-        <div class="mt-3">
-          <div class="k muted mb-1">Message</div>
-          <div class="p-3" style="border:1px solid var(--border); border-radius:14px; background:#fbfdff; min-height:120px; white-space:pre-wrap;" id="pvMsg">Start typing…</div>
-        </div>
-
-        <div class="mt-3">
-          <div class="k muted mb-1">Attachments</div>
-          <div class="hint mb-0" id="pvFiles">—</div>
-        </div>
-
-      </div>
-    </div>
-
-        </div> <!-- .feedback-content -->
-      </div> <!-- .container-fluid -->
-    </div> <!-- .body-wrapper -->
-  </div> <!-- .page-wrapper -->
-
-<script>
-  $(document).ready(function() {
-    $("#sidebar").load("/admin/component/sidebar-component.html", function() { $.getScript('/admin/js/sidebarmenu.js'); });
-    $("#header").load("/admin/component/header-component.html");
-    // toolbar hookups
-    document.getElementById('toolbarSubmit')?.addEventListener('click', () => document.getElementById('submitBtn').click());
-    document.getElementById('toolbarClear')?.addEventListener('click', () => document.getElementById('clearBtn').click());
-  });
-
-  const form = document.getElementById("feedbackForm");
-  const successBanner = document.getElementById("successBanner");
-  const errorBanner = document.getElementById("errorBanner");
-  const errorText = document.getElementById("errorText");
-
-  const emailEl = document.getElementById("email");
-  const typeEl = document.getElementById("type");
-  const messageEl = document.getElementById("message");
-  const pageEl = document.getElementById("page");
-  const okEl = document.getElementById("okToContact");
-  const charCount = document.getElementById("charCount");
-  const severityHidden = document.getElementById("severity");
-
-  const msgErr = document.getElementById("messageErr");
-  const clearBtn = document.getElementById("clearBtn");
-  const submitBtn = document.getElementById("submitBtn");
-  const btnText = submitBtn.querySelector(".btn-text");
-  const btnLoading = submitBtn.querySelector(".btn-loading");
-
-  const tagWrap = document.getElementById("tagWrap");
-  const chips = Array.from(tagWrap.querySelectorAll(".chip"));
-
-  const sevBtns = Array.from(document.querySelectorAll(".severity-btn"));
-
-  const dropzone = document.getElementById("dropzone");
-  const browseBtn = document.getElementById("browseBtn");
-  const filesInput = document.getElementById("files");
-  const fileList = document.getElementById("fileList");
-
-  // Preview fields
-  const pvEmail = document.getElementById("pvEmail");
-  const pvType = document.getElementById("pvType");
-  const pvTags = document.getElementById("pvTags");
-  const pvSev  = document.getElementById("pvSev");
-  const pvPage = document.getElementById("pvPage");
-  const pvOk   = document.getElementById("pvOk");
-  const pvMsg  = document.getElementById("pvMsg");
-  const pvFiles= document.getElementById("pvFiles");
-  const statusPill = document.getElementById("statusPill");
-
-  const MAX_FILES = 3;
-  const MAX_MB = 2;
-  let selectedFiles = []; // local list
-
-  function setStatus(text){
-    statusPill.innerHTML = `<i class="bi bi-circle-fill me-1" style="font-size:.6rem"></i> ${text}`;
-  }
-
-  function showError(msg){
-    errorText.textContent = msg;
-    errorBanner.style.display = "block";
-    successBanner.style.display = "none";
-    errorBanner.scrollIntoView({behavior:"smooth", block:"start"});
-  }
-  function showSuccess(){
-    successBanner.style.display = "block";
-    errorBanner.style.display = "none";
-    successBanner.scrollIntoView({behavior:"smooth", block:"start"});
-    setTimeout(()=> successBanner.style.display="none", 5000);
-  }
-
-  function updateChar(){
-    charCount.textContent = `${messageEl.value.length} / 1000`;
-    pvMsg.textContent = messageEl.value.trim() ? messageEl.value : "Start typing…";
-  }
-
-  function getSelectedTags(){
-    return chips
-      .filter(ch => ch.classList.contains("active"))
-      .map(ch => ch.querySelector("input").value);
-  }
-
-  function updatePreview(){
-    pvEmail.textContent = emailEl.value || "—";
-    pvType.textContent = typeEl.value || "—";
-    const tags = getSelectedTags();
-    pvTags.textContent = tags.length ? tags.join(", ") : "—";
-    pvSev.textContent = severityHidden.value || "—";
-    pvPage.textContent = pageEl.value || "—";
-    pvOk.textContent = okEl.checked ? "Yes" : "No";
-    pvFiles.textContent = selectedFiles.length ? selectedFiles.map(f => f.name).join(", ") : "—";
-
-    const hasAnything = !!(emailEl.value || typeEl.value || messageEl.value || pageEl.value || tags.length || severityHidden.value || selectedFiles.length);
-    setStatus(hasAnything ? "Draft" : "Empty");
-  }
-
-  // Chips toggle
-  chips.forEach(chip => {
-    chip.addEventListener("click", () => {
-      chip.classList.toggle("active");
-      updatePreview();
-    });
-  });
-
-  // Severity toggle
-  sevBtns.forEach(btn => {
-    btn.addEventListener("click", () => {
-      sevBtns.forEach(b => b.classList.remove("active"));
-      if (severityHidden.value === btn.dataset.sev){
-        severityHidden.value = "";
-      } else {
-        btn.classList.add("active");
-        severityHidden.value = btn.dataset.sev;
-      }
-      updatePreview();
-    });
-  });
-
-  // File helpers (UI only)
-  function bytesToSize(bytes){
-    const mb = bytes / (1024*1024);
-    return `${mb.toFixed(2)} MB`;
-  }
-
-  function renderFiles(){
-    fileList.innerHTML = "";
-    selectedFiles.forEach((f, idx) => {
-      const div = document.createElement("div");
-      div.className = "file-item";
-      div.innerHTML = `
-        <div class="file-meta">
-          <i class="bi ${f.type.includes("pdf") ? "bi-file-earmark-pdf" : "bi-image"} fs-5"></i>
-          <div class="min-width-0">
-            <div class="file-name fw-semibold">${f.name}</div>
-            <div class="hint mb-0">${bytesToSize(f.size)}</div>
+                <div class="mt-3">
+                  <div class="k muted mb-1">Attachments</div>
+                  <div class="hint mb-0" id="pvFiles">—</div>
+                </div>
+              </div>
+            </div>
           </div>
+
         </div>
-        <button type="button" class="btn btn-outline-danger btn-sm small-btn" data-remove="${idx}">
-          <i class="bi bi-x-lg"></i>
-        </button>
-      `;
-      fileList.appendChild(div);
+      </div>
+
+      <div id="footer"></div>
+    </div>
+  </div>
+
+  <script>
+    $(document).ready(function() {
+      $("#sidebar").load("/admin/component/sidebar-component.html", function() {
+        $.getScript('/admin/js/sidebarmenu.js');
+      });
+      $("#header").load("/admin/component/header-component.html");
+      $("#footer").load("/admin/component/footer-component.html");
+
+      document.getElementById('toolbarSubmit')?.addEventListener('click', () => {
+        document.getElementById('submitBtn').click();
+      });
+
+      document.getElementById('toolbarClear')?.addEventListener('click', () => {
+        document.getElementById('clearBtn').click();
+      });
     });
 
-    fileList.querySelectorAll("[data-remove]").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const i = parseInt(btn.getAttribute("data-remove"), 10);
-        selectedFiles.splice(i, 1);
-        renderFiles();
+    const form = document.getElementById("feedbackForm");
+    const successBanner = document.getElementById("successBanner");
+    const errorBanner = document.getElementById("errorBanner");
+    const errorText = document.getElementById("errorText");
+
+    const emailEl = document.getElementById("email");
+    const typeEl = document.getElementById("type");
+    const messageEl = document.getElementById("message");
+    const pageEl = document.getElementById("page");
+    const okEl = document.getElementById("okToContact");
+    const charCount = document.getElementById("charCount");
+    const severityHidden = document.getElementById("severity");
+
+    const msgErr = document.getElementById("messageErr");
+    const clearBtn = document.getElementById("clearBtn");
+    const submitBtn = document.getElementById("submitBtn");
+    const btnText = submitBtn.querySelector(".btn-text");
+    const btnLoading = submitBtn.querySelector(".btn-loading");
+
+    const tagWrap = document.getElementById("tagWrap");
+    const chips = Array.from(tagWrap.querySelectorAll(".chip"));
+    const sevBtns = Array.from(document.querySelectorAll(".severity-btn"));
+
+    const dropzone = document.getElementById("dropzone");
+    const browseBtn = document.getElementById("browseBtn");
+    const filesInput = document.getElementById("files");
+    const fileList = document.getElementById("fileList");
+
+    const pvEmail = document.getElementById("pvEmail");
+    const pvType = document.getElementById("pvType");
+    const pvTags = document.getElementById("pvTags");
+    const pvSev  = document.getElementById("pvSev");
+    const pvPage = document.getElementById("pvPage");
+    const pvOk   = document.getElementById("pvOk");
+    const pvMsg  = document.getElementById("pvMsg");
+    const pvFiles= document.getElementById("pvFiles");
+    const statusPill = document.getElementById("statusPill");
+
+    const MAX_FILES = 3;
+    const MAX_MB = 2;
+    let selectedFiles = [];
+
+    function setStatus(text){
+      statusPill.innerHTML = `<i class="bi bi-circle-fill me-1" style="font-size:.6rem"></i> ${text}`;
+    }
+
+    function showError(msg){
+      errorText.textContent = msg;
+      errorBanner.style.display = "block";
+      successBanner.style.display = "none";
+      errorBanner.scrollIntoView({behavior:"smooth", block:"start"});
+    }
+
+    function showSuccess(){
+      successBanner.style.display = "block";
+      errorBanner.style.display = "none";
+      successBanner.scrollIntoView({behavior:"smooth", block:"start"});
+      setTimeout(() => {
+        successBanner.style.display = "none";
+      }, 5000);
+    }
+
+    function updateChar(){
+      charCount.textContent = `${messageEl.value.length} / 1000`;
+      pvMsg.textContent = messageEl.value.trim() ? messageEl.value : "Start typing…";
+    }
+
+    function getSelectedTags(){
+      return chips
+        .filter(ch => ch.classList.contains("active"))
+        .map(ch => ch.querySelector("input").value);
+    }
+
+    function updatePreview(){
+      pvEmail.textContent = emailEl.value || "—";
+      pvType.textContent = typeEl.value || "—";
+      const tags = getSelectedTags();
+      pvTags.textContent = tags.length ? tags.join(", ") : "—";
+      pvSev.textContent = severityHidden.value || "—";
+      pvPage.textContent = pageEl.value || "—";
+      pvOk.textContent = okEl.checked ? "Yes" : "No";
+      pvFiles.textContent = selectedFiles.length ? selectedFiles.map(f => f.name).join(", ") : "—";
+
+      const hasAnything = !!(emailEl.value || typeEl.value || messageEl.value || pageEl.value || tags.length || severityHidden.value || selectedFiles.length);
+      setStatus(hasAnything ? "Draft" : "Empty");
+    }
+
+    chips.forEach(chip => {
+      chip.addEventListener("click", () => {
+        chip.classList.toggle("active");
         updatePreview();
       });
     });
 
-    updatePreview();
-  }
-
-  function validateAndAddFiles(files){
-    const incoming = Array.from(files);
-    for (const f of incoming){
-      if (selectedFiles.length >= MAX_FILES){
-        showError(`You can attach up to ${MAX_FILES} files.`);
-        break;
-      }
-      const sizeMb = f.size / (1024*1024);
-      if (sizeMb > MAX_MB){
-        showError(`"${f.name}" is larger than ${MAX_MB}MB.`);
-        continue;
-      }
-      const okType = /image\/(png|jpeg)|application\/pdf/.test(f.type);
-      if (!okType){
-        showError(`"${f.name}" type not allowed. Use PNG/JPG/PDF only.`);
-        continue;
-      }
-      selectedFiles.push(f);
-    }
-    renderFiles();
-  }
-
-  browseBtn.addEventListener("click", () => filesInput.click());
-  filesInput.addEventListener("change", (e) => validateAndAddFiles(e.target.files));
-
-  // Drag n drop UI
-  ["dragenter","dragover"].forEach(evt => {
-    dropzone.addEventListener(evt, (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      dropzone.classList.add("drag");
+    sevBtns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        sevBtns.forEach(b => b.classList.remove("active"));
+        if (severityHidden.value === btn.dataset.sev){
+          severityHidden.value = "";
+        } else {
+          btn.classList.add("active");
+          severityHidden.value = btn.dataset.sev;
+        }
+        updatePreview();
+      });
     });
-  });
-  ["dragleave","drop"].forEach(evt => {
-    dropzone.addEventListener(evt, (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      dropzone.classList.remove("drag");
-    });
-  });
-  dropzone.addEventListener("drop", (e) => validateAndAddFiles(e.dataTransfer.files));
 
-  // Live updates
-  [emailEl, typeEl, pageEl].forEach(el => el.addEventListener("input", updatePreview));
-  okEl.addEventListener("change", updatePreview);
-  messageEl.addEventListener("input", () => { updateChar(); updatePreview(); });
-
-  updateChar();
-  updatePreview();
-
-  // Clear
-  clearBtn.addEventListener("click", () => {
-    form.reset();
-    msgErr.style.display = "none";
-    severityHidden.value = "";
-    sevBtns.forEach(b => b.classList.remove("active"));
-    chips.forEach(c => c.classList.remove("active"));
-    selectedFiles = [];
-    renderFiles();
-    updateChar();
-    updatePreview();
-    successBanner.style.display = "none";
-    errorBanner.style.display = "none";
-    setStatus("Empty");
-  });
-
-  // Submit
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    msgErr.style.display = "none";
-    successBanner.style.display = "none";
-    errorBanner.style.display = "none";
-
-    const email = emailEl.value.trim();
-    const type = typeEl.value.trim();
-    const message = messageEl.value.trim();
-
-    let valid = true;
-    if (!emailEl.checkValidity()){ emailEl.classList.add("is-invalid"); valid = false; }
-    else emailEl.classList.remove("is-invalid");
-
-    if (!type){ typeEl.classList.add("is-invalid"); valid = false; }
-    else typeEl.classList.remove("is-invalid");
-
-    if (!message){
-      msgErr.style.display = "block";
-      valid = false;
+    function bytesToSize(bytes){
+      const mb = bytes / (1024 * 1024);
+      return `${mb.toFixed(2)} MB`;
     }
 
-    if (!valid) {
-      showError("Please fill the required fields correctly.");
-      return;
-    }
-
-    // UI loading state
-    submitBtn.disabled = true;
-    btnText.classList.add("d-none");
-    btnLoading.classList.remove("d-none");
-
-    try{
-      const payload = {
-        email,
-        type,
-        message,
-        page: pageEl.value.trim() || null,
-        severity: severityHidden.value || null,
-        tags: getSelectedTags(),
-        okToContact: okEl.checked,
-        attachments: selectedFiles.map(f => ({ name: f.name, size: f.size, type: f.type })) // UI-only metadata
-      };
-
-      const res = await fetch("/api/feedback", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
+    function renderFiles(){
+      fileList.innerHTML = "";
+      selectedFiles.forEach((f, idx) => {
+        const div = document.createElement("div");
+        div.className = "file-item";
+        div.innerHTML = `
+          <div class="file-meta">
+            <i class="bi ${f.type.includes("pdf") ? "bi-file-earmark-pdf" : "bi-image"} fs-5"></i>
+            <div class="min-width-0">
+              <div class="file-name fw-semibold">${f.name}</div>
+              <div class="hint mb-0">${bytesToSize(f.size)}</div>
+            </div>
+          </div>
+          <button type="button" class="btn btn-outline-danger btn-sm small-btn" data-remove="${idx}">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        `;
+        fileList.appendChild(div);
       });
 
-      if (!res.ok){
-        const t = await res.text().catch(()=> "");
-        throw new Error(t || "Server error");
+      fileList.querySelectorAll("[data-remove]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const i = parseInt(btn.getAttribute("data-remove"), 10);
+          selectedFiles.splice(i, 1);
+          renderFiles();
+          updatePreview();
+        });
+      });
+
+      updatePreview();
+    }
+
+    function validateAndAddFiles(files){
+      const incoming = Array.from(files);
+      for (const f of incoming){
+        if (selectedFiles.length >= MAX_FILES){
+          showError(`You can attach up to ${MAX_FILES} files.`);
+          break;
+        }
+        const sizeMb = f.size / (1024 * 1024);
+        if (sizeMb > MAX_MB){
+          showError(`"${f.name}" is larger than ${MAX_MB}MB.`);
+          continue;
+        }
+        const okType = /image\/(png|jpeg)|application\/pdf/.test(f.type);
+        if (!okType){
+          showError(`"${f.name}" type not allowed. Use PNG/JPG/PDF only.`);
+          continue;
+        }
+        selectedFiles.push(f);
       }
+      renderFiles();
+    }
 
-      showSuccess();
-      setStatus("Sent");
+    browseBtn.addEventListener("click", () => filesInput.click());
+    filesInput.addEventListener("change", (e) => validateAndAddFiles(e.target.files));
 
-      // Reset form after submit
+    ["dragenter","dragover"].forEach(evt => {
+      dropzone.addEventListener(evt, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropzone.classList.add("drag");
+      });
+    });
+
+    ["dragleave","drop"].forEach(evt => {
+      dropzone.addEventListener(evt, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropzone.classList.remove("drag");
+      });
+    });
+
+    dropzone.addEventListener("drop", (e) => validateAndAddFiles(e.dataTransfer.files));
+
+    [emailEl, typeEl, pageEl].forEach(el => el.addEventListener("input", updatePreview));
+    okEl.addEventListener("change", updatePreview);
+    messageEl.addEventListener("input", () => {
+      updateChar();
+      updatePreview();
+    });
+
+    updateChar();
+    updatePreview();
+
+    clearBtn.addEventListener("click", () => {
       form.reset();
+      msgErr.style.display = "none";
       severityHidden.value = "";
       sevBtns.forEach(b => b.classList.remove("active"));
       chips.forEach(c => c.classList.remove("active"));
@@ -742,31 +667,100 @@
       renderFiles();
       updateChar();
       updatePreview();
-    } catch(err){
-      console.error(err);
-      showError("Failed to send feedback. Please try again.");
-    } finally {
-      submitBtn.disabled = false;
-      btnLoading.classList.add("d-none");
-      btnText.classList.remove("d-none");
-    }
-  });
-</script>
+      successBanner.style.display = "none";
+      errorBanner.style.display = "none";
+      setStatus("Empty");
+      emailEl.classList.remove("is-invalid");
+      typeEl.classList.remove("is-invalid");
+    });
 
-      </div>
-        </div>
-      <div id="footer"></div>
-    </div>
-  </div>
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      msgErr.style.display = "none";
+      successBanner.style.display = "none";
+      errorBanner.style.display = "none";
 
-<script>
-  $(document).ready(function() {
-    // Load sidebar/header/footer components
-    $("#sidebar").load("/admin/component/sidebar-component.html", function() { $.getScript('/admin/js/sidebarmenu.js'); });
-    $("#header").load("/admin/component/header-component.html");
-    $("#footer").load("/admin/component/footer-component.html");
-  });
-</script>
+      const email = emailEl.value.trim();
+      const type = typeEl.value.trim();
+      const message = messageEl.value.trim();
 
+      let valid = true;
+
+      if (!emailEl.checkValidity()){
+        emailEl.classList.add("is-invalid");
+        valid = false;
+      } else {
+        emailEl.classList.remove("is-invalid");
+      }
+
+      if (!type){
+        typeEl.classList.add("is-invalid");
+        valid = false;
+      } else {
+        typeEl.classList.remove("is-invalid");
+      }
+
+      if (!message){
+        msgErr.style.display = "block";
+        valid = false;
+      }
+
+      if (!valid) {
+        showError("Please fill the required fields correctly.");
+        return;
+      }
+
+      submitBtn.disabled = true;
+      btnText.classList.add("d-none");
+      btnLoading.classList.remove("d-none");
+
+      try{
+        const payload = {
+          email,
+          type,
+          message,
+          page: pageEl.value.trim() || null,
+          severity: severityHidden.value || null,
+          tags: getSelectedTags(),
+          okToContact: okEl.checked,
+          attachments: selectedFiles.map(f => ({
+            name: f.name,
+            size: f.size,
+            type: f.type
+          }))
+        };
+
+        const res = await fetch("/api/feedback", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok){
+          const t = await res.text().catch(() => "");
+          throw new Error(t || "Server error");
+        }
+
+        showSuccess();
+        setStatus("Sent");
+
+        form.reset();
+        severityHidden.value = "";
+        sevBtns.forEach(b => b.classList.remove("active"));
+        chips.forEach(c => c.classList.remove("active"));
+        selectedFiles = [];
+        renderFiles();
+        updateChar();
+        updatePreview();
+      } catch(err){
+        console.error(err);
+        showError("Failed to send feedback. Please try again.");
+      } finally {
+        submitBtn.disabled = false;
+        btnLoading.classList.add("d-none");
+        btnText.classList.remove("d-none");
+      }
+    });
+  </script>
 </body>
 </html>
