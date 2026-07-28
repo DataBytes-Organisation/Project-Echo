@@ -26,13 +26,9 @@ In order to ensure clarity and ease of locating files within our project, we hav
 
 Initially, we have implemented distinct subdirectories for research and documentation purposes. This separation allows for efficient management of project-related materials and facilitates easy access when needed.
 
-Furthermore, within our file structure, we have introduced the 'src' folder, which serves as the repository for our source code. Within the 'src' folder, you will find subdirectories dedicated to components and prototypes. These subdivisions aid in categorizing and managing our source code effectively.
+Furthermore, within our file structure, we have introduced the 'src' folder, which serves as the repository for our source code. Within the 'src' folder, `components/` holds one subdirectory per microservice (api, engine, hmi, iot, mongodb, mqtt-server, simulator, store, data_scripts) — each owned by its respective team and following the FastAPI-style layout used by the api service as its reference. All folder names are lowercase by convention.
 
-Additionally, within the components and prototypes subdirectories, you will discover individual folders corresponding to the specific components of our project. This granular classification ensures that each aspect of our project is appropriately organized and accessible.
-
-By maintaining this structured file hierarchy, we aim to enhance our productivity and collaboration while minimizing confusion and time wastage in locating essential files.
-
-![Project Echo File Structure](https://github.com/DataBytes-Organisation/Project-Echo/assets/95070150/e8aaf728-c80f-42c1-af07-40651438c002)
+By maintaining this structured file hierarchy, we aim to enhance our productivity and collaboration while minimizing confusion and time wastage in locating essential files. See the [Full Directory Tree](#full-directory-tree) section below.
 
 ## Installation Guide
 
@@ -118,12 +114,12 @@ python code:
 
 ```bash
 import os
-import Echo
+import echo
 
 path_to_raw_audio_file = '/path/to/your/audio_file.mp3'
 
-my_model = Echo.load_model()
-classification = Echo.predict(my_model, path_to_raw_audio_file, traverse_path=False)
+my_model = echo.load_model()
+classification = echo.predict(my_model, path_to_raw_audio_file, traverse_path=False)
 
 print(classification)
 ```
@@ -134,7 +130,7 @@ To analyze all audio files in a directory, use:
 ```bash
 path_to_audio_directory = '/path/to/your/audio_directory/'
 
-classification = Echo.predict(my_model, path_to_audio_directory, traverse_path=True)
+classification = echo.predict(my_model, path_to_audio_directory, traverse_path=True)
 print(classification)
 ```
 
@@ -214,19 +210,68 @@ This will reduce errors caused by manual installation of conflicting dependency 
   numba>=0.56.0
 
 ```
-## Repository File Structure
+## Full Directory Tree
 
-We have organized the repository to streamline collaboration and ease of access:
+```
+Project-Echo/
+├── README.md                      - Project overview and usage guide
+├── requirements.txt               - Python package dependencies
+├── setup.py                       - Python package setup (echo pkg under src/production/infrastructure)
+│
+├── src/                           - All source code
+│   ├── production/                - Active production/runtime code
+│   │   ├── backend/               - FastAPI backend; app/{routers,services,middleware}
+│   │   │                            is the reference layout new services should mirror
+│   │   ├── engine/                - ML inference engine
+│   │   ├── hmi/                   - Frontend (Node.js/Express), served on port 3000
+│   │   ├── iot/                   - Edge device clients and onboarding
+│   │   ├── simulator/             - Synthetic sensor data simulator
+│   │   └── infrastructure/        - Shared infra & support: mongodb/, mqtt-server/,
+│   │                                store/, echo/ (installable pip package)
+│   │
+│   ├── prototypes/                - Experimental, research, non-production work
+│   │   ├── backend/               - Backend experiments
+│   │   ├── engine/                - Engine research: benchmarking/ (+ pytorch, augmentation,
+│   │   │                            event_detection, weather_noise, ensemble_overlap)
+│   │   ├── hmi/                   - HMI prototypes
+│   │   ├── iot/                   - IoT prototypes
+│   │   ├── simulator/             - Simulator prototypes
+│   │   └── computer_vision/       - CV research/prototypes
+│   │
+│   ├── data_tools/                - Data processing, inventory, and helper scripts
+│   │   ├── data_scripts/          - Movement/vegetation analysis scripts
+│   │   ├── training/              - TensorFlow training scripts
+│   │   └── utils/                 - Utility and file-indexing scripts
+│   │
+│   ├── deployment/                - Deployment assets, separated from source code
+│   │   ├── docker/                - docker-compose*.yml, dockerScript.py, package.json
+│   │   └── kubernetes/            - Kubernetes deployment files (consolidation pending)
+│   │
+│   └── tests/                     - Unit, integration, or system tests (placeholder)
+│
+├── docs/                          - Documentation
+│   ├── architecture/              - System structure & design (Engine_Documentation.md,
+│   │                                PORTS.md, Dockerfile_Optimization_Guide.md,
+│   │                                REPOSITORY_OWNERSHIP.md)
+│   ├── team-guides/               - Onboarding & usage (INSTALL.md, REQUIREMENTS.md,
+│   │                                sprints/, tasks/)
+│   └── research/                  - Literature reviews, research notes, experiments/
+│
+├── tutorials/                     - Learning guides and step-by-step instructions
+│
+└── models-and-data/               - Models & datasets (target: DVC/external, not normal Git;
+    ├── weather/                     git-tracked samples/fixtures live here for now)
+    ├── samples/                   - Sample audio/CSV fixtures used across teams
+    ├── test_fixtures/             - Fixtures for manual/API testing
+    ├── assets/                    - Submission/design artifacts (zips, overview html/json)
+    └── design/                    - System design documents and diagrams
+```
 
-- **`Design/`**: Contains design documents and diagrams.
-- **`Echo/`**: The core package implementation.
-- **`Requirements/`**: Dependency-related files (`requirements.txt`, `setup.py`).
-- **`Research/`**: Reports, datasets, and experiment results.
-- **`src/`**: Source code for various project components.
-- **`Tutorials/`**: Example usage notebooks.
+All folder names are lowercase by convention. Large local-only artifacts
+(model weights, mel-spectrogram caches, legacy prototype work formerly
+under `src/Archive`) live under the gitignored `.data/` folder rather
+than in the tracked tree above.
 
 ---
 
 *This README document provides an overview of Project Echo, an academic initiative at Deakin University during Trimester 1 of 2024. It outlines the project's goals, structure, evaluation criteria, support mechanisms, and feedback processes.*
-
-

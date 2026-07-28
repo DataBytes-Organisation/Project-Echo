@@ -4,12 +4,12 @@ on:
   push:
     branches: [ "main", "fix/reduce_docker_size" ]
     paths:
-      - 'src/Components/**/*'
+      - 'src/**/*'
       - '.github/workflows/**/*'
   pull_request:
     branches: [ "main" ]
     paths:
-      - 'src/Components/**/*'
+      - 'src/**/*'
 
 jobs:
   build:
@@ -44,12 +44,12 @@ jobs:
     
     - name: Build containers
       run: |
-        cd src/Components
+        cd src/deployment/docker
         docker compose -f docker-compose.test.yml build --no-cache --force-rm
         
     - name: Start containers
       run: |
-        cd src/Components
+        cd src/deployment/docker
         docker compose -f docker-compose.test.yml up -d
     
     - name: Wait for containers to be ready
@@ -57,16 +57,25 @@ jobs:
       
     - name: Check running containers
       run: |
-        cd src/Components
-        RUNNING_CONTAINERS=$(docker-compose ps | grep 'Up' | wc -l)
+        cd src/deployment/docker
+        RUNNING_CONTAINERS=$(docker compose -f docker-compose.test.yml ps | grep -c 'Up')
         if [ "$RUNNING_CONTAINERS" -eq 9 ]; then
           echo "All containers are up and running."
         else
           echo "Expected 9 running containers, but found $RUNNING_CONTAINERS. Failing."
+          echo "===================== DIAGNOSTICS ====================="
+          echo "----- docker compose ps -a (all container states) -----"
+          docker compose -f docker-compose.test.yml ps -a || docker-compose ps
+          echo "----- disk usage (df -h) -----"
+          df -h
+          echo "----- per-container logs (tail 60) -----"
+          docker compose -f docker-compose.test.yml logs --tail 60 || docker-compose logs --tail 60
+          echo "======================================================="
           exit 1
         fi
   
     - name: Stop and remove containers
+      if: always()
       run: |
-        cd src/Components
-        docker-compose down
+        cd src/deployment/docker
+        docker compose -f docker-compose.test.yml down --remove-orphans
