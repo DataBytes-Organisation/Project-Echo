@@ -976,7 +976,7 @@ function createBasemap(hmiState) {
 
 async function fetchWeatherData(timestamp, lat, lon) {
   const response = await fetch(
-    `http://localhost:9001/hmi/weather?timestamp=${timestamp}&lat=${lat}&lon=${lon}`
+    `http://localhost:9000/hmi/weather?timestamp=${timestamp}&lat=${lat}&lon=${lon}`
   );
   if (!response.ok) throw new Error("Failed to fetch weather data");
   return response.json();

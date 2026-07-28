@@ -22,8 +22,8 @@ services:
 
   echo_engine:
     build:
-      context: ../Prototypes/engine/torch_impl
-      dockerfile: light_engine.Dockerfile
+      context: ./Engine
+      dockerfile: Engine.Dockerfile
     image: ts-echo-engine
     container_name: ts-echo-engine-cont
     networks:
@@ -56,8 +56,11 @@ services:
     stdin_open: true
     tty: true
     environment:
-      - NODE_ENV=development
-      - API_HOST=ts-api-cont
+    - NODE_ENV=development
+    - API_HOST=ts-api-cont
+    - DB_HOST=echo_store
+    - MONGODB_URI=mongodb://root:root_password@echo_store:27017/EchoNet?authSource=admin
+    - MONGO_URI=mongodb://root:root_password@echo_store:27017/UserSample?authSource=admin
 
 
   echo_mqtt:

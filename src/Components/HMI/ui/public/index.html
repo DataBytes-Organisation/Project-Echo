@@ -122,7 +122,7 @@
       <div class="row main bg-black" style="padding: 0px !important;">
         <div class="col-md-12 col-main" style="padding: 0px !important;">
 
-          <div id="basemap"></div>
+          <div id="basemap" class="map_view"></div>
 
           <div id="editFormWrapper">
             <form id="editForm">
@@ -716,7 +716,7 @@
         function loadSelectedAnimalsFromBackend() {
           const token  = localStorage.getItem('token');
           const userId = localStorage.getItem('userId');
-          const backendUrl = 'http://localhost:9001';
+          const backendUrl = 'http://localhost:9000';
 
           fetch(`${backendUrl}/hmi/users/${userId}/notifications`, {
             method: 'GET',
@@ -812,7 +812,7 @@
         function saveNotificationToBackend(animal) {
           const token  = localStorage.getItem('token');
           const userId = localStorage.getItem('userId');
-          const backendUrl = 'http://localhost:9001';
+          const backendUrl = 'http://localhost:9000';
 
           fetch(`${backendUrl}/hmi/users/${userId}/notifications`, {
             method: 'POST',
@@ -846,7 +846,7 @@
         function removeNotificationFromBackend(animal) {
           const token  = localStorage.getItem('token');
           const userId = localStorage.getItem('userId');
-          const backendUrl = 'http://localhost:9001';
+          const backendUrl = 'http://localhost:9000';
 
           fetch(`${backendUrl}/hmi/users/${userId}/notifications/${animal.species}`, {
             method: 'DELETE',
