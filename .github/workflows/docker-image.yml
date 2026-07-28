@@ -58,7 +58,7 @@ jobs:
     - name: Check running containers
       run: |
         cd src/deployment/docker
-        RUNNING_CONTAINERS=$(docker-compose ps | grep 'Up' | wc -l)
+        RUNNING_CONTAINERS=$(docker compose -f docker-compose.test.yml ps | grep -c 'Up')
         if [ "$RUNNING_CONTAINERS" -eq 9 ]; then
           echo "All containers are up and running."
         else
@@ -75,6 +75,7 @@ jobs:
         fi
   
     - name: Stop and remove containers
+      if: always()
       run: |
         cd src/deployment/docker
-        docker-compose down
+        docker compose -f docker-compose.test.yml down --remove-orphans
