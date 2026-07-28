@@ -2867,3 +2867,45 @@ z-index: 1;
 #animalNotifications .node-status {
   font-weight: 600;
 }
+
+/* spectrogram  */
+
+  #spectrogram-container {
+    position: relative;
+    width: 100%;
+    height: 150px;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+  #spectrogram-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  #spectrogram-playhead {
+    position: absolute;
+    top: 0;
+    width: 2px;
+    height: 100%;
+    background: white;
+    pointer-events: none;
+  }
+  #spectrogram-play-btn {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 50px;
+    height: 100%;
+    background: rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3;
+    cursor: pointer;
+  }
+  #spectrogram-play-btn::after {
+    content: '';
+    border-left: 18px solid white;
+    border-top: 11px solid transparent;
+    border-bottom: 11px solid transparent;
+  }
