@@ -63,6 +63,14 @@ jobs:
           echo "All containers are up and running."
         else
           echo "Expected 9 running containers, but found $RUNNING_CONTAINERS. Failing."
+          echo "===================== DIAGNOSTICS ====================="
+          echo "----- docker compose ps -a (all container states) -----"
+          docker compose -f docker-compose.test.yml ps -a || docker-compose ps
+          echo "----- disk usage (df -h) -----"
+          df -h
+          echo "----- per-container logs (tail 60) -----"
+          docker compose -f docker-compose.test.yml logs --tail 60 || docker-compose logs --tail 60
+          echo "======================================================="
           exit 1
         fi
   
