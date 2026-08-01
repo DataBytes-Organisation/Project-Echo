@@ -1,8 +1,9 @@
+import logging
 import os
 # from Components.API.app.routers import add_csv_output_option, audio_upload_router
 from .routers import add_csv_output_option, audio_upload_router
 
-from fastapi import FastAPI, Body, HTTPException, status, APIRouter
+from fastapi import FastAPI, Body, HTTPException, status, APIRouter, Request
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import species_predictor
 from app.routers import auth_router
@@ -16,6 +17,7 @@ from app.routers import insights
 import datetime
 import pymongo
 import json 
+from pymongo.errors import ConnectionFailure, ExecutionTimeout
 
 from app.routers import hmi, engine, sim, two_factor
 from app.routers import public
@@ -58,6 +60,28 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+logger = logging.getLogger(__name__)
+
+
+async def database_unavailable_handler(request: Request, exc: Exception):
+    logger.warning(
+        "Database unavailable for %s %s (%s)",
+        request.method,
+        request.url.path,
+        exc.__class__.__name__,
+    )
+    return JSONResponse(
+        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+        content={
+            "error": "Database Unavailable",
+            "message": "The database is temporarily unavailable. Please try again later.",
+        },
+    )
+
+
+app.add_exception_handler(ConnectionFailure, database_unavailable_handler)
+app.add_exception_handler(ExecutionTimeout, database_unavailable_handler)
 
 
 # app.include_router(hmi.router, tags=['hmi'], prefix='/hmi')

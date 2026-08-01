@@ -5,6 +5,13 @@ import datetime
 import time
 # import mongoose
 
+MONGODB_TIMEOUT_MS = int(os.getenv("MONGODB_TIMEOUT_MS", "3000"))
+MONGODB_CLIENT_OPTIONS = {
+    "serverSelectionTimeoutMS": MONGODB_TIMEOUT_MS,
+    "connectTimeoutMS": MONGODB_TIMEOUT_MS,
+    "socketTimeoutMS": MONGODB_TIMEOUT_MS,
+}
+
 # prefer environment variable inside containers; fallback to service hostname (EchoNet DB)
 # legacy (kept for reference):
 # connection_string = "mongodb://modelUser:EchoNetAccess2023@ts-mongodb-cont:27017/EchoNet"
@@ -12,7 +19,7 @@ connection_string = os.getenv(
     "MONGODB_URI",
     "mongodb://modelUser:EchoNetAccess2023@ts-mongodb-cont:27017/EchoNet",
 )
-client = pymongo.MongoClient(connection_string)
+client = pymongo.MongoClient(connection_string, **MONGODB_CLIENT_OPTIONS)
 db = client["EchoNet"]
 # db = client['mydatabase']
 Events = db.events
@@ -41,7 +48,10 @@ User_connection_string = os.getenv(
     "USER_MONGODB_URI",
     "mongodb://root:root_password@ts-mongodb-cont/UserSample?authSource=admin",
 )
-Userclient = pymongo.MongoClient(User_connection_string)
+Userclient = pymongo.MongoClient(
+    User_connection_string,
+    **MONGODB_CLIENT_OPTIONS,
+)
 Userdb = Userclient['UserSample']
 User = Userdb.users
 Role = Userdb.roles
