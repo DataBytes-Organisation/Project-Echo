@@ -1,5 +1,11 @@
 //API to handle audio recording 
-export function getAudioRecorder(){
+export function getAudioRecorder(options = {}){
+
+const browserGetUserMedia = globalThis.navigator?.mediaDevices?.getUserMedia
+    ? globalThis.navigator.mediaDevices.getUserMedia.bind(globalThis.navigator.mediaDevices)
+    : null;
+const getUserMedia = options.getUserMedia || browserGetUserMedia;
+const MediaRecorderClass = options.MediaRecorderClass || globalThis.MediaRecorder;
 
 var audioRecorder = {
 
@@ -8,42 +14,28 @@ var audioRecorder = {
     streamBeingCaptured: null, 
 
     start: function () {
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)({sampleRate:48000});
-
-        if (!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)) {
+        if (!getUserMedia || !MediaRecorderClass) {
             return Promise.reject(new Error('mediaDevices API or getUserMedia method is not supported in this browser.'));
         }
 
         else {
             
-            return navigator.mediaDevices.getUserMedia({ audio: true })
+            return getUserMedia({ audio: true })
                 .then(stream => {
                     audioRecorder.streamBeingCaptured = stream;
-                    audioRecorder.mediaRecorder = new MediaRecorder(stream);
-
-                    console.log(audioRecorder.mediaRecorder.audioBitsPerSecond)
-
-                    audioRecorder.audioBlobs = [];
-
-                    audioRecorder.mediaRecorder.addEventListener("dataavailable", event => {
-                        audioRecorder.audioBlobs.push(event.data);
-                    });
-                    
-                    audioRecorder.mediaRecorder.addEventListener("stop", () => {
-      
-                        const audioBlob = new Blob(audioRecorder.audioBlobs);
-                        
-                        var buf = audioRecorder.resample(audioBlob);
-                        
-                        const audioUrl = URL.createObjectURL(audioBlob);
-                  
-                        const audio = new Audio(audioUrl);
-                        audio.play();
-                    });
-
-                    audioRecorder.mediaRecorder.start();
-                })
-                .catch(err => console.error("Error accessing microphone: ", err));
+                    try {
+                        audioRecorder.mediaRecorder = new MediaRecorderClass(stream);
+                        audioRecorder.audioBlobs = [];
+                        audioRecorder.mediaRecorder.addEventListener("dataavailable", event => {
+                            audioRecorder.audioBlobs.push(event.data);
+                        });
+                        audioRecorder.mediaRecorder.start();
+                    } catch (error) {
+                        audioRecorder.stopStream();
+                        audioRecorder.resetRecordingProperties();
+                        throw error;
+                    }
+                });
         }
     },
 
@@ -218,27 +210,36 @@ var audioRecorder = {
       },
 
     stop: function () {
-        return new Promise(resolve => {
-            let mimeType = 'audio/wav; codecs=MS_PCM'
-            //let mimeType = audioRecorder.mediaRecorder.mimeType;
-
-            audioRecorder.mediaRecorder.addEventListener("stop", () => {
-                let audioBlob = new Blob(audioRecorder.audioBlobs, { type: mimeType });
-                resolve(audioBlob);
-            });
-            audioRecorder.cancel();
+        return new Promise((resolve, reject) => {
+            const recorder = audioRecorder.mediaRecorder;
+            if (!recorder) {
+                reject(new Error("No audio recording is active."));
+                return;
+            }
+            const mimeType = recorder.mimeType || audioRecorder.audioBlobs[0]?.type || "audio/webm";
+            recorder.addEventListener("stop", () => {
+                resolve(new Blob(audioRecorder.audioBlobs, { type: mimeType }));
+            }, { once: true });
+            recorder.stop();
+            audioRecorder.stopStream();
+            audioRecorder.resetRecordingProperties();
         });
     },
 
     cancel: function () {
-        audioRecorder.mediaRecorder.stop();
+        if (audioRecorder.mediaRecorder && audioRecorder.mediaRecorder.state !== "inactive") {
+            audioRecorder.mediaRecorder.stop();
+        }
         audioRecorder.stopStream();
         audioRecorder.resetRecordingProperties();
+        audioRecorder.audioBlobs = [];
     },
 
     stopStream: function () {
-        audioRecorder.streamBeingCaptured.getTracks() 
-            .forEach(track => track.stop()); 
+        if (audioRecorder.streamBeingCaptured) {
+            audioRecorder.streamBeingCaptured.getTracks()
+                .forEach(track => track.stop());
+        }
     },
 
     resetRecordingProperties: function () {
