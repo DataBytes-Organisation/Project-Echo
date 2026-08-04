@@ -50,3 +50,15 @@ From the repository root:
 
 ```bash
 ./tests/load/run-load-tests.sh
+## Stress-test result
+
+The retrieval stress test sent 4,200 requests and reached a configured traffic spike of 100 users per second.
+
+- 4,200 successful responses
+- 0 failed virtual users
+- Mean latency: 4.5 ms
+- P95 latency: 10.1 ms
+- P99 latency: 21.1 ms
+- Maximum latency: 79 ms
+
+No clear bottleneck was identified at this load level. Further breaking-point testing and continuous CPU and memory monitoring are required to determine the maximum sustainable throughput.
