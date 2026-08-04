@@ -1,0 +1,35 @@
+name: Docker Build Check
+
+on:
+  push:
+    branches:
+      - "**"
+    paths:
+      - "src/**"
+      - ".github/workflows/docker-build-check.yml"
+
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "src/**"
+      - ".github/workflows/docker-build-check.yml"
+
+jobs:
+  docker-build:
+    name: Verify Docker Image Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Display Docker versions
+        run: |
+          docker --version
+          docker compose version
+
+      - name: Build Docker images
+        working-directory: src/deployment/docker
+        run: |
+          docker compose -f docker-compose.test.yml build --no-cache --force-rm
