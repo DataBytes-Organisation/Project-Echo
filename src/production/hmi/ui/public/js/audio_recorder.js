@@ -6,17 +6,21 @@
  * stop() returns { blob, samples, sampleRate, mimeType }
  */
 export function getAudioRecorder() {
+  const MAX_RECORDING_SECONDS = 20;
+
   const audioRecorder = {
     audioBlobs: [],
     streamBeingCaptured: null,
     discardChunks: false,
     isRecording: false,
+    isStarting: false,
     audioContext: null,
     scriptProcessor: null,
     mediaStreamSource: null,
     muteGain: null,
     mediaRecorder: null,
     pcmChunks: [],
+    ownedStreams: new Set(),
     sampleRate: 44100,
     recorderMimeType: "audio/webm",
 
@@ -29,11 +33,15 @@ export function getAudioRecorder() {
         );
       }
 
-      if (audioRecorder.isRecording) {
+      if (audioRecorder.isRecording || audioRecorder.isStarting) {
         return Promise.reject(new Error("Recording already in progress"));
       }
 
+      // Lock immediately to prevent concurrent getUserMedia() calls.
+      audioRecorder.isStarting = true;
+
       return navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
+        audioRecorder.ownedStreams.add(stream);
         audioRecorder.streamBeingCaptured = stream;
         audioRecorder.audioBlobs = [];
         audioRecorder.pcmChunks = [];
@@ -93,6 +101,7 @@ export function getAudioRecorder() {
         const finishStart = () => {
           setupPcmGraph();
           audioRecorder.isRecording = true;
+          audioRecorder.isStarting = false;
         };
 
         if (ctx.state === "suspended") {
@@ -100,12 +109,20 @@ export function getAudioRecorder() {
         }
         finishStart();
       }).catch((err) => {
+        audioRecorder.isStarting = false;
         audioRecorder.isRecording = false;
         audioRecorder.cleanupGraph();
-        audioRecorder.stopStream();
+        audioRecorder.stopAllOwnedStreams();
         audioRecorder.resetRecordingProperties();
         throw err;
       });
+    },
+
+    clampSamplesToMax: function (samples, sampleRate) {
+      if (!samples || samples.length === 0) return samples;
+      const maxSamples = Math.floor(sampleRate * MAX_RECORDING_SECONDS);
+      if (samples.length <= maxSamples) return samples;
+      return samples.slice(0, maxSamples);
     },
 
     mergePcmChunks: function () {
@@ -179,6 +196,11 @@ export function getAudioRecorder() {
 
     stop: function () {
       return new Promise((resolve, reject) => {
+        if (audioRecorder.isStarting) {
+          reject(new Error("Recording is still starting"));
+          return;
+        }
+
         if (!audioRecorder.isRecording) {
           reject(new Error("No active recording"));
           return;
@@ -194,13 +216,14 @@ export function getAudioRecorder() {
           try {
             const samples = audioRecorder.mergePcmChunks();
             const rate = audioRecorder.sampleRate;
+            const clampedSamples = audioRecorder.clampSamplesToMax(samples, rate);
 
             // Always prefer WAV from PCM for the native <audio> player.
             // MediaRecorder webm chunks are often incomplete on stop and grey out the player.
             let playbackBlob = null;
             let mimeType = "audio/wav";
-            if (samples.length > 0) {
-              playbackBlob = audioRecorder.encodeWavBlob(samples, rate);
+            if (clampedSamples.length > 0) {
+              playbackBlob = audioRecorder.encodeWavBlob(clampedSamples, rate);
               mimeType = "audio/wav";
             } else if (audioRecorder.audioBlobs.length > 0) {
               mimeType =
@@ -211,7 +234,7 @@ export function getAudioRecorder() {
             }
 
             audioRecorder.cleanupGraph();
-            audioRecorder.stopStream();
+            audioRecorder.stopAllOwnedStreams();
             audioRecorder.pcmChunks = [];
             audioRecorder.resetRecordingProperties();
 
@@ -223,13 +246,13 @@ export function getAudioRecorder() {
             audioRecorder.audioBlobs = [playbackBlob];
             resolve({
               blob: playbackBlob,
-              samples: samples,
+              samples: clampedSamples,
               sampleRate: rate,
               mimeType: mimeType,
             });
           } catch (err) {
             audioRecorder.cleanupGraph();
-            audioRecorder.stopStream();
+            audioRecorder.stopAllOwnedStreams();
             audioRecorder.resetRecordingProperties();
             reject(err);
           }
@@ -247,6 +270,7 @@ export function getAudioRecorder() {
     cancel: function () {
       audioRecorder.discardChunks = true;
       audioRecorder.isRecording = false;
+      audioRecorder.isStarting = false;
       audioRecorder.audioBlobs = [];
       audioRecorder.pcmChunks = [];
 
@@ -256,8 +280,19 @@ export function getAudioRecorder() {
       }
 
       audioRecorder.cleanupGraph();
-      audioRecorder.stopStream();
+      audioRecorder.stopAllOwnedStreams();
       audioRecorder.resetRecordingProperties();
+    },
+
+    stopAllOwnedStreams: function () {
+      audioRecorder.ownedStreams.forEach((stream) => {
+        try {
+          stream.getTracks().forEach((track) => track.stop());
+        } catch (_err) {
+          /* ignore */
+        }
+      });
+      audioRecorder.ownedStreams.clear();
     },
 
     stopStream: function () {
@@ -268,6 +303,7 @@ export function getAudioRecorder() {
     resetRecordingProperties: function () {
       audioRecorder.streamBeingCaptured = null;
       audioRecorder.mediaRecorder = null;
+      audioRecorder.isStarting = false;
     },
   };
 

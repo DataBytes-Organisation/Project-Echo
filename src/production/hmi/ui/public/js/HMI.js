@@ -161,6 +161,13 @@ function setPlayButtonPlaying(isPlaying) {
   if (playLabel) playLabel.textContent = isPlaying ? "Pause" : "Play recording";
 }
 
+function clampRecordingSamples(samples, sampleRate) {
+  if (!samples || !samples.length) return samples;
+  const maxSamples = Math.floor(sampleRate * MAX_RECORDING_SECONDS);
+  if (samples.length <= maxSamples) return samples;
+  return samples.slice(0, maxSamples);
+}
+
 function clearBrowserRecordingPlayback() {
   stopPcmPlayback();
 
@@ -187,8 +194,9 @@ function clearBrowserRecordingPlayback() {
 
 function prepareBrowserRecordingPlayback(result, durationLabel) {
   lastRecordingDurationLabel = durationLabel || null;
-  lastRecordingSamples = result && result.samples ? result.samples : null;
+  const rawSamples = result && result.samples ? result.samples : null;
   lastRecordingSampleRate = (result && result.sampleRate) || 44100;
+  lastRecordingSamples = clampRecordingSamples(rawSamples, lastRecordingSampleRate);
   lastBrowserRecordingBlob = (result && result.blob) ? result.blob : (result instanceof Blob ? result : null);
 
   // Keep a blob URL around for optional native player, but replay uses PCM.
@@ -1480,6 +1488,15 @@ export function startAudioRecording() {
 
   stopRecordingPlayback();
   playNextRecordedTrack = false;
+  // Lock controls immediately to prevent rapid concurrent starts while
+  // permission/getUserMedia is still pending.
+  const recordBtn = getRecordButton();
+  const stopBtn = getStopButton();
+  const cancelBtn = getCancelButton();
+  if (recordBtn) recordBtn.disabled = true;
+  if (stopBtn) stopBtn.disabled = true;
+  if (cancelBtn) cancelBtn.disabled = true;
+  setLiveRecordingState("idle", "Requesting microphone permission…");
 
   audioRecorder
     .start()
