@@ -1,0 +1,28 @@
+config:
+  target: "http://localhost:9000"
+
+  phases:
+    - name: "Warm up"
+      duration: 20
+      arrivalRate: 2
+
+    - name: "Normal load"
+      duration: 30
+      arrivalRate: 5
+
+    - name: "Increased load"
+      duration: 30
+      arrivalRate: 10
+
+  ensure:
+    thresholds:
+      - http.response_time.p95: 1000
+      - http.errors: 1
+
+scenarios:
+  - name: "Retrieve IoT nodes"
+    flow:
+      - get:
+          url: "/iot/nodes"
+          expect:
+            - statusCode: 200

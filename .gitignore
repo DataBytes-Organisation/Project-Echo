@@ -82,3 +82,4 @@ src/production/iot/management_application/audioUpload
 
 # Environment-specific generated file
 src/production/backend/app/main.py
+src/deployment/docker/docker-compose.yml.backup

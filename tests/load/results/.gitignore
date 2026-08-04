@@ -1,0 +1,12 @@
+# Generated Artillery reports
+*.json
+*.html
+
+# Generated Docker resource snapshots
+resources-before.txt
+resources-during.txt
+resources-after.txt
+
+# Keep selected documentation
+!.gitignore
+!baseline-summary.md
