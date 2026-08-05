@@ -96,12 +96,25 @@ module.exports = function (app) {
         userId: data.user.id,
       });
     } catch (err) {
-      console.log('Login exception error: ' + err.message)
-      // 401 from the API means bad credentials specifically, not some other failure - worth telling the user that outright
-      const alertMsg = err.status === 401
-        ? 'Failed! Invalid credentials!'
-        : `Login exception Error: ${err.message}!`;
-      res.send(`<script> window.location.href = "/login"; alert("${alertMsg}");</script>`);
+      console.error('Sign-in failed:', err.message);
+
+      // login.html checks response.ok then does response.json() either way - it needs
+      // real JSON with the right status code, not the HTML script-alert we were sending
+      if (err.status === 401 || err.status === 404) {
+        return res.status(401).json({
+          message: 'Invalid username, email, or password.',
+        });
+      }
+
+      if (err.isNetworkError) {
+        return res.status(502).json({
+          message: 'The sign-in service is currently unavailable.',
+        });
+      }
+
+      return res.status(500).json({
+        message: 'Unable to sign in. Please try again.',
+      });
     }
   });
 

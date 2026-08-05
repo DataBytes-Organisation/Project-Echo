@@ -520,6 +520,12 @@ export function hideRetryState(containerId) {
  * @param {number}   [opts.attempts=3]    - Maximum attempts.
  * @param {number}   [opts.delayMs=1500]  - Wait between attempts (ms).
  * @param {string}   [opts.retryMessage]  - Toast text shown on each retry.
+ * @param {boolean}  [opts.silent=false]  - Retry without showing the toasts. For
+ *                                          background work the user did not ask
+ *                                          for (polling heartbeats, decorative
+ *                                          charts) where a toast every attempt is
+ *                                          just noise. Off by default so existing
+ *                                          user-initiated calls are unchanged.
  * @returns {Promise<*>}
  *
  * @example
@@ -530,6 +536,7 @@ export async function withRetry(action, opts = {}) {
     attempts = 3,
     delayMs = 1500,
     retryMessage = "Retrying…",
+    silent = false,
   } = opts;
 
   for (let i = 1; i <= attempts; i++) {
@@ -537,7 +544,7 @@ export async function withRetry(action, opts = {}) {
       return await action();
     } catch (err) {
       if (i < attempts) {
-        showToast(`${retryMessage} (attempt ${i}/${attempts})`, "warning");
+        if (!silent) showToast(`${retryMessage} (attempt ${i}/${attempts})`, "warning");
         await _delay(delayMs);
       } else {
         throw err;

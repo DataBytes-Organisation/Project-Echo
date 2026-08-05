@@ -912,6 +912,19 @@ app.get('/iot/nodes', async (req, res) => {
   }
 });
 
+// The API implements /iot/nodes/{node_id} (iot.py) but there was no Node route for
+// it, so admin-nodes.html was calling http://localhost:9000 straight from the
+// browser - which only ever works in local dev. Same shape as the route above so
+// the page can go through the shared client like everything else.
+app.get('/iot/nodes/:nodeId', async (req, res) => {
+  try {
+    const data = await apiClient.get(`/iot/nodes/${encodeURIComponent(req.params.nodeId)}`);
+    res.json(data);
+  } catch (error) {
+    apiClient.sendApiError(res, error, 'Error fetching IoT node details');
+  }
+});
+
 app.get("/map", async(req,res) => {
   res.sendFile(path.join(__dirname, 'public/index.html'))
 })

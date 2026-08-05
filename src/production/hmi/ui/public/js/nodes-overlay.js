@@ -1,10 +1,7 @@
-let axios;
-
-if (typeof window === 'undefined') {
-  axios = require('axios');
-} else {
-  axios = window.axios;
-}
+// pulling this in so we're not rolling our own axios instance here - keeps us on
+// the same shared client (timeout, retry on the GET) as everywhere else now
+import { retrieveIotNodes } from "./routes.js";
+import { showToast, getApiErrorMessage } from "./HMI-utils.js";
 
 // Function to add IoT nodes to the existing map
 async function addIoTNodesToMap(hmiState) {
@@ -14,7 +11,7 @@ async function addIoTNodesToMap(hmiState) {
     }
     try {
         // Fetch nodes from the API
-        const response = await axios.get('/iot/nodes');
+        const response = await retrieveIotNodes();
         const nodes = response.data;
         
         // Create a new vector layer for IoT nodes
@@ -128,6 +125,8 @@ async function addIoTNodesToMap(hmiState) {
 
     } catch (error) {
         console.error('Error loading IoT nodes:', error);
+        // was silently swallowed before - at least let the user know the nodes didn't load
+        showToast(getApiErrorMessage(error, 'Could not load IoT nodes.'), 'error');
     }
 }
 
