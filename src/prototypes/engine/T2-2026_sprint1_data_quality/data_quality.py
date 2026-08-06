@@ -31,6 +31,11 @@ SUPPORTED_AUDIO_EXTENSIONS = [
 
 MIN_DURATION = 1.0
 MAX_DURATION = 10.0
+SAMPLE_RATE = 16000
+
+SILENCE_THRESHOLD = 0.80      # 80% of frames with very low energy
+ENERGY_THRESHOLD = 0.01       # Minimum mean RMS energy considered usable
+VARIANCE_THRESHOLD = 0.05     # High variation in signal energy
 
 #class
 class DatasetScanner:
@@ -364,7 +369,7 @@ def validate_audio(path):
 #add this analysis too as a addition - acoustic complexity with different sounds
 def analyse_acoustic_complexity(
     file_path,
-    sample_rate=16000
+    sample_rate=SAMPLE_RATE
 ):
     """
     Analyse environmental audio complexity.
@@ -398,7 +403,7 @@ def analyse_acoustic_complexity(
 
 
         silence_ratio = np.mean(
-            rms < 0.01
+            rms < ENERGY_THRESHOLD
         )
 
 
@@ -416,17 +421,17 @@ def analyse_acoustic_complexity(
 
 
         # Quality rules
-        if silence_ratio > 0.8:
+        if silence_ratio > SILENCE_THRESHOLD:
 
             flag = "HIGH_SILENCE"
 
 
-        elif mean_energy < 0.01:
+        elif mean_energy < ENERGY_THRESHOLD:
 
             flag = "LOW_SIGNAL"
 
 
-        elif energy_variance > 0.05:
+        elif energy_variance > VARIANCE_THRESHOLD:
 
             flag = "HIGH_VARIABILITY"
 
