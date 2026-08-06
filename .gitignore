@@ -56,9 +56,9 @@ tensorboard_logs/
 *.hdf5
 *.pb
 *.index
-models/
+#models/
 # Engine model weights (large binaries)
-src/production/engine/models/*
+#src/production/engine/models/*
 
 # -----------------------------------------------------------------------------
 # Databases
