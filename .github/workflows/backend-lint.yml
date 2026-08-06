@@ -1,0 +1,24 @@
+name: Backend Linter
+
+on: [pull_request]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+
+      - name: Install linter
+        run: python -m pip install ruff
+
+      - name: Check syntax and linting
+        run: ruff check src/production/backend
+
+      - name: Check formatting
+        run: ruff format --check src/production/backend

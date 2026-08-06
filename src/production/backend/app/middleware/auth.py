@@ -5,6 +5,10 @@ from decouple import config
 import datetime
 from bson.objectid import ObjectId
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 JWT_SECRET = "deff1952d59f883ece260e8683fed21ab0ad9a53323eca4f"
 JWT_ALGORITHM = "HS256"
 
@@ -28,9 +32,15 @@ def signJWT(user: dict, authorities: list[str]) -> str:
 # Handle JWT token received from HMI
 def decodeJWT(token: str) -> dict:
     try:
-        decoded_token = jwt.decode(token, JWT_SECRET, algorithms = [JWT_ALGORITHM])
-        print("toggled decode function! The result is: {}".format(decoded_token))
-        return decoded_token if datetime.datetime.utcfromtimestamp(decoded_token["exp"]) >= datetime.datetime.utcnow() else None
-    except Exception as e:
-        print("Decode failed! Need to check on this step: {}".format(e))
+        decoded_token = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        logger.debug("JWT decoded successfully")
+        token_is_valid = (
+            datetime.datetime.utcfromtimestamp(decoded_token["exp"])
+            >= datetime.datetime.utcnow()
+        )
+
+        return decoded_token if token_is_valid else None
+
+    except Exception:
+        logger.warning("JWT decoding failed", exc_info=True)
         return None
