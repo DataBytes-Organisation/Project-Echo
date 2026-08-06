@@ -43,6 +43,7 @@ sys.path.append("yamnet/")
 
 
 from platform import python_version
+from pathlib import Path
 
 import diskcache as dc
 # image processing related libraries
@@ -122,14 +123,158 @@ class EchoEngine():
 
         # Setup database client and connect
         try:
-            # database connection string
-            self.connection_string=f"mongodb://{self.credentials['DB_USERNAME']}:{self.credentials['DB_PASSWORD']}@{self.config['DB_HOSTNAME']}/EchoNet"
+            self.connection_string = (
+                f"mongodb://{self.credentials['DB_USERNAME']}:"
+                f"{self.credentials['DB_PASSWORD']}@"
+                f"{self.config['DB_HOSTNAME']}/EchoNet"
+            )
 
             myclient = pymongo.MongoClient(self.connection_string)
             self.echo_store = myclient["EchoNet"]
-            print(f"Found echo store database names: {myclient.list_database_names()}", flush=True)
-        except:
-            print(f"Failed to establish database connection", flush=True)
+
+            print(
+                f"Found echo store database names: "
+                f"{myclient.list_database_names()}",
+                flush=True
+            )
+
+        except Exception as e:
+            print(
+                f"Failed to establish database connection: {e}",
+                flush=True
+            )
+
+        # Load the selected EfficientNetV2 TFLite model
+        self.eff_interpreter = None
+        self.eff_input_details = None
+        self.eff_output_details = None
+        self.eff_class_mapping = None
+        self.eff_preprocess_config = None
+
+        if self.config.get("ACTIVE_INFERENCE_MODEL") == "efficientnetv2_tflite":
+            try:
+                engine_directory = Path(__file__).resolve().parent
+
+                model_path = (
+                    engine_directory
+                    / self.config["EFFICIENTNETV2_MODEL_PATH"]
+                ).resolve()
+
+                class_mapping_path = (
+                    engine_directory
+                    / self.config["EFFICIENTNETV2_CLASS_MAPPING_PATH"]
+                ).resolve()
+
+                preprocess_config_path = (
+                    engine_directory
+                    / self.config["EFFICIENTNETV2_PREPROCESS_CONFIG_PATH"]
+                ).resolve()
+
+                required_files = {
+                    "TFLite model": model_path,
+                    "class mapping": class_mapping_path,
+                    "preprocessing configuration": preprocess_config_path
+                }
+
+                for file_description, required_path in required_files.items():
+                    if not required_path.is_file():
+                        raise FileNotFoundError(
+                            f"{file_description} was not found: {required_path}"
+                        )
+
+                self.eff_interpreter = tf.lite.Interpreter(
+                    model_path=str(model_path)
+                )
+                self.eff_interpreter.allocate_tensors()
+
+                self.eff_input_details = (
+                    self.eff_interpreter.get_input_details()
+                )
+                self.eff_output_details = (
+                    self.eff_interpreter.get_output_details()
+                )
+
+                with class_mapping_path.open(
+                    "r",
+                    encoding="utf-8"
+                ) as mapping_file:
+                    self.eff_class_mapping = json.load(mapping_file)
+
+                with preprocess_config_path.open(
+                    "r",
+                    encoding="utf-8"
+                ) as config_file:
+                    self.eff_preprocess_config = json.load(config_file)
+
+                input_shape = tuple(
+                    int(value)
+                    for value in self.eff_input_details[0]["shape"]
+                )
+                output_shape = tuple(
+                    int(value)
+                    for value in self.eff_output_details[0]["shape"]
+                )
+
+                input_dtype = self.eff_input_details[0]["dtype"]
+                output_dtype = self.eff_output_details[0]["dtype"]
+
+                index_to_label = self.eff_class_mapping.get(
+                    "index_to_label",
+                    {}
+                )
+
+                if not index_to_label:
+                    raise ValueError(
+                        "class_mapping.json does not contain "
+                        "a valid index_to_label mapping."
+                    )
+
+                expected_class_count = output_shape[-1]
+
+                if len(index_to_label) != expected_class_count:
+                    raise ValueError(
+                        "Class mapping and model output count do not match. "
+                        f"Model outputs {expected_class_count} classes, "
+                        f"but the mapping contains {len(index_to_label)}."
+                    )
+
+                print(
+                    "EfficientNetV2 TFLite model loaded successfully.",
+                    flush=True
+                )
+                print(f"Model path: {model_path}", flush=True)
+                print(
+                    f"Input shape: {input_shape}",
+                    flush=True
+                )
+                print(
+                    f"Input dtype: {input_dtype}",
+                    flush=True
+                )
+                print(
+                    f"Output shape: {output_shape}",
+                    flush=True
+                )
+                print(
+                    f"Output dtype: {output_dtype}",
+                    flush=True
+                )
+                print(
+                    f"Species classes: {len(index_to_label)}",
+                    flush=True
+                )
+
+            except Exception as e:
+                raise RuntimeError(
+                    "Failed to initialise the selected EfficientNetV2 "
+                    f"TFLite model: {e}"
+                ) from e
+
+        else:
+            print(
+                "EfficientNetV2 TFLite is not the active inference model.",
+                flush=True
+            )
 
 
     ##################################################################################################
@@ -325,6 +470,254 @@ class EchoEngine():
         image = image / (tf.reduce_max(image)+0.0000001)
 
         return image, audio_clip, sample_rate
+    
+    def efficientnetv2_preprocess_audio_bytes(self, audio_clip):
+        """
+        Convert raw audio bytes into the tensor required by the selected
+        EfficientNetV2 TFLite model.
+
+        Expected input shape:
+        [1, 1, 128, 313]
+        """
+
+        if self.eff_interpreter is None:
+            raise RuntimeError(
+                "EfficientNetV2 TFLite interpreter is not initialised."
+            )
+
+        if not self.eff_preprocess_config:
+            raise RuntimeError(
+                "EfficientNetV2 preprocessing configuration is not loaded."
+            )
+
+        audio_file = io.BytesIO(audio_clip)
+
+        target_sr = int(
+            self.eff_preprocess_config["target_sr"]
+        )
+        duration_s = float(
+            self.eff_preprocess_config["duration_s"]
+        )
+        n_mels = int(
+            self.eff_preprocess_config["n_mels"]
+        )
+        hop_length = int(
+            self.eff_preprocess_config["hop_length"]
+        )
+        fmin = float(
+            self.eff_preprocess_config["fmin"]
+        )
+        fmax = float(
+            self.eff_preprocess_config["fmax"]
+        )
+
+        # Decode audio, convert to mono and resample.
+        audio, sample_rate = librosa.load(
+            audio_file,
+            sr=target_sr,
+            mono=True
+        )
+
+        audio = audio.astype(np.float32)
+
+        target_length = int(target_sr * duration_s)
+
+        # Deterministic fixed-length processing.
+        if len(audio) < target_length:
+            audio = np.pad(
+                audio,
+                (0, target_length - len(audio)),
+                mode="constant"
+            )
+        else:
+            audio = audio[:target_length]
+
+        mel_spectrogram = librosa.feature.melspectrogram(
+            y=audio,
+            sr=target_sr,
+            n_mels=n_mels,
+            hop_length=hop_length,
+            fmin=fmin,
+            fmax=fmax
+        )
+
+        mel_db = librosa.power_to_db(
+            mel_spectrogram,
+            ref=np.max
+        ).astype(np.float32)
+
+        # Same per-sample standardisation used during validation.
+        mel_mean = float(np.mean(mel_db))
+        mel_std = float(np.std(mel_db))
+
+        mel_db = (
+            mel_db - mel_mean
+        ) / (
+            mel_std + 1e-6
+        )
+
+        # NCHW shape: [batch, channel, mel, time]
+        input_tensor = np.expand_dims(
+            mel_db,
+            axis=0
+        )
+        input_tensor = np.expand_dims(
+            input_tensor,
+            axis=0
+        )
+
+        expected_shape = tuple(
+            int(value)
+            for value in self.eff_input_details[0]["shape"]
+        )
+
+        if tuple(input_tensor.shape) == expected_shape:
+            final_tensor = input_tensor
+
+        else:
+            # Support a future NHWC TFLite export if required.
+            nhwc_tensor = np.transpose(
+                input_tensor,
+                (0, 2, 3, 1)
+            )
+
+            if tuple(nhwc_tensor.shape) == expected_shape:
+                final_tensor = nhwc_tensor
+            else:
+                raise ValueError(
+                    "EfficientNetV2 input tensor shape mismatch. "
+                    f"Expected {expected_shape}, "
+                    f"generated NCHW {input_tensor.shape}, "
+                    f"generated NHWC {nhwc_tensor.shape}."
+                )
+
+        expected_dtype = self.eff_input_details[0]["dtype"]
+
+        final_tensor = final_tensor.astype(
+            expected_dtype,
+            copy=False
+        )
+
+        return final_tensor, audio, sample_rate
+
+
+    def efficientnetv2_tflite_predict_from_audio_bytes(
+        self,
+        audio_clip
+    ):
+        """
+        Run local EfficientNetV2 TFLite inference using raw audio bytes.
+        """
+
+        if self.eff_interpreter is None:
+            raise RuntimeError(
+                "EfficientNetV2 TFLite interpreter is not initialised."
+            )
+
+        input_tensor, processed_audio, sample_rate = (
+            self.efficientnetv2_preprocess_audio_bytes(
+                audio_clip
+            )
+        )
+
+        input_details = self.eff_input_details[0]
+        output_details = self.eff_output_details[0]
+
+        self.eff_interpreter.set_tensor(
+            input_details["index"],
+            input_tensor
+        )
+
+        self.eff_interpreter.invoke()
+
+        model_output = self.eff_interpreter.get_tensor(
+            output_details["index"]
+        )
+
+        if model_output.ndim != 2 or model_output.shape[0] != 1:
+            raise ValueError(
+                "Unexpected EfficientNetV2 output shape: "
+                f"{model_output.shape}"
+            )
+
+        logits = model_output[0].astype(
+            np.float32
+        )
+
+        # Numerically stable softmax.
+        shifted_logits = logits - np.max(logits)
+        exp_values = np.exp(shifted_logits)
+        probabilities = exp_values / np.sum(exp_values)
+
+        predicted_index = int(
+            np.argmax(probabilities)
+        )
+
+        confidence = float(
+            probabilities[predicted_index]
+        )
+
+        index_to_label = self.eff_class_mapping[
+            "index_to_label"
+        ]
+
+        predicted_class = index_to_label.get(
+            str(predicted_index)
+        )
+
+        if predicted_class is None:
+            raise KeyError(
+                "No species label exists for model output index "
+                f"{predicted_index}."
+            )
+
+        predicted_probability = round(
+            confidence * 100.0,
+            2
+        )
+
+        top_indices = np.argsort(
+            probabilities
+        )[::-1][:5]
+
+        top_predictions = []
+
+        for index in top_indices:
+            class_index = int(index)
+
+            label = index_to_label.get(
+                str(class_index),
+                f"Class_Index_{class_index}"
+            )
+
+            top_predictions.append(
+                {
+                    "index": class_index,
+                    "label": label,
+                    "confidence": float(
+                        probabilities[class_index]
+                    )
+                }
+            )
+
+        print(
+            f"EfficientNetV2 input tensor shape: "
+            f"{input_tensor.shape}",
+            flush=True
+        )
+        print(
+            f"EfficientNetV2 output tensor shape: "
+            f"{model_output.shape}",
+            flush=True
+        )
+
+        return (
+            predicted_class,
+            predicted_probability,
+            processed_audio,
+            sample_rate,
+            top_predictions
+        )
 
 
     # this method takes in binary audio data and encodes to string
@@ -353,47 +746,42 @@ class EchoEngine():
             sample_rate = 0
 
             if(audio_event['audioFile'] == "Recording_Mode"): # classic model
-                # convert to string representation of audio to binary for processing
-                print("Recording_Mode")
-                audio_clip = self.string_to_audio(audio_event['audioClip'])
 
-                image, audio_clip, sample_rate = self.combined_pipeline(audio_clip, "Recording_Mode")
+                print("Recording_Mode - EfficientNetV2 TFLite")
 
-                # update the audio event with the re-sampled audio
-                audio_event["audioClip"] = self.audio_to_string(audio_clip)
+                audio_clip = self.string_to_audio(
+                    audio_event["audioClip"]
+                )
 
-                image = tf.expand_dims(image, 0)
+                (
+                    predicted_class,
+                    predicted_probability,
+                    processed_audio,
+                    sample_rate,
+                    top_predictions
+                ) = self.efficientnetv2_tflite_predict_from_audio_bytes(
+                    audio_clip
+                )
 
-                #returned is melspectrogram with cam overlay,
-                #TODO: Can add this image to database
-                cam = melspectrogram_to_cam.convert(image)
-                image_list = image.numpy().tolist()
+                print(
+                    f"Predicted class : {predicted_class}",
+                    flush=True
+                )
+                print(
+                    f"Predicted probability : {predicted_probability}",
+                    flush=True
+                )
+                print(
+                    f"Top predictions : {top_predictions}",
+                    flush=True
+                )
 
-                # Run the model via tensorflow serve
-                data = json.dumps({"signature_name": "serving_default", "inputs": image_list})
-                url = self.config['MODEL_SERVER']
-                headers = {"content-type": "application/json"}
-                json_response = requests.post(url, data=data, headers=headers)
-                model_result   = json.loads(json_response.text)
-                predictions = model_result['outputs'][0]
-
-                # Predict class and probability using the prediction function
-                predicted_class, predicted_probability = self.predict_class(predictions)
-
-                print(f'Predicted class : {predicted_class}')
-                print(f'Predicted probability : {predicted_probability}')
-
-                # populate the database with the result
                 self.echo_api_send_detection_event(
                     audio_event,
                     sample_rate,
                     predicted_class,
-                    predicted_probability)
-
-
-                image = tf.expand_dims(image, 0)
-
-                image_list = image.numpy().tolist()
+                    predicted_probability
+                )
 
             elif(audio_event['audioFile'] == "Recording_Mode_V2"):
                 # convert to string representation of audio to binary for processing
@@ -447,48 +835,47 @@ class EchoEngine():
 
                     iteration_count = iteration_count + 1
 
-            else: # simulate animals mode
-                # convert to string representation of audio to binary for processing
-                audio_clip = self.string_to_audio(audio_event['audioClip'])
+            else:  # simulate animals mode
+                print(
+                    "Animal_Mode - EfficientNetV2 TFLite",
+                    flush=True
+                )
 
-                image, audio_clip, sample_rate = self.combined_pipeline(audio_clip, "Animal_Mode")
+                # Decode the original base64 audio payload.
+                audio_clip = self.string_to_audio(
+                    audio_event["audioClip"]
+                )
 
-                #returned is melspectrogram with cam overlay,
-                #TODO: Can add this image to database
-                cam = melspectrogram_to_cam.convert(image)
+                (
+                    predicted_class,
+                    predicted_probability,
+                    processed_audio,
+                    sample_rate,
+                    top_predictions
+                ) = self.efficientnetv2_tflite_predict_from_audio_bytes(
+                    audio_clip
+                )
 
+                print(
+                    f"Predicted class : {predicted_class}",
+                    flush=True
+                )
+                print(
+                    f"Predicted probability : {predicted_probability}",
+                    flush=True
+                )
+                print(
+                    f"Top predictions : {top_predictions}",
+                    flush=True
+                )
 
-                # update the audio event with the re-sampled audio
-                audio_event["audioClip"] = self.audio_to_string(audio_clip)
-
-                image = tf.expand_dims(image, 0)
-
-                image_list = image.numpy().tolist()
-
-                # Run the model via tensorflow serve
-                data = json.dumps({"signature_name": "serving_default", "inputs": image_list})
-                url = self.config['MODEL_SERVER']
-                headers = {"content-type": "application/json"}
-                json_response = requests.post(url, data=data, headers=headers)
-                model_result   = json.loads(json_response.text)
-                predictions = model_result['outputs'][0]
-
-                # Predict class and probability using the prediction function
-                predicted_class, predicted_probability = self.predict_class(predictions)
-
-                print(f'Predicted class : {predicted_class}')
-                print(f'Predicted probability : {predicted_probability}')
-
-                # populate the database with the result
+                # Keep the original valid base64 audioClip in audio_event.
                 self.echo_api_send_detection_event(
                     audio_event,
                     sample_rate,
                     predicted_class,
-                    predicted_probability)
-
-                image = tf.expand_dims(image, 0)
-
-                image_list = image.numpy().tolist()
+                    predicted_probability
+                )
 
         except Exception as e:
             # Catch the exception and print it to the console
@@ -774,24 +1161,39 @@ class EchoEngine():
                 return
 
             sensor_id = payload.get("sensor_id", "unknown_iot_sensor")
-            timestamp = str(int(time.time()))
+            timestamp = payload.get(
+                "timestamp",
+                str(int(time.time()))
+            )
 
-            # Decode and process audio
-            audio_binary = base64.b64decode(payload["audio_file"])
-            image, processed_audio, sample_rate = self.combined_pipeline(audio_binary, "Recording_Mode")
+            # Decode audio from the IoT payload
+            audio_binary = base64.b64decode(
+                payload["audio_file"],
+                validate=True
+            )
 
-            image = tf.expand_dims(image, 0)
-            image_list = image.numpy().tolist()
+            (
+                predicted_class,
+                predicted_probability,
+                processed_audio,
+                sample_rate,
+                top_predictions
+            ) = self.efficientnetv2_tflite_predict_from_audio_bytes(
+                audio_binary
+            )
 
-            # Run inference via TF Serving
-            data = json.dumps({"signature_name": "serving_default", "inputs": image_list})
-            url = self.config['MODEL_SERVER']
-            headers = {"content-type": "application/json"}
-            json_response = requests.post(url, data=data, headers=headers)
-            model_result = json.loads(json_response.text)
-            predictions = model_result['outputs'][0]
-
-            predicted_class, predicted_probability = self.predict_class(predictions)
+            print(
+                f"IoT Predicted class : {predicted_class}",
+                flush=True
+            )
+            print(
+                f"IoT Predicted probability : {predicted_probability}",
+                flush=True
+            )
+            print(
+                f"IoT Top predictions : {top_predictions}",
+                flush=True
+            )
             print(f"IoT Predicted class : {predicted_class}")
             print(f"IoT Predicted probability : {predicted_probability}")
 
@@ -804,7 +1206,7 @@ class EchoEngine():
                 "animalEstLLA": lla,
                 "animalTrueLLA": lla,
                 "animalLLAUncertainty": payload.get("gps_uncertainty", 10.0),
-                "audioClip": self.audio_to_string(processed_audio),
+                "audioClip": payload["audio_file"],
             }
 
             self.echo_api_send_detection_event(

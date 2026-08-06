@@ -1,0 +1,12 @@
+{
+  "timestamp": "2026-08-06T10:19:00Z",
+  "sensorId": "engine-test-sensor-05",
+  "species": "Laughing Kookaburra",
+  "microphoneLLA": [-33.8688, 151.2093, 25.0],
+  "animalEstLLA": [-33.8686, 151.2096, 21.0],
+  "animalTrueLLA": [-33.8685, 151.2097, 22.0],
+  "animalLLAUncertainty": 3,
+  "audioClip": "VGVzdCBhdWRpbyA1",
+  "confidence": 88.5,
+  "sampleRate": 16000
+}
