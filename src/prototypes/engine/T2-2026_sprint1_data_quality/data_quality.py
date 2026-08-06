@@ -615,7 +615,18 @@ if __name__ == "__main__":
         index=False
     )
 
+   # Create invalid records report
+    invalid_records = manifest[
+      (manifest["readable"] == False) |
+      (manifest["format_status"] != "OK") |
+      (manifest["issue"].notna() & (manifest["issue"] != ""))
+    ].copy()
 
+    invalid_records.to_csv(
+    REPORT_OUTPUT / "invalid_records.csv",
+    index=False
+    )
+    
     acoustic_report.to_csv(
         REPORT_OUTPUT / "acoustic_complexity_report.csv",
         index=False
