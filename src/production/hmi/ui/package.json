@@ -4,9 +4,9 @@
   "description": "",
   "main": "server.js",
  "scripts": {
-  "test": "node --test tests/nodes-overlay.test.js",
-  "dev": "nodemon --inspect=0.0.0.0 server.js"
-},
+    "test": "node --test tests/nodes-overlay.test.js",
+    "dev": "nodemon --inspect=0.0.0.0 server.js"
+  },
   "author": "",
   "license": "ISC",
   "dependencies": {
