@@ -59,6 +59,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# ✅ Global exception handlers (task C4.3)
+# Attached to this FastAPI instance deliberately. The module creates FastAPI()
+# twice; the instance built above line 22 is discarded when the name `app` is
+# reassigned, so handlers registered there would silently have no effect.
+from app.error_handlers import register_exception_handlers
+
+register_exception_handlers(app)
+
 
 # app.include_router(hmi.router, tags=['hmi'], prefix='/hmi')
 # app.include_router(engine.router, tags=['engine'], prefix='/engine')
