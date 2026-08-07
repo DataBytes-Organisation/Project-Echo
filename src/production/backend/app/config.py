@@ -74,6 +74,34 @@ def get_list(name, default):
     return items or list(default)
 
 
+_TRUE_VALUES = ("1", "true", "yes", "on")
+_FALSE_VALUES = ("0", "false", "no", "off")
+
+
+def get_bool(name, default):
+    """Return ``name`` parsed as a boolean, or ``default`` if it is not set.
+
+    Environment variables are always strings, so "false" would be truthy under
+    Python's normal rules. Accepted spellings are listed explicitly and
+    anything else raises, because silently treating an unrecognised value as
+    False is how a security setting ends up switched off without anyone
+    noticing.
+    """
+    value = _read(name)
+    if value is None:
+        return default
+    lowered = value.lower()
+    if lowered in _TRUE_VALUES:
+        return True
+    if lowered in _FALSE_VALUES:
+        return False
+    raise ConfigError(
+        "Environment variable '{}' must be one of {} or {}, got '{}'.".format(
+            name, ", ".join(_TRUE_VALUES), ", ".join(_FALSE_VALUES), value
+        )
+    )
+
+
 def _require_mongo_uri(name):
     """Return ``name`` as a MongoDB URI, rejecting anything malformed."""
     value = get_required(name)
@@ -120,3 +148,15 @@ def cors_allowed_origins():
     Defaults to the local HMI development server.
     """
     return get_list("CORS_ALLOWED_ORIGINS", ["http://localhost:8080"])
+
+
+def hsts_enabled():
+    """Whether to send the Strict-Transport-Security response header.
+
+    Defaults to False. The header instructs browsers to refuse plain HTTP for
+    this host for the given period, which is correct in a deployed
+    environment behind TLS and wrong during local development, where the API
+    is served over HTTP on localhost. It is therefore opt-in rather than
+    opt-out.
+    """
+    return get_bool("SECURITY_HSTS_ENABLED", False)

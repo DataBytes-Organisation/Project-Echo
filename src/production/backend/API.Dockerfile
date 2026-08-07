@@ -41,4 +41,7 @@ COPY . /app
 EXPOSE 9000
 
 # Start the API using uvicorn
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "9000"]
+# --no-server-header suppresses uvicorn's "server: uvicorn" response header,
+# which discloses the server software. It cannot be removed by ASGI
+# middleware because uvicorn writes it after the middleware stack has run.
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "9000", "--no-server-header"]

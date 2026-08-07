@@ -67,6 +67,17 @@ from app.error_handlers import register_exception_handlers
 
 register_exception_handlers(app)
 
+# ✅ Security response headers
+# Adds X-Content-Type-Options, X-Frame-Options, Referrer-Policy,
+# Content-Security-Policy and related headers to every response. The Python
+# equivalent of Helmet. Strict-Transport-Security is opt-in via the
+# SECURITY_HSTS_ENABLED environment variable, because it is correct behind
+# TLS and wrong on a local HTTP development server.
+from app import config
+from app.middleware.security_headers import add_security_headers
+
+add_security_headers(app, hsts_enabled=config.hsts_enabled())
+
 
 # app.include_router(hmi.router, tags=['hmi'], prefix='/hmi')
 # app.include_router(engine.router, tags=['engine'], prefix='/engine')
