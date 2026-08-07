@@ -2,17 +2,14 @@
 
 /**
  * map.js
- * Canonical Leaflet map implementation for the EchoNet production HMI.
+ * Leaflet map initialisation and IoT node rendering for the EchoNet HMI.
  *
- * FR-A1 architecture:
- * - Leaflet is the only production map-rendering library used on this page.
- * - A module-level singleton guard prevents duplicate Leaflet map instances.
- * - IoT nodes are retrieved through retrieveIotNodes() from routes.js.
- * - The frontend does not communicate with MongoDB directly.
- * - API configuration, environment URLs, timeouts, and request handling are
- *   managed by the shared API layer.
- * - A shared Leaflet layer group is cleared before each render, preventing
- *   markers and connection lines from accumulating during live updates.
+ * Sprint 1/2 : Map init, node markers, polylines, loading/error overlays.
+ * Task 7     : Removed local duplicates — showToastMessage, getFriendlyFetchError,
+ *              escapeHtml, safeFetchJson, and the inline loading/error/retry UI —
+ *              all replaced with imports from HMI-utils.js and routes.js.
+ *              loadNodes now calls retrieveIotNodes() (routes.js) so all API
+ *              traffic goes through the shared axios instance with its timeout.
  */
 
 import {
@@ -22,14 +19,20 @@ import {
   hideElementLoading,
   showRetryState,
   hideRetryState,
-  escapeHtml,
 } from "./HMI-utils.js";
 
 import { retrieveIotNodes } from "./routes.js";
 
-let map = null;
-let nodeLayerGroup = null;
-let loadRequestId = 0;
+// ─────────────────────────────────────────────────────────────────────────────
+// Map state
+// ─────────────────────────────────────────────────────────────────────────────
+
+let map;
+let markers = [];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Leaflet icons
+// ─────────────────────────────────────────────────────────────────────────────
 
 const masterIcon = L.icon({
   iconUrl: "/images/nodes/master-node.png",
@@ -45,91 +48,110 @@ const childIcon = L.icon({
   popupAnchor: [0, -24],
 });
 
-/**
- * Initialise the canonical Leaflet map once.
- */
+// ─────────────────────────────────────────────────────────────────────────────
+// Map initialisation
+// ─────────────────────────────────────────────────────────────────────────────
+
 async function initMap() {
-  const mapContainer = document.getElementById("map");
-
-  if (!mapContainer) {
-    console.error("Unable to initialise map: #map container was not found.");
-    return;
-  }
-
-  if (map) {
-    console.debug("Leaflet map is already initialised.");
-    return;
-  }
-
-  /*
-   * Leaflet stores an internal ID on an initialised container.
-   * This protects against another script having already created the map.
-   */
-  if (mapContainer._leaflet_id) {
-    console.warn(
-      "Map container is already associated with a Leaflet instance."
-    );
-    return;
-  }
-
-  map = L.map(mapContainer).setView([-38.7789, 143.5705], 14);
+  map = L.map("map").setView([-38.7789, 143.5705], 14);
 
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 19,
     attribution: "© OpenStreetMap contributors",
   }).addTo(map);
 
-  nodeLayerGroup = L.layerGroup().addTo(map);
-
   await loadNodes();
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Node loading
+// ─────────────────────────────────────────────────────────────────────────────
+
 /**
- * Retrieve and render IoT nodes using the shared frontend API helper.
+ * Fetch IoT nodes from the API and render them on the map.
+ * Uses showElementLoading / hideElementLoading for the loading state and
+ * showRetryState for the error state — both from HMI-utils.js.
+ * The fetch goes through retrieveIotNodes() in routes.js so it uses the
+ * shared axios instance (timeout, future interceptors, consistent base URL).
  */
 async function loadNodes() {
-  if (!map || !nodeLayerGroup) {
-    console.error("Cannot load nodes before the map has been initialised.");
-    return;
-  }
-
-  const currentRequestId = ++loadRequestId;
-
+  // "map" is the id of the map container div
   showElementLoading("map", "Loading IoT nodes...");
   hideRetryState("map");
 
   try {
     const response = await retrieveIotNodes();
+    const nodes = response.data;
 
-    /*
-     * Ignore an older response if another refresh completed after it.
-     * This prevents stale requests from overwriting newer map data.
-     */
-    if (currentRequestId !== loadRequestId) {
-      return;
-    }
+    // Clear existing markers and lines
+    markers.forEach((marker) => marker.remove());
+    markers = [];
 
-    const nodes = Array.isArray(response?.data) ? response.data : [];
+    nodes.forEach((node) => {
+      if (
+        !node.location ||
+        !node.location.latitude ||
+        !node.location.longitude
+      ) {
+        return;
+      }
 
-    nodeLayerGroup.clearLayers();
+      const icon = node.type === "master" ? masterIcon : childIcon;
 
-    const validNodes = nodes.filter(hasValidCoordinates);
-    const nodesById = new Map(
-      validNodes.map((node) => [String(node._id), node])
-    );
+      const marker = L.marker(
+        [node.location.latitude, node.location.longitude],
+        { icon, title: node.name }
+      );
 
-    validNodes.forEach((node) => {
-      renderNodeMarker(node);
+      const popupContent = `
+        <div class="node-popup">
+          <h3>${_escapeHtml(node.name)}</h3>
+          <p>Type: ${_escapeHtml(node.type)}</p>
+          <p>Model: ${_escapeHtml(node.model)}</p>
+          ${node.parentNode ? `<p>Parent: ${_escapeHtml(node.parentNode)}</p>` : ""}
+          <p>Components: ${Array.isArray(node.components) ? node.components.length : 0}</p>
+        </div>
+      `;
+
+      marker.bindPopup(popupContent);
+      marker.addTo(map);
+      markers.push(marker);
+
+      // Draw polylines to connected nodes
+      if (node.connectedNodes && node.connectedNodes.length > 0) {
+        node.connectedNodes.forEach((connectedId) => {
+          const connectedNode = nodes.find((n) => n._id === connectedId);
+
+          if (
+            connectedNode &&
+            connectedNode.location &&
+            connectedNode.location.latitude &&
+            connectedNode.location.longitude
+          ) {
+            const line = L.polyline(
+              [
+                [node.location.latitude, node.location.longitude],
+                [
+                  connectedNode.location.latitude,
+                  connectedNode.location.longitude,
+                ],
+              ],
+              {
+                color: "#3388ff",
+                weight: 2,
+                opacity: 0.6,
+                dashArray: "5, 10",
+              }
+            ).addTo(map);
+
+            markers.push(line);
+          }
+        });
+      }
     });
-
-    renderConnectionLines(validNodes, nodesById);
 
     showToast("IoT nodes loaded successfully", "success");
   } catch (error) {
-    if (currentRequestId !== loadRequestId) {
-      return;
-    }
-
     console.error("Error loading nodes:", error);
 
     const message = getApiErrorMessage(
@@ -137,130 +159,34 @@ async function loadNodes() {
       "Unable to load nodes. Please try again."
     );
 
+    // showRetryState renders the error message and a Retry button inside
+    // the map container.  When the user clicks Retry, loadNodes is called again.
     showRetryState("map", message, loadNodes);
     showToast("Failed to load IoT nodes", "error");
   } finally {
-    if (currentRequestId === loadRequestId) {
-      hideElementLoading("map");
-    }
+    hideElementLoading("map");
   }
 }
 
-/**
- * Add one IoT node marker to the shared map layer.
- */
-function renderNodeMarker(node) {
-  const latitude = Number(node.location.latitude);
-  const longitude = Number(node.location.longitude);
-  const icon = node.type === "master" ? masterIcon : childIcon;
-
-  const marker = L.marker([latitude, longitude], {
-    icon,
-    title: String(node.name ?? "Unnamed node"),
-  });
-
-  const popupContent = `
-    <div class="node-popup">
-      <h3>${escapeHtml(node.name ?? "Unnamed node")}</h3>
-      <p>Type: ${escapeHtml(node.type ?? "Unknown")}</p>
-      <p>Model: ${escapeHtml(node.model ?? "Unknown")}</p>
-      ${
-        node.parentNode
-          ? `<p>Parent: ${escapeHtml(node.parentNode)}</p>`
-          : ""
-      }
-      <p>Components: ${
-        Array.isArray(node.components) ? node.components.length : 0
-      }</p>
-    </div>
-  `;
-
-  marker.bindPopup(popupContent);
-  marker.addTo(nodeLayerGroup);
-}
+// ─────────────────────────────────────────────────────────────────────────────
+// Internal helpers
+// ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * Add each logical node connection once.
+ * Escape HTML special characters.
+ * Used only for Leaflet popup content built in this file.
+ * (HMI-utils.js handles escaping internally for toast/banner/retry content.)
  */
-function renderConnectionLines(nodes, nodesById) {
-  const renderedConnections = new Set();
-
-  nodes.forEach((node) => {
-    if (!Array.isArray(node.connectedNodes)) {
-      return;
-    }
-
-    node.connectedNodes.forEach((connectedId) => {
-      const connectedNode = nodesById.get(String(connectedId));
-
-      if (!connectedNode || String(node._id) === String(connectedNode._id)) {
-        return;
-      }
-
-      /*
-       * Sorting produces the same key for A → B and B → A,
-       * preventing duplicate bidirectional lines.
-       */
-      const connectionKey = [
-        String(node._id),
-        String(connectedNode._id),
-      ]
-        .sort()
-        .join(":");
-
-      if (renderedConnections.has(connectionKey)) {
-        return;
-      }
-
-      renderedConnections.add(connectionKey);
-
-      L.polyline(
-        [
-          [
-            Number(node.location.latitude),
-            Number(node.location.longitude),
-          ],
-          [
-            Number(connectedNode.location.latitude),
-            Number(connectedNode.location.longitude),
-          ],
-        ],
-        {
-          color: "#3388ff",
-          weight: 2,
-          opacity: 0.6,
-          dashArray: "5, 10",
-        }
-      ).addTo(nodeLayerGroup);
-    });
-  });
+function _escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
 }
 
-/**
- * Confirm that a node contains usable numeric coordinates.
- */
-function hasValidCoordinates(node) {
-  if (!node?.location) {
-    return false;
-  }
+// ─────────────────────────────────────────────────────────────────────────────
+// Entry point
+// ─────────────────────────────────────────────────────────────────────────────
 
-  const latitude = Number(node.location.latitude);
-  const longitude = Number(node.location.longitude);
-
-  return (
-    Number.isFinite(latitude) &&
-    Number.isFinite(longitude) &&
-    latitude >= -90 &&
-    latitude <= 90 &&
-    longitude >= -180 &&
-    longitude <= 180
-  );
-}
-
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", initMap, { once: true });
-} else {
-  initMap();
-}
-
-export { initMap, loadNodes };
+document.addEventListener("DOMContentLoaded", initMap);

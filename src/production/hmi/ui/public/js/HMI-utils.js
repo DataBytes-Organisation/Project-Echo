@@ -342,7 +342,7 @@ export function showToast(message, type = "info", duration = 4000) {
 
   toast.innerHTML = `
     <span class="hmi-toast__icon" aria-hidden="true">${_TOAST_ICONS[type]}</span>
-    <span class="hmi-toast__msg">${escapeHtml(message)}</span>
+    <span class="hmi-toast__msg">${_escapeHtml(message)}</span>
     <button class="hmi-toast__close" aria-label="Dismiss notification">✕</button>
     <span class="hmi-toast__progress"></span>
   `;
@@ -436,7 +436,7 @@ export function showElementLoading(containerId, label = "Loading...") {
   loader.innerHTML = `
     <div class="hmi-shared-loading__box">
       <div class="hmi-shared-loading__spinner"></div>
-      <p>${escapeHtml(label)}</p>
+      <p>${_escapeHtml(label)}</p>
     </div>
   `;
 
@@ -481,7 +481,7 @@ export function showRetryState(containerId, message, onRetry) {
   retry.className = "hmi-shared-retry";
   retry.innerHTML = `
     <div class="hmi-shared-retry__box">
-      <p>${escapeHtml(message)}</p>
+      <p>${_escapeHtml(message)}</p>
       <button type="button">Retry</button>
     </div>
   `;
@@ -580,7 +580,7 @@ export function showPageBanner(message, type = "info", dismissible = true) {
 
   banner.innerHTML = `
     <span class="hmi-page-banner__icon" aria-hidden="true">${icons[type]}</span>
-    <span class="hmi-page-banner__msg">${escapeHtml(message)}</span>
+    <span class="hmi-page-banner__msg">${_escapeHtml(message)}</span>
   `;
 
   if (dismissible) {
@@ -640,10 +640,10 @@ export function confirmDialog(message, confirmLabel = "Confirm", cancelLabel = "
 
     overlay.innerHTML = `
       <div class="hmi-confirm-box">
-        <p>${escapeHtml(message)}</p>
+        <p>${_escapeHtml(message)}</p>
         <div class="hmi-confirm-actions">
-          <button type="button" class="hmi-confirm-btn--cancel">${escapeHtml(cancelLabel)}</button>
-          <button type="button" class="hmi-confirm-btn--ok">${escapeHtml(confirmLabel)}</button>
+          <button type="button" class="hmi-confirm-btn--cancel">${_escapeHtml(cancelLabel)}</button>
+          <button type="button" class="hmi-confirm-btn--ok">${_escapeHtml(confirmLabel)}</button>
         </div>
       </div>
     `;
@@ -784,24 +784,15 @@ export function guardFormSubmit(formId, handler, opts = {}) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Shared and internal utilities
+// Internal utilities
 // ─────────────────────────────────────────────────────────────────────────────
 
-/**
- * Escape a value before inserting it into generated HTML.
- *
- * Shared by HMI components that construct HTML strings.
- *
- * @param {*} value
- * @returns {string}
- */
-export function escapeHtml(value) {
-  return String(value ?? "")
+function _escapeHtml(str) {
+  return String(str)
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+    .replace(/"/g, "&quot;");
 }
 
 function _delay(ms) {
