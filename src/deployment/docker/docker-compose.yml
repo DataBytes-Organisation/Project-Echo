@@ -110,6 +110,7 @@ services:
     environment:
       MAIL_STARTTLS: "true"
       MAIL_SSL_TLS: "false"
+      INTERNAL_API_KEY: "dev-local-secret123"
 
 
     stdin_open: false

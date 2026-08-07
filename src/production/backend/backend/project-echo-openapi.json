@@ -1207,6 +1207,17 @@
         ],
         "summary": "Create Event",
         "operationId": "create_event_engine_event_post",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "X-Api-Key"
+            },
+            "name": "x-api-key",
+            "in": "header"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
