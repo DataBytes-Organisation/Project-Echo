@@ -75,6 +75,7 @@ COPY ./echo_engine_iot.py ./echo_engine.py
 COPY ./echo_engine.json ./
 COPY ./echo_credentials.json ./
 COPY ./helpers ./helpers
+COPY ./models/efficientnetv2 ./models/efficientnetv2
 
 # Setup GCloud config dir
 RUN mkdir -p /root/.config/gcloud/
