@@ -1,5 +1,5 @@
 """
-Unit tests for IoT MQTT integration in echo_engine.py
+Unit tests for IoT MQTT integration in echo_engine_iot.py
 
 Mocks heavy dependencies (TensorFlow, librosa, MQTT, GCP, etc.) so tests
 run without the full Docker stack or GPU.
@@ -176,7 +176,7 @@ class TestIoTMessageHandler(unittest.TestCase):
         # requests.post to model server
         mock_resp = MagicMock()
         mock_resp.text = json.dumps({"outputs": [[0.1, 0.9]]})
-        self.requests_patcher = patch("echo_engine.requests.post", return_value=mock_resp)
+        self.requests_patcher = patch("echo_engine_iot.requests.post",return_value=mock_resp)
         self.mock_post = self.requests_patcher.start()
 
     def tearDown(self):
@@ -229,9 +229,19 @@ class TestIoTMessageHandler(unittest.TestCase):
         self.assertEqual(args[3], 87.3)
 
     def test_model_server_url_from_config(self):
-        self.engine.on_iot_message(None, None, _make_msg(_valid_payload()))
+        expected_url = "http://test-model-server:8501/v1/models/test:predict"
+        self.engine.config["MODEL_SERVER"] = expected_url
+
+        self.engine.on_iot_message(
+            None,
+            None,
+            _make_msg(_valid_payload())
+        )
+
+        self.mock_post.assert_called_once()
         post_url = self.mock_post.call_args[0][0]
-        self.assertEqual(post_url, _ENGINE_CONFIG["MODEL_SERVER"])
+
+        self.assertEqual(post_url, expected_url)
 
 
 # ===========================================================================
@@ -266,6 +276,30 @@ class TestIoTStartupOrder(unittest.TestCase):
         engine.execute()
 
         self.assertEqual(call_order, ["class_names", "iot_listener"])
+    class TestIoTStartupOrder(unittest.TestCase):
+        """Verify IoT listener starts AFTER class_names are loaded."""
+
+    def test_iot_listener_starts_after_class_names(self):
+        engine = EchoEngine()
+        call_order = []
+
+        engine.gcp_load_species_list = MagicMock(
+            side_effect=lambda: (
+                call_order.append("class_names"),
+                ["species"]
+            )[1]
+        )
+
+        engine.start_iot_mqtt_listener = MagicMock(
+            side_effect=lambda: call_order.append("iot_listener")
+        )
+
+        engine.execute()
+
+        self.assertEqual(
+            call_order,
+            ["class_names", "iot_listener"]
+        )
 
 
 if __name__ == "__main__":
