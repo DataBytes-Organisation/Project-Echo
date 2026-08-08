@@ -120,6 +120,10 @@ function pillHtml(status, batteryPct) {
     return `<span class="pill pill-success">${s}</span>`;
   }
 
+  if (s === "Degraded") {
+    return `<span class="pill pill-warning">${s}</span>`;
+  }
+
   if (s === "Offline" || s === "Failed") {
     return `<span class="pill pill-danger">${s}</span>`;
   }
@@ -167,12 +171,72 @@ function formatUptime(seconds) {
   return `${mins}m`;
 }
 
+function formatMinutesAgo(minutes) {
+  const num = Number(minutes);
+  if (!Number.isFinite(num) || num < 0) return "—";
+  if (num === 0) return "just now";
+  if (num < 60) return `${num}m ago`;
+
+  const hours = Math.floor(num / 60);
+  const mins = num % 60;
+  if (hours < 24) return mins ? `${hours}h ${mins}m ago` : `${hours}h ago`;
+
+  const days = Math.floor(hours / 24);
+  return `${days}d ago`;
+}
+
+// Single source of truth for the refresh interval.
+const REFRESH_MS = 15000;
+
+function refreshIntervalLabel() {
+  const seconds = Math.round(REFRESH_MS / 1000);
+  return seconds >= 60 ? `${Math.round(seconds / 60)}m` : `${seconds}s`;
+}
+
 function updateLastUpdated() {
   const el = document.getElementById("last-updated-at");
   if (!el) return;
 
   const now = new Date();
-  el.textContent = `Last updated at: ${now.toLocaleTimeString()}`;
+  const intervalSpan = `<span id="refresh-interval-label">${refreshIntervalLabel()}</span>`;
+  el.innerHTML = `Last updated at: ${now.toLocaleTimeString()} &middot; auto-refresh every ${intervalSpan}`;
+}
+
+// Compute status counts from the SAME array that fills the table,
+// so the KPI cards can never drift from the table contents.
+function updateSensorKpis(items) {
+  const counts = { total: 0, online: 0, degraded: 0, offline: 0, lowBattery: 0 };
+
+  for (const item of items) {
+    counts.total += 1;
+    switch (item.status) {
+      case "Online":
+        counts.online += 1;
+        break;
+      case "Degraded":
+        counts.degraded += 1;
+        break;
+      case "Offline":
+        counts.offline += 1;
+        break;
+      case "Low Battery":
+        counts.lowBattery += 1;
+        break;
+      default:
+        break;
+    }
+  }
+
+  const set = (id, value) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value;
+  };
+
+  set("kpi-total", counts.total);
+  set("kpi-online", counts.online);
+  set("kpi-degraded", counts.degraded);
+  set("kpi-offline", counts.offline);
+  set("kpi-low-battery", counts.lowBattery);
 }
 
 // ================================================================
@@ -356,14 +420,10 @@ async function loadSensorHealthPage() {
 
       const matchesSearch = !searchVal || sensorId.includes(searchVal);
 
-      let matchesStatus = true;
-      if (statusVal === "Online") {
-        matchesStatus = item.status === "Online";
-      } else if (statusVal === "Offline") {
-        matchesStatus = item.status === "Offline";
-      } else if (statusVal === "Low Battery") {
-        matchesStatus = Number.isFinite(batteryPct) && batteryPct < 20;
-      }
+      // Filter on the backend-derived status so the dropdown matches
+      // the status pills and KPI counts exactly.
+      const matchesStatus =
+        statusVal === "All" ? true : item.status === statusVal;
 
       return matchesSearch && matchesStatus;
     });
@@ -378,20 +438,29 @@ async function loadSensorHealthPage() {
     for (const item of filtered) {
       const tr = document.createElement("tr");
 
-      if (typeof item.batteryPct === "number" && item.batteryPct < 20) {
+      if (item.status === "Low Battery") {
         tr.classList.add("sensor-row-low-battery");
       }
 
+      // Flag stale / missing sensors so they stand out in the table.
+      if (item.status === "Degraded" || item.status === "Offline") {
+        tr.classList.add("sensor-row-stale");
+      }
+
+      // Last-seen context makes staleness legible at a glance.
+      const lastSeenText = formatMinutesAgo(item.lastSeenMinutesAgo);
+      const lastAudioText = formatMinutesAgo(item.lastAudioMinutesAgo);
+
       tr.innerHTML = `
         <td>${item.sensorId || "—"}</td>
-        <td>${pillHtml(item.status, item.batteryPct)}</td>
+        <td>${pillHtml(item.status, item.batteryPct)}<div class="cell-subtext">seen ${lastSeenText}</div></td>
         <td>${formatBattery(item.batteryPct)}</td>
         <td>${formatPercent(item.cpu)}</td>
         <td>${formatPercent(item.ram)}</td>
         <td>${formatPercent(item.disk)}</td>
         <td>${formatUptime(item.uptime)}</td>
         <td>${formatGps(item.gps)}</td>
-        <td>${item.lastAudio || "—"}</td>
+        <td>${lastAudioText}</td>
       `;
 
       tbody.appendChild(tr);
@@ -405,6 +474,7 @@ async function loadSensorHealthPage() {
     try {
       const data = await apiFetch("/sensors/updates");
       lastItems = Array.isArray(data.items) ? data.items : [];
+      updateSensorKpis(lastItems);
       updateLastUpdated();
       render();
     } catch (e) {
@@ -416,7 +486,7 @@ async function loadSensorHealthPage() {
   searchInput?.addEventListener("input", render);
 
   await refresh();
-  setInterval(refresh, 15000);
+  setInterval(refresh, REFRESH_MS);
 }
 
 // ================================================================
