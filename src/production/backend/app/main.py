@@ -19,21 +19,12 @@ import json
 
 from app.routers import hmi, engine, sim, two_factor
 from app.routers import public
-app = FastAPI()
 
-# Add the CORS middleware
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:8080"],  # 可根据实际需求配置
-)
-# Routers
-from .routers import add_csv_output_option, audio_upload_router
-from app.routers import species_predictor, auth_router, hmi, engine, sim, two_factor, public, iot, live, sensors #Websocket
+import logging
+from app.logging_config import configure_logging
 
-from app.routers import projects
-app.include_router(projects.router)
-
-from app.routers import hmi, engine, sim, iot
+configure_logging() # 
+logger = logging.getLogger(__name__)
 
 # ✅ Add metadata here
 app = FastAPI(
@@ -48,6 +39,25 @@ app = FastAPI(
     """,
     version="1.0.0"
 )
+
+# Log API startup in structured JSON format
+@app.on_event("startup")
+async def log_api_startup():
+    logger.info("API Server listening on port 9000")
+
+# Add the CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:8080"],  # 可根据实际需求配置
+)
+# Routers
+from .routers import add_csv_output_option, audio_upload_router
+from app.routers import species_predictor, auth_router, hmi, engine, sim, two_factor, public, iot, live, sensors #Websocket
+
+from app.routers import projects
+app.include_router(projects.router)
+
+from app.routers import hmi, engine, sim, iot
 
 # ✅ CORS Middleware
 app.add_middleware(
@@ -142,6 +152,6 @@ def export_openapi_to_file():
     with open(output_path, "w") as f:
         json.dump(app.openapi(), f, indent=2)
 
-    print(f"✅ OpenAPI spec exported to {output_path}")
+    logger.info(f"OpenAPI spec exported to {output_path}")
 
 export_openapi_to_file()
