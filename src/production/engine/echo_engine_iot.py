@@ -76,6 +76,27 @@ from sklearn.preprocessing import LabelEncoder
 print('Python Version           : ', python_version())
 print('TensorFlow Version       : ', tf.__version__)
 print('Librosa Version          : ', librosa.__version__)
+def load_keras_model_file(model_path):
+    """
+    Load a Keras model and provide clear errors for invalid paths
+    or corrupt model files.
+    """
+
+    if not isinstance(model_path, str) or not model_path.strip():
+        raise ValueError("Model path must be a non-empty string")
+
+    try:
+        return load_model(model_path)
+
+    except OSError as error:
+        raise FileNotFoundError(
+            f"Model file could not be loaded: {model_path}"
+        ) from error
+
+    except ValueError as error:
+        raise ValueError(
+            f"Invalid or corrupt model file: {model_path}"
+        ) from error
 
 # Load the necessary data and models
 with open('yamnet_dir/class_names.pkl', 'rb') as f:
@@ -87,7 +108,7 @@ with open('yamnet_dir/label_encoder.pkl', 'rb') as f:
 yamnet = yamnet_model.yamnet_frames_model(params)
 yamnet.load_weights('yamnet_dir/yamnet.h5')
 yamnet_classes = yamnet_model.class_names('yamnet_dir/yamnet_class_map.csv')
-model = load_model('yamnet_dir/model_3_82_16000.h5')
+model = load_keras_model_file('yamnet_dir/model_3_82_16000.h5')
 
 # Load the YAMNet model
 # yamnet_model_handle = 'https://tfhub.dev/google/yamnet/1'
