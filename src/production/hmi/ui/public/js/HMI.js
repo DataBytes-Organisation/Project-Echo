@@ -12,7 +12,7 @@
  *              No changes to map logic, layer management, or audio handling.
  */
 
-import { showToast, getApiErrorMessage, withRetry } from "./HMI-utils.js";
+import { showToast, getApiErrorMessage, withRetry, showPageBanner, hidePageBanner } from "./HMI-utils.js";
 import { getAudioRecorder } from "./audio_recorder.js";
 import {
   retrieveTruthEventsInTimeRange,
@@ -349,8 +349,58 @@ fetch("./js/sample_data.json")
  * Task 7: error message now routed through getApiErrorMessage so the wording
  * is consistent with every other error surface in the application.
  */
+// ─────────────────────────────────────────────────────────────────────────────
+// MQTT connection state polling (FR-A2)
+// ─────────────────────────────────────────────────────────────────────────────
+
+let _lastMqttState = null;
+
+async function pollMqttConnectionState() {
+  try {
+    const response = await fetch("http://localhost:9000/mqtt/connection-state");
+    if (!response.ok) throw new Error("Failed to fetch connection state");
+    const data = await response.json();
+    const state = data.state;
+
+    if (state !== _lastMqttState) {
+      if (state === "connected") {
+        hidePageBanner("warning");
+        hidePageBanner("error");
+        if (_lastMqttState !== null) {
+          showToast("Live data connection restored", "success");
+        }
+      } else if (state === "reconnecting") {
+        showPageBanner("Live data connection lost — reconnecting…", "warning", false);
+        showToast("Live data connection lost, reconnecting…", "warning");
+      } else if (state === "disconnected") {
+        showPageBanner("Live data unavailable", "error", false);
+      }
+      _lastMqttState = state;
+    }
+  } catch (err) {
+    console.error("Error polling MQTT connection state:", err);
+
+    // The status check itself failed (backend unreachable) — treat this
+    // as unavailable rather than silently keeping the last-known state.
+    if (_lastMqttState !== "unavailable") {
+      showPageBanner("Live data unavailable — unable to check connection status", "error", false);
+      _lastMqttState = "unavailable";
+    }
+  }
+}
+
+function startMqttConnectionPolling() {
+  pollMqttConnectionState();
+  setInterval(pollMqttConnectionState, 5000);
+}
+
+
+
+
+
 export function initialiseHMI(hmiState) {
   console.log("initialising");
+  startMqttConnectionPolling();
 
   showMapSpinner("Loading map data…");
   hideMapError();
