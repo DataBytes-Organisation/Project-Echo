@@ -3,15 +3,17 @@ import os
 import json
 
 connection_state = "disconnected"  # disconnected | connecting | connected | reconnecting
+latest_events = {}
 
 MQTT_BROKER_URL = os.environ.get("MQTT_BROKER_URL", "ts-mqtt-server-cont")
 MQTT_BROKER_PORT = int(os.environ.get("MQTT_BROKER_PORT", 1883))
+MQTT_TOPIC = os.environ.get("MQTT_PUBLISH_URL", "projectecho/engine/2")
 
 def on_connect(client, userdata, flags, rc):
     global connection_state
     connection_state = "connected"
     print(f"[MQTT] Connected, rc={rc}")
-    client.subscribe("Simulate_Recording")
+    client.subscribe(MQTT_TOPIC)
 
 def on_disconnect(client, userdata, rc):
     global connection_state
@@ -22,6 +24,8 @@ def on_message(client, userdata, msg):
     normalized = normalize_payload(msg.payload, msg.topic)
     if normalized:
         print(f"[MQTT] Normalized event: {normalized}")
+        sensor_id = normalized.get("sensorId", "unknown")
+        latest_events[sensor_id] = normalized
     # TODO: forward `normalized` to wherever the frontend/dashboard reads from
 
 def normalize_payload(raw_payload, topic):
@@ -76,3 +80,6 @@ def start_mqtt_client():
 
 def get_connection_state():
     return connection_state
+
+def get_latest_events():
+    return list(latest_events.values())

@@ -379,6 +379,13 @@ async function pollMqttConnectionState() {
     }
   } catch (err) {
     console.error("Error polling MQTT connection state:", err);
+
+    // The status check itself failed (backend unreachable) — treat this
+    // as unavailable rather than silently keeping the last-known state.
+    if (_lastMqttState !== "unavailable") {
+      showPageBanner("Live data unavailable — unable to check connection status", "error", false);
+      _lastMqttState = "unavailable";
+    }
   }
 }
 
