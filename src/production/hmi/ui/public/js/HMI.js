@@ -355,18 +355,32 @@ export function initialiseHMI(hmiState) {
   showMapSpinner("Loading map data…");
   hideMapError();
 
+  // FR-A1: initialiseHMI() is re-entered by the map-error retry button
+  // (see showMapError(userMsg, () => initialiseHMI(hmiState)) below), on
+  // the same hmiState. createBasemap() itself is idempotent (see above),
+  // but everything in this block is one-time setup: it adds a brand new
+  // vector layer for every vocalisation/truth/mic slot and registers a new
+  // map click listener. None of that is guarded against being called
+  // twice, so without this check a retry would silently stack a second
+  // copy of every layer and a second click handler on top of the reused
+  // map. Only run it the first time hmiState has no basemap yet.
+  const isFirstInit = !hmiState.basemap;
+
   createBasemap(hmiState);
-  addVocalisationLayers(hmiState);
-  addTruthLayers(hmiState);
 
-  for (let i = 1; i < 26; i++) {
-    addVectorLayerTopDown(hmiState, `mic_layer_${i}`);
+  if (isFirstInit) {
+    addVocalisationLayers(hmiState);
+    addTruthLayers(hmiState);
+
+    for (let i = 1; i < 26; i++) {
+      addVectorLayerTopDown(hmiState, `mic_layer_${i}`);
+    }
+    addVectorLayerTopDown(hmiState, "mic_layer");
+
+    addAllTruthFeatures(hmiState);
+    addAllVocalizationFeatures(hmiState);
+    createMapClickEvent(hmiState);
   }
-  addVectorLayerTopDown(hmiState, "mic_layer");
-
-  addAllTruthFeatures(hmiState);
-  addAllVocalizationFeatures(hmiState);
-  createMapClickEvent(hmiState);
 
   // Task 7: withRetry wraps the microphone fetch.  routes.js already retries
   // the axios call; this outer withRetry handles cases where the call itself
@@ -376,11 +390,19 @@ export function initialiseHMI(hmiState) {
     delayMs: 2000,
     retryMessage: "Microphone load failed, retrying",
   })
-    .then((res) => {
+    .then(async (res) => {
       hideMapSpinner();
       updateMicrophoneLayer(hmiState, res.data);
       stepMicAnimation(hmiState);
-      addIoTNodesToMap(hmiState);
+
+      // FR-A1: await this instead of firing-and-forgetting it. Before,
+      // a failed node load rejected with nothing awaiting it (an unhandled
+      // rejection) while this .then() carried on straight to the "Map data
+      // loaded successfully" toast regardless. Awaiting it here means a
+      // node-load failure is caught by the .catch() below instead, so the
+      // success toast only fires once nodes have actually loaded.
+      await addIoTNodesToMap(hmiState);
+
       queueSimUpdate(hmiState);
       showToast("Map data loaded successfully", "success");
     })
@@ -946,6 +968,15 @@ function getOlDefaultInteractions(options) {
 }
 
 function createBasemap(hmiState) {
+  // FR-A1: initialiseHMI() can run more than once (the map-error retry
+  // button calls it again on the same hmiState). Reuse the existing
+  // ol.Map instead of constructing a second one on top of the same
+  // #basemap target — a second ol.Map would leave the first one's canvas,
+  // render loop and event listeners still attached underneath it.
+  if (hmiState.basemap) {
+    return hmiState.basemap;
+  }
+
   const basemap = new ol.Map({
     target: "basemap",
     featureEvents: true,
