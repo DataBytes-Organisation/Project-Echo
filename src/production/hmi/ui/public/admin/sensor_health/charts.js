@@ -1,4 +1,11 @@
 /* Charts helper for sensor health (moved into /admin/sensor_health/) */
+
+// same shared client as script.js on these pages - this was the last raw fetch
+// left on the sensor health screens. Silent retry: the chart is decorative and
+// already falls back to zeroes, so it shouldn't stack toasts on top of the ones
+// loadAlertsPage() is already showing for the same endpoint.
+import { retrieveSensorAlerts } from "/js/routes.js";
+
 document.addEventListener("DOMContentLoaded", () => {
   drawAlertsChart();
 });
@@ -12,18 +19,8 @@ async function drawAlertsChart() {
   let values = [0, 0, 0, 0];
 
   try {
-    const res = await fetch('/sensors/alerts');
-
-    if (!res.ok) {
-      throw new Error(`Failed to load alerts chart data: ${res.status}`);
-    }
-
-    const contentType = res.headers.get('content-type') || '';
-    if (!contentType.includes('application/json')) {
-      throw new Error('Alerts chart API did not return JSON.');
-    }
-
-    const data = await res.json();
+    const response = await retrieveSensorAlerts({ silent: true });
+    const data = response.data;
     const items = Array.isArray(data.items) ? data.items : [];
 
     const counts = {

@@ -202,7 +202,16 @@
   ></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.6/dist/vis-network.min.js"></script>
 
-  <script>
+  <!-- axios has to load before the module below - routes.js grabs window.axios
+       as soon as it evaluates, so this one can't be deferred -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+  <script type="module">
+    // shared client instead of a raw fetch straight to the API - was previously
+    // hardcoded to http://localhost:9000 too which only ever worked in local dev
+    import { retrieveIotNodes, retrieveIotNode } from "/js/routes.js";
+    import { getApiErrorMessage } from "/js/HMI-utils.js";
+
     const pageState = createAdminPageState();
     pageState.resetPageState();
 
@@ -305,20 +314,10 @@
         let usedFallback = false;
 
         try {
-          const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 4000);
-
-          const response = await fetch('http://localhost:9000/iot/nodes', {
-            signal: controller.signal
-          });
-
-          clearTimeout(timeoutId);
-
-          if (!response.ok) {
-            throw new Error(`Failed to fetch nodes: ${response.status}`);
-          }
-
-          nodes = await response.json();
+          // retrieveIotNodes() already carries its own timeout + retry via the
+          // shared client, so no need for our own AbortController here anymore
+          const response = await retrieveIotNodes();
+          nodes = response.data;
         } catch (fetchErr) {
           console.warn('Could not fetch nodes from backend:', fetchErr);
           pageState.showError('Live node data is unavailable. Showing fallback network data.');
@@ -383,24 +382,14 @@
           pageState.showLoading();
 
           try {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 4000);
-
-            const resp = await fetch(`http://localhost:9000/iot/nodes/${nodeId}`, {
-              signal: controller.signal
-            });
-
-            clearTimeout(timeoutId);
-
-            if (!resp.ok) {
-              throw new Error(`Failed to fetch node details: ${resp.status}`);
-            }
-
-            const node = await resp.json();
-            showNodeDetails(node);
+            // last hardcoded localhost:9000 call on this page - now goes through
+            // the Node proxy via the shared client, which brings its own timeout
+            // and retry so the AbortController here isn't needed any more
+            const response = await retrieveIotNode(nodeId);
+            showNodeDetails(response.data);
           } catch (err) {
             console.warn('Could not fetch node details for', nodeId, err);
-            pageState.showError('Failed to load node details.');
+            pageState.showError(getApiErrorMessage(err, 'Failed to load node details.'));
           } finally {
             pageState.hideLoading();
           }

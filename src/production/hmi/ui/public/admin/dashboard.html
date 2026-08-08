@@ -25,13 +25,17 @@
   <script type="text/javascript" src="/admin/js/app.min.js"></script>
   <script type="text/javascript" src="/admin/js/dashboard.js"></script>
   <script type="text/javascript" src="/admin/js/admin-page-state.js"></script>
+
+  <!-- axios has to load before the modules below - routes.js grabs window.axios
+       as soon as it evaluates, so this one can't be deferred -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 
 <body>
 
 <!-- Sprint 2: API Status Badge -->
 <div id="api-status-badge" style="position: fixed; top: 10px; right: 10px; z-index: 9999;">Loading status...</div>
-<script src="/js/api-status.js"></script>
+<script type="module" src="/js/api-status.js"></script>
 
   <!--  Body Wrapper -->
   <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
