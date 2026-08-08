@@ -61,6 +61,20 @@ tensorboard_logs/
 #src/production/engine/models/*
 
 # -----------------------------------------------------------------------------
+# PyTorch training pipeline (src/prototypes/engine/augmentation/)
+# -----------------------------------------------------------------------------
+*.pth
+*.onnx
+src/prototypes/engine/augmentation/outputs/
+src/prototypes/engine/augmentation/.cache/
+
+# -----------------------------------------------------------------------------
+# Local prototype datasets (not tracked, too large / personal-machine paths)
+# -----------------------------------------------------------------------------
+src/prototypes/data_files/
+src/prototypes/spectrograms/
+
+# -----------------------------------------------------------------------------
 # Databases
 # -----------------------------------------------------------------------------
 *.db
