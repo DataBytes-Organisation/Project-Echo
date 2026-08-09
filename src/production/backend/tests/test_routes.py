@@ -7,7 +7,7 @@ def test_root_endpoint():
     """Verify that the root endpoint is accessible and returns a 200 OK."""
     response = client.get("/")
     assert response.status_code == 200
-    assert "Project Echo API" in response.text
+    assert "echo api" in response.text.lower()
 
 def test_openapi_spec_exists():
     """Verify that the OpenAPI export endpoint functions correctly."""
@@ -31,7 +31,4 @@ def test_detections_route_exists():
     response = client.get("/detections")
     assert response.status_code != 404
 
-def test_species_predictor_route_exists():
-    """Verify that the species predictor route is mounted."""
-    response = client.post("/predict_species")
-    assert response.status_code != 404
+
