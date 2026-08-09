@@ -4,7 +4,6 @@ import datetime
 
 client = TestClient(app)
 
-# Note: Using Australian/British spelling for tests where applicable
 def test_valid_payload_normalisation():
     """Verify that a valid engine payload is processed successfully."""
     payload = {
