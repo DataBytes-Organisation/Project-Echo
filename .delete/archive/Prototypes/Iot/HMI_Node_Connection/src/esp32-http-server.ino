@@ -196,26 +196,29 @@ void sendSensorUpdates() {
   mpu.getEvent(&a, &g, &temp);
 
   // Prepare the updates array
-  String updates = String("[") +
-    // DHT22 update
-    "{\"component_id\": \"dht11\", \"data\": {" +
-    "\"temperature\": " + String(temperature) + "," +
-    "\"humidity\": " + String(humidity) +
-    "}}," +
-    // MPU6050 update
-    "{\"component_id\": \"imu1\", \"data\": {" +
-    "\"accelerometer\": {" +
-    "\"x\": " + String(a.acceleration.x) + "," +
-    "\"y\": " + String(a.acceleration.y) + "," +
-    "\"z\": " + String(a.acceleration.z) +
-    "}," +
-    "\"gyroscope\": {" +
-    "\"x\": " + String(g.gyro.x) + "," +
-    "\"y\": " + String(g.gyro.y) + "," +
-    "\"z\": " + String(g.gyro.z) +
-    "}" +
-    "}}" +
-    "]";  
+String updates = String("[") +
+// DHT22 update
+"{\"component_id\": \"dht11\", \"data\": {" +
+"\"temperature\": " + String(temperature) + "," +
+"\"humidity\": " + String(humidity) + "," +
+"\"battery\": -1," +
+"\"wifiSignal\": -1" +
+"}}," +
+
+// MPU6050 update
+"{\"component_id\": \"imu1\", \"data\": {" +
+"\"accelerometer\": {" +
+"\"x\": " + String(a.acceleration.x) + "," +
+"\"y\": " + String(a.acceleration.y) + "," +
+"\"z\": " + String(a.acceleration.z) +
+"}," +
+"\"gyroscope\": {" +
+"\"x\": " + String(g.gyro.x) + "," +
+"\"y\": " + String(g.gyro.y) + "," +
+"\"z\": " + String(g.gyro.z) +
+"}" +
+"}}" +
+"]";
 
   // Send to server
   HTTPClient http;
