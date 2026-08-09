@@ -110,6 +110,10 @@ services:
     environment:
       MAIL_STARTTLS: "true"
       MAIL_SSL_TLS: "false"
+      RATE_LIMIT_ENABLED: ${RATE_LIMIT_ENABLED:-true}
+      RATE_LIMIT_REQUESTS: ${RATE_LIMIT_REQUESTS:-120}
+      RATE_LIMIT_WINDOW_SECONDS: ${RATE_LIMIT_WINDOW_SECONDS:-60}
+      RATE_LIMIT_TRUST_PROXY: ${RATE_LIMIT_TRUST_PROXY:-false}
 
 
     stdin_open: false
@@ -145,6 +149,10 @@ services:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: root_password
       MONGO_INITDB_DATABASE: EchoNet
+      RATE_LIMIT_ENABLED: "true"
+      RATE_LIMIT_REQUESTS: "3"
+      RATE_LIMIT_WINDOW_SECONDS: "60"
+      RATE_LIMIT_TRUST_PROXY: "false"
     ports:
       - "27017:27017"
     volumes:

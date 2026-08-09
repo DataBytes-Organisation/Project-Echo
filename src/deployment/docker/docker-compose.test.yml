@@ -103,6 +103,13 @@ services:
       - ../../production/backend:/app # Mount the api's src directory to /app in the container
       - credentials_volume:/root/.config/gcloud/
       - weather_data:/app/weather_data  # Add a volume for weather data
+    environment:
+      MAIL_STARTTLS: "true"
+      MAIL_SSL_TLS: "false"
+      RATE_LIMIT_ENABLED: ${RATE_LIMIT_ENABLED:-true}
+      RATE_LIMIT_REQUESTS: ${RATE_LIMIT_REQUESTS:-120}
+      RATE_LIMIT_WINDOW_SECONDS: ${RATE_LIMIT_WINDOW_SECONDS:-60}
+      RATE_LIMIT_TRUST_PROXY: ${RATE_LIMIT_TRUST_PROXY:-false}
 
     stdin_open: false
     tty: true
