@@ -95,11 +95,3 @@ Run the unit tests:
 ```powershell
 python -m pytest src/tests/unit/engine/test_selected_model_baseline.py
 ```
-
-## Comparing with Krish's main pipeline
-
-Use `per_file_predictions.csv` as the fixed comparison input. Run the same
-manifest through the main Engine pipeline and join the two outputs by
-`sha256` or `relative_path`. Compare predicted index, predicted label,
-confidence and preprocessing failures. Do not compare results from different
-file lists or preprocessing settings.
