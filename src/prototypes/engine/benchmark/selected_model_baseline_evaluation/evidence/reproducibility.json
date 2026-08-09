@@ -3,7 +3,7 @@
   "class_mapping_sha256": "b4b453faf511291013e9c5435efd1b86fc7daeff1f883c095e511c68dfe30a8e",
   "classes_in_model": 123,
   "classes_with_successful_files": 122,
-  "config_path": "src/prototypes/engine/evaluation/selected_model_baseline/evaluation_config.json",
+  "config_path": "src/prototypes/engine/benchmark/selected_model_baseline_evaluation/evaluation_config.json",
   "config_sha256": "5d7682d72aa23ec45193698ab8d34e36af3bdb056ec6eeaedd8b1db032d93c36",
   "confusion_matrix_sha256": "2a2d3c977ce26656670e53d74186dde2eb620a6da66d70ca7a804946937698e2",
   "created_utc": "2026-08-07T11:07:46.171761+00:00",

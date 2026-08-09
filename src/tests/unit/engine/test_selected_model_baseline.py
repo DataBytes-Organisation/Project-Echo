@@ -11,8 +11,8 @@ MODULE_PATH = (
     Path(__file__).resolve().parents[3]
     / "prototypes"
     / "engine"
-    / "evaluation"
-    / "selected_model_baseline"
+    / "benchmark"
+    / "selected_model_baseline_evaluation"
     / "baseline_evaluation.py"
 )
 SPEC = importlib.util.spec_from_file_location("selected_model_baseline", MODULE_PATH)

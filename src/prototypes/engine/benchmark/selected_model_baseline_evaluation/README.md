@@ -54,8 +54,8 @@ From the repository root, set reusable paths for your environment. PowerShell
 examples are shown below.
 
 ```powershell
-$eval = "src/prototypes/engine/evaluation/selected_model_baseline/baseline_evaluation.py"
-$config = "src/prototypes/engine/evaluation/selected_model_baseline/evaluation_config.json"
+$eval = "src/prototypes/engine/benchmark/selected_model_baseline_evaluation/baseline_evaluation.py"
+$config = "src/prototypes/engine/benchmark/selected_model_baseline_evaluation/evaluation_config.json"
 $run = ".data/selected_model_baseline"
 $gcloud = "C:/path/to/google-cloud-sdk/bin/gcloud.cmd"
 ```
