@@ -1,7 +1,7 @@
 ## app.schemas.py
 from datetime import datetime
 from typing import Optional, List, Dict, Any
-from pydantic import BaseModel, Field, validator, constr, conlist, condecimal
+from pydantic import BaseModel, Field, validator, constr, conlist, condecimal, root_validator
 from bson.objectid import ObjectId
 from app.database import GENDER, STATES_CODE, AUS_STATES
 
@@ -34,6 +34,24 @@ class EventSchema(BaseModel):
     audioClip: str  # Audio clip data
     confidence: float = Field(gt=0, lt=100) # Confidence value between 0 and 100
     sampleRate: int  # Audio sample rate
+    source_model: str = "unknown" # Model used for prediction
+
+    @root_validator(pre=True)
+    def normalize_payload(cls, values):
+        # Normalize species field (Resnet uses 'label', PANNs uses 'class')
+        species = values.get('species') or values.get('species_name') or values.get('label') or values.get('class')
+        if species is not None:
+            values['species'] = species
+            
+        # Normalize confidence field (Resnet uses 'score', PANNs uses 'probability')
+        confidence = values.get('confidence') or values.get('confidence_score') or values.get('score') or values.get('probability')
+        if confidence is not None:
+            # If the engine sends a probability between 0 and 1, convert it to a percentage (0-100)
+            if isinstance(confidence, (int, float)) and confidence <= 1.0:
+                confidence = float(confidence) * 100.0
+            values['confidence'] = confidence
+            
+        return values
 
     # Configuration and schema example
     class Config:
