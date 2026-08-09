@@ -6,7 +6,40 @@
  * thing actually being exercised (indirectly, via withRetry)
  */
 
-const { getApiErrorMessage, withRetry, showToast } = require('../HMI-utils.js');
+const { getApiErrorMessage, withRetry, showToast, isTransientError } = require('../HMI-utils.js');
+
+describe('isTransientError - only transient failures are worth another attempt', () => {
+  it('treats a request that never got a reply as transient', () => {
+    expect(isTransientError(new Error('Network Error'))).toBe(true);
+  });
+
+  it('treats a timeout as transient', () => {
+    expect(isTransientError({ code: 'ECONNABORTED' })).toBe(true);
+  });
+
+  it('treats 5xx as transient', () => {
+    expect(isTransientError({ response: { status: 500 } })).toBe(true);
+    expect(isTransientError({ response: { status: 503 } })).toBe(true);
+  });
+
+  it('treats 408 and 429 as transient', () => {
+    expect(isTransientError({ response: { status: 408 } })).toBe(true);
+    expect(isTransientError({ response: { status: 429 } })).toBe(true);
+  });
+
+  it('does NOT treat 4xx as transient - the answer will not change on a retry', () => {
+    expect(isTransientError({ response: { status: 400 } })).toBe(false);
+    expect(isTransientError({ response: { status: 401 } })).toBe(false);
+    expect(isTransientError({ response: { status: 403 } })).toBe(false);
+    expect(isTransientError({ response: { status: 404 } })).toBe(false);
+    expect(isTransientError({ response: { status: 422 } })).toBe(false);
+  });
+
+  it('reads the status off an ApiError-shaped error too', () => {
+    expect(isTransientError({ status: 404 })).toBe(false);
+    expect(isTransientError({ status: 502 })).toBe(true);
+  });
+});
 
 describe('getApiErrorMessage - safe user-facing messages', () => {
   it('gives a clear message for a timed-out request', () => {

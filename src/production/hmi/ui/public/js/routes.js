@@ -251,3 +251,101 @@ export function updateSensorSettings(settings) {
 export function rebootSensor(sensorId, reason = null) {
   return api.post(`/sensors/${encodeURIComponent(sensorId)}/reboot`, { reason });
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Notifications  (FR-D1 follow-up — new)
+//
+// These went to http://localhost:9000 directly, which only ever worked on a dev
+// machine. server.js already proxies /hmi/* through to the API, so the relative
+// path works everywhere and picks up the shared timeout and error handling.
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** Bearer header for the routes the API expects a token on. */
+function authHeaders(token) {
+  return token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+}
+
+/**
+ * @param {string} userId
+ * @param {string} token
+ * @returns {Promise<AxiosResponse>}  response.data is the saved species list.
+ */
+export function retrieveUserNotifications(userId, token) {
+  return withRetry(
+    () => api.get(`/hmi/users/${encodeURIComponent(userId)}/notifications`, authHeaders(token)),
+    RETRY_OPTS
+  );
+}
+
+/**
+ * POST — not retried, this adds a subscription rather than reading one.
+ * @param {string} userId
+ * @param {{species: string, common: string}} animal
+ * @param {string} token
+ * @returns {Promise<AxiosResponse>}
+ */
+export function addUserNotification(userId, animal, token) {
+  return api.post(
+    `/hmi/users/${encodeURIComponent(userId)}/notifications`,
+    { species: animal.species, common: animal.common },
+    authHeaders(token)
+  );
+}
+
+/**
+ * DELETE — not retried, same reasoning as the POST above.
+ * @param {string} userId
+ * @param {string} species
+ * @param {string} token
+ * @returns {Promise<AxiosResponse>}
+ */
+export function removeUserNotification(userId, species, token) {
+  return api.delete(
+    `/hmi/users/${encodeURIComponent(userId)}/notifications/${encodeURIComponent(species)}`,
+    authHeaders(token)
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Submissions, profile, donations  (FR-D1 follow-up — new)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * POST — not retried, a resubmit would create a second review request.
+ * @param {object} requestData
+ * @returns {Promise<AxiosResponse>}
+ */
+export function submitAnimalRequest(requestData) {
+  return api.post("/api/submit", requestData);
+}
+
+/** @returns {Promise<AxiosResponse>}  response.data is { username, email, ... }. */
+export function retrieveUserProfile() {
+  return withRetry(() => api.get("/user_profile"), RETRY_OPTS);
+}
+
+/** @returns {Promise<AxiosResponse>}  response.data is { cumulativeTotal }. */
+export function retrieveCumulativeDonations() {
+  return withRetry(() => api.get("/cumulativeDonations"), RETRY_OPTS);
+}
+
+/** @returns {Promise<AxiosResponse>}  response.data is the donations array. */
+export function retrieveDonations() {
+  return withRetry(() => api.get("/donations"), RETRY_OPTS);
+}
+
+/**
+ * Weather for a detection, used by the map popups.
+ * Was another direct localhost:9000 call - /hmi/* proxies through server.js.
+ *
+ * @param {number|string} timestamp
+ * @param {number} lat
+ * @param {number} lon
+ * @returns {Promise<AxiosResponse>}
+ */
+export function retrieveWeather(timestamp, lat, lon) {
+  return withRetry(
+    () => api.get("/hmi/weather", { params: { timestamp, lat, lon } }),
+    RETRY_OPTS
+  );
+}

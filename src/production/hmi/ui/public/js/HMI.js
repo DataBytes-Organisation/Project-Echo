@@ -25,6 +25,7 @@ import {
   setSimModeRecording,
   setSimModeRecordingV2,
   stopSimulator,
+  retrieveWeather,
 } from "./routes.js";
 import { addIoTNodesToMap } from "./nodes-overlay.js";
 
@@ -1127,11 +1128,10 @@ function createBasemap(hmiState) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 async function fetchWeatherData(timestamp, lat, lon) {
-  const response = await fetch(
-    `http://localhost:9000/hmi/weather?timestamp=${timestamp}&lat=${lat}&lon=${lon}`
-  );
-  if (!response.ok) throw new Error("Failed to fetch weather data");
-  return response.json();
+  // FR-D1: was hardcoded to http://localhost:9000, so weather never loaded
+  // anywhere but a dev machine. server.js proxies /hmi/* through to the API.
+  const response = await retrieveWeather(timestamp, lat, lon);
+  return response.data;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

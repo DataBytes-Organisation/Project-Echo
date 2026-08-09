@@ -12,7 +12,7 @@
 // real browser, where axios gets loaded via a CDN <script> tag onto window
 // before routes.js runs) - so we set that up directly rather than mocking
 // require('axios'), which wouldn't be the path actually taken here
-const mockApi = { get: jest.fn(), post: jest.fn(), patch: jest.fn() };
+const mockApi = { get: jest.fn(), post: jest.fn(), patch: jest.fn(), put: jest.fn(), delete: jest.fn() };
 global.window.axios = { create: jest.fn(() => mockApi) };
 
 const routes = require('../routes.js');
@@ -21,6 +21,8 @@ beforeEach(() => {
   mockApi.get.mockReset();
   mockApi.post.mockReset();
   mockApi.patch.mockReset();
+  mockApi.put.mockReset();
+  mockApi.delete.mockReset();
 });
 
 describe('routes.js - GET retry behaviour', () => {
@@ -116,6 +118,96 @@ describe('routes.js - state-changing requests are NOT retried', () => {
       username: 'someone',
       email: 'a@b.c',
       password: 'pw',
+    });
+  });
+});
+
+describe('routes.js - GET retries are limited to transient failures', () => {
+  it('gives up immediately on a 404 instead of burning three attempts', async () => {
+    mockApi.get.mockRejectedValue({ response: { status: 404 } });
+
+    await expect(routes.retrieveMicrophones()).rejects.toMatchObject({
+      response: { status: 404 },
+    });
+    expect(mockApi.get).toHaveBeenCalledTimes(1);
+  });
+
+  it('gives up immediately on a 401', async () => {
+    mockApi.get.mockRejectedValue({ response: { status: 401 } });
+
+    await expect(routes.retrieveAdminRequests()).rejects.toBeDefined();
+    expect(mockApi.get).toHaveBeenCalledTimes(1);
+  });
+
+  it('still retries a 503, which may well pass on the next go', async () => {
+    mockApi.get
+      .mockRejectedValueOnce({ response: { status: 503 } })
+      .mockResolvedValueOnce({ data: [] });
+
+    await routes.retrieveIotNodes({ silent: true });
+
+    expect(mockApi.get).toHaveBeenCalledTimes(2);
+  }, 10000);
+});
+
+describe('routes.js - notifications, submissions, profile and donations', () => {
+  it('retrieveUserNotifications uses the relative /hmi proxy path with a bearer token', async () => {
+    mockApi.get.mockResolvedValueOnce({ data: { notificationAnimals: [] } });
+
+    await routes.retrieveUserNotifications('user-1', 'tok123');
+
+    expect(mockApi.get).toHaveBeenCalledWith(
+      '/hmi/users/user-1/notifications',
+      { headers: { Authorization: 'Bearer tok123' } }
+    );
+  });
+
+  it('addUserNotification posts once and is never retried', async () => {
+    mockApi.post.mockRejectedValueOnce({ response: { status: 500 } });
+
+    await expect(
+      routes.addUserNotification('user-1', { species: 'koala', common: 'Koala' }, 'tok')
+    ).rejects.toBeDefined();
+    expect(mockApi.post).toHaveBeenCalledTimes(1);
+  });
+
+  it('removeUserNotification encodes the species and deletes once', async () => {
+    mockApi.delete.mockResolvedValueOnce({ data: {} });
+
+    await routes.removeUserNotification('user-1', 'grey headed flying fox', 'tok');
+
+    expect(mockApi.delete).toHaveBeenCalledWith(
+      '/hmi/users/user-1/notifications/grey%20headed%20flying%20fox',
+      { headers: { Authorization: 'Bearer tok' } }
+    );
+    expect(mockApi.delete).toHaveBeenCalledTimes(1);
+  });
+
+  it('submitAnimalRequest posts once - a resubmit would duplicate the review', async () => {
+    mockApi.post.mockRejectedValueOnce({ response: { status: 500 } });
+
+    await expect(routes.submitAnimalRequest({ animal: 'koala' })).rejects.toBeDefined();
+    expect(mockApi.post).toHaveBeenCalledTimes(1);
+  });
+
+  it('profile and donations use relative paths', async () => {
+    mockApi.get.mockResolvedValue({ data: {} });
+
+    await routes.retrieveUserProfile();
+    await routes.retrieveCumulativeDonations();
+    await routes.retrieveDonations();
+
+    const paths = mockApi.get.mock.calls.map(c => c[0]);
+    expect(paths).toEqual(['/user_profile', '/cumulativeDonations', '/donations']);
+  });
+
+  it('retrieveWeather goes through the /hmi proxy, not localhost:9000', async () => {
+    mockApi.get.mockResolvedValueOnce({ data: {} });
+
+    await routes.retrieveWeather(1700000000, -38.77, 143.57);
+
+    expect(mockApi.get).toHaveBeenCalledWith('/hmi/weather', {
+      params: { timestamp: 1700000000, lat: -38.77, lon: 143.57 },
     });
   });
 });
