@@ -4,7 +4,9 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "jest",
+    "test": "node --test \"public/js/**/*.test.mjs\" \"tests/**/*.test.mjs\" && jest",
+    "test:node": "node --test \"public/js/**/*.test.mjs\" \"tests/**/*.test.mjs\"",
+    "test:jest": "jest",
     "dev": "nodemon --inspect=0.0.0.0  server.js"
   },
   "author": "",
