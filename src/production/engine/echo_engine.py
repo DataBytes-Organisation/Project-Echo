@@ -1,10 +1,13 @@
 
 ##################################################################################################
-# Main Echo Engine application with IoT MQTT support
+# Project Echo - Production Echo Engine
 #
-# This is the canonical runtime for both standard and IoT MQTT processing.
+# Canonical runtime for standard Simulator/MQTT and IoT processing.
+# Includes EfficientNetV2 TFLite inference while preserving legacy Engine functionality.
 #
-# Author: IoT Team (reviewed & fixed by Engine Lead)
+# Original Engine: Project Echo
+# IoT integration: IoT Team and Engine Team
+# EfficientNetV2 TFLite integration: Engine Team
 ##################################################################################################
 
 
