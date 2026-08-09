@@ -238,8 +238,8 @@ app.post("/api/create-checkout-session", async (req, res) => {
       metadata: {
       type: "One-Time"
       },
-      success_url: "http://localhost:9000/donation-success?session_id={CHECKOUT_SESSION_ID}", //`${process.env.CLIENT_URL}`,
-      cancel_url: "http://localhost:9000"//`${process.env.CLIENT_URL}`,
+      success_url: `${process.env.CLIENT_URL}/donation-success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: process.env.CLIENT_URL,
     })
     console.log("two");
     res.json({ url: session.url })
