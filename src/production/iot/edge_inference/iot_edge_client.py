@@ -41,6 +41,19 @@ MODEL_PATH        = _DIR / "models" / "efficientnetv2_project_echo.tflite"
 CLASS_MAPPING_PATH = _DIR / "models" / "class_mapping.json"
 PREPROCESS_CFG_PATH = _DIR / "models" / "preprocess_config.json"
 
+# ---------------------------------------------------------------------------
+# Audio Enhancement Pipeline & Edge Event Detection
+# ---------------------------------------------------------------------------
+def enhance_and_detect_event(audio: np.ndarray, sr: int, energy_threshold: float = 0.01) -> tuple[np.ndarray, bool]:
+    rms_energy = float(np.sqrt(np.mean(audio**2)))
+    if rms_energy < energy_threshold:
+        return audio, False
+
+    max_val = np.max(np.abs(audio))
+    if max_val > 0:
+        audio = audio / max_val * 0.9
+
+    return audio, True
 
 # ---------------------------------------------------------------------------
 # Model loading
@@ -224,6 +237,8 @@ def main():
     parser.add_argument("--gps-uncertainty", type=float, default=10.0)
     parser.add_argument("--interval",        type=float, default=10.0,
                         help="Seconds between recordings (default: 10)")
+    parser.add_argument("--energy-threshold", type=float, default=0.01,
+                        help="Min RMS energy threshold for event detection")
     parser.add_argument("--use-gps",         action="store_true",
                         help="Read GPS from gpsd instead of using fixed --lat/--lon")
     args = parser.parse_args()
@@ -231,13 +246,20 @@ def main():
     interpreter, input_details, output_details, cfg, index_to_label = load_model()
     client = connect_mqtt(args.broker, args.port)
 
-    print("Edge inference client running. Ctrl+C to stop.\n", flush=True)
+    print("Edge inference client running. Ctrl+C to stop.", flush=True)
     try:
         while True:
             gps = get_gps(args.lat, args.lon) if args.use_gps else {"lat": args.lat, "lon": args.lon}
 
-            audio   = record_audio(cfg["duration_s"], cfg["target_sr"])
-            x       = preprocess(audio, cfg)
+            raw_audio = record_audio(cfg["duration_s"], cfg["target_sr"])
+            audio, event_detected = enhance_and_detect_event(raw_audio, cfg["target_sr"], args.energy_threshold)
+
+            if not event_detected:
+                print("Silence/Noise detected. Skipping inference & transmission.", flush=True)
+                time.sleep(args.interval)
+                continue
+
+            x = preprocess(audio, cfg)
             species, confidence, top5 = run_inference(
                 interpreter, input_details, output_details, x, index_to_label
             )
@@ -251,7 +273,7 @@ def main():
                 args.sensor_id, gps, args.gps_uncertainty,
             )
             client.publish(args.topic, json.dumps(payload), qos=1)
-            print(f"Published to {args.topic}\n", flush=True)
+            print(f"Published to {args.topic}", flush=True)
 
             time.sleep(args.interval)
 
