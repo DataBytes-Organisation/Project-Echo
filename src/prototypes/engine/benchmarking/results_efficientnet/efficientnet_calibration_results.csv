@@ -1,0 +1,2 @@
+variant,accuracy,macro_f1,ece,brier,size_kb,latency_ms,n_samples,n_classes_seen
+efficientnetv2_tflite_fp32,0.9579870729455217,0.9596358085608775,0.06966160832216359,0.07782146812370981,87235.5,139.28,2166,123
