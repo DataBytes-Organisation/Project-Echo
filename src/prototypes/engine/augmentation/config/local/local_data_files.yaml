@@ -1,0 +1,33 @@
+# @package _global_
+#
+# config/local/local_data_files.yaml
+#
+# Points system.audio_data_directory at the real local dataset already
+# present in this repo checkout at src/prototypes/data_files/ (128 species,
+# ~9,200 audio files, untracked in git - see .gitignore - and unrelated to
+# the archive). Opt-in only - select with `+local=local_data_files`. Does
+# NOT change config.yaml's own defaults, so it has zero effect on anyone
+# not explicitly selecting it, same as cpu.yaml.
+#
+# Combine with cpu.yaml on Windows/CPU-only machines, e.g.:
+#   python main.py +local=cpu +local=local_data_files
+# (Hydra merges both selections into the global config; this file only
+# adds the dataset path, so it composes cleanly with cpu.yaml rather than
+# duplicating cpu.yaml's hydra.run.dir / pretrained keys.)
+#
+# NOTE: no local background_noise/ folder was found alongside this
+# dataset. The default augmentation preset's AddBackgroundNoise transform
+# needs real files at system.background_noise_dir - either pass
+# `system.background_noise_dir=<path>` separately, or expect that
+# transform to log-and-skip per sample (dataset.py already only logs
+# augmentation errors rather than crashing on them).
+
+system:
+  # Relative to this file's folder (src/prototypes/engine/augmentation/).
+  # Only TWO levels up reaches src/prototypes/ here (augmentation/ ->
+  # engine/ -> prototypes/ -> data_files/), not four like cpu.yaml's
+  # example - that path points outside the repo entirely, this one
+  # doesn't, so don't copy-paste cpu.yaml's prefix without recomputing it.
+  # Verified: `cd src/prototypes/engine/augmentation && ls ../../data_files`
+  # lists the species folders.
+  audio_data_directory: ../../data_files
