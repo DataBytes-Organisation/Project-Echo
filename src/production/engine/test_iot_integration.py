@@ -1,5 +1,5 @@
 """
-Unit tests for IoT MQTT integration in echo_engine.py
+Unit tests for IoT MQTT integration in the consolidated Echo Engine runtime.
 
 Mocks heavy dependencies (TensorFlow, librosa, MQTT, GCP, etc.) so tests
 run without the full Docker stack or GPU.
@@ -27,6 +27,7 @@ _HEAVY_MODULES = [
     "paho", "paho.mqtt", "paho.mqtt.client",
     "google.cloud", "google.cloud.storage",
     "pymongo", "diskcache", "soundfile",
+    "requests",
     "geopy", "geopy.distance",
     "sklearn", "sklearn.preprocessing",
     "helpers", "helpers.melspectrogram_to_cam",
@@ -78,7 +79,7 @@ def _patched_open(path, *args, **kwargs):
 
 
 builtins.open = _patched_open
-from echo_engine_iot import EchoEngine  # noqa: E402
+from echo_engine import EchoEngine  # noqa: E402
 builtins.open = _real_open
 
 
