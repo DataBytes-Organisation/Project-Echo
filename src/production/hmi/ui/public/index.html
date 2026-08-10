@@ -489,44 +489,53 @@
                     <div class="markup_column"><div class="markup_row_left"><div>Latitude</div></div><div class="markup_row_right"><div id="mic_markup_loc_lat"></div></div></div>
                     <div class="markup_column"><div class="markup_row_left" style="width: 100px !important"><div>Date</div></div><div class="markup_row_right" style="text-align: right !important; width: 400px !important"><div id="mic_markup_date"></div></div></div>
                   </div>
-                  <h2 style="margin-top: 20px !important;">Record Live Audio</h2>
-                  <div id="audio_recording_container">
-                    <button type="button" id="record_audio_button" class="toggle-button btn btn-secondary btn-no-background select-all-btn" onclick="record()">Record</button>
-                    <div id="recording_controls_container" class="recording_controls controls_item_row hide">
-                      <i id="cancel_recording_button" class="toggle-button btn btn-secondary btn-no-background select-all-btn" onclick="{cancelRecording()}" aria-hidden="true">Cancel</i>
-                      <div id="recording_info" class="controls_item_row">
-                        <i id="recording_indicator" class="fa fa-circle" aria-hidden="true"></i>
-                        <p id="recording_duration">"00:00:00"</p>
+                  <section id="frb2-recording-panel" class="frb2-panel">
+                    <h2>Record Live Audio</h2>
+                    <p class="frb2-help">
+                      Record from your browser mic (max 20 seconds), then use the green play button to replay.
+                    </p>
+
+                    <div class="frb2-actions">
+                      <button type="button" id="record_audio_button" class="frb2-btn frb2-btn-record" onclick="record()">Record</button>
+                      <button type="button" id="stop_recording_button" class="frb2-btn frb2-btn-stop" onclick="stopRecording()" disabled>Stop</button>
+                      <button type="button" id="cancel_recording_button" class="frb2-btn frb2-btn-cancel" onclick="cancelRecording()" disabled>Cancel</button>
+                    </div>
+
+                    <div id="frb2-live-status" class="frb2-live-status" data-state="idle">
+                      <span id="recording_indicator" class="frb2-rec-dot" aria-hidden="true"></span>
+                      <span id="recording_duration" class="frb2-timer">00:00</span>
+                      <span id="frb2-status-label" class="frb2-status-label">Ready to record</span>
+                    </div>
+
+                    <div class="frb2-playback">
+                      <h3 id="recordingPlaybackHeader">Recording Playback</h3>
+                      <p id="recording_playback_status" class="frb2-playback-status">No recording yet. Press Record, then Stop.</p>
+                      <div class="frb2-play-row">
+                        <button type="button" id="frb2-play-button" class="frb2-play-fab" onclick="playRecordingClip()" disabled title="Play last recording" aria-label="Play last recording">
+                          <span class="frb2-play-fab-icon" aria-hidden="true"></span>
+                        </button>
+                        <span id="frb2-play-label" class="frb2-play-label">Play recording</span>
                       </div>
-                      <i id="stop_recording_button" class="toggle-button btn btn-secondary btn-no-background select-all-btn" onclick="{stopRecording()}" aria-hidden="true">Stop</i>
+                      <audio id="audioElem" class="frb2-audio frb2-audio-muted" controls preload="metadata" controlsList="nodownload"></audio>
                     </div>
-                    <div id="audio_playback_div">
-                      <p id="audio_playback_indicator" class="playback_indicator hide">Audio is playing<span>.</span><span>.</span><span>.</span></p>
-                    </div>
+                  </section>
+
+                  <!-- Keep legacy class hooks used by older helpers -->
+                  <div id="audio_recording_container" class="frb2-legacy-hidden" aria-hidden="true">
+                    <div id="recording_controls_container" class="recording_controls hide"></div>
+                    <div id="audio_playback_div"><p id="audio_playback_indicator" class="playback_indicator hide"></p></div>
                   </div>
-                  <h2 id="recordingPlaybackHeader" style="margin-top: 20px !important;">Recording Playback</h2>
-                  <div id="audio_playback_container">
-                    <div id="recordingAudioControl" class="audio_component">
-                      <span><i id="recordingI" class="fa fa-volume-up fa-2x" style="color:rgba(247, 186, 206, 0.6);" onclick="{toggleRecordingAudio()}"></i></span>
-                      <div class="audioContainer">
-                        <div class="boxR box1"></div><div class="boxR box2"></div><div class="boxR box3"></div><div class="boxR box4"></div><div class="boxR box5"></div>
-                        <div class="boxR box6"></div><div class="boxR box7"></div><div class="boxR box8"></div><div class="boxR box9"></div><div class="boxR box10"></div>
-                        <div class="boxR box1"></div><div class="boxR box2"></div><div class="boxR box3"></div><div class="boxR box4"></div><div class="boxR box5"></div>
-                        <div class="boxR box6"></div><div class="boxR box7"></div><div class="boxR box8"></div><div class="boxR box9"></div><div class="boxR box10"></div>
-                      </div>
-                    </div>
-                  </div>
+
                   <h2 id="recordingSimulationHeader" style="margin-top: 20px !important;">Recording Simulation</h2>
                   <div id="recording_simulation_master_container">
-                    <div id="recording_export_container" style="margin-top: 10px !important;" class="recording_controls controls_item_row">
+                    <div id="recording_export_container" style="margin-top: 10px !important;" class="controls_item_row">
                       <input type="file" style="display: inline-block !important; width: 250px !important" id="fileInput">
                     </div>
-                    <div id="recording_simulation_container" style="margin-top: 10px !important;" class="recording_controls controls_item_row">
+                    <div id="recording_simulation_container" style="margin-top: 10px !important;" class="controls_item_row">
                       <i id="simulate_recording_button" style="width:120px !important" class="toggle-button btn btn-secondary btn-no-background select-all-btn" onclick="{simulateRecordingEvent()}" aria-hidden="true">Simulate</i>
                     </div>
                     <div id="downloadLink"></div>
                   </div>
-                  <audio controls id="audioElem" class="audio-element hide"></audio>
                 </div>
                 <div id="mic-default-content">
                   <h2 style="text-align: left; color: rgba(247, 186, 206, 1) !important;">Microphone Bio Data</h2>
@@ -1309,8 +1318,18 @@
         }
       }
 
-      function animateRecordedAudioPlay() { $(".boxmutedR").removeClass("boxmutedR"); recordingAud = true;  document.getElementById("recordingI").style.opacity = ".5"; }
-      function animateRecordedAudioMute() { $(".boxR").addClass("boxmutedR");          recordingAud = false; document.getElementById("recordingI").style.opacity = "1"; }
+      function animateRecordedAudioPlay() {
+        recordingAud = true;
+        const icon = document.getElementById("recordingI");
+        if (icon) icon.style.opacity = ".5";
+        $(".boxmutedR").removeClass("boxmutedR");
+      }
+      function animateRecordedAudioMute() {
+        recordingAud = false;
+        const icon = document.getElementById("recordingI");
+        if (icon) icon.style.opacity = "1";
+        $(".boxR").addClass("boxmutedR");
+      }
 
       function toggleRecordingAudio() {
         if (!recordingAud) {
@@ -1481,7 +1500,7 @@
         resetWildlifeLayers, MapOpenNav, MapCloseNav, getAnimalToggled,
         enableMicAnimation, disableMicAnimation, getUTC,
         startAudioRecording, stopAudioRecording, cancelAudioRecording,
-        testFunct, convertCSV
+        playRecordingClip, testFunct, convertCSV
       } from "./js/HMI.js";
 
       import { retrieveTruthEventsInTimeRange, retrieveVocalizationEventsInTimeRange } from "./js/routes.js";
@@ -1490,6 +1509,10 @@
       // the non-module <script> blocks above can call window.showToast().
       import { showToast } from "./js/HMI-utils.js";
       window.showToast = showToast;
+      window.playRecordingClip = playRecordingClip;
+      window.startAudioRecording = startAudioRecording;
+      window.stopAudioRecording = stopAudioRecording;
+      window.cancelAudioRecording = cancelAudioRecording;
 
       window.updateMics              = updateMics;
       window.downloadCSV             = downloadCSV;
@@ -1717,13 +1740,13 @@
 
       // ── Audio recording ─────────────────────────────────────────────────
 
-      function record()         { startAudioRecording();  }
-      function stopRecording()  { stopAudioRecording();   }
-      function cancelRecording(){ cancelAudioRecording(); }
+      function record()          { startAudioRecording(); }
+      function stopRecording()   { stopAudioRecording(); }
+      function cancelRecording() { cancelAudioRecording(); }
 
-      window.record          = record;
-      window.cancelRecording = cancelRecording;
-      window.stopRecording   = stopRecording;
+      window.record            = record;
+      window.cancelRecording   = cancelRecording;
+      window.stopRecording     = stopRecording;
     </script>
 
     <script>
