@@ -11,3 +11,6 @@ resources-after.txt
 !.gitignore
 !baseline-summary.md
 !stress-summary.md
+*.csv
+!ingestion-summary.md
+!bottleneck-analysis.md

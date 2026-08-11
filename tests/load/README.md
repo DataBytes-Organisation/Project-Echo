@@ -62,3 +62,18 @@ The retrieval stress test sent 4,200 requests and reached a configured traffic s
 - Maximum latency: 79 ms
 
 No clear bottleneck was identified at this load level. Further breaking-point testing and continuous CPU and memory monitoring are required to determine the maximum sustainable throughput.
+## Tested API Paths
+
+The D1.1 load-testing framework covers both retrieval and ingestion workloads:
+
+- `GET /iot/nodes` - retrieval baseline and stress testing
+- `POST /engine/event` - ingestion baseline and stress testing
+
+The ingestion workload uses clearly marked test records with the species
+`LOAD_TEST_SPECIES` and sensor ID `load-test-sensor`. These records should be
+removed from MongoDB after testing.
+
+Resource utilisation can be monitored during tests using:
+
+```bash
+./tests/load/monitor-resources.sh

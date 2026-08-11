@@ -1,0 +1,39 @@
+config:
+  target: "http://localhost:9000"
+
+  phases:
+    - name: "Warm up"
+      duration: 20
+      arrivalRate: 1
+
+    - name: "Normal ingestion load"
+      duration: 30
+      arrivalRate: 2
+
+    - name: "Increased ingestion load"
+      duration: 30
+      arrivalRate: 5
+
+  ensure:
+    thresholds:
+      - http.response_time.p95: 1000
+      - http.errors: 1
+
+scenarios:
+  - name: "Create event"
+    flow:
+      - post:
+          url: "/engine/event"
+          json:
+            timestamp: "2026-08-11T05:30:00.000Z"
+            sensorId: "load-test-sensor"
+            species: "LOAD_TEST_SPECIES"
+            microphoneLLA: [-38.7789, 143.5705, 20.0]
+            animalEstLLA: [-38.7790, 143.5706, 20.0]
+            animalTrueLLA: [-38.7791, 143.5707, 20.0]
+            animalLLAUncertainty: 10
+            audioClip: "load-test-placeholder"
+            confidence: 95.0
+            sampleRate: 48000
+          expect:
+            - statusCode: 201
