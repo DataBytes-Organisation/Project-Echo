@@ -16,14 +16,20 @@ router = APIRouter()
 
 @router.post("/event", status_code=status.HTTP_201_CREATED)
 def create_event(event: schemas.EventSchema):
+    event_data = event.dict()
+    event_data["confidence"] = float(event_data["confidence"])
 
-    result = Events.insert_one(event.dict())
+    result = Events.insert_one(event_data)
+
     pipeline = [
-            {'$match': {'_id': result.inserted_id}},
-        ]
-    new_post = serializers.eventListEntity(Events.aggregate(pipeline))[0]
-    return new_post
+        {'$match': {'_id': result.inserted_id}},
+    ]
 
+    new_post = serializers.eventListEntity(
+        Events.aggregate(pipeline)
+    )[0]
+
+    return new_post
     
 # Return all species data
 
