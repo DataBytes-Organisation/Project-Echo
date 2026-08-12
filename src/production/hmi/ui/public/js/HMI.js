@@ -394,6 +394,57 @@ function startMqttConnectionPolling() {
   setInterval(pollMqttConnectionState, 5000);
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Live MQTT events → map layers (FR-A2)
+// ─────────────────────────────────────────────────────────────────────────────
+
+const _seenMqttEventIds = new Set();
+
+async function pollMqttLatestEvents(hmiState) {
+  try {
+    const response = await fetch("http://localhost:9000/mqtt/latest-events");
+    if (!response.ok) throw new Error("Failed to fetch latest events");
+    const data = await response.json();
+    const events = data.events || [];
+
+
+    const newVocalizationEvents = [];
+    const newMovementEvents = [];
+
+    for (const event of events) {
+      if (_seenMqttEventIds.has(event._id)) continue;
+      _seenMqttEventIds.add(event._id);
+
+      if (event.eventType === "vocalization") {
+        newVocalizationEvents.push(event);
+      } else if (event.eventType === "movement") {
+        newMovementEvents.push(event);
+      }
+      // sensor_health / iot_node: normalized on the backend, but there is
+      // no existing HMI render function for these yet, so they are not
+      // routed to the map here. Flagged for a follow-up ticket.
+    }
+
+    if (newVocalizationEvents.length > 0) {
+      updateVocalizationLayerFromLiveData(hmiState, newVocalizationEvents);
+    }
+    if (newMovementEvents.length > 0) {
+      updateAnimalMovementLayerFromLiveData(hmiState, newMovementEvents);
+    }
+
+
+  } catch (err) {
+    console.error("Error polling MQTT latest events:", err);
+  }
+}
+
+function startMqttEventPolling(hmiState) {
+  pollMqttLatestEvents(hmiState);
+  setInterval(() => pollMqttLatestEvents(hmiState), 5000);
+}
+
+
+
 
 
 
@@ -401,6 +452,7 @@ function startMqttConnectionPolling() {
 export function initialiseHMI(hmiState) {
   console.log("initialising");
   startMqttConnectionPolling();
+  startMqttEventPolling(hmiState);
 
   showMapSpinner("Loading map data…");
   hideMapError();

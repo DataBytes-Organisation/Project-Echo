@@ -73,7 +73,9 @@ def mqtt_connection_state():
 
 @app.get("/mqtt/latest-events", tags=["mqtt"])
 def mqtt_latest_events():
-    return {"events": get_latest_events()} 
+    from app.routers.hmi import show_latest_events
+    return {"events": show_latest_events(limit=20)}
+
 
 
 # app.include_router(hmi.router, tags=['hmi'], prefix='/hmi')

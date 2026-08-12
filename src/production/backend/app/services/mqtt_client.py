@@ -24,14 +24,14 @@ def on_message(client, userdata, msg):
     normalized = normalize_payload(msg.payload, msg.topic)
     if normalized:
         print(f"[MQTT] Normalized event: {normalized}")
-        sensor_id = normalized.get("sensorId", "unknown")
-        latest_events[sensor_id] = normalized
+        key = normalized.get("_id", "unknown")
+        latest_events[key] = normalized
     # TODO: forward `normalized` to wherever the frontend/dashboard reads from
 
 def normalize_payload(raw_payload, topic):
     """
-    Converts a raw MQTT message into a consistent shape for
-    downstream use (map rendering, dashboards, notifications).
+    Converts a raw MQTT message into a shape the frontend can use directly.
+    Routes by event type: vocalization, movement, sensor_health, iot_node.
     """
     try:
         data = json.loads(raw_payload)
@@ -40,27 +40,65 @@ def normalize_payload(raw_payload, topic):
         return None
 
     # Vocalization / recording events (from comms_manager.py's
-    # mqtt_send_random_audio_msg and mqtt_send_recording_msg)
+    # mqtt_send_random_audio_msg and mqtt_send_recording_msg).
+    # NOTE: species classification (species/commonName/status/diet) is NOT
+    # available at this stage — it only exists after the engine classifies
+    # the audio and posts the result to MongoDB via HTTP, not over MQTT.
+    # We use clear placeholders here rather than fabricate values.
     if "animalEstLLA" in data or "audioClip" in data:
-        est_lla = data.get("animalEstLLA", [None, None, None])
         return {
-            "type": "vocalization",
+            "eventType": "vocalization",
+            "_id": f"{data.get('sensorId', 'unknown')}_{data.get('timestamp', '')}",
             "timestamp": data.get("timestamp"),
-            "sensorId": data.get("sensorId"),
-            "location": {
-                "lat": est_lla[0] if len(est_lla) > 0 else None,
-                "lon": est_lla[1] if len(est_lla) > 1 else None,
-                "alt": est_lla[2] if len(est_lla) > 2 else None,
-            },
             "confidence": data.get("animalLLAUncertainty"),
+            "species": "unclassified",
+            "commonName": "unclassified",
+            "type": "mammal",
+            "status": "normal",
+            "diet": "unknown",
+            "animalLLAUncertainty": data.get("animalLLAUncertainty"),
+            "animalEstLLA": data.get("animalEstLLA"),
+            "animalTrueLLA": data.get("animalTrueLLA"),
+            "sensorId": data.get("sensorId"),
+            "microphoneLLA": data.get("microphoneLLA"),
         }
 
-    # Fallback for any unrecognized event shape
+    # Movement events
+    if "animalId" in data and "species" in data:
+        return {
+            "eventType": "movement",
+            "_id": f"{data.get('animalId', 'unknown')}_{data.get('timestamp', '')}",
+            "timestamp": data.get("timestamp"),
+            "animalId": data.get("animalId"),
+            "species": data.get("species"),
+            "animalTrueLLA": data.get("animalTrueLLA"),
+        }
+
+    # Sensor health events
+    if "cpu" in data or "batteryPct" in data:
+        return {
+            "eventType": "sensor_health",
+            "_id": f"{data.get('sensorId', 'unknown')}_{data.get('timestamp', '')}",
+            "timestamp": data.get("timestamp"),
+            "sensorId": data.get("sensorId"),
+            "status": data.get("status"),
+            "batteryPct": data.get("batteryPct"),
+            "cpu": data.get("cpu"),
+            "ram": data.get("ram"),
+        }
+
+    # IoT node updates
+    if "nodeId" in data:
+        return {
+            "eventType": "iot_node",
+            "_id": f"{data.get('nodeId', 'unknown')}_{data.get('timestamp', '')}",
+            "timestamp": data.get("timestamp"),
+            "nodeId": data.get("nodeId"),
+            "status": data.get("status"),
+        }
+
     print(f"[MQTT] Unrecognized payload shape on {topic}: {list(data.keys())}")
-    return {
-        "type": "unknown",
-        "raw": data,
-    }
+    return {"eventType": "unknown", "raw": data}
 
 def start_mqtt_client():
     global connection_state
