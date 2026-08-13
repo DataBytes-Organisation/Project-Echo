@@ -1,9 +1,14 @@
-# augmentation
+# reproducible_training_pipeline
 
 Reproducible PyTorch/Hydra training pipeline for Project Echo species
 classification (Sprint 1 baseline). Ported from an archived prototype
 into its permanent home here, with two bug fixes, a rewritten
 `augment.py`, and small config gaps closed - see Known Limitations below.
+
+Originally landed at `src/prototypes/engine/augmentation/`; moved here to
+free up that path for Kiernan Nguyen's separate augmentation-focused
+work, per team agreement. See git history for the move (`git mv`,
+content unchanged).
 
 ## Attribution
 
@@ -18,7 +23,7 @@ this task.
 ## File Layout
 
 ```text
-src/prototypes/engine/augmentation/
+src/prototypes/engine/reproducible_training_pipeline/
 |-- main.py            Hydra entrypoint - dataset split, model build, training loop trigger
 |-- train.py            Trainer class - AMP training loop, metric learning, distillation, TensorBoard
 |-- dataset.py            SpectrogramDataset / index_directory - audio loading, caching, chunking
@@ -33,7 +38,7 @@ src/prototypes/engine/augmentation/
 ## Setup and Execution Instructions
 
 ```powershell
-cd src\prototypes\engine\augmentation
+cd src\prototypes\engine\reproducible_training_pipeline
 uv sync
 ```
 

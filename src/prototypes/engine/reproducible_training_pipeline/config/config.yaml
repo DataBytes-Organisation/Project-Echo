@@ -2,6 +2,13 @@
 # config/model/, config/teacher_model/) was provided by Kiernan Nguyen for the
 # SpecAugment validation experiment work. Adopted as-is per team agreement to
 # build on top of it rather than start a separate config setup.
+#
+# Note: the "permanent home" mentioned two paragraphs down
+# (src/prototypes/engine/augmentation/) was accurate when that sentence was
+# written, but this folder was subsequently moved to
+# src/prototypes/engine/reproducible_training_pipeline/ to free up the
+# `augmentation/` path for Kiernan's own separate work, per team agreement.
+# Content unchanged, only the containing folder's name/location moved.
 
 # The project's Hydra settings file. 2 things were changed from the original version
 # to move augmentation parameters into configuration rather than hardcoded values:

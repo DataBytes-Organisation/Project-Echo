@@ -1,5 +1,5 @@
 """End-to-end smoke test for the ported PyTorch training pipeline
-(src/prototypes/engine/augmentation/).
+(src/prototypes/engine/reproducible_training_pipeline/).
 
 Runs the real `main.py` Hydra CLI, unmodified, against a small synthetic
 dataset generated on the fly. Confirms the pipeline runs end-to-end
@@ -26,8 +26,8 @@ import wave
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[5]
-AUGMENTATION_DIR = REPO_ROOT / "src" / "prototypes" / "engine" / "augmentation"
-MAIN_PY = AUGMENTATION_DIR / "main.py"
+PIPELINE_DIR = REPO_ROOT / "src" / "prototypes" / "engine" / "reproducible_training_pipeline"
+MAIN_PY = PIPELINE_DIR / "main.py"
 
 CLASSES = ["synth_class_a", "synth_class_b", "synth_class_c"]
 SAMPLE_RATE = 48000
@@ -41,8 +41,8 @@ def _venv_python() -> str:
     """Prefer the pipeline's own uv-managed venv (from `uv sync`); fall back
     to whatever interpreter is running this test if it's missing."""
     candidates = [
-        AUGMENTATION_DIR / ".venv" / "Scripts" / "python.exe",  # Windows
-        AUGMENTATION_DIR / ".venv" / "bin" / "python",  # POSIX
+        PIPELINE_DIR / ".venv" / "Scripts" / "python.exe",  # Windows
+        PIPELINE_DIR / ".venv" / "bin" / "python",  # POSIX
     ]
     for candidate in candidates:
         if candidate.is_file():
@@ -112,7 +112,7 @@ class TrainingPipelineSmokeTest(unittest.TestCase):
         try:
             return subprocess.run(
                 cmd,
-                cwd=AUGMENTATION_DIR,
+                cwd=PIPELINE_DIR,
                 capture_output=True,
                 text=True,
                 timeout=TIMEOUT_SECONDS,
