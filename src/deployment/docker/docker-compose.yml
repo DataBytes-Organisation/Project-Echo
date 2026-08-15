@@ -6,8 +6,8 @@ services:
       context: ../../production/engine
       dockerfile: Model.Dockerfile
       args:
-       # BASE_IMAGE: tensorflow/serving:latest
-       BASE_IMAGE: emacski/tensorflow-serving # Uncomment if on macos and comment above line
+       BASE_IMAGE: tensorflow/serving:latest
+       # BASE_IMAGE: emacski/tensorflow-serving # Uncomment if on macos and comment above line
     image: ts-echo-model
     container_name: ts-echo-model-cont
     command: --model_config_file=/models/models.config
