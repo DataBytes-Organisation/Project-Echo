@@ -30,7 +30,7 @@ one described by the architecture documentation.
 |---|---|---|---|
 | **A — "echo_model"** | `src/production/engine/models/echo_model/1/` | TensorFlow SavedModel | `src/production/engine/optimised_engine_pipeline.ipynb` (TF/Keras, EfficientNetV2-B0 via TF-Hub) |
 | **B — "efficientnetv2" (TFLite)** | `src/production/engine/models/efficientnetv2/efficientnetv2_project_echo.tflite` | PyTorch → ONNX → TFLite | `.delete/archive/Prototypes/engine/torch_impl/Integrate_EfficientNetV2_Engine/project_echo_train_save_efficientnetv2.ipynb` |
-| **C — torch_impl pipeline** | (no weights produced until this sprint's port work) | PyTorch | `src/prototypes/engine/augmentation/main.py` (ported this sprint) |
+| **C — torch_impl pipeline** | (no weights produced until this sprint's port work) | PyTorch | `src/prototypes/engine/reproducible_training_pipeline/main.py` (ported this sprint) |
 
 ## Finding 1 — The Dockerfile deploys a different model than the docs describe
 
@@ -116,7 +116,7 @@ Read directly from `src/production/engine/optimised_engine_pipeline.ipynb`:
 3. Reconcile `echo_engine.json`'s `AUDIO_WINDOW` value with what
    `echo_engine.py` actually does, so the checked-in config stops
    contradicting the runtime behaviour.
-4. This repo's new PyTorch/Hydra pipeline (Candidate C, `src/prototypes/engine/augmentation/`)
+4. This repo's new PyTorch/Hydra pipeline (Candidate C, `src/prototypes/engine/reproducible_training_pipeline/`)
    already fixes the seeding gap for its own training runs (see that
    folder's README) and is a reasonable long-term replacement candidate,
    but it has not yet been trained to convergence on real data — see the

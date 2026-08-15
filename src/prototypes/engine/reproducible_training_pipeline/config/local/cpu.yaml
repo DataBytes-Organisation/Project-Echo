@@ -14,6 +14,12 @@
 # to. (A first attempt at this file put explanatory comments before that
 # directive, which silently broke the merge - Hydra only recognises it as
 # the very first line.)
+#
+# Note: comments below referencing "src/prototypes/engine/augmentation/"
+# describe this folder's location when they were written. It was
+# subsequently moved to src/prototypes/engine/reproducible_training_pipeline/
+# (same directory depth, so the relative-path math below is unaffected) -
+# see the containing README for why.
 
 hydra:
   run:
