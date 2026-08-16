@@ -42,11 +42,11 @@ import { addIoTNodesToMap } from "./nodes-overlay.js";
 // Constants
 // ─────────────────────────────────────────────────────────────────────────────
 
-const EARTH_RADIUS        = 6371000;
-const MIC_DETECTION_RANGE = 300;
-const MAX_RECORDING_TIME_S = "20";
-const DEG_TO_RAD          = Math.PI / 180;
-const RAD_TO_DEG          = 180 / Math.PI;
+const EARTH_RADIUS         = 6371000;
+const MIC_DETECTION_RANGE  = 300;
+const MAX_RECORDING_SECONDS = 20;
+const DEG_TO_RAD           = Math.PI / 180;
+const RAD_TO_DEG           = 180 / Math.PI;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Module-level state
@@ -104,6 +104,14 @@ var durationTimer        = null;
 var playNextRecordedTrack         = false;
 var recordingPlaybackAnimTimeout  = null;
 var audioRecordingElement         = null;
+var stopRecordingInProgress       = false;
+var lastBrowserRecordingBlob      = null;
+var lastBrowserRecordingUrl       = null;
+var lastRecordingDurationLabel    = null;
+var lastRecordingSamples          = null;
+var lastRecordingSampleRate       = 44100;
+var playbackSourceNode            = null;
+var playbackAudioContext          = null;
 
 var recordingPlaybackContext = null;
 var a_source        = null;
@@ -123,13 +131,157 @@ export var animal_toggled = false;
 // ─────────────────────────────────────────────────────────────────────────────
 
 function getDurationTag()       { return document.getElementById("recording_duration"); }
-function getAudioElement()      { return document.getElementsByClassName("audio-element")[0] || null; }
+function getAudioElement()      { return document.getElementById("audioElem"); }
 function getAudioElementSource(){ const a = getAudioElement(); return a ? a.getElementsByTagName("source")[0] || null : null; }
-function getPlaybackIndicator() { return document.getElementsByClassName("playback_indicator")[0] || null; }
+function getPlaybackIndicator() { return document.getElementById("audio_playback_indicator"); }
 function getRecordButton()      { return document.getElementById("record_audio_button"); }
-function getRecordingControls() { return document.getElementsByClassName("recording_controls")[0] || null; }
+function getStopButton()        { return document.getElementById("stop_recording_button"); }
+function getCancelButton()      { return document.getElementById("cancel_recording_button"); }
+function getPlayButton()        { return document.getElementById("frb2-play-button"); }
+function getPlayLabel()         { return document.getElementById("frb2-play-label"); }
+function getLiveStatus()        { return document.getElementById("frb2-live-status"); }
+function getStatusLabel()       { return document.getElementById("frb2-status-label"); }
 function getFileInput()         { return document.getElementById("fileInput"); }
 function getAudioElemForRecordedPlayback() { return document.getElementById("audioElem"); }
+function getRecordingPlaybackStatus() { return document.getElementById("recording_playback_status"); }
+
+function setRecordingPlaybackStatus(message) {
+  const status = getRecordingPlaybackStatus();
+  if (status) status.textContent = message;
+}
+
+function setLiveRecordingState(state, label) {
+  const live = getLiveStatus();
+  const statusLabel = getStatusLabel();
+  if (live) live.setAttribute("data-state", state);
+  if (statusLabel && label) statusLabel.textContent = label;
+}
+
+function setRecordingActionState(isRecording) {
+  const recordBtn = getRecordButton();
+  const stopBtn = getStopButton();
+  const cancelBtn = getCancelButton();
+  if (recordBtn) recordBtn.disabled = !!isRecording;
+  if (stopBtn) stopBtn.disabled = !isRecording;
+  if (cancelBtn) cancelBtn.disabled = !isRecording;
+}
+
+function setPlayEnabled(enabled) {
+  const playBtn = getPlayButton();
+  if (playBtn) playBtn.disabled = !enabled;
+}
+
+function setPlayButtonPlaying(isPlaying) {
+  const playBtn = getPlayButton();
+  const playLabel = getPlayLabel();
+  if (playBtn) playBtn.classList.toggle("is-playing", !!isPlaying);
+  if (playLabel) playLabel.textContent = isPlaying ? "Pause" : "Play recording";
+}
+
+function clampRecordingSamples(samples, sampleRate) {
+  if (!samples || !samples.length) return samples;
+  const maxSamples = Math.floor(sampleRate * MAX_RECORDING_SECONDS);
+  if (samples.length <= maxSamples) return samples;
+  return samples.slice(0, maxSamples);
+}
+
+function clearBrowserRecordingPlayback() {
+  stopPcmPlayback();
+
+  if (lastBrowserRecordingUrl) {
+    URL.revokeObjectURL(lastBrowserRecordingUrl);
+    lastBrowserRecordingUrl = null;
+  }
+  lastBrowserRecordingBlob = null;
+  lastRecordingDurationLabel = null;
+  lastRecordingSamples = null;
+  lastRecordingSampleRate = 44100;
+
+  const audioEl = getAudioElemForRecordedPlayback();
+  if (audioEl) {
+    audioEl.pause();
+    audioEl.removeAttribute("src");
+    while (audioEl.firstChild) audioEl.removeChild(audioEl.firstChild);
+  }
+
+  setPlayEnabled(false);
+  setPlayButtonPlaying(false);
+  setRecordingPlaybackStatus("No recording yet. Press Record, then Stop.");
+}
+
+function prepareBrowserRecordingPlayback(result, durationLabel) {
+  lastRecordingDurationLabel = durationLabel || null;
+  const rawSamples = result && result.samples ? result.samples : null;
+  lastRecordingSampleRate = (result && result.sampleRate) || 44100;
+  lastRecordingSamples = clampRecordingSamples(rawSamples, lastRecordingSampleRate);
+  lastBrowserRecordingBlob = (result && result.blob) ? result.blob : (result instanceof Blob ? result : null);
+
+  // Keep a blob URL around for optional native player, but replay uses PCM.
+  if (lastBrowserRecordingBlob) {
+    if (lastBrowserRecordingUrl) URL.revokeObjectURL(lastBrowserRecordingUrl);
+    lastBrowserRecordingUrl = URL.createObjectURL(lastBrowserRecordingBlob);
+    const audioEl = getAudioElemForRecordedPlayback();
+    if (audioEl) {
+      audioEl.src = lastBrowserRecordingUrl;
+    }
+  }
+
+  const hasClip = !!(lastRecordingSamples && lastRecordingSamples.length);
+  setPlayEnabled(hasClip);
+  setPlayButtonPlaying(false);
+
+  const durationText = durationLabel ? ` (${durationLabel})` : "";
+  setRecordingPlaybackStatus(
+    hasClip
+      ? "Recording ready" + durationText + ". Press the green play button to listen."
+      : "Recording finished, but no audio was captured. Try again."
+  );
+}
+
+function stopPcmPlayback() {
+  try {
+    if (playbackSourceNode) {
+      playbackSourceNode.onended = null;
+      playbackSourceNode.stop();
+    }
+  } catch (_err) { /* ignore */ }
+  playbackSourceNode = null;
+
+  if (playbackAudioContext) {
+    playbackAudioContext.close().catch(() => {});
+    playbackAudioContext = null;
+  }
+}
+
+function playPcmRecording() {
+  if (!lastRecordingSamples || !lastRecordingSamples.length) {
+    return Promise.reject(new Error("No PCM samples available"));
+  }
+
+  stopPcmPlayback();
+
+  const AudioCtx = window.AudioContext || window.webkitAudioContext;
+  const ctx = new AudioCtx();
+  playbackAudioContext = ctx;
+
+  const buffer = ctx.createBuffer(1, lastRecordingSamples.length, lastRecordingSampleRate);
+  buffer.getChannelData(0).set(lastRecordingSamples);
+
+  const source = ctx.createBufferSource();
+  playbackSourceNode = source;
+  source.buffer = buffer;
+  source.connect(ctx.destination);
+
+  return ctx.resume().then(() => {
+    source.start(0);
+    return new Promise((resolve) => {
+      source.onended = () => {
+        playbackSourceNode = null;
+        resolve();
+      };
+    });
+  });
+}
 
 function revokeObjectUrl(url) {
   if (url) URL.revokeObjectURL(url);
@@ -443,18 +595,32 @@ export function initialiseHMI(hmiState) {
   showMapSpinner("Loading map data…");
   hideMapError();
 
+  // FR-A1: initialiseHMI() is re-entered by the map-error retry button
+  // (see showMapError(userMsg, () => initialiseHMI(hmiState)) below), on
+  // the same hmiState. createBasemap() itself is idempotent (see above),
+  // but everything in this block is one-time setup: it adds a brand new
+  // vector layer for every vocalisation/truth/mic slot and registers a new
+  // map click listener. None of that is guarded against being called
+  // twice, so without this check a retry would silently stack a second
+  // copy of every layer and a second click handler on top of the reused
+  // map. Only run it the first time hmiState has no basemap yet.
+  const isFirstInit = !hmiState.basemap;
+
   createBasemap(hmiState);
-  addVocalisationLayers(hmiState);
-  addTruthLayers(hmiState);
 
-  for (let i = 1; i < 26; i++) {
-    addVectorLayerTopDown(hmiState, `mic_layer_${i}`);
+  if (isFirstInit) {
+    addVocalisationLayers(hmiState);
+    addTruthLayers(hmiState);
+
+    for (let i = 1; i < 26; i++) {
+      addVectorLayerTopDown(hmiState, `mic_layer_${i}`);
+    }
+    addVectorLayerTopDown(hmiState, "mic_layer");
+
+    addAllTruthFeatures(hmiState);
+    addAllVocalizationFeatures(hmiState);
+    createMapClickEvent(hmiState);
   }
-  addVectorLayerTopDown(hmiState, "mic_layer");
-
-  addAllTruthFeatures(hmiState);
-  addAllVocalizationFeatures(hmiState);
-  createMapClickEvent(hmiState);
 
   // Task 7: withRetry wraps the microphone fetch.  routes.js already retries
   // the axios call; this outer withRetry handles cases where the call itself
@@ -464,11 +630,19 @@ export function initialiseHMI(hmiState) {
     delayMs: 2000,
     retryMessage: "Microphone load failed, retrying",
   })
-    .then((res) => {
+    .then(async (res) => {
       hideMapSpinner();
       updateMicrophoneLayer(hmiState, res.data);
       stepMicAnimation(hmiState);
-      addIoTNodesToMap(hmiState);
+
+      // FR-A1: await this instead of firing-and-forgetting it. Before,
+      // a failed node load rejected with nothing awaiting it (an unhandled
+      // rejection) while this .then() carried on straight to the "Map data
+      // loaded successfully" toast regardless. Awaiting it here means a
+      // node-load failure is caught by the .catch() below instead, so the
+      // success toast only fires once nodes have actually loaded.
+      await addIoTNodesToMap(hmiState);
+
       queueSimUpdate(hmiState);
       showToast("Map data loaded successfully", "success");
     })
@@ -1064,6 +1238,15 @@ function getOlDefaultInteractions(options) {
 }
 
 function createBasemap(hmiState) {
+  // FR-A1: initialiseHMI() can run more than once (the map-error retry
+  // button calls it again on the same hmiState). Reuse the existing
+  // ol.Map instead of constructing a second one on top of the same
+  // #basemap target — a second ol.Map would leave the first one's canvas,
+  // render loop and event listeners still attached underneath it.
+  if (hmiState.basemap) {
+    return hmiState.basemap;
+  }
+
   const basemap = new ol.Map({
     target: "basemap",
     featureEvents: true,
@@ -1421,24 +1604,22 @@ function queueSimUpdate(hmiState) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function showRecordingControls() {
-  const recordButton     = getRecordButton();
-  const recordingControls = getRecordingControls();
-  if (!recordButton || !recordingControls) return;
-  recordButton.style.display = "none";
-  recordingControls.classList.remove("hide");
+  setRecordingActionState(true);
+  setLiveRecordingState("recording", "Recording…");
   initializeRecordingDuration();
 }
 
 export function hideRecordingControls() {
-  const recordButton     = getRecordButton();
-  const recordingControls = getRecordingControls();
-  if (!recordButton || !recordingControls) return;
-  recordButton.style.display = "block";
-  recordingControls.classList.add("hide");
-  clearInterval(durationTimer);
+  setRecordingActionState(false);
+  if (durationTimer) {
+    clearInterval(durationTimer);
+    durationTimer = null;
+  }
 }
 
-export function showRecordingNotSupportedOverlay() { /* implement if needed */ }
+export function showRecordingNotSupportedOverlay() {
+  showToast("Audio recording is not supported in this browser.", "error");
+}
 
 export function createSourceForAudioElement() {
   const audioElement = getAudioElement();
@@ -1468,6 +1649,18 @@ export function startAudioRecording() {
     hidePlaybackIndicator();
   }
 
+  stopRecordingPlayback();
+  playNextRecordedTrack = false;
+  // Lock controls immediately to prevent rapid concurrent starts while
+  // permission/getUserMedia is still pending.
+  const recordBtn = getRecordButton();
+  const stopBtn = getStopButton();
+  const cancelBtn = getCancelButton();
+  if (recordBtn) recordBtn.disabled = true;
+  if (stopBtn) stopBtn.disabled = true;
+  if (cancelBtn) cancelBtn.disabled = true;
+  setLiveRecordingState("idle", "Requesting microphone permission…");
+
   audioRecorder
     .start()
     .then(() => {
@@ -1485,23 +1678,29 @@ export function startAudioRecording() {
       stopRecordingPlayback();
       audioRecordStartTime = new Date();
       showRecordingControls();
+      showToast("Recording started", "info");
     })
     .catch((error) => {
-      showToast("Audio recording failed: " + error.message, "error");
+      setLiveRecordingState("idle", "Ready to record");
+      setRecordingActionState(false);
 
       if (error.message.includes("mediaDevices API or getUserMedia method is not supported in this browser.")) {
         showRecordingNotSupportedOverlay();
       }
 
       const toastMap = {
-        NotAllowedError:  "Microphone permission was denied",
+        NotAllowedError:  "Microphone permission was denied. Allow mic access in your browser settings and try again.",
         NotFoundError:    "No microphone device found",
         NotReadableError: "Microphone is not available right now",
         SecurityError:    "Microphone access blocked for security reasons",
+        AbortError:       "Microphone access was interrupted",
         UnknownError:     "Unknown audio recording error",
       };
 
-      if (toastMap[error.name]) showToast(toastMap[error.name], "error");
+      showToast(
+        toastMap[error.name] || ("Audio recording failed: " + error.message),
+        "error"
+      );
     });
 }
 
@@ -1537,6 +1736,38 @@ export function cancelAudioRecording() {
   decodedAudioStore = null;
   microphoneSpectrogramWorkflow?.clear();
   hideRecordingControls();
+  setLiveRecordingState("idle", "Recording cancelled");
+  showToast("Recording cancelled", "info");
+}
+
+/** FR-B2 replay via green play button (PCM / Web Audio). */
+export function playRecordingClip() {
+  if (!lastRecordingSamples || !lastRecordingSamples.length) {
+    showToast("No recording available to play. Record audio first.", "error");
+    return;
+  }
+
+  // Toggle pause
+  if (playbackSourceNode) {
+    stopPcmPlayback();
+    setPlayButtonPlaying(false);
+    setLiveRecordingState("idle", "Playback paused");
+    return;
+  }
+
+  setPlayButtonPlaying(true);
+  setLiveRecordingState("playing", "Playing recording");
+
+  playPcmRecording()
+    .then(() => {
+      setPlayButtonPlaying(false);
+      setLiveRecordingState("idle", "Playback finished");
+    })
+    .catch((err) => {
+      setPlayButtonPlaying(false);
+      setLiveRecordingState("idle", "Ready to record");
+      showToast("Unable to play recording: " + (err.message || "unknown error"), "error");
+    });
 }
 
 document.addEventListener("saveRecording",     function () { save(); });
@@ -1634,8 +1865,8 @@ function save() {
 document.addEventListener("playRecordedAudio",  function () { playNextRecordedTrack = true;  playAudio(); });
 document.addEventListener("stopRecordedAudio",  function () { playNextRecordedTrack = false; stopRecordingPlayback(); });
 
-function playRecording(recordedChunks) {
-  if (recordedChunks.length === 0) return;
+function playRecording(recordedChunksOrBlob) {
+  let blob = null;
 
   const mimeType = recordedChunks[0]?.type || "audio/webm";
   const blob = new Blob(recordedChunks, { type: mimeType });
@@ -1682,7 +1913,16 @@ function stopRecordingPlayback(updateAnimation = true) {
 }
 
 export function playAudio() {
-  if (!decodedAudioStore) { playRecording(audioRecorder.audioBlobs); return; }
+  // Mic-panel browser recordings take priority for FR-B2 replay.
+  if (lastBrowserRecordingBlob || (audioRecorder.audioBlobs && audioRecorder.audioBlobs.length > 0)) {
+    playRecording(lastBrowserRecordingBlob || audioRecorder.audioBlobs);
+    return;
+  }
+
+  if (!decodedAudioStore) {
+    showToast("No recording available to play. Record audio first.", "error");
+    return;
+  }
 
   if (playNextRecordedTrack) {
     stopRecordingPlayback(false);
@@ -1723,28 +1963,33 @@ export function playAudio() {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function initializeRecordingDuration() {
-  showRecordingDuration("00:00:00");
+  showRecordingDuration("00:00");
   durationTimer = setInterval(() => {
     showRecordingDuration(computeRecordingDuration(audioRecordStartTime));
-  }, 1000);
+  }, 250);
 }
 
 export function showRecordingDuration(duration) {
   const tag = getDurationTag();
   if (!tag) return;
-  tag.innerHTML = duration;
+  tag.textContent = duration;
   if (checkAudioDurationThreshold(duration)) stopAudioRecording();
 }
 
 export function checkAudioDurationThreshold(duration) {
-  return duration.split(":")[2] === MAX_RECORDING_TIME_S;
+  const parts = String(duration).split(":");
+  if (parts.length !== 2) return false;
+  const mins = Number(parts[0]);
+  const secs = Number(parts[1]);
+  if (Number.isNaN(mins) || Number.isNaN(secs)) return false;
+  return mins * 60 + secs >= MAX_RECORDING_SECONDS;
 }
 
 export function computeRecordingDuration(startTime) {
-  const delta = (new Date() - startTime) / 1000;
-  const secs  = Math.floor(delta % 60);
+  const delta = Math.max(0, (new Date() - startTime) / 1000);
   const mins  = Math.floor(delta / 60) % 60;
-  return "00:" + String(mins).padStart(2, "0") + ":" + String(secs).padStart(2, "0");
+  const secs  = Math.floor(delta % 60);
+  return String(mins).padStart(2, "0") + ":" + String(secs).padStart(2, "0");
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
