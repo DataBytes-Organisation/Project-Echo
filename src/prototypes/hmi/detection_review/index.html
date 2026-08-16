@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="description" content="Prototype-only Project Echo detection review queue and evidence shell.">
+    <title>Detection review · Project Echo</title>
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <!-- Prototype-only deterministic workflow; no production writes or live services. -->
+    <header class="masthead">
+      <p class="masthead__line">Project Echo · Week 2 prototype · deterministic reviewer sessions</p>
+      <h1>Detection review</h1>
+      <p class="masthead__description">
+        Verify model detections independently, resolve consensus automatically, and adjudicate disagreements.
+      </p>
+      <nav class="scenario-nav" aria-label="Preview fixture states">
+        <div class="scenario-nav__group">
+          <span>Queue shell</span>
+          <ul>
+            <li><a href="?scenario=populated" data-scenario-link="populated">Populated</a></li>
+            <li><a href="?scenario=loading" data-scenario-link="loading">Loading</a></li>
+            <li><a href="?scenario=empty" data-scenario-link="empty">Empty</a></li>
+            <li><a href="?scenario=error" data-scenario-link="error">Error</a></li>
+          </ul>
+        </div>
+        <div class="scenario-nav__group">
+          <span>Review workflow</span>
+          <ul>
+            <li><a href="?scenario=first-review" data-scenario-link="first-review">First review</a></li>
+            <li><a href="?scenario=second-review" data-scenario-link="second-review">Blind second</a></li>
+            <li><a href="?scenario=consensus" data-scenario-link="consensus">Consensus</a></li>
+            <li><a href="?scenario=adjudication" data-scenario-link="adjudication">Adjudication</a></li>
+            <li><a href="?scenario=finalized" data-scenario-link="finalized">Finalized</a></li>
+          </ul>
+        </div>
+      </nav>
+      <hr class="masthead__rule" aria-hidden="true">
+    </header>
+
+    <main class="page-shell" id="app"></main>
+
+    <footer class="page-footer">
+      <p>Prototype data only · no live services</p>
+      <p>Independent review · deterministic consensus · explicit adjudication</p>
+    </footer>
+
+    <script type="module" src="./src/app.mjs"></script>
+  </body>
+</html>

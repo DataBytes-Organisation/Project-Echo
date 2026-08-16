@@ -1,0 +1,56 @@
+:root {
+  --color-paper: oklch(97% 0.012 125);
+  --color-paper-2: oklch(94% 0.016 125);
+  --color-paper-3: oklch(90% 0.021 125);
+  --color-surface: oklch(99% 0.008 125);
+  --color-ink: oklch(21% 0.022 135);
+  --color-ink-soft: oklch(35% 0.025 135);
+  --color-muted: oklch(43% 0.02 130);
+  --color-rule: oklch(80% 0.022 125);
+  --color-rule-strong: oklch(63% 0.035 130);
+  --color-accent: oklch(42% 0.12 145);
+  --color-accent-soft: oklch(91% 0.05 140);
+  --color-accent-ink: oklch(98% 0.008 125);
+  --color-focus: oklch(50% 0.17 55);
+  --color-error: oklch(48% 0.17 28);
+  --color-error-soft: oklch(93% 0.035 28);
+  --color-shadow: oklch(20% 0.02 135 / 0.08);
+
+  --font-display: ui-serif, "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
+  --font-body: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-data: ui-monospace, "Cascadia Code", "SFMono-Regular", monospace;
+
+  --space-3xs: 0.125rem;
+  --space-2xs: 0.25rem;
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2.5rem;
+  --space-2xl: 4rem;
+  --space-3xl: 6rem;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-md: 1.125rem;
+  --text-lg: 1.375rem;
+  --text-xl: 1.75rem;
+  --text-2xl: 2.25rem;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-micro: 120ms;
+  --dur-short: 220ms;
+
+  --rule-hair: 1px;
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+
+  --page-gutter: clamp(1rem, 4vw, 3rem);
+  --page-width: 88rem;
+  --touch-target: 2.75rem;
+  --panel-shadow: 0 1px 2px var(--color-shadow);
+}
