@@ -99,6 +99,8 @@ src/production/backend/app/main.py
 
 # Benchmarking self-test throwaway output
 results_selftest/
+dataset/
+dataset_v2/
 
 .claude/
 CLAUDE.md
