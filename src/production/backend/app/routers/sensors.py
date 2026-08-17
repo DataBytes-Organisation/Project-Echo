@@ -8,6 +8,7 @@ from fastapi import APIRouter, Body, HTTPException, Query
 from fastapi.encoders import jsonable_encoder
 
 from app.database import Events, Nodes, SensorReboots, SensorSettings
+from app.error_tracking import capture_critical_error
 
 router = APIRouter()
 
@@ -177,6 +178,11 @@ def get_sensor_updates(
 
         return jsonable_encoder({"items": updates, "count": len(updates)})
     except Exception as error:
+        capture_critical_error(
+            error,
+            operation="sensor_health_updates",
+            context={"component": "sensor_management", "limit": limit},
+        )
         raise HTTPException(status_code=500, detail=f"Error deriving sensor updates: {str(error)}")
 
 
@@ -227,6 +233,11 @@ def get_sensor_alerts(
     except HTTPException:
         raise
     except Exception as error:
+        capture_critical_error(
+            error,
+            operation="sensor_alerts",
+            context={"component": "sensor_management", "limit": limit},
+        )
         raise HTTPException(status_code=500, detail=f"Error deriving alerts: {str(error)}")
 
 
@@ -236,6 +247,11 @@ def get_sensor_settings(sensor_id: str):
         settings = _get_settings_for_sensor(sensor_id)
         return jsonable_encoder({"sensorId": sensor_id, "settings": settings})
     except Exception as error:
+        capture_critical_error(
+            error,
+            operation="sensor_settings_read",
+            context={"sensor_id": sensor_id, "component": "sensor_management"},
+        )
         raise HTTPException(status_code=500, detail=f"Error retrieving settings: {str(error)}")
 
 
@@ -262,6 +278,11 @@ def put_sensor_settings(sensor_id: str, payload: Dict[str, Any] = Body(...)):
     except HTTPException:
         raise
     except Exception as error:
+        capture_critical_error(
+            error,
+            operation="sensor_settings_write",
+            context={"sensor_id": sensor_id, "component": "sensor_management"},
+        )
         raise HTTPException(status_code=500, detail=f"Error saving settings: {str(error)}")
 
 
@@ -283,6 +304,11 @@ def queue_reboot(sensor_id: str, payload: Dict[str, Any] = Body(default={})):  #
         result = SensorReboots.insert_one(doc)
         return jsonable_encoder({"rebootId": str(result.inserted_id), "sensorId": sensor_id, "status": "Queued"})
     except Exception as error:
+        capture_critical_error(
+            error,
+            operation="sensor_reboot_queue",
+            context={"sensor_id": sensor_id, "component": "sensor_management"},
+        )
         raise HTTPException(status_code=500, detail=f"Error queuing reboot: {str(error)}")
 
 
@@ -298,6 +324,15 @@ def get_reboot_history(sensor_id: str, limit: int = Query(50, ge=1, le=200)):
             items.append(doc)
         return jsonable_encoder({"items": items, "count": len(items)})
     except Exception as error:
+        capture_critical_error(
+            error,
+            operation="sensor_reboot_history",
+            context={
+                "sensor_id": sensor_id,
+                "component": "sensor_management",
+                "limit": limit,
+            },
+        )
         raise HTTPException(status_code=500, detail=f"Error retrieving reboot history: {str(error)}")
 
 
@@ -313,4 +348,9 @@ def get_recent_reboots(limit: int = Query(50, ge=1, le=200)):
             items.append(doc)
         return jsonable_encoder({"items": items, "count": len(items)})
     except Exception as error:
+        capture_critical_error(
+            error,
+            operation="sensor_reboot_history_recent",
+            context={"component": "sensor_management", "limit": limit},
+        )
         raise HTTPException(status_code=500, detail=f"Error retrieving recent reboots: {str(error)}")

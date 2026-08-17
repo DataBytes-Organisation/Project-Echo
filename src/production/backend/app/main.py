@@ -1,4 +1,5 @@
 import os
+from app.error_tracking import init_error_tracking
 # from Components.API.app.routers import add_csv_output_option, audio_upload_router
 from .routers import add_csv_output_option, audio_upload_router
 
@@ -19,6 +20,9 @@ import json
 
 from app.routers import hmi, engine, sim, two_factor
 from app.routers import public
+
+init_error_tracking()
+
 app = FastAPI()
 
 # Add the CORS middleware
