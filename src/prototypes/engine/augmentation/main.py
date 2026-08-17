@@ -6,7 +6,6 @@ from torch.utils.data import DataLoader, random_split
 import hydra
 from omegaconf import DictConfig, OmegaConf
 import os
-import random
 from pathlib import Path
 import copy
 from tqdm import tqdm
@@ -22,12 +21,7 @@ from train import Trainer
 def main(cfg: DictConfig):
 	print(OmegaConf.to_yaml(cfg))
 
-	# Seed torch, numpy, and stdlib random so augmentation masking
-	# (augment.py uses random.randint/random.random) is reproducible too,
-	# not just model init / dataloader shuffling.
 	torch.manual_seed(cfg.training.seed)
-	np.random.seed(cfg.training.seed)
-	random.seed(cfg.training.seed)
 	device = torch.device(cfg.training.device if torch.cuda.is_available() else "cpu")
 
 	audio_files, labels, class_names = index_directory(cfg.system.audio_data_directory)
@@ -165,7 +159,7 @@ def main(cfg: DictConfig):
 		load_path = None
 
 		if cfg.run.checkpoint_path:
-			ckpt_path = Path(hydra.utils.to_absolute_path(cfg.run.checkpoint_path))
+			ckpt_path = Path(hydra.utils.to_absolute_path(cfg.run.cKLDivLossheckpoint_path))
 			if ckpt_path.is_file():
 				load_path = ckpt_path
 			else:

@@ -123,7 +123,7 @@ to confirm what these five names actually refer to.
    `jabwar`, `sheowl`, `spodov`, and `wiltur` are meant to represent.
 4. If the team commits to a single canonical species list going forward,
    this repo's new PyTorch/Hydra pipeline
-   (`src/prototypes/engine/augmentation/`) derives its class list
+   (`src/prototypes/engine/reproducible_training_pipeline/`) derives its class list
    automatically from whatever dataset directory is passed in
    (`dataset.py`'s `index_directory`), so pointing it at one agreed
    dataset snapshot would make the list self-documenting rather than a

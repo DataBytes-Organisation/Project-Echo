@@ -1,5 +1,4 @@
 name: panns_mobilenetv2
-norm_choice: freeze_bn
 params:
   model_name: "panns_mobilenetv2"
   pretrained: true

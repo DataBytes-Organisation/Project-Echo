@@ -23,11 +23,14 @@
 # augmentation errors rather than crashing on them).
 
 system:
-  # Relative to this file's folder (src/prototypes/engine/augmentation/).
-  # Only TWO levels up reaches src/prototypes/ here (augmentation/ ->
-  # engine/ -> prototypes/ -> data_files/), not four like cpu.yaml's
-  # example - that path points outside the repo entirely, this one
-  # doesn't, so don't copy-paste cpu.yaml's prefix without recomputing it.
-  # Verified: `cd src/prototypes/engine/augmentation && ls ../../data_files`
-  # lists the species folders.
+  # Relative to this file's folder
+  # (src/prototypes/engine/reproducible_training_pipeline/, formerly
+  # .../augmentation/ - same directory depth, so this relative path is
+  # unaffected by that move). Only TWO levels up reaches src/prototypes/
+  # here (this folder -> engine/ -> prototypes/ -> data_files/), not four
+  # like cpu.yaml's example - that path points outside the repo entirely,
+  # this one doesn't, so don't copy-paste cpu.yaml's prefix without
+  # recomputing it.
+  # Verified: `cd src/prototypes/engine/reproducible_training_pipeline &&
+  # ls ../../data_files` lists the species folders.
   audio_data_directory: ../../data_files

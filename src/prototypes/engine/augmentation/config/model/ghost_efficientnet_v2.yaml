@@ -1,5 +1,4 @@
 name: ghost_efficientnet_v2_qat
-norm_choice: freeze_bn
 params:
   model_name: "ghost_efficientnet_v2"
   num_classes: ${data.num_classes}

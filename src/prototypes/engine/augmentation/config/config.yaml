@@ -1,8 +1,3 @@
-# Source: this config/ folder (config.yaml, config/augmentation/, config/local/,
-# config/model/, config/teacher_model/) was provided by Kiernan Nguyen for the
-# SpecAugment validation experiment work. Adopted as-is per team agreement to
-# build on top of it rather than start a separate config setup.
-
 # The project's Hydra settings file. 2 things were changed from the original version
 # to move augmentation parameters into configuration rather than hardcoded values:
 #   1. The `defaults` list was added a new `augmentation` config group entry.
