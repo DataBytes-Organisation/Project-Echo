@@ -7,7 +7,7 @@ from unittest.mock import MagicMock, patch
 
 from test_iot_integration import EchoEngine
 
-import echo_engine_iot as engine_module
+import echo_engine as engine_module
 
 
 class TestEnginePredictionOutput(unittest.TestCase):

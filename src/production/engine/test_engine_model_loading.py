@@ -8,7 +8,7 @@ from unittest.mock import MagicMock, patch
 # Importing this first prepares the mocked heavy dependencies.
 from test_iot_integration import EchoEngine  # noqa: F401
 
-import echo_engine_iot as engine_module
+import echo_engine as engine_module
 
 
 class TestEngineModelLoading(unittest.TestCase):

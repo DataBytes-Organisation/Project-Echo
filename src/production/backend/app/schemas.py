@@ -32,7 +32,7 @@ class EventSchema(BaseModel):
     animalTrueLLA: conlist(float, min_items=3, max_items=3)  # List of exactly 3 floats for true animal location
     animalLLAUncertainty: int  # Uncertainty value
     audioClip: str  # Audio clip data
-    confidence: condecimal(gt=0, lt=100)  # Confidence value between 0 and 100
+    confidence: float = Field(gt=0, lt=100) # Confidence value between 0 and 100
     sampleRate: int  # Audio sample rate
 
     # Configuration and schema example

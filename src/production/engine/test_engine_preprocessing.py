@@ -15,7 +15,7 @@ import numpy as np
 # Prepares mocked heavy dependencies before importing the Engine.
 from test_iot_integration import EchoEngine  # noqa: F401
 
-import echo_engine_iot as engine_module
+import echo_engine as engine_module
 
 
 def generate_small_wav(
