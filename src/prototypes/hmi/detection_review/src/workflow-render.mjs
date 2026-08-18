@@ -403,10 +403,10 @@ export function renderAdjudicationQueue(sessions) {
     ? `<p class="adjudication-empty">No disagreements are waiting for adjudication.</p>`
     : `<ol>${sessions.map(session => `
         <li>
-          <a href="?scenario=adjudication&detection=${encodeURIComponent(session.detectionId)}">
+          <button type="button" data-detection-id="${escapeHtml(session.detectionId)}">
             <strong>${escapeHtml(session.detectionId)}</strong>
             <span>Compare two independent decisions</span>
-          </a>
+          </button>
         </li>`).join("")}</ol>`;
 
   return `

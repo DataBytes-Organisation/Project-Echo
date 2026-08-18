@@ -26,6 +26,19 @@ function formatConfidence(confidence) {
   return `${Number.isInteger(confidence) ? confidence : confidence.toFixed(1)}%`;
 }
 
+const REVIEW_STATUS_LABELS = Object.freeze({
+  awaiting_first_review: "Awaiting reviewer 1",
+  awaiting_second_review: "Awaiting reviewer 2",
+  consensus: "Consensus reached",
+  awaiting_adjudication: "Awaiting adjudication",
+  finalized: "Finalized",
+});
+
+function queueStatusLabel(record) {
+  return REVIEW_STATUS_LABELS[record.reviewStatus]
+    ?? "Pending review";
+}
+
 function renderQueueState(state) {
   if (state.status === "loading") {
     return `
@@ -52,7 +65,7 @@ function renderQueueState(state) {
       <div class="queue-state queue-state--error" role="alert">
         <p class="queue-state__title">Detection queue unavailable</p>
         <p>${escapeHtml(state.errorMessage)}</p>
-        <a class="text-link" href="?scenario=populated">Open valid fixtures</a>
+        <p>Reload this prototype to try again.</p>
       </div>`;
   }
 
@@ -79,7 +92,10 @@ function renderQueueState(state) {
             <span>${escapeHtml(record.sensorId)}</span>
             <time datetime="${escapeHtml(record.timestamp)}">${escapeHtml(timestamp)}</time>
           </span>
-          <span class="queue-status">Pending review</span>
+          <span class="queue-status">${escapeHtml(queueStatusLabel(record))}</span>
+          ${record.isActionable
+    ? '<span class="queue-actionable">Action required</span>'
+    : ""}
         </button>
       </li>`;
   }).join("");

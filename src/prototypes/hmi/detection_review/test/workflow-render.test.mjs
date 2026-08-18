@@ -155,6 +155,8 @@ test("renders disagreement context and adjudication controls", () => {
   assert.match(html, /name="resolutionReason"[\s\S]*?required/);
   assert.match(queueHtml, /1 case/);
   assert.match(queueHtml, /det-echo-001/);
+  assert.match(queueHtml, /<button[^>]*data-detection-id="det-echo-001"/);
+  assert.doesNotMatch(queueHtml, /\?scenario=adjudication/);
 });
 
 test("escapes reviewer and workflow error content before rendering", () => {

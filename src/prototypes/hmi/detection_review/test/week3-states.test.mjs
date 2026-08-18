@@ -51,6 +51,7 @@ test("application markup names every queue page state", () => {
       workflowLoadError: null,
     });
     assert.match(html, new RegExp(`data-page-state="${status}"`));
+    assert.match(html, /class="prototype-controls"/);
   }
 });
 

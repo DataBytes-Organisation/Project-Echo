@@ -50,6 +50,7 @@ test("renders a controlled queue error without internal details", () => {
   assert.doesNotMatch(html, new RegExp(escapeRegExp(rawMessage)));
   assert.match(html, />Unavailable<\/span>/);
   assert.doesNotMatch(html, />0 records<\/span>/);
+  assert.doesNotMatch(html, /\?scenario=populated/);
 });
 
 test("renders a populated queue with an explicit selected detection", () => {
@@ -70,6 +71,41 @@ test("renders a populated queue with an explicit selected detection", () => {
   assert.match(html, /Pending review/);
   const queueButton = html.match(/<button[\s\S]*?>/)[0];
   assert.doesNotMatch(queueButton, /aria-label=/);
+});
+
+test("renders role-aware queue labels and an actionable-work cue", () => {
+  const record = validateDetectionRecord(makeDetection());
+  const html = renderQueue({
+    status: "populated",
+    records: [{ ...record, reviewStatus: "awaiting_second_review", isActionable: true }],
+    selectedId: record.id,
+    errorMessage: null,
+  });
+
+  assert.match(html, /Awaiting reviewer 2/);
+  assert.match(html, /Action required/);
+  assert.match(html, /queue-actionable/);
+});
+
+test("renders every human workflow status label in the queue", () => {
+  const expectedLabels = {
+    awaiting_first_review: "Awaiting reviewer 1",
+    awaiting_second_review: "Awaiting reviewer 2",
+    consensus: "Consensus reached",
+    awaiting_adjudication: "Awaiting adjudication",
+    finalized: "Finalized",
+  };
+
+  for (const [reviewStatus, label] of Object.entries(expectedLabels)) {
+    const html = renderQueue({
+      status: "populated",
+      records: [{ ...validateDetectionRecord(makeDetection({ id: reviewStatus })), reviewStatus, isActionable: false }],
+      selectedId: reviewStatus,
+      errorMessage: null,
+    });
+
+    assert.match(html, new RegExp(label));
+  }
 });
 
 test("renders every required evidence field and available-audio state", () => {
