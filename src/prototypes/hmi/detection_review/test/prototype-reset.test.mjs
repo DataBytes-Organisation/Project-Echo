@@ -6,28 +6,7 @@ import { PersistentReviewWorkflowRepository } from "../src/persistent-review-rep
 import { createReviewDraftStore } from "../src/draft-store.mjs";
 import { createPrototypePreferenceStore } from "../src/prototype-preferences.mjs";
 import { resetPrototype } from "../src/prototype-reset.mjs";
-
-function createMemoryStorage(initial = {}) {
-  const entries = new Map(Object.entries(initial));
-  return {
-    entries,
-    get length() {
-      return entries.size;
-    },
-    key(index) {
-      return [...entries.keys()][index] ?? null;
-    },
-    getItem(key) {
-      return entries.has(key) ? entries.get(key) : null;
-    },
-    setItem(key, value) {
-      entries.set(key, String(value));
-    },
-    removeItem(key) {
-      entries.delete(key);
-    },
-  };
-}
+import { createMemoryStorage } from "../test-support/helpers.mjs";
 
 test("confirmed reset clears only prototype state and reseeds Reviewer 1", async () => {
   const storage = createMemoryStorage({ unrelated: "keep" });

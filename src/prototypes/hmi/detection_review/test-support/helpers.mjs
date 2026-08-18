@@ -13,6 +13,18 @@ export const BASE_DETECTION = Object.freeze({
   version: 1,
 });
 
+export function createMemoryStorage(initial = {}) {
+  const entries = new Map(Object.entries(initial));
+  return {
+    entries,
+    get length() { return entries.size; },
+    key(index) { return [...entries.keys()][index] ?? null; },
+    getItem(key) { return entries.has(key) ? entries.get(key) : null; },
+    setItem(key, value) { entries.set(key, String(value)); },
+    removeItem(key) { entries.delete(key); },
+  };
+}
+
 export function makeDetection(overrides = {}) {
   const record = { ...BASE_DETECTION, ...overrides };
 

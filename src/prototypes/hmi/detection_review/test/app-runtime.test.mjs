@@ -9,27 +9,7 @@ import { createReviewDraftStore } from "../src/draft-store.mjs";
 import { PersistentReviewWorkflowRepository } from "../src/persistent-review-repository.mjs";
 import { createPrototypePreferenceStore } from "../src/prototype-preferences.mjs";
 import { createReviewCase, submitIndependentReview } from "../src/review-domain.mjs";
-
-function createMemoryStorage(initial = {}) {
-  const entries = new Map(Object.entries(initial));
-  return {
-    get length() {
-      return entries.size;
-    },
-    key(index) {
-      return [...entries.keys()][index] ?? null;
-    },
-    getItem(key) {
-      return entries.has(key) ? entries.get(key) : null;
-    },
-    setItem(key, value) {
-      entries.set(key, String(value));
-    },
-    removeItem(key) {
-      entries.delete(key);
-    },
-  };
-}
+import { createMemoryStorage } from "../test-support/helpers.mjs";
 
 function createRuntime({
   storage = createMemoryStorage(),

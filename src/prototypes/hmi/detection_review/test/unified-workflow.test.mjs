@@ -4,18 +4,7 @@ import assert from "node:assert/strict";
 import { createReviewCase } from "../src/review-domain.mjs";
 import { PersistentReviewWorkflowRepository } from "../src/persistent-review-repository.mjs";
 import { createReviewWorkflow } from "../src/review-workflow.mjs";
-
-function createMemoryStorage(initial = {}) {
-  const entries = new Map(Object.entries(initial));
-  return {
-    entries,
-    get length() { return entries.size; },
-    key(index) { return [...entries.keys()][index] ?? null; },
-    getItem(key) { return entries.has(key) ? entries.get(key) : null; },
-    setItem(key, value) { entries.set(key, String(value)); },
-    removeItem(key) { entries.delete(key); },
-  };
-}
+import { createMemoryStorage } from "../test-support/helpers.mjs";
 
 function workflowFor(storage, now) {
   return createReviewWorkflow(

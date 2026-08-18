@@ -6,24 +6,9 @@ import {
   createBrowserPrototypePreferenceStore,
   createPrototypePreferenceStore,
 } from "../src/prototype-preferences.mjs";
+import { createMemoryStorage } from "../test-support/helpers.mjs";
 
 const ROLE_KEY = "echo-detection-review:active-role:v1";
-
-function createMemoryStorage(initial = {}) {
-  const entries = new Map(Object.entries(initial));
-  return {
-    entries,
-    getItem(key) {
-      return entries.has(key) ? entries.get(key) : null;
-    },
-    setItem(key, value) {
-      entries.set(key, String(value));
-    },
-    removeItem(key) {
-      entries.delete(key);
-    },
-  };
-}
 
 test("defaults to Reviewer 1 and persists only supported roles across store instances", () => {
   const storage = createMemoryStorage();

@@ -6,6 +6,7 @@ import {
   createBrowserReviewDraftStore,
   createReviewDraftStore,
 } from "../src/draft-store.mjs";
+import { createMemoryStorage } from "../test-support/helpers.mjs";
 
 const context = Object.freeze({
   detectionId: "det-echo-001",
@@ -35,28 +36,6 @@ const values = Object.freeze({
   reason: "The call pattern does not support the prediction.",
   resolutionReason: "",
 });
-
-function createMemoryStorage(initial = {}) {
-  const entries = new Map(Object.entries(initial));
-  return {
-    entries,
-    get length() {
-      return entries.size;
-    },
-    key(index) {
-      return [...entries.keys()][index] ?? null;
-    },
-    getItem(key) {
-      return entries.has(key) ? entries.get(key) : null;
-    },
-    setItem(key, value) {
-      entries.set(key, String(value));
-    },
-    removeItem(key) {
-      entries.delete(key);
-    },
-  };
-}
 
 test("saves a versioned draft and restores it from a new store after navigation", () => {
   const storage = createMemoryStorage();
