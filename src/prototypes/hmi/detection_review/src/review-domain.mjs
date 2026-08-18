@@ -409,8 +409,10 @@ export function restoreReviewCase(candidate) {
       ? 1
       : status === "awaiting_second_review"
         ? 2
-        : status === "finalized" || status === "consensus" || status === "awaiting_adjudication"
-          ? 3
+        : status === "finalized"
+          ? 4
+          : status === "consensus" || status === "awaiting_adjudication"
+            ? 3
           : 1) + restoredHistory.staleCount;
     if (version < normalMinimum) {
       throw new Error("A stored review version is behind its history.");

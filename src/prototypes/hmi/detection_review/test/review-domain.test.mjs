@@ -315,6 +315,32 @@ test("restores and deeply freezes a serialized finalized review case", () => {
   assert.equal(Object.isFrozen(restored.history[0]), true);
 });
 
+test("rejects a finalized case below its adjudication version minimum", () => {
+  const candidate = JSON.parse(JSON.stringify(finalizedCase()));
+  candidate.version = 3;
+
+  assert.throws(
+    () => restoreReviewCase(candidate),
+    error => error instanceof ReviewValidationError
+      && error.field === "storedCase"
+      && error.message === "Saved review data is invalid.",
+  );
+});
+
+test("restores a finalized case with an additional stale-write conflict entry", () => {
+  const conflicted = recordReviewConflict(
+    finalizedCase(),
+    "fixture-concurrent-review",
+    "2026-08-17T04:00:00.000Z",
+  );
+  const restored = restoreReviewCase(JSON.parse(JSON.stringify(conflicted)));
+
+  assert.deepEqual(restored, conflicted);
+  assert.equal(restored.version, 5);
+  assert.equal(restored.history.at(-1).action, "stale_write_conflict");
+  assert.equal(Object.isFrozen(restored.history.at(-1)), true);
+});
+
 test("rejects stored review cases whose status and contents disagree", () => {
   assert.throws(
     () => restoreReviewCase({
