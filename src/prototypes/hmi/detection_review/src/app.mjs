@@ -9,11 +9,14 @@ import {
   createBrowserReviewDraftStore,
 } from "./draft-store.mjs";
 import {
-  createAsyncViewGuard,
   getSubmissionVersion,
   lockSubmissionForm,
   persistDraftAtBoundary,
 } from "./app-coordination.mjs";
+import {
+  beginRecognizedWorkflowSubmission,
+  createAppRuntimeController,
+} from "./app-runtime.mjs";
 import { restoreQueueItemFocus } from "./focus.mjs";
 import { getQueueNavigationTarget } from "./keyboard.mjs";
 import {
@@ -29,7 +32,6 @@ import { FixtureDetectionReviewRepository } from "./repository.mjs";
 import { createReviewCase, ReviewValidationError } from "./review-domain.mjs";
 import { createBrowserPersistentReviewRepository } from "./persistent-review-repository.mjs";
 import { createBrowserPrototypePreferenceStore } from "./prototype-preferences.mjs";
-import { resetPrototype } from "./prototype-reset.mjs";
 import {
   firstActionableDetectionId,
   isActionableForRole,
@@ -94,7 +96,7 @@ let workflowRepository = null;
 let workflow = null;
 let draftStore = null;
 let preferenceStore = null;
-let activeRole = "reviewer-1";
+let initialRole = "reviewer-1";
 let startupErrorMessage = null;
 
 try {
@@ -106,7 +108,7 @@ try {
   workflow = createReviewWorkflow(workflowRepository, { now });
   draftStore = createBrowserReviewDraftStore(browserWindow, { now });
   preferenceStore = createBrowserPrototypePreferenceStore(browserWindow);
-  activeRole = preferenceStore.loadRole();
+  initialRole = preferenceStore.loadRole();
 } catch (error) {
   startupErrorMessage = controlledMessage(error);
 }
@@ -119,21 +121,13 @@ let workflowRenderOptions = {};
 let workflowLoadError = null;
 let draftRecovery = createRecoveryState();
 let workflowConflict = null;
-let isPending = false;
 let resetStatus = null;
 let workbench;
-let viewGuard;
-
-function currentViewIdentity() {
-  return {
-    detectionId: workbench?.getState().selectedId ?? null,
-    actor: activeRole,
-  };
-}
+let runtime;
 
 function sessionForRender() {
   if (workflowSession?.status === "awaiting_first_review"
-    && !isActionableForRole(workflowSession.status, activeRole)) {
+    && !isActionableForRole(workflowSession.status, runtime.activeRole)) {
     return null;
   }
 
@@ -143,9 +137,9 @@ function sessionForRender() {
 function render() {
   root.innerHTML = renderApplicationView({
     detectionState: workbench.getState(),
-    workflowActor: activeRole,
-    activeRole,
-    isPending,
+    workflowActor: runtime.activeRole,
+    activeRole: runtime.activeRole,
+    isPending: runtime.isPending,
     resetStatus,
     workflowSession: sessionForRender(),
     workflowLoadError,
@@ -303,7 +297,7 @@ async function buildWorkbench(records, selectedId) {
 async function refreshRoleWorkspace({
   forceFirstActionable = false,
   selectedId = workbench.getState().selectedId,
-  viewToken = viewGuard.begin(currentViewIdentity()),
+  viewToken = runtime.beginView(),
   focusSelector = null,
 } = {}) {
   if (!workflow || baseRecords.length === 0) {
@@ -313,23 +307,27 @@ async function refreshRoleWorkspace({
   try {
     const entries = await Promise.all(baseRecords.map(async record => [
       record.id,
-      await workflow.getSession(record.id, activeRole),
+      await workflow.getSession(record.id, runtime.activeRole),
     ]));
 
-    if (!viewGuard.isCurrent(viewToken)) {
+    if (!runtime.isCurrent(viewToken)) {
       return false;
     }
 
     const nextSessions = new Map(entries);
-    const orderedRecords = orderRecordsForRole(baseRecords, nextSessions, activeRole);
+    const orderedRecords = orderRecordsForRole(
+      baseRecords,
+      nextSessions,
+      runtime.activeRole,
+    );
     const firstActionableId = firstActionableDetectionId(
       baseRecords,
       nextSessions,
-      activeRole,
+      runtime.activeRole,
     );
     const selectedSession = nextSessions.get(selectedId);
     const selectedIsActionable = selectedSession
-      ? isActionableForRole(selectedSession.status, activeRole)
+      ? isActionableForRole(selectedSession.status, runtime.activeRole)
       : false;
     let nextSelectedId = orderedRecords.some(record => record.id === selectedId)
       ? selectedId
@@ -341,14 +339,14 @@ async function refreshRoleWorkspace({
 
     const nextWorkbench = await buildWorkbench(orderedRecords, nextSelectedId);
 
-    if (!viewGuard.isCurrent(viewToken)) {
+    if (!runtime.isCurrent(viewToken)) {
       return false;
     }
 
     roleSessions = nextSessions;
     workbench = nextWorkbench;
     workflowSession = roleSessions.get(nextSelectedId) ?? null;
-    adjudicationSessions = activeRole === "adjudicator"
+    adjudicationSessions = runtime.activeRole === "adjudicator"
       ? [...roleSessions.values()].filter(
         session => session.status === "awaiting_adjudication",
       )
@@ -361,7 +359,7 @@ async function refreshRoleWorkspace({
     root.querySelector(focusSelector)?.focus();
     return true;
   } catch (error) {
-    if (!viewGuard.isCurrent(viewToken)) {
+    if (!runtime.isCurrent(viewToken)) {
       return false;
     }
 
@@ -380,20 +378,30 @@ async function refreshRoleWorkspace({
 }
 
 async function selectDetection(detectionId) {
-  clearWorkflowView();
-  resetStatus = null;
-  const state = workbench.select(detectionId);
+  let state;
+  const navigation = runtime.beginNavigation(() => {
+    clearWorkflowView();
+    resetStatus = null;
+    state = workbench.select(detectionId);
+  });
 
-  if (state.selectedId !== detectionId) {
-    return;
+  if (navigation.status === "blocked") {
+    return false;
   }
 
-  const viewToken = viewGuard.begin(currentViewIdentity());
-  await refreshRoleWorkspace({ selectedId: detectionId, viewToken });
+  if (state.selectedId !== detectionId) {
+    return false;
+  }
+
+  await refreshRoleWorkspace({
+    selectedId: detectionId,
+    viewToken: navigation.token,
+  });
 
   if (workbench.getState().selectedId === detectionId) {
     restoreQueueItemFocus(root, detectionId);
   }
+  return true;
 }
 
 workbench = createReviewWorkbench(
@@ -402,7 +410,11 @@ workbench = createReviewWorkbench(
     : selectedDetectionRepository,
   render,
 );
-viewGuard = createAsyncViewGuard(currentViewIdentity);
+runtime = createAppRuntimeController({
+  initialRole,
+  getDetectionId: () => workbench.getState().selectedId,
+  preferenceStore,
+});
 
 root.addEventListener("change", event => {
   if (event.target.matches('[name="decision"]')) {
@@ -455,39 +467,42 @@ root.addEventListener("click", async event => {
   if (roleButton) {
     const nextRole = roleButton.dataset.role;
 
-    if (isPending || nextRole === activeRole) {
+    if (nextRole === runtime.activeRole) {
       roleButton.focus();
       return;
     }
 
-    viewGuard.begin(currentViewIdentity());
+    let switchResult;
 
     try {
-      preferenceStore.saveRole(nextRole);
+      switchResult = runtime.switchRole(nextRole);
     } catch (error) {
       workflowSession = null;
       workflowLoadError = controlledMessage(error);
       render();
-      root.querySelector(`[data-role="${activeRole}"]`)?.focus();
+      root.querySelector(`[data-role="${runtime.activeRole}"]`)?.focus();
       return;
     }
 
-    activeRole = nextRole;
+    if (switchResult.status === "blocked") {
+      roleButton.focus();
+      return;
+    }
+
     clearWorkflowView();
     resetStatus = null;
     render();
-    const viewToken = viewGuard.begin(currentViewIdentity());
+    const viewToken = runtime.beginView();
     await refreshRoleWorkspace({
       forceFirstActionable: true,
       viewToken,
-      focusSelector: `[data-role="${activeRole}"]`,
+      focusSelector: `[data-role="${runtime.activeRole}"]`,
     });
     return;
   }
 
   if (event.target.closest("[data-prototype-reset]")) {
-    const resetResult = await resetPrototype({
-      isPending,
+    const resetResult = await runtime.reset({
       confirmReset: () => window.confirm(
         "Reset submitted reviews, final decisions, audit history, and drafts for this prototype?",
       ),
@@ -507,8 +522,6 @@ root.addEventListener("click", async event => {
       return;
     }
 
-    viewGuard.begin(currentViewIdentity());
-    activeRole = resetResult.role;
     clearWorkflowView();
     workbench = createReviewWorkbench(selectedDetectionRepository, render);
     const state = await workbench.load();
@@ -523,7 +536,7 @@ root.addEventListener("click", async event => {
     if (firstDetectionId) {
       workbench.select(firstDetectionId);
     }
-    const viewToken = viewGuard.begin(currentViewIdentity());
+    const viewToken = runtime.beginView();
     await refreshRoleWorkspace({
       forceFirstActionable: true,
       selectedId: firstDetectionId,
@@ -536,8 +549,12 @@ root.addEventListener("click", async event => {
   const retryButton = event.target.closest("[data-workflow-retry]");
 
   if (retryButton) {
+    if (runtime.isPending) {
+      return;
+    }
+
     clearWorkflowView();
-    const viewToken = viewGuard.begin(currentViewIdentity());
+    const viewToken = runtime.beginView();
     await refreshRoleWorkspace({ viewToken });
     return;
   }
@@ -606,22 +623,28 @@ root.addEventListener("click", async event => {
 root.addEventListener("submit", async event => {
   const form = event.target.closest("[data-review-form], [data-adjudication-form]");
 
-  if (!form || !workflowSession || isPending
-    || !isActionableForRole(workflowSession.status, activeRole)) {
+  if (!form) {
     return;
   }
 
-  event.preventDefault();
+  const submission = beginRecognizedWorkflowSubmission(event, runtime, {
+    canSubmit: Boolean(workflowSession)
+      && isActionableForRole(workflowSession.status, runtime.activeRole),
+  });
+
+  if (submission.status === "blocked") {
+    return;
+  }
+
   const values = formValues(form);
   const submittedSession = workflowSession;
   const expectedVersion = getSubmissionVersion(submittedSession, draftRecovery);
-  const submissionToken = viewGuard.capture(currentViewIdentity());
+  const submissionToken = submission.token;
   const submittedDraftResult = persistDraftValues(
     values,
     submittedSession,
     expectedVersion,
   );
-  isPending = true;
   resetStatus = null;
   workflowRenderOptions = { ...workflowRenderOptions, values };
   render();
@@ -637,7 +660,7 @@ root.addEventListener("submit", async event => {
   try {
     if (form.matches("[data-adjudication-form]")) {
       await workflow.finalize(submittedSession.detectionId, {
-        actor: activeRole,
+        actor: runtime.activeRole,
         decision: values.decision,
         correctedSpecies: values.correctedSpecies,
         resolutionReason: values.resolutionReason,
@@ -645,7 +668,7 @@ root.addEventListener("submit", async event => {
       });
     } else {
       await workflow.submitReview(submittedSession.detectionId, {
-        actor: activeRole,
+        actor: runtime.activeRole,
         decision: values.decision,
         correctedSpecies: values.correctedSpecies,
         reason: values.reason,
@@ -653,16 +676,19 @@ root.addEventListener("submit", async event => {
       });
     }
 
-    isPending = false;
+    const completion = runtime.completeSuccessfulSubmission(
+      submissionToken,
+      () => submittedDraftResult.status === "saved"
+        ? discardStoredDraft(submittedSession, submittedDraftResult.draft)
+        : submittedDraftResult,
+    );
 
-    if (!viewGuard.isCurrent(submissionToken)) {
+    if (completion.status === "stale") {
       render();
       return;
     }
 
-    const discardResult = submittedDraftResult.status === "saved"
-      ? discardStoredDraft(submittedSession, submittedDraftResult.draft)
-      : submittedDraftResult;
+    const discardResult = completion.cleanupResult;
     const recoveryError = submittedDraftResult.status === "failed"
       ? submittedDraftResult.errorMessage
       : discardResult.status === "failed"
@@ -684,9 +710,9 @@ root.addEventListener("submit", async event => {
       render();
     }
   } catch (error) {
-    isPending = false;
+    const completion = runtime.completeFailedSubmission(submissionToken);
 
-    if (!viewGuard.isCurrent(submissionToken)) {
+    if (completion.status === "stale") {
       render();
       return;
     }
@@ -733,6 +759,6 @@ const initialState = await workbench.load();
 baseRecords = initialState.status === "populated" ? initialState.records : [];
 
 if (initialState.status === "populated") {
-  const viewToken = viewGuard.begin(currentViewIdentity());
+  const viewToken = runtime.beginView();
   await refreshRoleWorkspace({ viewToken });
 }
