@@ -8,6 +8,7 @@ import {
 import {
   FixtureReviewWorkflowRepository,
   ReviewWorkflowRepository,
+  StaleReviewVersionError,
 } from "../src/review-repository.mjs";
 
 test("review workflow repository declares load, save, and adjudication list operations", async () => {
@@ -27,9 +28,10 @@ test("fixture repository loads and saves deterministic immutable review cases", 
   }, "2026-08-16T01:00:00.000Z");
 
   assert.notEqual(await repository.loadCase("det-echo-001"), initial);
-  await repository.saveCase(afterFirst);
+  const saved = await repository.saveCase(afterFirst, 1);
 
   assert.notEqual(await repository.loadCase("det-echo-001"), afterFirst);
+  assert.equal(saved.version, 2);
   assert.equal(Object.isFrozen((await repository.loadCase("det-echo-001")).submissions), true);
 });
 
@@ -56,10 +58,48 @@ test("fixture repository isolates saved cases from later caller mutation", async
     "2026-08-16T01:00:00.000Z",
   ));
 
-  await repository.saveCase(callerOwned);
+  await repository.saveCase(callerOwned, 1);
   callerOwned.status = "tampered";
 
   assert.equal((await repository.loadCase("det-echo-001")).status, "awaiting_second_review");
+});
+
+test("rejects a stale expected version and returns the latest immutable case", async () => {
+  const initial = createReviewCase("det-echo-001");
+  const repository = new FixtureReviewWorkflowRepository([initial]);
+  const firstWrite = submitIndependentReview(initial, {
+    actor: "reviewer-1",
+    decision: "confirmed",
+  }, "2026-08-16T01:00:00.000Z");
+  await repository.saveCase(firstWrite, 1);
+
+  await assert.rejects(
+    () => repository.saveCase(firstWrite, 1),
+    error => error instanceof StaleReviewVersionError
+      && error.expectedVersion === 1
+      && error.actualVersion === 2
+      && error.latestCase.version === 2
+      && Object.isFrozen(error.latestCase),
+  );
+});
+
+test("deterministic conflict simulation advances history then rejects one save", async () => {
+  const initial = createReviewCase("det-echo-001");
+  const repository = new FixtureReviewWorkflowRepository([initial], {
+    conflictOnNextSave: true,
+    now: () => "2026-08-17T02:00:00.000Z",
+  });
+  const firstWrite = submitIndependentReview(initial, {
+    actor: "reviewer-1",
+    decision: "confirmed",
+  }, "2026-08-17T01:00:00.000Z");
+
+  await assert.rejects(
+    () => repository.saveCase(firstWrite, 1),
+    error => error instanceof StaleReviewVersionError
+      && error.latestCase.history.at(-1).action === "stale_write_conflict",
+  );
+  assert.equal((await repository.loadCase("det-echo-001")).version, 2);
 });
 
 test("fixture repository lists only cases awaiting adjudication", async () => {

@@ -3,13 +3,16 @@ import assert from "node:assert/strict";
 
 import {
   createReviewCase,
+  ReviewValidationError,
   submitIndependentReview,
 } from "../src/review-domain.mjs";
 import {
+  ReviewConflictError,
   ReviewLoadError,
   ReviewSubmissionError,
   createReviewWorkflow,
 } from "../src/review-workflow.mjs";
+import { StaleReviewVersionError } from "../src/review-repository.mjs";
 import { createRepositoryDouble } from "../test-support/helpers.mjs";
 
 const T1 = "2026-08-16T01:00:00.000Z";
@@ -54,12 +57,32 @@ test("matching second review saves once and returns a consensus projection", asy
   const session = await workflow.submitReview("det-echo-001", {
     actor: "reviewer-2",
     decision: "confirmed",
+    expectedVersion: 2,
   });
 
   assert.equal(repository.saveCalls.length, 1);
   assert.equal(session.status, "consensus");
   assert.equal(session.consensus.decision, "confirmed");
+  assert.equal(session.version, 3);
   assert.deepEqual(Object.keys(session.submissions), ["reviewer-1", "reviewer-2"]);
+});
+
+test("stateful commands require a positive expected version", async () => {
+  const repository = createRepositoryDouble(afterFirstReview());
+  const workflow = createReviewWorkflow(repository, { now: () => T2 });
+
+  for (const expectedVersion of [undefined, 0, -1, 1.5, "2"]) {
+    await assert.rejects(
+      () => workflow.submitReview("det-echo-001", {
+        actor: "reviewer-2",
+        decision: "confirmed",
+        expectedVersion,
+      }),
+      error => error instanceof ReviewValidationError
+        && error.field === "expectedVersion",
+    );
+  }
+  assert.equal(repository.saveCalls.length, 0);
 });
 
 test("mismatched second review is returned by the adjudication queue", async () => {
@@ -70,6 +93,7 @@ test("mismatched second review is returned by the adjudication queue", async () 
     actor: "reviewer-2",
     decision: "insufficient_evidence",
     reason: "The audio evidence is unavailable.",
+    expectedVersion: 2,
   });
   const queue = await workflow.listAdjudication();
 
@@ -87,6 +111,7 @@ test("adjudicator finalization saves once and exposes the final resolution", asy
     actor: "adjudicator",
     decision: "rejected",
     resolutionReason: "Two independent evidence concerns support rejection.",
+    expectedVersion: 3,
   });
 
   assert.equal(repository.saveCalls.length, 1);
@@ -106,6 +131,7 @@ test("stateful review submission does not retry a failed repository write", asyn
     () => workflow.submitReview("det-echo-001", {
       actor: "reviewer-2",
       decision: "confirmed",
+      expectedVersion: 2,
     }),
     error => error instanceof ReviewSubmissionError
       && error.userMessage === "The review could not be saved. Your submission was not retried.",
@@ -125,11 +151,47 @@ test("stateful adjudication finalization does not retry a failed repository writ
       actor: "adjudicator",
       decision: "confirmed",
       resolutionReason: "The prediction is supported after evidence comparison.",
+      expectedVersion: 3,
     }),
     error => error instanceof ReviewSubmissionError,
   );
   assert.equal(repository.saveCalls.length, 1);
   assert.equal((await workflow.getSession("det-echo-001", "adjudicator")).status, "awaiting_adjudication");
+});
+
+test("a stale write is attempted once and preserves entered values with the latest session", async () => {
+  const latestCase = {
+    ...afterFirstReview(),
+    version: 3,
+    history: Object.freeze([
+      ...afterFirstReview().history,
+      Object.freeze({
+        actor: "fixture-concurrent-review",
+        action: "stale_write_conflict",
+        timestamp: T3,
+        previousStatus: "awaiting_second_review",
+        resultingStatus: "awaiting_second_review",
+      }),
+    ]),
+  };
+  const repository = createRepositoryDouble(afterFirstReview(), {
+    saveError: new StaleReviewVersionError(2, 3, latestCase),
+  });
+  const workflow = createReviewWorkflow(repository, { now: () => T3 });
+
+  await assert.rejects(
+    () => workflow.submitReview("det-echo-001", {
+      actor: "reviewer-2",
+      decision: "rejected",
+      reason: "Preserve this entered reason.",
+      expectedVersion: 2,
+    }),
+    error => error instanceof ReviewConflictError
+      && error.expectedVersion === 2
+      && error.latestSession.version === 3
+      && error.attemptedValues.reason === "Preserve this entered reason.",
+  );
+  assert.equal(repository.saveCalls.length, 1);
 });
 
 test("converts repository load failures to a controlled workflow error", async () => {

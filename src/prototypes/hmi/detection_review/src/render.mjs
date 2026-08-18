@@ -68,6 +68,8 @@ function renderQueueState(state) {
           class="queue-item"
           data-detection-id="${escapeHtml(record.id)}"
           aria-pressed="${isSelected}"
+          aria-describedby="queue-keyboard-help"
+          aria-keyshortcuts="ArrowUp ArrowDown Home End"
         >
           <span class="queue-item__topline">
             <strong>${escapeHtml(record.species)}</strong>
@@ -109,6 +111,7 @@ export function renderQueue(state) {
         </div>
         <span class="record-count" aria-label="${escapeHtml(countAriaLabel)}">${escapeHtml(countLabel)}</span>
       </header>
+      <p class="sr-only" id="queue-keyboard-help">Use the Up and Down arrow keys, Home, or End to move through detection records.</p>
       ${renderQueueState(state)}
     </section>`;
 }

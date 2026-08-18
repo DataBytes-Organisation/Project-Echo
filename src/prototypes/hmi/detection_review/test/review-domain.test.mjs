@@ -6,6 +6,7 @@ import {
   createReviewCase,
   decisionsMatch,
   finalizeAdjudication,
+  recordReviewConflict,
   submitIndependentReview,
 } from "../src/review-domain.mjs";
 
@@ -37,6 +38,22 @@ test("rejects a decision outside the four supported review outcomes", () => {
       && error.field === "decision"
       && /supported decision/i.test(error.message),
   );
+});
+
+test("starts review cases at version 1 and advances the version for each transition", () => {
+  const initial = createReviewCase("det-echo-001");
+  const afterFirst = submitIndependentReview(initial, {
+    actor: "reviewer-1",
+    decision: "confirmed",
+  }, T1);
+  const afterSecond = submitIndependentReview(afterFirst, {
+    actor: "reviewer-2",
+    decision: "confirmed",
+  }, T2);
+
+  assert.equal(initial.version, 1);
+  assert.equal(afterFirst.version, 2);
+  assert.equal(afterSecond.version, 3);
 });
 
 test("requires a reason for rejection, species correction, and insufficient evidence", () => {
@@ -160,6 +177,13 @@ test("appends immutable history entries for every status transition", () => {
     },
     {
       actor: "reviewer-2",
+      action: "second_review_submitted",
+      timestamp: T2,
+      previousStatus: "awaiting_second_review",
+      resultingStatus: "awaiting_second_review",
+    },
+    {
+      actor: "reviewer-2",
       action: "disagreement_routed",
       timestamp: T2,
       previousStatus: "awaiting_second_review",
@@ -168,6 +192,26 @@ test("appends immutable history entries for every status transition", () => {
   ]);
   assert.equal(Object.isFrozen(afterSecond.history), true);
   assert.equal(Object.isFrozen(afterSecond.history[0]), true);
+});
+
+test("records a versioned immutable conflict event without changing workflow status", () => {
+  const initial = createReviewCase("det-echo-001");
+  const conflicted = recordReviewConflict(
+    initial,
+    "fixture-concurrent-review",
+    "2026-08-17T02:00:00.000Z",
+  );
+
+  assert.equal(conflicted.version, 2);
+  assert.equal(conflicted.status, "awaiting_first_review");
+  assert.deepEqual(conflicted.history.at(-1), {
+    actor: "fixture-concurrent-review",
+    action: "stale_write_conflict",
+    timestamp: "2026-08-17T02:00:00.000Z",
+    previousStatus: "awaiting_first_review",
+    resultingStatus: "awaiting_first_review",
+  });
+  assert.equal(Object.isFrozen(conflicted.history.at(-1)), true);
 });
 
 test("adjudicator finalization requires a resolution reason and records the final result", () => {

@@ -45,14 +45,17 @@ export function escapeRegExp(value) {
 export function createRepositoryDouble(reviewCase, options = {}) {
   let currentCase = reviewCase;
   const saveCalls = [];
+  const expectedVersions = [];
 
   return {
     saveCalls,
+    expectedVersions,
     async loadCase(detectionId) {
       return currentCase?.detectionId === detectionId ? currentCase : null;
     },
-    async saveCase(nextCase) {
+    async saveCase(nextCase, expectedVersion) {
       saveCalls.push(nextCase);
+      expectedVersions.push(expectedVersion);
 
       if (options.saveError) {
         throw options.saveError;

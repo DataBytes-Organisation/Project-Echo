@@ -54,6 +54,9 @@ export const reviewScenarioFixtures = Object.freeze({
   consensus: casesFor(consensusCase),
   adjudication: casesFor(disagreementCase),
   finalized: casesFor(finalizedCase),
+  "draft-restored": casesFor(createReviewCase),
+  conflict: casesFor(createReviewCase),
+  success: casesFor(consensusCase),
 });
 
 export const scenarioActors = Object.freeze({
@@ -62,4 +65,7 @@ export const scenarioActors = Object.freeze({
   consensus: "reviewer-2",
   adjudication: "adjudicator",
   finalized: "adjudicator",
+  "draft-restored": "reviewer-1",
+  conflict: "reviewer-1",
+  success: "reviewer-2",
 });

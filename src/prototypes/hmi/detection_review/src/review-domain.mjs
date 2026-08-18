@@ -107,6 +107,7 @@ export function createReviewCase(detectionId) {
       "detectionId",
       "A detection ID is required.",
     ),
+    version: 1,
     status: "awaiting_first_review",
     submissions: {},
     consensus: null,
@@ -159,6 +160,7 @@ export function submitIndependentReview(reviewCase, command, timestamp) {
     const resultingStatus = "awaiting_second_review";
     return freezeReviewCase({
       ...reviewCase,
+      version: reviewCase.version + 1,
       status: resultingStatus,
       submissions,
       history: appendHistory(reviewCase, historyEntry(
@@ -177,6 +179,7 @@ export function submitIndependentReview(reviewCase, command, timestamp) {
 
   return freezeReviewCase({
     ...reviewCase,
+    version: reviewCase.version + 1,
     status: resultingStatus,
     submissions,
     consensus: matched
@@ -186,12 +189,42 @@ export function submitIndependentReview(reviewCase, command, timestamp) {
         reachedAt: submittedAt,
       }
       : null,
+    history: [
+      ...reviewCase.history,
+      historyEntry(
+        actor,
+        "second_review_submitted",
+        submittedAt,
+        reviewCase.status,
+        reviewCase.status,
+      ),
+      historyEntry(
+        actor,
+        action,
+        submittedAt,
+        reviewCase.status,
+        resultingStatus,
+      ),
+    ],
+  });
+}
+
+export function recordReviewConflict(reviewCase, actor, timestamp) {
+  const recordedAt = requiredText(
+    timestamp,
+    "timestamp",
+    "A conflict timestamp is required.",
+  );
+
+  return freezeReviewCase({
+    ...reviewCase,
+    version: reviewCase.version + 1,
     history: appendHistory(reviewCase, historyEntry(
-      actor,
-      action,
-      submittedAt,
+      requiredText(actor, "actor", "A conflict actor is required."),
+      "stale_write_conflict",
+      recordedAt,
       reviewCase.status,
-      resultingStatus,
+      reviewCase.status,
     )),
   });
 }
@@ -227,6 +260,7 @@ export function finalizeAdjudication(reviewCase, command, timestamp) {
 
   return freezeReviewCase({
     ...reviewCase,
+    version: reviewCase.version + 1,
     status: resultingStatus,
     adjudication: {
       actor: "adjudicator",

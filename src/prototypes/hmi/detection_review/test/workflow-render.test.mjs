@@ -28,6 +28,7 @@ function makeSession(overrides = {}) {
     detectionId: "det-echo-001",
     actor: "reviewer-1",
     status: "awaiting_first_review",
+    version: 1,
     firstReviewComplete: false,
     submissions: {},
     consensus: null,
@@ -48,6 +49,40 @@ test("renders all four outcomes in the first-review decision form", () => {
   assert.match(html, /name="reason"/);
   assert.match(html, /name="correctedSpecies"/);
   assert.equal((html.match(/name="decision"[\s\S]*?required/g) ?? []).length, 4);
+  assert.match(html, /data-review-form[\s\S]*aria-describedby=/);
+});
+
+test("offers explicit Restore and Discard actions before applying a recovered draft", () => {
+  const html = renderReviewWorkflow(makeSession(), {
+    recoveryState: {
+      status: "available",
+      draft: { version: 1, savedAt: "2026-08-17T01:00:00.000Z" },
+      values: null,
+      errorMessage: null,
+    },
+  });
+
+  assert.match(html, /Recovered draft available/);
+  assert.match(html, /data-draft-restore/);
+  assert.match(html, /data-draft-discard/);
+  assert.doesNotMatch(html, /checked/);
+});
+
+test("renders audit history as an always-visible labelled ordered list", () => {
+  const html = renderReviewWorkflow(makeSession({
+    history: [{
+      actor: "reviewer-1",
+      action: "first_review_submitted",
+      timestamp: "2026-08-16T01:00:00.000Z",
+      previousStatus: "awaiting_first_review",
+      resultingStatus: "awaiting_second_review",
+    }],
+  }));
+
+  assert.match(html, /<section[^>]*class="history-panel"/);
+  assert.match(html, /Case audit history/);
+  assert.match(html, /<ol>/);
+  assert.doesNotMatch(html, /<details|<summary/);
 });
 
 test("renders native required state and associated field errors in form order", () => {

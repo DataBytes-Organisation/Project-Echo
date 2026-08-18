@@ -93,7 +93,14 @@ function decisionFields(values, errors, { adjudication = false } = {}) {
 function reviewForm(session, options) {
   const { errors = {}, values = {} } = options;
   return `
-    <form class="decision-form" data-review-form data-actor="${escapeHtml(session.actor)}" novalidate>
+    <form
+      class="decision-form"
+      data-review-form
+      data-actor="${escapeHtml(session.actor)}"
+      aria-describedby="review-form-guidance"
+      novalidate
+    >
+      <p class="form-guidance" id="review-form-guidance">Choose one decision. Required supporting fields appear after your choice.</p>
       ${decisionFields(values, errors)}
       ${options.submissionError
     ? `<p class="submission-error" role="alert">${escapeHtml(options.submissionError)}</p>`
@@ -106,7 +113,14 @@ function reviewForm(session, options) {
 function adjudicationForm(session, options) {
   const { errors = {}, values = {} } = options;
   return `
-    <form class="decision-form" data-adjudication-form data-actor="${escapeHtml(session.actor)}" novalidate>
+    <form
+      class="decision-form"
+      data-adjudication-form
+      data-actor="${escapeHtml(session.actor)}"
+      aria-describedby="adjudication-form-guidance"
+      novalidate
+    >
+      <p class="form-guidance" id="adjudication-form-guidance">Choose the final result and explain how it resolves the disagreement.</p>
       ${decisionFields(values, errors, { adjudication: true })}
       ${options.submissionError
     ? `<p class="submission-error" role="alert">${escapeHtml(options.submissionError)}</p>`
@@ -145,11 +159,7 @@ function independentReviewSummary(session) {
     </div>`;
 }
 
-function renderHistory(history) {
-  if (history.length === 0) {
-    return "";
-  }
-
+function renderHistory(history, headingId = "case-history-heading") {
   const entries = history.map(entry => `
     <li>
       <strong>${escapeHtml(entry.action.replaceAll("_", " "))}</strong>
@@ -158,10 +168,113 @@ function renderHistory(history) {
     </li>`).join("");
 
   return `
-    <details class="history-panel">
-      <summary>Append-only case history · ${history.length} ${history.length === 1 ? "entry" : "entries"}</summary>
-      <ol>${entries}</ol>
-    </details>`;
+    <section class="history-panel" aria-labelledby="${headingId}">
+      <div class="history-panel__heading">
+        <h3 id="${headingId}">Case audit history</h3>
+        <span>${history.length} ${history.length === 1 ? "entry" : "entries"}</span>
+      </div>
+      <p class="history-panel__description">Append-only record of case actions and status transitions.</p>
+      ${history.length === 0
+    ? '<p class="history-empty">No case actions have been recorded yet.</p>'
+    : `<ol>${entries}</ol>`}
+    </section>`;
+}
+
+export function renderDraftRecovery(recoveryState) {
+  if (!recoveryState || ["idle", "discarded"].includes(recoveryState.status)) {
+    return "";
+  }
+
+  if (recoveryState.status === "failed") {
+    return `
+      <aside class="draft-recovery draft-recovery--failed" role="alert">
+        <h3>Draft recovery unavailable</h3>
+        <p>${escapeHtml(recoveryState.errorMessage)}</p>
+      </aside>`;
+  }
+
+  if (recoveryState.status === "restored") {
+    return `
+      <aside class="draft-recovery draft-recovery--restored" role="status" aria-live="polite">
+        <div>
+          <h3>Draft restored</h3>
+          <p>Your saved input is back in the form. Review it before submitting.</p>
+        </div>
+        <button class="secondary-button" type="button" data-draft-discard>Discard restored draft</button>
+      </aside>`;
+  }
+
+  return `
+    <aside class="draft-recovery" role="status" aria-labelledby="draft-recovery-heading">
+      <div>
+        <h3 id="draft-recovery-heading">Recovered draft available</h3>
+        <p>Saved ${escapeHtml(recoveryState.draft.savedAt)} from case version ${escapeHtml(recoveryState.draft.version)}.</p>
+      </div>
+      <div class="recovery-actions" aria-label="Recovered draft actions">
+        <button class="primary-button" type="button" data-draft-restore>Restore draft</button>
+        <button class="secondary-button" type="button" data-draft-discard>Discard draft</button>
+      </div>
+    </aside>`;
+}
+
+function attemptedReviewSummary(values) {
+  const reason = values.resolutionReason || values.reason;
+  return `
+    <dl class="conflict-summary">
+      <div>
+        <dt>Decision</dt>
+        <dd>${escapeHtml(decisionLabel(values.decision))}</dd>
+      </div>
+      ${values.correctedSpecies ? `
+        <div>
+          <dt>Corrected species</dt>
+          <dd>${escapeHtml(values.correctedSpecies)}</dd>
+        </div>` : ""}
+      ${reason ? `
+        <div>
+          <dt>Entered reason</dt>
+          <dd>${escapeHtml(reason)}</dd>
+        </div>` : ""}
+    </dl>`;
+}
+
+export function renderConflictRecovery(conflict) {
+  const latest = conflict.latestSession;
+  return `
+    <section class="panel workflow-panel conflict-panel" aria-labelledby="conflict-heading" data-workflow-status="conflict">
+      <header class="panel-heading">
+        <div>
+          <h2 id="conflict-heading" tabindex="-1">Review changed before save</h2>
+          <p role="alert">Your entered data is preserved. Nothing was submitted again.</p>
+        </div>
+        <span class="workflow-status">conflict</span>
+      </header>
+      <div class="workflow-body">
+        <div class="conflict-comparison" aria-label="Stale write comparison">
+          <article class="conflict-version">
+            <h3>Your unsaved review</h3>
+            <p class="version-label">Version ${escapeHtml(conflict.expectedVersion)}</p>
+            ${attemptedReviewSummary(conflict.attemptedValues)}
+          </article>
+          <article class="conflict-version">
+            <h3>Latest case</h3>
+            <p class="version-label">Version ${escapeHtml(latest.version)}</p>
+            <dl class="conflict-summary">
+              <div>
+                <dt>Current status</dt>
+                <dd>${escapeHtml(statusLabel(latest.status))}</dd>
+              </div>
+            </dl>
+          </article>
+        </div>
+        <p class="submission-note">Keeping the draft updates its version reference only. You must review and submit it again yourself.</p>
+        <div class="recovery-actions" aria-label="Conflict recovery actions">
+          <button class="primary-button" type="button" data-conflict-keep-draft>Keep draft with latest case</button>
+          <button class="secondary-button" type="button" data-conflict-discard-draft>Discard draft and use latest</button>
+        </div>
+        ${renderHistory(latest.history, "conflict-history-heading")}
+      </div>
+    </section>`;
 }
 
 function workflowBody(session, options) {
@@ -238,6 +351,14 @@ function workflowBody(session, options) {
 }
 
 export function renderReviewWorkflow(session, options = {}) {
+  const recoveryValues = options.recoveryState?.status === "restored"
+    ? options.recoveryState.values
+    : null;
+  const resolvedOptions = {
+    ...options,
+    values: options.values ?? recoveryValues ?? {},
+  };
+
   return `
     <section class="panel workflow-panel" aria-labelledby="workflow-heading" data-workflow-status="${escapeHtml(session.status)}">
       <header class="panel-heading">
@@ -248,7 +369,8 @@ export function renderReviewWorkflow(session, options = {}) {
         <span class="workflow-status">${escapeHtml(statusLabel(session.status))}</span>
       </header>
       <div class="workflow-body">
-        ${workflowBody(session, options)}
+        ${renderDraftRecovery(options.recoveryState)}
+        ${workflowBody(session, resolvedOptions)}
         ${renderHistory(session.history)}
       </div>
     </section>`;

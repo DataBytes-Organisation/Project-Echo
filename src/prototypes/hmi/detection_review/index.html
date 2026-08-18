@@ -8,9 +8,10 @@
     <link rel="stylesheet" href="./styles.css">
   </head>
   <body>
+    <a class="skip-link" href="#app">Skip to review workbench</a>
     <!-- Prototype-only deterministic workflow; no production writes or live services. -->
     <header class="masthead">
-      <p class="masthead__line">Project Echo · Week 2 prototype · deterministic reviewer sessions</p>
+      <p class="masthead__line">Project Echo · Week 3 prototype · recoverable reviewer sessions</p>
       <h1>Detection review</h1>
       <p class="masthead__description">
         Verify model detections independently, resolve consensus automatically, and adjudicate disagreements.
@@ -33,17 +34,20 @@
             <li><a href="?scenario=consensus" data-scenario-link="consensus">Consensus</a></li>
             <li><a href="?scenario=adjudication" data-scenario-link="adjudication">Adjudication</a></li>
             <li><a href="?scenario=finalized" data-scenario-link="finalized">Finalized</a></li>
+            <li><a href="?scenario=draft-restored" data-scenario-link="draft-restored">Draft restored</a></li>
+            <li><a href="?scenario=conflict" data-scenario-link="conflict">Conflict</a></li>
+            <li><a href="?scenario=success" data-scenario-link="success">Success</a></li>
           </ul>
         </div>
       </nav>
       <hr class="masthead__rule" aria-hidden="true">
     </header>
 
-    <main class="page-shell" id="app"></main>
+    <main class="page-shell" id="app" tabindex="-1"></main>
 
     <footer class="page-footer">
       <p>Prototype data only · no live services</p>
-      <p>Independent review · deterministic consensus · explicit adjudication</p>
+      <p>Draft recovery · optimistic conflicts · append-only audit history</p>
     </footer>
 
     <script type="module" src="./src/app.mjs"></script>

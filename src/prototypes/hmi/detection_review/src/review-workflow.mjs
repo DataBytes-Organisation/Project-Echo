@@ -1,7 +1,9 @@
 import {
   finalizeAdjudication,
+  ReviewValidationError,
   submitIndependentReview,
 } from "./review-domain.mjs";
+import { StaleReviewVersionError } from "./review-repository.mjs";
 
 const REVIEW_SAVE_ERROR = "The review could not be saved. Your submission was not retried.";
 const ADJUDICATION_SAVE_ERROR = "The adjudication could not be saved. Your submission was not retried.";
@@ -21,6 +23,31 @@ export class ReviewSubmissionError extends Error {
     super(message, options);
     this.name = "ReviewSubmissionError";
     this.userMessage = message;
+  }
+}
+
+function attemptedValues(command) {
+  return Object.freeze({
+    decision: typeof command?.decision === "string" ? command.decision : "",
+    correctedSpecies: typeof command?.correctedSpecies === "string"
+      ? command.correctedSpecies
+      : "",
+    reason: typeof command?.reason === "string" ? command.reason : "",
+    resolutionReason: typeof command?.resolutionReason === "string"
+      ? command.resolutionReason
+      : "",
+  });
+}
+
+export class ReviewConflictError extends Error {
+  constructor(expectedVersion, actualVersion, latestSession, command, options) {
+    super("The review changed before your save completed.", options);
+    this.name = "ReviewConflictError";
+    this.userMessage = "This review changed before your save completed. Your entered data is preserved.";
+    this.expectedVersion = expectedVersion;
+    this.actualVersion = actualVersion;
+    this.latestSession = latestSession;
+    this.attemptedValues = attemptedValues(command);
   }
 }
 
@@ -57,6 +84,7 @@ export function projectReviewCase(reviewCase, actor) {
     detectionId: reviewCase.detectionId,
     actor,
     status: reviewCase.status,
+    version: reviewCase.version,
     firstReviewComplete: Boolean(reviewCase.submissions["reviewer-1"]),
     submissions,
     consensus: reviewCase.consensus,
@@ -81,10 +109,41 @@ async function loadRequiredCase(repository, detectionId) {
   return reviewCase;
 }
 
-async function saveOnce(repository, nextCase, failureMessage) {
+function expectedVersionFor(_reviewCase, command) {
+  if (!Number.isInteger(command?.expectedVersion) || command.expectedVersion < 1) {
+    throw new ReviewValidationError(
+      "A positive expected review version is required.",
+      "expectedVersion",
+    );
+  }
+
+  return command.expectedVersion;
+}
+
+function conflictFromLatest(expectedVersion, reviewCase, actor, command, options) {
+  return new ReviewConflictError(
+    expectedVersion,
+    reviewCase.version,
+    projectReviewCase(reviewCase, actor),
+    command,
+    options,
+  );
+}
+
+async function saveOnce(repository, nextCase, expectedVersion, failureMessage, actor, command) {
   try {
-    await repository.saveCase(nextCase);
+    return await repository.saveCase(nextCase, expectedVersion);
   } catch (error) {
+    if (error instanceof StaleReviewVersionError) {
+      throw conflictFromLatest(
+        error.expectedVersion,
+        error.latestCase,
+        actor,
+        command,
+        { cause: error },
+      );
+    }
+
     throw new ReviewSubmissionError(failureMessage, { cause: error });
   }
 }
@@ -98,9 +157,22 @@ export function createReviewWorkflow(repository, { now = () => new Date().toISOS
 
     async submitReview(detectionId, command) {
       const reviewCase = await loadRequiredCase(repository, detectionId);
+      const expectedVersion = expectedVersionFor(reviewCase, command);
+
+      if (expectedVersion !== reviewCase.version) {
+        throw conflictFromLatest(expectedVersion, reviewCase, command.actor, command);
+      }
+
       const nextCase = submitIndependentReview(reviewCase, command, now());
-      await saveOnce(repository, nextCase, REVIEW_SAVE_ERROR);
-      return projectReviewCase(nextCase, command.actor);
+      const savedCase = await saveOnce(
+        repository,
+        nextCase,
+        expectedVersion,
+        REVIEW_SAVE_ERROR,
+        command.actor,
+        command,
+      );
+      return projectReviewCase(savedCase, command.actor);
     },
 
     async listAdjudication() {
@@ -117,9 +189,22 @@ export function createReviewWorkflow(repository, { now = () => new Date().toISOS
 
     async finalize(detectionId, command) {
       const reviewCase = await loadRequiredCase(repository, detectionId);
+      const expectedVersion = expectedVersionFor(reviewCase, command);
+
+      if (expectedVersion !== reviewCase.version) {
+        throw conflictFromLatest(expectedVersion, reviewCase, "adjudicator", command);
+      }
+
       const nextCase = finalizeAdjudication(reviewCase, command, now());
-      await saveOnce(repository, nextCase, ADJUDICATION_SAVE_ERROR);
-      return projectReviewCase(nextCase, "adjudicator");
+      const savedCase = await saveOnce(
+        repository,
+        nextCase,
+        expectedVersion,
+        ADJUDICATION_SAVE_ERROR,
+        "adjudicator",
+        command,
+      );
+      return projectReviewCase(savedCase, "adjudicator");
     },
   });
 }

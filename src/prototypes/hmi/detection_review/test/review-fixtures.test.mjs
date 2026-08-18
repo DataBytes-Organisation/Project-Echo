@@ -7,9 +7,12 @@ test("deterministic scenario fixtures contain the expected states and ordered hi
   const expectations = {
     "first-review": ["awaiting_first_review", 0],
     "second-review": ["awaiting_second_review", 1],
-    consensus: ["consensus", 2],
-    adjudication: ["awaiting_adjudication", 2],
-    finalized: ["finalized", 3],
+    consensus: ["consensus", 3],
+    adjudication: ["awaiting_adjudication", 3],
+    finalized: ["finalized", 4],
+    "draft-restored": ["awaiting_first_review", 0],
+    conflict: ["awaiting_first_review", 0],
+    success: ["consensus", 3],
   };
 
   for (const [scenario, [status, historyLength]] of Object.entries(expectations)) {
@@ -21,6 +24,7 @@ test("deterministic scenario fixtures contain the expected states and ordered hi
     ]);
     assert.equal(cases.every(reviewCase => reviewCase.status === status), true);
     assert.equal(cases.every(reviewCase => reviewCase.history.length === historyLength), true);
+    assert.equal(cases.every(reviewCase => Number.isInteger(reviewCase.version)), true);
     assert.equal(cases.every(reviewCase => reviewCase.history.every((entry, index, history) => (
       index === 0 || Date.parse(history[index - 1].timestamp) <= Date.parse(entry.timestamp)
     ))), true);
