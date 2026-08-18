@@ -12,6 +12,10 @@ export class ReviewWorkflowRepository {
   async listAdjudication() {
     throw new Error("listAdjudication() must be implemented");
   }
+
+  async reset() {
+    throw new Error("reset() must be implemented");
+  }
 }
 
 export class StaleReviewVersionError extends Error {
@@ -49,6 +53,8 @@ function immutableSnapshot(reviewCase) {
 export class FixtureReviewWorkflowRepository extends ReviewWorkflowRepository {
   #cases;
   #conflictOnNextSave;
+  #initialCases;
+  #initialConflictOnNextSave;
   #now;
 
   constructor(reviewCases, {
@@ -56,13 +62,13 @@ export class FixtureReviewWorkflowRepository extends ReviewWorkflowRepository {
     now = () => new Date().toISOString(),
   } = {}) {
     super();
-    this.#cases = new Map(
-      reviewCases.map(reviewCase => [
-        reviewCase.detectionId,
-        immutableSnapshot(reviewCase),
-      ]),
-    );
+    this.#initialCases = reviewCases.map(immutableSnapshot);
+    this.#cases = new Map(this.#initialCases.map(reviewCase => [
+      reviewCase.detectionId,
+      immutableSnapshot(reviewCase),
+    ]));
     this.#conflictOnNextSave = conflictOnNextSave;
+    this.#initialConflictOnNextSave = conflictOnNextSave;
     this.#now = now;
   }
 
@@ -109,5 +115,13 @@ export class FixtureReviewWorkflowRepository extends ReviewWorkflowRepository {
     return [...this.#cases.values()]
       .filter(reviewCase => reviewCase.status === "awaiting_adjudication")
       .map(immutableSnapshot);
+  }
+
+  async reset() {
+    this.#cases = new Map(this.#initialCases.map(reviewCase => [
+      reviewCase.detectionId,
+      immutableSnapshot(reviewCase),
+    ]));
+    this.#conflictOnNextSave = this.#initialConflictOnNextSave;
   }
 }

@@ -11,12 +11,13 @@ import {
   StaleReviewVersionError,
 } from "../src/review-repository.mjs";
 
-test("review workflow repository declares load, save, and adjudication list operations", async () => {
+test("review workflow repository declares load, save, adjudication list, and reset operations", async () => {
   const repository = new ReviewWorkflowRepository();
 
   await assert.rejects(() => repository.loadCase("det-echo-001"), /must be implemented/);
   await assert.rejects(() => repository.saveCase(createReviewCase("det-echo-001")), /must be implemented/);
   await assert.rejects(() => repository.listAdjudication(), /must be implemented/);
+  await assert.rejects(() => repository.reset(), /must be implemented/);
 });
 
 test("fixture repository loads and saves deterministic immutable review cases", async () => {
@@ -118,4 +119,31 @@ test("fixture repository lists only cases awaiting adjudication", async () => {
   const queued = await repository.listAdjudication();
 
   assert.deepEqual(queued.map(reviewCase => reviewCase.detectionId), ["det-echo-002"]);
+});
+
+test("fixture repository reset restores constructor seeds and its one-shot conflict simulation", async () => {
+  const initial = createReviewCase("det-echo-001");
+  const repository = new FixtureReviewWorkflowRepository([initial], {
+    conflictOnNextSave: true,
+    now: () => "2026-08-17T02:00:00.000Z",
+  });
+  const firstWrite = submitIndependentReview(initial, {
+    actor: "reviewer-1",
+    decision: "confirmed",
+  }, "2026-08-17T01:00:00.000Z");
+
+  await assert.rejects(
+    () => repository.saveCase(firstWrite, 1),
+    StaleReviewVersionError,
+  );
+  await repository.reset();
+
+  await assert.rejects(
+    () => repository.saveCase(firstWrite, 1),
+    error => error instanceof StaleReviewVersionError
+      && error.latestCase.history.at(-1).action === "stale_write_conflict",
+  );
+  const restored = await repository.loadCase("det-echo-001");
+  assert.equal(restored.status, "awaiting_first_review");
+  assert.equal(restored.version, 2);
 });
