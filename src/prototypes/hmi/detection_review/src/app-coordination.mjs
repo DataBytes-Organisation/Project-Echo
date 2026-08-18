@@ -42,24 +42,30 @@ export function lockSubmissionForm(form) {
   }
 }
 
-export function createAsyncViewGuard(getSelectedId) {
+export function createAsyncViewGuard(getCurrentIdentity) {
   let revision = 0;
 
-  function tokenFor(detectionId) {
-    return Object.freeze({ detectionId, revision });
+  function tokenFor(identity) {
+    return Object.freeze({
+      detectionId: identity?.detectionId ?? null,
+      actor: identity?.actor ?? null,
+      revision,
+    });
   }
 
   return Object.freeze({
-    begin(detectionId) {
+    begin(identity) {
       revision += 1;
-      return tokenFor(detectionId);
+      return tokenFor(identity);
     },
-    capture(detectionId) {
-      return tokenFor(detectionId);
+    capture(identity) {
+      return tokenFor(identity);
     },
     isCurrent(token) {
+      const currentIdentity = getCurrentIdentity();
       return token?.revision === revision
-        && token.detectionId === getSelectedId();
+        && token.detectionId === currentIdentity?.detectionId
+        && token.actor === currentIdentity?.actor;
     },
   });
 }

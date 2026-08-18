@@ -75,17 +75,44 @@ test("draft persistence distinguishes saved drafts from empty-form removal", () 
 });
 
 test("async view guard rejects older loads and submit completions after navigation", () => {
-  let selectedId = "det-echo-001";
-  const guard = createAsyncViewGuard(() => selectedId);
-  const firstLoad = guard.begin("det-echo-001");
-  const firstSubmit = guard.capture("det-echo-001");
+  let current = { detectionId: "det-echo-001", actor: "reviewer-1" };
+  const guard = createAsyncViewGuard(() => current);
+  const firstLoad = guard.begin(current);
+  const firstSubmit = guard.capture(current);
 
-  selectedId = "det-echo-002";
-  const secondLoad = guard.begin("det-echo-002");
+  current = { detectionId: "det-echo-002", actor: "reviewer-1" };
+  const secondLoad = guard.begin(current);
 
   assert.equal(guard.isCurrent(firstLoad), false);
   assert.equal(guard.isCurrent(firstSubmit), false);
   assert.equal(guard.isCurrent(secondLoad), true);
+});
+
+test("async view guard rejects the same detection after a role switch", () => {
+  let current = { detectionId: "det-echo-001", actor: "reviewer-1" };
+  const guard = createAsyncViewGuard(() => current);
+  const reviewerOneLoad = guard.begin(current);
+
+  current = { detectionId: "det-echo-001", actor: "reviewer-2" };
+  const reviewerTwoLoad = guard.begin(current);
+
+  assert.equal(guard.isCurrent(reviewerOneLoad), false);
+  assert.equal(guard.isCurrent(reviewerTwoLoad), true);
+});
+
+test("async view guard freezes identity values inside each token", () => {
+  const current = { detectionId: "det-echo-001", actor: "reviewer-1" };
+  const guard = createAsyncViewGuard(() => current);
+  const reviewerOneLoad = guard.begin(current);
+
+  current.actor = "reviewer-2";
+
+  assert.equal(guard.isCurrent(reviewerOneLoad), false);
+  assert.deepEqual(reviewerOneLoad, {
+    detectionId: "det-echo-001",
+    actor: "reviewer-1",
+    revision: 1,
+  });
 });
 
 test("submission lock prevents edits while a stateful write is pending", () => {

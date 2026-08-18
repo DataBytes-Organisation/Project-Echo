@@ -26,12 +26,15 @@ import {
   restoreRecoveredDraft,
 } from "./recovery-state.mjs";
 import { FixtureDetectionReviewRepository } from "./repository.mjs";
+import { createReviewCase, ReviewValidationError } from "./review-domain.mjs";
+import { createBrowserPersistentReviewRepository } from "./persistent-review-repository.mjs";
+import { createBrowserPrototypePreferenceStore } from "./prototype-preferences.mjs";
+import { resetPrototype } from "./prototype-reset.mjs";
 import {
-  reviewScenarioFixtures,
-  scenarioActors,
-} from "./review-fixtures.mjs";
-import { ReviewValidationError } from "./review-domain.mjs";
-import { FixtureReviewWorkflowRepository } from "./review-repository.mjs";
+  firstActionableDetectionId,
+  isActionableForRole,
+  orderRecordsForRole,
+} from "./role-workspace.mjs";
 import {
   ReviewLoadError,
   ReviewConflictError,
@@ -40,67 +43,111 @@ import {
 } from "./review-workflow.mjs";
 import { createReviewWorkbench } from "./workbench-state.mjs";
 
-const QUEUE_SCENARIOS = new Set(["populated", "loading", "empty", "error"]);
-const WORKFLOW_SCENARIOS = new Set(Object.keys(reviewScenarioFixtures));
-const ALLOWED_SCENARIOS = new Set([...QUEUE_SCENARIOS, ...WORKFLOW_SCENARIOS]);
+const now = () => "2026-08-16T04:00:00.000Z";
 const requestedParameters = new URLSearchParams(window.location.search);
-const requestedScenario = requestedParameters.get("scenario");
-const requestedDetection = requestedParameters.get("detection");
-const scenario = ALLOWED_SCENARIOS.has(requestedScenario)
-  ? requestedScenario
-  : "first-review";
-const fixtures = scenario === "empty"
-  ? []
-  : scenario === "error"
-    ? malformedDetectionFixtures
-    : detectionFixtures;
-const detectionRepository = new FixtureDetectionReviewRepository(fixtures);
+const fixtureState = requestedParameters.get("fixtureState");
+const conflictOnNextSave = requestedParameters.get("simulateConflict") === "1";
+const simulateStorageFailure = requestedParameters.get("simulateStorageFailure") === "1";
+const detectionRepository = new FixtureDetectionReviewRepository(detectionFixtures);
+const emptyDetectionRepository = new FixtureDetectionReviewRepository([]);
+const failedDetectionRepository = new FixtureDetectionReviewRepository(
+  malformedDetectionFixtures,
+);
+const selectedDetectionRepository = fixtureState === "empty"
+  ? emptyDetectionRepository
+  : fixtureState === "error"
+    ? failedDetectionRepository
+    : detectionRepository;
+const reviewSeeds = detectionFixtures.map(record => createReviewCase(record.id));
 const root = document.querySelector("#app");
-const workflowActor = scenarioActors[scenario] ?? null;
-const workflowRepository = workflowActor
-  ? new FixtureReviewWorkflowRepository(reviewScenarioFixtures[scenario], {
-    conflictOnNextSave: scenario === "conflict",
-    now: () => "2026-08-16T04:00:00.000Z",
-  })
-  : null;
-const workflow = workflowRepository
-  ? createReviewWorkflow(workflowRepository, {
-    now: () => "2026-08-16T04:00:00.000Z",
-  })
-  : null;
 
+function createStorageFailureAdapter() {
+  const windowAdapter = {};
+  Object.defineProperty(windowAdapter, "localStorage", {
+    get() {
+      throw new Error("Deterministic blocked browser storage fixture.");
+    },
+  });
+  return windowAdapter;
+}
+
+function controlledMessage(error) {
+  return typeof error?.userMessage === "string"
+    ? error.userMessage
+    : "Prototype data could not be accessed in this browser.";
+}
+
+function failedRepository(message) {
+  return Object.freeze({
+    async list() {
+      const error = new Error(message);
+      error.userMessage = message;
+      throw error;
+    },
+  });
+}
+
+const browserWindow = simulateStorageFailure
+  ? createStorageFailureAdapter()
+  : window;
+let workflowRepository = null;
+let workflow = null;
+let draftStore = null;
+let preferenceStore = null;
+let activeRole = "reviewer-1";
+let startupErrorMessage = null;
+
+try {
+  workflowRepository = createBrowserPersistentReviewRepository(
+    browserWindow,
+    reviewSeeds,
+    { conflictOnNextSave },
+  );
+  workflow = createReviewWorkflow(workflowRepository, { now });
+  draftStore = createBrowserReviewDraftStore(browserWindow, { now });
+  preferenceStore = createBrowserPrototypePreferenceStore(browserWindow);
+  activeRole = preferenceStore.loadRole();
+} catch (error) {
+  startupErrorMessage = controlledMessage(error);
+}
+
+let baseRecords = [];
+let roleSessions = new Map();
 let workflowSession = null;
 let adjudicationSessions = [];
 let workflowRenderOptions = {};
 let workflowLoadError = null;
 let draftRecovery = createRecoveryState();
 let workflowConflict = null;
+let isPending = false;
+let resetStatus = null;
 let workbench;
 let viewGuard;
-let draftStore = null;
 
-try {
-  draftStore = createBrowserReviewDraftStore(window, {
-    now: () => "2026-08-16T04:00:00.000Z",
-  });
-} catch (error) {
-  draftRecovery = createRecoveryState(error instanceof DraftStorageError
-    ? error.userMessage
-    : DRAFT_STORAGE_ERROR_MESSAGE);
+function currentViewIdentity() {
+  return {
+    detectionId: workbench?.getState().selectedId ?? null,
+    actor: activeRole,
+  };
 }
 
-const DEMO_DRAFT_VALUES = Object.freeze({
-  decision: "corrected_species",
-  correctedSpecies: "Southern Boobook",
-  reason: "The shorter repeated cadence supports a different species.",
-  resolutionReason: "",
-});
+function sessionForRender() {
+  if (workflowSession?.status === "awaiting_first_review"
+    && !isActionableForRole(workflowSession.status, activeRole)) {
+    return null;
+  }
+
+  return workflowSession;
+}
 
 function render() {
   root.innerHTML = renderApplicationView({
     detectionState: workbench.getState(),
-    workflowActor,
-    workflowSession,
+    workflowActor: activeRole,
+    activeRole,
+    isPending,
+    resetStatus,
+    workflowSession: sessionForRender(),
     workflowLoadError,
     adjudicationSessions,
     workflowRenderOptions,
@@ -109,55 +156,13 @@ function render() {
   });
 }
 
-workbench = createReviewWorkbench(detectionRepository, render);
-viewGuard = createAsyncViewGuard(() => workbench.getState().selectedId);
-
-for (const link of document.querySelectorAll("[data-scenario-link]")) {
-  if (link.dataset.scenarioLink === scenario) {
-    link.setAttribute("aria-current", "page");
-  }
-}
-
-async function refreshWorkflow(
-  detectionId,
-  viewToken = viewGuard.begin(detectionId),
-) {
-  if (!workflow) {
-    return false;
-  }
-
-  try {
-    const loadedSession = await workflow.getSession(detectionId, workflowActor);
-    const loadedAdjudicationSessions = workflowActor === "adjudicator"
-      ? await workflow.listAdjudication()
-      : [];
-
-    if (!viewGuard.isCurrent(viewToken)) {
-      return false;
-    }
-
-    workflowSession = loadedSession;
-    adjudicationSessions = loadedAdjudicationSessions;
-    workflowRenderOptions = {};
-    workflowLoadError = null;
-    workflowConflict = null;
-    loadRecoveredDraft();
-  } catch (error) {
-    if (!viewGuard.isCurrent(viewToken)) {
-      return false;
-    }
-
-    workflowSession = null;
-    adjudicationSessions = [];
-    workflowLoadError = error instanceof ReviewLoadError
-      ? error.userMessage
-      : "The review workflow could not be loaded. Try again manually.";
-    draftRecovery = createRecoveryState();
-    workflowConflict = null;
-  }
-
-  render();
-  return true;
+function clearWorkflowView() {
+  workflowSession = null;
+  adjudicationSessions = [];
+  workflowRenderOptions = {};
+  workflowLoadError = null;
+  draftRecovery = createRecoveryState();
+  workflowConflict = null;
 }
 
 function draftContext(session = workflowSession) {
@@ -186,18 +191,8 @@ function loadRecoveredDraft() {
   }
 
   try {
-    let draft = draftStore.load(context);
-
-    if (scenario === "draft-restored" && !draft) {
-      draft = draftStore.save(context, DEMO_DRAFT_VALUES, workflowSession.version);
-    }
-
+    const draft = draftStore.load(context);
     draftRecovery = offerRecoveredDraft(createRecoveryState(), draft);
-
-    if (scenario === "draft-restored" && draft) {
-      draftRecovery = restoreRecoveredDraft(draftRecovery);
-      workflowRenderOptions = { values: draftRecovery.values };
-    }
   } catch (error) {
     draftRecovery = error instanceof DraftStorageError
       ? createRecoveryState(error.userMessage)
@@ -290,6 +285,125 @@ function syncConditionalFields(form) {
   }
 }
 
+async function buildWorkbench(records, selectedId) {
+  const nextWorkbench = createReviewWorkbench({
+    async list() {
+      return records;
+    },
+  });
+  await nextWorkbench.load();
+
+  if (selectedId) {
+    nextWorkbench.select(selectedId);
+  }
+
+  return nextWorkbench;
+}
+
+async function refreshRoleWorkspace({
+  forceFirstActionable = false,
+  selectedId = workbench.getState().selectedId,
+  viewToken = viewGuard.begin(currentViewIdentity()),
+  focusSelector = null,
+} = {}) {
+  if (!workflow || baseRecords.length === 0) {
+    return false;
+  }
+
+  try {
+    const entries = await Promise.all(baseRecords.map(async record => [
+      record.id,
+      await workflow.getSession(record.id, activeRole),
+    ]));
+
+    if (!viewGuard.isCurrent(viewToken)) {
+      return false;
+    }
+
+    const nextSessions = new Map(entries);
+    const orderedRecords = orderRecordsForRole(baseRecords, nextSessions, activeRole);
+    const firstActionableId = firstActionableDetectionId(
+      baseRecords,
+      nextSessions,
+      activeRole,
+    );
+    const selectedSession = nextSessions.get(selectedId);
+    const selectedIsActionable = selectedSession
+      ? isActionableForRole(selectedSession.status, activeRole)
+      : false;
+    let nextSelectedId = orderedRecords.some(record => record.id === selectedId)
+      ? selectedId
+      : orderedRecords[0]?.id ?? null;
+
+    if (firstActionableId && (forceFirstActionable || !selectedIsActionable)) {
+      nextSelectedId = firstActionableId;
+    }
+
+    const nextWorkbench = await buildWorkbench(orderedRecords, nextSelectedId);
+
+    if (!viewGuard.isCurrent(viewToken)) {
+      return false;
+    }
+
+    roleSessions = nextSessions;
+    workbench = nextWorkbench;
+    workflowSession = roleSessions.get(nextSelectedId) ?? null;
+    adjudicationSessions = activeRole === "adjudicator"
+      ? [...roleSessions.values()].filter(
+        session => session.status === "awaiting_adjudication",
+      )
+      : [];
+    workflowRenderOptions = {};
+    workflowLoadError = null;
+    workflowConflict = null;
+    loadRecoveredDraft();
+    render();
+    root.querySelector(focusSelector)?.focus();
+    return true;
+  } catch (error) {
+    if (!viewGuard.isCurrent(viewToken)) {
+      return false;
+    }
+
+    workflowSession = null;
+    adjudicationSessions = [];
+    workflowLoadError = error instanceof ReviewLoadError
+      ? error.userMessage
+      : controlledMessage(error);
+    workflowRenderOptions = {};
+    draftRecovery = createRecoveryState();
+    workflowConflict = null;
+    render();
+    root.querySelector(focusSelector)?.focus();
+    return false;
+  }
+}
+
+async function selectDetection(detectionId) {
+  clearWorkflowView();
+  resetStatus = null;
+  const state = workbench.select(detectionId);
+
+  if (state.selectedId !== detectionId) {
+    return;
+  }
+
+  const viewToken = viewGuard.begin(currentViewIdentity());
+  await refreshRoleWorkspace({ selectedId: detectionId, viewToken });
+
+  if (workbench.getState().selectedId === detectionId) {
+    restoreQueueItemFocus(root, detectionId);
+  }
+}
+
+workbench = createReviewWorkbench(
+  startupErrorMessage
+    ? failedRepository(startupErrorMessage)
+    : selectedDetectionRepository,
+  render,
+);
+viewGuard = createAsyncViewGuard(currentViewIdentity);
+
 root.addEventListener("change", event => {
   if (event.target.matches('[name="decision"]')) {
     syncConditionalFields(event.target.form);
@@ -315,30 +429,6 @@ root.addEventListener("input", event => {
   }
 });
 
-async function selectDetection(detectionId) {
-  workflowSession = null;
-  adjudicationSessions = [];
-  workflowRenderOptions = {};
-  workflowLoadError = null;
-  draftRecovery = createRecoveryState();
-  workflowConflict = null;
-  const state = workbench.select(detectionId);
-
-  if (state.selectedId !== detectionId) {
-    return;
-  }
-
-  const viewToken = viewGuard.begin(detectionId);
-
-  if (workflow) {
-    await refreshWorkflow(detectionId, viewToken);
-  }
-
-  if (viewGuard.isCurrent(viewToken)) {
-    restoreQueueItemFocus(root, detectionId);
-  }
-}
-
 root.addEventListener("keydown", async event => {
   const queueItem = event.target.closest("[data-detection-id]");
 
@@ -360,13 +450,95 @@ root.addEventListener("keydown", async event => {
 });
 
 root.addEventListener("click", async event => {
+  const roleButton = event.target.closest("[data-role]");
+
+  if (roleButton) {
+    const nextRole = roleButton.dataset.role;
+
+    if (isPending || nextRole === activeRole) {
+      roleButton.focus();
+      return;
+    }
+
+    viewGuard.begin(currentViewIdentity());
+
+    try {
+      preferenceStore.saveRole(nextRole);
+    } catch (error) {
+      workflowSession = null;
+      workflowLoadError = controlledMessage(error);
+      render();
+      root.querySelector(`[data-role="${activeRole}"]`)?.focus();
+      return;
+    }
+
+    activeRole = nextRole;
+    clearWorkflowView();
+    resetStatus = null;
+    render();
+    const viewToken = viewGuard.begin(currentViewIdentity());
+    await refreshRoleWorkspace({
+      forceFirstActionable: true,
+      viewToken,
+      focusSelector: `[data-role="${activeRole}"]`,
+    });
+    return;
+  }
+
+  if (event.target.closest("[data-prototype-reset]")) {
+    const resetResult = await resetPrototype({
+      isPending,
+      confirmReset: () => window.confirm(
+        "Reset submitted reviews, final decisions, audit history, and drafts for this prototype?",
+      ),
+      reviewRepository: workflowRepository,
+      draftStore,
+      preferenceStore,
+    });
+
+    if (resetResult.status === "cancelled") {
+      return;
+    }
+
+    resetStatus = resetResult;
+
+    if (resetResult.status !== "reset") {
+      render();
+      return;
+    }
+
+    viewGuard.begin(currentViewIdentity());
+    activeRole = resetResult.role;
+    clearWorkflowView();
+    workbench = createReviewWorkbench(selectedDetectionRepository, render);
+    const state = await workbench.load();
+    baseRecords = state.status === "populated" ? state.records : [];
+
+    if (state.status !== "populated") {
+      render();
+      return;
+    }
+
+    const firstDetectionId = baseRecords[0]?.id ?? null;
+    if (firstDetectionId) {
+      workbench.select(firstDetectionId);
+    }
+    const viewToken = viewGuard.begin(currentViewIdentity());
+    await refreshRoleWorkspace({
+      forceFirstActionable: true,
+      selectedId: firstDetectionId,
+      viewToken,
+    });
+    restoreQueueItemFocus(root, workbench.getState().selectedId);
+    return;
+  }
+
   const retryButton = event.target.closest("[data-workflow-retry]");
 
   if (retryButton) {
-    const state = workbench.getState();
-    if (state.status === "populated") {
-      await refreshWorkflow(state.selectedId);
-    }
+    clearWorkflowView();
+    const viewToken = viewGuard.begin(currentViewIdentity());
+    await refreshRoleWorkspace({ viewToken });
     return;
   }
 
@@ -389,6 +561,7 @@ root.addEventListener("click", async event => {
   if (event.target.closest("[data-conflict-keep-draft]") && workflowConflict) {
     const rebased = keepConflictDraft(workflowConflict);
     workflowSession = rebased.latestSession;
+    roleSessions.set(workflowSession.detectionId, workflowSession);
     const persistence = persistDraftValues(
       rebased.values,
       workflowSession,
@@ -414,6 +587,7 @@ root.addEventListener("click", async event => {
   if (event.target.closest("[data-conflict-discard-draft]") && workflowConflict) {
     const discarded = discardConflictDraft(workflowConflict);
     workflowSession = discarded.latestSession;
+    roleSessions.set(workflowSession.detectionId, workflowSession);
     discardDraft(workflowSession);
     workflowRenderOptions = {};
     workflowConflict = null;
@@ -424,18 +598,16 @@ root.addEventListener("click", async event => {
 
   const queueItem = event.target.closest("[data-detection-id]");
 
-  if (!queueItem) {
-    return;
+  if (queueItem) {
+    await selectDetection(queueItem.dataset.detectionId);
   }
-
-  const detectionId = queueItem.dataset.detectionId;
-  await selectDetection(detectionId);
 });
 
 root.addEventListener("submit", async event => {
   const form = event.target.closest("[data-review-form], [data-adjudication-form]");
 
-  if (!form || !workflowSession) {
+  if (!form || !workflowSession || isPending
+    || !isActionableForRole(workflowSession.status, activeRole)) {
     return;
   }
 
@@ -443,55 +615,79 @@ root.addEventListener("submit", async event => {
   const values = formValues(form);
   const submittedSession = workflowSession;
   const expectedVersion = getSubmissionVersion(submittedSession, draftRecovery);
-  const submissionToken = viewGuard.capture(submittedSession.detectionId);
+  const submissionToken = viewGuard.capture(currentViewIdentity());
   const submittedDraftResult = persistDraftValues(
     values,
     submittedSession,
     expectedVersion,
   );
-  lockSubmissionForm(form);
+  isPending = true;
+  resetStatus = null;
+  workflowRenderOptions = { ...workflowRenderOptions, values };
+  render();
+  const pendingForm = root.querySelector(
+    form.matches("[data-adjudication-form]")
+      ? "[data-adjudication-form]"
+      : "[data-review-form]",
+  );
+  if (pendingForm) {
+    lockSubmissionForm(pendingForm);
+  }
 
   try {
-    const nextSession = form.matches("[data-adjudication-form]")
-      ? await workflow.finalize(submittedSession.detectionId, {
-        actor: "adjudicator",
+    if (form.matches("[data-adjudication-form]")) {
+      await workflow.finalize(submittedSession.detectionId, {
+        actor: activeRole,
         decision: values.decision,
         correctedSpecies: values.correctedSpecies,
         resolutionReason: values.resolutionReason,
         expectedVersion,
-      })
-      : await workflow.submitReview(submittedSession.detectionId, {
-        actor: form.dataset.actor,
+      });
+    } else {
+      await workflow.submitReview(submittedSession.detectionId, {
+        actor: activeRole,
         decision: values.decision,
         correctedSpecies: values.correctedSpecies,
         reason: values.reason,
         expectedVersion,
       });
-    const nextAdjudicationSessions = workflowActor === "adjudicator"
-      ? await workflow.listAdjudication()
-      : [];
+    }
+
+    isPending = false;
 
     if (!viewGuard.isCurrent(submissionToken)) {
+      render();
       return;
     }
 
     const discardResult = submittedDraftResult.status === "saved"
       ? discardStoredDraft(submittedSession, submittedDraftResult.draft)
       : submittedDraftResult;
-
-    workflowSession = nextSession;
-    adjudicationSessions = nextAdjudicationSessions;
-    workflowRenderOptions = {};
-    draftRecovery = submittedDraftResult.status === "failed"
-      ? createRecoveryState(submittedDraftResult.errorMessage)
+    const recoveryError = submittedDraftResult.status === "failed"
+      ? submittedDraftResult.errorMessage
       : discardResult.status === "failed"
-      ? createRecoveryState(discardResult.errorMessage)
+        ? discardResult.errorMessage
+        : null;
+    workflowRenderOptions = {};
+    draftRecovery = recoveryError
+      ? createRecoveryState(recoveryError)
       : discardRecoveredDraft(draftRecovery);
     workflowConflict = null;
     workflowLoadError = null;
-    render();
+    await refreshRoleWorkspace({
+      selectedId: submittedSession.detectionId,
+      viewToken: submissionToken,
+    });
+
+    if (recoveryError) {
+      draftRecovery = createRecoveryState(recoveryError);
+      render();
+    }
   } catch (error) {
+    isPending = false;
+
     if (!viewGuard.isCurrent(submissionToken)) {
+      render();
       return;
     }
 
@@ -504,6 +700,7 @@ root.addEventListener("submit", async event => {
 
     if (error instanceof ReviewConflictError) {
       workflowSession = error.latestSession;
+      roleSessions.set(error.latestSession.detectionId, error.latestSession);
       workflowConflict = createConflictState(error);
       workflowRenderOptions = { values: error.attemptedValues };
       render();
@@ -532,15 +729,10 @@ root.addEventListener("submit", async event => {
 });
 
 render();
+const initialState = await workbench.load();
+baseRecords = initialState.status === "populated" ? initialState.records : [];
 
-if (scenario !== "loading") {
-  let state = await workbench.load();
-
-  if (requestedDetection && state.status === "populated") {
-    state = workbench.select(requestedDetection);
-  }
-
-  if (workflow && state.status === "populated") {
-    await refreshWorkflow(state.selectedId, viewGuard.begin(state.selectedId));
-  }
+if (initialState.status === "populated") {
+  const viewToken = viewGuard.begin(currentViewIdentity());
+  await refreshRoleWorkspace({ viewToken });
 }
