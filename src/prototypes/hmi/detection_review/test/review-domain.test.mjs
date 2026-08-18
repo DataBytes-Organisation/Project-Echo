@@ -7,6 +7,7 @@ import {
   decisionsMatch,
   finalizeAdjudication,
   recordReviewConflict,
+  restoreReviewCase,
   submitIndependentReview,
 } from "../src/review-domain.mjs";
 
@@ -29,6 +30,14 @@ function disagreementCase() {
     decision: "rejected",
     reason: "Call structure does not match the proposed species.",
   }, T2);
+}
+
+function finalizedCase() {
+  return finalizeAdjudication(disagreementCase(), {
+    actor: "adjudicator",
+    decision: "rejected",
+    resolutionReason: "Both recordings support rejection.",
+  }, "2026-08-17T03:00:00.000Z");
 }
 
 test("rejects a decision outside the four supported review outcomes", () => {
@@ -280,4 +289,104 @@ test("adjudicator finalization requires a resolution reason and records the fina
     }, T3),
     error => error instanceof ReviewValidationError && error.field === "actor",
   );
+});
+
+test("restores and deeply freezes a serialized finalized review case", () => {
+  const first = submitIndependentReview(createReviewCase("det-echo-001"), {
+    actor: "reviewer-1",
+    decision: "confirmed",
+  }, "2026-08-17T01:00:00.000Z");
+  const second = submitIndependentReview(first, {
+    actor: "reviewer-2",
+    decision: "rejected",
+    reason: "The call pattern contradicts the prediction.",
+  }, "2026-08-17T02:00:00.000Z");
+  const finalized = finalizeAdjudication(second, {
+    actor: "adjudicator",
+    decision: "rejected",
+    resolutionReason: "Both recordings support rejection.",
+  }, "2026-08-17T03:00:00.000Z");
+
+  const restored = restoreReviewCase(JSON.parse(JSON.stringify(finalized)));
+
+  assert.deepEqual(restored, finalized);
+  assert.equal(Object.isFrozen(restored), true);
+  assert.equal(Object.isFrozen(restored.submissions["reviewer-1"]), true);
+  assert.equal(Object.isFrozen(restored.history[0]), true);
+});
+
+test("rejects stored review cases whose status and contents disagree", () => {
+  assert.throws(
+    () => restoreReviewCase({
+      detectionId: "det-echo-001",
+      version: 3,
+      status: "consensus",
+      submissions: {},
+      consensus: null,
+      adjudication: null,
+      history: [],
+    }),
+    error => error instanceof ReviewValidationError && error.field === "storedCase",
+  );
+});
+
+test("rejects malformed persisted review-case shapes with a controlled storedCase error", () => {
+  const validFinalized = JSON.parse(JSON.stringify(finalizedCase()));
+  const cases = [
+    ["unknown status", { status: "unknown" }],
+    ["non-positive version", { version: 0 }],
+    ["unknown submission actor", {
+      submissions: {
+        ...validFinalized.submissions,
+        observer: validFinalized.submissions["reviewer-1"],
+      },
+    }],
+    ["missing reviewer one submission", {
+      status: "awaiting_second_review",
+      version: 2,
+      submissions: {},
+      consensus: null,
+      adjudication: null,
+      history: [validFinalized.history[0]],
+    }],
+    ["missing both submissions for consensus", {
+      status: "consensus",
+      version: 3,
+      submissions: {},
+      consensus: { decision: "confirmed", correctedSpecies: null, reachedAt: "2026-08-17T02:00:00.000Z" },
+      adjudication: null,
+      history: [],
+    }],
+    ["missing consensus data", {
+      status: "consensus",
+      version: 3,
+      history: validFinalized.history.slice(0, 3),
+      consensus: null,
+      adjudication: null,
+    }],
+    ["finalized without adjudication", {
+      adjudication: null,
+    }],
+    ["unordered history", {
+      history: [...validFinalized.history].reverse(),
+    }],
+    ["malformed history", {
+      history: [{ ...validFinalized.history[0], action: "not-an-action" }],
+    }],
+    ["malformed submission", {
+      submissions: {
+        ...validFinalized.submissions,
+        "reviewer-1": { ...validFinalized.submissions["reviewer-1"], decision: "maybe" },
+      },
+    }],
+  ];
+
+  for (const [label, mutation] of cases) {
+    const candidate = { ...validFinalized, ...mutation };
+    assert.throws(
+      () => restoreReviewCase(candidate),
+      error => error instanceof ReviewValidationError && error.field === "storedCase",
+      label,
+    );
+  }
 });
