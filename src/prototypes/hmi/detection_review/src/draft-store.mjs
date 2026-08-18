@@ -158,6 +158,21 @@ export function createReviewDraftStore(storage, {
       return existed;
     },
 
+    discardAll() {
+      const encodedPrefix = `${encodeURIComponent(prefix)}:`;
+      const keys = storageOperation(() => Array.from(
+        { length: storage.length },
+        (_value, index) => storage.key(index),
+      ));
+      const draftKeys = keys.filter(key => key?.startsWith(encodedPrefix));
+
+      for (const key of draftKeys) {
+        storageOperation(() => storage.removeItem(key));
+      }
+
+      return draftKeys.length;
+    },
+
     discardIfUnchanged(contextInput, expectedDraft) {
       const context = normalizeContext(contextInput);
       const key = draftKey(prefix, context);

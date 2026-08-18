@@ -40,6 +40,12 @@ function createMemoryStorage(initial = {}) {
   const entries = new Map(Object.entries(initial));
   return {
     entries,
+    get length() {
+      return entries.size;
+    },
+    key(index) {
+      return [...entries.keys()][index] ?? null;
+    },
     getItem(key) {
       return entries.has(key) ? entries.get(key) : null;
     },
@@ -81,6 +87,16 @@ test("discard removes only the matching actor and workflow draft", () => {
   assert.equal(store.discard(context), true);
   assert.equal(store.load(context), null);
   assert.notEqual(store.load({ ...context, actor: "reviewer-2" }), null);
+});
+
+test("discardAll removes only detection-review drafts", () => {
+  const storage = createMemoryStorage({ unrelated: "keep" });
+  const store = createReviewDraftStore(storage);
+  store.save(context, values, 1);
+  store.save({ ...context, actor: "reviewer-2" }, values, 1);
+
+  assert.equal(store.discardAll(), 2);
+  assert.equal(storage.getItem("unrelated"), "keep");
 });
 
 test("an older submission completion cannot discard a newer saved draft", () => {
