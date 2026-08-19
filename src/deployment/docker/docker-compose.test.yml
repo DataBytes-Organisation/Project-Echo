@@ -76,11 +76,6 @@ services:
       - "1883:1883"
       - "7001:7001"
       - "7070:7070"
-    healthcheck:
-      test: ["CMD", "nc", "-z", "localhost", "1883"]
-      interval: 5s
-      timeout: 3s
-      retries: 10
 
   echo_simulator:
     build:
@@ -95,9 +90,9 @@ services:
       - credentials_volume:/root/.config/gcloud/
     stdin_open: false
     tty: true
+    restart: on-failure
     depends_on:
-      echo_mqtt:
-        condition: service_healthy
+      - echo_mqtt
 
 
   echo_api:
