@@ -1,10 +1,11 @@
-/**
- * Browser audio recording helper (FR-B2).
- * Captures:
- *  - PCM samples as the preferred source of truth
- *  - MediaRecorder chunks as a fallback when PCM is empty
- * stop() always returns a WAV blob capped at MAX_RECORDING_SECONDS.
- */
+//API to handle audio recording 
+export function getAudioRecorder(options = {}){
+
+const browserGetUserMedia = globalThis.navigator?.mediaDevices?.getUserMedia
+    ? globalThis.navigator.mediaDevices.getUserMedia.bind(globalThis.navigator.mediaDevices)
+    : null;
+const getUserMedia = options.getUserMedia || browserGetUserMedia;
+const MediaRecorderClass = options.MediaRecorderClass || globalThis.MediaRecorder;
 
 export const MAX_RECORDING_SECONDS = 20;
 
@@ -159,20 +160,30 @@ export function getAudioRecorder() {
     recorderMimeType: "audio/webm",
 
     start: function () {
-      if (!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)) {
-        return Promise.reject(
-          new Error(
-            "mediaDevices API or getUserMedia method is not supported in this browser."
-          )
-        );
-      }
+        if (!getUserMedia || !MediaRecorderClass) {
+            return Promise.reject(new Error('mediaDevices API or getUserMedia method is not supported in this browser.'));
+        }
 
-      if (audioRecorder.isRecording || audioRecorder.isStarting) {
-        return Promise.reject(new Error("Recording already in progress"));
-      }
-
-      // Lock immediately to prevent concurrent getUserMedia() calls.
-      audioRecorder.isStarting = true;
+        else {
+            
+            return getUserMedia({ audio: true })
+                .then(stream => {
+                    audioRecorder.streamBeingCaptured = stream;
+                    try {
+                        audioRecorder.mediaRecorder = new MediaRecorderClass(stream);
+                        audioRecorder.audioBlobs = [];
+                        audioRecorder.mediaRecorder.addEventListener("dataavailable", event => {
+                            audioRecorder.audioBlobs.push(event.data);
+                        });
+                        audioRecorder.mediaRecorder.start();
+                    } catch (error) {
+                        audioRecorder.stopStream();
+                        audioRecorder.resetRecordingProperties();
+                        throw error;
+                    }
+                });
+        }
+    },
 
       return navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
         audioRecorder.ownedStreams.add(stream);
@@ -291,99 +302,36 @@ export function getAudioRecorder() {
     },
 
     stop: function () {
-      return new Promise((resolve, reject) => {
-        if (audioRecorder.isStarting) {
-          reject(new Error("Recording is still starting"));
-          return;
-        }
-
-        if (!audioRecorder.isRecording) {
-          reject(new Error("No active recording"));
-          return;
-        }
-
-        audioRecorder.isRecording = false;
-        let settled = false;
-
-        const finalize = async () => {
-          if (settled) return;
-          settled = true;
-
-          try {
-            const samples = audioRecorder.mergePcmChunks();
-            const rate = audioRecorder.sampleRate;
-            const mediaMimeType =
-              (audioRecorder.mediaRecorder && audioRecorder.mediaRecorder.mimeType) ||
-              audioRecorder.recorderMimeType ||
-              "audio/webm";
-
-            const result = await buildCappedRecording({
-              pcmSamples: samples,
-              sampleRate: rate,
-              mediaBlobs: audioRecorder.audioBlobs.slice(),
-              mediaMimeType,
-              decodeAudioBlob: decodeAudioBlobWithWebAudio,
-            });
-
-            audioRecorder.cleanupGraph();
-            audioRecorder.stopAllOwnedStreams();
-            audioRecorder.pcmChunks = [];
+        return new Promise((resolve, reject) => {
+            const recorder = audioRecorder.mediaRecorder;
+            if (!recorder) {
+                reject(new Error("No audio recording is active."));
+                return;
+            }
+            const mimeType = recorder.mimeType || audioRecorder.audioBlobs[0]?.type || "audio/webm";
+            recorder.addEventListener("stop", () => {
+                resolve(new Blob(audioRecorder.audioBlobs, { type: mimeType }));
+            }, { once: true });
+            recorder.stop();
+            audioRecorder.stopStream();
             audioRecorder.resetRecordingProperties();
-            audioRecorder.audioBlobs = [result.blob];
-
-            resolve(result);
-          } catch (err) {
-            audioRecorder.cleanupGraph();
-            audioRecorder.stopAllOwnedStreams();
-            audioRecorder.pcmChunks = [];
-            audioRecorder.resetRecordingProperties();
-            audioRecorder.audioBlobs = [];
-            reject(err);
-          }
-        };
-
-        const recorder = audioRecorder.mediaRecorder;
-        if (recorder && recorder.state !== "inactive") {
-          try { recorder.stop(); } catch (_err) { /* ignore */ }
-        }
-        // Brief wait so final MediaRecorder chunks can land before fallback decode.
-        setTimeout(() => {
-          finalize().catch(reject);
-        }, 150);
-      });
+        });
     },
 
     cancel: function () {
-      audioRecorder.discardChunks = true;
-      audioRecorder.isRecording = false;
-      audioRecorder.isStarting = false;
-      audioRecorder.audioBlobs = [];
-      audioRecorder.pcmChunks = [];
-
-      const recorder = audioRecorder.mediaRecorder;
-      if (recorder && recorder.state !== "inactive") {
-        try { recorder.stop(); } catch (_err) { /* ignore */ }
-      }
-
-      audioRecorder.cleanupGraph();
-      audioRecorder.stopAllOwnedStreams();
-      audioRecorder.resetRecordingProperties();
-    },
-
-    stopAllOwnedStreams: function () {
-      audioRecorder.ownedStreams.forEach((stream) => {
-        try {
-          stream.getTracks().forEach((track) => track.stop());
-        } catch (_err) {
-          /* ignore */
+        if (audioRecorder.mediaRecorder && audioRecorder.mediaRecorder.state !== "inactive") {
+            audioRecorder.mediaRecorder.stop();
         }
-      });
-      audioRecorder.ownedStreams.clear();
+        audioRecorder.stopStream();
+        audioRecorder.resetRecordingProperties();
+        audioRecorder.audioBlobs = [];
     },
 
     stopStream: function () {
-      if (!audioRecorder.streamBeingCaptured) return;
-      audioRecorder.streamBeingCaptured.getTracks().forEach((track) => track.stop());
+        if (audioRecorder.streamBeingCaptured) {
+            audioRecorder.streamBeingCaptured.getTracks()
+                .forEach(track => track.stop());
+        }
     },
 
     resetRecordingProperties: function () {
@@ -394,4 +342,8 @@ export function getAudioRecorder() {
   };
 
   return audioRecorder;
+}
+
+return audioRecorder;
+
 }
