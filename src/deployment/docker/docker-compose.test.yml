@@ -113,6 +113,9 @@ services:
     stdin_open: false
     tty: true
     command: python -m pytest tests/ -v
+    environment:
+      MAIL_STARTTLS: "false"
+      MAIL_SSL_TLS: "false"
     depends_on:
       echo_store:
         condition: service_healthy
