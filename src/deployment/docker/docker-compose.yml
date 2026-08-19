@@ -115,6 +115,14 @@ services:
     stdin_open: false
     tty: true
     command: uvicorn app.main:app --host 0.0.0.0 --port 9000 --reload
+    depends_on:
+      echo_store:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   mongo-express:
     image: mongo-express
@@ -128,7 +136,8 @@ services:
       ME_CONFIG_MONGODB_ADMINUSERNAME: root
       ME_CONFIG_MONGODB_ADMINPASSWORD: root_password
     depends_on:
-      - echo_store
+      echo_store:
+        condition: service_healthy
     networks:
       - echo-net
 
@@ -149,6 +158,11 @@ services:
       - "27017:27017"
     volumes:
       - db-data:/data/db
+    healthcheck:
+      test: ["CMD-SHELL", "mongosh --eval 'db.adminCommand(\"ping\")' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   echo-redis:
     image: redis:latest

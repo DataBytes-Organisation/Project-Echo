@@ -59,6 +59,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+from app.middleware.content_type_guard import ContentTypeGuardMiddleware
+app.add_middleware(ContentTypeGuardMiddleware)
+
 
 # app.include_router(hmi.router, tags=['hmi'], prefix='/hmi')
 # app.include_router(engine.router, tags=['engine'], prefix='/engine')
@@ -105,6 +108,8 @@ def show_home():
 app.include_router(auth_router.router, tags=["auth"], prefix="/api")
 from app.routers import detections
 app.include_router(detections.router)
+from app.routers import health
+app.include_router(health.router, tags=['health'], prefix='/health')
 
 # ✅ /openapi-export - fetch live OpenAPI spec
 @app.get("/openapi-export", include_in_schema=False)
