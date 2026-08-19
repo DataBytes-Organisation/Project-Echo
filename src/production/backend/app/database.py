@@ -7,11 +7,15 @@ import time
 
 # prefer environment variable inside containers; fallback to service hostname (EchoNet DB)
 # legacy (kept for reference):
-# connection_string = "mongodb://modelUser:EchoNetAccess2023@ts-mongodb-cont:27017/EchoNet"
-connection_string = os.getenv(
-    "MONGODB_URI",
-    "mongodb://modelUser:EchoNetAccess2023@ts-mongodb-cont:27017/EchoNet",
-)
+
+def get_required_env(variable_name: str) -> str:
+    value = os.getenv(variable_name)
+    if not value:
+        raise RuntimeError(f"Required environment variable '{variable_name}' is not configured.")
+
+    return value
+
+connection_string = get_required_env("MONGODB_URI")
 client = pymongo.MongoClient(connection_string)
 db = client["EchoNet"]
 # db = client['mydatabase']
@@ -36,11 +40,7 @@ SensorReboots.create_index(
 
 # User DB connection (env first, then service hostname)
 # legacy (kept for reference):
-# User_connection_string = "mongodb://root:root_password@ts-mongodb-cont/UserSample?authSource=admin"
-User_connection_string = os.getenv(
-    "USER_MONGODB_URI",
-    "mongodb://root:root_password@ts-mongodb-cont/UserSample?authSource=admin",
-)
+User_connection_string = get_required_env("USER_MONGODB_URI")
 Userclient = pymongo.MongoClient(User_connection_string)
 Userdb = Userclient['UserSample']
 User = Userdb.users

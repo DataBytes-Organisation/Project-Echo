@@ -6,6 +6,218 @@
     "version": "1.0.0"
   },
   "paths": {
+    "/projects": {
+      "get": {
+        "tags": [
+          "projects"
+        ],
+        "summary": "List projects",
+        "operationId": "get_projects_projects_get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Status"
+            },
+            "name": "status",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Location"
+            },
+            "name": "location",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Ecologist"
+            },
+            "name": "ecologist",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "projects"
+        ],
+        "summary": "Create a project",
+        "operationId": "create_project_projects_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Project"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/projects/{project_id}": {
+      "put": {
+        "tags": [
+          "projects"
+        ],
+        "summary": "Update a project (replace)",
+        "operationId": "update_project_projects__project_id__put",
+        "parameters": [
+          {
+            "description": "Mongo ObjectId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Project Id",
+              "description": "Mongo ObjectId"
+            },
+            "name": "project_id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Project"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "projects"
+        ],
+        "summary": "Delete a project",
+        "operationId": "delete_project_projects__project_id__delete",
+        "parameters": [
+          {
+            "description": "Mongo ObjectId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Project Id",
+              "description": "Mongo ObjectId"
+            },
+            "name": "project_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/projects/_meta/ecologists": {
+      "get": {
+        "tags": [
+          "projects"
+        ],
+        "summary": "List ecologists",
+        "operationId": "get_ecologists_projects__meta_ecologists_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/audio/upload": {
       "post": {
         "tags": [
@@ -3596,6 +3808,158 @@
           "otp"
         ],
         "title": "OTPVerifyRequest"
+      },
+      "Project": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Name"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "location": {
+            "type": "string",
+            "title": "Location"
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Status"
+          },
+          "sensorIds": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Sensorids"
+          },
+          "ecologists": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Ecologists"
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "status",
+          "id"
+        ],
+        "title": "Project"
+      },
+      "ProjectCreate": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Name"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "location": {
+            "type": "string",
+            "title": "Location"
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Status"
+          },
+          "sensorIds": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Sensorids"
+          },
+          "ecologists": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Ecologists"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "status"
+        ],
+        "title": "ProjectCreate"
+      },
+      "ProjectListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/Project"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "ProjectListResponse"
+      },
+      "ProjectUpdate": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Name"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "location": {
+            "type": "string",
+            "title": "Location"
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Status"
+          },
+          "sensorIds": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Sensorids"
+          },
+          "ecologists": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Ecologists"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "status"
+        ],
+        "title": "ProjectUpdate"
       },
       "RecordingData": {
         "properties": {
