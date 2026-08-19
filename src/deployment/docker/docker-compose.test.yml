@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   model_server:
     build:
@@ -52,10 +50,8 @@ services:
       - "3000:3000"
     restart: on-failure
     depends_on:
-      echo-redis:
-        condition: service_started
-      echo_store:
-        condition: service_healthy
+      - echo-redis
+      - echo_store
     stdin_open: true
     tty: true
     environment:
