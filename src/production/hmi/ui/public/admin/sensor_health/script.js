@@ -6,6 +6,16 @@
 // setInterval timer and the interval shown to the user, so they cannot drift.
 const REFRESH_MS = 15000;
 
+// Small muted style for the "seen X ago" line under each status pill.
+(function injectSensorHealthStyles() {
+  if (document.getElementById("sensor-health-inline-styles")) return;
+  const style = document.createElement("style");
+  style.id = "sensor-health-inline-styles";
+  style.textContent =
+    ".cell-subtext{font-size:11px;color:var(--muted,#888);margin-top:2px;}";
+  document.head.appendChild(style);
+})();
+
 const menuToggle = document.getElementById("menu-toggle");
 const mobileBackdrop = document.getElementById("mobile-backdrop");
 
@@ -173,6 +183,22 @@ function formatUptime(seconds) {
   if (days > 0) return `${days}d ${hours}h ${mins}m`;
   if (hours > 0) return `${hours}h ${mins}m`;
   return `${mins}m`;
+}
+
+// Turn a "minutes ago" number into readable text for last-seen / last-audio.
+function formatMinutesAgo(minutes) {
+  if (minutes === null || minutes === undefined || minutes === "") return "—";
+  const num = Number(minutes);
+  if (!Number.isFinite(num) || num < 0) return "—";
+  if (num === 0) return "just now";
+  if (num < 60) return `${num}m ago`;
+
+  const hours = Math.floor(num / 60);
+  const mins = num % 60;
+  if (hours < 24) return mins ? `${hours}h ${mins}m ago` : `${hours}h ago`;
+
+  const days = Math.floor(hours / 24);
+  return `${days}d ago`;
 }
 
 function updateLastUpdated() {
@@ -435,14 +461,14 @@ async function loadSensorHealthPage() {
 
       tr.innerHTML = `
         <td>${item.sensorId || "—"}</td>
-        <td>${pillHtml(item.status)}</td>
+        <td>${pillHtml(item.status)}<div class="cell-subtext">seen ${formatMinutesAgo(item.lastSeenMinutesAgo)}</div></td>
         <td>${formatBattery(item.batteryPct)}</td>
         <td>${formatPercent(item.cpu)}</td>
         <td>${formatPercent(item.ram)}</td>
         <td>${formatPercent(item.disk)}</td>
         <td>${formatUptime(item.uptime)}</td>
         <td>${formatGps(item.gps)}</td>
-        <td>${item.lastAudio || "—"}</td>
+        <td>${formatMinutesAgo(item.lastAudioMinutesAgo)}</td>
       `;
 
       tbody.appendChild(tr);
