@@ -3,7 +3,7 @@ from app.database import db
 
 router = APIRouter()
 
-@router.get("/")
+@router.get("")
 def health_check():
     """
     Returns the health status of the API and the MongoDB connection.
