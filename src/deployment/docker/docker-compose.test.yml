@@ -155,9 +155,9 @@ services:
       - db-data:/data/db
     healthcheck:
       test: ["CMD-SHELL", "mongo -u root -p root_password --authenticationDatabase admin --eval 'db.adminCommand(\"ping\")' || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      interval: 5s
+      timeout: 10s
+      retries: 30
 
   echo-redis:
     image: redis:latest
