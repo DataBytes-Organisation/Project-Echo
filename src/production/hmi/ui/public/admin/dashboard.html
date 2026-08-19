@@ -18,6 +18,7 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="/admin/js/admin-layout.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
   <script src="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.min.js"></script>
@@ -306,17 +307,6 @@
   </div>
 
   <script type="text/javascript">
-    $(document).ready(function () {
-      $("#sidebar").load("/admin/component/sidebar-component.html", function () {
-        $("#header").load("/admin/component/header-component.html", function () {
-          // Run layout behaviour only after both shared components exist
-          $.getScript("/admin/js/app.min.js");
-          $.getScript("/admin/js/sidebarmenu.js");
-        });
-      });
-
-      $("#footer").load("/admin/component/footer-component.html");
-    });
   
     const pageState = createAdminPageState();
     pageState.resetPageState();
