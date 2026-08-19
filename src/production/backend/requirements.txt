@@ -31,3 +31,5 @@ Werkzeug==2.0.3
 fastapi_mail
 twilio==8.5.0
 python-multipart
+pytest
+httpx<0.28

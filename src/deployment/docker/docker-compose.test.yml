@@ -6,7 +6,7 @@ services:
       context: ../../production/engine
       dockerfile: Model.Dockerfile
       args:
-        BASE_IMAGE: tensorflow/serving:2.3.0
+        BASE_IMAGE: tensorflow/serving:2.11.0
         # BASE_IMAGE: emacski/tensorflow-serving # Uncomment if on macos and comment above line
     image: ts-echo-model
     container_name: ts-echo-model-cont
@@ -52,7 +52,10 @@ services:
       - "3000:3000"
     restart: on-failure
     depends_on:
-      - echo-redis
+      echo-redis:
+        condition: service_started
+      echo_store:
+        condition: service_healthy
     stdin_open: true
     tty: true
     environment:
@@ -73,6 +76,11 @@ services:
       - "1883:1883"
       - "7001:7001"
       - "7070:7070"
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "1883"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
   echo_simulator:
     build:
@@ -87,6 +95,9 @@ services:
       - credentials_volume:/root/.config/gcloud/
     stdin_open: false
     tty: true
+    depends_on:
+      echo_mqtt:
+        condition: service_healthy
 
 
   echo_api:
