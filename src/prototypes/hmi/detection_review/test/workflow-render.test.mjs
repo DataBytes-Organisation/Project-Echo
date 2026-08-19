@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 
 import {
   renderAdjudicationQueue,
+  renderConflictRecovery,
   renderReviewWorkflowFailure,
   renderReviewWorkflow,
 } from "../src/workflow-render.mjs";
@@ -41,6 +42,7 @@ function makeSession(overrides = {}) {
 test("renders all four outcomes in the first-review decision form", () => {
   const html = renderReviewWorkflow(makeSession());
 
+  assert.match(html, /class="panel workflow-panel decision-band"/);
   assert.match(html, /First independent review/);
   assert.match(html, /value="confirmed"/);
   assert.match(html, /value="rejected"/);
@@ -50,6 +52,8 @@ test("renders all four outcomes in the first-review decision form", () => {
   assert.match(html, /name="correctedSpecies"/);
   assert.equal((html.match(/name="decision"[\s\S]*?required/g) ?? []).length, 4);
   assert.match(html, /data-review-form[\s\S]*aria-describedby=/);
+  assert.ok(html.indexOf("data-review-form") < html.indexOf("lifecycle-panel"));
+  assert.doesNotMatch(html, /class="eyebrow"/);
 });
 
 test("offers explicit Restore and Discard actions before applying a recovered draft", () => {
@@ -79,7 +83,7 @@ test("renders audit history as an always-visible labelled ordered list", () => {
     }],
   }));
 
-  assert.match(html, /<section[^>]*class="history-panel"/);
+  assert.match(html, /<section[^>]*class="history-panel lifecycle-panel"/);
   assert.match(html, /Case audit history/);
   assert.match(html, /<ol>/);
   assert.doesNotMatch(html, /<details|<summary/);
@@ -157,6 +161,8 @@ test("renders disagreement context and adjudication controls", () => {
   assert.match(queueHtml, /det-echo-001/);
   assert.match(queueHtml, /<button[^>]*data-detection-id="det-echo-001"/);
   assert.doesNotMatch(queueHtml, /\?scenario=adjudication/);
+  assert.doesNotMatch(html, /class="eyebrow"/);
+  assert.doesNotMatch(queueHtml, /class="eyebrow"/);
 });
 
 test("escapes reviewer and workflow error content before rendering", () => {
@@ -182,6 +188,19 @@ test("escapes reviewer and workflow error content before rendering", () => {
   assert.doesNotMatch(failureHtml, /<script>/);
   assert.match(failureHtml, /&lt;script&gt;/);
   assert.match(failureHtml, /data-workflow-retry/);
+  assert.match(failureHtml, /class="panel workflow-panel decision-band"/);
+  assert.doesNotMatch(failureHtml, /class="eyebrow"/);
+});
+
+test("keeps conflict recovery and latest history in the decision lane", () => {
+  const html = renderConflictRecovery({
+    expectedVersion: 1,
+    attemptedValues: { decision: "confirmed", reason: "", correctedSpecies: "" },
+    latestSession: makeSession({ version: 2 }),
+  });
+
+  assert.match(html, /class="panel workflow-panel decision-band conflict-panel"/);
+  assert.match(html, /class="history-panel lifecycle-panel"/);
 });
 
 test("renders the finalized outcome and resolution reason without another form", () => {

@@ -35,12 +35,15 @@ export function renderPrototypeControls({
 
   return `
     <section class="prototype-controls" aria-label="Prototype controls">
-      <div class="role-switcher" role="group" aria-label="Active review role">
-        ${roleButtons}
+      <div class="prototype-controls__roles">
+        <div class="role-switcher" role="group" aria-label="Active review role">
+          ${roleButtons}
+        </div>
       </div>
-      <div class="prototype-reset">
-        <button type="button" class="secondary-button" data-prototype-reset ${disabled}>Reset prototype data</button>
-        <p>Reset submitted reviews, final decisions, audit history, and drafts for this prototype.</p>
+      <div class="prototype-controls__reset">
+        <div class="prototype-reset">
+          <button type="button" class="secondary-button" data-prototype-reset ${disabled}>Reset prototype data</button>
+        </div>
       </div>
       ${resetMessage}
     </section>`;

@@ -64,15 +64,25 @@ export function renderApplicationView({
         <p>Completed and other-role cases remain visible in the queue.</p>
       </aside>`
     : "";
+  const controlsHtml = renderPrototypeControls({ activeRole, isPending, resetStatus });
 
   return `
     <div class="application-view" data-page-state="${pageState}">
-      <p class="sr-only" role="status" aria-live="polite">Current page state: ${pageState.replaceAll("-", " ")}.</p>
-      ${renderPrototypeControls({ activeRole, isPending, resetStatus })}
-      ${noActionableWorkHtml}
-      ${renderWorkbench(detectionState, {
+      <header class="command-bar">
+        <div class="command-bar__identity">
+          <span class="command-bar__product">PROJECT ECHO</span>
+          <strong>Detection review</strong>
+          <small>Prototype data only</small>
+        </div>
+        ${controlsHtml}
+      </header>
+      <div class="page-shell" id="review-workbench">
+        <p class="sr-only" role="status" aria-live="polite">Current page state: ${pageState.replaceAll("-", " ")}.</p>
+        ${noActionableWorkHtml}
+        ${renderWorkbench(detectionState, {
     workflowHtml,
     adjudicationQueueHtml,
   })}
+      </div>
     </div>`;
 }

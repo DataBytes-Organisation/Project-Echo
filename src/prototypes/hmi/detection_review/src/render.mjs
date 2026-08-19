@@ -82,7 +82,7 @@ function renderQueueState(state) {
           data-detection-id="${escapeHtml(record.id)}"
           aria-pressed="${isSelected}"
           aria-describedby="queue-keyboard-help"
-          aria-keyshortcuts="ArrowUp ArrowDown Home End"
+          aria-keyshortcuts="ArrowLeft ArrowRight ArrowUp ArrowDown Home End"
         >
           <span class="queue-item__topline">
             <strong>${escapeHtml(record.species)}</strong>
@@ -100,7 +100,7 @@ function renderQueueState(state) {
       </li>`;
   }).join("");
 
-  return `<ol class="queue-list">${items}</ol>`;
+  return `<ol class="queue-list case-queue__rail">${items}</ol>`;
 }
 
 export function renderQueue(state) {
@@ -119,7 +119,7 @@ export function renderQueue(state) {
       : countLabel;
 
   return `
-    <section class="panel queue-panel" aria-labelledby="queue-heading">
+    <section class="panel queue-panel case-queue" aria-labelledby="queue-heading">
       <header class="panel-heading">
         <div>
           <h2 id="queue-heading">Detection queue</h2>
@@ -127,7 +127,7 @@ export function renderQueue(state) {
         </div>
         <span class="record-count" aria-label="${escapeHtml(countAriaLabel)}">${escapeHtml(countLabel)}</span>
       </header>
-      <p class="sr-only" id="queue-keyboard-help">Use the Up and Down arrow keys, Home, or End to move through detection records.</p>
+      <p class="sr-only" id="queue-keyboard-help">Use the Left and Right arrow keys, Up and Down arrow keys, Home, or End to move through detection records.</p>
       ${renderQueueState(state)}
     </section>`;
 }
@@ -174,7 +174,7 @@ export function renderEvidence(record, stateStatus) {
     const copy = evidenceEmptyCopy(stateStatus);
 
     return `
-      <section class="panel evidence-panel" aria-labelledby="evidence-heading">
+      <section class="panel evidence-panel evidence-canvas" aria-labelledby="evidence-heading">
         <header class="panel-heading">
           <div>
             <h2 id="evidence-heading">Evidence record</h2>
@@ -197,7 +197,7 @@ export function renderEvidence(record, stateStatus) {
     : "evidence-list__value--unavailable";
 
   return `
-    <section class="panel evidence-panel" aria-labelledby="evidence-heading">
+    <section class="panel evidence-panel evidence-canvas" aria-labelledby="evidence-heading">
       <header class="panel-heading panel-heading--evidence">
         <div>
           <h2 id="evidence-heading">Evidence record</h2>
@@ -205,7 +205,7 @@ export function renderEvidence(record, stateStatus) {
         </div>
         <span class="record-id">${escapeHtml(record.id)}</span>
       </header>
-      <div class="prediction-summary">
+      <div class="prediction-summary evidence-canvas__summary">
         <p>Species prediction</p>
         <strong>${escapeHtml(record.species)}</strong>
         <span>${escapeHtml(formatConfidence(record.confidence))} model confidence</span>

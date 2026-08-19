@@ -67,7 +67,12 @@ test("renders a populated queue with an explicit selected detection", () => {
 
   assert.match(html, /Powerful Owl/);
   assert.match(html, /Koala/);
+  assert.match(html, /class="panel queue-panel case-queue"/);
+  assert.match(html, /class="queue-list case-queue__rail"/);
+  assert.equal((html.match(/data-detection-id=/g) ?? []).length, 2);
   assert.match(html, /data-detection-id="det-echo-002"[^>]*aria-pressed="true"/);
+  assert.match(html, /aria-keyshortcuts="ArrowLeft ArrowRight ArrowUp ArrowDown Home End"/);
+  assert.match(html, /Use the Left and Right arrow keys/);
   assert.match(html, /Pending review/);
   const queueButton = html.match(/<button[\s\S]*?>/)[0];
   assert.doesNotMatch(queueButton, /aria-label=/);
@@ -125,6 +130,10 @@ test("renders every required evidence field and available-audio state", () => {
   for (const value of requiredValues) {
     assert.match(html, new RegExp(escapeRegExp(value)));
   }
+
+  assert.match(html, /class="panel evidence-panel evidence-canvas"/);
+  assert.match(html, /class="prediction-summary evidence-canvas__summary"/);
+  assert.doesNotMatch(html, /waveform|Play audio|sample rate|model version/i);
 });
 
 test("renders the unavailable-audio evidence state", () => {

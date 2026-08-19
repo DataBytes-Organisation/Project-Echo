@@ -168,7 +168,7 @@ function renderHistory(history, headingId = "case-history-heading") {
     </li>`).join("");
 
   return `
-    <section class="history-panel" aria-labelledby="${headingId}">
+    <section class="history-panel lifecycle-panel" aria-labelledby="${headingId}">
       <div class="history-panel__heading">
         <h3 id="${headingId}">Case audit history</h3>
         <span>${history.length} ${history.length === 1 ? "entry" : "entries"}</span>
@@ -241,7 +241,7 @@ function attemptedReviewSummary(values) {
 export function renderConflictRecovery(conflict) {
   const latest = conflict.latestSession;
   return `
-    <section class="panel workflow-panel conflict-panel" aria-labelledby="conflict-heading" data-workflow-status="conflict">
+    <section class="panel workflow-panel decision-band conflict-panel" aria-labelledby="conflict-heading" data-workflow-status="conflict">
       <header class="panel-heading">
         <div>
           <h2 id="conflict-heading" tabindex="-1">Review changed before save</h2>
@@ -281,8 +281,8 @@ function workflowBody(session, options) {
   if (session.status === "awaiting_first_review") {
     return `
       <div class="workflow-intro">
-        <p class="eyebrow">Reviewer 1 session</p>
         <h3>First independent review</h3>
+        <p class="workflow-context">Reviewer 1 session</p>
         <p>Record an evidence-led decision. Reviewer 2 will not see it before submitting independently.</p>
       </div>
       ${reviewForm(session, options)}`;
@@ -292,8 +292,8 @@ function workflowBody(session, options) {
     if (session.actor !== "reviewer-2") {
       return `
         <div class="workflow-result" role="status">
-          <p class="eyebrow">Review recorded</p>
           <h3>Waiting for reviewer 2</h3>
+          <p class="workflow-context">Review recorded</p>
           <p>Your first review is stored. Its decision remains hidden from the second reviewer.</p>
         </div>`;
     }
@@ -304,8 +304,8 @@ function workflowBody(session, options) {
         <span>The first review is complete. Its decision and notes remain hidden until you submit.</span>
       </div>
       <div class="workflow-intro">
-        <p class="eyebrow">Reviewer 2 session</p>
         <h3>Second independent review</h3>
+        <p class="workflow-context">Reviewer 2 session</p>
         <p>Assess the same evidence without influence from reviewer 1’s decision.</p>
       </div>
       ${reviewForm(session, options)}`;
@@ -314,8 +314,8 @@ function workflowBody(session, options) {
   if (session.status === "consensus") {
     return `
       <div class="workflow-result workflow-result--success" role="status">
-        <p class="eyebrow">Automatic comparison complete</p>
         <h3>Consensus reached</h3>
+        <p class="workflow-context">Automatic comparison complete</p>
         <p>Both independent reviewers selected <strong>${escapeHtml(decisionLabel(session.consensus.decision))}</strong>${session.consensus.correctedSpecies
     ? ` for <strong>${escapeHtml(session.consensus.correctedSpecies)}</strong>`
     : ""}.</p>
@@ -326,8 +326,8 @@ function workflowBody(session, options) {
   if (session.status === "awaiting_adjudication") {
     return `
       <div class="workflow-result workflow-result--warning" role="status">
-        <p class="eyebrow">Independent decisions differ</p>
         <h3>Adjudication required</h3>
+        <p class="workflow-context">Independent decisions differ</p>
         <p>Compare both submissions, then record one final result and a resolution reason.</p>
       </div>
       ${independentReviewSummary(session)}
@@ -337,8 +337,8 @@ function workflowBody(session, options) {
   if (session.status === "finalized") {
     return `
       <div class="workflow-result workflow-result--success" role="status">
-        <p class="eyebrow">Case closed</p>
         <h3>Adjudication finalized</h3>
+        <p class="workflow-context">Case closed</p>
         <p>Final result: <strong>${escapeHtml(decisionLabel(session.adjudication.decision))}</strong>${session.adjudication.correctedSpecies
     ? ` for <strong>${escapeHtml(session.adjudication.correctedSpecies)}</strong>`
     : ""}.</p>
@@ -360,7 +360,7 @@ export function renderReviewWorkflow(session, options = {}) {
   };
 
   return `
-    <section class="panel workflow-panel" aria-labelledby="workflow-heading" data-workflow-status="${escapeHtml(session.status)}">
+    <section class="panel workflow-panel decision-band" aria-labelledby="workflow-heading" data-workflow-status="${escapeHtml(session.status)}">
       <header class="panel-heading">
         <div>
           <h2 id="workflow-heading">Review workflow</h2>
@@ -378,7 +378,7 @@ export function renderReviewWorkflow(session, options = {}) {
 
 export function renderReviewWorkflowFailure(message) {
   return `
-    <section class="panel workflow-panel" aria-labelledby="workflow-heading" data-workflow-status="failed">
+    <section class="panel workflow-panel decision-band" aria-labelledby="workflow-heading" data-workflow-status="failed">
       <header class="panel-heading">
         <div>
           <h2 id="workflow-heading">Review workflow</h2>
@@ -388,8 +388,8 @@ export function renderReviewWorkflowFailure(message) {
       </header>
       <div class="workflow-body">
         <div class="workflow-result workflow-result--warning" role="alert">
-          <p class="eyebrow">Workflow unavailable</p>
           <h3>Review state could not be loaded</h3>
+          <p class="workflow-context">Workflow unavailable</p>
           <p>${escapeHtml(message)}</p>
         </div>
         <button class="primary-button" type="button" data-workflow-retry>Try again manually</button>
@@ -412,8 +412,8 @@ export function renderAdjudicationQueue(sessions) {
   return `
     <aside class="adjudication-queue" aria-labelledby="adjudication-queue-heading">
       <div>
-        <p class="eyebrow">Adjudicator session</p>
         <h2 id="adjudication-queue-heading">Disagreement queue</h2>
+        <p class="workflow-context">Adjudicator session</p>
       </div>
       <span class="record-count">${countLabel}</span>
       ${items}

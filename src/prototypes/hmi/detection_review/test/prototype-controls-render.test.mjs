@@ -15,6 +15,9 @@ test("renders one labelled role switcher with the active role pressed", () => {
   assert.match(html, /data-role="reviewer-2"[^>]*aria-pressed="true"/);
   assert.match(html, /data-role="adjudicator"[^>]*aria-pressed="false"/);
   assert.match(html, /data-prototype-reset/);
+  assert.match(html, /class="prototype-controls__roles"/);
+  assert.match(html, /class="prototype-controls__reset"/);
+  assert.doesNotMatch(html, /Reset submitted reviews, final decisions/);
 });
 
 test("disables role and reset controls while a stateful operation is pending", () => {

@@ -1,4 +1,11 @@
-const NAVIGATION_KEYS = new Set(["ArrowDown", "ArrowUp", "Home", "End"]);
+const NAVIGATION_KEYS = new Set([
+  "ArrowDown",
+  "ArrowUp",
+  "ArrowLeft",
+  "ArrowRight",
+  "Home",
+  "End",
+]);
 
 export function getQueueNavigationTarget(records, selectedId, key) {
   if (!Array.isArray(records) || records.length === 0 || !NAVIGATION_KEYS.has(key)) {
@@ -15,7 +22,7 @@ export function getQueueNavigationTarget(records, selectedId, key) {
 
   const selectedIndex = records.findIndex(record => record.id === selectedId);
   const currentIndex = selectedIndex >= 0 ? selectedIndex : 0;
-  const offset = key === "ArrowDown" ? 1 : -1;
+  const offset = ["ArrowDown", "ArrowRight"].includes(key) ? 1 : -1;
   const nextIndex = (currentIndex + offset + records.length) % records.length;
   return records[nextIndex].id;
 }

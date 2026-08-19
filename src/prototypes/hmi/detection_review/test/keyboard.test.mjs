@@ -16,6 +16,13 @@ test("ArrowDown and ArrowUp move through the queue and wrap at boundaries", () =
   assert.equal(getQueueNavigationTarget(records, "det-echo-001", "ArrowUp"), "det-echo-003");
 });
 
+test("ArrowRight and ArrowLeft follow the horizontal queue and wrap at boundaries", () => {
+  assert.equal(getQueueNavigationTarget(records, "det-echo-001", "ArrowRight"), "det-echo-002");
+  assert.equal(getQueueNavigationTarget(records, "det-echo-003", "ArrowRight"), "det-echo-001");
+  assert.equal(getQueueNavigationTarget(records, "det-echo-003", "ArrowLeft"), "det-echo-002");
+  assert.equal(getQueueNavigationTarget(records, "det-echo-001", "ArrowLeft"), "det-echo-003");
+});
+
 test("Home and End select queue boundaries", () => {
   assert.equal(getQueueNavigationTarget(records, "det-echo-002", "Home"), "det-echo-001");
   assert.equal(getQueueNavigationTarget(records, "det-echo-002", "End"), "det-echo-003");

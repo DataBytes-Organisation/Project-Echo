@@ -8,23 +8,9 @@
     <link rel="stylesheet" href="./styles.css">
   </head>
   <body>
-    <a class="skip-link" href="#app">Skip to review workbench</a>
-    <!-- Prototype-only deterministic workflow; no production writes or live services. -->
-    <header class="masthead">
-      <p class="masthead__line">Project Echo · prototype · recoverable reviewer sessions</p>
-      <h1>Detection review prototype</h1>
-      <p class="masthead__description">
-        Verify model detections independently, resolve consensus automatically, and adjudicate disagreements.
-      </p>
-      <hr class="masthead__rule" aria-hidden="true">
-    </header>
 
-    <main class="page-shell" id="app" tabindex="-1"></main>
-
-    <footer class="page-footer">
-      <p>Prototype data only · no live services</p>
-      <p>Draft recovery · optimistic conflicts · append-only audit history</p>
-    </footer>
+    <a class="skip-link" href="#review-workbench">Skip to review workbench</a>
+    <main id="app" tabindex="-1"></main>
 
     <script type="module" src="./src/app.mjs"></script>
   </body>

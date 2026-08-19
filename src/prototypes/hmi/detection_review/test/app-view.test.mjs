@@ -21,6 +21,24 @@ const staleAdjudicationSession = Object.freeze({
   history: Object.freeze([]),
 });
 
+test("renders the Project Echo command bar before the review workbench", () => {
+  const html = renderApplicationView({
+    detectionState,
+    workflowActor: "reviewer-1",
+    activeRole: "reviewer-1",
+    workflowSession: null,
+    workflowLoadError: null,
+  });
+
+  assert.match(html, /<header class="command-bar"/);
+  assert.match(html, /class="command-bar__identity"/);
+  assert.match(html, /PROJECT ECHO/);
+  assert.match(html, /Detection review/);
+  assert.match(html, /Prototype data only/);
+  assert.ok(html.indexOf("command-bar__identity") < html.indexOf("prototype-controls"));
+  assert.ok(html.indexOf("prototype-controls") < html.indexOf("workbench"));
+});
+
 test("adjudication load failure hides stale or false-empty queue data", () => {
   const html = renderApplicationView({
     detectionState,
