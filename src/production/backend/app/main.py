@@ -3,6 +3,7 @@ import os
 from .routers import add_csv_output_option, audio_upload_router
 
 from fastapi import FastAPI, Body, HTTPException, status, APIRouter
+from app.middleware.request_size_limit import RequestSizeLimitMiddleware 
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import species_predictor
 from app.routers import auth_router
@@ -19,21 +20,6 @@ import json
 
 from app.routers import hmi, engine, sim, two_factor
 from app.routers import public
-app = FastAPI()
-
-# Add the CORS middleware
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:8080"],  # 可根据实际需求配置
-)
-# Routers
-from .routers import add_csv_output_option, audio_upload_router
-from app.routers import species_predictor, auth_router, hmi, engine, sim, two_factor, public, iot, live, sensors #Websocket
-
-from app.routers import projects
-app.include_router(projects.router)
-
-from app.routers import hmi, engine, sim, iot
 
 # ✅ Add metadata here
 app = FastAPI(
@@ -48,6 +34,25 @@ app = FastAPI(
     """,
     version="1.0.0"
 )
+# Add the CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:8080"],  # 可根据实际需求配置
+)
+# Routers
+from .routers import add_csv_output_option, audio_upload_router
+from app.routers import species_predictor, auth_router, hmi, engine, sim, two_factor, public, iot, live, sensors #Websocket
+
+from app.routers import projects
+app.include_router(projects.router)
+
+from app.routers import hmi, engine, sim, iot
+
+app.add_middleware(
+     RequestSizeLimitMiddleware, 
+     json_limit=1 * 1024 * 1024,       # 1 MB 
+     upload_limit=32 * 1024 * 1024,   # 32 MB 
+) 
 
 # ✅ CORS Middleware
 app.add_middleware(
