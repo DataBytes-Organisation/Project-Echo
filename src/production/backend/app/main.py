@@ -3,6 +3,7 @@ import os
 from .routers import add_csv_output_option, audio_upload_router
 
 from fastapi import FastAPI, Body, HTTPException, status, APIRouter
+from app.middleware.request_size_limit import RequestSizeLimitMiddleware 
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import species_predictor
 from app.routers import auth_router
@@ -19,7 +20,19 @@ import json
 
 from app.routers import hmi, engine, sim, two_factor
 from app.routers import public
-app = FastAPI()
+# ✅ Add metadata here
+app = FastAPI(
+    title="Project Echo API",
+    description="""
+    Project Echo is an IoT-based system designed to record and analyze audio data for species identification and ecosystem monitoring.
+
+    This API provides endpoints to:
+    - Upload audio files
+    - Simulate audio responses
+    - Interface with HMI and audio engine modules
+    """,
+    version="1.0.0"
+)
 
 # Add the CORS middleware
 app.add_middleware(
@@ -35,18 +48,10 @@ app.include_router(projects.router)
 
 from app.routers import hmi, engine, sim, iot
 
-# ✅ Add metadata here
-app = FastAPI(
-    title="Project Echo API",
-    description="""
-    Project Echo is an IoT-based system designed to record and analyze audio data for species identification and ecosystem monitoring.
-
-    This API provides endpoints to:
-    - Upload audio files
-    - Simulate audio responses
-    - Interface with HMI and audio engine modules
-    """,
-    version="1.0.0"
+app.add_middleware( 
+    RequestSizeLimitMiddleware, 
+    json_limit=1 * 1024 * 1024,       # 1 MB 
+    upload_limit=32 * 1024 * 1024,   # 32 MB 
 )
 
 # ✅ CORS Middleware
