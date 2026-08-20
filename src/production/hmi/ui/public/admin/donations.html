@@ -48,6 +48,10 @@
     <!-- Shared admin page state -->
     <script type="text/javascript" src="/admin/js/admin-page-state.js"></script>
 
+  <!-- axios has to load before the module below - routes.js grabs window.axios
+       as soon as it evaluates, so this one can't be deferred -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
     <style>
       .status-succeeded { color: green; font-weight: 600; }
       .status-failed { color: red; font-weight: 600; }
@@ -146,7 +150,12 @@
       });
     </script>
 
-    <script>
+    <script type="module">
+      // FR-D1: module so the donations list can use the shared client. Nothing
+      // outside this block reaches into it, so losing the globals costs nothing.
+      import { retrieveDonations } from "/js/routes.js";
+      import { getApiErrorMessage } from "/js/HMI-utils.js";
+
       const pageState = createAdminPageState();
       pageState.resetPageState();
 
@@ -218,20 +227,16 @@
         try {
           clearTable();
 
-          const response = await fetch('/donations');
+          const response = await retrieveDonations();
+          const data = response.data;
 
-          if (!response.ok) {
-            throw new Error(`Status ${response.status}`);
+          // /donations redirects to the dashboard once the session has expired
+          // and axios follows redirects, so a 2xx can still be an HTML page.
+          // Without this the page would just claim there are no donations.
+          if (!data || typeof data !== 'object') {
+            throw new Error('Your session has expired. Please sign in again.');
           }
 
-          const contentType = response.headers.get('content-type') || '';
-          if (!contentType.includes('application/json')) {
-            const rawText = await response.text();
-            console.error('Expected JSON but received:', rawText);
-            throw new Error('API did not return JSON.');
-          }
-
-          const data = await response.json();
           const charges = data.charges?.data || [];
 
           if (charges.length === 0) {
@@ -289,7 +294,7 @@
 
         } catch (error) {
           console.error('Error fetching donations:', error);
-          pageState.showError('Failed to load donations. Please try again.');
+          pageState.showError(getApiErrorMessage(error, 'Failed to load donations. Please try again.'));
           clearTable();
           dataBody.innerHTML = `<tr><td colspan="4" class="text-center text-muted">Unable to load donations.</td></tr>`;
           updateDonationChart([]);

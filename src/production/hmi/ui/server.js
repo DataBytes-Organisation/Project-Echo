@@ -12,9 +12,10 @@ const bcrypt = require('bcryptjs');
 client.connect();
 const cors = require('cors');
 require('dotenv').config();
-const API_BASE_URL = `http://${process.env.API_HOST || 'localhost'}:9000`;
+const apiClient = require('./services/apiClient');
+const API_BASE_URL = apiClient.API_BASE_URL;
 const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY);
-const axios = require('axios');
+const axios = require('axios'); // still needed directly for proxyToApi's pass-through behaviour below
 const { MongoClient, ObjectId } = require('mongodb');
 
 
@@ -676,16 +677,11 @@ app.post("/api/submit", async (req, res) => {
   schema.date = new Date();
   try {
     console.log("Request submission data: ", JSON.stringify(schema));
-    const axiosResponse = await axios.post(`${API_BASE_URL}/hmi/api/submit`, JSON.stringify(schema), { headers: {"Authorization" : `Bearer ${token}`, 'Content-Type': 'application/json'}})
-    //If successful return a 201 status code
-    if (axiosResponse.status === 201) {
-      console.log('Status Code: ' + axiosResponse.status + ' ' + axiosResponse.statusText)
-      res.status(201).send(`<script> window.location.href = "/login"; alert("Request Submitted successfully");</script>`);
-    } else {
-      res.status(400).send(`<script> window.location.href = "/login"; alert("Ooops! Something went wrong");</script>`);
-    }
+    // apiClient throws on any non-2xx, so getting here means it succeeded - no need to check the status manually
+    await apiClient.post('/hmi/api/submit', schema, { headers: {"Authorization" : `Bearer ${token}`, 'Content-Type': 'application/json'}})
+    res.status(201).send(`<script> window.location.href = "/login"; alert("Request Submitted successfully");</script>`);
   } catch (error) {
-    console.error(error.data);
+    console.error(error.message);
     res.status(500).send("An error occurred");
   }
 });
@@ -724,15 +720,10 @@ app.patch('/api/requests/:id', async (req, res) => {
   })
   try {
     console.log("Admin Request update data: ", JSON.stringify(schema));
-    const axiosResponse = await axios.patch(`${API_BASE_URL}/hmi/api/requests`, JSON.stringify(schema), { headers: {"Authorization" : `Bearer ${token}`, 'Content-Type': 'application/json'}})
-    if (axiosResponse.status === 200) {
-      console.log('Status Code: ' + axiosResponse.status + ' ' + axiosResponse.statusText)
-      res.status(200).send(`<script> window.location.href = "/login"; alert("Request data updated successfully");</script>`);
-    } else {
-      res.status(400).send(`<script> window.location.href = "/login"; alert("Ooops! Something went wrong with updating request table");</script>`);
-    }
+    await apiClient.patch('/hmi/api/requests', schema, { headers: {"Authorization" : `Bearer ${token}`, 'Content-Type': 'application/json'}})
+    res.status(200).send(`<script> window.location.href = "/login"; alert("Request data updated successfully");</script>`);
   } catch (error) {
-    console.error(error.data);
+    console.error(error.message);
     res.status(500).send({ error: 'Error updating request status' });
   }
 });
@@ -755,15 +746,10 @@ app.patch('/api/updateConservationStatus/:animal', async (req, res) => {
   })
   try {
     console.log("Admin update species data: ", JSON.stringify(schema));
-    const axiosResponse = await axios.patch(`${API_BASE_URL}/hmi/api/updateConservationStatus`, JSON.stringify(schema), { headers: {"Authorization" : `Bearer ${token}`, 'Content-Type': 'application/json'}})
-    if (axiosResponse.status === 200) {
-      console.log('Status Code: ' + axiosResponse.status + ' ' + axiosResponse.statusText)
-      res.status(200).send(`<script> window.location.href = "/login"; alert("Species Data updated successfully");</script>`);
-    } else {
-      res.status(400).send(`<script> window.location.href = "/login"; alert("Ooops! Something went wrong with updating species data");</script>`);
-    }
+    await apiClient.patch('/hmi/api/updateConservationStatus', schema, { headers: {"Authorization" : `Bearer ${token}`, 'Content-Type': 'application/json'}})
+    res.status(200).send(`<script> window.location.href = "/login"; alert("Species Data updated successfully");</script>`);
   } catch (error) {
-    console.error(error.data);
+    console.error(error.message);
     res.status(500).send({ error: 'Error updating species status' });
   }
 });
@@ -781,13 +767,8 @@ app.get('/api/requests', async (req, res) => {
       }
     })
 
-    const axiosResponse = await axios.get(`${API_BASE_URL}/hmi/requests`, { headers: {"Authorization" : `Bearer ${token}`}})
-  
-    if (axiosResponse.status === 200) {
-      res.json(axiosResponse.data);
-    } else {
-      res.status(500).json({ error: 'Error fetching data' });
-    }
+    const data = await apiClient.get('/hmi/requests', { headers: {"Authorization" : `Bearer ${token}`}})
+    res.json(data);
   } catch (err) {
     console.log('Requests error: ', err)
     res.status(401).redirect('/admin-dashboard')
@@ -882,6 +863,9 @@ app.post('/suspendUser', async (req, res) => {
 //Page direction to the map
 // Proxy route for IoT nodes API
 // Proxy routes for Sensor Health API
+// Deliberately kept on raw axios rather than apiClient here - this needs to forward
+// whatever status the backend actually returns (even error ones), whereas apiClient
+// always throws on non-2xx. Still points at the same shared API_BASE_URL though.
 async function proxyToApi(req, res) {
   try {
     const url = `${API_BASE_URL}${req.originalUrl}`;
@@ -921,11 +905,23 @@ app.all('/hmi/*', proxyToApi);
 
 app.get('/iot/nodes', async (req, res) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/iot/nodes`);
-    res.json(response.data);
+    const data = await apiClient.get('/iot/nodes');
+    res.json(data);
   } catch (error) {
-    console.error('Error fetching IoT nodes:', error);
-    res.status(500).json({ error: 'Error fetching IoT nodes' });
+    apiClient.sendApiError(res, error, 'Error fetching IoT nodes');
+  }
+});
+
+// The API implements /iot/nodes/{node_id} (iot.py) but there was no Node route for
+// it, so admin-nodes.html was calling http://localhost:9000 straight from the
+// browser - which only ever works in local dev. Same shape as the route above so
+// the page can go through the shared client like everything else.
+app.get('/iot/nodes/:nodeId', async (req, res) => {
+  try {
+    const data = await apiClient.get(`/iot/nodes/${encodeURIComponent(req.params.nodeId)}`);
+    res.json(data);
+  } catch (error) {
+    apiClient.sendApiError(res, error, 'Error fetching IoT node details');
   }
 });
 

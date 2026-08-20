@@ -25,13 +25,17 @@
   <script type="text/javascript" src="/admin/js/app.min.js"></script>
   <script type="text/javascript" src="/admin/js/dashboard.js"></script>
   <script type="text/javascript" src="/admin/js/admin-page-state.js"></script>
+
+  <!-- axios has to load before the modules below - routes.js grabs window.axios
+       as soon as it evaluates, so this one can't be deferred -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 
 <body>
 
 <!-- Sprint 2: API Status Badge -->
 <div id="api-status-badge" style="position: fixed; top: 10px; right: 10px; z-index: 9999;">Loading status...</div>
-<script src="/js/api-status.js"></script>
+<script type="module" src="/js/api-status.js"></script>
 
   <!--  Body Wrapper -->
   <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
@@ -303,7 +307,12 @@
     <div id="footer"></div>
   </div>
 
-  <script type="text/javascript">
+  <script type="module">
+    // FR-D1: module so the donations call can use the shared client. Nothing
+    // outside this block reaches into it, so losing the globals costs nothing.
+    import { retrieveCumulativeDonations } from "/js/routes.js";
+    import { getApiErrorMessage } from "/js/HMI-utils.js";
+
     $(document).ready(function() {
       $("#sidebar").load("/admin/component/sidebar-component.html", function() {
         $.getScript('/admin/js/sidebarmenu.js');
@@ -311,7 +320,7 @@
       $("#header").load("/admin/component/header-component.html");
       $("#footer").load("/admin/component/footer-component.html");
     });
-  
+
     const pageState = createAdminPageState();
     pageState.resetPageState();
   
@@ -320,21 +329,13 @@
   
       pageState.hideError();
       pageState.showLoading();
-  
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 2000);
-  
+
       try {
-        const response = await fetch('/cumulativeDonations', {
-          signal: controller.signal
-        });
-  
-        if (!response.ok) {
-          throw new Error(`Request failed with status ${response.status}`);
-        }
-  
-        const data = await response.json();
-  
+        // FR-D1: shared client, which carries its own timeout and retry - the
+        // AbortController that used to be here is doing the same job twice now.
+        const response = await retrieveCumulativeDonations();
+        const data = response.data;
+
         if (data === 0 || data === undefined || data.cumulativeTotal === undefined) {
           totalDonationsElement.innerHTML = "Total Donations: Connect Stripe Account";
         } else {
@@ -342,14 +343,8 @@
         }
       } catch (error) {
         console.error('Error:', error);
-  
-        if (error.name === 'AbortError') {
-          pageState.showError('Loading donation data timed out. Please try again.');
-        } else {
-          pageState.showError('Failed to load donation data. Please try again.');
-        }
+        pageState.showError(getApiErrorMessage(error, 'Failed to load donation data. Please try again.'));
       } finally {
-        clearTimeout(timeoutId);
         pageState.hideLoading();
       }
     }

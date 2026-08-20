@@ -512,6 +512,33 @@ export function hideRetryState(containerId) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
+ * Decide whether a failure is worth trying again.
+ *
+ * Only transient problems qualify: the request never got a reply (network down,
+ * DNS, connection refused, CORS), it timed out, the server rate-limited us, or
+ * the server itself fell over. A 401/403/404/422 is a settled answer - it will
+ * come back identical on every attempt, so retrying just delays the error the
+ * user needs to see and triples the load for nothing.
+ *
+ * @param {Error|object} error  - An axios error, or any thrown value.
+ * @returns {boolean}
+ */
+export function isTransientError(error) {
+  if (!error) return false;
+
+  if (error.code === "ECONNABORTED" || error.code === "ETIMEDOUT") return true;
+
+  const status = error.response ? error.response.status : error.status;
+
+  // no status at all means we never got a reply back - worth another go
+  if (status === undefined || status === null) return true;
+
+  if (status === 408 || status === 429) return true;
+
+  return status >= 500 && status <= 599;
+}
+
+/**
  * Automatically retry an async action on failure.
  * Shows a warning toast between attempts and throws on final failure.
  *
@@ -520,6 +547,15 @@ export function hideRetryState(containerId) {
  * @param {number}   [opts.attempts=3]    - Maximum attempts.
  * @param {number}   [opts.delayMs=1500]  - Wait between attempts (ms).
  * @param {string}   [opts.retryMessage]  - Toast text shown on each retry.
+ * @param {boolean}  [opts.silent=false]  - Retry without showing the toasts. For
+ *                                          background work the user did not ask
+ *                                          for (polling heartbeats, decorative
+ *                                          charts) where a toast every attempt is
+ *                                          just noise. Off by default so existing
+ *                                          user-initiated calls are unchanged.
+ * @param {Function} [opts.shouldRetry]   - Predicate deciding if a given error is
+ *                                          worth retrying. Defaults to
+ *                                          isTransientError.
  * @returns {Promise<*>}
  *
  * @example
@@ -530,14 +566,18 @@ export async function withRetry(action, opts = {}) {
     attempts = 3,
     delayMs = 1500,
     retryMessage = "Retrying…",
+    silent = false,
+    shouldRetry = isTransientError,
   } = opts;
 
   for (let i = 1; i <= attempts; i++) {
     try {
       return await action();
     } catch (err) {
-      if (i < attempts) {
-        showToast(`${retryMessage} (attempt ${i}/${attempts})`, "warning");
+      // give up straight away on anything that is not transient - see
+      // isTransientError above for why a 4xx is not worth a second attempt
+      if (i < attempts && shouldRetry(err)) {
+        if (!silent) showToast(`${retryMessage} (attempt ${i}/${attempts})`, "warning");
         await _delay(delayMs);
       } else {
         throw err;

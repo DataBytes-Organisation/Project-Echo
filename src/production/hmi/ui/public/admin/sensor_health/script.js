@@ -2,6 +2,18 @@
    Sprint 2: UI enhancement and live status monitoring
 */
 
+// swapped our own apiFetch wrapper for the shared client - same retry-on-GET
+// behaviour as the rest of the app now instead of a one-off helper just for this page
+import {
+  retrieveSensorUpdates,
+  retrieveSensorAlerts,
+  retrieveRecentReboots,
+  retrieveSensorSettings,
+  updateSensorSettings,
+  rebootSensor,
+} from "/js/routes.js";
+import { getApiErrorMessage } from "/js/HMI-utils.js";
+
 const menuToggle = document.getElementById("menu-toggle");
 const mobileBackdrop = document.getElementById("mobile-backdrop");
 
@@ -85,28 +97,6 @@ function showMessage(elementId, message, type = "success") {
     el.style.opacity = 1;
     el.style.transition = "opacity .4s";
   }, 30);
-}
-
-// ================================================================
-// API helper
-// ================================================================
-async function apiFetch(path, options = {}) {
-  const response = await fetch(path, {
-    headers: { "Content-Type": "application/json", ...(options.headers || {}) },
-    ...options,
-  });
-
-  if (!response.ok) {
-    const text = await response.text().catch(() => "");
-    throw new Error(text || `Request failed: ${response.status}`);
-  }
-
-  const contentType = response.headers.get("content-type") || "";
-  if (contentType.includes("application/json")) {
-    return response.json();
-  }
-
-  return response.text();
 }
 
 function pillHtml(status, batteryPct) {
@@ -198,17 +188,15 @@ async function rebootSensors() {
 
   try {
     for (const sensorId of sensors) {
-      await apiFetch(`/sensors/${encodeURIComponent(sensorId)}/reboot`, {
-        method: "POST",
-        body: JSON.stringify({ reason: reason || null }),
-      });
+      await rebootSensor(sensorId, reason || null);
     }
 
     showMessage("reboot-message", `Reboot queued for ${sensors.join(", ")}.`, "success");
     await loadRecentRebootHistory();
   } catch (e) {
-    showMessage("reboot-message", `Failed to queue reboot: ${e.message}`, "danger");
-    showPageError(`Failed to queue reboot: ${e.message}`);
+    const msg = getApiErrorMessage(e, "Failed to queue reboot.");
+    showMessage("reboot-message", `Failed to queue reboot: ${msg}`, "danger");
+    showPageError(`Failed to queue reboot: ${msg}`);
   } finally {
     hidePageLoading();
   }
@@ -251,15 +239,13 @@ async function saveSettings() {
       batteryThresholdPct: Number.isFinite(battery) ? battery : 25,
     };
 
-    await apiFetch(`/sensors/__default__/settings`, {
-      method: "PUT",
-      body: JSON.stringify({ settings: payload }),
-    });
+    await updateSensorSettings(payload);
 
     showMessage("settings-message", "Settings saved.", "success");
   } catch (e) {
-    showMessage("settings-message", `Failed to save settings: ${e.message}`, "danger");
-    showPageError(`Failed to save settings: ${e.message}`);
+    const msg = getApiErrorMessage(e, "Failed to save settings.");
+    showMessage("settings-message", `Failed to save settings: ${msg}`, "danger");
+    showPageError(`Failed to save settings: ${msg}`);
   } finally {
     hidePageLoading();
   }
@@ -403,12 +389,13 @@ async function loadSensorHealthPage() {
     showPageLoading();
 
     try {
-      const data = await apiFetch("/sensors/updates");
+      const response = await retrieveSensorUpdates();
+      const data = response.data;
       lastItems = Array.isArray(data.items) ? data.items : [];
       updateLastUpdated();
       render();
     } catch (e) {
-      tbody.innerHTML = `<tr><td colspan="9">Failed to load sensors: ${e.message}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="9">Failed to load sensors: ${getApiErrorMessage(e)}</td></tr>`;
     }
   }
 
@@ -430,7 +417,8 @@ async function loadAlertsPage() {
   showPageLoading();
 
   try {
-    const data = await apiFetch("/sensors/alerts");
+    const response = await retrieveSensorAlerts();
+    const data = response.data;
     const items = Array.isArray(data.items) ? data.items : [];
     tbody.innerHTML = "";
 
@@ -453,8 +441,9 @@ async function loadAlertsPage() {
       tbody.appendChild(tr);
     }
   } catch (e) {
-    tbody.innerHTML = `<tr><td colspan="4">Failed to load alerts: ${e.message}</td></tr>`;
-    showPageError(`Failed to load alerts: ${e.message}`);
+    const msg = getApiErrorMessage(e);
+    tbody.innerHTML = `<tr><td colspan="4">Failed to load alerts: ${msg}</td></tr>`;
+    showPageError(`Failed to load alerts: ${msg}`);
   } finally {
     hidePageLoading();
   }
@@ -471,7 +460,8 @@ async function loadRecentRebootHistory() {
   showPageLoading();
 
   try {
-    const data = await apiFetch("/sensors/reboots/recent?limit=50");
+    const response = await retrieveRecentReboots(50);
+    const data = response.data;
     const items = Array.isArray(data.items) ? data.items : [];
     tbody.innerHTML = "";
 
@@ -498,8 +488,9 @@ async function loadRecentRebootHistory() {
       tbody.appendChild(tr);
     }
   } catch (e) {
-    tbody.innerHTML = `<tr><td colspan="3">Failed to load reboot history: ${e.message}</td></tr>`;
-    showPageError(`Failed to load reboot history: ${e.message}`);
+    const msg = getApiErrorMessage(e);
+    tbody.innerHTML = `<tr><td colspan="3">Failed to load reboot history: ${msg}</td></tr>`;
+    showPageError(`Failed to load reboot history: ${msg}`);
   } finally {
     hidePageLoading();
   }
@@ -518,15 +509,15 @@ async function loadSettingsPage() {
   showPageLoading();
 
   try {
-    const data = await apiFetch("/sensors/__default__/settings");
-    const settings = data.settings || {};
+    const response = await retrieveSensorSettings();
+    const settings = response.data.settings || {};
     const intervalLabel = secondsToIntervalLabel(settings.recordIntervalSeconds);
 
     interval.value = intervalLabel;
     sensitivity.value = settings.sensitivity || "Medium";
     battery.value = Number(settings.batteryThresholdPct || 25);
   } catch (e) {
-    showMessage("settings-message", `Failed to load settings: ${e.message}`, "danger");
+    showMessage("settings-message", `Failed to load settings: ${getApiErrorMessage(e)}`, "danger");
   }
 }
 

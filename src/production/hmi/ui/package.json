@@ -4,8 +4,10 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-     "test": "node --test tests/nodes-overlay.test.mjs public/js/audio_recorder.test.mjs",
-    "dev": "nodemon --inspect=0.0.0.0 server.js"
+    "test": "node --test \"public/js/**/*.test.mjs\" \"tests/**/*.test.mjs\" && jest",
+    "test:node": "node --test \"public/js/**/*.test.mjs\" \"tests/**/*.test.mjs\"",
+    "test:jest": "jest",
+    "dev": "nodemon --inspect=0.0.0.0  server.js"
   },
   "author": "",
   "license": "ISC",
@@ -34,5 +36,12 @@
     "serve-index": "^1.9.1",
     "simplebar": "^6.2.5",
     "stripe": "^13.4.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^8.0.1",
+    "@babel/preset-env": "^8.0.2",
+    "babel-jest": "^30.4.1",
+    "jest": "^30.4.2",
+    "jest-environment-jsdom": "^30.4.1"
   }
 }
