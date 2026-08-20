@@ -73,6 +73,30 @@ print('Python Version           : ', python_version())
 print('TensorFlow Version       : ', tf.__version__)
 print('Librosa Version          : ', librosa.__version__)
 
+
+def load_keras_model_file(model_path):
+    """
+    Load a Keras model and provide clear errors for invalid paths
+    or corrupt model files.
+    """
+
+    if not isinstance(model_path, str) or not model_path.strip():
+        raise ValueError("Model path must be a non-empty string")
+
+    try:
+        return load_model(model_path)
+
+    except OSError as error:
+        raise FileNotFoundError(
+            f"Model file could not be loaded: {model_path}"
+        ) from error
+
+    except ValueError as error:
+        raise ValueError(
+            f"Invalid or corrupt model file: {model_path}"
+        ) from error
+
+
 # Load the necessary data and models
 with open('yamnet_dir/class_names.pkl', 'rb') as f:
     class_names = pickle.load(f)
@@ -147,7 +171,7 @@ class EchoEngine():
         self.eff_class_mapping = None
         self.eff_preprocess_config = None
 
-        if self.config.get("ACTIVE_INFERENCE_MODEL") == "efficientnetv2_tflite":
+        if getattr(self, "config", {}).get("ACTIVE_INFERENCE_MODEL") == "efficientnetv2_tflite":
             try:
                 engine_directory = Path(__file__).resolve().parent
 
