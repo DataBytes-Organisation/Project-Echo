@@ -15,6 +15,16 @@
 import { showToast, getApiErrorMessage, withRetry } from "./HMI-utils.js";
 import { getAudioRecorder } from "./audio_recorder.js";
 import {
+  AudioDecoder,
+  SpectrogramView,
+  decodeFloat32PcmBase64,
+} from "./spectrogram.js";
+import {
+  AnimalSpectrogramWorkflow,
+  LatestSourceGuard,
+  MicrophoneSpectrogramWorkflow,
+} from "./spectrogram-workflow.js";
+import {
   retrieveTruthEventsInTimeRange,
   retrieveVocalizationEventsInTimeRange,
   retrieveMicrophones,
@@ -80,6 +90,7 @@ var current_mic_lon  = 0.0;
 var current_mic_id   = "";
 
 var activeAudioNode     = null;
+var activeAudioContext  = null;
 var audioAnimTimeout    = null;
 var playNextTrack       = false;
 
@@ -102,10 +113,16 @@ var lastRecordingSampleRate       = 44100;
 var playbackSourceNode            = null;
 var playbackAudioContext          = null;
 
-var audioContext    = null;
+var recordingPlaybackContext = null;
 var a_source        = null;
 var decodedAudioStore = null;
 var fileContent     = null;
+var microphoneSourceGuard = new LatestSourceGuard();
+var selectedFileObjectUrl = null;
+var recordedAudioObjectUrl = null;
+
+var animalSpectrogramWorkflow = null;
+var microphoneSpectrogramWorkflow = null;
 
 export var animal_toggled = false;
 
@@ -264,6 +281,33 @@ function playPcmRecording() {
       };
     });
   });
+}
+
+function revokeObjectUrl(url) {
+  if (url) URL.revokeObjectURL(url);
+}
+
+function initializeSpectrogramWorkflows() {
+  if (!animalSpectrogramWorkflow) {
+    const animalRoot = document.getElementById("animal-spectrogram");
+    if (animalRoot) {
+      animalSpectrogramWorkflow = new AnimalSpectrogramWorkflow({
+        decodePcm: decodeFloat32PcmBase64,
+        retrieveAudio,
+        view: new SpectrogramView(animalRoot),
+      });
+    }
+  }
+
+  if (!microphoneSpectrogramWorkflow) {
+    const microphoneRoot = document.getElementById("microphone-spectrogram");
+    if (microphoneRoot) {
+      microphoneSpectrogramWorkflow = new MicrophoneSpectrogramWorkflow({
+        decoder: new AudioDecoder(),
+        view: new SpectrogramView(microphoneRoot),
+      });
+    }
+  }
 }
 
 function isJQueryAvailable() {
@@ -437,6 +481,8 @@ export function getUTC() {
 }
 
 function initializeStaticDOMHooks() {
+  initializeSpectrogramWorkflows();
+
   const audioElement = getAudioElement();
   if (audioElement && !audioElement.dataset.hmiBound) {
     audioElement.onended = hidePlaybackIndicator;
@@ -446,25 +492,46 @@ function initializeStaticDOMHooks() {
   const fileInput = getFileInput();
   if (fileInput && !fileInput.dataset.hmiBound) {
     fileInput.dataset.hmiBound = "true";
-    fileInput.addEventListener("change", function (event) {
-      const selectedFile = event.target.files[0];
-      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    fileInput.addEventListener("change", async function (event) {
+      const selection = microphoneSourceGuard.begin();
+      const selectedFile = event.target.files?.[0] || null;
 
-      if (selectedFile) {
-        const reader = new FileReader();
-        reader.onload = function (loadEvent) {
-          fileContent = loadEvent.target.result;
-          audioContext.decodeAudioData(fileContent.slice(0), function (decodedAudio) {
-            decodedAudioStore = decodedAudio;
-            a_source = null;
+      if (!selectedFile) {
+        fileContent = null;
+        decodedAudioStore = null;
+        microphoneSpectrogramWorkflow?.clear();
+        revokeObjectUrl(selectedFileObjectUrl);
+        selectedFileObjectUrl = null;
+        return;
+      }
 
-            const audioElementRef = getAudioElement();
-            if (audioElementRef) {
-              audioElementRef.src = URL.createObjectURL(selectedFile);
-            }
-          });
-        };
-        reader.readAsArrayBuffer(selectedFile);
+      stopRecordingPlayback();
+      audioRecorder.audioBlobs = [];
+      revokeObjectUrl(selectedFileObjectUrl);
+      revokeObjectUrl(recordedAudioObjectUrl);
+      selectedFileObjectUrl = null;
+      recordedAudioObjectUrl = null;
+
+      const [encodedData, decodedAudio] = await Promise.all([
+        selectedFile.arrayBuffer().catch(() => null),
+        microphoneSpectrogramWorkflow?.load(selectedFile) ?? Promise.resolve(null),
+      ]);
+      if (!microphoneSourceGuard.isCurrent(selection)) return;
+
+      if (!encodedData || !decodedAudio) {
+        fileContent = null;
+        decodedAudioStore = null;
+        return;
+      }
+
+      fileContent = encodedData;
+      decodedAudioStore = decodedAudio;
+      a_source = null;
+      const audioElementRef = getAudioElement();
+      if (audioElementRef) {
+        revokeObjectUrl(selectedFileObjectUrl);
+        selectedFileObjectUrl = URL.createObjectURL(selectedFile);
+        audioElementRef.src = selectedFileObjectUrl;
       }
     });
   }
@@ -475,6 +542,27 @@ if (document.readyState === "loading") {
 } else {
   initializeStaticDOMHooks();
 }
+
+async function destroyAudioFeatures() {
+  microphoneSourceGuard.invalidate();
+  playNextTrack = false;
+  playNextRecordedTrack = false;
+  stopAudioPlayback();
+  stopRecordingPlayback();
+  revokeObjectUrl(selectedFileObjectUrl);
+  revokeObjectUrl(recordedAudioObjectUrl);
+  selectedFileObjectUrl = null;
+  recordedAudioObjectUrl = null;
+  if (audioRecorder.mediaRecorder) audioRecorder.cancel();
+  await Promise.allSettled([
+    animalSpectrogramWorkflow?.destroy(),
+    microphoneSpectrogramWorkflow?.destroy(),
+  ]);
+  animalSpectrogramWorkflow = null;
+  microphoneSpectrogramWorkflow = null;
+}
+
+window.addEventListener("beforeunload", () => { void destroyAudioFeatures(); }, { once: true });
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Sample data loader
@@ -798,48 +886,78 @@ export function muteRecordingPlaybackAnimation() {
   document.dispatchEvent(new CustomEvent("muteRecordingAnimation", { detail: { message: "mute animation" } }));
 }
 
-export function stopAudioPlayback() {
-  muteAudioAnimation();
+export function stopAudioPlayback(updateAnimation = true) {
+  if (updateAnimation) muteAudioAnimation();
   if (audioAnimTimeout) clearTimeout(audioAnimTimeout);
-  if (activeAudioNode !== null) activeAudioNode.stop();
+  audioAnimTimeout = null;
+  if (activeAudioNode !== null) {
+    try { activeAudioNode.stop(); } catch (_error) { /* Source may already have ended. */ }
+    activeAudioNode.disconnect();
+  }
   activeAudioNode = null;
+  if (activeAudioContext !== null) {
+    void activeAudioContext.close().catch(() => {});
+  }
+  activeAudioContext = null;
 }
 
-function playAudioString(audioDataString, sampleRate) {
-  const audioData = new Uint8Array(
-    atob(audioDataString).split("").map((char) => char.charCodeAt(0))
-  );
+function playDecodedAudio(decodedAudio) {
+  if (!decodedAudio || !playNextTrack) return;
+  stopAudioPlayback(false);
+  playNextTrack = true;
 
-  const localAudioContext = new AudioContext();
-  const audioBuffer       = localAudioContext.createBuffer(1, audioData.length / 2, sampleRate);
-  audioBuffer.copyToChannel(new Float32Array(audioData.buffer), 0);
-
-  activeAudioNode = localAudioContext.createBufferSource();
-  activeAudioNode.buffer = audioBuffer;
-  activeAudioNode.connect(localAudioContext.destination);
-
-  if (playNextTrack) {
-    activeAudioNode.start();
-    audioAnimTimeout = setTimeout(muteAudioAnimation, audioBuffer.duration * 1000);
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  const context = new AudioContextClass();
+  const channelCount = Math.max(1, decodedAudio.numberOfChannels || 1);
+  const audioBuffer = context.createBuffer(channelCount, decodedAudio.length, decodedAudio.sampleRate);
+  for (let channel = 0; channel < channelCount; channel += 1) {
+    audioBuffer.copyToChannel(decodedAudio.getChannelData(channel), channel);
   }
+
+  const source = context.createBufferSource();
+  source.buffer = audioBuffer;
+  source.connect(context.destination);
+  source.onended = () => {
+    if (activeAudioNode !== source) return;
+    if (audioAnimTimeout) clearTimeout(audioAnimTimeout);
+    audioAnimTimeout = null;
+    activeAudioNode = null;
+    activeAudioContext = null;
+    source.disconnect();
+    void context.close().catch(() => {});
+    muteAudioAnimation();
+  };
+  activeAudioContext = context;
+  activeAudioNode = source;
+  source.start();
+  audioAnimTimeout = setTimeout(muteAudioAnimation, audioBuffer.duration * 1000);
 }
 
 document.addEventListener("playAudio", function () {
   playNextTrack = true;
-  if (selectedVocalizationEventId !== null) {
-    retrieveAudio(selectedVocalizationEventId)
-      .then((res) => { playAudioString(res.data.audioClip, res.data.sampleRate); })
-      .catch((error) => {
-        console.error("Error loading audio:", error);
-        showToast(getApiErrorMessage(error, "Failed to load audio clip"), "error");
-      });
+  if (!animalSpectrogramWorkflow || selectedVocalizationEventId === null) {
+    muteAudioAnimation();
+    return;
   }
+  animalSpectrogramWorkflow.getSelectedAudio().then((decodedAudio) => {
+    if (!decodedAudio || !playNextTrack) {
+      muteAudioAnimation();
+      return;
+    }
+    playDecodedAudio(decodedAudio);
+  });
 });
 
 document.addEventListener("stopAudio", function () {
   playNextTrack = false;
   stopAudioPlayback();
 });
+
+function clearAnimalAudioSelection() {
+  selectedVocalizationEventId = null;
+  animalSpectrogramWorkflow?.clear();
+  stopAudioPlayback();
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Layer visibility
@@ -1174,6 +1292,7 @@ function createMapClickEvent(hmiState) {
     const feature = hmiState.basemap.forEachFeatureAtPixel(evt.pixel, (f) => f);
 
     if (!feature) {
+      clearAnimalAudioSelection();
       safeHideJQuery("#animal-popup-content");
       safeHideJQuery("#mic-popup-content");
       safeHideJQuery("#node-popup-content");
@@ -1223,6 +1342,7 @@ function createMapClickEvent(hmiState) {
     }
 
     if (values.isMic) {
+      clearAnimalAudioSelection();
       active_mic_content.show();  default_mic_content.hide();
       active_node_content.hide(); default_node_content.show();
       active_content.hide();      default_content.show();
@@ -1253,6 +1373,7 @@ function createMapClickEvent(hmiState) {
       document.dispatchEvent(new CustomEvent("micToggled", { detail: { message: "Mic toggled:" } }));
 
     } else if (values.isNode) {
+      clearAnimalAudioSelection();
       active_node_content.show();  default_node_content.hide();
       active_mic_content.hide();   default_mic_content.show();
       active_content.hide();       default_content.show();
@@ -1274,16 +1395,24 @@ function createMapClickEvent(hmiState) {
       active_mic_content.hide();   default_mic_content.show();
       active_node_content.hide();  default_node_content.show();
 
-      if (values.eventId) selectedVocalizationEventId = values.eventId;
-
-      const audioHeader  = document.getElementById("audioHeader");
-      const audioControl = document.getElementById("audioControl");
+      const audioHeader  = document.getElementById("animalAudioHeader");
+      const audioControl = document.getElementById("animalAudioControl");
+      const spectrogram  = document.getElementById("animal-spectrogram");
       if (values.isAnimalMovement) {
+        clearAnimalAudioSelection();
         if (audioHeader)  audioHeader.style.display  = "none";
         if (audioControl) audioControl.style.display = "none";
+        if (spectrogram)  spectrogram.style.display  = "none";
       } else {
         if (audioHeader)  audioHeader.style.display  = "flex";
         if (audioControl) audioControl.style.display = "flex";
+        if (spectrogram)  spectrogram.style.display  = "block";
+        selectedVocalizationEventId = values.eventId || null;
+        if (selectedVocalizationEventId !== null) {
+          void animalSpectrogramWorkflow?.select(selectedVocalizationEventId);
+        } else {
+          animalSpectrogramWorkflow?.clear();
+        }
       }
 
       if (values.animalSpecies) {
@@ -1511,8 +1640,11 @@ export function hidePlaybackIndicator() {
 export function testFunct() { console.log("Recording started 1"); }
 
 export function startAudioRecording() {
-  const audioElement = getAudioElement();
-  if (audioElement && !audioElement.paused) {
+  const sourceToken = microphoneSourceGuard.begin();
+  const audioElement       = getAudioElement();
+  const audioElementSource = getAudioElementSource();
+
+  if (audioElementSource && audioElement && !audioElement.paused) {
     audioElement.pause();
     hidePlaybackIndicator();
   }
@@ -1532,6 +1664,18 @@ export function startAudioRecording() {
   audioRecorder
     .start()
     .then(() => {
+      if (!microphoneSourceGuard.isCurrent(sourceToken)) {
+        audioRecorder.cancel();
+        return;
+      }
+      fileContent = null;
+      decodedAudioStore = null;
+      microphoneSpectrogramWorkflow?.clear();
+      revokeObjectUrl(selectedFileObjectUrl);
+      revokeObjectUrl(recordedAudioObjectUrl);
+      selectedFileObjectUrl = null;
+      recordedAudioObjectUrl = null;
+      stopRecordingPlayback();
       audioRecordStartTime = new Date();
       showRecordingControls();
       showToast("Recording started", "info");
@@ -1561,51 +1705,36 @@ export function startAudioRecording() {
 }
 
 export function stopAudioRecording() {
-  if (stopRecordingInProgress) return;
-  stopRecordingInProgress = true;
-
-  if (durationTimer) {
-    clearInterval(durationTimer);
-    durationTimer = null;
-  }
-
-  const durationLabel = getDurationTag() ? getDurationTag().textContent : null;
-
+  const sourceToken = microphoneSourceGuard.begin();
   audioRecorder
     .stop()
-    .then((result) => {
+    .then(async (audioBlob) => {
       hideRecordingControls();
-      setLiveRecordingState("idle", "Recording stopped");
-
-      const audioBlob = result && result.blob ? result.blob : result;
-      if (!audioBlob || audioBlob.size === 0) {
-        clearBrowserRecordingPlayback();
-        showToast("Recording stopped, but no audio was captured. Try again.", "error");
-        return;
+      if (!microphoneSourceGuard.isCurrent(sourceToken)) return;
+      fileContent = null;
+      const decodedAudio = await microphoneSpectrogramWorkflow?.load(audioBlob) || null;
+      if (!microphoneSourceGuard.isCurrent(sourceToken)) return;
+      decodedAudioStore = decodedAudio;
+      revokeObjectUrl(recordedAudioObjectUrl);
+      recordedAudioObjectUrl = URL.createObjectURL(audioBlob);
+      const audioElement = getAudioElemForRecordedPlayback();
+      if (audioElement) audioElement.src = recordedAudioObjectUrl;
+      if (!decodedAudioStore) {
+        showToast("Recorded audio could not be decoded", "error");
       }
-
-      prepareBrowserRecordingPlayback(result, durationLabel);
-      showToast("Recording ready — press the green play button", "success");
     })
     .catch((error) => {
-      hideRecordingControls();
-      setLiveRecordingState("idle", "Ready to record");
-      showToast(
-        "Error stopping recording: " + (error.message || error.name || "unknown error"),
-        "error"
-      );
-      console.log("Stop recording error:", error);
-    })
-    .finally(() => {
-      stopRecordingInProgress = false;
+      if (!microphoneSourceGuard.isCurrent(sourceToken)) return;
+      showToast("Error stopping recording", "error");
+      console.log("Stop recording error:", error.name);
     });
 }
 
 export function cancelAudioRecording() {
+  microphoneSourceGuard.invalidate();
   audioRecorder.cancel();
-  stopRecordingPlayback();
-  playNextRecordedTrack = false;
-  clearBrowserRecordingPlayback();
+  decodedAudioStore = null;
+  microphoneSpectrogramWorkflow?.clear();
   hideRecordingControls();
   setLiveRecordingState("idle", "Recording cancelled");
   showToast("Recording cancelled", "info");
@@ -1739,75 +1868,33 @@ document.addEventListener("stopRecordedAudio",  function () { playNextRecordedTr
 function playRecording(recordedChunksOrBlob) {
   let blob = null;
 
-  if (recordedChunksOrBlob instanceof Blob) {
-    blob = recordedChunksOrBlob;
-  } else if (Array.isArray(recordedChunksOrBlob) && recordedChunksOrBlob.length > 0) {
-    const type = recordedChunksOrBlob[0].type || "audio/wav";
-    blob = new Blob(recordedChunksOrBlob, { type });
-  } else if (lastBrowserRecordingBlob) {
-    blob = lastBrowserRecordingBlob;
-  }
-
-  if (!blob || blob.size === 0) {
-    showToast("No recording available to play. Record audio first.", "error");
-    return;
-  }
+  const mimeType = recordedChunks[0]?.type || "audio/webm";
+  const blob = new Blob(recordedChunks, { type: mimeType });
+  if (blob.size === 0) return;
 
   audioRecordingElement = getAudioElemForRecordedPlayback();
   if (!audioRecordingElement) return;
 
-  // Reuse the prepared player from Stop — do not reload (avoids play() races).
-  const alreadyPrepared =
-    lastBrowserRecordingBlob === blob &&
-    lastBrowserRecordingUrl &&
-    audioRecordingElement.src;
+  revokeObjectUrl(recordedAudioObjectUrl);
+  recordedAudioObjectUrl = URL.createObjectURL(blob);
+  audioRecordingElement.src = recordedAudioObjectUrl;
+  audioRecordingElement.load();
 
-  if (!alreadyPrepared) {
-    if (lastBrowserRecordingUrl) URL.revokeObjectURL(lastBrowserRecordingUrl);
-    lastBrowserRecordingUrl = URL.createObjectURL(blob);
-    lastBrowserRecordingBlob = blob;
-    audioRecordingElement.src = lastBrowserRecordingUrl;
-    audioRecordingElement.classList.remove("hide");
-    audioRecordingElement.load();
-  } else {
-    audioRecordingElement.classList.remove("hide");
-  }
-
-  if (!playNextRecordedTrack) return;
-
-  recordingPlaybackAnimTimeout = setTimeout(muteRecordingPlaybackAnimation, 10000);
-
-  const playPromise = audioRecordingElement.play();
-  if (playPromise && typeof playPromise.then === "function") {
-    playPromise.catch((err) => {
-      // Fallback: decode WAV/PCM via AudioContext if the element fails.
-      blob.arrayBuffer()
-        .then((arrayBuffer) => {
-          const ctx = new (window.AudioContext || window.webkitAudioContext)();
-          audioContext = ctx;
-          return ctx.decodeAudioData(arrayBuffer.slice(0)).then((decoded) => {
-            a_source = ctx.createBufferSource();
-            a_source.buffer = decoded;
-            a_source.connect(ctx.destination);
-            a_source.start();
-          });
-        })
-        .catch(() => {
-          showToast(
-            "Unable to play recording: " + (err.message || "unsupported audio format"),
-            "error"
-          );
-          playNextRecordedTrack = false;
-          muteRecordingPlaybackAnimation();
-        });
-    });
+  if (playNextRecordedTrack) {
+    recordingPlaybackAnimTimeout = setTimeout(muteRecordingPlaybackAnimation, 10000);
+    audioRecordingElement.onended = () => {
+      if (recordingPlaybackAnimTimeout) clearTimeout(recordingPlaybackAnimTimeout);
+      recordingPlaybackAnimTimeout = null;
+      muteRecordingPlaybackAnimation();
+    };
+    audioRecordingElement.play();
   }
 }
 
-function stopRecordingPlayback() {
-  muteRecordingPlaybackAnimation();
+function stopRecordingPlayback(updateAnimation = true) {
+  if (updateAnimation) muteRecordingPlaybackAnimation();
   if (recordingPlaybackAnimTimeout) clearTimeout(recordingPlaybackAnimTimeout);
-  stopPcmPlayback();
+  recordingPlaybackAnimTimeout = null;
 
   if (a_source === null) {
     if (audioRecordingElement !== null) {
@@ -1815,8 +1902,13 @@ function stopRecordingPlayback() {
       audioRecordingElement.currentTime = 0;
     }
   } else {
-    try { a_source.stop(); } catch (_err) { /* ignore */ }
+    try { a_source.stop(); } catch (_error) { /* Source may already have ended. */ }
+    a_source.disconnect();
     a_source = null;
+  }
+  if (recordingPlaybackContext !== null) {
+    void recordingPlaybackContext.close().catch(() => {});
+    recordingPlaybackContext = null;
   }
 }
 
@@ -1832,14 +1924,37 @@ export function playAudio() {
     return;
   }
 
-  audioContext = new (window.AudioContext || window.webkitAudioContext)();
-
   if (playNextRecordedTrack) {
-    recordingPlaybackAnimTimeout = setTimeout(muteRecordingPlaybackAnimation, 10000);
-    a_source = audioContext.createBufferSource();
-    a_source.buffer = decodedAudioStore;
-    a_source.connect(audioContext.destination);
-    a_source.start();
+    stopRecordingPlayback(false);
+    playNextRecordedTrack = true;
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    recordingPlaybackContext = new AudioContextClass();
+    const context = recordingPlaybackContext;
+    const channelCount = Math.max(1, decodedAudioStore.numberOfChannels || 1);
+    const audioBuffer = context.createBuffer(
+      channelCount,
+      decodedAudioStore.length,
+      decodedAudioStore.sampleRate
+    );
+    for (let channel = 0; channel < channelCount; channel += 1) {
+      audioBuffer.copyToChannel(decodedAudioStore.getChannelData(channel), channel);
+    }
+    recordingPlaybackAnimTimeout = setTimeout(muteRecordingPlaybackAnimation, audioBuffer.duration * 1000);
+    const source = context.createBufferSource();
+    source.buffer = audioBuffer;
+    source.connect(context.destination);
+    source.onended = () => {
+      if (a_source !== source) return;
+      if (recordingPlaybackAnimTimeout) clearTimeout(recordingPlaybackAnimTimeout);
+      recordingPlaybackAnimTimeout = null;
+      source.disconnect();
+      a_source = null;
+      recordingPlaybackContext = null;
+      void context.close().catch(() => {});
+      muteRecordingPlaybackAnimation();
+    };
+    a_source = source;
+    source.start();
   }
 }
 

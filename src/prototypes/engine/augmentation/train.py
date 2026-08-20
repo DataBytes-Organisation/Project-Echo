@@ -9,7 +9,7 @@ from tqdm import tqdm
 from pathlib import Path
 from sklearn.metrics import f1_score, precision_score, recall_score, accuracy_score
 import hydra
-from omegaconf import DictConfig, OmegaConf
+from omegaconf import DictConfig
 
 from model.utils import ArcMarginProduct, CircleLoss
 from model import Model

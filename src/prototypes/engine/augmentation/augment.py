@@ -1,6 +1,22 @@
+"""
+The SpecAugment implementation, with the modifications from
+"Review of current SpecAugment implementation and its connection to the
+training dataloader.md" applied. Inline comments reference the exact Chunk /
+Modification labels used in that document.
+
+Started as a testing copy under a local torch_impl/ folder, then
+moved into its permanent home here at src/prototypes/engine/augmentation/
+once the changes were verified.
+"""
+
+import torch
+import torch.nn as nn
 import random
 
-import torch.nn as nn
+# --- Chunk 1 modification ------------
+# Original imported `Compose, AddGaussianNoise, TimeStretch, PitchShift, Shift`
+# from `audiomentations`, and `transforms` from `torchvision`. Removed here:
+# none of them were used anywhere in the original file (Chunk 1 finding).
 
 
 class SpecAugment(nn.Module):
@@ -8,51 +24,43 @@ class SpecAugment(nn.Module):
 	Spectrogram augmentation module.
 	Reference: SpecAugment: A Simple Data Augmentation Method for Automatic Speech Recognition
 	(https://arxiv.org/abs/1904.08779)
-
-	Supports two ways of sizing each masked strip, selected per axis by
-	which pair of constructor args is supplied:
-	  - Legacy pixel API: freq_mask_param / time_mask_param (fixed max width
-	    in bins/timeframes). Used by the `original_unfixed_reference` preset
-	    to reproduce the original, uncapped masking behaviour.
-	  - Ratio API: freq_mask_ratio / time_mask_ratio (max width as a
-	    fraction of the spectrogram's total size on that axis). Used by the
-	    default/light/heavy presets so mask size scales with clip length
-	    instead of being a fixed pixel count.
-	Exactly one of each pair must be given; mixing pixel-freq with
-	ratio-time (or vice versa) is allowed but unused by any current preset.
 	"""
+	# Chunk 2: no modification needed - class declaration and docstring unchanged.
 
 	def __init__(
 		self,
 		p=0.5,
 		n_freq_mask=2,
 		n_time_mask=2,
+		# --- Chunk 3, Modification 1 --------
+		# "these five values must be configured in the
+		# project's configuration files (used by the
+		# project's Hydra config system)." These two stay as optional
+		# fixed-pixel overrides (default None) - the values actually used at
+		# training time come from config/augmentation/*.yaml once wired up
+		# through Hydra, not from the defaults written here.
 		freq_mask_param=None,
 		time_mask_param=None,
-		freq_mask_ratio=None,
-		time_mask_ratio=None,
-		max_total_time_ratio=1.0,
+		# --- Chunk 3, Modification 3 ------------
+		# "add ratio-based options like freq_mask_ratio and time_mask_ratio
+		# (percentages, not fixed pixel counts)... a percentage-based setting
+		# can be adaptive and is therefore a better choice." These are now the
+		# new defaults; the fixed-pixel arguments above still work if
+		# explicitly supplied.
+		freq_mask_ratio=0.15,
+		time_mask_ratio=0.10,
+		# --- Chunk 6, Modification 1 --------------
+		# "we must add a hard cap on the total combined coverage (e.g. never
+		# more than 40%) to strictly prevent the covering-most-timeframes issue from
+		# happening no matter how the audio clip length or audio settings
+		# change later."
+		max_total_time_ratio=0.4,
+		# --- Chunk 3, Modification 2 -----------------------------------------------
+		# "add mask_value (so the covering colour is a choice, not fixed)."
+		# "zero" reproduces the exact original behaviour.
 		mask_value="zero",
 	):
 		super().__init__()
-
-		if (freq_mask_param is None) == (freq_mask_ratio is None):
-			raise ValueError(
-				"SpecAugment: specify exactly one of freq_mask_param or freq_mask_ratio, not both/neither."
-			)
-		if (time_mask_param is None) == (time_mask_ratio is None):
-			raise ValueError(
-				"SpecAugment: specify exactly one of time_mask_param or time_mask_ratio, not both/neither."
-			)
-		if freq_mask_ratio is not None and not (0.0 <= freq_mask_ratio <= 1.0):
-			raise ValueError(f"SpecAugment: freq_mask_ratio must be in [0.0, 1.0], got {freq_mask_ratio}.")
-		if time_mask_ratio is not None and not (0.0 <= time_mask_ratio <= 1.0):
-			raise ValueError(f"SpecAugment: time_mask_ratio must be in [0.0, 1.0], got {time_mask_ratio}.")
-		if not (0.0 <= max_total_time_ratio <= 1.0):
-			raise ValueError(f"SpecAugment: max_total_time_ratio must be in [0.0, 1.0], got {max_total_time_ratio}.")
-		if mask_value != "zero":
-			raise ValueError(f"SpecAugment: unsupported mask_value '{mask_value}'; only 'zero' is currently implemented.")
-
 		self.p = p
 		self.n_freq_mask = n_freq_mask
 		self.n_time_mask = n_time_mask
@@ -63,43 +71,98 @@ class SpecAugment(nn.Module):
 		self.max_total_time_ratio = max_total_time_ratio
 		self.mask_value = mask_value
 
-	def _fill(self, x, index_slice):
-		# Only "zero" is implemented today; validated in __init__.
-		x[index_slice] = 0.0
-
-	def _strip_width(self, param, ratio, axis_size):
-		"""Draw a random strip width, capped either by a fixed param (pixel API) or a fraction of axis_size (ratio API)."""
-		cap = param if param is not None else int(axis_size * ratio)
-		cap = min(cap, axis_size)
-		return random.randint(0, cap)
+	def _fill_value(self, x):
+		# Supports Chunk 3, Modification 2 (the mask_value option).
+		if self.mask_value == "zero":
+			return 0.0
+		elif self.mask_value == "min":
+			return x.min()
+		elif self.mask_value == "mean":
+			return x.mean()
+		else:
+			raise ValueError(f"Unknown mask_value: {self.mask_value!r}")
 
 	def forward(self, x):
+		# Chunk 4: no modification needed to this part of the logic.
 		if random.random() > self.p:
 			return x
 
 		C, F, T = x.shape
+		# set the fill value as per the chosen mask_value option (0, min, mean)
+		fill = self._fill_value(x)
 
-		# Frequency strips: no cumulative cap, matches every current preset.
+		# -----Chunk 5 (original lines 30-36): frequency masking---------
+		freq_param = (
+			self.freq_mask_param
+			if self.freq_mask_param is not None
+			else max(1, int(F * self.freq_mask_ratio))  # Chunk 3, Modification 3: number of blacked out freqs per freq-strip - a percentage (freq_mask_ratio) of total freqs (min 1 pixel) - this is the default case because freq_mask_param=None by default. The other case is using freq_mask_param if a value is explicitly set.
+		)
 		for _ in range(self.n_freq_mask):
-			width = self._strip_width(self.freq_mask_param, self.freq_mask_ratio, F)
-			if width <= 0:
-				continue
-			f0 = random.randint(0, F - width)
-			self._fill(x, (slice(None), slice(f0, f0 + width), slice(None)))
+			# updated to use the new freq_param (the old file uses freq_mask_param)
+			f_param = min(freq_param, F)
 
-		# Time strips: cumulative width is capped at max_total_time_ratio * T.
-		# With max_total_time_ratio=1.0 the cap can never bind (equals the
-		# full clip width), reproducing the "no safety cap" behaviour used
-		# by original_unfixed_reference.yaml through this same code path.
-		max_total_time_frames = int(T * self.max_total_time_ratio)
-		total_time_masked = 0
+			# --- Modification needed at line 34 (Chunk 5) ---------------
+			# Original: f = random.randint(0, F_param)
+			# This could return 0, producing a mask with zero width that
+			# covers nothing - "a configured mask should always actually mask
+			# something." Lower bound changed from 0 to 1.
+			# ------------------------------------------------------------------------
+			f = random.randint(1, max(1, f_param)) # use max to set the lower bound to 1 to prevent configuring e.g. freq_mask_param=0.8
+
+			f0 = random.randint(0, F - f)
+			x[:, f0 : f0 + f, :] = fill  # fill is now configurable (was hardcoded 0)
+
+		# ------Chunk 6 (original lines 38-43): time masking-------------
+		time_param = (
+			self.time_mask_param
+			if self.time_mask_param is not None
+			else max(1, int(T * self.time_mask_ratio))  # Chunk 3, Modification 3 (same logic as freq_param but for the time-strip)
+		)
+
+		# --- Chunk 6, Modification 1: hard cap on total combined coverage -----
+		# Without this cap, the original defaults (time_mask_param=80,
+		# n_time_mask=2) could black out up to ~80% of a 201-column clip (the
+		# headline finding in the review). This ensures no combination of
+		# settings can ever exceed max_total_time_ratio of the clip, even if
+		# old fixed-pixel values are passed in directly.
+		max_total_time = max(1, int(T * self.max_total_time_ratio)) # max total timeframes to black out
+		total_masked = 0 # total blacked out timeframes so far, initially 0
+
 		for _ in range(self.n_time_mask):
-			width = self._strip_width(self.time_mask_param, self.time_mask_ratio, T)
-			width = min(width, max_total_time_frames - total_time_masked)
-			if width <= 0:
-				continue
-			t0 = random.randint(0, T - width)
-			self._fill(x, (slice(None), slice(None), slice(t0, t0 + width)))
-			total_time_masked += width
+			# updated from using time_mask_param to using the new time_param
+			t_param = min(time_param, T)
+			# remaining allowed timeframes to black out after blacking out some in previous iterations (total_masked so far)
+			remaining = max_total_time - total_masked
+			if remaining <= 0:
+				break  # cap already reached - stop adding more masks
+
+			# --- Chunk 6, Modification 2: same zero-width fix as Chunk 5 ----
+			# Original: t = random.randint(0, T_param)
+			t = random.randint(1, max(1, min(t_param, remaining))) # choose remaining allowed timeframes to black out if it is < than the original blacked out timeframes per strip
+
+			t0 = random.randint(0, T - t)
+			x[:, :, t0 : t0 + t] = fill # configurable instead of hardcoded
+			total_masked += t # accumulate to total blacked out timeframes to determine remaining ones in next iterations
 
 		return x
+
+	def __repr__(self):
+		# Not one of the listed modifications, but needed so a training log
+		# can show which augmentation settings were actually active for a run.
+		return (
+			f"SpecAugment(p={self.p}, n_freq_mask={self.n_freq_mask}, n_time_mask={self.n_time_mask}, "
+			f"freq_mask_param={self.freq_mask_param}, time_mask_param={self.time_mask_param}, "
+			f"freq_mask_ratio={self.freq_mask_ratio}, time_mask_ratio={self.time_mask_ratio}, "
+			f"max_total_time_ratio={self.max_total_time_ratio}, mask_value={self.mask_value})"
+		)
+
+	# Chunk 7 (original line 45, `return x`): folded into forward() above -
+	# no separate modification needed here.
+
+# --- Duplicate implementation note --------------------------------------------
+# A second written copy of this class used to exist in
+# _single.py. In the review doc: "This needs to be removed and replaced with
+# an import of augment.py after implementing the above modifications." That
+# fix was made while this file still lived in a local torch_impl/ testing
+# copy - _single.py itself wasn't carried into this repo location, since
+# nothing here depends on it
