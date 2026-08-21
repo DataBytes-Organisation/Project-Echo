@@ -4,6 +4,7 @@ from .routers import add_csv_output_option, audio_upload_router
 
 from fastapi import FastAPI, Body, HTTPException, status, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
+from app.middleware.rate_limit import RateLimitMiddleware
 from app.routers import species_predictor
 from app.routers import auth_router
 from app.routers import admin_budget, admin_services
@@ -48,6 +49,8 @@ app = FastAPI(
     """,
     version="1.0.0"
 )
+
+app.add_middleware(RateLimitMiddleware.from_environment)
 
 # ✅ CORS Middleware
 app.add_middleware(
