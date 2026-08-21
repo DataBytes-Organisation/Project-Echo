@@ -60,6 +60,24 @@ app.add_middleware(
 )
 
 
+######### MQTT live event handling (FR-A2)
+from app.services.mqtt_client import start_mqtt_client, get_connection_state, get_latest_events
+
+@app.on_event("startup")
+def startup_mqtt():
+    start_mqtt_client()
+
+@app.get("/mqtt/connection-state", tags=["mqtt"])
+def mqtt_connection_state():
+    return {"state": get_connection_state()}
+
+@app.get("/mqtt/latest-events", tags=["mqtt"])
+def mqtt_latest_events():
+    from app.routers.hmi import show_latest_events
+    return {"events": show_latest_events(limit=20)}
+
+
+
 # app.include_router(hmi.router, tags=['hmi'], prefix='/hmi')
 # app.include_router(engine.router, tags=['engine'], prefix='/engine')
 # app.include_router(sim.router, tags=['sim'], prefix='/sim')
