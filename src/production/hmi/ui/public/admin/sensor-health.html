@@ -9,6 +9,23 @@
   <link rel="stylesheet" href="/admin/css/icons/tabler-icons/tabler-icons.css" />
   <link rel="stylesheet" href="/admin/sensor_health/style.css" />
 
+  <style>
+    /* FR-C1 additions: KPI accents, stale rows, last-seen subtext */
+    #kpi-online { color: var(--primary, #2e7d32); }
+    #kpi-degraded { color: var(--warning, #b8860b); }
+    #kpi-offline { color: var(--danger, #c62828); }
+    #kpi-low-battery { color: var(--danger, #c62828); }
+
+    .sensor-row-stale td { background: rgba(184, 134, 11, 0.06); }
+    .sensor-row-low-battery td { background: rgba(198, 40, 40, 0.06); }
+
+    .cell-subtext {
+      font-size: 11px;
+      color: var(--muted, #888);
+      margin-top: 2px;
+    }
+  </style>
+
   <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script type="text/javascript" src="/admin/js/app.min.js"></script>
 
@@ -71,21 +88,31 @@
             <div id="view-root">
               <div class="dashboard-shell">
 
-                <!-- Summary cards -->
+                <!-- Summary cards (populated from the same data as the table) -->
                 <section class="kpi-grid">
                   <div class="kpi-card">
-                    <p>SENSOR MONITORING</p>
-                    <h3>Live</h3>
+                    <p>TOTAL SENSORS</p>
+                    <h3 id="kpi-total">--</h3>
                   </div>
 
                   <div class="kpi-card">
-                    <p>DATA SOURCE</p>
-                    <h3>MQTT / Seeded</h3>
+                    <p>ONLINE</p>
+                    <h3 id="kpi-online" class="kpi-online">--</h3>
                   </div>
 
                   <div class="kpi-card">
-                    <p>AUTO REFRESH</p>
-                    <h3>15s</h3>
+                    <p>DEGRADED</p>
+                    <h3 id="kpi-degraded" class="kpi-degraded">--</h3>
+                  </div>
+
+                  <div class="kpi-card">
+                    <p>OFFLINE</p>
+                    <h3 id="kpi-offline" class="kpi-offline">--</h3>
+                  </div>
+
+                  <div class="kpi-card">
+                    <p>LOW BATTERY</p>
+                    <h3 id="kpi-low-battery" class="kpi-low-battery">--</h3>
                   </div>
                 </section>
 
@@ -111,6 +138,7 @@
                       <select id="sensor-status-filter">
                         <option value="All">All</option>
                         <option value="Online">Online</option>
+                        <option value="Degraded">Degraded</option>
                         <option value="Offline">Offline</option>
                         <option value="Low Battery">Low Battery</option>
                       </select>
@@ -122,7 +150,7 @@
                     class="card-subtitle"
                     style="margin-bottom: 12px;"
                   >
-                    Last updated at: --
+                    Last updated at: -- &middot; auto-refresh every <span id="refresh-interval-label">--</span>
                   </div>
 
                   <div class="table-responsive">

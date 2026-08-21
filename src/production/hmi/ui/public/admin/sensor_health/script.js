@@ -2,6 +2,20 @@
    Sprint 2: UI enhancement and live status monitoring
 */
 
+// Single source of truth for the auto-refresh interval. Drives both the
+// setInterval timer and the interval shown to the user, so they cannot drift.
+const REFRESH_MS = 15000;
+
+// Small muted style for the "seen X ago" line under each status pill.
+(function injectSensorHealthStyles() {
+  if (document.getElementById("sensor-health-inline-styles")) return;
+  const style = document.createElement("style");
+  style.id = "sensor-health-inline-styles";
+  style.textContent =
+    ".cell-subtext{font-size:11px;color:var(--muted,#888);margin-top:2px;}";
+  document.head.appendChild(style);
+})();
+
 const menuToggle = document.getElementById("menu-toggle");
 const mobileBackdrop = document.getElementById("mobile-backdrop");
 
@@ -109,15 +123,19 @@ async function apiFetch(path, options = {}) {
   return response.text();
 }
 
-function pillHtml(status, batteryPct) {
+function pillHtml(status) {
+  // Status is the single source of truth (derived by the backend). We do not
+  // re-derive Low Battery from a raw battery threshold here, otherwise a
+  // Degraded/Offline sensor that also has low battery would show the wrong
+  // pill while the KPI cards and row highlight correctly show its real status.
   const s = String(status || "").trim();
-
-  if (typeof batteryPct === "number" && batteryPct < 20) {
-    return `<span class="pill pill-warning">Low Battery</span>`;
-  }
 
   if (s === "Online" || s === "Success") {
     return `<span class="pill pill-success">${s}</span>`;
+  }
+
+  if (s === "Degraded" || s === "Low Battery") {
+    return `<span class="pill pill-warning">${s}</span>`;
   }
 
   if (s === "Offline" || s === "Failed") {
@@ -167,12 +185,73 @@ function formatUptime(seconds) {
   return `${mins}m`;
 }
 
+// Turn a "minutes ago" number into readable text for last-seen / last-audio.
+function formatMinutesAgo(minutes) {
+  if (minutes === null || minutes === undefined || minutes === "") return "—";
+  const num = Number(minutes);
+  if (!Number.isFinite(num) || num < 0) return "—";
+  if (num === 0) return "just now";
+  if (num < 60) return `${num}m ago`;
+
+  const hours = Math.floor(num / 60);
+  const mins = num % 60;
+  if (hours < 24) return mins ? `${hours}h ${mins}m ago` : `${hours}h ago`;
+
+  const days = Math.floor(hours / 24);
+  return `${days}d ago`;
+}
+
 function updateLastUpdated() {
   const el = document.getElementById("last-updated-at");
   if (!el) return;
 
   const now = new Date();
   el.textContent = `Last updated at: ${now.toLocaleTimeString()}`;
+}
+
+// Compute status counts from the SAME array that fills the table, so the KPI
+// cards can never drift from the table contents.
+//
+// The backend currently derives exactly four statuses (Online, Degraded,
+// Offline, Low Battery). The `other` bucket is a safety net: if the backend
+// ever returns a status outside that set, it is still counted so the buckets
+// always reconcile with the total and the cards can never silently under-count.
+function updateSensorKpis(items) {
+  const counts = { total: 0, online: 0, degraded: 0, offline: 0, lowBattery: 0, other: 0 };
+
+  for (const item of items) {
+    counts.total += 1;
+    switch (item.status) {
+      case "Online":
+        counts.online += 1;
+        break;
+      case "Degraded":
+        counts.degraded += 1;
+        break;
+      case "Offline":
+        counts.offline += 1;
+        break;
+      case "Low Battery":
+        counts.lowBattery += 1;
+        break;
+      default:
+        counts.other += 1;
+        break;
+    }
+  }
+
+  const set = (id, value) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value;
+  };
+
+  set("kpi-total", counts.total);
+  set("kpi-online", counts.online);
+  set("kpi-degraded", counts.degraded);
+  set("kpi-offline", counts.offline);
+  set("kpi-low-battery", counts.lowBattery);
+
+  return counts;
 }
 
 // ================================================================
@@ -352,18 +431,13 @@ async function loadSensorHealthPage() {
 
     const filtered = lastItems.filter((item) => {
       const sensorId = String(item.sensorId || "").toLowerCase();
-      const batteryPct = Number(item.batteryPct);
 
       const matchesSearch = !searchVal || sensorId.includes(searchVal);
 
-      let matchesStatus = true;
-      if (statusVal === "Online") {
-        matchesStatus = item.status === "Online";
-      } else if (statusVal === "Offline") {
-        matchesStatus = item.status === "Offline";
-      } else if (statusVal === "Low Battery") {
-        matchesStatus = Number.isFinite(batteryPct) && batteryPct < 20;
-      }
+      // Filter on the backend-derived status so the dropdown matches the pills
+      // and KPI counts exactly (same source of truth everywhere).
+      const matchesStatus =
+        statusVal === "All" ? true : item.status === statusVal;
 
       return matchesSearch && matchesStatus;
     });
@@ -378,20 +452,23 @@ async function loadSensorHealthPage() {
     for (const item of filtered) {
       const tr = document.createElement("tr");
 
-      if (typeof item.batteryPct === "number" && item.batteryPct < 20) {
+      if (item.status === "Low Battery") {
         tr.classList.add("sensor-row-low-battery");
+      }
+      if (item.status === "Degraded" || item.status === "Offline") {
+        tr.classList.add("sensor-row-stale");
       }
 
       tr.innerHTML = `
         <td>${item.sensorId || "—"}</td>
-        <td>${pillHtml(item.status, item.batteryPct)}</td>
+        <td>${pillHtml(item.status)}<div class="cell-subtext">seen ${formatMinutesAgo(item.lastSeenMinutesAgo)}</div></td>
         <td>${formatBattery(item.batteryPct)}</td>
         <td>${formatPercent(item.cpu)}</td>
         <td>${formatPercent(item.ram)}</td>
         <td>${formatPercent(item.disk)}</td>
         <td>${formatUptime(item.uptime)}</td>
         <td>${formatGps(item.gps)}</td>
-        <td>${item.lastAudio || "—"}</td>
+        <td>${formatMinutesAgo(item.lastAudioMinutesAgo)}</td>
       `;
 
       tbody.appendChild(tr);
@@ -405,6 +482,7 @@ async function loadSensorHealthPage() {
     try {
       const data = await apiFetch("/sensors/updates");
       lastItems = Array.isArray(data.items) ? data.items : [];
+      updateSensorKpis(lastItems);
       updateLastUpdated();
       render();
     } catch (e) {
@@ -416,7 +494,7 @@ async function loadSensorHealthPage() {
   searchInput?.addEventListener("input", render);
 
   await refresh();
-  setInterval(refresh, 15000);
+  setInterval(refresh, REFRESH_MS);
 }
 
 // ================================================================
