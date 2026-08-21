@@ -1,0 +1,113 @@
+file_name,relative_path,species,species_label,source,issue_type,severity
+XC181330 - Red-browed Pardalote - Pardalotus rubricatus rubricatus.mp3,XC181330 - Red-browed Pardalote - Pardalotus rubricatus rubricatus.mp3,unknown,unknown,unknown,missing_source,High
+XC143502 - Brown Gerygone - Gerygone mouki richmondi.mp3,XC143502 - Brown Gerygone - Gerygone mouki richmondi.mp3,unknown,unknown,unknown,missing_source,High
+XC36630 - Red-browed Pardalote - Pardalotus rubricatus.mp3,XC36630 - Red-browed Pardalote - Pardalotus rubricatus.mp3,unknown,unknown,unknown,missing_source,High
+XC550699 - Rose Robin - Petroica rosea.mp3,XC550699 - Rose Robin - Petroica rosea.mp3,unknown,unknown,unknown,missing_source,High
+XC350439 - Rose Robin - Petroica rosea.mp3,XC350439 - Rose Robin - Petroica rosea.mp3,unknown,unknown,unknown,missing_source,High
+XC181330 - Red-browed Pardalote - Pardalotus rubricatus rubricatus.mp3,XC181330 - Red-browed Pardalote - Pardalotus rubricatus rubricatus.mp3,unknown,unknown,unknown,missing_species,High
+XC143502 - Brown Gerygone - Gerygone mouki richmondi.mp3,XC143502 - Brown Gerygone - Gerygone mouki richmondi.mp3,unknown,unknown,unknown,missing_species,High
+XC36630 - Red-browed Pardalote - Pardalotus rubricatus.mp3,XC36630 - Red-browed Pardalote - Pardalotus rubricatus.mp3,unknown,unknown,unknown,missing_species,High
+XC550699 - Rose Robin - Petroica rosea.mp3,XC550699 - Rose Robin - Petroica rosea.mp3,unknown,unknown,unknown,missing_species,High
+XC350439 - Rose Robin - Petroica rosea.mp3,XC350439 - Rose Robin - Petroica rosea.mp3,unknown,unknown,unknown,missing_species,High
+XC181330 - Red-browed Pardalote - Pardalotus rubricatus rubricatus.mp3,XC181330 - Red-browed Pardalote - Pardalotus rubricatus rubricatus.mp3,unknown,unknown,unknown,missing_species_label,High
+XC143502 - Brown Gerygone - Gerygone mouki richmondi.mp3,XC143502 - Brown Gerygone - Gerygone mouki richmondi.mp3,unknown,unknown,unknown,missing_species_label,High
+XC36630 - Red-browed Pardalote - Pardalotus rubricatus.mp3,XC36630 - Red-browed Pardalote - Pardalotus rubricatus.mp3,unknown,unknown,unknown,missing_species_label,High
+XC550699 - Rose Robin - Petroica rosea.mp3,XC550699 - Rose Robin - Petroica rosea.mp3,unknown,unknown,unknown,missing_species_label,High
+XC350439 - Rose Robin - Petroica rosea.mp3,XC350439 - Rose Robin - Petroica rosea.mp3,unknown,unknown,unknown,missing_species_label,High
+region_0.500-2.499.wav,project_data_gcp/Capra Hircus/region_0.500-2.499.wav,Capra Hircus,capra_hircus,project_data_gcp,duplicate_metadata_record,Medium
+region_0.400-2.399.wav,project_data_gcp/Capra Hircus/region_0.400-2.399.wav,Capra Hircus,capra_hircus,project_data_gcp,duplicate_metadata_record,Medium
+region_19.700-21.700.mp3,project_data_gcp/Ceyx azureus/region_19.700-21.700.mp3,Ceyx azureus,ceyx_azureus,project_data_gcp,duplicate_metadata_record,Medium
+region_15.700-17.700.mp3,project_data_gcp/Ceyx azureus/region_15.700-17.700.mp3,Ceyx azureus,ceyx_azureus,project_data_gcp,duplicate_metadata_record,Medium
+region_5.050-7.050.mp3,project_data_gcp/Ceyx azureus/region_5.050-7.050.mp3,Ceyx azureus,ceyx_azureus,project_data_gcp,duplicate_metadata_record,Medium
+region_31.200-33.200.mp3,project_data_gcp/Lalage leucomela/region_31.200-33.200.mp3,Lalage leucomela,lalage_leucomela,project_data_gcp,duplicate_metadata_record,Medium
+region_5.200-7.200.mp3,project_data_gcp/Lalage leucomela/region_5.200-7.200.mp3,Lalage leucomela,lalage_leucomela,project_data_gcp,duplicate_metadata_record,Medium
+region_32.100-34.100.mp3,project_data_gcp/Uperoleia altissima/region_32.100-34.100.mp3,Uperoleia altissima,uperoleia_altissima,project_data_gcp,duplicate_metadata_record,Medium
+region_29.700-31.700.mp3,project_data_gcp/Uperoleia altissima/region_29.700-31.700.mp3,Uperoleia altissima,uperoleia_altissima,project_data_gcp,duplicate_metadata_record,Medium
+region_30.100-32.100.mp3,project_data_gcp/Uperoleia altissima/region_30.100-32.100.mp3,Uperoleia altissima,uperoleia_altissima,project_data_gcp,duplicate_metadata_record,Medium
+XC181330 - Red-browed Pardalote - Pardalotus rubricatus rubricatus.mp3,XC181330 - Red-browed Pardalote - Pardalotus rubricatus rubricatus.mp3,unknown,unknown,unknown,hash_read_error,Medium
+XC143502 - Brown Gerygone - Gerygone mouki richmondi.mp3,XC143502 - Brown Gerygone - Gerygone mouki richmondi.mp3,unknown,unknown,unknown,hash_read_error,Medium
+XC36630 - Red-browed Pardalote - Pardalotus rubricatus.mp3,XC36630 - Red-browed Pardalote - Pardalotus rubricatus.mp3,unknown,unknown,unknown,hash_read_error,Medium
+XC550699 - Rose Robin - Petroica rosea.mp3,XC550699 - Rose Robin - Petroica rosea.mp3,unknown,unknown,unknown,hash_read_error,Medium
+XC350439 - Rose Robin - Petroica rosea.mp3,XC350439 - Rose Robin - Petroica rosea.mp3,unknown,unknown,unknown,hash_read_error,Medium
+region_0.500-2.499.wav,project_data_gcp/Capra Hircus/region_0.500-2.499.wav,Capra Hircus,capra_hircus,project_data_gcp,hash_read_error,Medium
+region_0.400-2.399.wav,project_data_gcp/Capra Hircus/region_0.400-2.399.wav,Capra Hircus,capra_hircus,project_data_gcp,hash_read_error,Medium
+region_3.149-4.448.wav,project_data_gcp/Capra Hircus/region_3.149-4.448.wav,Capra Hircus,capra_hircus,project_data_gcp,hash_read_error,Medium
+region_0.300-1.500.mp3,project_data_gcp/Pitta iris/region_0.300-1.500.mp3,Pitta iris,pitta_iris,project_data_gcp,hash_read_error,Medium
+region_6.100-8.100.mp3,project_data_gcp/Pitta iris/region_6.100-8.100.mp3,Pitta iris,pitta_iris,project_data_gcp,hash_read_error,Medium
+region_21.850-23.100.mp3,project_data_gcp/Pitta iris/region_21.850-23.100.mp3,Pitta iris,pitta_iris,project_data_gcp,hash_read_error,Medium
+XC554830.ogg,project_data_gcp/Asio_flammeus/XC554830.ogg,Asio_flammeus,asio_flammeus,project_data_gcp,hash_read_error,Medium
+XC666499.ogg,project_data_gcp/Asio_flammeus/XC666499.ogg,Asio_flammeus,asio_flammeus,project_data_gcp,hash_read_error,Medium
+XC522575.ogg,project_data_gcp/Asio_flammeus/XC522575.ogg,Asio_flammeus,asio_flammeus,project_data_gcp,hash_read_error,Medium
+region_11.250-13.250.mp3,project_data_gcp/Acanthiza reguloides/region_11.250-13.250.mp3,Acanthiza reguloides,acanthiza_reguloides,project_data_gcp,hash_read_error,Medium
+region_156.550-158.550.mp3,project_data_gcp/Acanthiza reguloides/region_156.550-158.550.mp3,Acanthiza reguloides,acanthiza_reguloides,project_data_gcp,hash_read_error,Medium
+region_13.600-14.150.mp3,project_data_gcp/Acanthiza reguloides/region_13.600-14.150.mp3,Acanthiza reguloides,acanthiza_reguloides,project_data_gcp,hash_read_error,Medium
+Ground_Parrot (12).mp3,project_data_gcp/Pezoporus wallicus/Ground_Parrot (12).mp3,Pezoporus wallicus,pezoporus_wallicus,project_data_gcp,hash_read_error,Medium
+Ground_Parrot (15).wav,project_data_gcp/Pezoporus wallicus/Ground_Parrot (15).wav,Pezoporus wallicus,pezoporus_wallicus,project_data_gcp,hash_read_error,Medium
+Ground_Parrot (15).mp3,project_data_gcp/Pezoporus wallicus/Ground_Parrot (15).mp3,Pezoporus wallicus,pezoporus_wallicus,project_data_gcp,hash_read_error,Medium
+region_32.100-34.100.mp3,project_data_gcp/Uperoleia altissima/region_32.100-34.100.mp3,Uperoleia altissima,uperoleia_altissima,project_data_gcp,hash_read_error,Medium
+region_29.700-31.700.mp3,project_data_gcp/Uperoleia altissima/region_29.700-31.700.mp3,Uperoleia altissima,uperoleia_altissima,project_data_gcp,hash_read_error,Medium
+region_30.100-32.100.mp3,project_data_gcp/Uperoleia altissima/region_30.100-32.100.mp3,Uperoleia altissima,uperoleia_altissima,project_data_gcp,hash_read_error,Medium
+XC190962.ogg,project_data_gcp/Spilopelia_chinensis/XC190962.ogg,Spilopelia_chinensis,spilopelia_chinensis,project_data_gcp,hash_read_error,Medium
+XC245917.ogg,project_data_gcp/Spilopelia_chinensis/XC245917.ogg,Spilopelia_chinensis,spilopelia_chinensis,project_data_gcp,hash_read_error,Medium
+XC153022.ogg,project_data_gcp/Spilopelia_chinensis/XC153022.ogg,Spilopelia_chinensis,spilopelia_chinensis,project_data_gcp,hash_read_error,Medium
+tony264-australia-4802329_1920.mp3,project_data_gcp/Spilopelia_chinensis/tony264-australia-4802329_1920.mp3,Spilopelia_chinensis,spilopelia_chinensis,project_data_gcp,hash_read_error,Medium
+region_10.900-12.750.mp3,project_data_gcp/Falco cenchroides/region_10.900-12.750.mp3,Falco cenchroides,falco_cenchroides,project_data_gcp,hash_read_error,Medium
+region_2.000-4.000.mp3,project_data_gcp/Falco cenchroides/region_2.000-4.000.mp3,Falco cenchroides,falco_cenchroides,project_data_gcp,hash_read_error,Medium
+region_3.000-4.950.wav,project_data_gcp/Falco cenchroides/region_3.000-4.950.wav,Falco cenchroides,falco_cenchroides,project_data_gcp,hash_read_error,Medium
+region_0.750-2.750.mp3,project_data_gcp/Stomiopera unicolor/region_0.750-2.750.mp3,Stomiopera unicolor,stomiopera_unicolor,project_data_gcp,hash_read_error,Medium
+region_17.950-19.300.mp3,project_data_gcp/Stomiopera unicolor/region_17.950-19.300.mp3,Stomiopera unicolor,stomiopera_unicolor,project_data_gcp,hash_read_error,Medium
+region_13.050-13.600.mp3,project_data_gcp/Stomiopera unicolor/region_13.050-13.600.mp3,Stomiopera unicolor,stomiopera_unicolor,project_data_gcp,hash_read_error,Medium
+region_29.200-31.200.wav,project_data_gcp/Lalage leucomela/region_29.200-31.200.wav,Lalage leucomela,lalage_leucomela,project_data_gcp,hash_read_error,Medium
+region_31.200-33.200.mp3,project_data_gcp/Lalage leucomela/region_31.200-33.200.mp3,Lalage leucomela,lalage_leucomela,project_data_gcp,hash_read_error,Medium
+region_5.200-7.200.mp3,project_data_gcp/Lalage leucomela/region_5.200-7.200.mp3,Lalage leucomela,lalage_leucomela,project_data_gcp,hash_read_error,Medium
+XC352831.ogg,project_data_gcp/Branta_bernical_nigricans/XC352831.ogg,Branta_bernical_nigricans,branta_bernical_nigricans,project_data_gcp,hash_read_error,Medium
+XC164608.ogg,project_data_gcp/Branta_bernical_nigricans/XC164608.ogg,Branta_bernical_nigricans,branta_bernical_nigricans,project_data_gcp,hash_read_error,Medium
+XC143518.ogg,project_data_gcp/Branta_bernical_nigricans/XC143518.ogg,Branta_bernical_nigricans,branta_bernical_nigricans,project_data_gcp,hash_read_error,Medium
+region_19.700-21.700.mp3,project_data_gcp/Ceyx azureus/region_19.700-21.700.mp3,Ceyx azureus,ceyx_azureus,project_data_gcp,hash_read_error,Medium
+region_15.700-17.700.mp3,project_data_gcp/Ceyx azureus/region_15.700-17.700.mp3,Ceyx azureus,ceyx_azureus,project_data_gcp,hash_read_error,Medium
+region_5.050-7.050.mp3,project_data_gcp/Ceyx azureus/region_5.050-7.050.mp3,Ceyx azureus,ceyx_azureus,project_data_gcp,hash_read_error,Medium
+region_10.350-12.350.mp3,project_data_gcp/Parvipsitta pusilla/region_10.350-12.350.mp3,Parvipsitta pusilla,parvipsitta_pusilla,project_data_gcp,hash_read_error,Medium
+pen_ash-little-pied-cormorant-7911240_1920.jpg,project_data_gcp/Parvipsitta pusilla/pen_ash-little-pied-cormorant-7911240_1920.jpg,Parvipsitta pusilla,parvipsitta_pusilla,project_data_gcp,hash_read_error,Medium
+region_16.300-18.300.mp3,project_data_gcp/Parvipsitta pusilla/region_16.300-18.300.mp3,Parvipsitta pusilla,parvipsitta_pusilla,project_data_gcp,hash_read_error,Medium
+region_19.650-20.500.mp3,project_data_gcp/Parvipsitta pusilla/region_19.650-20.500.mp3,Parvipsitta pusilla,parvipsitta_pusilla,project_data_gcp,hash_read_error,Medium
+region_0.500-2.499.wav,project_data_gcp/Capra Hircus/region_0.500-2.499.wav,Capra Hircus,capra_hircus,project_data_gcp,species_name_formatting,Low
+region_0.400-2.399.wav,project_data_gcp/Capra Hircus/region_0.400-2.399.wav,Capra Hircus,capra_hircus,project_data_gcp,species_name_formatting,Low
+region_3.149-4.448.wav,project_data_gcp/Capra Hircus/region_3.149-4.448.wav,Capra Hircus,capra_hircus,project_data_gcp,species_name_formatting,Low
+region_0.300-1.500.mp3,project_data_gcp/Pitta iris/region_0.300-1.500.mp3,Pitta iris,pitta_iris,project_data_gcp,species_name_formatting,Low
+region_6.100-8.100.mp3,project_data_gcp/Pitta iris/region_6.100-8.100.mp3,Pitta iris,pitta_iris,project_data_gcp,species_name_formatting,Low
+region_21.850-23.100.mp3,project_data_gcp/Pitta iris/region_21.850-23.100.mp3,Pitta iris,pitta_iris,project_data_gcp,species_name_formatting,Low
+XC554830.ogg,project_data_gcp/Asio_flammeus/XC554830.ogg,Asio_flammeus,asio_flammeus,project_data_gcp,species_name_formatting,Low
+XC666499.ogg,project_data_gcp/Asio_flammeus/XC666499.ogg,Asio_flammeus,asio_flammeus,project_data_gcp,species_name_formatting,Low
+XC522575.ogg,project_data_gcp/Asio_flammeus/XC522575.ogg,Asio_flammeus,asio_flammeus,project_data_gcp,species_name_formatting,Low
+region_11.250-13.250.mp3,project_data_gcp/Acanthiza reguloides/region_11.250-13.250.mp3,Acanthiza reguloides,acanthiza_reguloides,project_data_gcp,species_name_formatting,Low
+region_156.550-158.550.mp3,project_data_gcp/Acanthiza reguloides/region_156.550-158.550.mp3,Acanthiza reguloides,acanthiza_reguloides,project_data_gcp,species_name_formatting,Low
+region_13.600-14.150.mp3,project_data_gcp/Acanthiza reguloides/region_13.600-14.150.mp3,Acanthiza reguloides,acanthiza_reguloides,project_data_gcp,species_name_formatting,Low
+Ground_Parrot (12).mp3,project_data_gcp/Pezoporus wallicus/Ground_Parrot (12).mp3,Pezoporus wallicus,pezoporus_wallicus,project_data_gcp,species_name_formatting,Low
+Ground_Parrot (15).wav,project_data_gcp/Pezoporus wallicus/Ground_Parrot (15).wav,Pezoporus wallicus,pezoporus_wallicus,project_data_gcp,species_name_formatting,Low
+Ground_Parrot (15).mp3,project_data_gcp/Pezoporus wallicus/Ground_Parrot (15).mp3,Pezoporus wallicus,pezoporus_wallicus,project_data_gcp,species_name_formatting,Low
+region_32.100-34.100.mp3,project_data_gcp/Uperoleia altissima/region_32.100-34.100.mp3,Uperoleia altissima,uperoleia_altissima,project_data_gcp,species_name_formatting,Low
+region_29.700-31.700.mp3,project_data_gcp/Uperoleia altissima/region_29.700-31.700.mp3,Uperoleia altissima,uperoleia_altissima,project_data_gcp,species_name_formatting,Low
+region_30.100-32.100.mp3,project_data_gcp/Uperoleia altissima/region_30.100-32.100.mp3,Uperoleia altissima,uperoleia_altissima,project_data_gcp,species_name_formatting,Low
+XC190962.ogg,project_data_gcp/Spilopelia_chinensis/XC190962.ogg,Spilopelia_chinensis,spilopelia_chinensis,project_data_gcp,species_name_formatting,Low
+XC245917.ogg,project_data_gcp/Spilopelia_chinensis/XC245917.ogg,Spilopelia_chinensis,spilopelia_chinensis,project_data_gcp,species_name_formatting,Low
+XC153022.ogg,project_data_gcp/Spilopelia_chinensis/XC153022.ogg,Spilopelia_chinensis,spilopelia_chinensis,project_data_gcp,species_name_formatting,Low
+tony264-australia-4802329_1920.mp3,project_data_gcp/Spilopelia_chinensis/tony264-australia-4802329_1920.mp3,Spilopelia_chinensis,spilopelia_chinensis,project_data_gcp,species_name_formatting,Low
+region_10.900-12.750.mp3,project_data_gcp/Falco cenchroides/region_10.900-12.750.mp3,Falco cenchroides,falco_cenchroides,project_data_gcp,species_name_formatting,Low
+region_2.000-4.000.mp3,project_data_gcp/Falco cenchroides/region_2.000-4.000.mp3,Falco cenchroides,falco_cenchroides,project_data_gcp,species_name_formatting,Low
+region_3.000-4.950.wav,project_data_gcp/Falco cenchroides/region_3.000-4.950.wav,Falco cenchroides,falco_cenchroides,project_data_gcp,species_name_formatting,Low
+region_0.750-2.750.mp3,project_data_gcp/Stomiopera unicolor/region_0.750-2.750.mp3,Stomiopera unicolor,stomiopera_unicolor,project_data_gcp,species_name_formatting,Low
+region_17.950-19.300.mp3,project_data_gcp/Stomiopera unicolor/region_17.950-19.300.mp3,Stomiopera unicolor,stomiopera_unicolor,project_data_gcp,species_name_formatting,Low
+region_13.050-13.600.mp3,project_data_gcp/Stomiopera unicolor/region_13.050-13.600.mp3,Stomiopera unicolor,stomiopera_unicolor,project_data_gcp,species_name_formatting,Low
+region_29.200-31.200.wav,project_data_gcp/Lalage leucomela/region_29.200-31.200.wav,Lalage leucomela,lalage_leucomela,project_data_gcp,species_name_formatting,Low
+region_31.200-33.200.mp3,project_data_gcp/Lalage leucomela/region_31.200-33.200.mp3,Lalage leucomela,lalage_leucomela,project_data_gcp,species_name_formatting,Low
+region_5.200-7.200.mp3,project_data_gcp/Lalage leucomela/region_5.200-7.200.mp3,Lalage leucomela,lalage_leucomela,project_data_gcp,species_name_formatting,Low
+XC352831.ogg,project_data_gcp/Branta_bernical_nigricans/XC352831.ogg,Branta_bernical_nigricans,branta_bernical_nigricans,project_data_gcp,species_name_formatting,Low
+XC164608.ogg,project_data_gcp/Branta_bernical_nigricans/XC164608.ogg,Branta_bernical_nigricans,branta_bernical_nigricans,project_data_gcp,species_name_formatting,Low
+XC143518.ogg,project_data_gcp/Branta_bernical_nigricans/XC143518.ogg,Branta_bernical_nigricans,branta_bernical_nigricans,project_data_gcp,species_name_formatting,Low
+region_19.700-21.700.mp3,project_data_gcp/Ceyx azureus/region_19.700-21.700.mp3,Ceyx azureus,ceyx_azureus,project_data_gcp,species_name_formatting,Low
+region_15.700-17.700.mp3,project_data_gcp/Ceyx azureus/region_15.700-17.700.mp3,Ceyx azureus,ceyx_azureus,project_data_gcp,species_name_formatting,Low
+region_5.050-7.050.mp3,project_data_gcp/Ceyx azureus/region_5.050-7.050.mp3,Ceyx azureus,ceyx_azureus,project_data_gcp,species_name_formatting,Low
+region_10.350-12.350.mp3,project_data_gcp/Parvipsitta pusilla/region_10.350-12.350.mp3,Parvipsitta pusilla,parvipsitta_pusilla,project_data_gcp,species_name_formatting,Low
+pen_ash-little-pied-cormorant-7911240_1920.jpg,project_data_gcp/Parvipsitta pusilla/pen_ash-little-pied-cormorant-7911240_1920.jpg,Parvipsitta pusilla,parvipsitta_pusilla,project_data_gcp,species_name_formatting,Low
+region_16.300-18.300.mp3,project_data_gcp/Parvipsitta pusilla/region_16.300-18.300.mp3,Parvipsitta pusilla,parvipsitta_pusilla,project_data_gcp,species_name_formatting,Low
+region_19.650-20.500.mp3,project_data_gcp/Parvipsitta pusilla/region_19.650-20.500.mp3,Parvipsitta pusilla,parvipsitta_pusilla,project_data_gcp,species_name_formatting,Low
