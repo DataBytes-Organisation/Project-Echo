@@ -1,0 +1,17 @@
+# NOT a recommended preset because this is a reproduction of the ORIGINAL
+# unfixed SpecAugment settings found during the review (fixed pixel counts,
+# no total-time safety cap). Exists as an
+# experiment arm, and so the covering-most-timeframes flaw can be
+# reproduced for comparison purposes.
+# Selected via: python main.py augmentation=original_unfixed_reference
+
+_target_: torchvision.transforms.Compose
+transforms:
+  - _target_: augment.SpecAugment
+    p: 0.5
+    freq_mask_param: 30
+    time_mask_param: 80
+    n_freq_mask: 2
+    n_time_mask: 2
+    max_total_time_ratio: 1.0 # disables the new cap, to reproduce the original flaw
+    mask_value: "zero"

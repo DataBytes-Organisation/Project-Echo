@@ -1,0 +1,2 @@
+class_index,species,support,failed_files,precision,recall,f1_score,top_1_accuracy,top_3_accuracy,top_5_accuracy,mean_confidence,mean_inference_ms
+8,Aidemosyne modesta,0,0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0

@@ -1,0 +1,216 @@
+Command:
+  D:/Deakin/SIT374/Project-Echo/src/prototypes/engine/augmentation/.venv/Scripts/python.exe main.py system.audio_data_directory=C:/Users/Lenovo/AppData/Local/Temp/tmpafbcufbf/data system.background_noise_dir=C:/Users/Lenovo/AppData/Local/Temp/tmpafbcufbf/background_noise system.use_disk_cache=false hydra.run.dir=C:/Users/Lenovo/AppData/Local/Temp/tmpafbcufbf/outputs training.num_workers=0 training.device=cpu training.seed=0 training.distillation.enabled=false model=ghost_efficientnet_v2 training.epochs=2 training.batch_size=2
+
+Return code: 0
+
+--- stdout ---
+model:
+  name: ghost_efficientnet_v2_qat
+  norm_choice: freeze_bn
+  params:
+    model_name: ghost_efficientnet_v2
+    num_classes: ${data.num_classes}
+    use_qat: true
+    use_arcface: true
+    width_mult: 0.75
+    depth_mult: 1
+    drop_rate: 0.1
+teacher_model:
+  name: efficientnet_v2
+  params:
+    model_name: efficientnet_v2_s
+    pretrained: true
+    num_classes: ${data.num_classes}
+augmentation:
+  _target_: torchvision.transforms.Compose
+  transforms:
+  - _target_: augment.SpecAugment
+    p: 0.5
+    n_freq_mask: 2
+    n_time_mask: 2
+    freq_mask_ratio: 0.15
+    time_mask_ratio: 0.1
+    max_total_time_ratio: 0.4
+    mask_value: zero
+system:
+  audio_data_directory: C:/Users/Lenovo/AppData/Local/Temp/tmpafbcufbf/data
+  background_noise_dir: C:/Users/Lenovo/AppData/Local/Temp/tmpafbcufbf/background_noise
+  cache_directory: .cache
+  use_disk_cache: false
+data:
+  audio_clip_duration: 2
+  sample_rate: 48000
+  n_fft: 4096
+  hop_length: 480
+  n_mels: 384
+  fmin: 50
+  fmax: 14000
+  top_db: 80
+  train_split: 0.8
+  val_split: 0.2
+  num_classes: -1
+run:
+  pretrain: true
+  train: true
+  test: false
+  quantise: true
+  checkpoint_path: ./outputs/2025-08-23/18-50-17/best_efficientnet_v2_qat.pth
+training:
+  batch_size: 2
+  grad_accum_steps: 2
+  epochs: 2
+  learning_rate: 0.001
+  num_workers: 0
+  device: cpu
+  seed: 0
+  metric_mode: min
+  use_arcface: circle
+  arcface:
+    s: 30
+    m: 0.5
+  circle:
+    s: 80
+    m: 0.4
+  early_stopping_patience: 15
+  distillation:
+    enabled: false
+    teacher_model_path: best_EFF2_QAT_Circle.pth
+    criterion:
+      _target_: torch.nn.KLDivLoss
+      log_target: true
+      reduction: batchmean
+    alpha: 0.5
+    temperature: 3.0
+  criterion:
+    _target_: torch.nn.CrossEntropyLoss
+  optimizer:
+    _target_: torch.optim.AdamW
+    lr: ${training.learning_rate}
+    weight_decay: 0.01
+  scheduler:
+    _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
+    mode: min
+    factor: 0.1
+    patience: 10
+augmentations:
+  audio:
+    _target_: torch_audiomentations.Compose
+    transforms:
+    - _target_: torch_audiomentations.AddBackgroundNoise
+      background_paths: ${system.background_noise_dir}
+      min_snr_in_db: 10.0
+      max_snr_in_db: 30.0
+      p: 0.5
+      sample_rate: ${data.sample_rate}
+    - _target_: torch_audiomentations.Shift
+      output_type: tensor
+      mode: per_example
+      min_shift: -0.5
+      max_shift: 0.5
+      shift_unit: fraction
+      rollover: false
+      p: 0.2
+      sample_rate: ${data.sample_rate}
+    - _target_: torch_audiomentations.Gain
+      output_type: tensor
+      mode: per_example
+      min_gain_in_db: -6.0
+      max_gain_in_db: 6.0
+      p: 0.2
+      sample_rate: ${data.sample_rate}
+  image: ${augmentation}
+
+Saved class names to C:\Users\Lenovo\AppData\Local\Temp\tmpafbcufbf\outputs\class_names.txt
+Splitting dataset with stratification (Val split: 0.2)...
+Total Training samples: 15
+Total Validation samples: 3
+Applying: FREEZE_BN. Setting all BatchNorm layers to eval() mode.
+Model fusion completed successfully.
+=================================================================
+Model Summary: GraphModule
+-----------------------------------------------------------------
+Total Parameters              : 4,842,224
+Trainable Parameters          : 4,785,446
+Non-trainable Parameters      : 56,778
+Estimated Model Size (MB)     : 19.96
+=================================================================
+None
+
+Training complete. Best model from epoch 1 saved to C:\Users\Lenovo\AppData\Local\Temp\tmpafbcufbf\outputs\best_ghost_efficientnet_v2_qat.pth
+Loading best model weights...
+Best model loaded successfully.
+
+--- stderr ---
+D:\Deakin\SIT374\Project-Echo\src\prototypes\engine\augmentation\.venv\Lib\site-packages\torch_audiomentations\core\transforms_interface.py:76: FutureWarning: Transforms now expect an `output_type` argument that currently defaults to 'tensor', will default to 'dict' in v0.12, and will be removed in v0.13. Make sure to update your code to something like:
+  >>> augment = AddBackgroundNoise(..., output_type='dict')
+  >>> augmented_samples = augment(samples).samples
+  warnings.warn(
+D:\Deakin\SIT374\Project-Echo\src\prototypes\engine\augmentation\.venv\Lib\site-packages\torch_audiomentations\core\composition.py:42: FutureWarning: Transforms now expect an `output_type` argument that currently defaults to 'tensor', will default to 'dict' in v0.12, and will be removed in v0.13. Make sure to update your code to something like:
+  >>> augment = Compose(..., output_type='dict')
+  >>> augmented_samples = augment(samples).samples
+  warnings.warn(
+D:\Deakin\SIT374\Project-Echo\src\prototypes\engine\augmentation\.venv\Lib\site-packages\torch\ao\quantization\observer.py:246: UserWarning: Please use quant_min and quant_max to specify the range for observers.                     reduce_range will be deprecated in a future release of PyTorch.
+  warnings.warn(
+
+Training Progress:   0%|          | 0/22 [00:00<?, ?it/s]
+Epoch 1/2:   0%|          | 0/22 [00:00<?, ?it/s]        D:\Deakin\SIT374\Project-Echo\src\prototypes\engine\augmentation\.venv\Lib\site-packages\torch\utils\data\dataloader.py:666: UserWarning: 'pin_memory' argument is set as true but no accelerator is found, then device pinned memory won't be used.
+  warnings.warn(warn_msg)
+D:\Deakin\SIT374\Project-Echo\src\prototypes\engine\augmentation\.venv\Lib\site-packages\torch_audiomentations\utils\io.py:92: UserWarning: torchaudio._backend.utils.info has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+  info = torchaudio.info(str(file_path))
+
+Epoch 1/2:   0%|          | 0/22 [00:00<?, ?it/s, phase=train, best_metric=inf, batch_loss=16.6931]
+Epoch 1/2:   5%|4         | 1/22 [00:00<00:15,  1.34it/s, phase=train, best_metric=inf, batch_loss=16.6931]
+Epoch 1/2:   5%|4         | 1/22 [00:01<00:15,  1.34it/s, phase=train, best_metric=inf, batch_loss=16.6931]
+Epoch 1/2:   9%|9         | 2/22 [00:01<00:14,  1.35it/s, phase=train, best_metric=inf, batch_loss=16.6931]
+Epoch 1/2:   9%|9         | 2/22 [00:02<00:14,  1.35it/s, phase=train, best_metric=inf, batch_loss=16.6931]
+Epoch 1/2:  14%|#3        | 3/22 [00:02<00:13,  1.41it/s, phase=train, best_metric=inf, batch_loss=16.6931]
+Epoch 1/2:  14%|#3        | 3/22 [00:02<00:13,  1.41it/s, phase=train, best_metric=inf, batch_loss=16.6931]
+Epoch 1/2:  18%|#8        | 4/22 [00:02<00:13,  1.37it/s, phase=train, best_metric=inf, batch_loss=16.6931]
+Epoch 1/2:  18%|#8        | 4/22 [00:03<00:13,  1.37it/s, phase=train, best_metric=inf, batch_loss=16.6931]
+Epoch 1/2:  23%|##2       | 5/22 [00:03<00:12,  1.40it/s, phase=train, best_metric=inf, batch_loss=16.6931]
+Epoch 1/2:  23%|##2       | 5/22 [00:04<00:12,  1.40it/s, phase=train, best_metric=inf, batch_loss=16.6931]
+Epoch 1/2:  27%|##7       | 6/22 [00:04<00:11,  1.38it/s, phase=train, best_metric=inf, batch_loss=16.6931]
+Epoch 1/2:  27%|##7       | 6/22 [00:05<00:11,  1.38it/s, phase=train, best_metric=inf, batch_loss=16.6931]
+Epoch 1/2:  32%|###1      | 7/22 [00:05<00:10,  1.38it/s, phase=train, best_metric=inf, batch_loss=16.6931]
+Epoch 1/2:  32%|###1      | 7/22 [00:05<00:10,  1.38it/s, phase=train, best_metric=inf, batch_loss=16.6931]
+Epoch 1/2:  36%|###6      | 8/22 [00:05<00:09,  1.44it/s, phase=train, best_metric=inf, batch_loss=16.6931]D:\Deakin\SIT374\Project-Echo\src\prototypes\engine\augmentation\.venv\Lib\site-packages\torch\utils\data\dataloader.py:666: UserWarning: 'pin_memory' argument is set as true but no accelerator is found, then device pinned memory won't be used.
+  warnings.warn(warn_msg)
+
+Epoch 1/2:  36%|###6      | 8/22 [00:06<00:09,  1.44it/s, phase=val, best_metric=inf, batch_loss=16.6931]  
+Epoch 1/2:  41%|####      | 9/22 [00:06<00:07,  1.66it/s, phase=val, best_metric=inf, batch_loss=16.6931]
+Epoch 1/2:  41%|####      | 9/22 [00:06<00:07,  1.66it/s, phase=val, best_metric=inf, batch_loss=16.6931]
+Epoch 1/2:  45%|####5     | 10/22 [00:06<00:06,  1.95it/s, phase=val, best_metric=inf, batch_loss=16.6931]
+Epoch 1/2:  45%|####5     | 10/22 [00:06<00:06,  1.95it/s, phase=val, best_metric=inf, batch_loss=16.6931]
+Epoch 1/2:  50%|#####     | 11/22 [00:06<00:04,  2.22it/s, phase=val, best_metric=inf, batch_loss=16.6931]
+Epoch 1/2:  50%|#####     | 11/22 [00:06<00:04,  2.22it/s, phase=val, best_metric=1.0986, batch_loss=16.6931, train_loss=16.6931, train_acc=0.0000, val_loss=1.0986, val_acc=0.3333]
+Epoch 2/2:  50%|#####     | 11/22 [00:06<00:04,  2.22it/s, phase=val, best_metric=1.0986, batch_loss=16.6931, train_loss=16.6931, train_acc=0.0000, val_loss=1.0986, val_acc=0.3333]D:\Deakin\SIT374\Project-Echo\src\prototypes\engine\augmentation\.venv\Lib\site-packages\torch\utils\data\dataloader.py:666: UserWarning: 'pin_memory' argument is set as true but no accelerator is found, then device pinned memory won't be used.
+  warnings.warn(warn_msg)
+
+Epoch 2/2:  50%|#####     | 11/22 [00:07<00:04,  2.22it/s, phase=train, best_metric=1.0986, batch_loss=16.6931, train_loss=16.6931, train_acc=0.0000, val_loss=1.0986, val_acc=0.3333]
+Epoch 2/2:  55%|#####4    | 12/22 [00:07<00:05,  1.72it/s, phase=train, best_metric=1.0986, batch_loss=16.6931, train_loss=16.6931, train_acc=0.0000, val_loss=1.0986, val_acc=0.3333]D:\Deakin\SIT374\Project-Echo\src\prototypes\engine\augmentation\.venv\Lib\site-packages\torch_audiomentations\utils\io.py:92: UserWarning: torchaudio._backend.utils.info has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+  info = torchaudio.info(str(file_path))
+
+Epoch 2/2:  55%|#####4    | 12/22 [00:08<00:05,  1.72it/s, phase=train, best_metric=1.0986, batch_loss=16.6931, train_loss=16.6931, train_acc=0.0000, val_loss=1.0986, val_acc=0.3333]
+Epoch 2/2:  59%|#####9    | 13/22 [00:08<00:05,  1.59it/s, phase=train, best_metric=1.0986, batch_loss=16.6931, train_loss=16.6931, train_acc=0.0000, val_loss=1.0986, val_acc=0.3333]
+Epoch 2/2:  59%|#####9    | 13/22 [00:09<00:05,  1.59it/s, phase=train, best_metric=1.0986, batch_loss=16.6931, train_loss=16.6931, train_acc=0.0000, val_loss=1.0986, val_acc=0.3333]
+Epoch 2/2:  64%|######3   | 14/22 [00:09<00:05,  1.56it/s, phase=train, best_metric=1.0986, batch_loss=16.6931, train_loss=16.6931, train_acc=0.0000, val_loss=1.0986, val_acc=0.3333]
+Epoch 2/2:  64%|######3   | 14/22 [00:09<00:05,  1.56it/s, phase=train, best_metric=1.0986, batch_loss=16.6931, train_loss=16.6931, train_acc=0.0000, val_loss=1.0986, val_acc=0.3333]
+Epoch 2/2:  68%|######8   | 15/22 [00:09<00:04,  1.49it/s, phase=train, best_metric=1.0986, batch_loss=16.6931, train_loss=16.6931, train_acc=0.0000, val_loss=1.0986, val_acc=0.3333]
+Epoch 2/2:  68%|######8   | 15/22 [00:10<00:04,  1.49it/s, phase=train, best_metric=1.0986, batch_loss=16.6931, train_loss=16.6931, train_acc=0.0000, val_loss=1.0986, val_acc=0.3333]
+Epoch 2/2:  73%|#######2  | 16/22 [00:10<00:04,  1.47it/s, phase=train, best_metric=1.0986, batch_loss=16.6931, train_loss=16.6931, train_acc=0.0000, val_loss=1.0986, val_acc=0.3333]
+Epoch 2/2:  73%|#######2  | 16/22 [00:11<00:04,  1.47it/s, phase=train, best_metric=1.0986, batch_loss=16.6931, train_loss=16.6931, train_acc=0.0000, val_loss=1.0986, val_acc=0.3333]
+Epoch 2/2:  77%|#######7  | 17/22 [00:11<00:03,  1.44it/s, phase=train, best_metric=1.0986, batch_loss=16.6931, train_loss=16.6931, train_acc=0.0000, val_loss=1.0986, val_acc=0.3333]
+Epoch 2/2:  77%|#######7  | 17/22 [00:11<00:03,  1.44it/s, phase=train, best_metric=1.0986, batch_loss=16.6931, train_loss=16.6931, train_acc=0.0000, val_loss=1.0986, val_acc=0.3333]
+Epoch 2/2:  82%|########1 | 18/22 [00:11<00:02,  1.40it/s, phase=train, best_metric=1.0986, batch_loss=16.6931, train_loss=16.6931, train_acc=0.0000, val_loss=1.0986, val_acc=0.3333]
+Epoch 2/2:  82%|########1 | 18/22 [00:12<00:02,  1.40it/s, phase=train, best_metric=1.0986, batch_loss=16.6931, train_loss=16.6931, train_acc=0.0000, val_loss=1.0986, val_acc=0.3333]
+Epoch 2/2:  86%|########6 | 19/22 [00:12<00:01,  1.51it/s, phase=train, best_metric=1.0986, batch_loss=16.6931, train_loss=16.6931, train_acc=0.0000, val_loss=1.0986, val_acc=0.3333]D:\Deakin\SIT374\Project-Echo\src\prototypes\engine\augmentation\.venv\Lib\site-packages\torch\utils\data\dataloader.py:666: UserWarning: 'pin_memory' argument is set as true but no accelerator is found, then device pinned memory won't be used.
+  warnings.warn(warn_msg)
+
+Epoch 2/2:  86%|########6 | 19/22 [00:12<00:01,  1.51it/s, phase=val, best_metric=1.0986, batch_loss=16.6931, train_loss=16.6931, train_acc=0.0000, val_loss=1.0986, val_acc=0.3333]  
+Epoch 2/2:  91%|######### | 20/22 [00:12<00:01,  1.72it/s, phase=val, best_metric=1.0986, batch_loss=16.6931, train_loss=16.6931, train_acc=0.0000, val_loss=1.0986, val_acc=0.3333]
+Epoch 2/2:  91%|######### | 20/22 [00:13<00:01,  1.72it/s, phase=val, best_metric=1.0986, batch_loss=16.6931, train_loss=16.6931, train_acc=0.0000, val_loss=1.0986, val_acc=0.3333]
+Epoch 2/2:  95%|#########5| 21/22 [00:13<00:00,  2.00it/s, phase=val, best_metric=1.0986, batch_loss=16.6931, train_loss=16.6931, train_acc=0.0000, val_loss=1.0986, val_acc=0.3333]
+Epoch 2/2:  95%|#########5| 21/22 [00:13<00:00,  2.00it/s, phase=val, best_metric=1.0986, batch_loss=16.6931, train_loss=16.6931, train_acc=0.0000, val_loss=1.0986, val_acc=0.3333]
+Epoch 2/2: 100%|##########| 22/22 [00:13<00:00,  2.26it/s, phase=val, best_metric=1.0986, batch_loss=16.6931, train_loss=16.6931, train_acc=0.0000, val_loss=1.0986, val_acc=0.3333]
+Epoch 2/2: 100%|##########| 22/22 [00:13<00:00,  2.26it/s, phase=val, best_metric=1.0986, batch_loss=16.6931, train_loss=16.6931, train_acc=0.0000, val_loss=1.0986, val_acc=0.3333]
+Epoch 2/2: 100%|##########| 22/22 [00:13<00:00,  1.63it/s, phase=val, best_metric=1.0986, batch_loss=16.6931, train_loss=16.6931, train_acc=0.0000, val_loss=1.0986, val_acc=0.3333]

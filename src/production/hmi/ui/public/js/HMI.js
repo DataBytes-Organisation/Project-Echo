@@ -15,6 +15,16 @@
 import { showToast, getApiErrorMessage, withRetry } from "./HMI-utils.js";
 import { getAudioRecorder } from "./audio_recorder.js";
 import {
+  AudioDecoder,
+  SpectrogramView,
+  decodeFloat32PcmBase64,
+} from "./spectrogram.js";
+import {
+  AnimalSpectrogramWorkflow,
+  LatestSourceGuard,
+  MicrophoneSpectrogramWorkflow,
+} from "./spectrogram-workflow.js";
+import {
   retrieveTruthEventsInTimeRange,
   retrieveVocalizationEventsInTimeRange,
   retrieveMicrophones,
@@ -32,11 +42,11 @@ import { addIoTNodesToMap } from "./nodes-overlay.js";
 // Constants
 // ─────────────────────────────────────────────────────────────────────────────
 
-const EARTH_RADIUS        = 6371000;
-const MIC_DETECTION_RANGE = 300;
-const MAX_RECORDING_TIME_S = "20";
-const DEG_TO_RAD          = Math.PI / 180;
-const RAD_TO_DEG          = 180 / Math.PI;
+const EARTH_RADIUS         = 6371000;
+const MIC_DETECTION_RANGE  = 300;
+const MAX_RECORDING_SECONDS = 20;
+const DEG_TO_RAD           = Math.PI / 180;
+const RAD_TO_DEG           = 180 / Math.PI;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Module-level state
@@ -80,6 +90,7 @@ var current_mic_lon  = 0.0;
 var current_mic_id   = "";
 
 var activeAudioNode     = null;
+var activeAudioContext  = null;
 var audioAnimTimeout    = null;
 var playNextTrack       = false;
 
@@ -93,11 +104,25 @@ var durationTimer        = null;
 var playNextRecordedTrack         = false;
 var recordingPlaybackAnimTimeout  = null;
 var audioRecordingElement         = null;
+var stopRecordingInProgress       = false;
+var lastBrowserRecordingBlob      = null;
+var lastBrowserRecordingUrl       = null;
+var lastRecordingDurationLabel    = null;
+var lastRecordingSamples          = null;
+var lastRecordingSampleRate       = 44100;
+var playbackSourceNode            = null;
+var playbackAudioContext          = null;
 
-var audioContext    = null;
+var recordingPlaybackContext = null;
 var a_source        = null;
 var decodedAudioStore = null;
 var fileContent     = null;
+var microphoneSourceGuard = new LatestSourceGuard();
+var selectedFileObjectUrl = null;
+var recordedAudioObjectUrl = null;
+
+var animalSpectrogramWorkflow = null;
+var microphoneSpectrogramWorkflow = null;
 
 export var animal_toggled = false;
 
@@ -106,13 +131,184 @@ export var animal_toggled = false;
 // ─────────────────────────────────────────────────────────────────────────────
 
 function getDurationTag()       { return document.getElementById("recording_duration"); }
-function getAudioElement()      { return document.getElementsByClassName("audio-element")[0] || null; }
+function getAudioElement()      { return document.getElementById("audioElem"); }
 function getAudioElementSource(){ const a = getAudioElement(); return a ? a.getElementsByTagName("source")[0] || null : null; }
-function getPlaybackIndicator() { return document.getElementsByClassName("playback_indicator")[0] || null; }
+function getPlaybackIndicator() { return document.getElementById("audio_playback_indicator"); }
 function getRecordButton()      { return document.getElementById("record_audio_button"); }
-function getRecordingControls() { return document.getElementsByClassName("recording_controls")[0] || null; }
+function getStopButton()        { return document.getElementById("stop_recording_button"); }
+function getCancelButton()      { return document.getElementById("cancel_recording_button"); }
+function getPlayButton()        { return document.getElementById("frb2-play-button"); }
+function getPlayLabel()         { return document.getElementById("frb2-play-label"); }
+function getLiveStatus()        { return document.getElementById("frb2-live-status"); }
+function getStatusLabel()       { return document.getElementById("frb2-status-label"); }
 function getFileInput()         { return document.getElementById("fileInput"); }
 function getAudioElemForRecordedPlayback() { return document.getElementById("audioElem"); }
+function getRecordingPlaybackStatus() { return document.getElementById("recording_playback_status"); }
+
+function setRecordingPlaybackStatus(message) {
+  const status = getRecordingPlaybackStatus();
+  if (status) status.textContent = message;
+}
+
+function setLiveRecordingState(state, label) {
+  const live = getLiveStatus();
+  const statusLabel = getStatusLabel();
+  if (live) live.setAttribute("data-state", state);
+  if (statusLabel && label) statusLabel.textContent = label;
+}
+
+function setRecordingActionState(isRecording) {
+  const recordBtn = getRecordButton();
+  const stopBtn = getStopButton();
+  const cancelBtn = getCancelButton();
+  if (recordBtn) recordBtn.disabled = !!isRecording;
+  if (stopBtn) stopBtn.disabled = !isRecording;
+  if (cancelBtn) cancelBtn.disabled = !isRecording;
+}
+
+function setPlayEnabled(enabled) {
+  const playBtn = getPlayButton();
+  if (playBtn) playBtn.disabled = !enabled;
+}
+
+function setPlayButtonPlaying(isPlaying) {
+  const playBtn = getPlayButton();
+  const playLabel = getPlayLabel();
+  if (playBtn) playBtn.classList.toggle("is-playing", !!isPlaying);
+  if (playLabel) playLabel.textContent = isPlaying ? "Pause" : "Play recording";
+}
+
+function clampRecordingSamples(samples, sampleRate) {
+  if (!samples || !samples.length) return samples;
+  const maxSamples = Math.floor(sampleRate * MAX_RECORDING_SECONDS);
+  if (samples.length <= maxSamples) return samples;
+  return samples.slice(0, maxSamples);
+}
+
+function clearBrowserRecordingPlayback() {
+  stopPcmPlayback();
+
+  if (lastBrowserRecordingUrl) {
+    URL.revokeObjectURL(lastBrowserRecordingUrl);
+    lastBrowserRecordingUrl = null;
+  }
+  lastBrowserRecordingBlob = null;
+  lastRecordingDurationLabel = null;
+  lastRecordingSamples = null;
+  lastRecordingSampleRate = 44100;
+
+  const audioEl = getAudioElemForRecordedPlayback();
+  if (audioEl) {
+    audioEl.pause();
+    audioEl.removeAttribute("src");
+    while (audioEl.firstChild) audioEl.removeChild(audioEl.firstChild);
+  }
+
+  setPlayEnabled(false);
+  setPlayButtonPlaying(false);
+  setRecordingPlaybackStatus("No recording yet. Press Record, then Stop.");
+}
+
+function prepareBrowserRecordingPlayback(result, durationLabel) {
+  lastRecordingDurationLabel = durationLabel || null;
+  const rawSamples = result && result.samples ? result.samples : null;
+  lastRecordingSampleRate = (result && result.sampleRate) || 44100;
+  lastRecordingSamples = clampRecordingSamples(rawSamples, lastRecordingSampleRate);
+  lastBrowserRecordingBlob = (result && result.blob) ? result.blob : (result instanceof Blob ? result : null);
+
+  // Keep a blob URL around for optional native player, but replay uses PCM.
+  if (lastBrowserRecordingBlob) {
+    if (lastBrowserRecordingUrl) URL.revokeObjectURL(lastBrowserRecordingUrl);
+    lastBrowserRecordingUrl = URL.createObjectURL(lastBrowserRecordingBlob);
+    const audioEl = getAudioElemForRecordedPlayback();
+    if (audioEl) {
+      audioEl.src = lastBrowserRecordingUrl;
+    }
+  }
+
+  const hasClip = !!(lastRecordingSamples && lastRecordingSamples.length);
+  setPlayEnabled(hasClip);
+  setPlayButtonPlaying(false);
+
+  const durationText = durationLabel ? ` (${durationLabel})` : "";
+  setRecordingPlaybackStatus(
+    hasClip
+      ? "Recording ready" + durationText + ". Press the green play button to listen."
+      : "Recording finished, but no audio was captured. Try again."
+  );
+}
+
+function stopPcmPlayback() {
+  try {
+    if (playbackSourceNode) {
+      playbackSourceNode.onended = null;
+      playbackSourceNode.stop();
+    }
+  } catch (_err) { /* ignore */ }
+  playbackSourceNode = null;
+
+  if (playbackAudioContext) {
+    playbackAudioContext.close().catch(() => {});
+    playbackAudioContext = null;
+  }
+}
+
+function playPcmRecording() {
+  if (!lastRecordingSamples || !lastRecordingSamples.length) {
+    return Promise.reject(new Error("No PCM samples available"));
+  }
+
+  stopPcmPlayback();
+
+  const AudioCtx = window.AudioContext || window.webkitAudioContext;
+  const ctx = new AudioCtx();
+  playbackAudioContext = ctx;
+
+  const buffer = ctx.createBuffer(1, lastRecordingSamples.length, lastRecordingSampleRate);
+  buffer.getChannelData(0).set(lastRecordingSamples);
+
+  const source = ctx.createBufferSource();
+  playbackSourceNode = source;
+  source.buffer = buffer;
+  source.connect(ctx.destination);
+
+  return ctx.resume().then(() => {
+    source.start(0);
+    return new Promise((resolve) => {
+      source.onended = () => {
+        playbackSourceNode = null;
+        resolve();
+      };
+    });
+  });
+}
+
+function revokeObjectUrl(url) {
+  if (url) URL.revokeObjectURL(url);
+}
+
+function initializeSpectrogramWorkflows() {
+  if (!animalSpectrogramWorkflow) {
+    const animalRoot = document.getElementById("animal-spectrogram");
+    if (animalRoot) {
+      animalSpectrogramWorkflow = new AnimalSpectrogramWorkflow({
+        decodePcm: decodeFloat32PcmBase64,
+        retrieveAudio,
+        view: new SpectrogramView(animalRoot),
+      });
+    }
+  }
+
+  if (!microphoneSpectrogramWorkflow) {
+    const microphoneRoot = document.getElementById("microphone-spectrogram");
+    if (microphoneRoot) {
+      microphoneSpectrogramWorkflow = new MicrophoneSpectrogramWorkflow({
+        decoder: new AudioDecoder(),
+        view: new SpectrogramView(microphoneRoot),
+      });
+    }
+  }
+}
 
 function isJQueryAvailable() {
   return typeof window !== "undefined" && typeof window.$ === "function";
@@ -285,6 +481,8 @@ export function getUTC() {
 }
 
 function initializeStaticDOMHooks() {
+  initializeSpectrogramWorkflows();
+
   const audioElement = getAudioElement();
   if (audioElement && !audioElement.dataset.hmiBound) {
     audioElement.onended = hidePlaybackIndicator;
@@ -294,25 +492,46 @@ function initializeStaticDOMHooks() {
   const fileInput = getFileInput();
   if (fileInput && !fileInput.dataset.hmiBound) {
     fileInput.dataset.hmiBound = "true";
-    fileInput.addEventListener("change", function (event) {
-      const selectedFile = event.target.files[0];
-      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    fileInput.addEventListener("change", async function (event) {
+      const selection = microphoneSourceGuard.begin();
+      const selectedFile = event.target.files?.[0] || null;
 
-      if (selectedFile) {
-        const reader = new FileReader();
-        reader.onload = function (loadEvent) {
-          fileContent = loadEvent.target.result;
-          audioContext.decodeAudioData(fileContent.slice(0), function (decodedAudio) {
-            decodedAudioStore = decodedAudio;
-            a_source = null;
+      if (!selectedFile) {
+        fileContent = null;
+        decodedAudioStore = null;
+        microphoneSpectrogramWorkflow?.clear();
+        revokeObjectUrl(selectedFileObjectUrl);
+        selectedFileObjectUrl = null;
+        return;
+      }
 
-            const audioElementRef = getAudioElement();
-            if (audioElementRef) {
-              audioElementRef.src = URL.createObjectURL(selectedFile);
-            }
-          });
-        };
-        reader.readAsArrayBuffer(selectedFile);
+      stopRecordingPlayback();
+      audioRecorder.audioBlobs = [];
+      revokeObjectUrl(selectedFileObjectUrl);
+      revokeObjectUrl(recordedAudioObjectUrl);
+      selectedFileObjectUrl = null;
+      recordedAudioObjectUrl = null;
+
+      const [encodedData, decodedAudio] = await Promise.all([
+        selectedFile.arrayBuffer().catch(() => null),
+        microphoneSpectrogramWorkflow?.load(selectedFile) ?? Promise.resolve(null),
+      ]);
+      if (!microphoneSourceGuard.isCurrent(selection)) return;
+
+      if (!encodedData || !decodedAudio) {
+        fileContent = null;
+        decodedAudioStore = null;
+        return;
+      }
+
+      fileContent = encodedData;
+      decodedAudioStore = decodedAudio;
+      a_source = null;
+      const audioElementRef = getAudioElement();
+      if (audioElementRef) {
+        revokeObjectUrl(selectedFileObjectUrl);
+        selectedFileObjectUrl = URL.createObjectURL(selectedFile);
+        audioElementRef.src = selectedFileObjectUrl;
       }
     });
   }
@@ -323,6 +542,27 @@ if (document.readyState === "loading") {
 } else {
   initializeStaticDOMHooks();
 }
+
+async function destroyAudioFeatures() {
+  microphoneSourceGuard.invalidate();
+  playNextTrack = false;
+  playNextRecordedTrack = false;
+  stopAudioPlayback();
+  stopRecordingPlayback();
+  revokeObjectUrl(selectedFileObjectUrl);
+  revokeObjectUrl(recordedAudioObjectUrl);
+  selectedFileObjectUrl = null;
+  recordedAudioObjectUrl = null;
+  if (audioRecorder.mediaRecorder) audioRecorder.cancel();
+  await Promise.allSettled([
+    animalSpectrogramWorkflow?.destroy(),
+    microphoneSpectrogramWorkflow?.destroy(),
+  ]);
+  animalSpectrogramWorkflow = null;
+  microphoneSpectrogramWorkflow = null;
+}
+
+window.addEventListener("beforeunload", () => { void destroyAudioFeatures(); }, { once: true });
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Sample data loader
@@ -355,18 +595,32 @@ export function initialiseHMI(hmiState) {
   showMapSpinner("Loading map data…");
   hideMapError();
 
+  // FR-A1: initialiseHMI() is re-entered by the map-error retry button
+  // (see showMapError(userMsg, () => initialiseHMI(hmiState)) below), on
+  // the same hmiState. createBasemap() itself is idempotent (see above),
+  // but everything in this block is one-time setup: it adds a brand new
+  // vector layer for every vocalisation/truth/mic slot and registers a new
+  // map click listener. None of that is guarded against being called
+  // twice, so without this check a retry would silently stack a second
+  // copy of every layer and a second click handler on top of the reused
+  // map. Only run it the first time hmiState has no basemap yet.
+  const isFirstInit = !hmiState.basemap;
+
   createBasemap(hmiState);
-  addVocalisationLayers(hmiState);
-  addTruthLayers(hmiState);
 
-  for (let i = 1; i < 26; i++) {
-    addVectorLayerTopDown(hmiState, `mic_layer_${i}`);
+  if (isFirstInit) {
+    addVocalisationLayers(hmiState);
+    addTruthLayers(hmiState);
+
+    for (let i = 1; i < 26; i++) {
+      addVectorLayerTopDown(hmiState, `mic_layer_${i}`);
+    }
+    addVectorLayerTopDown(hmiState, "mic_layer");
+
+    addAllTruthFeatures(hmiState);
+    addAllVocalizationFeatures(hmiState);
+    createMapClickEvent(hmiState);
   }
-  addVectorLayerTopDown(hmiState, "mic_layer");
-
-  addAllTruthFeatures(hmiState);
-  addAllVocalizationFeatures(hmiState);
-  createMapClickEvent(hmiState);
 
   // Task 7: withRetry wraps the microphone fetch.  routes.js already retries
   // the axios call; this outer withRetry handles cases where the call itself
@@ -376,11 +630,19 @@ export function initialiseHMI(hmiState) {
     delayMs: 2000,
     retryMessage: "Microphone load failed, retrying",
   })
-    .then((res) => {
+    .then(async (res) => {
       hideMapSpinner();
       updateMicrophoneLayer(hmiState, res.data);
       stepMicAnimation(hmiState);
-      addIoTNodesToMap(hmiState);
+
+      // FR-A1: await this instead of firing-and-forgetting it. Before,
+      // a failed node load rejected with nothing awaiting it (an unhandled
+      // rejection) while this .then() carried on straight to the "Map data
+      // loaded successfully" toast regardless. Awaiting it here means a
+      // node-load failure is caught by the .catch() below instead, so the
+      // success toast only fires once nodes have actually loaded.
+      await addIoTNodesToMap(hmiState);
+
       queueSimUpdate(hmiState);
       showToast("Map data loaded successfully", "success");
     })
@@ -624,48 +886,78 @@ export function muteRecordingPlaybackAnimation() {
   document.dispatchEvent(new CustomEvent("muteRecordingAnimation", { detail: { message: "mute animation" } }));
 }
 
-export function stopAudioPlayback() {
-  muteAudioAnimation();
+export function stopAudioPlayback(updateAnimation = true) {
+  if (updateAnimation) muteAudioAnimation();
   if (audioAnimTimeout) clearTimeout(audioAnimTimeout);
-  if (activeAudioNode !== null) activeAudioNode.stop();
+  audioAnimTimeout = null;
+  if (activeAudioNode !== null) {
+    try { activeAudioNode.stop(); } catch (_error) { /* Source may already have ended. */ }
+    activeAudioNode.disconnect();
+  }
   activeAudioNode = null;
+  if (activeAudioContext !== null) {
+    void activeAudioContext.close().catch(() => {});
+  }
+  activeAudioContext = null;
 }
 
-function playAudioString(audioDataString, sampleRate) {
-  const audioData = new Uint8Array(
-    atob(audioDataString).split("").map((char) => char.charCodeAt(0))
-  );
+function playDecodedAudio(decodedAudio) {
+  if (!decodedAudio || !playNextTrack) return;
+  stopAudioPlayback(false);
+  playNextTrack = true;
 
-  const localAudioContext = new AudioContext();
-  const audioBuffer       = localAudioContext.createBuffer(1, audioData.length / 2, sampleRate);
-  audioBuffer.copyToChannel(new Float32Array(audioData.buffer), 0);
-
-  activeAudioNode = localAudioContext.createBufferSource();
-  activeAudioNode.buffer = audioBuffer;
-  activeAudioNode.connect(localAudioContext.destination);
-
-  if (playNextTrack) {
-    activeAudioNode.start();
-    audioAnimTimeout = setTimeout(muteAudioAnimation, audioBuffer.duration * 1000);
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  const context = new AudioContextClass();
+  const channelCount = Math.max(1, decodedAudio.numberOfChannels || 1);
+  const audioBuffer = context.createBuffer(channelCount, decodedAudio.length, decodedAudio.sampleRate);
+  for (let channel = 0; channel < channelCount; channel += 1) {
+    audioBuffer.copyToChannel(decodedAudio.getChannelData(channel), channel);
   }
+
+  const source = context.createBufferSource();
+  source.buffer = audioBuffer;
+  source.connect(context.destination);
+  source.onended = () => {
+    if (activeAudioNode !== source) return;
+    if (audioAnimTimeout) clearTimeout(audioAnimTimeout);
+    audioAnimTimeout = null;
+    activeAudioNode = null;
+    activeAudioContext = null;
+    source.disconnect();
+    void context.close().catch(() => {});
+    muteAudioAnimation();
+  };
+  activeAudioContext = context;
+  activeAudioNode = source;
+  source.start();
+  audioAnimTimeout = setTimeout(muteAudioAnimation, audioBuffer.duration * 1000);
 }
 
 document.addEventListener("playAudio", function () {
   playNextTrack = true;
-  if (selectedVocalizationEventId !== null) {
-    retrieveAudio(selectedVocalizationEventId)
-      .then((res) => { playAudioString(res.data.audioClip, res.data.sampleRate); })
-      .catch((error) => {
-        console.error("Error loading audio:", error);
-        showToast(getApiErrorMessage(error, "Failed to load audio clip"), "error");
-      });
+  if (!animalSpectrogramWorkflow || selectedVocalizationEventId === null) {
+    muteAudioAnimation();
+    return;
   }
+  animalSpectrogramWorkflow.getSelectedAudio().then((decodedAudio) => {
+    if (!decodedAudio || !playNextTrack) {
+      muteAudioAnimation();
+      return;
+    }
+    playDecodedAudio(decodedAudio);
+  });
 });
 
 document.addEventListener("stopAudio", function () {
   playNextTrack = false;
   stopAudioPlayback();
 });
+
+function clearAnimalAudioSelection() {
+  selectedVocalizationEventId = null;
+  animalSpectrogramWorkflow?.clear();
+  stopAudioPlayback();
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Layer visibility
@@ -946,6 +1238,15 @@ function getOlDefaultInteractions(options) {
 }
 
 function createBasemap(hmiState) {
+  // FR-A1: initialiseHMI() can run more than once (the map-error retry
+  // button calls it again on the same hmiState). Reuse the existing
+  // ol.Map instead of constructing a second one on top of the same
+  // #basemap target — a second ol.Map would leave the first one's canvas,
+  // render loop and event listeners still attached underneath it.
+  if (hmiState.basemap) {
+    return hmiState.basemap;
+  }
+
   const basemap = new ol.Map({
     target: "basemap",
     featureEvents: true,
@@ -991,6 +1292,7 @@ function createMapClickEvent(hmiState) {
     const feature = hmiState.basemap.forEachFeatureAtPixel(evt.pixel, (f) => f);
 
     if (!feature) {
+      clearAnimalAudioSelection();
       safeHideJQuery("#animal-popup-content");
       safeHideJQuery("#mic-popup-content");
       safeHideJQuery("#node-popup-content");
@@ -1040,6 +1342,7 @@ function createMapClickEvent(hmiState) {
     }
 
     if (values.isMic) {
+      clearAnimalAudioSelection();
       active_mic_content.show();  default_mic_content.hide();
       active_node_content.hide(); default_node_content.show();
       active_content.hide();      default_content.show();
@@ -1070,6 +1373,7 @@ function createMapClickEvent(hmiState) {
       document.dispatchEvent(new CustomEvent("micToggled", { detail: { message: "Mic toggled:" } }));
 
     } else if (values.isNode) {
+      clearAnimalAudioSelection();
       active_node_content.show();  default_node_content.hide();
       active_mic_content.hide();   default_mic_content.show();
       active_content.hide();       default_content.show();
@@ -1091,16 +1395,24 @@ function createMapClickEvent(hmiState) {
       active_mic_content.hide();   default_mic_content.show();
       active_node_content.hide();  default_node_content.show();
 
-      if (values.eventId) selectedVocalizationEventId = values.eventId;
-
-      const audioHeader  = document.getElementById("audioHeader");
-      const audioControl = document.getElementById("audioControl");
+      const audioHeader  = document.getElementById("animalAudioHeader");
+      const audioControl = document.getElementById("animalAudioControl");
+      const spectrogram  = document.getElementById("animal-spectrogram");
       if (values.isAnimalMovement) {
+        clearAnimalAudioSelection();
         if (audioHeader)  audioHeader.style.display  = "none";
         if (audioControl) audioControl.style.display = "none";
+        if (spectrogram)  spectrogram.style.display  = "none";
       } else {
         if (audioHeader)  audioHeader.style.display  = "flex";
         if (audioControl) audioControl.style.display = "flex";
+        if (spectrogram)  spectrogram.style.display  = "block";
+        selectedVocalizationEventId = values.eventId || null;
+        if (selectedVocalizationEventId !== null) {
+          void animalSpectrogramWorkflow?.select(selectedVocalizationEventId);
+        } else {
+          animalSpectrogramWorkflow?.clear();
+        }
       }
 
       if (values.animalSpecies) {
@@ -1292,24 +1604,22 @@ function queueSimUpdate(hmiState) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function showRecordingControls() {
-  const recordButton     = getRecordButton();
-  const recordingControls = getRecordingControls();
-  if (!recordButton || !recordingControls) return;
-  recordButton.style.display = "none";
-  recordingControls.classList.remove("hide");
+  setRecordingActionState(true);
+  setLiveRecordingState("recording", "Recording…");
   initializeRecordingDuration();
 }
 
 export function hideRecordingControls() {
-  const recordButton     = getRecordButton();
-  const recordingControls = getRecordingControls();
-  if (!recordButton || !recordingControls) return;
-  recordButton.style.display = "block";
-  recordingControls.classList.add("hide");
-  clearInterval(durationTimer);
+  setRecordingActionState(false);
+  if (durationTimer) {
+    clearInterval(durationTimer);
+    durationTimer = null;
+  }
 }
 
-export function showRecordingNotSupportedOverlay() { /* implement if needed */ }
+export function showRecordingNotSupportedOverlay() {
+  showToast("Audio recording is not supported in this browser.", "error");
+}
 
 export function createSourceForAudioElement() {
   const audioElement = getAudioElement();
@@ -1330,6 +1640,7 @@ export function hidePlaybackIndicator() {
 export function testFunct() { console.log("Recording started 1"); }
 
 export function startAudioRecording() {
+  const sourceToken = microphoneSourceGuard.begin();
   const audioElement       = getAudioElement();
   const audioElementSource = getAudioElementSource();
 
@@ -1338,44 +1649,125 @@ export function startAudioRecording() {
     hidePlaybackIndicator();
   }
 
+  stopRecordingPlayback();
+  playNextRecordedTrack = false;
+  // Lock controls immediately to prevent rapid concurrent starts while
+  // permission/getUserMedia is still pending.
+  const recordBtn = getRecordButton();
+  const stopBtn = getStopButton();
+  const cancelBtn = getCancelButton();
+  if (recordBtn) recordBtn.disabled = true;
+  if (stopBtn) stopBtn.disabled = true;
+  if (cancelBtn) cancelBtn.disabled = true;
+  setLiveRecordingState("idle", "Requesting microphone permission…");
+
   audioRecorder
     .start()
     .then(() => {
+      if (!microphoneSourceGuard.isCurrent(sourceToken)) {
+        audioRecorder.cancel();
+        return;
+      }
+      fileContent = null;
+      decodedAudioStore = null;
+      microphoneSpectrogramWorkflow?.clear();
+      revokeObjectUrl(selectedFileObjectUrl);
+      revokeObjectUrl(recordedAudioObjectUrl);
+      selectedFileObjectUrl = null;
+      recordedAudioObjectUrl = null;
+      stopRecordingPlayback();
       audioRecordStartTime = new Date();
       showRecordingControls();
+      showToast("Recording started", "info");
     })
     .catch((error) => {
-      showToast("Audio recording failed: " + error.message, "error");
+      setLiveRecordingState("idle", "Ready to record");
+      setRecordingActionState(false);
 
       if (error.message.includes("mediaDevices API or getUserMedia method is not supported in this browser.")) {
         showRecordingNotSupportedOverlay();
       }
 
       const toastMap = {
-        NotAllowedError:  "Microphone permission was denied",
+        NotAllowedError:  "Microphone permission was denied. Allow mic access in your browser settings and try again.",
         NotFoundError:    "No microphone device found",
         NotReadableError: "Microphone is not available right now",
         SecurityError:    "Microphone access blocked for security reasons",
+        AbortError:       "Microphone access was interrupted",
         UnknownError:     "Unknown audio recording error",
       };
 
-      if (toastMap[error.name]) showToast(toastMap[error.name], "error");
+      showToast(
+        toastMap[error.name] || ("Audio recording failed: " + error.message),
+        "error"
+      );
     });
 }
 
 export function stopAudioRecording() {
+  const sourceToken = microphoneSourceGuard.begin();
   audioRecorder
     .stop()
-    .then(() => { playAudio(); hideRecordingControls(); })
+    .then(async (audioBlob) => {
+      hideRecordingControls();
+      if (!microphoneSourceGuard.isCurrent(sourceToken)) return;
+      fileContent = null;
+      const decodedAudio = await microphoneSpectrogramWorkflow?.load(audioBlob) || null;
+      if (!microphoneSourceGuard.isCurrent(sourceToken)) return;
+      decodedAudioStore = decodedAudio;
+      revokeObjectUrl(recordedAudioObjectUrl);
+      recordedAudioObjectUrl = URL.createObjectURL(audioBlob);
+      const audioElement = getAudioElemForRecordedPlayback();
+      if (audioElement) audioElement.src = recordedAudioObjectUrl;
+      if (!decodedAudioStore) {
+        showToast("Recorded audio could not be decoded", "error");
+      }
+    })
     .catch((error) => {
+      if (!microphoneSourceGuard.isCurrent(sourceToken)) return;
       showToast("Error stopping recording", "error");
       console.log("Stop recording error:", error.name);
     });
 }
 
 export function cancelAudioRecording() {
+  microphoneSourceGuard.invalidate();
   audioRecorder.cancel();
+  decodedAudioStore = null;
+  microphoneSpectrogramWorkflow?.clear();
   hideRecordingControls();
+  setLiveRecordingState("idle", "Recording cancelled");
+  showToast("Recording cancelled", "info");
+}
+
+/** FR-B2 replay via green play button (PCM / Web Audio). */
+export function playRecordingClip() {
+  if (!lastRecordingSamples || !lastRecordingSamples.length) {
+    showToast("No recording available to play. Record audio first.", "error");
+    return;
+  }
+
+  // Toggle pause
+  if (playbackSourceNode) {
+    stopPcmPlayback();
+    setPlayButtonPlaying(false);
+    setLiveRecordingState("idle", "Playback paused");
+    return;
+  }
+
+  setPlayButtonPlaying(true);
+  setLiveRecordingState("playing", "Playing recording");
+
+  playPcmRecording()
+    .then(() => {
+      setPlayButtonPlaying(false);
+      setLiveRecordingState("idle", "Playback finished");
+    })
+    .catch((err) => {
+      setPlayButtonPlaying(false);
+      setLiveRecordingState("idle", "Ready to record");
+      showToast("Unable to play recording: " + (err.message || "unknown error"), "error");
+    });
 }
 
 document.addEventListener("saveRecording",     function () { save(); });
@@ -1473,27 +1865,36 @@ function save() {
 document.addEventListener("playRecordedAudio",  function () { playNextRecordedTrack = true;  playAudio(); });
 document.addEventListener("stopRecordedAudio",  function () { playNextRecordedTrack = false; stopRecordingPlayback(); });
 
-function playRecording(recordedChunks) {
-  if (recordedChunks.length === 0) return;
+function playRecording(recordedChunksOrBlob) {
+  let blob = null;
 
-  const blob = new Blob(recordedChunks, { type: "audio/wav; codecs=MS_PCM" });
+  const mimeType = recordedChunks[0]?.type || "audio/webm";
+  const blob = new Blob(recordedChunks, { type: mimeType });
   if (blob.size === 0) return;
 
   audioRecordingElement = getAudioElemForRecordedPlayback();
   if (!audioRecordingElement) return;
 
-  audioRecordingElement.src = URL.createObjectURL(blob);
+  revokeObjectUrl(recordedAudioObjectUrl);
+  recordedAudioObjectUrl = URL.createObjectURL(blob);
+  audioRecordingElement.src = recordedAudioObjectUrl;
   audioRecordingElement.load();
 
   if (playNextRecordedTrack) {
     recordingPlaybackAnimTimeout = setTimeout(muteRecordingPlaybackAnimation, 10000);
+    audioRecordingElement.onended = () => {
+      if (recordingPlaybackAnimTimeout) clearTimeout(recordingPlaybackAnimTimeout);
+      recordingPlaybackAnimTimeout = null;
+      muteRecordingPlaybackAnimation();
+    };
     audioRecordingElement.play();
   }
 }
 
-function stopRecordingPlayback() {
-  muteRecordingPlaybackAnimation();
+function stopRecordingPlayback(updateAnimation = true) {
+  if (updateAnimation) muteRecordingPlaybackAnimation();
   if (recordingPlaybackAnimTimeout) clearTimeout(recordingPlaybackAnimTimeout);
+  recordingPlaybackAnimTimeout = null;
 
   if (a_source === null) {
     if (audioRecordingElement !== null) {
@@ -1501,22 +1902,59 @@ function stopRecordingPlayback() {
       audioRecordingElement.currentTime = 0;
     }
   } else {
-    a_source.stop();
+    try { a_source.stop(); } catch (_error) { /* Source may already have ended. */ }
+    a_source.disconnect();
     a_source = null;
+  }
+  if (recordingPlaybackContext !== null) {
+    void recordingPlaybackContext.close().catch(() => {});
+    recordingPlaybackContext = null;
   }
 }
 
 export function playAudio() {
-  if (!decodedAudioStore) { playRecording(audioRecorder.audioBlobs); return; }
+  // Mic-panel browser recordings take priority for FR-B2 replay.
+  if (lastBrowserRecordingBlob || (audioRecorder.audioBlobs && audioRecorder.audioBlobs.length > 0)) {
+    playRecording(lastBrowserRecordingBlob || audioRecorder.audioBlobs);
+    return;
+  }
 
-  audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  if (!decodedAudioStore) {
+    showToast("No recording available to play. Record audio first.", "error");
+    return;
+  }
 
   if (playNextRecordedTrack) {
-    recordingPlaybackAnimTimeout = setTimeout(muteRecordingPlaybackAnimation, 10000);
-    a_source = audioContext.createBufferSource();
-    a_source.buffer = decodedAudioStore;
-    a_source.connect(audioContext.destination);
-    a_source.start();
+    stopRecordingPlayback(false);
+    playNextRecordedTrack = true;
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    recordingPlaybackContext = new AudioContextClass();
+    const context = recordingPlaybackContext;
+    const channelCount = Math.max(1, decodedAudioStore.numberOfChannels || 1);
+    const audioBuffer = context.createBuffer(
+      channelCount,
+      decodedAudioStore.length,
+      decodedAudioStore.sampleRate
+    );
+    for (let channel = 0; channel < channelCount; channel += 1) {
+      audioBuffer.copyToChannel(decodedAudioStore.getChannelData(channel), channel);
+    }
+    recordingPlaybackAnimTimeout = setTimeout(muteRecordingPlaybackAnimation, audioBuffer.duration * 1000);
+    const source = context.createBufferSource();
+    source.buffer = audioBuffer;
+    source.connect(context.destination);
+    source.onended = () => {
+      if (a_source !== source) return;
+      if (recordingPlaybackAnimTimeout) clearTimeout(recordingPlaybackAnimTimeout);
+      recordingPlaybackAnimTimeout = null;
+      source.disconnect();
+      a_source = null;
+      recordingPlaybackContext = null;
+      void context.close().catch(() => {});
+      muteRecordingPlaybackAnimation();
+    };
+    a_source = source;
+    source.start();
   }
 }
 
@@ -1525,28 +1963,33 @@ export function playAudio() {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function initializeRecordingDuration() {
-  showRecordingDuration("00:00:00");
+  showRecordingDuration("00:00");
   durationTimer = setInterval(() => {
     showRecordingDuration(computeRecordingDuration(audioRecordStartTime));
-  }, 1000);
+  }, 250);
 }
 
 export function showRecordingDuration(duration) {
   const tag = getDurationTag();
   if (!tag) return;
-  tag.innerHTML = duration;
+  tag.textContent = duration;
   if (checkAudioDurationThreshold(duration)) stopAudioRecording();
 }
 
 export function checkAudioDurationThreshold(duration) {
-  return duration.split(":")[2] === MAX_RECORDING_TIME_S;
+  const parts = String(duration).split(":");
+  if (parts.length !== 2) return false;
+  const mins = Number(parts[0]);
+  const secs = Number(parts[1]);
+  if (Number.isNaN(mins) || Number.isNaN(secs)) return false;
+  return mins * 60 + secs >= MAX_RECORDING_SECONDS;
 }
 
 export function computeRecordingDuration(startTime) {
-  const delta = (new Date() - startTime) / 1000;
-  const secs  = Math.floor(delta % 60);
+  const delta = Math.max(0, (new Date() - startTime) / 1000);
   const mins  = Math.floor(delta / 60) % 60;
-  return "00:" + String(mins).padStart(2, "0") + ":" + String(secs).padStart(2, "0");
+  const secs  = Math.floor(delta % 60);
+  return String(mins).padStart(2, "0") + ":" + String(secs).padStart(2, "0");
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
