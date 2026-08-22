@@ -1,41 +1,28 @@
 import os
-# from Components.API.app.routers import add_csv_output_option, audio_upload_router
-from .routers import add_csv_output_option, audio_upload_router
-
-from fastapi import FastAPI, Body, HTTPException, status, APIRouter
+import json
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import species_predictor
-from app.routers import auth_router
-from app.routers import admin_budget, admin_services
-from fastapi.responses import Response, JSONResponse
-from fastapi.encoders import jsonable_encoder
-from pydantic import BaseModel, Field, EmailStr
-from bson import ObjectId
-from typing import Optional, List
-from app.routers import insights
-import datetime
-import pymongo
-import json 
 
-from app.routers import hmi, engine, sim, two_factor
-from app.routers import public
-app = FastAPI()
-
-# Add the CORS middleware
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:8080"],  # 可根据实际需求配置
+# Import all routers
+from app.routers import (
+    audio_upload_router,
+    species_predictor,
+    auth_router,
+    admin_budget,
+    admin_services,
+    insights,
+    hmi,
+    engine,
+    sim,
+    two_factor,
+    public,
+    iot,
+    sensors,
+    projects,
+    detections,
 )
-# Routers
-from .routers import add_csv_output_option, audio_upload_router
-from app.routers import species_predictor, auth_router, hmi, engine, sim, two_factor, public, iot, live, sensors #Websocket
 
-from app.routers import projects
-app.include_router(projects.router)
-
-from app.routers import hmi, engine, sim, iot
-
-# ✅ Add metadata here
+# Initialize FastAPI app with metadata
 app = FastAPI(
     title="Project Echo API",
     description="""
@@ -49,64 +36,42 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# ✅ CORS Middleware
+# Add CORS Middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Allow all origins
-
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-
-# app.include_router(hmi.router, tags=['hmi'], prefix='/hmi')
-# app.include_router(engine.router, tags=['engine'], prefix='/engine')
-# app.include_router(sim.router, tags=['sim'], prefix='/sim')
-# app.include_router(add_csv_output_option.router, tags=['csv'], prefix='/api')
-app.include_router(audio_upload_router.router, tags=['audio'], prefix='/api')
-
-
-# ✅ Include routers
+# Include all routers
 app.include_router(hmi.router, tags=['hmi'], prefix='/hmi')
 app.include_router(engine.router, tags=['engine'], prefix='/engine')
 app.include_router(sim.router, tags=['sim'], prefix='/sim')
-app.include_router(two_factor.router)
-app.include_router(admin_budget.router, tags=["admin"], prefix="/api")
-app.include_router(admin_services.router, tags=["admin"], prefix="/api")
-
-app.include_router(public.router, tags=['public'], prefix='/public')
-
-'''try:
-    file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'echo_config.json')
-    with open(file_path, 'r') as f:
-        echo_config = json.load(f)
-    print(f"Echo API echo_config successfully loaded", flush=True)
-except:
-    print(f"Could not API echo_config : {file_path}") 
-print(f" database names: {client.list_database_names()}")
-'''
-
 app.include_router(iot.router, tags=['iot'], prefix='/iot')
 app.include_router(sensors.router, tags=['sensors'], prefix='/sensors')
+app.include_router(public.router, tags=['public'], prefix='/public')
+
+# API prefixed routers
+app.include_router(audio_upload_router.router, tags=['audio'], prefix='/api')
+app.include_router(admin_budget.router, tags=["admin"], prefix="/api")
+app.include_router(admin_services.router, tags=["admin"], prefix="/api")
+app.include_router(auth_router.router, tags=["auth"], prefix="/api")
+
+# Unprefixed routers
+app.include_router(projects.router)
+app.include_router(two_factor.router)
 app.include_router(species_predictor.router, tags=["predict"])
-
-
-
-# ✅ Root endpoint
 app.include_router(insights.router, tags=["insights"])
+app.include_router(detections.router)
 
 # --- Root Endpoint ---
 @app.get("/", response_description="API Root")
 def show_home():
-    return 'Welcome to echo api, move to /docs for more'
     return 'Welcome to Project Echo API. Visit /docs for interactive documentation.'
 
-app.include_router(auth_router.router, tags=["auth"], prefix="/api")
-from app.routers import detections
-app.include_router(detections.router)
-
-# ✅ /openapi-export - fetch live OpenAPI spec
+# --- OpenAPI Spec Export Endpoints ---
 @app.get("/openapi-export", include_in_schema=False)
 async def get_openapi_spec():
     """
@@ -115,7 +80,6 @@ async def get_openapi_spec():
     """
     return app.openapi()
 
-# ✅ /spec/summary - for OpenAPI spec verification/debug
 @app.get("/spec/summary", tags=["debug"], include_in_schema=False)
 async def get_spec_summary():
     """
@@ -129,7 +93,6 @@ async def get_spec_summary():
         "tags": [tag.get("name") for tag in spec.get("tags", []) if "name" in tag]
     }
 
-# ✅ Save OpenAPI spec to file when app starts
 def export_openapi_to_file():
     """
     Saves the OpenAPI spec to a file on startup.
