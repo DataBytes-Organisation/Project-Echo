@@ -29,7 +29,8 @@
 html, body { margin:0; padding:0; font-family:var(--font); background:var(--page); color:var(--ink); }
 
 .sidebar{ width:250px; background:#WHITE; border-right:1px solid #E6E6E6; padding:18px 14px; display:flex; flex-direction:column; }
-.brand-logo{ width:64px; height:64px; object-fit:contain; border-radius:999px; }
+/* Apply only to the old Sensor Health sidebar, not the shared admin sidebar */
+.sidebar-brand .brand-logo { width: 64px; height: 64px; object-fit: contain; border-radius: 999px; }
 .sidebar-menu{ display:flex; flex-direction:column; gap:14px; overflow:auto; padding-right:4px; }
 .nav-section{ display:flex; flex-direction:column; gap:6px; }
 .nav-title{ font-size:10px; letter-spacing:.12em; font-weight:700; color:#9AA0A6; padding:2px 8px; text-transform:uppercase; }
