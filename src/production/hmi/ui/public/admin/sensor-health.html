@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="/admin/sensor_health/style.css" />
 
   <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script type="text/javascript" src="/admin/js/app.min.js"></script>
+  <script src="/admin/js/admin-layout.js" defer></script>
 
   <!-- Shared admin page state -->
   <script type="text/javascript" src="/admin/js/admin-page-state.js"></script>
@@ -183,14 +183,6 @@
   </div>
 
   <script>
-    $(document).ready(function() {
-      $("#sidebar").load("/admin/component/sidebar-component.html", function() {
-        $.getScript('/admin/js/sidebarmenu.js');
-      });
-      $("#header").load("/admin/component/header-component.html");
-      $("#footer").load("/admin/component/footer-component.html");
-    });
-
     const pageState = createAdminPageState();
     pageState.resetPageState();
   </script>

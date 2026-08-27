@@ -18,8 +18,8 @@ The workflow produces:
 - a poor-performing-species report; and
 - hashes and environment details needed to reproduce the result.
 
-The audio dataset is local-only and must not be committed to Git. The manifest,
-reports and scripts are the reviewable evidence.
+The audio dataset and generated output files are local-only and must not be
+committed to Git.
 
 ## Important split limitation
 
