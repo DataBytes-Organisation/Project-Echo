@@ -7,10 +7,9 @@ standard inference response without modifying the
 production Engine.
 """
 
-from inference_wrapper import InferenceWrapper
-from validator import InferenceValidator
-from backend_adapter import BackendAdapter
-
+from .inference_wrapper import InferenceWrapper
+from .validator import InferenceValidator
+from .backend_adapter import BackendAdapter
 
 class PrototypeEngine:
 

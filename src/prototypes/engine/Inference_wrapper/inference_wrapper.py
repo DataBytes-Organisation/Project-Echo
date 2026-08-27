@@ -9,7 +9,7 @@ Responsibilities:
 - Keep response generation separate from the Engine logic.
 """
 
-from response_schema import InferenceResponse
+from .response_schema import InferenceResponse
 
 
 class InferenceWrapper:
