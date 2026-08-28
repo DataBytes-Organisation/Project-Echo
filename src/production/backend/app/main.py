@@ -74,7 +74,17 @@ def mqtt_connection_state():
 @app.get("/mqtt/latest-events", tags=["mqtt"])
 def mqtt_latest_events():
     from app.routers.hmi import show_latest_events
-    return {"events": show_latest_events(limit=20)}
+
+    events = [
+        {"eventType": "vocalization", **event}
+        for event in show_latest_events(limit=20)
+    ]
+    events += [
+        event for event in get_latest_events()
+        if event.get("eventType") != "vocalization"
+    ]
+
+    return {"events": events}
 
 
 

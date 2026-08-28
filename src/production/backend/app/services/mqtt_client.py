@@ -7,13 +7,17 @@ latest_events = {}
 
 MQTT_BROKER_URL = os.environ.get("MQTT_BROKER_URL", "ts-mqtt-server-cont")
 MQTT_BROKER_PORT = int(os.environ.get("MQTT_BROKER_PORT", 1883))
-MQTT_TOPIC = os.environ.get("MQTT_PUBLISH_URL", "projectecho/engine/2")
+MQTT_TOPICS = os.environ.get(
+    "MQTT_TOPICS",
+    "projectecho/engine/2,projectecho/movement,iot/data/test",
+).split(",")
 
 def on_connect(client, userdata, flags, rc):
     global connection_state
     connection_state = "connected"
     print(f"[MQTT] Connected, rc={rc}")
-    client.subscribe(MQTT_TOPIC)
+    for topic in MQTT_TOPICS:
+        client.subscribe(topic.strip())
 
 def on_disconnect(client, userdata, rc):
     global connection_state
@@ -72,6 +76,12 @@ def normalize_payload(raw_payload, topic):
             "animalId": data.get("animalId"),
             "species": data.get("species"),
             "animalTrueLLA": data.get("animalTrueLLA"),
+            # Placeholders: real species metadata isn't available on this
+            # MQTT payload, only after DB enrichment (see vocalization
+            # branch above for the same limitation).
+            "type": "mammal",
+            "status": "normal",
+            "diet": "omnivore",
         }
 
     # Sensor health events

@@ -655,14 +655,22 @@ async function pollMqttLatestEvents(hmiState) {
       if (_seenMqttEventIds.has(event._id)) continue;
       _seenMqttEventIds.add(event._id);
 
-      if (event.eventType === "vocalization") {
+      switch (event.eventType) {
+      case "vocalization":
         newVocalizationEvents.push(event);
-      } else if (event.eventType === "movement") {
+        break;
+      case "movement":
         newMovementEvents.push(event);
+        break;
+      case "sensor_health":
+      case "iot_node":
+        document.dispatchEvent(
+          new CustomEvent(`mqtt:${event.eventType}`, { detail: event })
+        );
+        break;
       }
-      // sensor_health / iot_node: normalized on the backend, but there is
-      // no existing HMI render function for these yet, so they are not
-      // routed to the map here. Flagged for a follow-up ticket.
+
+      
     }
 
     if (newVocalizationEvents.length > 0) {
