@@ -1,0 +1,3 @@
+check,duplicate_records,status
+metadata_records,0,no_duplicates_found
+exact_file_hash,10,duplicates_found
