@@ -33,3 +33,24 @@ python calibration_quant_benchmark.py \
   --data <otways dataset> --max-per-class 20 \
   --out-dir results_efficientnet
 ```
+
+# Sprint 2 progress
+
+## fp32 baseline + class-count audit (no labels needed)
+
+Latency/size measurement and a model-vs-mapping class-count audit on the
+shipped fp32 `.tflite`, using synthetic input (`--fp32-baseline`, needs no dataset
+or source Keras model). Raw numbers:
+[`results_efficientnet/efficientnet_fp32_baseline.csv`](results_efficientnet/efficientnet_fp32_baseline.csv).
+
+| variant                      | input            | output   | size    | latency (ms/inference)              |
+| ---------------------------- | ---------------- | -------- | ------- | ----------------------------------- |
+| `efficientnetv2_tflite_fp32` | (1, 1, 128, 313) | (1, 123) | 85.2 MB | mean 135.8, median 133.2, p95 180.2 |
+
+Reproduce the baseline:
+
+```bash
+python calibration_quant_benchmark.py --fp32-baseline \
+  --efficientnet <models/efficientnetv2 dir> \
+  --out-dir results_efficientnet
+```
