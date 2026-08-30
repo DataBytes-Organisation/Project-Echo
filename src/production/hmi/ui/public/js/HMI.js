@@ -38,6 +38,7 @@ import {
   retrieveWeather,
 } from "./routes.js";
 import { addIoTNodesToMap } from "./nodes-overlay.js";
+import { connectDetectionStream } from "./detection_stream_client.js";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
@@ -645,6 +646,7 @@ export function initialiseHMI(hmiState) {
       await addIoTNodesToMap(hmiState);
 
       queueSimUpdate(hmiState);
+      startDetectionStream(hmiState);
       showToast("Map data loaded successfully", "success");
     })
     .catch((error) => {
@@ -745,16 +747,18 @@ export function convertJSONtoAnimalMovementEvent(hmiState, data) {
 }
 
 export function convertJSONtoAnimalVocalizationEvent(hmiState, data) {
+  const speciesName = (data.species || "unknown").toLowerCase();
+
   return {
     timestamp:                      hmiState.currentTime,
     eventTimestamp:                 data.timestamp,
     eventId:                        data._id,
     speciesIdentificationConfidence:data.confidence,
-    speciesScientificName:          data.species.toLowerCase(),
-    commonName:                     data.commonName.toLowerCase(),
-    animalType:                     data.type.toLowerCase(),
-    animalStatus:                   matchStatus(data.status.toLowerCase()),
-    animalDiet:                     data.diet.toLowerCase(),
+    speciesScientificName:          speciesName,
+    commonName:                     (data.commonName || data.species || "unknown").toLowerCase(),
+    animalType:                     (data.type || "mammal").toLowerCase(),
+    animalStatus:                   matchStatus((data.status || "least concern").toLowerCase()),
+    animalDiet:                     (data.diet || "herbivore").toLowerCase(),
     locationConfidence:             100 - data.animalLLAUncertainty,
     estLat:                         data.animalEstLLA[0],
     estLon:                         data.animalEstLLA[1],
@@ -1495,6 +1499,35 @@ export function MapCloseNav() {
 // ─────────────────────────────────────────────────────────────────────────────
 // Live updates
 // ─────────────────────────────────────────────────────────────────────────────
+
+let disconnectDetectionStream = null;
+
+function startDetectionStream(hmiState) {
+  if (disconnectDetectionStream) return;
+
+  disconnectDetectionStream = connectDetectionStream({
+    onStatus: (status) => console.log("Detection stream:", status),
+    onDetection: (data) => {
+      console.log("[B1.2 WS] map handler received detection:", {
+        _id: data._id,
+        species: data.species,
+        sensorId: data.sensorId,
+        confidence: data.confidence,
+      });
+
+      const alreadySeen = hmiState.vocalizationEvents.some(
+        (event) => event.eventId === data._id
+      );
+      if (alreadySeen) {
+        console.log("[B1.2 WS] duplicate ignored:", data._id);
+        return;
+      }
+
+      updateVocalizationLayerFromLiveData(hmiState, [data]);
+      showToast(`Live detection: ${data.species}`, "success");
+    },
+  });
+}
 
 function updateTruthEvents(hmiState) {
   retrieveTruthEventsInTimeRange(hmiState.currentTime - 5, hmiState.currentTime)
