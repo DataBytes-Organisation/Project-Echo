@@ -400,6 +400,17 @@ class DetectionListResponses(BaseModel):
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
 
+
+class DetectionCursorListResponse(BaseModel):
+    items: List[Detection]
+    limit: int
+    next_cursor: Optional[str] = None
+
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+
 class BudgetRule(BaseModel):
     service: str = Field(..., min_length=1)
     monthly_limit: int = Field(..., ge=0)

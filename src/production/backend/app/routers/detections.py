@@ -3,7 +3,7 @@ from typing import Optional, Dict, Any
 
 from fastapi import APIRouter, Query, Path, Body, HTTPException, Depends
 
-from app.schemas import Detection, DetectionCreate, DetectionListResponses
+from app.schemas import Detection, DetectionCreate, DetectionListResponses, DetectionCursorListResponse
 from app import detections as detections_service
 from app.middleware.pause_guard import pause_guard
 from app.services.budget import enforce_and_consume
@@ -56,6 +56,43 @@ def list_detections_endpoint(
         page=page,
         page_size=page_size,
     )
+
+
+@router.get(
+    "/cursor",
+    response_model=DetectionCursorListResponse,
+    summary="List detections with cursor pagination",
+    dependencies=[Depends(pause_guard("detections"))],
+)
+def list_detections_cursor_endpoint(
+    species: Optional[str] = Query(None, description="Filter by species name (exact match)"),
+    start_time: Optional[datetime] = Query(
+        None, description="Filter detections from this timestamp (inclusive, ISO 8601)"
+    ),
+    end_time: Optional[datetime] = Query(
+        None, description="Filter detections up to this timestamp (inclusive, ISO 8601)"
+    ),
+    lat: Optional[float] = Query(None, description="Latitude for location filter (requires lon & radius_km)"),
+    lon: Optional[float] = Query(None, description="Longitude for location filter (requires lat & radius_km)"),
+    radius_km: Optional[float] = Query(None, description="Radius in kilometres for location filter (requires lat & lon)"),
+    limit: int = Query(20, ge=1, le=100, description="Number of detections per page (max 100)"),
+    cursor: Optional[str] = Query(None, description="Opaque cursor from a previous cursor response"),
+):
+    enforce_and_consume("detections", cost=1)
+
+    try:
+        return detections_service.list_detections_cursor(
+            species=species,
+            start_time=start_time,
+            end_time=end_time,
+            lat=lat,
+            lon=lon,
+            radius_km=radius_km,
+            limit=limit,
+            cursor=cursor,
+        )
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid cursor")
 
 
 @router.get(
