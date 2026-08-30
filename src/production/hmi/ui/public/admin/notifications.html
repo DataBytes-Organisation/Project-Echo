@@ -14,6 +14,7 @@
   />
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="/admin/js/admin-layout.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
   <script
     type="text/javascript"
@@ -21,7 +22,7 @@
     crossorigin="anonymous"
   ></script>
 
-  <script type="text/javascript" src="/admin/js/app.min.js"></script>
+
   <script type="text/javascript" src="/admin/js/notifications.js"></script>
 
   <!-- Shared admin page state -->
@@ -94,14 +95,6 @@
   </div>
 
   <script>
-    $(document).ready(function() {
-      $("#sidebar").load("/admin/component/sidebar-component.html", function() {
-        $.getScript('/admin/js/sidebarmenu.js');
-      });
-      $("#header").load("/admin/component/header-component.html");
-      $("#footer").load("/admin/component/footer-component.html");
-    });
-
     const pageState = createAdminPageState();
     pageState.resetPageState();
   </script>
