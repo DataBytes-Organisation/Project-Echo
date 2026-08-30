@@ -29,7 +29,7 @@ from tqdm import tqdm
 # CONFIGURATION
 # ==========================================
 
-PROJECT_ROOT = Path.cwd()
+PROJECT_ROOT = Path(__file__).resolve().parent
 
 # Dataset configuration
 DATASET_ZIP_NAME = "datasets.zip"
@@ -557,9 +557,10 @@ def find_species_inconsistencies(df):
     # A. Formatting differences
     # ------------------------------------------
 
-    formatting_issues = df[
-        df["species"] != df["species_label"]
-    ].copy()
+    raw = df["species"].astype(str)
+    cleaned = raw.str.strip().str.replace(r"\s+", " ", regex=True)
+
+    formatting_issues = df[raw != cleaned].copy()
 
     formatting_issues["issue_type"] = (
         "species_name_formatting"
