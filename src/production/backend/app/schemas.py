@@ -369,7 +369,7 @@ class DetectionCreate(EventSchema):
 class Detection(EventSchema):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
 
-    class config:
+    class Config:
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
@@ -395,10 +395,12 @@ class DetectionListResponses(BaseModel):
     page: int
     page_size: int
 
-    class config:
-        allow_population_by_fiels_name = True
+    class Config:
+        allow_population_by_field_name = True
         arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str}
+        json_encoders = {
+            ObjectId: str,
+        }
 
 class BudgetRule(BaseModel):
     service: str = Field(..., min_length=1)

@@ -110,8 +110,11 @@ services:
     environment:
       MAIL_STARTTLS: "true"
       MAIL_SSL_TLS: "false"
-
-
+      REDIS_HOST: "echo-redis"
+      REDIS_PORT: "6379"
+    depends_on:
+      echo-redis:
+        condition: service_healthy
     stdin_open: false
     tty: true
     command: uvicorn app.main:app --host 0.0.0.0 --port 9000 --reload
