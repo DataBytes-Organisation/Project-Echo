@@ -31,3 +31,4 @@ Werkzeug==2.0.3
 fastapi_mail
 twilio==8.5.0
 python-multipart
+redis==5.0.8
