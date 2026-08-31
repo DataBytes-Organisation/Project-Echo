@@ -160,7 +160,25 @@ def main(cfg: DictConfig):
 	# trainer.test(val_loader)
 
 	if cfg.run.train:
-		trainer.train()
+			if cfg.run.checkpoint_path:
+					ckpt_path = Path(hydra.utils.to_absolute_path(cfg.run.checkpoint_path))
+
+					if ckpt_path.is_file():
+							checkpoint = torch.load(ckpt_path, map_location=device)
+
+							if isinstance(checkpoint, dict) and "model_state_dict" in checkpoint:
+									print(f"Resuming training from: {ckpt_path}")
+									trainer.load_checkpoint(ckpt_path)
+							else:
+									print(
+											f"Checkpoint '{ckpt_path}' contains model weights only; "
+											"loading weights and starting training from epoch 1."
+									)
+									trainer.model.load_state_dict(checkpoint)
+					else:
+							print(f"WARNING: Resume checkpoint '{ckpt_path}' not found. Starting training from scratch.")
+
+			trainer.train()
 	elif cfg.run.test:
 		load_path = None
 
@@ -174,8 +192,17 @@ def main(cfg: DictConfig):
 			load_path = trainer.best_model_path
 
 		if load_path:
-			print(f"Training skipped. Loading model from: {load_path}")
-			trainer.model.load_state_dict(torch.load(load_path, map_location=device))
+				print(f"Training skipped. Loading model from: {load_path}")
+
+				checkpoint = torch.load(load_path, map_location=device)
+
+				if isinstance(checkpoint, dict) and "model_state_dict" in checkpoint:
+						trainer.model.load_state_dict(checkpoint["model_state_dict"])
+				else:
+						# Backward compatibility with older weight-only checkpoints
+						trainer.model.load_state_dict(checkpoint)
+
+				print("Checkpoint loaded successfully for testing.")
 		else:
 			print("WARNING: Training skipped and no valid model checkpoint found. Testing with an untrained model.")
 
