@@ -7,7 +7,7 @@
 
   <link rel="stylesheet" type="text/css" href="/admin/css/styles.min.css" />
   <link rel="stylesheet" href="/admin/css/icons/tabler-icons/tabler-icons.css" />
-  <link rel="stylesheet" href="/admin/sensor_health/style.css" />
+  <link rel="stylesheet" href="/admin/sensor_health/style.css?v=frc2-5" />
 
   <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="/admin/js/admin-layout.js" defer></script>
@@ -15,8 +15,8 @@
   <!-- Shared admin page state -->
   <script type="text/javascript" src="/admin/js/admin-page-state.js"></script>
 
-  <script src="/admin/sensor_health/script.js" defer></script>
-  <script src="/admin/sensor_health/charts.js" defer></script>
+  <script src="/admin/sensor_health/script.js?v=frc2-5" defer></script>
+  <script src="/admin/sensor_health/charts.js?v=frc2-5" defer></script>
 </head>
 <body>
   <div
@@ -64,7 +64,9 @@
                   Monitor live device health, battery level, system performance, GPS location, and recent audio activity.
                 </p>
               </div>
-              <div class="page-header-actions"></div>
+              <div class="page-header-actions">
+                <button type="button" class="btn-secondary" id="sensor-refresh-button">Refresh</button>
+              </div>
             </header>
 
             <!-- Content root -->
@@ -80,7 +82,7 @@
 
                   <div class="kpi-card">
                     <p>DATA SOURCE</p>
-                    <h3>MQTT / Seeded</h3>
+                    <h3 id="sensor-data-source">Checking…</h3>
                   </div>
 
                   <div class="kpi-card">
@@ -93,7 +95,7 @@
                 <section class="card">
                   <h3>Sensor Overview</h3>
                   <p class="card-subtitle">
-                    Search, filter, and monitor live sensor status in one dashboard view.
+                    Search, filter, and select a sensor to open its device detail workflow.
                   </p>
 
                   <div class="form-grid sensor-toolbar" style="margin-bottom: 16px;">
@@ -112,6 +114,7 @@
                         <option value="All">All</option>
                         <option value="Online">Online</option>
                         <option value="Offline">Offline</option>
+                        <option value="Unknown">Unknown</option>
                         <option value="Low Battery">Low Battery</option>
                       </select>
                     </div>
@@ -130,19 +133,21 @@
                       <thead>
                         <tr>
                           <th>Sensor ID</th>
+                          <th>Name</th>
                           <th>Status</th>
+                          <th>Type</th>
+                          <th>Model</th>
                           <th>Battery</th>
-                          <th>CPU</th>
-                          <th>RAM</th>
-                          <th>Disk</th>
-                          <th>Uptime</th>
+                          <th>Temp</th>
+                          <th>Components</th>
                           <th>GPS</th>
                           <th>Last Audio</th>
+                          <th>Details</th>
                         </tr>
                       </thead>
                       <tbody id="sensor-overview-tbody">
                         <tr>
-                          <td colspan="9">Loading sensor data...</td>
+                          <td colspan="11">Loading sensor data...</td>
                         </tr>
                       </tbody>
                     </table>

@@ -2382,6 +2382,58 @@
         }
       }
     },
+    "/sensors/{sensor_id}": {
+      "get": {
+        "tags": [
+          "sensors"
+        ],
+        "summary": "Get Sensor Detail",
+        "operationId": "get_sensor_detail_sensors__sensor_id__get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Sensor Id"
+            },
+            "name": "sensor_id",
+            "in": "path"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 50.0,
+              "minimum": 1.0,
+              "title": "History Limit",
+              "default": 10
+            },
+            "name": "history_limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get a single sensor's current health, location, and recent audio metadata",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/predict": {
       "post": {
         "tags": [
