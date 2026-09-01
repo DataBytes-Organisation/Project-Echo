@@ -38,9 +38,7 @@ const storeItems = new Map([[
   1, { priceInCents: 100, name: "donation"}
 ]])
 app.post('/api/razorpay-webhook', express.raw({ type: 'application/json' }), (req, res) => {
-  const donations = connectedDB ? connectedDB.collection("donations") : null;
-  const orders = connectedDB ? connectedDB.collection("razorpay_orders") : null;
-  return razorpayPayment.handleWebhook(req, res, donations, { orders });
+  return razorpayPayment.handleWebhook(req, res, { apiBaseUrl: API_BASE_URL });
 });
 app.use(express.json({limit: '10mb'}));
 const cookieSecret = process.env.COOKIE_SECRET || crypto.randomBytes(32).toString("hex");
@@ -389,14 +387,11 @@ const donationClient = new MongoClient(process.env.MONGODB_URI || `mongodb://${p
 })();
 
 app.post('/api/create-razorpay-order', checkUserSession, limitRazorpayOrders, (req, res) => {
-  const orders = connectedDB ? connectedDB.collection("razorpay_orders") : null;
-  return razorpayPayment.createOrder(req, res, { orders });
+  return razorpayPayment.createOrder(req, res, { apiBaseUrl: API_BASE_URL });
 });
 
 app.post('/api/save-razorpay-payment', (req, res) => {
-  const donations = connectedDB ? connectedDB.collection("donations") : null;
-  const orders = connectedDB ? connectedDB.collection("razorpay_orders") : null;
-  return razorpayPayment.savePayment(req, res, donations, { orders });
+  return razorpayPayment.savePayment(req, res, { apiBaseUrl: API_BASE_URL });
 });
 
 
