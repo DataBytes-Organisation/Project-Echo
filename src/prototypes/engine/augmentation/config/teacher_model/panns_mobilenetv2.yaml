@@ -1,0 +1,5 @@
+name: panns_mobilenetv2
+params:
+  pretrained: true
+  num_classes: ${data.num_classes}
+  use_arcface: false
