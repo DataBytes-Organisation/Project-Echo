@@ -18,6 +18,7 @@ const axios = require('axios');
 const { MongoClient, ObjectId } = require('mongodb');
 const razorpayPayment = require('./routes/razorpay.routes');
 const limitRazorpayOrders = razorpayPayment.createOrderRateLimiter();
+let connectedDB;
 
 
 
@@ -36,6 +37,11 @@ const validation = require('deep-email-validator')
 const storeItems = new Map([[
   1, { priceInCents: 100, name: "donation"}
 ]])
+app.post('/api/razorpay-webhook', express.raw({ type: 'application/json' }), (req, res) => {
+  const donations = connectedDB ? connectedDB.collection("donations") : null;
+  const orders = connectedDB ? connectedDB.collection("razorpay_orders") : null;
+  return razorpayPayment.handleWebhook(req, res, donations, { orders });
+});
 app.use(express.json({limit: '10mb'}));
 
 // Import the User model
@@ -361,8 +367,6 @@ const donationClient = new MongoClient(process.env.MONGODB_URI || `mongodb://${p
   useNewUrlParser: true,
   useUnifiedTopology: true
 });
-
-let connectedDB;
 
 (async () => {
   try {

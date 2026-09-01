@@ -7,9 +7,12 @@ const test = require("node:test");
 const {
   createOrder,
   createOrderRateLimiter,
+  handleWebhook,
   savePayment,
   withRazorpayCsp,
 } = require("../routes/razorpay.routes");
+
+const CAPTURED_WEBHOOK = '{  "entity":"event","account_id":"acc_test123","event":"payment.captured","contains":["payment"],"payload":{"payment":{"entity":{"id":"pay_verified123","entity":"payment","amount":999999,"currency":"USD","status":"captured","order_id":"order_verified123","method":"card","email":"forged@example.com","contact":"+61000000000","created_at":1700000000,"captured":true}}},"created_at":1700000001  }';
 
 function response() {
   return {
@@ -109,6 +112,19 @@ function signature(secret = "test_secret") {
     .createHmac("sha256", secret)
     .update("order_verified123|pay_verified123")
     .digest("hex");
+}
+
+function webhookSignature(body, secret = "webhook_secret") {
+  return crypto.createHmac("sha256", secret).update(body).digest("hex");
+}
+
+function webhookRequest(body, signature = webhookSignature(body)) {
+  return {
+    body: Buffer.from(body),
+    get(name) {
+      return name.toLowerCase() === "x-razorpay-signature" ? signature : undefined;
+    },
+  };
 }
 
 function paymentRequest(body = {}) {
@@ -406,6 +422,202 @@ test("savePayment reports provider and database failures without recording succe
   assert.equal(databaseFailure.statusCode, 503);
   assert.deepEqual(databaseFailure.body, { error: "Donation could not be recorded." });
   assert.equal(JSON.stringify(databaseFailure.body).includes("mongodb"), false);
+});
+
+test("handleWebhook requires a configured webhook secret before processing", async () => {
+  const httpClient = providerClient();
+  const donations = collection();
+  const res = response();
+
+  await handleWebhook(webhookRequest(CAPTURED_WEBHOOK), res, donations, {
+    httpClient,
+    keyId: "rzp_test_key",
+    keySecret: "test_secret",
+    webhookSecret: "",
+    orders: pendingOrders(),
+  });
+
+  assert.equal(res.statusCode, 503);
+  assert.equal(httpClient.calls.length, 0);
+  assert.equal(donations.updateCalls, 0);
+});
+
+test("handleWebhook rejects missing or non-matching signatures before processing", async () => {
+  const signedBody = CAPTURED_WEBHOOK;
+  const changedBody = CAPTURED_WEBHOOK.replace("999999", "999998");
+  const httpClient = providerClient();
+  const donations = collection();
+  const missing = response();
+  const res = response();
+  const dependencies = {
+    httpClient,
+    keyId: "rzp_test_key",
+    keySecret: "test_secret",
+    webhookSecret: "webhook_secret",
+    orders: pendingOrders(),
+  };
+
+  await handleWebhook(webhookRequest(signedBody, null), missing, donations, dependencies);
+
+  await handleWebhook(
+    webhookRequest(changedBody, webhookSignature(signedBody)),
+    res,
+    donations,
+    dependencies
+  );
+
+  assert.equal(missing.statusCode, 400);
+  assert.equal(res.statusCode, 400);
+  assert.equal(httpClient.calls.length, 0);
+  assert.equal(donations.updateCalls, 0);
+});
+
+test("handleWebhook rejects malformed signed JSON before provider or database calls", async () => {
+  const body = '{"event":"payment.captured"';
+  const httpClient = providerClient();
+  const donations = collection();
+  const res = response();
+
+  await handleWebhook(webhookRequest(body), res, donations, {
+    httpClient,
+    keyId: "rzp_test_key",
+    keySecret: "test_secret",
+    webhookSecret: "webhook_secret",
+    orders: pendingOrders(),
+  });
+
+  assert.equal(res.statusCode, 400);
+  assert.equal(httpClient.calls.length, 0);
+  assert.equal(donations.updateCalls, 0);
+});
+
+test("handleWebhook rejects malformed payment.captured identifiers without writes", async () => {
+  const payload = JSON.parse(CAPTURED_WEBHOOK);
+  payload.payload.payment.entity.id = "../payment";
+  const body = JSON.stringify(payload);
+  const httpClient = providerClient();
+  const donations = collection();
+  const res = response();
+
+  await handleWebhook(webhookRequest(body), res, donations, {
+    httpClient,
+    keyId: "rzp_test_key",
+    keySecret: "test_secret",
+    webhookSecret: "webhook_secret",
+    orders: pendingOrders(),
+  });
+
+  assert.equal(res.statusCode, 400);
+  assert.equal(httpClient.calls.length, 0);
+  assert.equal(donations.updateCalls, 0);
+});
+
+test("handleWebhook acknowledges a signed unrelated event without side effects", async () => {
+  const body = '{"entity":"event","event":"payment.failed","payload":{}}';
+  const httpClient = providerClient();
+  const donations = collection();
+  const res = response();
+
+  await handleWebhook(webhookRequest(body), res, donations, {
+    httpClient,
+    keyId: "rzp_test_key",
+    keySecret: "test_secret",
+    webhookSecret: "webhook_secret",
+    orders: pendingOrders(),
+  });
+
+  assert.equal(res.statusCode, 200);
+  assert.deepEqual(res.body, { status: "ignored" });
+  assert.equal(httpClient.calls.length, 0);
+  assert.equal(donations.updateCalls, 0);
+});
+
+test("handleWebhook stores authoritative Razorpay records for payment.captured", async () => {
+  const donations = collection();
+  const res = response();
+
+  await handleWebhook(webhookRequest(CAPTURED_WEBHOOK), res, donations, {
+    httpClient: providerClient(),
+    keyId: "rzp_test_key",
+    keySecret: "test_secret",
+    webhookSecret: "webhook_secret",
+    orders: pendingOrders(),
+  });
+
+  assert.equal(res.statusCode, 201);
+  assert.deepEqual(res.body, { status: "success" });
+  assert.deepEqual(donations.records.get("razorpay:pay_verified123"), {
+    _id: "razorpay:pay_verified123",
+    paymentId: "pay_verified123",
+    orderId: "order_verified123",
+    name: "Anonymous",
+    email: "donor@example.com",
+    amount: 5,
+    currency: "aud",
+    method: "card",
+    status: "succeeded",
+    created: 1700000000,
+  });
+});
+
+test("handleWebhook and savePayment concurrently persist one donation", async () => {
+  const donations = collection();
+  const webhookResponse = response();
+  const checkoutResponse = response();
+  const replayResponse = response();
+  const orders = pendingOrders();
+
+  await Promise.all([
+    handleWebhook(webhookRequest(CAPTURED_WEBHOOK), webhookResponse, donations, {
+      httpClient: providerClient(),
+      keyId: "rzp_test_key",
+      keySecret: "test_secret",
+      webhookSecret: "webhook_secret",
+      orders,
+    }),
+    savePayment(paymentRequest(), checkoutResponse, donations, {
+      httpClient: providerClient(),
+      keyId: "rzp_test_key",
+      keySecret: "test_secret",
+      orders,
+    }),
+  ]);
+
+  await handleWebhook(webhookRequest(CAPTURED_WEBHOOK), replayResponse, donations, {
+    httpClient: providerClient(),
+    keyId: "rzp_test_key",
+    keySecret: "test_secret",
+    webhookSecret: "webhook_secret",
+    orders,
+  });
+
+  assert.equal(donations.records.size, 1);
+  assert.deepEqual([webhookResponse.statusCode, checkoutResponse.statusCode].sort(), [200, 201]);
+  assert.equal(replayResponse.statusCode, 200);
+});
+
+test("handleWebhook returns transient provider and database failures for retry", async () => {
+  const providerFailure = response();
+  await handleWebhook(webhookRequest(CAPTURED_WEBHOOK), providerFailure, collection(), {
+    httpClient: providerClient({ getError: new Error("provider unavailable") }),
+    keyId: "rzp_test_key",
+    keySecret: "test_secret",
+    webhookSecret: "webhook_secret",
+    orders: pendingOrders(),
+  });
+  assert.equal(providerFailure.statusCode, 502);
+
+  const donations = collection();
+  donations.findOne = async () => { throw new Error("database unavailable"); };
+  const databaseFailure = response();
+  await handleWebhook(webhookRequest(CAPTURED_WEBHOOK), databaseFailure, donations, {
+    httpClient: providerClient(),
+    keyId: "rzp_test_key",
+    keySecret: "test_secret",
+    webhookSecret: "webhook_secret",
+    orders: pendingOrders(),
+  });
+  assert.equal(databaseFailure.statusCode, 503);
 });
 
 test("withRazorpayCsp enables Checkout scripts, API connections, and payment frames", () => {

@@ -72,10 +72,13 @@ function validSignature(orderId, paymentId, signature, keySecret) {
     return false;
   }
 
-  const expected = crypto
-    .createHmac("sha256", keySecret)
-    .update(`${orderId}|${paymentId}`)
-    .digest();
+  return validHmac(`${orderId}|${paymentId}`, signature, keySecret);
+}
+
+function validHmac(message, signature, secret) {
+  if (!SIGNATURE.test(signature)) return false;
+
+  const expected = crypto.createHmac("sha256", secret).update(message).digest();
   const received = Buffer.from(signature, "hex");
   return received.length === expected.length && crypto.timingSafeEqual(received, expected);
 }
@@ -162,14 +165,13 @@ function verifiedProviderRecords(payment, order, expectedOrder, paymentId) {
     Number.isInteger(payment.created_at);
 }
 
-async function savePayment(req, res, donations, dependencies = {}) {
-  const { paymentId, orderId, signature, name } = req.body || {};
+async function persistVerifiedPayment(paymentId, orderId, name, res, donations, dependencies) {
   const { keyId, keySecret } = credentials(dependencies);
 
   if (!validCredentials(keyId, keySecret)) {
     return res.status(503).json({ error: "Payment service is unavailable." });
   }
-  if (!ORDER_ID.test(orderId) || !PAYMENT_ID.test(paymentId) || !SIGNATURE.test(signature)) {
+  if (!ORDER_ID.test(orderId) || !PAYMENT_ID.test(paymentId)) {
     return res.status(400).json({ error: "Payment could not be verified." });
   }
   if (!donations || !dependencies.orders) {
@@ -183,7 +185,7 @@ async function savePayment(req, res, donations, dependencies = {}) {
     console.error("Razorpay order lookup failed.");
     return res.status(503).json({ error: "Donation could not be recorded." });
   }
-  if (!expectedOrder || !validSignature(expectedOrder._id, paymentId, signature, keySecret)) {
+  if (!expectedOrder) {
     return res.status(400).json({ error: "Payment could not be verified." });
   }
 
@@ -241,4 +243,66 @@ async function savePayment(req, res, donations, dependencies = {}) {
   }
 }
 
-module.exports = { createOrder, createOrderRateLimiter, savePayment, withRazorpayCsp };
+async function savePayment(req, res, donations, dependencies = {}) {
+  const { paymentId, orderId, signature, name } = req.body || {};
+  const { keyId, keySecret } = credentials(dependencies);
+
+  if (!validCredentials(keyId, keySecret)) {
+    return res.status(503).json({ error: "Payment service is unavailable." });
+  }
+  if (!validSignature(orderId, paymentId, signature, keySecret)) {
+    return res.status(400).json({ error: "Payment could not be verified." });
+  }
+
+  return persistVerifiedPayment(paymentId, orderId, name, res, donations, dependencies);
+}
+
+async function handleWebhook(req, res, donations, dependencies = {}) {
+  const webhookSecret = Object.hasOwn(dependencies, "webhookSecret")
+    ? dependencies.webhookSecret
+    : process.env.RAZORPAY_WEBHOOK_SECRET;
+  if (!validCredentials("webhook", webhookSecret)) {
+    return res.status(503).json({ error: "Payment service is unavailable." });
+  }
+
+  const rawBody = req.body;
+  const signature = typeof req.get === "function"
+    ? req.get("x-razorpay-signature")
+    : req.headers?.["x-razorpay-signature"];
+  if (!Buffer.isBuffer(rawBody) || !validHmac(rawBody, signature, webhookSecret)) {
+    return res.status(400).json({ error: "Invalid webhook." });
+  }
+
+  let event;
+  try {
+    event = JSON.parse(rawBody.toString("utf8"));
+  } catch (error) {
+    return res.status(400).json({ error: "Invalid webhook." });
+  }
+
+  if (event?.event !== "payment.captured") {
+    return res.status(200).json({ status: "ignored" });
+  }
+
+  const payment = event.payload?.payment?.entity;
+  if (!PAYMENT_ID.test(payment?.id) || !ORDER_ID.test(payment?.order_id)) {
+    return res.status(400).json({ error: "Invalid webhook." });
+  }
+
+  return persistVerifiedPayment(
+    payment.id,
+    payment.order_id,
+    "Anonymous",
+    res,
+    donations,
+    dependencies
+  );
+}
+
+module.exports = {
+  createOrder,
+  createOrderRateLimiter,
+  handleWebhook,
+  savePayment,
+  withRazorpayCsp,
+};
