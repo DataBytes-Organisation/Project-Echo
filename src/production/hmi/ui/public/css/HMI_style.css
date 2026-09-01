@@ -2868,182 +2868,68 @@ z-index: 1;
   font-weight: 600;
 }
 
-/* spectrogram  */
+/* Spectrogram */
 
-  #spectrogram-container {
-    position: relative;
-    width: 100%;
-    height: 150px;
-    cursor: pointer;
-    margin-top: 10px;
-  }
-  #spectrogram-canvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-  }
-  #spectrogram-playhead {
-    position: absolute;
-    top: 0;
-    width: 2px;
-    height: 100%;
-    background: white;
-    pointer-events: none;
-  }
-  #spectrogram-play-btn {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 50px;
-    height: 100%;
-    background: rgba(255,255,255,0.08);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 3;
-    cursor: pointer;
-  }
-  #spectrogram-play-btn::after {
-    content: '';
-    border-left: 18px solid white;
-    border-top: 11px solid transparent;
-    border-bottom: 11px solid transparent;
-  }
+.spectrogram-panel {
+  width: 100%;
+  margin-top: 12px;
+}
 
-/* ── FR-B2 browser recording panel ─────────────────────────────────────────── */
-.frb2-panel {
-  margin-top: 16px;
-  padding: 16px;
+.spectrogram-viewport {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  height: 230px;
+  min-height: 190px;
+  overflow: hidden;
   border: 1px solid rgba(247, 186, 206, 0.35);
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.03);
+  border-radius: 4px;
+  background: #071118;
 }
-.frb2-panel h2,
-.frb2-panel h3 {
-  margin: 0 0 8px 0 !important;
-  color: rgba(247, 186, 206, 1) !important;
+
+.spectrogram-viewport canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
 }
-.frb2-help,
-.frb2-playback-status {
-  margin: 0 0 14px 0 !important;
-  opacity: 0.85;
-  line-height: 1.4;
-  font-size: 0.95rem;
-}
-.frb2-actions {
+
+.spectrogram-state {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 14px;
-}
-.frb2-btn {
-  min-width: 110px;
-  padding: 8px 14px;
-  border-radius: 6px;
-  border: 1px solid rgba(247, 186, 206, 0.55);
-  background: rgba(247, 186, 206, 0.12);
-  color: #fff;
-  font-weight: 600;
-  cursor: pointer;
-}
-.frb2-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-.frb2-btn-record { border-color: #e74c3c; background: rgba(231, 76, 60, 0.2); }
-.frb2-btn-stop { border-color: #f1c40f; background: rgba(241, 196, 15, 0.18); }
-.frb2-btn-cancel { border-color: #95a5a6; background: rgba(149, 165, 166, 0.18); }
-.frb2-live-status {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-height: 28px;
-  margin-bottom: 16px;
-}
-.frb2-rec-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: #777;
-  display: inline-block;
-}
-.frb2-live-status[data-state="recording"] .frb2-rec-dot {
-  background: #e74c3c;
-  animation: frb2-pulse 1s infinite;
-}
-.frb2-live-status[data-state="playing"] .frb2-rec-dot {
-  background: #2ecc71;
-}
-.frb2-timer {
-  font-variant-numeric: tabular-nums;
-  font-weight: 700;
-  min-width: 48px;
-}
-.frb2-status-label { opacity: 0.9; }
-.frb2-playback {
-  padding-top: 8px;
-  border-top: 1px solid rgba(247, 186, 206, 0.2);
-}
-.frb2-play-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin: 10px 0 12px;
-}
-.frb2-play-fab {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  border: 1px solid rgba(46, 204, 113, 0.55);
-  background: rgba(46, 204, 113, 0.22);
-  color: #d8ffe8;
-  cursor: pointer;
-  display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 24px;
+  background: rgba(7, 17, 24, 0.9);
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 14px;
+  line-height: 20px;
+  text-align: center;
 }
-.frb2-play-fab:hover:not(:disabled) {
-  background: rgba(46, 204, 113, 0.35);
-  transform: scale(1.04);
+
+.spectrogram-state[hidden] {
+  display: none;
 }
-.frb2-play-fab:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
+
+.spectrogram-state-error {
+  color: #ffccd8;
 }
-.frb2-play-fab-icon {
-  width: 0;
-  height: 0;
-  border-top: 7px solid transparent;
-  border-bottom: 7px solid transparent;
-  border-left: 12px solid #7dffb0;
-  margin-left: 3px;
+
+.spectrogram-summary {
+  min-height: 18px;
+  margin: 6px 0 0;
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 12px;
+  line-height: 18px;
 }
-.frb2-play-fab.is-playing .frb2-play-fab-icon {
-  width: 10px;
-  height: 12px;
-  border: none;
-  margin-left: 0;
-  background: linear-gradient(to right, #7dffb0 0 3px, transparent 3px 7px, #7dffb0 7px 10px);
-}
-.frb2-play-label {
-  font-size: 0.95rem;
-  opacity: 0.9;
-}
-.frb2-audio {
-  width: 100%;
-  max-width: 440px;
-  display: block;
-  margin-top: 8px;
-}
-.frb2-audio-muted {
-  opacity: 0.35;
-  pointer-events: none;
-}
-.frb2-legacy-hidden {
-  display: none !important;
-}
-@keyframes frb2-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.25; }
+
+@media only screen and (max-width: 980px) and (orientation: portrait) {
+  .spectrogram-viewport {
+    height: 210px;
+  }
 }

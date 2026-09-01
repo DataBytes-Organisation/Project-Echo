@@ -1,5 +1,5 @@
 """
-Unit tests for IoT MQTT integration in the consolidated Echo Engine runtime.
+Unit tests for IoT MQTT integration in echo_engine.py
 
 Mocks heavy dependencies (TensorFlow, librosa, MQTT, GCP, etc.) so tests
 run without the full Docker stack or GPU.
@@ -27,7 +27,6 @@ _HEAVY_MODULES = [
     "paho", "paho.mqtt", "paho.mqtt.client",
     "google.cloud", "google.cloud.storage",
     "pymongo", "diskcache", "soundfile",
-    "requests",
     "geopy", "geopy.distance",
     "sklearn", "sklearn.preprocessing",
     "helpers", "helpers.melspectrogram_to_cam",
@@ -59,6 +58,7 @@ _ENGINE_CONFIG = {
     "MODEL_SERVER": "http://localhost:8501/v1/models/echo_model:predict",
     "WEATHER_SERVER": "http://localhost:8501/v1/models/weather_model:predict",
     "GCLOUD_PROJECT": "test", "BUCKET_NAME": "test", "DB_HOSTNAME": "localhost",
+    "ACTIVE_INFERENCE_MODEL": "classic",
     "IOT_MQTT_BROKER": "broker.hivemq.com",
     "IOT_MQTT_PORT": 1883,
     "IOT_MQTT_TOPIC": "iot/data/test",
@@ -78,9 +78,12 @@ def _patched_open(path, *args, **kwargs):
     return _real_open(path, *args, **kwargs)
 
 
+# Keep the patched open installed so EchoEngine() construction in each test's
+# setUp also reads the mocked _ENGINE_CONFIG (which selects the classic model,
+# not efficientnetv2_tflite, so __init__ skips the TFLite interpreter setup).
+# Real file access still falls through to _real_open inside _patched_open.
 builtins.open = _patched_open
 from echo_engine import EchoEngine  # noqa: E402
-builtins.open = _real_open
 
 
 # ===========================================================================
@@ -160,32 +163,27 @@ class TestIoTMessageHandler(unittest.TestCase):
         self.engine = EchoEngine()
         self.engine.class_names = ["Kookaburra", "Magpie"]
 
-        self.engine.combined_pipeline = MagicMock(return_value=(
-            np.zeros((260, 260, 3)),
-            np.zeros(48000 * 5, dtype=np.float32),
-            48000,
-        ))
-        self.engine.predict_class = MagicMock(return_value=("Kookaburra", 95.5))
+        # The consolidated engine runs local EfficientNetV2 TFLite inference for
+        # IoT messages (on_iot_message -> efficientnetv2_tflite_predict_from_audio_bytes),
+        # which returns (class, probability, processed_audio, sample_rate, top_predictions).
+        self.engine.efficientnetv2_tflite_predict_from_audio_bytes = MagicMock(
+            return_value=(
+                "Kookaburra", 95.5, np.zeros(48000 * 5, dtype=np.float32), 48000, [],
+            )
+        )
         self.engine.echo_api_send_detection_event = MagicMock()
-        self.engine.audio_to_string = MagicMock(return_value="base64audio")
 
-        # tf.expand_dims returns a mock tensor with .numpy().tolist()
-        mock_tensor = MagicMock()
-        mock_tensor.numpy.return_value.tolist.return_value = [[[[0.0] * 3] * 260] * 260]
-        sys.modules["tensorflow"].expand_dims.return_value = mock_tensor
-
-        # requests.post to model server
-        mock_resp = MagicMock()
-        mock_resp.text = json.dumps({"outputs": [[0.1, 0.9]]})
-        self.requests_patcher = patch("echo_engine.requests.post", return_value=mock_resp)
+        # The IoT path infers locally and must not POST to a remote model server;
+        # patch requests.post so we can assert it is never used.
+        self.requests_patcher = patch("echo_engine.requests.post")
         self.mock_post = self.requests_patcher.start()
 
     def tearDown(self):
         self.requests_patcher.stop()
 
-    def test_valid_payload_calls_pipeline(self):
+    def test_valid_payload_runs_local_inference(self):
         self.engine.on_iot_message(None, None, _make_msg(_valid_payload()))
-        self.engine.combined_pipeline.assert_called_once()
+        self.engine.efficientnetv2_tflite_predict_from_audio_bytes.assert_called_once()
 
     def test_valid_payload_calls_api(self):
         self.engine.on_iot_message(None, None, _make_msg(_valid_payload()))
@@ -223,16 +221,19 @@ class TestIoTMessageHandler(unittest.TestCase):
         self.assertEqual(event["animalLLAUncertainty"], 10.0)
 
     def test_species_and_confidence_forwarded(self):
-        self.engine.predict_class.return_value = ("Magpie", 87.3)
+        self.engine.efficientnetv2_tflite_predict_from_audio_bytes.return_value = (
+            "Magpie", 87.3, np.zeros(1, dtype=np.float32), 48000, [],
+        )
         self.engine.on_iot_message(None, None, _make_msg(_valid_payload()))
         args = self.engine.echo_api_send_detection_event.call_args[0]
         self.assertEqual(args[2], "Magpie")
         self.assertEqual(args[3], 87.3)
 
-    def test_model_server_url_from_config(self):
+    def test_iot_uses_local_inference_not_model_server(self):
+        # IoT inference is local; the handler must not call out to a remote model server.
         self.engine.on_iot_message(None, None, _make_msg(_valid_payload()))
-        post_url = self.mock_post.call_args[0][0]
-        self.assertEqual(post_url, _ENGINE_CONFIG["MODEL_SERVER"])
+        self.engine.efficientnetv2_tflite_predict_from_audio_bytes.assert_called_once()
+        self.mock_post.assert_not_called()
 
 
 # ===========================================================================
@@ -267,6 +268,30 @@ class TestIoTStartupOrder(unittest.TestCase):
         engine.execute()
 
         self.assertEqual(call_order, ["class_names", "iot_listener"])
+    class TestIoTStartupOrder(unittest.TestCase):
+        """Verify IoT listener starts AFTER class_names are loaded."""
+
+    def test_iot_listener_starts_after_class_names(self):
+        engine = EchoEngine()
+        call_order = []
+
+        engine.gcp_load_species_list = MagicMock(
+            side_effect=lambda: (
+                call_order.append("class_names"),
+                ["species"]
+            )[1]
+        )
+
+        engine.start_iot_mqtt_listener = MagicMock(
+            side_effect=lambda: call_order.append("iot_listener")
+        )
+
+        engine.execute()
+
+        self.assertEqual(
+            call_order,
+            ["class_names", "iot_listener"]
+        )
 
 
 if __name__ == "__main__":

@@ -457,6 +457,15 @@
                       <div class="box box6"></div><div class="box box7"></div><div class="box box8"></div><div class="box box9"></div><div class="box box10"></div>
                     </div>
                   </div>
+                  <div id="animal-spectrogram" class="spectrogram-panel" data-state="empty">
+                    <div class="spectrogram-viewport" data-role="viewport">
+                      <canvas data-role="canvas"></canvas>
+                      <p class="spectrogram-state" data-role="empty">Select a vocalisation event to view its spectrogram.</p>
+                      <p class="spectrogram-state" data-role="loading" hidden>Decoding audio...</p>
+                      <p class="spectrogram-state spectrogram-state-error" data-role="error" role="alert" hidden></p>
+                    </div>
+                    <p class="spectrogram-summary" data-role="summary" aria-live="polite"></p>
+                  </div>
                   <p style="margin-top: 40px !important;">Is the information above inaccurate? <br>Request to make an edit.</p>
                   <button id="request-edit-button">Request Edit</button>
                 </div>
@@ -525,7 +534,15 @@
                     <div id="recording_controls_container" class="recording_controls hide"></div>
                     <div id="audio_playback_div"><p id="audio_playback_indicator" class="playback_indicator hide"></p></div>
                   </div>
-
+                  <div id="microphone-spectrogram" class="spectrogram-panel" data-state="empty">
+                    <div class="spectrogram-viewport" data-role="viewport">
+                      <canvas data-role="canvas"></canvas>
+                      <p class="spectrogram-state" data-role="empty">Record or select an audio clip to view its spectrogram.</p>
+                      <p class="spectrogram-state" data-role="loading" hidden>Decoding audio...</p>
+                      <p class="spectrogram-state spectrogram-state-error" data-role="error" role="alert" hidden></p>
+                    </div>
+                    <p class="spectrogram-summary" data-role="summary" aria-live="polite"></p>
+                  </div>
                   <h2 id="recordingSimulationHeader" style="margin-top: 20px !important;">Recording Simulation</h2>
                   <div id="recording_simulation_master_container">
                     <div id="recording_export_container" style="margin-top: 10px !important;" class="controls_item_row">
@@ -1348,7 +1365,7 @@
       function loadRecordingEvent()     { document.dispatchEvent(new CustomEvent('loadRecording',     { detail: { message: "load" } })); }
       function simulateRecordingEvent() { document.dispatchEvent(new CustomEvent('simulateRecording', { detail: { message: "simulate" } })); }
 
-      toggleAudio();
+      animateAudioMute();
       animateRecordedAudioMute();
 
       document.addEventListener('muteAnimation',          () => animateAudioMute());
