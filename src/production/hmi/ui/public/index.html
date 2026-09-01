@@ -1530,6 +1530,12 @@
 
       hmiState.liveMode       = true;
       hmiState.simUpdateDelay = 10000;
+
+      // Live-event window (ms): how long a live vocalization/movement marker
+      // stays on the HMI map before it is purged (see purgeVocalizationEvents /
+      // purgeTruthEvents and the fade styling in HMI.js). Default 60000 (60s),
+      // inside the 60-120s range recommended for this feature. Change ONLY
+      // this value to retune the window — everything else reads it from here.
       hmiState.liveWindow     = 60000;
       hmiState.simMode        = "Stop";
 
