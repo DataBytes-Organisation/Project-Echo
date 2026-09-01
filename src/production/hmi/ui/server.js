@@ -43,6 +43,16 @@ app.post('/api/razorpay-webhook', express.raw({ type: 'application/json' }), (re
   return razorpayPayment.handleWebhook(req, res, donations, { orders });
 });
 app.use(express.json({limit: '10mb'}));
+const cookieSecret = process.env.COOKIE_SECRET || crypto.randomBytes(32).toString("hex");
+// ponytail: ephemeral fallback invalidates sessions on restart; configure COOKIE_SECRET for stable sessions.
+app.use(
+  cookieSession({
+    name: "echo-session",
+    keys: [cookieSecret],
+    httpOnly: true,
+    sameSite: "lax"
+  })
+);
 
 // Import the User model
 const { User } = require('./model/user.model'); // Add this line
@@ -406,14 +416,6 @@ app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }))
 
 //const serveIndex = require('serve-index'); 
 //app.use('/images/bio', serveIndex(express.static(path.join(__dirname, '/images/bio'))));
-
-app.use(
-  cookieSession({
-    name: "echo-session",
-    keys: ["COOKIE_SECRET"], // should use as secret environment variable
-    httpOnly: true
-  })
-);
 
 const nodemailer = require('nodemailer');
 var transporter = nodemailer.createTransport({

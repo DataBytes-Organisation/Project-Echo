@@ -11,6 +11,7 @@ const {
   savePayment,
   withRazorpayCsp,
 } = require("../routes/razorpay.routes");
+const { createCheckUserSession } = require("../middleware/session");
 
 const CAPTURED_WEBHOOK = '{  "entity":"event","account_id":"acc_test123","event":"payment.captured","contains":["payment"],"payload":{"payment":{"entity":{"id":"pay_verified123","entity":"payment","amount":999999,"currency":"USD","status":"captured","order_id":"order_verified123","method":"card","email":"forged@example.com","contact":"+61000000000","created_at":1700000000,"captured":true}}},"created_at":1700000001  }';
 
@@ -656,4 +657,49 @@ test("createOrderRateLimiter bounds order creation per client and resets after i
   now = 2001;
   limiter(req, response(), () => { nextCalls += 1; });
   assert.equal(nextCalls, 3);
+});
+
+test("order authentication rejects missing or mismatched requester sessions even when Redis has a JWT", async () => {
+  const checkUserSession = createCheckUserSession({
+    isOpen: true,
+    async get() {
+      return "requester-jwt";
+    },
+  });
+
+  for (const session of [{}, { token: "another-user-jwt" }]) {
+    const res = response();
+    let nextCalls = 0;
+
+    await checkUserSession(
+      { path: "/api/create-razorpay-order", session },
+      res,
+      () => { nextCalls += 1; }
+    );
+
+    assert.equal(res.statusCode, 401);
+    assert.deepEqual(res.body, { error: "Authentication required." });
+    assert.equal(nextCalls, 0);
+  }
+});
+
+test("order authentication accepts the requester session whose JWT matches Redis", async () => {
+  const checkUserSession = createCheckUserSession({
+    isOpen: true,
+    async get() {
+      return "requester-jwt";
+    },
+  });
+  const res = response();
+  let nextCalls = 0;
+
+  await checkUserSession(
+    { path: "/api/create-razorpay-order", session: { token: "requester-jwt" } },
+    res,
+    () => { nextCalls += 1; }
+  );
+
+  assert.equal(res.statusCode, 200);
+  assert.equal(res.body, undefined);
+  assert.equal(nextCalls, 1);
 });
