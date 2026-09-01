@@ -42,11 +42,14 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y docker-compose
     
-    - name: Build containers
+        - name: Build containers
       run: |
         cd src/deployment/docker
-        docker compose -f docker-compose.test.yml build --no-cache --force-rm
-        
+        for i in 1 2 3; do
+          docker compose -f docker-compose.test.yml build --no-cache --force-rm && break
+          echo "Build attempt $i failed — retrying in 20s..."
+          sleep 20
+        done
     - name: Start containers
       run: |
         cd src/deployment/docker
