@@ -16,6 +16,8 @@ const API_BASE_URL = `http://${process.env.API_HOST || 'localhost'}:9000`;
 const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY);
 const axios = require('axios');
 const { MongoClient, ObjectId } = require('mongodb');
+const razorpayPayment = require('./routes/razorpay.routes');
+const limitRazorpayOrders = razorpayPayment.createOrderRateLimiter();
 
 
 
@@ -103,7 +105,7 @@ app.use(
   helmet({
     contentSecurityPolicy: {
       useDefaults: true,
-      directives: {
+      directives: razorpayPayment.withRazorpayCsp({
         defaultSrc: ["'self'"],
 
         scriptSrc: [
@@ -194,7 +196,7 @@ app.use(
 
         objectSrc: ["'none'"],
         upgradeInsecureRequests: null
-      }
+      })
     }
   })
 );
@@ -372,28 +374,15 @@ let connectedDB;
   }
 })();
 
-app.post('/api/save-razorpay-payment', async (req, res) => {
-  const { paymentId, name, email, amount, currency, method } = req.body;
+app.post('/api/create-razorpay-order', checkUserSession, limitRazorpayOrders, (req, res) => {
+  const orders = connectedDB ? connectedDB.collection("razorpay_orders") : null;
+  return razorpayPayment.createOrder(req, res, { orders });
+});
 
-  try {
-    const donations = connectedDB.collection("donations");
-
-    await donations.insertOne({
-      paymentId,
-      name,
-      email,
-      amount,
-      currency,
-      method,
-      status: 'succeeded',
-      timestamp: new Date()
-    });
-
-    res.status(201).json({ status: 'success' });
-  } catch (error) {
-    console.error('❌ Error saving donation:', error);
-    res.status(500).send("Error retrieving session details.");
-  }
+app.post('/api/save-razorpay-payment', (req, res) => {
+  const donations = connectedDB ? connectedDB.collection("donations") : null;
+  const orders = connectedDB ? connectedDB.collection("razorpay_orders") : null;
+  return razorpayPayment.savePayment(req, res, donations, { orders });
 });
 
 

@@ -1153,10 +1153,8 @@
         });
       });
 
-      let cart = [{ id: 1, quantity: 0 }];
-
       const donationButton = document.getElementById('donation-button');
-      donationButton.addEventListener("click", () => {
+      donationButton.addEventListener("click", async () => {
         if (donorAmount == undefined) {
           // TASK 7: replaced silent return with a warning toast
           if (window.showToast) {
@@ -1165,8 +1163,6 @@
           return;
         }
 
-        cart[0].quantity = donorAmount;
-
         if (!username || !email) {
           if (window.showToast) {
             window.showToast('User details are still loading. Please try again in a moment.', 'warning');
@@ -1174,28 +1170,36 @@
           return;
         }
 
-        var options = payment(username, donorAmount * 100, email);
-        var rzp1 = new Razorpay(options);
-        rzp1.open();
-        rzp1.on('payment.failed', function () { rzp1.close(); });
+        donationButton.disabled = true;
+        const releaseDonationButton = () => { donationButton.disabled = false; };
 
-        fetch("/api/create-checkout-session", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ items: cart, userEmail: email }),
-        })
-          .then(res => {
-            if (res.ok) return res.json();
-            return res.json().then(json => Promise.reject(json));
-          })
-          .then(({ url }) => { window.location = url; })
-          .catch(e => {
-            console.error(e.error);
+        try {
+          const response = await fetch("/api/create-razorpay-order", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ amount: Number(donorAmount) * 100 }),
+          });
+          if (!response.ok) throw new Error('Razorpay order creation failed');
+
+          const order = await response.json();
+          const options = payment(username, order, email, releaseDonationButton);
+          const rzp1 = new Razorpay(options);
+          rzp1.on('payment.failed', function () {
+            rzp1.close();
+            releaseDonationButton();
             if (window.showToast) {
-              window.showToast('Payment session could not be started. Please try again.', 'error');
+              window.showToast('Payment failed. Please try again.', 'error');
             }
           });
-      });
+          rzp1.open();
+        } catch (error) {
+          releaseDonationButton();
+          console.error('Razorpay order creation failed.');
+          if (window.showToast) {
+            window.showToast('Payment session could not be started. Please try again.', 'error');
+          }
+        }
+        });
     </script>
 
     <script>
