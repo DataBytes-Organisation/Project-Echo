@@ -2,6 +2,7 @@ import os
 
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import JSONResponse
+from starlette.concurrency import run_in_threadpool
 
 from app.database import Donations, RazorpayOrders
 from app.middleware.auth_bearer import JWTBearer
@@ -46,4 +47,10 @@ def verify_razorpay_checkout(payload: RazorpayCheckoutProof):
 async def receive_razorpay_webhook(request: Request):
     raw_body = await request.body()
     signature = request.headers.get("x-razorpay-signature")
-    return _response(payment_service.process_webhook(raw_body, signature, _dependencies()))
+    result = await run_in_threadpool(
+        payment_service.process_webhook,
+        raw_body,
+        signature,
+        _dependencies(),
+    )
+    return _response(result)

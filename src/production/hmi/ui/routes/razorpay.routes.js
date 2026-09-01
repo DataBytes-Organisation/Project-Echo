@@ -54,7 +54,12 @@ function isJsonObject(value) {
 
 
 function forwardResponse(res, response, safeError) {
-  if (!Number.isInteger(response?.status) || !isJsonObject(response.data)) {
+  if (
+    !Number.isInteger(response?.status) ||
+    response.status < 200 ||
+    response.status > 299 ||
+    !isJsonObject(response.data)
+  ) {
     return res.status(503).json({ error: safeError });
   }
   return res.status(response.status).json(response.data);
@@ -64,11 +69,13 @@ function forwardResponse(res, response, safeError) {
 function forwardFailure(res, error, safeError) {
   const status = error?.response?.status;
   const body = error?.response?.data;
-  const knownBody = isJsonObject(body) &&
-    (typeof body.error === "string" || typeof body.status === "string");
+  const knownStatus = Number.isInteger(status) && status >= 400 && status <= 599;
 
-  if (Number.isInteger(status) && knownBody) {
-    return res.status(status).json(body);
+  if (knownStatus && isJsonObject(body) && typeof body.error === "string") {
+    return res.status(status).json({ error: body.error });
+  }
+  if (knownStatus && isJsonObject(body) && typeof body.status === "string") {
+    return res.status(status).json({ status: body.status });
   }
   console.error("Payment Backend request failed.");
   return res.status(503).json({ error: safeError });

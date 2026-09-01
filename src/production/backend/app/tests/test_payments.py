@@ -358,6 +358,8 @@ class PaymentTests(unittest.TestCase):
     def test_webhook_rejects_malformed_json_and_identifiers(self):
         for body in (
             b'{"event":"payment.captured"',
+            b'{"event":"payment.captured","payload":null}',
+            b'{"event":"payment.captured","payload":{"payment":null}}',
             json.dumps(
                 {
                     "event": "payment.captured",

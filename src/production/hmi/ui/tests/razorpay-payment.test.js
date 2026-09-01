@@ -141,7 +141,9 @@ test("payment proxies preserve known Backend errors", async () => {
   ];
 
   for (const [handler, req, status, message] of cases) {
-    const httpClient = proxyClient({ error: backendError(status, { error: message }) });
+    const httpClient = proxyClient({
+      error: backendError(status, { error: message, detail: "internal stack" }),
+    });
     const res = response();
     await handler(req, res, { httpClient, apiBaseUrl: "http://backend:9000" });
     assert.equal(httpClient.calls.length, 1);

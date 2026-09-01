@@ -268,7 +268,9 @@ def process_webhook(raw_body, signature, dependencies):
     if event.get("event") != "payment.captured":
         return PaymentResult(200, {"status": "ignored"})
 
-    payment = event.get("payload", {}).get("payment", {}).get("entity", {})
+    payload = event.get("payload")
+    payment_payload = payload.get("payment") if isinstance(payload, dict) else None
+    payment = payment_payload.get("entity") if isinstance(payment_payload, dict) else None
     payment_id = payment.get("id") if isinstance(payment, dict) else None
     order_id = payment.get("order_id") if isinstance(payment, dict) else None
     if (

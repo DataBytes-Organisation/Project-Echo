@@ -11,6 +11,7 @@ fake_database.STATES_CODE = []
 fake_database.AUS_STATES = []
 fake_database.Donations = object()
 fake_database.RazorpayOrders = object()
+original_database = sys.modules.get("app.database")
 sys.modules["app.database"] = fake_database
 
 from fastapi import FastAPI
@@ -18,6 +19,11 @@ from fastapi.testclient import TestClient
 
 from app.routers import payments as payment_router
 from app.services.payments import PaymentResult
+
+if original_database is None:
+    sys.modules.pop("app.database", None)
+else:
+    sys.modules["app.database"] = original_database
 
 
 CHECKOUT_ORDER = {
