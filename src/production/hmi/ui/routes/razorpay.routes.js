@@ -107,7 +107,7 @@ async function savePayment(req, res, dependencies = {}) {
     const response = await httpClient.post(
       backendUrl(dependencies, "/payments/razorpay/verify"),
       { paymentId, orderId, signature, name },
-      { timeout: 10000 }
+      { timeout: 21000 }
     );
     return forwardResponse(res, response, "Donation could not be recorded.");
   } catch (error) {

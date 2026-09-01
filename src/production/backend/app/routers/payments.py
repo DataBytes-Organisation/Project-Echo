@@ -1,6 +1,6 @@
 import os
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Request, Response
 from fastapi.responses import JSONResponse
 from starlette.concurrency import run_in_threadpool
 
@@ -24,9 +24,15 @@ def _dependencies():
     )
 
 
-def _response(result):
-    return JSONResponse(status_code=result.status_code, content=result.body)
+def _response(result, response: Response):
+    if 200 <= result.status_code < 300:
+        response.status_code = result.status_code
+        return result.body  # FastAPI validates this against response_model
 
+    return JSONResponse(
+        status_code=result.status_code,
+        content=result.body,
+    )
 
 @router.post(
     "/orders",
@@ -34,23 +40,35 @@ def _response(result):
     status_code=201,
     dependencies=[Depends(jwt_bearer)],
 )
-def create_razorpay_order(payload: RazorpayOrderRequest):
-    return _response(payment_service.create_order(payload.amount, _dependencies()))
+def create_razorpay_order(payload: RazorpayOrderRequest, response: Response):
+    result = payment_service.create_order(payload.amount, _dependencies())
+    return _response(result, response)
 
 
-@router.post("/verify", response_model=PaymentStatusResponse)
-def verify_razorpay_checkout(payload: RazorpayCheckoutProof):
-    return _response(payment_service.verify_checkout(payload.dict(), _dependencies()))
+@router.post(
+    "/verify",
+    response_model=PaymentStatusResponse,
+    responses={201: {"model": PaymentStatusResponse}},
+)
+def verify_razorpay_checkout(
+    payload: RazorpayCheckoutProof,
+    response: Response,
+):
+    result = payment_service.verify_checkout(payload.dict(), _dependencies())
+    return _response(result, response)
 
 
-@router.post("/webhook", response_model=PaymentStatusResponse)
-async def receive_razorpay_webhook(request: Request):
+@router.post(
+    "/webhook",
+    response_model=PaymentStatusResponse,
+    responses={201: {"model": PaymentStatusResponse}},
+)
+async def receive_razorpay_webhook(request: Request, response: Response):
     raw_body = await request.body()
-    signature = request.headers.get("x-razorpay-signature")
     result = await run_in_threadpool(
         payment_service.process_webhook,
         raw_body,
-        signature,
+        request.headers.get("x-razorpay-signature"),
         _dependencies(),
     )
-    return _response(result)
+    return _response(result, response)
