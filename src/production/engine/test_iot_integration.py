@@ -28,7 +28,7 @@ _HEAVY_MODULES = [
     "google.cloud", "google.cloud.storage",
     "pymongo", "diskcache", "soundfile",
     "geopy", "geopy.distance",
-    "sklearn", "sklearn.preprocessing",
+    # "sklearn", "sklearn.preprocessing",
     "helpers", "helpers.melspectrogram_to_cam",
     "yamnet_dir", "yamnet_dir.params", "yamnet_dir.yamnet",
 ]
@@ -55,7 +55,7 @@ _ENGINE_CONFIG = {
     "MODEL_INPUT_IMAGE_CHANNELS": 3,
     "MQTT_CLIENT_URL": "localhost", "MQTT_CLIENT_PORT": 1883,
     "MQTT_PUBLISH_URL": "projectecho/engine/2",
-    "MODEL_SERVER": "http://localhost:8501/v1/models/echo_model:predict",
+    "MODEL_SERVER": "http://ts-echo-model-cont:8501/v1/models/echo_model/versions/1:predict",
     "WEATHER_SERVER": "http://localhost:8501/v1/models/weather_model:predict",
     "GCLOUD_PROJECT": "test", "BUCKET_NAME": "test", "DB_HOSTNAME": "localhost",
     "IOT_MQTT_BROKER": "broker.hivemq.com",

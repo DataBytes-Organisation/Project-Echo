@@ -40,7 +40,10 @@ import pandas as pd
 import soundfile as sf
 import sys
 sys.path.append("yamnet/")
+from pathlib import Path
 
+ENGINE_DIR = Path(__file__).resolve().parent
+YAMNET_DIR = ENGINE_DIR / "yamnet_dir"
 
 from platform import python_version
 
@@ -77,22 +80,22 @@ print('TensorFlow Version       : ', tf.__version__)
 print('Librosa Version          : ', librosa.__version__)
 
 # Load the necessary data and models
-with open('yamnet_dir/class_names.pkl', 'rb') as f:
+with open(YAMNET_DIR / "class_names.pkl", "rb") as f:
     class_names = pickle.load(f)
 
-with open('yamnet_dir/label_encoder.pkl', 'rb') as f:
+with open(YAMNET_DIR / "label_encoder.pkl", "rb") as f:
     le = pickle.load(f)
 
 yamnet = yamnet_model.yamnet_frames_model(params)
-yamnet.load_weights('yamnet_dir/yamnet.h5')
-yamnet_classes = yamnet_model.class_names('yamnet_dir/yamnet_class_map.csv')
-model = load_model('yamnet_dir/model_3_82_16000.h5')
+yamnet.load_weights(str(YAMNET_DIR / "yamnet.h5"))
+yamnet_classes = yamnet_model.class_names(str(YAMNET_DIR / "yamnet_class_map.csv"))
+model = load_model(str(YAMNET_DIR / "model_3_82_16000.h5"))
 
 # Load the YAMNet model
 # yamnet_model_handle = 'https://tfhub.dev/google/yamnet/1'
 # yamnet_model = hub.load(yamnet_model_handle)
 #TODO: Fix for above macOS, as installing tensorflow hub causes issue
-yamnet_model =tf.saved_model.load('yamnet_dir/model')
+yamnet_model = tf.saved_model.load(str(YAMNET_DIR / "model"))
 
 
 class EchoEngine():

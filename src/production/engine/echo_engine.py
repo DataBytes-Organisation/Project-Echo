@@ -14,6 +14,9 @@
 # disable warnings
 import warnings
 warnings.filterwarnings("ignore")
+from pathlib import Path
+ENGINE_DIR = Path(__file__).resolve().parent
+YAMNET_DIR = ENGINE_DIR / "yamnet_dir"
 
 # os environment
 import os
@@ -62,6 +65,13 @@ from helpers import melspectrogram_to_cam
 # for weather label
 from sklearn.preprocessing import LabelEncoder
 
+# Sprint 2 inference wrapper
+from inference_wrapper import (
+    InferenceResponse,
+    InferenceWrapper,
+    InferenceValidator,
+    BackendAdapter,
+)
 
 # print system information
 print('Python Version           : ', python_version())
@@ -69,22 +79,24 @@ print('TensorFlow Version       : ', tf.__version__)
 print('Librosa Version          : ', librosa.__version__)
 
 # Load the necessary data and models
-with open('yamnet_dir/class_names.pkl', 'rb') as f:
+YAMNET_DIR = Path(__file__).resolve().parent / "yamnet_dir"
+with open(YAMNET_DIR / "class_names.pkl", "rb") as f:
+
     class_names = pickle.load(f)
 
-with open('yamnet_dir/label_encoder.pkl', 'rb') as f:
+with open(YAMNET_DIR / "label_encoder.pkl", "rb") as f:
     le = pickle.load(f)
 
 yamnet = yamnet_model.yamnet_frames_model(params)
-yamnet.load_weights('yamnet_dir/yamnet.h5')
-yamnet_classes = yamnet_model.class_names('yamnet_dir/yamnet_class_map.csv')
-model = load_model('yamnet_dir/model_3_82_16000.h5')
+yamnet.load_weights(str(YAMNET_DIR / "yamnet.h5"))
+yamnet_classes = yamnet_model.class_names(str(YAMNET_DIR / "yamnet_class_map.csv"))
+model = load_model(str(YAMNET_DIR / "model_3_82_16000.h5"))
 
 # Load the YAMNet model
 # yamnet_model_handle = 'https://tfhub.dev/google/yamnet/1'
 # yamnet_model = hub.load(yamnet_model_handle)
 #TODO: Fix for above macOS, as installing tensorflow hub causes issue
-yamnet_model =tf.saved_model.load('yamnet_dir/model')
+model = load_model(str(YAMNET_DIR / "model_3_82_16000.h5"))
 
 
 class EchoEngine():
@@ -490,25 +502,176 @@ class EchoEngine():
     ########################################################################################
     # this function populates the database with the prediction results
     ########################################################################################
-    def echo_api_send_detection_event(self, audio_event, sample_rate, predicted_class, predicted_probability):
-        
-        detection_event = {
-            "timestamp": audio_event["timestamp"],
-            "species": predicted_class,
-            "confidence": predicted_probability, 
-            "sensorId": audio_event["sensorId"],
-            "microphoneLLA": audio_event["microphoneLLA"],
-            "animalEstLLA": audio_event["animalEstLLA"], 
-            "animalTrueLLA": audio_event["animalTrueLLA"], 
-            "animalLLAUncertainty": audio_event["animalLLAUncertainty"],
-            "audioClip": audio_event["audioClip"],
-            "sampleRate": sample_rate     
+    def echo_api_send_detection_event(self,audio_event,sample_rate,predicted_class,predicted_probability):
+
+
+        # ---------------------------------------------------------
+        # Step 1: Validate required input fields
+        # ---------------------------------------------------------
+        valid, error = InferenceValidator.validate_required_fields(
+            audio_event
+        )
+
+        if not valid:
+            response = InferenceWrapper.build_failure(
+                timestamp=audio_event.get("timestamp", ""),
+                sensorId=audio_event.get("sensorId", ""),
+                sampleRate=sample_rate,
+                error_code=error["code"],
+                error_message=error["message"]
+            )
+
+            backend_payload = BackendAdapter.to_backend_payload(response)
+
+            url = 'http://ts-api-cont:9000/engine/event'
+            x = requests.post(url, json=backend_payload)
+            print(x.text)
+
+            return
+
+        # ---------------------------------------------------------
+        # Step 2: Validate audio
+        # ---------------------------------------------------------
+        valid, error = InferenceValidator.validate_audio(
+            audio_event.get("audioClip")
+        )
+
+        if not valid:
+            response = InferenceWrapper.build_failure(
+                timestamp=audio_event.get("timestamp", ""),
+                sensorId=audio_event.get("sensorId", ""),
+                sampleRate=sample_rate,
+                error_code=error["code"],
+                error_message=error["message"]
+            )
+
+            backend_payload = BackendAdapter.to_backend_payload(response)
+
+            url = 'http://ts-api-cont:9000/engine/event'
+            x = requests.post(url, json=backend_payload)
+            print(x.text)
+
+            return
+
+        # ---------------------------------------------------------
+        # Step 3: Validate sample rate
+        # ---------------------------------------------------------
+        valid, error = InferenceValidator.validate_sample_rate(
+            sample_rate
+        )
+
+        if not valid:
+            response = InferenceWrapper.build_failure(
+                timestamp=audio_event.get("timestamp", ""),
+                sensorId=audio_event.get("sensorId", ""),
+                sampleRate=sample_rate,
+                error_code=error["code"],
+                error_message=error["message"]
+            )
+
+            backend_payload = BackendAdapter.to_backend_payload(response)
+
+            url = 'http://ts-api-cont:9000/engine/event'
+            x = requests.post(url, json=backend_payload)
+            print(x.text)
+
+            return
+
+        # ---------------------------------------------------------
+        # Step 4: Validate prediction
+        # ---------------------------------------------------------
+        valid, error = InferenceValidator.validate_prediction(
+            predicted_class,
+            predicted_probability
+        )
+
+        if not valid:
+            response = InferenceWrapper.build_failure(
+                timestamp=audio_event.get("timestamp", ""),
+                sensorId=audio_event.get("sensorId", ""),
+                sampleRate=sample_rate,
+                error_code=error["code"],
+                error_message=error["message"]
+            )
+
+            backend_payload = BackendAdapter.to_backend_payload(response)
+
+            url = 'http://ts-api-cont:9000/engine/event'
+            x = requests.post(url, json=backend_payload)
+            print(x.text)
+
+            return
+
+        # ---------------------------------------------------------
+        # Step 5: Convert GPS arrays into standard GPS objects
+        # ---------------------------------------------------------
+        microphone_lla = audio_event.get("microphoneLLA")
+
+        microphone_lla_object = {
+            "latitude": microphone_lla[0],
+            "longitude": microphone_lla[1],
+            "altitude": microphone_lla[2]
         }
-        
+
+        animal_est_lla = audio_event.get("animalEstLLA")
+
+        animal_est_lla_object = None
+
+        if animal_est_lla:
+            animal_est_lla_object = {
+                "latitude": animal_est_lla[0],
+                "longitude": animal_est_lla[1],
+                "altitude": animal_est_lla[2]
+            }
+
+        animal_true_lla = audio_event.get("animalTrueLLA")
+
+        animal_true_lla_object = None
+
+        if animal_true_lla:
+            animal_true_lla_object = {
+                "latitude": animal_true_lla[0],
+                "longitude": animal_true_lla[1],
+                "altitude": animal_true_lla[2]
+            }
+
+        # ---------------------------------------------------------
+        # Step 6: Build standard inference response
+        # ---------------------------------------------------------
+        response = InferenceWrapper.build_success(
+            timestamp=audio_event["timestamp"],
+            species=predicted_class,
+            confidence=predicted_probability,
+            sensorId=audio_event["sensorId"],
+            microphoneLLA=microphone_lla_object,
+            animalEstLLA=animal_est_lla_object,
+            animalTrueLLA=animal_true_lla_object,
+            animalLLAUncertainty=audio_event.get(
+                "animalLLAUncertainty"
+            ),
+            audioClip=audio_event["audioClip"],
+            sampleRate=sample_rate
+        )
+
+        # ---------------------------------------------------------
+        # Step 7: Convert standard response to Backend format
+        # ---------------------------------------------------------
+        backend_payload = BackendAdapter.to_backend_payload(
+            response
+        )
+
+        # ---------------------------------------------------------
+        # Step 8: Send existing Backend payload
+        # ---------------------------------------------------------
         url = 'http://ts-api-cont:9000/engine/event'
-        x = requests.post(url, json = detection_event)
+
+        x = requests.post(
+            url,
+            json=backend_payload
+        )
+
         print(x.text)
-    
+
     def weather_pipeline(self, audio_clip):
         """
             Processes an audio clip to generate a resized log-mel spectrogram. To be used similar to combined_pipeline() function

@@ -14,12 +14,13 @@
 # ==============================================================================
 
 """Installation test for YAMNet."""
-
+from pathlib import Path
+YAMNET_DIR = Path(__file__).resolve().parent
 import numpy as np
 import tensorflow as tf
 
-import params
-import yamnet
+from yamnet_dir import params
+from yamnet_dir import yamnet
 
 class YAMNetTest(tf.test.TestCase):
 
@@ -33,9 +34,11 @@ class YAMNetTest(tf.test.TestCase):
     cls._yamnet_graph = tf.Graph()
     with cls._yamnet_graph.as_default():
       cls._yamnet = yamnet.yamnet_frames_model(params)
-      cls._yamnet.load_weights('yamnet.h5')
-      cls._yamnet_classes = yamnet.class_names('yamnet_class_map.csv')
-
+      yamnet_weights = Path(__file__).resolve().parent / "yamnet.h5"
+      cls._yamnet.load_weights(str(yamnet_weights))
+      yamnet_class_map = Path(__file__).resolve().parent / "yamnet_class_map.csv"
+      cls._yamnet_classes = yamnet.class_names(str(yamnet_class_map))
+      
   def clip_test(self, waveform, expected_class_name, top_n=10):
     """Run the model on the waveform, check that expected class is in top-n."""
     with YAMNetTest._yamnet_graph.as_default():
