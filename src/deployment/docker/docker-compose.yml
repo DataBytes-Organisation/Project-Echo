@@ -110,7 +110,9 @@ services:
     environment:
       MAIL_STARTTLS: "true"
       MAIL_SSL_TLS: "false"
-
+      MQTT_BROKER_URL: "ts-mqtt-server-cont"
+      MQTT_BROKER_PORT: "1883"
+      MQTT_PUBLISH_URL: "projectecho/engine/2"
 
     stdin_open: false
     tty: true
