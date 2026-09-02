@@ -15,18 +15,12 @@ The `.env` file holds environment-specific settings such as the website address 
 ```
 API_HOST=localhost
 CLIENT_URL=http://localhost:8080
-RAZORPAY_KEY_ID=
-RAZORPAY_KEY_SECRET=
 ```
-
-Generate the Razorpay values in Razorpay Dashboard **Test Mode** for local development. Keep `RAZORPAY_KEY_SECRET` server-side and never commit it to source control.
 
 ## Variable Descriptions
 
 - `API_HOST` — Backend API host. Locally set to `localhost`. Automatically switches to `api-service` in Kubernetes via the ConfigMap.
 - `CLIENT_URL` — Frontend URL used for Stripe redirects and password reset emails. Locally set to `http://localhost:8080`. On the live server, this is provided by the Cloud team.
-- `RAZORPAY_KEY_ID` — Public Razorpay API key ID returned to Standard Checkout. Use a Test Mode key locally and the corresponding Live Mode key in production.
-- `RAZORPAY_KEY_SECRET` — Private Razorpay API key secret used only by the HMI server to create and verify payments. Never expose it to browser code or commit it.
 
 ## Updating `CLIENT_URL` for Live Server
 
@@ -49,5 +43,5 @@ After updating, the connection status badge on the admin dashboard will display:
 
 - **Badge shows "Cannot connect to backend API"** → The backend API service is not running or unreachable. Check that all Docker containers are up.
 - **Badge shows "Fallback Mode"** → `CLIENT_URL` is not set correctly in the `.env` file.
-- **Donation checkout reports that the payment service is unavailable** → Confirm both Razorpay variables are set as a matching Test or Live Mode key pair, then restart the HMI service.
+- **Donation checkout reports that the payment service is unavailable** → Confirm the Backend Razorpay configuration uses a matching Test or Live Mode key pair, then restart the Backend service.
 - **Changes to `.env` not taking effect** → Restart Docker with `docker compose down && docker compose up --build`.
