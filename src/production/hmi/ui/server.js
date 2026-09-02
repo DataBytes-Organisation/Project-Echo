@@ -17,7 +17,6 @@ const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY);
 const axios = require('axios');
 const { MongoClient, ObjectId } = require('mongodb');
 const razorpayPayment = require('./routes/razorpay.routes');
-const limitRazorpayOrders = razorpayPayment.createOrderRateLimiter();
 let connectedDB;
 
 
@@ -386,12 +385,9 @@ const donationClient = new MongoClient(process.env.MONGODB_URI || `mongodb://${p
   }
 })();
 
-app.post('/api/create-razorpay-order', checkUserSession, limitRazorpayOrders, (req, res) => {
-  return razorpayPayment.createOrder(req, res, { apiBaseUrl: API_BASE_URL });
-});
-
-app.post('/api/save-razorpay-payment', (req, res) => {
-  return razorpayPayment.savePayment(req, res, { apiBaseUrl: API_BASE_URL });
+razorpayPayment.registerRazorpayBrowserRoutes(app, {
+  apiBaseUrl: API_BASE_URL,
+  checkUserSession,
 });
 
 

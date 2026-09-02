@@ -14,14 +14,14 @@ function withRazorpayCsp(directives) {
 }
 
 
-function createOrderRateLimiter(options = {}) {
+function createPaymentRateLimiter(options = {}) {
   const limit = options.limit || 10;
   const windowMs = options.windowMs || 10 * 60 * 1000;
   const now = options.now || Date.now;
   const attempts = new Map();
 
   // ponytail: per-process/IP state; move to shared session-aware storage if HMI scales horizontally.
-  return function limitOrderCreation(req, res, next) {
+  return function limitPaymentAttempts(req, res, next) {
     const time = now();
     const client = req.ip || req.socket?.remoteAddress || "unknown";
     const current = attempts.get(client);
@@ -37,6 +37,19 @@ function createOrderRateLimiter(options = {}) {
     current.count += 1;
     return next();
   };
+}
+
+
+function registerRazorpayBrowserRoutes(app, dependencies) {
+  const limitOrders = createPaymentRateLimiter();
+  const limitVerification = createPaymentRateLimiter();
+
+  app.post("/api/create-razorpay-order", dependencies.checkUserSession, limitOrders, (req, res) => {
+    return createOrder(req, res, dependencies);
+  });
+  app.post("/api/save-razorpay-payment", limitVerification, (req, res) => {
+    return savePayment(req, res, dependencies);
+  });
 }
 
 
@@ -142,8 +155,9 @@ async function handleWebhook(req, res, dependencies = {}) {
 
 module.exports = {
   createOrder,
-  createOrderRateLimiter,
+  createPaymentRateLimiter,
   handleWebhook,
+  registerRazorpayBrowserRoutes,
   savePayment,
   withRazorpayCsp,
 };

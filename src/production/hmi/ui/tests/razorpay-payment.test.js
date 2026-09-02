@@ -5,8 +5,9 @@ const test = require("node:test");
 
 const {
   createOrder,
-  createOrderRateLimiter,
+  createPaymentRateLimiter,
   handleWebhook,
+  registerRazorpayBrowserRoutes,
   savePayment,
   withRazorpayCsp,
 } = require("../routes/razorpay.routes");
@@ -49,6 +50,29 @@ function backendError(status, data) {
   const error = new Error("Backend request failed");
   error.response = { status, data };
   return error;
+}
+
+function routeHarness() {
+  const routes = new Map();
+
+  return {
+    app: {
+      post(path, ...handlers) {
+        routes.set(path, handlers);
+      },
+    },
+    async post(path, req) {
+      const handlers = routes.get(path);
+      const res = response();
+      let index = 0;
+      const next = async () => {
+        const handler = handlers?.[index++];
+        if (handler) return handler(req, res, next);
+      };
+      await next();
+      return res;
+    },
+  };
 }
 
 test("createOrder forwards the amount and requester JWT to FastAPI once", async () => {
@@ -94,7 +118,7 @@ test("savePayment forwards only checkout proof fields to FastAPI once", async ()
   assert.deepEqual(httpClient.calls[0], {
     url: "http://backend:9000/payments/razorpay/verify",
     body: proof,
-    options: { timeout: 10000 },
+    options: { timeout: 21000 },
   });
   assert.equal(res.statusCode, 200);
   assert.deepEqual(res.body, { status: "success" });
@@ -191,28 +215,89 @@ test("withRazorpayCsp enables Checkout scripts, API connections, and payment fra
   assert.deepEqual(directives.frameSrc, ["'self'", "https://api.razorpay.com", "https://*.razorpay.com"]);
 });
 
-test("createOrderRateLimiter bounds order creation per client and resets after its window", () => {
+test("payment rate limiters keep order and verification budgets separate", () => {
   let now = 1000;
-  let nextCalls = 0;
-  const limiter = createOrderRateLimiter({
+  let orderCalls = 0;
+  let verificationCalls = 0;
+  const options = {
     limit: 2,
     windowMs: 1000,
     now: () => now,
-  });
+  };
+  const limitOrders = createPaymentRateLimiter(options);
+  const limitVerification = createPaymentRateLimiter(options);
   const req = { ip: "192.0.2.1" };
 
-  limiter(req, response(), () => { nextCalls += 1; });
-  limiter(req, response(), () => { nextCalls += 1; });
-  const blocked = response();
-  limiter(req, blocked, () => { nextCalls += 1; });
+  limitOrders(req, response(), () => { orderCalls += 1; });
+  limitOrders(req, response(), () => { orderCalls += 1; });
+  const blockedOrder = response();
+  limitOrders(req, blockedOrder, () => { orderCalls += 1; });
+  limitVerification(req, response(), () => { verificationCalls += 1; });
+  limitVerification(req, response(), () => { verificationCalls += 1; });
+  const blockedVerification = response();
+  limitVerification(req, blockedVerification, () => { verificationCalls += 1; });
 
-  assert.equal(nextCalls, 2);
-  assert.equal(blocked.statusCode, 429);
-  assert.deepEqual(blocked.body, { error: "Too many payment attempts. Please try again later." });
+  assert.equal(orderCalls, 2);
+  assert.equal(verificationCalls, 2);
+  for (const blocked of [blockedOrder, blockedVerification]) {
+    assert.equal(blocked.statusCode, 429);
+    assert.deepEqual(blocked.body, { error: "Too many payment attempts. Please try again later." });
+  }
 
   now = 2001;
-  limiter(req, response(), () => { nextCalls += 1; });
-  assert.equal(nextCalls, 3);
+  limitVerification(req, response(), () => { verificationCalls += 1; });
+  assert.equal(verificationCalls, 3);
+});
+
+test("Razorpay browser routes rate-limit verification without requiring authentication", async () => {
+  const harness = routeHarness();
+  const httpClient = proxyClient();
+  const checkUserSession = (req, res, next) => {
+    if (req.session?.token !== "requester-jwt") {
+      return res.status(401).json({ error: "Authentication required." });
+    }
+    return next();
+  };
+  registerRazorpayBrowserRoutes(harness.app, {
+    apiBaseUrl: "http://backend:9000",
+    checkUserSession,
+    httpClient,
+  });
+
+  const unauthenticatedOrder = await harness.post(
+    "/api/create-razorpay-order",
+    { ip: "192.0.2.1", body: { amount: 500 } }
+  );
+  assert.equal(unauthenticatedOrder.statusCode, 401);
+
+  for (let attempt = 0; attempt < 10; attempt += 1) {
+    const order = await harness.post(
+      "/api/create-razorpay-order",
+      { ip: "192.0.2.1", body: { amount: 500 }, session: { token: "requester-jwt" } }
+    );
+    assert.equal(order.statusCode, 200);
+  }
+  const blockedOrder = await harness.post(
+    "/api/create-razorpay-order",
+    { ip: "192.0.2.1", body: { amount: 500 }, session: { token: "requester-jwt" } }
+  );
+  assert.equal(blockedOrder.statusCode, 429);
+
+  for (let attempt = 0; attempt < 10; attempt += 1) {
+    const verification = await harness.post(
+      "/api/save-razorpay-payment",
+      { ip: "192.0.2.1", body: {} }
+    );
+    assert.equal(verification.statusCode, 200);
+  }
+  const blockedVerification = await harness.post(
+    "/api/save-razorpay-payment",
+    { ip: "192.0.2.1", body: {} }
+  );
+  assert.equal(blockedVerification.statusCode, 429);
+  assert.deepEqual(blockedVerification.body, {
+    error: "Too many payment attempts. Please try again later.",
+  });
 });
 
 test("order authentication rejects missing or mismatched requester sessions even when Redis has a JWT", async () => {
