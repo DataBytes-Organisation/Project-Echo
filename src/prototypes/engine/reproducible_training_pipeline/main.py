@@ -150,8 +150,18 @@ def main(cfg: DictConfig):
 	# test_loader = DataLoader(test_dataset, batch_size=cfg.training.batch_size, shuffle=False, num_workers=cfg.training.num_workers, pin_memory=True)
 
 	# cfg.training.epochs = 15
+	qat_example_input = None
 
-	model = Model(cfg).to(device)
+	if cfg.model.params.get("use_qat", False):
+		example_inputs, _ = next(iter(train_loader))
+		qat_example_input = example_inputs[:1].cpu()
+
+		print(
+			f"Using training-pipeline example input for QAT: "
+			f"{tuple(qat_example_input.shape)}"
+		)
+
+	model = Model(cfg, example_input=qat_example_input).to(device)
 	print(model.summary())
 	trainer = Trainer(cfg, model, train_loader, val_loader, device, cfg.model.name)
 	# trainer.train()
@@ -213,7 +223,7 @@ def main(cfg: DictConfig):
 
 		if cfg.run.quantise:
 			print("\n--- Quantising model ---")
-			trainer.model.quantise()
+			trainer.model.quantise(train_loader)
 			print("\n--- Testing quantised model ---")
 			# trainer.test(val_loader, name="Quantised")
 			trainer.test(val_loader)
