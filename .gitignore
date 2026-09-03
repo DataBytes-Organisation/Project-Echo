@@ -61,6 +61,20 @@ tensorboard_logs/
 #src/production/engine/models/*
 
 # -----------------------------------------------------------------------------
+# PyTorch training pipeline (src/prototypes/engine/reproducible_training_pipeline/)
+# -----------------------------------------------------------------------------
+*.pth
+*.onnx
+src/prototypes/engine/reproducible_training_pipeline/outputs/
+src/prototypes/engine/reproducible_training_pipeline/.cache/
+
+# -----------------------------------------------------------------------------
+# Local prototype datasets (not tracked, too large / personal-machine paths)
+# -----------------------------------------------------------------------------
+src/prototypes/data_files/
+src/prototypes/spectrograms/
+
+# -----------------------------------------------------------------------------
 # Databases
 # -----------------------------------------------------------------------------
 *.db
@@ -85,3 +99,8 @@ src/production/backend/app/main.py
 
 # Benchmarking self-test throwaway output
 results_selftest/
+dataset/
+dataset_v2/
+
+.claude/
+CLAUDE.md
