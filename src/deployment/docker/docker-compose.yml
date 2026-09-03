@@ -165,6 +165,9 @@ services:
       retries: 5
     restart: on-failure
 
+
+    
+
   echo_iot_management:
     build:
       context: ../../production/iot/management_application
