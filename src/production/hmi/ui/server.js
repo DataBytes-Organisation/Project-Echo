@@ -165,6 +165,11 @@ app.use(
           "https:"
         ],
 
+        mediaSrc: [
+        "'self'",
+        "blob:"
+        ],
+
         connectSrc: [
           "'self'",
           "ws:",

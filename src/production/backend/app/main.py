@@ -4,6 +4,8 @@ from .routers import add_csv_output_option, audio_upload_router
 
 from fastapi import FastAPI, Body, HTTPException, status, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.exceptions import RequestValidationError
+from app.errors import StandardizeErrorResponseMiddleware, http_exception_handler, unhandled_exception_handler, validation_exception_handler
 from app.routers import species_predictor
 from app.routers import auth_router
 from app.routers import admin_budget, admin_services
@@ -45,11 +47,6 @@ app = FastAPI(
 async def log_api_startup():
     logger.info("API Server listening on port 9000")
 
-# Add the CORS middleware
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:8080"],  # 可根据实际需求配置
-)
 # Routers
 from .routers import add_csv_output_option, audio_upload_router
 from app.routers import species_predictor, auth_router, hmi, engine, sim, two_factor, public, iot, live, sensors #Websocket
@@ -57,7 +54,10 @@ from app.routers import species_predictor, auth_router, hmi, engine, sim, two_fa
 from app.routers import projects
 app.include_router(projects.router)
 
-from app.routers import hmi, engine, sim, iot
+app.add_exception_handler(HTTPException, http_exception_handler)
+app.add_exception_handler(RequestValidationError, validation_exception_handler)
+app.add_exception_handler(Exception, unhandled_exception_handler)
+app.add_middleware(StandardizeErrorResponseMiddleware)
 
 # ✅ CORS Middleware
 app.add_middleware(
