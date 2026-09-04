@@ -116,6 +116,23 @@ services:
     tty: true
     command: uvicorn app.main:app --host 0.0.0.0 --port 9000 --reload
 
+  echo_worker:
+    build:
+      context: ../../production/backend
+      dockerfile: API.Dockerfile
+    image: ts-worker
+    container_name: ts-worker-cont
+    networks:
+      - echo-net
+    volumes:
+      - ../../production/backend:/app
+      - credentials_volume:/root/.config/gcloud/
+    depends_on:
+      - echo-redis
+    environment:
+      REDIS_HOST: echo-redis
+      REDIS_PORT: 6379
+    command: rq worker echo-backend --url redis://echo-redis:6379/1
   mongo-express:
     image: mongo-express
     container_name: mongo-express
