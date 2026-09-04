@@ -97,6 +97,7 @@ module.exports = function (app) {
             console.log("Set User roles successfully: ", res)
           }
         })
+        req.session.token = axiosResponse.data.tkn;
         /*
         res.status(200).send(
         `<script> 
@@ -158,6 +159,7 @@ module.exports = function (app) {
             console.log("Set User roles successfully: ", res)
           }
         })
+        req.session.token = axiosResponse.data.tkn;
         res.status(200).send(
         `<script> 
           alert("Login Successfully");

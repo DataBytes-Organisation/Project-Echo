@@ -19,6 +19,8 @@ Events = db.events
 Movements = db.movements
 Species = db.species
 Microphones = db.microphones
+Donations = db.donations
+RazorpayOrders = db.razorpay_orders
 
 Nodes = db.nodes
 Components = db.components
