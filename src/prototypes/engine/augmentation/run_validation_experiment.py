@@ -38,13 +38,15 @@ import sys
 # regardless of the OS's path separator conventions.
 from pathlib import Path
 
-# The folder this script lives in (src/prototypes/engine/reproducible_training_pipeline/) -
-# every subprocess call needs to run with this as its working directory,
-# since main.py expects to find config/, dataset.py, etc. relative to here.
-SCRIPT_DIR = Path(__file__).resolve().parent
+# Keep the Sprint 1 augmentation experiment utilities and evidence in
+# src/prototypes/engine/augmentation/, while using the consolidated
+# training pipeline from reproducible_training_pipeline/.
+AUGMENTATION_DIR = Path(__file__).resolve().parent
+PIPELINE_DIR = AUGMENTATION_DIR.parent / "reproducible_training_pipeline"
 
-# Where each arm's log, checkpoint, and TensorBoard file get archived.
-RESULTS_DIR = SCRIPT_DIR / "experiment_results"
+# The subset and archived experiment results remain augmentation evidence.
+EXPERIMENT_DATA_DIR = AUGMENTATION_DIR / "experiment_data_subset"
+RESULTS_DIR = AUGMENTATION_DIR / "experiment_results"
 
 # The three experiment arms: (folder-safe name for results, augmentation
 # preset to select via Hydra's `augmentation=<name>` override). Order matches
@@ -91,7 +93,7 @@ def build_command(python_exe, augmentation_preset, epochs, batch_size):
         "+local=cpu",
         # Points at the small 10-species subset instead of the `b3` folder
         # the checked-in config defaults to, which does not exist here.
-        "system.audio_data_directory=experiment_data_subset",
+        f"system.audio_data_directory={EXPERIMENT_DATA_DIR.as_posix()}",
         # Removes the audio-level augmentation section entirely (the `~`
         # prefix is Hydra's "delete this key" syntax). It depends on a
         # `background_noise_dir` that doesn't exist in this environment, and
@@ -146,7 +148,7 @@ def run_arm(python_exe, arm_name, augmentation_preset, epochs, batch_size):
     # unexpected byte sequence in the future gets substituted with a
     # placeholder character instead of crashing the whole experiment run.
     result = subprocess.run(
-        command, cwd=SCRIPT_DIR, capture_output=True, text=True,
+        command, cwd=PIPELINE_DIR, capture_output=True, text=True,
         encoding="utf-8", errors="replace",
     )
 
@@ -179,12 +181,12 @@ def run_arm(python_exe, arm_name, augmentation_preset, epochs, batch_size):
     # main.py always writes to the same fixed checkpoint filename regardless
     # of which arm is active, so it must be moved into this arm's folder
     # before the next arm's run overwrites it.
-    checkpoint = SCRIPT_DIR / "best_efficientnet_v2.pth"
+    checkpoint = PIPELINE_DIR / "best_efficientnet_v2.pth"
     if checkpoint.exists():
         shutil.move(str(checkpoint), str(arm_dir / "best_efficientnet_v2.pth"))
 
     # Same reasoning for the TensorBoard event file train.py writes.
-    for event_file in SCRIPT_DIR.glob("events.out.tfevents.*"):
+    for event_file in PIPELINE_DIR.glob("events.out.tfevents.*"):
         shutil.move(str(event_file), str(arm_dir / event_file.name))
 
     # Search the captured stdout for every match of the metrics pattern and

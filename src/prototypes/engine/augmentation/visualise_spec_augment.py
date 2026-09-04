@@ -14,12 +14,20 @@ shape/extent of masking.
 """
 
 import random
+import sys
 from pathlib import Path
 
 import librosa
 import numpy as np
 import matplotlib.pyplot as plt
 import torch
+# Import SpecAugment from the consolidated training pipeline rather than
+# keeping a second duplicate augment.py under augmentation/.
+PIPELINE_DIR = (
+    Path(__file__).resolve().parent.parent
+    / "reproducible_training_pipeline"
+)
+sys.path.insert(0, str(PIPELINE_DIR))
 
 from augment import SpecAugment
 
@@ -35,7 +43,7 @@ CLIP_DURATION = 2 # seconds - gives ~201 time frames, matching the review's find
 CLIP_SAMPLES = int(SAMPLE_RATE * CLIP_DURATION)
 
 # Four `.parent`s reach the repo root (Project-Echo/) from this file's folder
-# (src/prototypes/engine/reproducible_training_pipeline/), then down into models-and-data/data_files
+# (src/prototypes/engine/augmentation/), then down into models-and-data/data_files
 # - the real dataset's location in this repo.
 DATA_DIR = Path(__file__).resolve().parent.parent.parent.parent.parent / "models-and-data" / "data_files"
 OUTPUT_DIR = Path(__file__).resolve().parent / "spectrogram_examples"
