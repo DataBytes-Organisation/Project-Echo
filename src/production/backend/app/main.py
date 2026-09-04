@@ -32,13 +32,27 @@ app.add_middleware(
 from .routers import add_csv_output_option, audio_upload_router
 from app.routers import species_predictor, auth_router, hmi, engine, sim, two_factor, public, iot, live, sensors #Websocket
 
-from app.routers import projects
-app.include_router(projects.router)
-
+from app.routers import projects, health
 from app.routers import hmi, engine, sim, iot
+
+from contextlib import asynccontextmanager
+from app.database import client
+from app.queue import redis_conn
+import os
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup actions
+    print("Backend starting up... Connections initialized.")
+    yield
+    # Shutdown actions
+    print("Backend shutting down... Closing database connections cleanly.")
+    client.close()
+    redis_conn.close()
 
 # ✅ Add metadata here
 app = FastAPI(
+    lifespan=lifespan,
     title="Project Echo API",
     description="""
     Project Echo is an IoT-based system designed to record and analyze audio data for species identification and ecosystem monitoring.
@@ -55,6 +69,9 @@ app.add_exception_handler(HTTPException, http_exception_handler)
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
 app.add_exception_handler(Exception, unhandled_exception_handler)
 app.add_middleware(StandardizeErrorResponseMiddleware)
+
+app.include_router(projects.router)
+app.include_router(health.router)
 
 # ✅ CORS Middleware
 app.add_middleware(
