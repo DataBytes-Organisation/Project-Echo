@@ -38,7 +38,7 @@ import sys
 # regardless of the OS's path separator conventions.
 from pathlib import Path
 
-# The folder this script lives in (src/prototypes/engine/augmentation/) -
+# The folder this script lives in (src/prototypes/engine/reproducible_training_pipeline/) -
 # every subprocess call needs to run with this as its working directory,
 # since main.py expects to find config/, dataset.py, etc. relative to here.
 SCRIPT_DIR = Path(__file__).resolve().parent

@@ -21,7 +21,7 @@ FILES_PER_SPECIES = 100 # number of clips to copy per species
 AUDIO_EXTENSIONS = (".wav", ".mp3", ".ogg", ".flac")
 
 # Four `.parent`s reach the repo root (Project-Echo/) from this file's folder
-# (src/prototypes/engine/augmentation/), then down into models-and-data/data_files
+# (src/prototypes/engine/reproducible_training_pipeline/), then down into models-and-data/data_files
 # - the real dataset's location in this repo.
 SOURCE_DIR = Path(__file__).resolve().parent.parent.parent.parent.parent / "models-and-data" / "data_files"
 DEST_DIR = Path(__file__).resolve().parent / "experiment_data_subset"
