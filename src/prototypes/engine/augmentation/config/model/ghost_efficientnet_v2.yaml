@@ -1,0 +1,9 @@
+name: ghost_efficientnet_v2_qat
+params:
+  model_name: "ghost_efficientnet_v2"
+  num_classes: ${data.num_classes}
+  use_qat: true
+  use_arcface: true
+  width_mult: 0.75
+  depth_mult: 1 
+  drop_rate: 0.1

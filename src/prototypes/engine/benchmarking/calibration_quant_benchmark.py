@@ -462,7 +462,7 @@ def load_efficientnet_bundle(model_dir: str):
 
 def efficientnet_preprocess(path: str, pre: dict) -> np.ndarray:
     """Audio file -> (1, n_mels, time) float32 tensor, matching production
-    echo_engine_iot.efficientnetv2_preprocess_audio_bytes exactly."""
+    echo_engine.efficientnetv2_preprocess_audio_bytes exactly."""
     import librosa
 
     target_sr = int(pre["target_sr"])
