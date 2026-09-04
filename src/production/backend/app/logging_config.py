@@ -1,8 +1,9 @@
 import json
 import logging
-import os
 import sys
 from datetime import datetime, timezone
+
+from app.config import settings
 
 
 # Format Python log records as single-line JSON objects.
@@ -23,7 +24,7 @@ class JsonFormatter(logging.Formatter):
 
 # Configure application and Uvicorn logging to output JSON.
 def configure_logging() -> None:
-    log_level = os.getenv("LOG_LEVEL", "INFO").upper()
+    log_level = settings.log_level.upper()
 
     handler = logging.StreamHandler(sys.stdout)
     handler.setFormatter(JsonFormatter())

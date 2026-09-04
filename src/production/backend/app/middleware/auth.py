@@ -1,16 +1,17 @@
 ## app.middleware.auth.py
 import jwt
-from decouple import config
 # from typing import Dict, List
 import datetime
 from bson.objectid import ObjectId
 
 import logging
 
+from app.config import settings
+
 logger = logging.getLogger(__name__)
 
-JWT_SECRET = "deff1952d59f883ece260e8683fed21ab0ad9a53323eca4f"
-JWT_ALGORITHM = "HS256"
+JWT_SECRET = settings.jwt_secret
+JWT_ALGORITHM = settings.jwt_algorithm
 
 
 def token_response(token: str):
@@ -22,7 +23,7 @@ def signJWT(user: dict, authorities: list[str]) -> str:
     payload = {
         "id": str(user["_id"]),
         "roles": authorities,
-        "exp": datetime.datetime.utcnow() + datetime.timedelta(seconds=86400)
+        "exp": datetime.datetime.utcnow() + datetime.timedelta(seconds=settings.jwt_expiry_seconds)
     }
     
     token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)

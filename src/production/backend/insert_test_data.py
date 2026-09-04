@@ -1,22 +1,17 @@
 import pymongo
 import datetime
-import os
 
 import logging
 
 from app.logging_config import configure_logging
+from app.config import settings
 
 configure_logging()
 logger = logging.getLogger(__name__)
 
 # Connect to local MongoDB
-# Using the same URI as the test script
-uri = os.getenv("MONGODB_URI")
-if not uri:
-    raise RuntimeError("MONGODB_URI environment variable is required to insert test data.")
-
-client = pymongo.MongoClient(uri)
-db = client['EchoNet']
+client = pymongo.MongoClient(settings.mongodb_uri)
+db = client[settings.mongo_db_name]
 
 logger.info("MongoDB client initialized")
 

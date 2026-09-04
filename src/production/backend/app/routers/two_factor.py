@@ -5,6 +5,7 @@ from fastapi.security import HTTPBearer
 from fastapi.responses import JSONResponse
 from .. import schemas
 from ..utils.sms import send_sms
+from ..config import settings
 import random
 import datetime
 
@@ -54,7 +55,7 @@ async def generate_2fa_code(credentials = Depends(security)):
     otp = generate_otp()
     
     # Store OTP with 5-minute expiration
-    expiration = datetime.datetime.utcnow() + datetime.timedelta(minutes=5)
+    expiration = datetime.datetime.utcnow() + datetime.timedelta(minutes=settings.otp_expiry_minutes)
     
     # Update user document with OTP info
     update_result = User.update_one(

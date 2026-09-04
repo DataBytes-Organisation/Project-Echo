@@ -24,8 +24,9 @@ from app.routers import public
 
 import logging
 from app.logging_config import configure_logging
+from app.config import settings
 
-configure_logging() # 
+configure_logging() #
 logger = logging.getLogger(__name__)
 
 # ✅ Add metadata here
@@ -45,7 +46,7 @@ app = FastAPI(
 # Log API startup in structured JSON format
 @app.on_event("startup")
 async def log_api_startup():
-    logger.info("API Server listening on port 9000")
+    logger.info(f"API Server listening on port {settings.api_port}")
 
 # Routers
 from .routers import add_csv_output_option, audio_upload_router
@@ -62,7 +63,7 @@ app.add_middleware(StandardizeErrorResponseMiddleware)
 # ✅ CORS Middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins
+    allow_origins=settings.cors_origins,
 
     allow_credentials=True,
     allow_methods=["*"],

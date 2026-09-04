@@ -1,16 +1,10 @@
-import os
 from fastapi import APIRouter, Query
 from datetime import datetime
 from typing import Optional
-import pymongo
+
+from app.database import db
 
 router = APIRouter(prefix="/insights", tags=["insights"])
-
-MONGO_URI = os.getenv("MONGO_URI")
-MONGO_DB = os.getenv("MONGO_DB", "EchoNet")
-
-client = pymongo.MongoClient(MONGO_URI)
-db = client[MONGO_DB]
 
 
 def parse_ts(value):
