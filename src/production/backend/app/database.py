@@ -1,19 +1,13 @@
 ## app.database.py
 import pymongo
-import os
 import datetime
 import time
 # import mongoose
 
-# prefer environment variable inside containers; fallback to service hostname (EchoNet DB)
-# legacy (kept for reference):
-# connection_string = "mongodb://modelUser:EchoNetAccess2023@ts-mongodb-cont:27017/EchoNet"
-connection_string = os.getenv(
-    "MONGODB_URI",
-    "mongodb://modelUser:EchoNetAccess2023@ts-mongodb-cont:27017/EchoNet",
-)
-client = pymongo.MongoClient(connection_string)
-db = client["EchoNet"]
+from app.config import settings
+
+client = pymongo.MongoClient(settings.mongodb_uri)
+db = client[settings.mongo_db_name]
 # db = client['mydatabase']
 Events = db.events
 Movements = db.movements
@@ -34,14 +28,8 @@ SensorReboots.create_index(
     name="idx_sensor_reboots_sensor_requestedAt_desc",
 )
 
-# User DB connection (env first, then service hostname)
-# legacy (kept for reference):
-# User_connection_string = "mongodb://root:root_password@ts-mongodb-cont/UserSample?authSource=admin"
-User_connection_string = os.getenv(
-    "USER_MONGODB_URI",
-    "mongodb://root:root_password@ts-mongodb-cont/UserSample?authSource=admin",
-)
-Userclient = pymongo.MongoClient(User_connection_string)
+# User DB connection
+Userclient = pymongo.MongoClient(settings.user_mongodb_uri)
 Userdb = Userclient['UserSample']
 User = Userdb.users
 Role = Userdb.roles

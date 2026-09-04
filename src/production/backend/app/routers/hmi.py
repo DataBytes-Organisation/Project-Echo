@@ -27,16 +27,17 @@ from bson.objectid import ObjectId
 import uuid
 from .weather_data import download_file_from_ftp,read_file,download_weather_stations_from_ftp,find_closest_station
 import tempfile
-import os 
+import os
 import pandas as pd
+from app.config import settings
 
 jwtBearer = JWTBearer()
 
 router = APIRouter()
 
-MQTT_BROKER_URL = "ts-mqtt-server-cont"
-MQTT_ENGINE_URL = "projectecho/engine/2"
-MQTT_BROKER_PORT = 1883
+MQTT_BROKER_URL = settings.mqtt_host
+MQTT_ENGINE_URL = settings.mqtt_engine_topic
+MQTT_BROKER_PORT = settings.mqtt_port
 #mqtt_client = paho.Client()
 #mqtt_client.connect(MQTT_BROKER_URL, MQTT_BROKER_PORT)
 
@@ -354,7 +355,7 @@ def signin(user: schemas.UserLoginSchema):
         headers = {"Authorization": f"Bearer {jwtToken}"}
         try:
             response = requests.post(
-                "http://localhost:9000/2fa/generate",
+                f"{settings.internal_api_base_url}/2fa/generate",
                 headers=headers
             )
             print(response.json())
@@ -666,7 +667,7 @@ def forgotpassword(user: schemas.ResetPasswordSchema):
 @router.get("/filter_algorithm/{algorithm_type}", status_code=status.HTTP_200_OK, response_description="returns the running filter algorithm name")
 def filter_name(algorithm_type : str):
     try:
-        algorithms_running = requests.get("http://ts-api-cont:9000/engine/algorithms_data")
+        algorithms_running = requests.get(f"{settings.internal_api_base_url}/engine/algorithms_data")
         algorithm_name = algorithms_running.json()[algorithm_type]
         if(algorithm_name is not None):
             response = {"message": algorithm_name}
