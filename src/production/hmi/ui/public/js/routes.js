@@ -134,3 +134,49 @@ export function stopSimulator()        { return api.post("/sim_control/Stop"); }
 export function retrieveSimTime() {
   return withRetry(() => api.get("/latest_movement"), RETRY_OPTS);
 }
+
+// -----------------------------------------------------------------------------
+// Admin notifications  (FR-D2)
+//
+// Every action returns the refreshed list, so the caller never has to guess what
+// the server now holds or keep a second copy of the list in sync by hand.
+// -----------------------------------------------------------------------------
+
+/** @returns {Promise<AxiosResponse>}  response.data is { notifications, unreadCount }. */
+export function retrieveNotifications() {
+  return withRetry(() => api.get("/api/notifications"), RETRY_OPTS);
+}
+
+/**
+ * PATCH - not retried, this changes the notification rather than reading it.
+ * @param {string} notificationId
+ * @returns {Promise<AxiosResponse>}
+ */
+export function markNotificationRead(notificationId) {
+  return api.patch(`/api/notifications/${encodeURIComponent(notificationId)}/read`);
+}
+
+/**
+ * PATCH - not retried, same reasoning as above.
+ * @returns {Promise<AxiosResponse>}
+ */
+export function markAllNotificationsRead() {
+  return api.patch("/api/notifications/read-all");
+}
+
+/**
+ * DELETE - not retried, we do not want to risk repeating a removal.
+ * @param {string} notificationId
+ * @returns {Promise<AxiosResponse>}
+ */
+export function deleteNotification(notificationId) {
+  return api.delete(`/api/notifications/${encodeURIComponent(notificationId)}`);
+}
+
+/**
+ * DELETE - not retried, same reasoning as above.
+ * @returns {Promise<AxiosResponse>}
+ */
+export function deleteReadNotifications() {
+  return api.delete("/api/notifications/read");
+}
