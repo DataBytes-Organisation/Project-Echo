@@ -1,10 +1,20 @@
 from datetime import datetime
 from typing import Optional, Dict, Any
 
-from fastapi import APIRouter, Query, Path, Body, HTTPException, Depends
+from fastapi import (
+    APIRouter,
+    Body,
+    Depends,
+    HTTPException,
+    Path,
+    Query,
+    Request,
+    Response,
+)
 
 from app.schemas import Detection, DetectionCreate, DetectionListResponses
 from app import detections as detections_service
+from app.http_cache import if_none_match_matches, make_etag
 from app.middleware.pause_guard import pause_guard
 from app.services.budget import enforce_and_consume
 
@@ -63,11 +73,52 @@ def list_detections_endpoint(
     response_model=Detection,
     summary="Get a single detection by id",
     dependencies=[Depends(pause_guard("detections"))],
+    responses={
+        200: {
+            "description": "Detection returned with ETag and Cache-Control headers.",
+            "headers": {
+                "ETag": {
+                    "description": "Strong validator for this detection representation.",
+                    "schema": {"type": "string"},
+                },
+                "Cache-Control": {
+                    "description": "Requires private caches to revalidate before reuse.",
+                    "schema": {"type": "string"},
+                },
+            },
+        },
+        304: {
+            "description": "The supplied If-None-Match validator is still current.",
+            "headers": {
+                "ETag": {
+                    "description": "Validator for the cached representation.",
+                    "schema": {"type": "string"},
+                }
+            },
+        },
+        400: {"description": "The detection id is invalid."},
+        404: {"description": "The detection does not exist."},
+        503: {"description": "Detection storage is temporarily unavailable."},
+    },
 )
 def get_detection_endpoint(
+    request: Request,
+    response: Response,
     detection_id: str = Path(..., description="MongoDB ObjectId of the detection"),
 ):
-    return detections_service.get_detection(detection_id)
+    detection = detections_service.get_detection(detection_id)
+    etag = make_etag(detection)
+    cache_headers = {
+        "ETag": etag,
+        "Cache-Control": "private, no-cache",
+    }
+
+    if if_none_match_matches(request.headers.get("if-none-match"), etag):
+        return Response(status_code=304, headers=cache_headers)
+
+    for name, value in cache_headers.items():
+        response.headers[name] = value
+    return detection
 
 
 @router.patch(

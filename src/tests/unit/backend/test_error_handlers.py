@@ -17,9 +17,16 @@ from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app import error_handlers
+from app.exceptions import (
+    DetectionError,
+    DetectionNotFoundError,
+    DetectionRuleError,
+    DetectionStorageError,
+)
+from app.middleware.correlation_id import CORRELATION_ID_HEADER
 
 
-def make_request(method="GET", path="/detections"):
+def make_request(method="GET", path="/detections", correlation_id=None, headers=None):
     """Build the smallest Request object the handlers need."""
     from starlette.requests import Request
 
@@ -29,11 +36,16 @@ def make_request(method="GET", path="/detections"):
         "path": path,
         "raw_path": path.encode(),
         "query_string": b"",
-        "headers": [],
+        "headers": [
+            (name.lower().encode(), value.encode())
+            for name, value in (headers or {}).items()
+        ],
         "scheme": "http",
         "server": ("testserver", 80),
         "root_path": "",
     }
+    if correlation_id:
+        scope["state"] = {"correlation_id": correlation_id}
     return Request(scope)
 
 
@@ -97,6 +109,24 @@ def test_request_id_appears_in_both_response_and_log(caplog):
     assert request_id in caplog.text
 
 
+def test_existing_correlation_id_is_reused_in_body_header_and_log(caplog):
+    request_id = "caller-trace-42"
+    with caplog.at_level("ERROR", logger="echo.api"):
+        response = asyncio.run(
+            error_handlers.unhandled_exception_handler(
+                make_request(correlation_id=request_id), ValueError("boom")
+            )
+        )
+
+    assert body_of(response)["error"]["request_id"] == request_id
+    assert response.headers[CORRELATION_ID_HEADER] == request_id
+    assert request_id in caplog.text
+    assert any(
+        getattr(record, "correlation_id", None) == request_id
+        for record in caplog.records
+    )
+
+
 def test_request_ids_are_unique():
     ids = {
         body_of(
@@ -142,6 +172,43 @@ def test_http_exception_uses_the_standard_envelope():
     error = body_of(response)["error"]
     assert set(error) == {"type", "message", "request_id"}
     assert error["type"] == "http_error"
+
+
+def test_http_exception_preserves_protocol_headers():
+    response = asyncio.run(
+        error_handlers.http_exception_handler(
+            make_request(),
+            StarletteHTTPException(
+                status_code=401,
+                detail="Authentication required",
+                headers={"WWW-Authenticate": "Bearer"},
+            ),
+        )
+    )
+    assert response.headers["www-authenticate"] == "Bearer"
+
+
+# ---------------------------------------------------------------------------
+# Detection domain failures
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "exception,status_code,error_type",
+    [
+        (DetectionRuleError("bad filters"), 400, "detection_rule_error"),
+        (DetectionNotFoundError("missing"), 404, "detection_not_found"),
+        (DetectionStorageError("unavailable"), 503, "detection_storage_error"),
+    ],
+)
+def test_detection_errors_are_mapped_to_stable_responses(
+    exception, status_code, error_type
+):
+    response = asyncio.run(
+        error_handlers.detection_exception_handler(make_request(), exception)
+    )
+    assert response.status_code == status_code
+    assert body_of(response)["error"]["type"] == error_type
 
 
 # ---------------------------------------------------------------------------
@@ -206,6 +273,7 @@ def test_register_exception_handlers_attaches_all_three():
         app.exception_handlers[RequestValidationError]
         is error_handlers.validation_exception_handler
     )
+    assert app.exception_handlers[DetectionError] is error_handlers.detection_exception_handler
 
 
 def test_register_exception_handlers_returns_the_app():

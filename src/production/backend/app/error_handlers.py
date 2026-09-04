@@ -22,15 +22,22 @@ Related task: C4.3.
 """
 
 import logging
-import uuid
-
 from fastapi import Request
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+from app.exceptions import DetectionError
+from app.middleware.correlation_id import (
+    CORRELATION_ID_HEADER,
+    configure_correlation_logging,
+    correlation_id_for_request,
+    new_correlation_id,
+)
+
 logger = logging.getLogger("echo.api")
+configure_correlation_logging(logger)
 
 # Returned instead of the real exception text for unhandled errors. The detail
 # goes to the log, not to the caller.
@@ -40,11 +47,18 @@ GENERIC_MESSAGE = (
 
 
 def new_request_id():
-    """Return a short identifier used to tie a response back to a log entry."""
-    return uuid.uuid4().hex[:12]
+    """Backward-compatible alias for the correlation ID generator."""
+    return new_correlation_id()
 
 
-def error_response(status_code, error_type, message, request_id, extra=None):
+def error_response(
+    status_code,
+    error_type,
+    message,
+    request_id,
+    extra=None,
+    headers=None,
+):
     """Build the standard error response body."""
     payload = {
         "error": {
@@ -55,7 +69,13 @@ def error_response(status_code, error_type, message, request_id, extra=None):
     }
     if extra is not None:
         payload["error"]["details"] = extra
-    return JSONResponse(status_code=status_code, content=jsonable_encoder(payload))
+    response_headers = dict(headers or {})
+    response_headers[CORRELATION_ID_HEADER] = request_id
+    return JSONResponse(
+        status_code=status_code,
+        content=jsonable_encoder(payload),
+        headers=response_headers,
+    )
 
 
 async def http_exception_handler(request: Request, exc: StarletteHTTPException):
@@ -64,7 +84,7 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
     These are expected outcomes rather than faults, so the message the route
     supplied is passed through unchanged. Only the envelope is standardised.
     """
-    request_id = new_request_id()
+    request_id = correlation_id_for_request(request)
     logger.info(
         "HTTP %s on %s %s (request_id=%s): %s",
         exc.status_code,
@@ -72,12 +92,14 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
         request.url.path,
         request_id,
         exc.detail,
+        extra={"correlation_id": request_id},
     )
     return error_response(
         status_code=exc.status_code,
         error_type="http_error",
         message=str(exc.detail),
         request_id=request_id,
+        headers=exc.headers,
     )
 
 
@@ -88,13 +110,14 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     every other error the API returns. The field-level detail is preserved
     under "details" because the caller needs it to fix their request.
     """
-    request_id = new_request_id()
+    request_id = correlation_id_for_request(request)
     logger.info(
         "Validation failure on %s %s (request_id=%s): %s",
         request.method,
         request.url.path,
         request_id,
         exc.errors(),
+        extra={"correlation_id": request_id},
     )
     return error_response(
         status_code=422,
@@ -116,7 +139,7 @@ async def unhandled_exception_handler(request: Request, exc: Exception):
     logger.exception(), which reads the ambient exception state and therefore
     records nothing when the handler is invoked outside an except block.
     """
-    request_id = new_request_id()
+    request_id = correlation_id_for_request(request)
     logger.error(
         "Unhandled %s on %s %s (request_id=%s)",
         type(exc).__name__,
@@ -124,6 +147,7 @@ async def unhandled_exception_handler(request: Request, exc: Exception):
         request.url.path,
         request_id,
         exc_info=exc,
+        extra={"correlation_id": request_id},
     )
     return error_response(
         status_code=500,
@@ -133,14 +157,38 @@ async def unhandled_exception_handler(request: Request, exc: Exception):
     )
 
 
+async def detection_exception_handler(request: Request, exc: DetectionError):
+    """Map expected detection failures to stable, client-safe responses."""
+    request_id = correlation_id_for_request(request)
+    log_level = logging.WARNING if exc.status_code >= 500 else logging.INFO
+    logger.log(
+        log_level,
+        "Detection failure on %s %s (request_id=%s, type=%s): %s",
+        request.method,
+        request.url.path,
+        request_id,
+        exc.error_type,
+        exc,
+        exc_info=exc if exc.status_code >= 500 else None,
+        extra={"correlation_id": request_id},
+    )
+    return error_response(
+        status_code=exc.status_code,
+        error_type=exc.error_type,
+        message=str(exc),
+        request_id=request_id,
+    )
+
+
 def register_exception_handlers(app):
     """Attach all handlers to ``app``.
 
-    Call this once, on the FastAPI instance that is actually served. Note
-    that app/main.py currently constructs FastAPI() twice; handlers attached
-    to the discarded first instance would have no effect.
+    Call this once, on the FastAPI instance that is actually served.
     """
     app.add_exception_handler(StarletteHTTPException, http_exception_handler)
     app.add_exception_handler(RequestValidationError, validation_exception_handler)
+    # Register the domain exception before the generic catch-all. FastAPI
+    # resolves the most specific matching exception class at request time.
+    app.add_exception_handler(DetectionError, detection_exception_handler)
     app.add_exception_handler(Exception, unhandled_exception_handler)
     return app
