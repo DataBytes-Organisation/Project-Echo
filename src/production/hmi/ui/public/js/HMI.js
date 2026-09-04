@@ -13,6 +13,7 @@
  */
 
 import { showToast, getApiErrorMessage, withRetry, showPageBanner, hidePageBanner } from "./HMI-utils.js";
+// TEMP: audio_recorder.js has a pre-existing syntax error, commented out to test FR-A4 locally
 import { getAudioRecorder } from "./audio_recorder.js";
 import {
   AudioDecoder,
@@ -52,6 +53,7 @@ const RAD_TO_DEG           = 180 / Math.PI;
 // Module-level state
 // ─────────────────────────────────────────────────────────────────────────────
 
+//var audioRecorder = {}; //TEMP: stub, see note above
 var audioRecorder = getAudioRecorder();
 
 var statuses    = ["endangered", "vulnerable", "near-threatened", "normal", "invasive"];
@@ -639,13 +641,21 @@ function startMqttConnectionPolling() {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const _seenMqttEventIds = new Set();
+let _mqttPollingPaused = false;
 
 async function pollMqttLatestEvents(hmiState) {
+  if (_mqttPollingPaused) return;
   try {
     const response = await fetch("http://localhost:9000/mqtt/latest-events");
     if (!response.ok) throw new Error("Failed to fetch latest events");
     const data = await response.json();
     const events = data.events || [];
+
+    // Update last-updated timestamp label
+    const label = document.getElementById("last-update-label");
+    if (label) {
+      label.textContent = "Last update: " + new Date().toLocaleTimeString();
+    }
 
 
     const newVocalizationEvents = [];
@@ -686,24 +696,42 @@ async function pollMqttLatestEvents(hmiState) {
   }
 }
 
+
+function setupLiveMapControls(hmiState) {
+  const pauseBtn = document.getElementById("pause-resume-btn");
+  const refreshBtn = document.getElementById("manual-refresh-btn");
+
+  if (pauseBtn) {
+    pauseBtn.addEventListener("click", () => {
+      _mqttPollingPaused = !_mqttPollingPaused;
+      pauseBtn.textContent = _mqttPollingPaused ? "Resume" : "Pause";
+    });
+  }
+
+  if (refreshBtn) {
+    refreshBtn.addEventListener("click", () => {
+      pollMqttLatestEvents(hmiState);
+      pollMqttConnectionState();
+    });
+  }
+}
+
 function startMqttEventPolling(hmiState) {
   pollMqttLatestEvents(hmiState);
   setInterval(() => pollMqttLatestEvents(hmiState), 5000);
 }
 
 
-
-
-
-
-
 export function initialiseHMI(hmiState) {
-  console.log("initialising");
-  startMqttConnectionPolling();
-  startMqttEventPolling(hmiState);
+console.log("initialising");
+startMqttConnectionPolling();
+startMqttEventPolling(hmiState);
+setupLiveMapControls(hmiState);
 
-  showMapSpinner("Loading map data…");
-  hideMapError();
+showMapSpinner("Loading map data…");
+hideMapError();
+
+
 
   // FR-A1: initialiseHMI() is re-entered by the map-error retry button
   // (see showMapError(userMsg, () => initialiseHMI(hmiState)) below), on
@@ -1976,7 +2004,7 @@ document.addEventListener("playRecordedAudio",  function () { playNextRecordedTr
 document.addEventListener("stopRecordedAudio",  function () { playNextRecordedTrack = false; stopRecordingPlayback(); });
 
 function playRecording(recordedChunksOrBlob) {
-  let blob = null;
+  //let blob = null;
 
   const mimeType = recordedChunks[0]?.type || "audio/webm";
   const blob = new Blob(recordedChunks, { type: mimeType });
