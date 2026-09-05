@@ -72,7 +72,13 @@ src/prototypes/engine/reproducible_training_pipeline/.cache/
 # Local prototype datasets (not tracked, too large / personal-machine paths)
 # -----------------------------------------------------------------------------
 src/prototypes/data_files/
+src/prototypes/data_files_excluded/
 src/prototypes/spectrograms/
+
+# -----------------------------------------------------------------------------
+# Sprint 2 raw run logs (tqdm progress-bar dumps, not meant for review)
+# -----------------------------------------------------------------------------
+docs/sprint2/*.log
 
 # -----------------------------------------------------------------------------
 # Databases
