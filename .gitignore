@@ -17,6 +17,7 @@
 __pycache__/
 .ipynb_checkpoints/
 .pytest_cache/
+.coverage
 *.egg-info/
 build/
 dist/
@@ -96,6 +97,11 @@ src/production/iot/management_application/audioUpload
 
 # Environment-specific generated file
 src/production/backend/app/main.py
+
+# Generated on every `import app.main` (app/main.py's export_openapi_to_file()
+# runs unconditionally at module import time, including from tests) - not
+# something to commit.
+/backend/project-echo-openapi.json
 
 # Benchmarking self-test throwaway output
 results_selftest/
