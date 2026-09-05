@@ -1,5 +1,5 @@
 # Builder (Compilers and heavy lifting)
-ARG BASE_IMAGE=python:3.10-slim-bullseye
+ARG BASE_IMAGE=python:3.10-slim-bookworm
 FROM ${BASE_IMAGE} AS echo_engine_builder
 
 WORKDIR /build
@@ -39,7 +39,7 @@ WORKDIR /app
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-	libopenexr25 \
+	libopenexr-3-1-30 \
 	libgl1-mesa-glx \
 	libglib2.0-0 \
 	curl \
