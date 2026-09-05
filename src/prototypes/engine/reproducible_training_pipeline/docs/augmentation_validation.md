@@ -1,5 +1,12 @@
-# SpecAugment (Audio Augmentation) Usage Instructions
+> **Historical documentation note:** This document was originally written for the
+> augmentation experiment implementation before the training pipeline was
+> consolidated into `reproducible_training_pipeline/`. Some implementation details
+> have since changed. In particular, the current `augment.py` supports
+> `mask_value="zero"` only; the `"min"` and `"mean"` options described below are
+> historical and are not currently implemented. Refer to the current pipeline code
+> and main README for authoritative behaviour.
 
+# SpecAugment (Audio Augmentation) Usage Instructions
 
 
 ## 1. Required libraries

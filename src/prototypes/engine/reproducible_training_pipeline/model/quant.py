@@ -37,23 +37,52 @@ qconfig_mapping = (
 )
 
 
-def prepare_qat_fx(float_model, input_size=(1, 3, 32, 32)):
-	example_inputs = torch.rand(size=input_size).cpu()
-	prepared_qat = __prepare_qat_fx(float_model, qconfig_mapping, example_inputs=example_inputs)
+def prepare_qat_fx(float_model, example_input):
+    """
+    Prepare a model for FX graph-mode quantisation-aware training
+    using an example tensor from the real training pipeline.
+    """
+    if example_input is None:
+        raise ValueError(
+            "An example input tensor is required to prepare the model for QAT."
+        )
 
-	return prepared_qat
+    example_input = example_input.cpu()
+
+    prepared_qat = __prepare_qat_fx(
+        float_model,
+        qconfig_mapping,
+        example_inputs=(example_input,),
+    )
+
+    return prepared_qat
 
 
-def prepare_post_static_quantize_fx(float_model, calib_dl, input_size=(1, 3, 32, 32)):
-	quant_model = copy.deepcopy(float_model).cpu().eval()
+def prepare_post_static_quantize_fx(float_model, calib_dl):
+    """
+    Prepare a model for post-training static quantisation using
+    an example tensor from the calibration DataLoader.
+    """
+    quant_model = copy.deepcopy(float_model).cpu().eval()
 
-	example_inputs = torch.rand(size=input_size).cpu()
-	prepared = prepare_fx(quant_model, qconfig_mapping, example_inputs=example_inputs)
+    try:
+        example_inputs, _ = next(iter(calib_dl))
+    except StopIteration:
+        raise ValueError(
+            "Calibration DataLoader is empty and cannot provide "
+            "an example input for static quantisation."
+        )
 
-	# calibration: run a batch through prepared model
-	with torch.no_grad():
-		for inputs, _ in calib_dl:
-			prepared(inputs.cpu())
-			break
+    example_input = example_inputs[:1].cpu()
 
-	return prepared
+    prepared = prepare_fx(
+        quant_model,
+        qconfig_mapping,
+        example_inputs=(example_input,),
+    )
+
+    with torch.no_grad():
+        for inputs, _ in calib_dl:
+            prepared(inputs.cpu())
+
+    return prepared
