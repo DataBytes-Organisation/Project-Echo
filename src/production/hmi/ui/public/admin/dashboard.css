@@ -4696,3 +4696,19 @@ perspective effects (not including the modals and the overlay).
   -webkit-animation-name: slideOutUp;
   animation-name: slideOutUp;
 }
+
+/* API status badge */
+.api-status-badge {
+  position: static;
+  max-width: 100%;
+  margin-bottom: 16px;
+}
+
+/* Mobile layout */
+@media (max-width: 767.98px) {
+  .api-status-badge {
+    font-size: 11px;
+    line-height: 1.3;
+    text-align: center;
+  }
+}
