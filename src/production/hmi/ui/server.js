@@ -713,6 +713,120 @@ app.get("/notifications", (req,res) => {
   res.sendFile(path.join(__dirname, 'public/admin/notifications.html'))
 })
 
+// ============================================================
+// Admin notifications
+//
+// The admin notification list used to be a hardcoded array in the browser, so
+// nothing survived a refresh. The feed is now built from records we already
+// hold (donations and user registrations) and the read/deleted state is kept in
+// its own collection, keyed by a stable id per source record. That way marking
+// something read is still true after a reload, and we are not duplicating the
+// donation or user documents just to track a flag against them.
+// ============================================================
+
+const NOTIFICATION_STATE_COLLECTION = 'notificationState';
+const notificationFeed = require('./services/notifications');
+
+async function getEchoNetDb() {
+  if (!connectedDB) {
+    await donationClient.connect();
+    connectedDB = donationClient.db('EchoNet');
+    console.log('Reconnected to MongoDB for notifications');
+  }
+  return connectedDB;
+}
+
+// Reads only. The shaping and the read/deleted join live in
+// services/notifications.js so they can be tested without Mongo or the server.
+async function listNotifications() {
+  const db = await getEchoNetDb();
+
+  const donations = await db.collection('donations').find({}).toArray();
+  const users = await donationClient
+    .db('UserSample')
+    .collection('users')
+    .find({}, { projection: { email: 1, username: 1, createdAt: 1 } })
+    .toArray();
+  const stateRows = await db.collection(NOTIFICATION_STATE_COLLECTION).find({}).toArray();
+
+  return notificationFeed.applyState(
+    notificationFeed.buildFeed({ donations, users }),
+    stateRows
+  );
+}
+
+// One place to write a flag so the four actions cannot drift apart.
+async function setNotificationFlags(ids, flags) {
+  if (ids.length === 0) return 0;
+
+  const db = await getEchoNetDb();
+  const operations = ids.map(id => ({
+    updateOne: {
+      filter: { _id: id },
+      update: { $set: { ...flags, updatedAt: new Date() } },
+      upsert: true
+    }
+  }));
+
+  const result = await db.collection(NOTIFICATION_STATE_COLLECTION).bulkWrite(operations);
+  return result.upsertedCount + result.modifiedCount;
+}
+
+app.get('/api/notifications', async (req, res) => {
+  try {
+    res.json(await listNotifications());
+  } catch (error) {
+    console.error('Error loading notifications:', error);
+    res.status(500).json({ error: 'Unable to load notifications.' });
+  }
+});
+
+// Declared before the /:id routes below, otherwise "read-all" and "read" get
+// swallowed as an id.
+app.patch('/api/notifications/read-all', async (req, res) => {
+  try {
+    const { notifications } = await listNotifications();
+    const unreadIds = notifications.filter(item => !item.read).map(item => item.id);
+    await setNotificationFlags(unreadIds, { read: true });
+    res.json(await listNotifications());
+  } catch (error) {
+    console.error('Error marking all notifications read:', error);
+    res.status(500).json({ error: 'Unable to mark notifications as read.' });
+  }
+});
+
+app.delete('/api/notifications/read', async (req, res) => {
+  try {
+    const { notifications } = await listNotifications();
+    const readIds = notifications.filter(item => item.read).map(item => item.id);
+    await setNotificationFlags(readIds, { deleted: true });
+    res.json(await listNotifications());
+  } catch (error) {
+    console.error('Error deleting read notifications:', error);
+    res.status(500).json({ error: 'Unable to delete read notifications.' });
+  }
+});
+
+app.patch('/api/notifications/:id/read', async (req, res) => {
+  try {
+    await setNotificationFlags([req.params.id], { read: true });
+    res.json(await listNotifications());
+  } catch (error) {
+    console.error('Error marking notification read:', error);
+    res.status(500).json({ error: 'Unable to mark the notification as read.' });
+  }
+});
+
+app.delete('/api/notifications/:id', async (req, res) => {
+  try {
+    await setNotificationFlags([req.params.id], { deleted: true });
+    res.json(await listNotifications());
+  } catch (error) {
+    console.error('Error deleting notification:', error);
+    res.status(500).json({ error: 'Unable to delete the notification.' });
+  }
+});
+
 //API endpoint for patching the new review status to the newly reviewed edit request
 app.patch('/api/requests/:id', async (req, res) => {
   const requestId = req.params.id; // Get the request ID from the URL parameter
