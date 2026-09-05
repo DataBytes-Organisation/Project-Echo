@@ -103,6 +103,14 @@ services:
       - ../../production/backend:/app # Mount the api's src directory to /app in the container
       - credentials_volume:/root/.config/gcloud/
       - weather_data:/app/weather_data  # Add a volume for weather data
+    environment:
+      # C4 made these fail-fast required settings; the CI stack has no .env
+      # file, so they must be supplied here to match echo_store's credentials.
+      MONGODB_URI: mongodb://root:root_password@ts-mongodb-cont:27017/EchoNet?authSource=admin
+      USER_MONGODB_URI: mongodb://root:root_password@ts-mongodb-cont:27017/EchoNet?authSource=admin
+      JWT_SECRET: ci-test-secret-not-for-production
+    depends_on:
+      - echo_store
 
     stdin_open: false
     tty: true

@@ -1,14 +1,19 @@
 import pymongo
 import datetime
-import os
+
+import logging
+
+from app.logging_config import configure_logging
+from app.config import settings
+
+configure_logging()
+logger = logging.getLogger(__name__)
 
 # Connect to local MongoDB
-# Using the same URI as the test script
-uri = "mongodb://root:root_password@localhost:27017/EchoNet?authSource=admin"
-client = pymongo.MongoClient(uri)
-db = client['EchoNet']
+client = pymongo.MongoClient(settings.mongodb_uri)
+db = client[settings.mongo_db_name]
 
-print("Connected to MongoDB.")
+logger.info("MongoDB client initialized")
 
 # 1. Define Species Data (Reference Table)
 species_data = [
@@ -43,14 +48,14 @@ species_data = [
 ]
 
 # Insert or Update Species
-print("Upserting Species...")
+logger.info("Upserting species data")
 for s in species_data:
     db.species.update_one(
         {"_id": s["_id"]}, 
         {"$set": s}, 
         upsert=True
     )
-print(f"Upserted {len(species_data)} species.")
+logger.info("Upserted %d species", len(species_data))
 
 # 2. Define Tracking/Movement Data
 # The image timestamp 1763691070419 corresponds to roughly Nov 23, 2025.
@@ -101,10 +106,9 @@ movements_data = [
     }
 ]
 
-print("Inserting Movements...")
+logger.info("Inserting movement data")
 # Clear existing test data to avoid duplicates if run multiple times? 
 # Maybe better to just insert.
 result = db.movements.insert_many(movements_data)
-print(f"Inserted {len(result.inserted_ids)} movement records.")
-
-print("Done. Data is ready for API testing.")
+logger.info("Inserted %d movement records", len(result.inserted_ids))
+logger.info("Test data insertion completed")
