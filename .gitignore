@@ -102,5 +102,9 @@ results_selftest/
 dataset/
 dataset_v2/
 
+# Generated TFLite quantisation variants (large, reproducible via
+# quantise_efficientnetv2.py)
+src/prototypes/engine/benchmarking/results_efficientnet/variants/
+
 .claude/
 CLAUDE.md
