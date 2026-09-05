@@ -1,0 +1,18 @@
+# Credentials - never commit these
+main/secrets.h
+
+# Captured audio
+recordings/
+*.wav
+dump.txt
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Arduino build output
+build/
+*.bin
+*.elf
