@@ -238,7 +238,7 @@ function asDetailPayload(sensor, source) {
   };
 }
 
-module.exports = function (app) {
+function registerSensorRoutes(app) {
   app.get("/sensors/updates", async (_req, res) => {
     const catalog = await loadSensorCatalog();
     const items = catalog.source === "demo-fallback" ? catalog.items.map(toListItem) : catalog.items;
@@ -388,4 +388,16 @@ module.exports = function (app) {
     }
     return res.json(asDetailPayload(demoSensor, "demo-fallback"));
   });
+}
+
+registerSensorRoutes.alertsFrom = alertsFrom;
+registerSensorRoutes.getDemoSensors = getDemoSensors;
+registerSensorRoutes.findDemoSensor = findDemoSensor;
+registerSensorRoutes.asDetailPayload = asDetailPayload;
+registerSensorRoutes.toListItem = toListItem;
+registerSensorRoutes.resetStores = function resetStores() {
+  for (const key of Object.keys(settingsStore)) delete settingsStore[key];
+  rebootStore.length = 0;
 };
+
+module.exports = registerSensorRoutes;
