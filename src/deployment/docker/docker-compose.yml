@@ -99,6 +99,8 @@ services:
       dockerfile: API.Dockerfile
     image: ts-api
     container_name: ts-api-cont
+    env_file:
+      - .env
     networks:
       - echo-net
     ports:
@@ -110,11 +112,10 @@ services:
     environment:
       MAIL_STARTTLS: "true"
       MAIL_SSL_TLS: "false"
-
-
+      WEB_CONCURRENCY: "${WEB_CONCURRENCY:-2}"
     stdin_open: false
     tty: true
-    command: uvicorn app.main:app --host 0.0.0.0 --port 9000 --reload
+    command: uvicorn app.main:app --host 0.0.0.0 --port 9000 --workers ${WEB_CONCURRENCY:-2}
 
   mongo-express:
     image: mongo-express
