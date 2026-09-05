@@ -60,11 +60,103 @@ tbody tr:hover { background:#FAFAFA; }
 label { font-size:13px; color:var(--muted); margin-bottom:4px; display:inline-block; }
 input, select, textarea { width:100%; padding:8px 12px; height:38px; border:1px solid var(--border); border-radius:var(--radius); font-size:14px; color:var(--ink); background:#FFFFFF; }
 
-.btn-primary, .btn-secondary { padding:8px 20px; border-radius:999px; font-size:14px; cursor:pointer; border:1px solid transparent; }
+.btn-primary, .btn-secondary { padding:8px 20px; border-radius:999px; font-size:14px; cursor:pointer; border:1px solid transparent; text-decoration:none; display:inline-flex; align-items:center; justify-content:center; }
 .btn-primary { background:var(--primary); color:#FFF; }
+.btn-secondary { background:transparent; border-color:var(--border); color:var(--ink); }
+.btn-secondary:hover { background:#F0F0F0; }
 .pill { padding:2px 10px; border-radius:999px; font-size:12px; font-weight:600; }
 .pill-success { background: rgba(47, 110, 79, 0.15); color: var(--success); }
 .pill-warning { background: rgba(210, 155, 56, 0.20); color: var(--warning); }
 .pill-danger { background: rgba(200, 71, 60, 0.18); color: var(--danger); }
+.pill-muted { background: rgba(125, 133, 146, 0.18); color: var(--muted); }
+.note { font-size:13px; color:var(--muted); margin-top:10px; }
+.battery-low { color: var(--danger); font-weight: 600; }
+.sensor-row-low-battery { background: rgba(200, 71, 60, 0.06); }
+.sensor-row-clickable { cursor: pointer; }
+.sensor-row-clickable:focus { outline: 2px solid var(--primary); outline-offset: -2px; }
+.device-detail-link { font-size: 13px; padding: 4px 12px; height: auto; }
+a.device-detail-link { color: var(--primary); font-weight: 600; }
+
+.device-detail-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+.device-detail-header h1 { margin: 0; font-size: 28px; }
+.device-health-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+  margin: 0;
+}
+.device-health-grid div {
+  background: var(--accent);
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+.device-health-grid dt {
+  font-size: 11px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.device-health-grid dd { margin: 0; font-size: 16px; font-weight: 600; }
+.device-subheading { margin: 20px 0 8px; font-size: 16px; }
+.device-empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+}
+.device-empty-state h2 { margin: 0 0 8px; }
+.device-empty-state p { color: var(--muted); margin: 0 0 20px; }
+.device-location-map {
+  margin-top: 12px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  width: 100%;
+  height: 260px;
+}
+.device-location-map .ol-viewport {
+  border-radius: 12px;
+}
+.device-connected-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  color: var(--muted);
+}
+.device-connected-item {
+  display: inline-block;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  color: inherit;
+}
+a.device-connected-item:hover {
+  border-color: var(--accent, #4f8cff);
+  color: var(--accent, #4f8cff);
+}
+.device-connected-missing {
+  opacity: 0.6;
+  font-weight: 500;
+}
+
+[hidden] { display: none !important; }
+
+.alert-bars { display: flex; flex-direction: column; gap: 12px; padding: 8px 0 4px; }
+.alert-bar-row { display: grid; grid-template-columns: 88px 1fr 40px; align-items: center; gap: 12px; }
+.alert-bar-label { font-size: 13px; font-weight: 600; color: var(--ink); }
+.alert-bar-track { height: 16px; background: #F0EEE8; border-radius: 999px; overflow: hidden; }
+.alert-bar-fill { height: 100%; border-radius: 999px; min-width: 8px; }
+.alert-bar-value { font-size: 14px; font-weight: 700; text-align: right; }
 
 @media (max-width:960px){ .sidebar{ position:fixed; top:0; bottom:0; left:-260px; transition:left .2s ease; z-index:50; } body.sidebar-open .sidebar{ left:0; } }

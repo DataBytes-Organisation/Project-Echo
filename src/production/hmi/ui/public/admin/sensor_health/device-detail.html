@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Device Detail – Project Echo</title>
+
+  <link rel="stylesheet" type="text/css" href="/admin/css/styles.min.css" />
+  <link rel="stylesheet" href="/admin/css/icons/tabler-icons/tabler-icons.css" />
+  <link rel="stylesheet" href="/css/ol.css" />
+  <link rel="stylesheet" href="/admin/sensor_health/style.css?v=frc2-5" />
+
+  <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="/admin/js/admin-layout.js" defer></script>
+  <script type="text/javascript" src="/admin/js/admin-page-state.js"></script>
+  <script src="/js/ol.js"></script>
+  <script src="/admin/sensor_health/script.js?v=frc2-5" defer></script>
+</head>
+<body>
+  <div
+    class="page-wrapper"
+    id="main-wrapper"
+    data-layout="vertical"
+    data-navbarbg="skin6"
+    data-sidebartype="full"
+    data-sidebar-position="fixed"
+    data-header-position="fixed"
+  >
+    <div id="sidebar"></div>
+
+    <div class="body-wrapper">
+      <div id="header"></div>
+
+      <div class="container-fluid">
+        <div class="sensor-page">
+          <div class="dashboard-shell">
+            <div class="admin-page-status">
+              <div class="admin-error-banner d-none" role="alert" aria-live="polite">
+                <div class="admin-error-banner__content">
+                  <i class="ti ti-alert-circle"></i>
+                  <span>Something went wrong while loading this page.</span>
+                </div>
+                <button type="button" class="admin-error-banner__dismiss" aria-label="Dismiss error message">
+                  <i class="ti ti-x"></i>
+                </button>
+              </div>
+
+              <div class="admin-loading-spinner d-none" role="status" aria-live="polite">
+                <div class="spinner-border text-danger" aria-hidden="true"></div>
+                <span class="admin-loading-spinner__text">Loading...</span>
+              </div>
+            </div>
+
+            <div id="device-empty-state" class="device-empty-state" role="status">
+              <h2>Sensor not available</h2>
+              <p id="device-empty-message">Select a sensor from the dashboard to inspect its details.</p>
+              <a class="btn-secondary" href="/admin/sensor-health.html">Back to Sensor Health</a>
+            </div>
+
+            <div id="device-detail-root" hidden>
+              <section class="device-detail-header">
+                <a class="btn-secondary" href="/admin/sensor-health.html">← Sensor Health</a>
+                <div>
+                  <p class="card-subtitle" style="margin-bottom: 4px;">Device detail</p>
+                  <h1 id="device-title">Sensor</h1>
+                </div>
+                <div id="device-status-wrap"></div>
+              </section>
+
+              <section class="card">
+                <h3>Current health</h3>
+                <p class="card-subtitle">Current status, power and thermal readings for this device.</p>
+                <dl class="device-health-grid">
+                  <div>
+                    <dt>Status</dt>
+                    <dd id="device-health-status">—</dd>
+                  </div>
+                  <div>
+                    <dt>Battery</dt>
+                    <dd id="device-health-battery">—</dd>
+                  </div>
+                  <div>
+                    <dt>Battery health</dt>
+                    <dd id="device-health-battery-health">—</dd>
+                  </div>
+                  <div>
+                    <dt>Temperature</dt>
+                    <dd id="device-health-temperature">—</dd>
+                  </div>
+                  <div>
+                    <dt>Solar output</dt>
+                    <dd id="device-health-solar">—</dd>
+                  </div>
+                  <div>
+                    <dt>Last seen</dt>
+                    <dd id="device-health-last-seen">—</dd>
+                  </div>
+                  <div>
+                    <dt>Project</dt>
+                    <dd id="device-health-project">—</dd>
+                  </div>
+                </dl>
+                <p id="device-telemetry-note" class="note"></p>
+              </section>
+
+              <section class="card">
+                <h3>Hardware</h3>
+                <p class="card-subtitle">Device identity and reported hardware specification.</p>
+                <dl class="device-health-grid">
+                  <div>
+                    <dt>Device type</dt>
+                    <dd id="device-hw-type">—</dd>
+                  </div>
+                  <div>
+                    <dt>Model</dt>
+                    <dd id="device-hw-model">—</dd>
+                  </div>
+                  <div>
+                    <dt>Processor</dt>
+                    <dd id="device-hw-processor">—</dd>
+                  </div>
+                  <div>
+                    <dt>Clock speed</dt>
+                    <dd id="device-hw-clock">—</dd>
+                  </div>
+                  <div>
+                    <dt>Memory</dt>
+                    <dd id="device-hw-memory">—</dd>
+                  </div>
+                  <div>
+                    <dt>Storage</dt>
+                    <dd id="device-hw-storage">—</dd>
+                  </div>
+                </dl>
+              </section>
+
+              <section class="card">
+                <h3>Components</h3>
+                <p class="card-subtitle">Power, cooling, audio and sensor components reported by this device.</p>
+                <div class="table-responsive">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Component</th>
+                        <th>Category</th>
+                        <th>Model</th>
+                        <th>Readings</th>
+                      </tr>
+                    </thead>
+                    <tbody id="device-components-tbody">
+                      <tr><td colspan="4">Loading…</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+
+              <section class="card">
+                <h3>Connected devices</h3>
+                <p class="card-subtitle">Mesh neighbours of this device. Select one to open its detail view.</p>
+                <div id="device-connected-list" class="device-connected-list">—</div>
+              </section>
+
+
+              <section class="card">
+                <h3>Location</h3>
+                <p class="card-subtitle">Last reported GPS position for this device.</p>
+                <p id="device-location-text" class="note">—</p>
+                <div id="device-location-map" class="device-location-map" hidden></div>
+              </section>
+
+              <section class="card">
+                <h3>Last audio</h3>
+                <p class="card-subtitle">Most recent recording metadata for this device.</p>
+                <dl class="device-health-grid">
+                  <div>
+                    <dt>When</dt>
+                    <dd id="device-audio-when">—</dd>
+                  </div>
+                  <div>
+                    <dt>Species</dt>
+                    <dd id="device-audio-species">—</dd>
+                  </div>
+                  <div>
+                    <dt>Confidence</dt>
+                    <dd id="device-audio-confidence">—</dd>
+                  </div>
+                  <div>
+                    <dt>Sample rate</dt>
+                    <dd id="device-audio-sample-rate">—</dd>
+                  </div>
+                </dl>
+                <p id="device-audio-note" class="note"></p>
+              </section>
+
+              <section class="card">
+                <h3>Recent history</h3>
+                <p class="card-subtitle">Recent audio events and reboot commands for this device.</p>
+
+                <h4 class="device-subheading">Audio events</h4>
+                <div class="table-responsive">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Time</th>
+                        <th>Species</th>
+                        <th>Confidence</th>
+                        <th>Sample rate</th>
+                      </tr>
+                    </thead>
+                    <tbody id="device-audio-history-tbody">
+                      <tr><td colspan="4">Loading…</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <h4 class="device-subheading">Reboot history</h4>
+                <div class="table-responsive">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Status</th>
+                        <th>Reason</th>
+                        <th>Time</th>
+                      </tr>
+                    </thead>
+                    <tbody id="device-reboot-history-tbody">
+                      <tr><td colspan="3">Loading…</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+
+              <section class="card">
+                <h3>Device actions</h3>
+                <p class="card-subtitle">Queue a reboot or update recording settings for this device only.</p>
+
+                <div class="form-grid">
+                  <div>
+                    <label for="device-reboot-reason">Reboot reason</label>
+                    <input id="device-reboot-reason" placeholder="e.g. frozen board, config update" />
+                  </div>
+                </div>
+                <button type="button" class="btn-primary" id="device-reboot-button">Queue reboot</button>
+                <p id="device-reboot-message" class="note"></p>
+
+                <h4 class="device-subheading">Device settings</h4>
+                <div class="form-grid">
+                  <div>
+                    <label for="device-record-interval">Recording interval</label>
+                    <select id="device-record-interval">
+                      <option>30 seconds</option>
+                      <option selected>1 minute</option>
+                      <option>5 minutes</option>
+                      <option>10 minutes</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label for="device-sensitivity">Sensitivity</label>
+                    <select id="device-sensitivity">
+                      <option>Low</option>
+                      <option selected>Medium</option>
+                      <option>High</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label for="device-battery-threshold">Battery warning threshold (%)</label>
+                    <input id="device-battery-threshold" type="number" value="25" min="1" max="100" />
+                  </div>
+                </div>
+                <button type="button" class="btn-primary" id="device-settings-button">Save device settings</button>
+                <p id="device-settings-message" class="note"></p>
+              </section>
+            </div>
+          </div>
+        </div>
+
+        <div id="footer"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const pageState = createAdminPageState();
+    pageState.resetPageState();
+  </script>
+</body>
+</html>

@@ -588,6 +588,7 @@ app.post('/api/applyAlgorithm', (req, res) => {
 require('./routes/auth.routes')(app);
 require('./routes/user.routes')(app);
 require('./routes/map.routes')(app);
+require('./routes/sensor.routes')(app);
 //updated 2026/01/26 to serve mongodb api endpoints to admin folder for data integration
 app.get(
   ['/admin/*', '/map', '/requests', '/notifications'],
@@ -911,9 +912,6 @@ async function proxyToApi(req, res) {
   }
 }
 
-app.all('/sensors', proxyToApi);
-app.all('/sensors/*', proxyToApi);
-// Proxy all remaining API routes to the Python backend
 app.all('/movement_time/*', proxyToApi);
 app.all('/events_time/*', proxyToApi);
 app.all('/microphones', proxyToApi);

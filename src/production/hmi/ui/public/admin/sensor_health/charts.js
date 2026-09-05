@@ -1,107 +1,78 @@
-/* Charts helper for sensor health (moved into /admin/sensor_health/) */
+/* Alert severity bars for sensor health */
+
+function renderAlertsChart(items) {
+  const root = document.getElementById("alertsChart");
+  if (!root) return;
+
+  const counts = { Critical: 0, High: 0, Medium: 0, Low: 0 };
+  for (const alert of Array.isArray(items) ? items : []) {
+    const issue = String(alert.issue || "").toLowerCase();
+    const sev = String(alert.severity || "");
+    if (counts[sev] !== undefined) {
+      counts[sev] += 1;
+    } else if (issue.includes("offline")) {
+      counts.Critical += 1;
+    } else if (issue.includes("battery")) {
+      counts.High += 1;
+    } else {
+      counts.Medium += 1;
+    }
+  }
+
+  const rows = [
+    { label: "Critical", value: counts.Critical, color: "#C8473C" },
+    { label: "High", value: counts.High, color: "#D29B38" },
+    { label: "Medium", value: counts.Medium, color: "#F59E0B" },
+    { label: "Low", value: counts.Low, color: "#2F6E4F" },
+  ];
+
+  const total = rows.reduce((sum, row) => sum + row.value, 0);
+  if (total === 0) {
+    root.innerHTML = '<p class="card-subtitle">No active alerts.</p>';
+    return;
+  }
+
+  const maxValue = Math.max(...rows.map((row) => row.value), 1);
+
+  root.innerHTML = rows
+    .map((row) => {
+      const width = Math.max(6, Math.round((row.value / maxValue) * 100));
+      return `
+        <div class="alert-bar-row">
+          <span class="alert-bar-label">${row.label}</span>
+          <div class="alert-bar-track">
+            <div class="alert-bar-fill" style="width:${width}%; background:${row.color};"></div>
+          </div>
+          <span class="alert-bar-value">${row.value}</span>
+        </div>
+      `;
+    })
+    .join("");
+}
+
+async function drawAlertsChart() {
+  const root = document.getElementById("alertsChart");
+  if (!root) return;
+
+  root.innerHTML = '<p class="card-subtitle">Loading alert summary…</p>';
+
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 4000);
+    const res = await fetch("/sensors/alerts", { signal: controller.signal });
+    clearTimeout(timer);
+
+    if (!res.ok) throw new Error(`Failed to load alerts: ${res.status}`);
+    const data = await res.json();
+    renderAlertsChart(Array.isArray(data.items) ? data.items : []);
+  } catch (e) {
+    console.warn("Alerts chart fallback in use:", e);
+    renderAlertsChart([]);
+  }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   drawAlertsChart();
 });
 
-async function drawAlertsChart() {
-  const canvas = document.getElementById("alertsChart");
-  if (!canvas) return;
-
-  const ctx = canvas.getContext("2d");
-  const labels = ["Critical", "High", "Medium", "Low"];
-  let values = [0, 0, 0, 0];
-
-  try {
-    const res = await fetch('/sensors/alerts');
-
-    if (!res.ok) {
-      throw new Error(`Failed to load alerts chart data: ${res.status}`);
-    }
-
-    const contentType = res.headers.get('content-type') || '';
-    if (!contentType.includes('application/json')) {
-      throw new Error('Alerts chart API did not return JSON.');
-    }
-
-    const data = await res.json();
-    const items = Array.isArray(data.items) ? data.items : [];
-
-    const counts = {
-      Critical: 0,
-      High: 0,
-      Medium: 0,
-      Low: 0
-    };
-
-    for (const a of items) {
-      const sev = String(a.severity || 'Medium');
-      if (counts[sev] !== undefined) {
-        counts[sev] += 1;
-      }
-    }
-
-    values = [counts.Critical, counts.High, counts.Medium, counts.Low];
-  } catch (e) {
-    console.warn('Alerts chart fallback in use:', e);
-    values = [0, 0, 0, 0];
-  }
-
-  const colors = ["#C8473C", "#D29B38", "#F59E0B", "#2F6E4F"];
-  const width = canvas.width;
-  const height = canvas.height;
-  const padding = 30;
-  const bottomPadding = 40;
-  const topPadding = 20;
-  const maxValue = Math.max(...values, 1);
-  const chartHeight = height - bottomPadding - topPadding;
-  const scaleY = chartHeight / maxValue;
-  const barWidth = 32;
-  const gap = 26;
-
-  ctx.clearRect(0, 0, width, height);
-
-  ctx.strokeStyle = "rgba(148, 163, 184, 0.25)";
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(padding, height - bottomPadding);
-  ctx.lineTo(width - padding, height - bottomPadding);
-  ctx.stroke();
-
-  ctx.font = "12px Inter, system-ui, sans-serif";
-  ctx.textAlign = "center";
-
-  values.forEach((value, i) => {
-    const x = padding + i * (barWidth + gap) + barWidth / 2;
-    const barHeight = value * scaleY;
-    const y = height - bottomPadding - barHeight;
-
-    ctx.fillStyle = colors[i];
-
-    if (ctx.roundRect) {
-      ctx.roundRect(x - barWidth / 2, y, barWidth, barHeight, 6);
-      ctx.fill();
-    } else {
-      ctx.fillRect(x - barWidth / 2, y, barWidth, barHeight);
-    }
-
-    ctx.fillStyle = "#111827";
-    ctx.fillText(value, x, y - 6);
-
-    ctx.fillStyle = "#6F7B74";
-    ctx.fillText(labels[i], x, height - bottomPadding + 18);
-  });
-}
-
-if (!CanvasRenderingContext2D.prototype.roundRect) {
-  CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
-    r = Math.min(r, w / 2, h / 2);
-    this.beginPath();
-    this.moveTo(x + r, y);
-    this.arcTo(x + w, y, x + w, y + h, r);
-    this.arcTo(x + w, y + h, x, y + h, r);
-    this.arcTo(x, y + h, x, y, r);
-    this.arcTo(x, y, x + w, y, r);
-    this.closePath();
-    return this;
-  };
-}
+window.renderAlertsChart = renderAlertsChart;
