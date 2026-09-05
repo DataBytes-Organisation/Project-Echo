@@ -38,7 +38,10 @@ WORKDIR /app
 # We also add the gcloud CLI here in a single consolidated step
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update -o Acquire::Retries=5 -o Acquire::http::Timeout=30 \
+	&& apt-get install -y --no-install-recommends \
+	-o Acquire::Retries=5 \
+	-o Acquire::http::Timeout=30 \
 	libopenexr25 \
 	libgl1-mesa-glx \
 	libglib2.0-0 \
@@ -46,11 +49,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 	gnupg \
 	ca-certificates \
 	&& echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list \
-	&& curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg add - \
-	&& apt-get update -y \
-	&& apt-get install -y google-cloud-cli \
+	&& curl --retry 5 --retry-delay 5 --retry-connrefused https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg add - \
+	&& apt-get update -y -o Acquire::Retries=5 -o Acquire::http::Timeout=30 \
+	&& apt-get install -y google-cloud-cli -o Acquire::Retries=5 -o Acquire::http::Timeout=30 \
 	&& apt-get clean \
-	&& rm -rf /var/lib/apt/lists/* 
+	&& rm -rf /var/lib/apt/lists/*
 
 COPY --from=echo_engine_builder /opt/venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"

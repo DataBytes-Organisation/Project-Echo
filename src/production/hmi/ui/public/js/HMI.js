@@ -49,6 +49,51 @@ const DEG_TO_RAD           = Math.PI / 180;
 const RAD_TO_DEG           = 180 / Math.PI;
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Live-event visualisation (location confidence + event age)
+//
+// HMI Planner (Sprint 2, Project Echo) — "The HMI map shall visually
+// represent live detections with location, confidence, event type, and
+// event age."
+//
+// Confidence -> ring radius (vocalization events only):
+//   CONFIRMED against src/production/iot/edge_inference/README.md
+//   ("GPS accuracy estimate in metres") and echo_engine.py / comms_manager.py:
+//   `animalLLAUncertainty` is a real distance in METRES (default 10.0),
+//   not a 0-100 score. It is carried through onto the event as
+//   `locationUncertaintyM` and used directly below for the ring radius.
+//   (`locationConfidence` = `100 - animalLLAUncertainty`, computed in
+//   convertJSONtoAnimalVocalizationEvent, is kept only for the existing
+//   popup's "Location Confidence %" label — a pre-existing approximation
+//   that reads oddly once uncertainty exceeds ~100m; not changed here since
+//   fixing that display is outside this feature's scope.)
+//   Movement/truth events are ground truth (uncertainty is always 0),
+//   so they get no ring — only vocalization detections carry real
+//   location uncertainty.
+//
+// Event age -> fade -> expiry:
+//   hmiState.liveWindow (ms, set once in index.html) is the single source
+//   of truth for how long a live event stays on the map. Default is
+//   60000 ms (60s), inside the 60-120s range suggested for this feature.
+//   To change the window, edit hmiState.liveWindow in index.html — nothing
+//   else needs to change. purgeVocalizationEvents/purgeTruthEvents (below)
+//   remove a feature once its age passes that window; the constants here
+//   only control when a *visible* marker starts fading before that happens,
+//   so fade and removal always agree (a marker reaches MIN_LIVE_EVENT_OPACITY
+//   right as it is purged).
+// ─────────────────────────────────────────────────────────────────────────────
+
+const CONFIDENCE_RING_BASE_RADIUS_M = 15;  // minimum ring radius (m), so a very precise fix is still visible
+const CONFIDENCE_RING_MAX_RADIUS_M  = 300; // cap on displayed radius (m), so one outlier reading can't dominate the map
+const LIVE_EVENT_FADE_START_RATIO        = 0.5;  // start fading at 50% of hmiState.liveWindow elapsed
+const MIN_LIVE_EVENT_OPACITY             = 0.15; // opacity immediately before purge removes the marker
+
+// Vocalization (detected) vs movement/truth markers are told apart by BOTH
+// color and shape (circle+amber vs diamond+teal), not color alone, so the
+// distinction still reads for colour-blind users and in greyscale printouts.
+const VOCALIZATION_MARKER_COLOR = "255, 167, 38"; // amber
+const TRUTH_MARKER_COLOR        = "0, 172, 193";  // teal
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Module-level state
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -754,7 +799,8 @@ export function convertJSONtoAnimalVocalizationEvent(hmiState, data) {
     animalType:                     data.type.toLowerCase(),
     animalStatus:                   matchStatus(data.status.toLowerCase()),
     animalDiet:                     data.diet.toLowerCase(),
-    locationConfidence:             100 - data.animalLLAUncertainty,
+    locationConfidence:             100 - data.animalLLAUncertainty, // legacy popup "%" label only, see note above
+    locationUncertaintyM:           data.animalLLAUncertainty,       // metres — used for the map confidence ring
     estLat:                         data.animalEstLLA[0],
     estLon:                         data.animalEstLLA[1],
     locationLat:                    data.animalTrueLLA[0],
@@ -991,16 +1037,112 @@ export function updateLayers(hmiState, filterState) {
 // Map features
 // ─────────────────────────────────────────────────────────────────────────────
 
-function _makeAnimalIcon(iconPath) {
-  return new ol.style.Style({
-    image: new ol.style.Icon({ src: iconPath, anchor: [0.5, 1], scale: 0.75, className: "true-icon" }),
-  });
+/**
+ * Fraction of hmiState.liveWindow elapsed for a live event, measured from
+ * the same `timestamp` field purgeTruthEvents/purgeVocalizationEvents use
+ * to expire it (stored on the feature as animalRecordDate), so fade and
+ * expiry always agree.
+ */
+function _liveEventAgeRatio(hmiState, recordTimestampSeconds) {
+  const windowSeconds = hmiState.liveWindow / 1000;
+  if (!windowSeconds || !hmiState.currentTime) return 0;
+  const ageSeconds = hmiState.currentTime - recordTimestampSeconds;
+  return ageSeconds / windowSeconds;
 }
 
-function _makeVocalizationIcon(iconPath) {
-  return new ol.style.Style({
-    image: new ol.style.Icon({ src: iconPath, anchor: [0.5, 1], scale: 0.75, className: "vocalization-icon" }),
-  });
+/** Opacity (1 = fresh, MIN_LIVE_EVENT_OPACITY = about to be purged) for a live event's age. */
+function _computeFadeOpacity(hmiState, recordTimestampSeconds) {
+  const ratio = _liveEventAgeRatio(hmiState, recordTimestampSeconds);
+  if (ratio <= LIVE_EVENT_FADE_START_RATIO) return 1;
+  if (ratio >= 1) return MIN_LIVE_EVENT_OPACITY;
+
+  const fadeRatio = (ratio - LIVE_EVENT_FADE_START_RATIO) / (1 - LIVE_EVENT_FADE_START_RATIO);
+  return 1 - fadeRatio * (1 - MIN_LIVE_EVENT_OPACITY);
+}
+
+/**
+ * Maps a location-uncertainty reading in metres (animalLLAUncertainty /
+ * locationUncertaintyM — see the "Confidence -> ring radius" note above) to
+ * an on-map ring radius in metres. Missing/invalid uncertainty is treated as
+ * CONFIDENCE_RING_MAX_RADIUS_M (worst case) rather than 0, so a data gap
+ * shows as "we don't know", never as false confidence.
+ */
+function _uncertaintyToRingRadiusMeters(uncertaintyMeters) {
+  const safeUncertainty = Number.isFinite(uncertaintyMeters) && uncertaintyMeters >= 0
+    ? uncertaintyMeters
+    : CONFIDENCE_RING_MAX_RADIUS_M;
+  return Math.min(CONFIDENCE_RING_BASE_RADIUS_M + safeUncertainty, CONFIDENCE_RING_MAX_RADIUS_M);
+}
+
+/**
+ * Style FUNCTION (not a static Style) for movement/truth markers.
+ * OpenLayers calls this at render time only for features actually on
+ * screen, so age-based fade updates automatically as hmiState.currentTime
+ * advances — nothing here loops over features or rebuilds styles itself
+ * (see the per-tick source.changed() calls in queueSimUpdate, which just
+ * mark each layer dirty so OpenLayers repaints it on its next frame).
+ * Ground-truth locations have no location uncertainty, so there is no
+ * confidence ring — only the diamond/teal shape+colour marker (AC2) drawn
+ * underneath the existing per-species icon.
+ */
+function _makeTruthStyleFn(hmiState, iconPath) {
+  return function truthStyle(feature) {
+    const opacity = _computeFadeOpacity(hmiState, feature.get("animalRecordDate"));
+
+    return [
+      new ol.style.Style({
+        image: new ol.style.RegularShape({
+          points: 4,
+          radius: 9,
+          angle: Math.PI / 4, // rotate square -> diamond
+          fill:   new ol.style.Fill({ color: `rgba(${TRUTH_MARKER_COLOR}, ${opacity})` }),
+          stroke: new ol.style.Stroke({ color: `rgba(255, 255, 255, ${opacity})`, width: 1.5 }),
+        }),
+      }),
+      new ol.style.Style({
+        image: new ol.style.Icon({
+          src: iconPath, anchor: [0.5, 1], scale: 0.75, opacity, className: "true-icon",
+        }),
+      }),
+    ];
+  };
+}
+
+/**
+ * Style FUNCTION for vocalization (detected) markers. Same fade behaviour
+ * as _makeTruthStyleFn, plus a translucent confidence ring (AC3) drawn as a
+ * real ol.geom.Circle in map units (metres) centred on the marker, so it
+ * scales correctly with zoom and with the event's own reported location
+ * uncertainty (in metres) — see _uncertaintyToRingRadiusMeters. The ring
+ * uses a fixed low alpha (not the
+ * age-fade opacity) so overlapping detections stay legible instead of a
+ * cluster of fading rings compounding into an unreadable smear.
+ */
+function _makeVocalizationStyleFn(hmiState, iconPath) {
+  return function vocalizationStyle(feature) {
+    const opacity = _computeFadeOpacity(hmiState, feature.get("animalRecordDate"));
+    const radiusM = _uncertaintyToRingRadiusMeters(feature.get("animalLocUncertaintyM"));
+
+    return [
+      new ol.style.Style({
+        geometry: (feat) => new ol.geom.Circle(feat.getGeometry().getCoordinates(), radiusM),
+        fill:   new ol.style.Fill({ color: `rgba(${VOCALIZATION_MARKER_COLOR}, 0.18)` }),
+        stroke: new ol.style.Stroke({ color: `rgba(${VOCALIZATION_MARKER_COLOR}, 0.6)`, width: 1 }),
+      }),
+      new ol.style.Style({
+        image: new ol.style.Circle({
+          radius: 9,
+          fill:   new ol.style.Fill({ color: `rgba(${VOCALIZATION_MARKER_COLOR}, ${opacity})` }),
+          stroke: new ol.style.Stroke({ color: `rgba(255, 255, 255, ${opacity})`, width: 1.5 }),
+        }),
+      }),
+      new ol.style.Style({
+        image: new ol.style.Icon({
+          src: iconPath, anchor: [0.5, 1], scale: 0.75, opacity, className: "vocalization-icon",
+        }),
+      }),
+    ];
+  };
 }
 
 function _resolveSimIconPath(entry) {
@@ -1034,7 +1176,7 @@ function _addTruthFeature(hmiState, entry) {
     isAnimalMovement:  1,
   });
 
-  feature.setStyle(_makeAnimalIcon(iconPath));
+  feature.setStyle(_makeTruthStyleFn(hmiState, iconPath));
   feature.setId(entry.animalId);
 
   const layer = findMapLayerWithName(hmiState, deriveTruthLayerName(entry.animalStatus, entry.animalType));
@@ -1044,16 +1186,31 @@ function _addTruthFeature(hmiState, entry) {
 function _addVocalizationFeature(hmiState, entry) {
   const iconPath = _resolveVocalizationIconPath(entry);
 
+  // ASSUMPTION (please confirm against the real data model): a vocalization
+  // detection's "estimated location" is entry.estLat/estLon, derived from
+  // data.animalEstLLA — the acoustic triangulation estimate. entry.locationLat/
+  // locationLon (data.animalTrueLLA) is the simulator's ground-truth position;
+  // a real deployment would not have that for a vocalization-only detection.
+  // It is kept on the feature (animalTrueLon/animalTrueLat) for debugging
+  // only and is never used to place the marker or the confidence ring.
+  // If the estimated fields are ever missing, fall back to the true location
+  // rather than silently dropping the marker.
+  const estLon = Number.isFinite(entry.estLon) ? entry.estLon : entry.locationLon;
+  const estLat = Number.isFinite(entry.estLat) ? entry.estLat : entry.locationLat;
+
   const feature = new ol.Feature({
-    geometry:          new ol.geom.Point(ol.proj.fromLonLat([entry.locationLon, entry.locationLat])),
+    geometry:          new ol.geom.Point(ol.proj.fromLonLat([estLon, estLat])),
     name:              "vocalisation_" + entry.speciesScientificName,
     animalType:        entry.animalType,
     animalStatus:      entry.animalStatus,
     animalSpecies:     entry.speciesScientificName,
-    animalLon:         entry.locationLon,
-    animalLat:         entry.locationLat,
+    animalLon:         estLon,
+    animalLat:         estLat,
+    animalTrueLon:     entry.locationLon,
+    animalTrueLat:     entry.locationLat,
     animalConfidence:  entry.speciesIdentificationConfidence,
     animalLocConfidence: entry.locationConfidence,
+    animalLocUncertaintyM: entry.locationUncertaintyM,
     animalDiet:        entry.animalDiet,
     animalIcon:        iconPath,
     animalRecordDate:  entry.timestamp,
@@ -1061,7 +1218,7 @@ function _addVocalizationFeature(hmiState, entry) {
     isAnimalMovement:  0,
   });
 
-  feature.setStyle(_makeVocalizationIcon(iconPath));
+  feature.setStyle(_makeVocalizationStyleFn(hmiState, iconPath));
   feature.setId(entry.eventId);
 
   const layer = findMapLayerWithName(hmiState, deriveLayerName(entry.animalStatus, entry.animalType));
@@ -1583,10 +1740,20 @@ function queueSimUpdate(hmiState) {
 
       if (simUpdateTimeout) clearTimeout(simUpdateTimeout);
 
+      // Re-invalidate every live-event layer each tick so age-based fade
+      // (computed inside the style functions in the "Live-event
+      // visualisation" section above) repaints smoothly. This does NOT
+      // rebuild features or re-render the whole map — it only marks each
+      // vector layer's own canvas dirty, so OpenLayers repaints just that
+      // layer's on-screen features on its next frame, same as the
+      // pre-existing truth-layer refresh this replaces.
       for (let stat of statuses) {
         for (let animalType of animalTypes) {
-          const layer = findMapLayerWithName(hmiState, deriveTruthLayerName(stat, animalType));
-          if (layer) { layer.changed(); layer.getSource().changed(); }
+          const truthLayer = findMapLayerWithName(hmiState, deriveTruthLayerName(stat, animalType));
+          if (truthLayer) { truthLayer.changed(); truthLayer.getSource().changed(); }
+
+          const vocalizationLayer = findMapLayerWithName(hmiState, deriveLayerName(stat, animalType));
+          if (vocalizationLayer) { vocalizationLayer.changed(); vocalizationLayer.getSource().changed(); }
         }
       }
 
