@@ -14,11 +14,17 @@ files or third-party packages needed to build the fixtures). It does
 the expected artifacts - see `src/prototypes/engine/reproducible_training_pipeline/README.md`
 for a real (non-synthetic) baseline run.
 
+This directory also contains `test_disk_cache_regression.py`, a separate
+regression test for an LMDB cache-collision bug found during Sprint 2
+(see below) - `test_train_smoke.py` runs with `system.use_disk_cache=false`
+so it never exercises that code path at all.
+
 ## Location and Structure
 
 ```text
 src/tests/pipeline/engine_training/smoke_test/
 |-- test_train_smoke.py
+|-- test_disk_cache_regression.py
 `-- README.md
 ```
 
@@ -95,3 +101,28 @@ own README).
 - Timeout (default 300s): CPU-only training of even a tiny synthetic set
   can be slow on constrained hardware; the failure message includes
   whatever stdout/stderr was captured before the timeout.
+
+## `test_disk_cache_regression.py`
+
+Regression test for a bug found during Sprint 2: `train_dataset` and
+`val_dataset` in `dataset.py` are separate `SpectrogramDataset` instances
+that each lazily open their own `lmdb.Environment`. With
+`training.num_workers=0` both live in the same process, and lmdb refuses
+to open the same environment path twice there - this crashed the first
+real (non-synthetic) full training run as soon as validation started,
+since `system.use_disk_cache` defaults to `True` in `config.yaml`. Fixed
+by giving each split its own cache subdirectory
+(`cache_directory/train/` vs `cache_directory/val/`).
+
+Same subprocess-per-`main.py` approach as `test_train_smoke.py`, but with
+`system.use_disk_cache=true` (the actual trigger) instead of `false`.
+Asserts the process exits `0`, that `"already open in this process"`
+never appears in the output, and that both cache subdirectories were
+actually created (confirms the fix mechanism, not just an incidental
+pass).
+
+Run it the same way:
+
+```powershell
+python src\tests\pipeline\engine_training\smoke_test\test_disk_cache_regression.py
+```

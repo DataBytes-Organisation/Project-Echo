@@ -4,6 +4,8 @@ from .routers import add_csv_output_option, audio_upload_router
 
 from fastapi import FastAPI, Body, HTTPException, status, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.exceptions import RequestValidationError
+from app.errors import StandardizeErrorResponseMiddleware, http_exception_handler, unhandled_exception_handler, validation_exception_handler
 from app.routers import species_predictor
 from app.routers import auth_router
 from app.routers import admin_budget, admin_services
@@ -48,6 +50,11 @@ app = FastAPI(
     """,
     version="1.0.0"
 )
+
+app.add_exception_handler(HTTPException, http_exception_handler)
+app.add_exception_handler(RequestValidationError, validation_exception_handler)
+app.add_exception_handler(Exception, unhandled_exception_handler)
+app.add_middleware(StandardizeErrorResponseMiddleware)
 
 # ✅ CORS Middleware
 app.add_middleware(
