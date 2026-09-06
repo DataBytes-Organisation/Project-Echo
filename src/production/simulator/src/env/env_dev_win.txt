@@ -5,8 +5,7 @@ dm-sonnet
 flask
 folium
 geopy
-google-cloud
-google-cloud-storage
+boto3
 graphviz
 gviz-api
 gym

@@ -55,8 +55,8 @@ class Config:
         # Initialise the communications manager
         self.comms_manager.initialise_communications()
         
-        # Use google cloud to initialise species list
-        species_list = self.comms_manager.gcp_load_species_list()
+        # Use Cloudflare R2 to initialise the species list and audio keys
+        species_list = self.comms_manager.r2_load_species_list()
         
         # Create the factories
         animal_factory = self.create_animal_factory(species_list)

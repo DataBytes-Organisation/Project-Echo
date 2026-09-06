@@ -40,7 +40,6 @@ FROM ${BASE_IMAGE}
 WORKDIR /app
 
 # Install ONLY runtime libraries (not the -dev versions)
-# We also add the gcloud CLI here in a single consolidated step
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -50,17 +49,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 	libopenexr25 \
 	libgl1-mesa-glx \
 	libglib2.0-0 \
-	curl \
-	gnupg \
-	ca-certificates \
-	&& rm -rf /var/lib/apt/lists/* 
-
-# Google Cloud CLI
-RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list \
-	&& curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg \
-	&& apt-get update -y \
-	&& apt-get install -y google-cloud-cli \
-	&& apt-get clean \
 	&& rm -rf /var/lib/apt/lists/* 
 
 RUN ln -s /usr/bin/python3 /usr/bin/python 
@@ -72,12 +60,10 @@ COPY --from=echo_engine_builder /build/echo_engine.sh ./
 
 COPY yamnet_dir/ ./yamnet_dir/
 COPY ./echo_engine.py ./
+COPY ./r2_storage.py ./
 COPY ./echo_engine.json ./
 COPY ./echo_credentials.json ./
 COPY ./helpers ./helpers
 COPY ./models/efficientnetv2 ./models/efficientnetv2
-
-# Setup GCloud config dir
-RUN mkdir -p /root/.config/gcloud/
 
 CMD ["/bin/bash", "/app/echo_engine.sh"]

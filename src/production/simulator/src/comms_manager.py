@@ -2,7 +2,7 @@
 
 #############################################################################
 # This class provides message handling for read and writing JSON messages
-# This class interfaces with google cloud for audio data
+# This class interfaces with Cloudflare R2 for audio data
 # This class interfaces with mqtt for message passing
 #############################################################################
 
@@ -10,8 +10,9 @@ import paho.mqtt.client as paho
 import base64
 import json
 import pymongo
-from google.cloud import storage
 import os
+from pathlib import PurePosixPath
+from r2_storage import R2Storage
 from entities.species import Species
 import random
 from clock import Clock
@@ -25,6 +26,7 @@ class CommsManager():
     
     def __init__(self) -> None:
         self.audio_blobs = {}
+        self.r2_storage = None
         self.clock = Clock()
        
     # Initialise communication with MQTT endpoints
@@ -56,31 +58,13 @@ class CommsManager():
             print(f"Failed to establish database connection", flush=True)
 
 
-    # This function uses the google bucket with audio files and
-    # leverages the folder names as the official species names
-    # Note: to run this you will need to first authenticate
-    # See https://github.com/DataBytes-Organisation/Project-Echo/tree/main/src/Prototypes/data#readme
-    def gcp_load_species_list(self):
- 
-        species_names = set()
+    # Load species and audio object keys from Cloudflare R2.
+    def r2_load_species_list(self):
+        self.r2_storage = R2Storage()
+        self.audio_blobs = self.r2_storage.list_audio_by_species()
 
-        storage_client = storage.Client()
-        bucket = storage_client.get_bucket(os.environ['BUCKET_NAME'])
-        blobs = bucket.list_blobs()  # Get list of files
-        for blob in blobs:
-            folder_name = blob.name.split('/')[0]
-       
-            species_names.add(folder_name)
-            
-            if folder_name in self.audio_blobs:
-                self.audio_blobs[folder_name].append(blob)
-            else:
-                self.audio_blobs[folder_name] = []
-                self.audio_blobs[folder_name].append(blob)
-        
-        # using the names loaded from GCP, construct the Species objects
         species_list = []
-        for name in species_names:
+        for name in sorted(self.audio_blobs):
             species = Species(name)
             species_list.append(species)
             
@@ -100,16 +84,16 @@ class CommsManager():
         microphone_lla  = closest_mic.getLLA()
         
         # randomly sample from available audio blobs from this species
-        sample_blob = random.sample(self.audio_blobs[species_name], k=1)[0]
+        sample_key = random.sample(self.audio_blobs[species_name], k=1)[0]
         
         # Read the blob's content as a byte array
-        audio = sample_blob.download_as_bytes()
+        audio = self.r2_storage.download_bytes(sample_key)
  
         # Encode the audio data as a string
         audio_str = self.audio_to_string(audio)
         
         # For now, send filename across for format information
-        audio_file = sample_blob.name.split('/')[1]
+        audio_file = PurePosixPath(sample_key).name
 
         print("DEBUG audio_file:", audio_file, flush=True)
         print("DEBUG audio bytes length:", len(audio), flush=True)
@@ -207,9 +191,9 @@ class CommsManager():
     def test(self):
         logger1.info(f'testing MessageManager')
         
-        logger1.info(f'Testing GCP endpoint')
+        logger1.info(f'Testing Cloudflare R2 endpoint')
         
-        species_list = self.gcp_load_species_list()
+        species_list = self.r2_load_species_list()
         for species in species_list:
             logger1.info(f'Found species : {species.getName()}')
         
@@ -232,4 +216,3 @@ class CommsManager():
             
             logger1.info(f'test completed successfully')
     
-        

@@ -25,8 +25,7 @@ dependencies:
  - ffmpeg
  - sox
  - pip:
-    - google-cloud
-    - google-cloud-storage
+    - boto3
     - matplotlib
     - notebook
     - numpy

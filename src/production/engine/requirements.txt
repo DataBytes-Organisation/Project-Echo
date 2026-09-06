@@ -1,8 +1,7 @@
 audiomentations
 diskcache
 geopy
-google-cloud
-google-cloud-storage
+boto3>=1.34,<2
 ipykernel
 librosa
 matplotlib
