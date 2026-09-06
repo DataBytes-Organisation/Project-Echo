@@ -1,10 +1,14 @@
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 import datetime
+import os
 
-# Replace <hostname> with the actual hostname where MongoDB is running
-client = MongoClient("mongodb://modelUser:EchoNetAccess2023@localhost:27017/EchoNet")
+connection_string = os.getenv("MONGODB_URI")
 
+if not connection_string:
+    raise RuntimeError("MONGODB_URI environment variable is required for the connection test.")
+
+client = MongoClient(connection_string)
 db = client["EchoNet"]
 
 # Insert a new event
