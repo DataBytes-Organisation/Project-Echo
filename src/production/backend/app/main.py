@@ -25,6 +25,7 @@ from app.routers import public
 import logging
 from app.logging_config import configure_logging
 from app.config import settings
+from app.middleware.request_timeout import RequestTimeoutMiddleware
 
 configure_logging() #
 logger = logging.getLogger(__name__)
@@ -59,6 +60,13 @@ app.add_exception_handler(HTTPException, http_exception_handler)
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
 app.add_exception_handler(Exception, unhandled_exception_handler)
 app.add_middleware(StandardizeErrorResponseMiddleware)
+
+# Bound safe read requests without cancelling writes that may still complete in
+# a synchronous database or external-service worker thread.
+app.add_middleware(
+    RequestTimeoutMiddleware,
+    timeout_seconds=settings.request_timeout_seconds,
+)
 
 # ✅ CORS Middleware
 app.add_middleware(

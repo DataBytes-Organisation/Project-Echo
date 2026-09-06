@@ -30,7 +30,7 @@ class Settings(BaseSettings):
     api_port: int = 9000
 
     # --- Timeouts / thresholds (consumed by C10/C11 later) ---
-    request_timeout_seconds: float = 15.0
+    request_timeout_seconds: float = Field(15.0, gt=0)
     slow_operation_ms: float = 500.0
     cache_ttl_seconds: int = 60
 
