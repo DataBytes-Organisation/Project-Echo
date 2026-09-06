@@ -451,3 +451,25 @@ class ProjectListResponse(BaseModel):
 # Backwards/expected import name used by app.routers.detections
 class DetectionListResponse(DetectionListResponses):
     pass
+
+
+class RazorpayOrderRequest(BaseModel):
+    amount: int
+
+
+class RazorpayCheckoutProof(BaseModel):
+    paymentId: str
+    orderId: str
+    signature: str
+    name: Optional[str] = None
+
+
+class RazorpayOrderResponse(BaseModel):
+    keyId: str
+    orderId: str
+    amount: int
+    currency: str
+
+
+class PaymentStatusResponse(BaseModel):
+    status: str

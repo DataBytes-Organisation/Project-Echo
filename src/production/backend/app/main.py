@@ -30,7 +30,7 @@ app.add_middleware(
 )
 # Routers
 from .routers import add_csv_output_option, audio_upload_router
-from app.routers import species_predictor, auth_router, hmi, engine, sim, two_factor, public, iot, live, sensors #Websocket
+from app.routers import species_predictor, auth_router, hmi, engine, sim, two_factor, public, iot, live, sensors, payments #Websocket
 
 from app.routers import projects
 app.include_router(projects.router)
@@ -96,6 +96,7 @@ print(f" database names: {client.list_database_names()}")
 
 app.include_router(iot.router, tags=['iot'], prefix='/iot')
 app.include_router(sensors.router, tags=['sensors'], prefix='/sensors')
+app.include_router(payments.router)
 app.include_router(species_predictor.router, tags=["predict"])
 
 
