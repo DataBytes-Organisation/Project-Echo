@@ -76,9 +76,10 @@ src/prototypes/data_files_excluded/
 src/prototypes/spectrograms/
 
 # -----------------------------------------------------------------------------
-# Sprint 2 raw run logs (tqdm progress-bar dumps, not meant for review)
+# Sprint 2 personal working notes (interview-prep log, raw run logs) - not
+# meant to be shared/reviewed, kept local only
 # -----------------------------------------------------------------------------
-docs/sprint2/*.log
+docs/sprint2/
 
 # -----------------------------------------------------------------------------
 # Databases
