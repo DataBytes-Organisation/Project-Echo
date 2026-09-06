@@ -7,6 +7,10 @@ from app.middleware.auth import signJWT
 from app.middleware.random import genotp
 import time
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 router = APIRouter()
 
 otp_store = {}
@@ -32,7 +36,7 @@ def signin(data: SignInRequest):
         "user": user
     }
 
-    print(f"[DEBUG] OTP for {data.email} is {otp}")  # Simulate email
+    logger.info("OTP generated for sign-in request")
 
     return {"message": "OTP sent to email"}
 
