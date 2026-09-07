@@ -1,82 +1,63 @@
 # Testing & TDD Guide
 
-**Researched and written for**: Project Echo Engine team, Sprint 2 (Trimester 2, 2026),
-per Krish Warnakulasuriya's request to research and practically test 1-2 testing
-frameworks (unit, integration/e2e, load/performance) and produce a short TDD guide for
-future students, since the project currently does no TDD.
+Project Echo currently has no unified test tooling and does no TDD. This guide sets up
+**pytest** (Backend + Engine unit/integration/e2e) and **Locust + k6** (load testing),
+and shows how to run and extend each. Every command here was actually run against the
+real codebase - full findings, bugs, and the detailed load-testing analysis are in
+`Testing_Framework_Research_Report_Nolan_Nguyen.pdf` (same folder as this guide's source
+task); this file is the short, practical how-to.
 
-Everything in this guide was actually run against the real codebase while writing it -
-every example, every command, every number. Where something didn't work on the first
-try, that's noted too, because those are usually the parts worth knowing.
+## 1. What Exists Today
 
-## 1. What's Actually Here Today (before this guide)
-
-| Area | What exists | Gap |
+| Area | Tests today | Notes |
 |---|---|---|
-| Backend (`src/production/backend`) | No tests at all | - |
-| Engine (`src/production/engine`) | 7 files, `unittest.TestCase`, "44 tests / 46% coverage" per `TESTING.md` | No `pytest.ini` anywhere; never wired into CI; the coverage workflow was manual and undocumented in requirements |
-| HMI (`src/production/hmi/ui`) | `node --test` via `package.json`'s `test` script, 2 files | Works fine, just needed more coverage |
-| Load/performance testing | Nothing, anywhere | - |
-| CI (`.github/workflows/docker-image.yml`) | Builds all Docker images, checks 9 containers report "Up" | A container-health smoke check, not application testing - doesn't run pytest, `unittest`, or `node --test` at all |
+| Backend | None | New in this guide |
+| Engine | 44 tests (`unittest`), no runner config | Now unified under pytest, zero changes needed |
+| HMI | `node --test`, 2 files | Unchanged, extended with 1 new test |
+| Load/performance | None | New in this guide (Locust + k6) |
+| CI | Docker container-health check only | Doesn't run any of the above yet |
 
-## 2. Frameworks Chosen, and Why Not the Others
+## 2. Frameworks and Why
 
-- **pytest** (Backend + Engine unit/integration/e2e). It discovers and runs
-  `unittest.TestCase`-based files natively - Engine's existing 44 tests needed **zero
-  changes** to run under it (verified below). Jest wasn't chosen for the Python side
-  because it's a JavaScript framework; it wasn't needed for HMI either, since
-  `node --test` (Node's built-in runner, zero extra dependency) already does the job.
-- **Locust and k6** both practically tested for load/performance testing, per Krish's
-  direct request ("no need to test all frameworks, maybe locust and k6 - load testing
-  is important too"). Both were run against the *same* live backend with the *same*
-  load shape (20 virtual users, 60 seconds, the same 4 endpoints) for a fair,
-  apples-to-apples comparison - see section 4 for the real numbers from both. Locust
-  scripts are plain Python (`locustfile.py`), matching the rest of the team's stack;
-  k6 scripts are JavaScript (`k6_loadtest.js`) and k6 itself is a separate compiled
-  binary (installed here via `winget install k6`), not a pip package. Artillery wasn't
-  practically tested - Krish's follow-up narrowed the comparison to Locust and k6
-  specifically.
-- **HMI stays on `node --test`.** It already works (2 passing test files before this
-  guide); introducing Jest would be a real migration cost for no concrete benefit at
-  this project's current scale.
+- **pytest** - discovers and runs Engine's existing `unittest.TestCase` files natively
+  (zero migration cost), adds fixtures/coverage on top. Not Jest - wrong language for
+  Backend/Engine.
+- **Locust + k6** - both practically tested and compared (see the report for the full
+  head-to-head), per direct request to evaluate these two specifically for load
+  testing. Recommendation: **Locust**, since scripts stay in Python like the rest of
+  the stack - k6 is an equally valid pick, especially for teams wanting more explicit
+  failure signalling under stress (see section 4).
+- **HMI stays on `node --test`** - already works, no migration benefit at this scale.
 
 ## 3. Setup
-
-From the repo root:
 
 ```powershell
 pip install -r requirements-dev.txt   # pytest, pytest-cov, locust
 ```
 
-**Backend specifically needs its own virtual environment - don't install its
-requirements into a shared/base Python environment.** Found out the hard way: Backend's
-`requirements.txt` pins `pydantic<2.0` (via `fastapi_mail`), while the same machine's
-base environment had other tools (`gradio`, `streamlit`) that need `pydantic>=2.7`.
-Installing Backend's requirements into the base env downgraded `pydantic` and broke
-those other tools' imports outright - not a hypothetical, this actually happened and
-had to be reverted mid-session. Instead:
+**Backend needs its own virtual environment** - its `requirements.txt` pins
+`pydantic<2.0`, which conflicts with other tools in a shared/base Python environment
+(verified: this broke `gradio`/`streamlit` when tried).
 
 ```powershell
 cd src/production/backend
 python -m venv .venv
 .venv\Scripts\python.exe -m pip install -r requirements.txt
-.venv\Scripts\python.exe -m pip install pytest pytest-cov locust httpx
+.venv\Scripts\python.exe -m pip install pytest pytest-cov locust "httpx<0.28,>=0.23"
 ```
 
-One more pin needed on top of Backend's `requirements.txt`: it pins
-`starlette==0.36.3`, which is incompatible with the newest `httpx` (`TestClient`
-breaks with `TypeError: Client.__init__() got an unexpected keyword argument 'app'`).
-Fix:
+(`httpx<0.28` is required - the newest `httpx` breaks `TestClient` against this
+project's pinned `starlette==0.36.3`.)
+
+k6 is a separate binary, not a pip package:
 
 ```powershell
-.venv\Scripts\python.exe -m pip install "httpx<0.28,>=0.23"
+winget install k6
 ```
 
-Engine's dependencies (TensorFlow, librosa, etc.) were already present in this
-project's base environment and didn't need a separate venv for the tests below - but
-if you're setting this up fresh, give Engine its own venv too, for the same reason.
-
-Root `pytest.ini` (new):
+Root `pytest.ini` (new) - deliberately excludes `src/tests/unit/backend` and
+`src/tests/integration/backend`, since Backend needs its own venv above and a plain
+`pytest` run in another environment would fail on unrelated missing dependencies:
 
 ```ini
 [pytest]
@@ -90,357 +71,123 @@ python_classes = Test*
 python_functions = test_*
 ```
 
-`src/tests/unit/backend` and `src/tests/integration/backend` are deliberately **not**
-in this list. Found out why the hard way: Backend needs its own venv (previous
-section), and a plain `pytest` invocation using whatever environment happens to be
-active would otherwise try to collect those two folders too and fail with unrelated
-dependency errors (`email-validator version >= 2.0 required` was the one hit here).
-Run Backend's tests explicitly through its own venv instead - shown below.
-
-Root `.coveragerc` (new) - without this, `pytest-cov` counts the test files themselves
-as "covered" source, inflating the number:
+Root `.coveragerc` (new) - without it, `pytest-cov` counts test files themselves as
+"covered", inflating the number:
 
 ```ini
 [run]
-omit =
-    */test_*.py
-    */.venv/*
-    */node_modules/*
+omit = */test_*.py
+       */.venv/*
+       */node_modules/*
 ```
 
 ## 4. Running Everything
 
-### Engine + repo-wide unit/integration tests (pytest)
+### Engine + repo-wide tests (pytest)
 
 ```powershell
 python -m pytest --cov=src/production/engine --cov-report=term-missing
 ```
+**Expect: 61 passed**, ~40% coverage on `echo_engine.py`.
 
-Result when this guide was written: **61 passed**, `echo_engine.py` at **40%**
-coverage (close to `TESTING.md`'s manually-reported 46% - the small difference is
-expected, since that number came from a different, undocumented ad-hoc run).
-
-**A real bug this surfaced**: running the full suite together (not each file
-individually) failed one test -
-`test_heldout_baseline.py::test_summarize_heldout_predictions_uses_only_shared_rows` -
-with `ModuleNotFoundError: No module named 'sklearn.metrics'; 'sklearn' is not a
-package`, even though `sklearn` is installed. Root cause:
-`test_iot_integration.py` stubs `sys.modules["sklearn"] = MagicMock()` at module import
-time (to avoid needing real TensorFlow/librosa/etc. for its own tests), and pytest
-imports every test file during collection **before running any of them** - so the stub
-was already in place before the heldout test ever got a chance to do a real
-`from sklearn.metrics import ...`. This is exactly the kind of bug that stays invisible
-until tests are unified under one runner (each file passed fine in isolation). Fixed in
-`test_iot_integration.py` by restoring `sys.modules["sklearn"]` immediately after the
-one import that needed it mocked, rather than never restoring it. Lesson: **global
-state changes (`sys.modules`, monkeypatching a singleton, etc.) need matching cleanup,
-or they leak into whatever test happens to run in the same process afterward.**
-
-### Backend unit test (TDD red-green example)
-
-`src/tests/unit/backend/test_errors.py` - first-ever tests for `app/errors.py`'s
-`error_body()` (pure function, no Mongo/Redis needed):
+### Backend unit test (TDD example)
 
 ```powershell
 cd src/production/backend
 .venv\Scripts\python.exe -m pytest ../../tests/unit/backend/test_errors.py -v
 ```
+**Expect: 6 passed.** `test_locked_status_maps_to_locked_code` is a real red→green
+example - it failed before `app/errors.py` gained a one-line fix (`423: "LOCKED"`).
+That's the TDD loop: write the test for the behaviour you want, watch it fail for the
+right reason, make the smallest change that passes it.
 
-This file **is** the TDD example. One of its tests,
-`test_locked_status_maps_to_locked_code`, was written and run *before* the
-corresponding code change - it failed (`assert 'REQUEST_FAILED' == 'LOCKED'`, since
-HTTP 423 wasn't in `STATUS_CODES` yet), which is exactly the point: 423 isn't raised by
-any route today, but a future account-lockout feature (the two-factor auth flow is
-already in this codebase) plausibly could raise it, and the fix costs one line:
+### Backend integration/e2e test (`TestClient`)
 
-```python
-# before
-STATUS_CODES = {..., 422: "VALIDATION_ERROR", 429: "RATE_LIMIT_EXCEEDED", ...}
-# after (red -> green)
-STATUS_CODES = {..., 422: "VALIDATION_ERROR", 423: "LOCKED", 429: "RATE_LIMIT_EXCEEDED", ...}
-```
-
-That's the whole TDD loop: **write the test for the behaviour you want, watch it fail
-for the right reason, make the smallest change that passes it.**
-
-### Backend integration/e2e test (FastAPI's `TestClient`)
-
-`src/tests/integration/backend/test_public_routes.py` tests a real route
-(`GET /public/public-test`) through the real app - routing, middleware, response
-handling - without a live server process, using `fastapi.testclient.TestClient`.
-
-**This needed more than expected to actually run.** `app.main` cannot be imported at
-all without a *reachable* MongoDB - `app/database.py` calls
-`SensorSettings.create_index(...)` unconditionally at import time (not lazily on first
-real query, which is what a plain `pymongo.MongoClient()` construction alone would be).
-So even a route that touches no database at all still needs Mongo up just to import the
-app. In order:
+Needs MongoDB reachable even for a route that touches no data - `app/database.py` calls
+`create_index(...)` unconditionally at import time.
 
 ```powershell
-# 1. Start Mongo + Redis
 docker compose -f src/deployment/docker/docker-compose.yml up echo_store echo-redis -d
-
-# 2. Point at Mongo from the host (not from inside a container) - the container's
-#    own hostname (ts-mongodb-cont, the default in app/database.py) only resolves
-#    on the Docker network, not from your host machine. Also needs `authSource=admin`
-#    - the root user was created in the admin database, not EchoNet.
 $env:MONGODB_URI = "mongodb://root:root_password@localhost:27017/EchoNet?authSource=admin"
-
-# 3. fastapi_mail's ConnectionConfig needs these even though they're not passed
-#    explicitly in code (app/routers/sim.py) - it reads them from the environment.
-#    Matches docker-compose.yml's echo_api service.
-$env:MAIL_STARTTLS = "true"
-$env:MAIL_SSL_TLS = "false"
+$env:MAIL_STARTTLS = "true"; $env:MAIL_SSL_TLS = "false"
 
 cd src/production/backend
 .venv\Scripts\python.exe -m pytest ../../tests/integration/backend/test_public_routes.py -v
 ```
+**Expect: 2 passed.**
 
-Result: **2 passed** (both the happy-path GET and a 405-on-POST routing check).
-
-`GET /public/public-test` was chosen deliberately - checked `app/routers/public.py`
-first and confirmed it doesn't touch Mongo/Redis at all (unlike its neighbour
-`GET /public/filter-data`, which queries `Events` and would need real seeded data to
-test meaningfully).
-
-### Backend load test (Locust) - a real run, not just config
+### Backend load test (Locust and k6)
 
 ```powershell
-# Same env vars as above, plus this one (see the "bugs found" section - without it,
-# the server crashes on startup when its output isn't a real interactive terminal):
-$env:PYTHONIOENCODING = "utf-8"
-
+$env:PYTHONIOENCODING = "utf-8"   # see section 5 - required to even start the server
 .venv\Scripts\python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 9000
 ```
 
 In another terminal:
 
 ```powershell
-cd src/production/backend
-.venv\Scripts\python.exe -m locust -f ../../tests/load/locustfile.py `
-    --host http://127.0.0.1:9000 --headless -u 20 -r 5 -t 60s --csv=locust_results
-```
+# Locust
+.venv\Scripts\python.exe -m locust -f src/tests/load/locustfile.py `
+    --host http://127.0.0.1:9000 --headless -u 20 -r 5 -t 60s
 
-Real results from this run (20 simulated users, 60 seconds, all 4 endpoints
-combined):
-
-| Metric | Value |
-|---|---|
-| Total requests | 578 |
-| Failures | 0 (0.00%) |
-| Median response time | 5 ms |
-| 95th percentile | 12 ms |
-| Max response time | 26 ms |
-| Requests/sec | ~9.8 |
-
-Per-endpoint breakdown (median response time): `/public/public-test` 2ms,
-`/hmi/microphones` 5ms, `/iot/nodes` 5ms, `/engine/animal_records` 11ms (this one is
-CSV-serialising every record on every request - the slowest of the four, worth knowing
-if it ever needs to handle real traffic).
-
-### Backend load test (k6) - same backend, same load shape, for direct comparison
-
-Krish asked specifically for Locust *and* k6 to be compared, not just one load tool
-picked over the other. k6 is a separate compiled binary (not a Python package):
-
-```powershell
-winget install k6
-```
-
-`src/tests/load/k6_loadtest.js` hits the exact same 4 endpoints, with the same request
-mix (weighted 3:2:2:1, matching `locustfile.py`'s `@task` weights) and the same load
-shape (20 virtual users, 60 seconds), so the two tools' results are directly
-comparable rather than testing different things. With the backend already running
-(same setup as the Locust section above):
-
-```powershell
+# k6
 k6 run src/tests/load/k6_loadtest.js
 ```
 
-Real results from this run:
+**Baseline (20 users/VUs, 60s): both ~0% failures, ~5ms median, ~9.7 req/s** - the two
+tools agree closely at this load.
 
-| Metric | Value |
-|---|---|
-| Total requests | 604 |
-| Failures | 0 (0.00%) |
-| Median response time (`http_req_duration`) | 3.91 ms |
-| 95th percentile | 11.76 ms |
-| Max response time | 39.28 ms |
-| Requests/sec | ~9.67 |
+**Pushed further (10 → 1000 concurrent users)**, the system is clean up to ~200 users,
+then a real capacity ceiling appears from ~300 users on (single uvicorn worker's
+connection backlog) - **and Locust and k6 report that same ceiling completely
+differently**: k6 surfaces it as explicit connection failures (1.88% → 5.36% as load
+rises); Locust shows 0.00% failures throughout, and only its latency exposes the
+identical problem (median jumps from ~6ms to 130ms at 1000 users). **Takeaway: a
+0%-failure summary alone isn't proof of headroom - check latency too.** Full per-level
+data and the code-verified root cause are in the report PDF.
 
-### How the system behaves under increasing load (the actual point of load testing)
-
-Krish's brief specifically asked to look at "how the system behaves when many users or
-requests access it at the same time" - a single fixed load level only proves the system
-survives *one* level, not where it actually starts to strain. So both tools were run
-across **7 escalating levels - 10, 50, 100, 200, 300, 500, 1000 concurrent users, 30
-seconds each** - against the same 4 endpoints, pushed until real failures actually
-appeared, not stopped at an arbitrary comfortable number.
-
-**Locust:**
-
-| Users | Requests | Failures | req/s | Median | p95 | p99 | Max |
-|---|---|---|---|---|---|---|---|
-| 10 | 152 | 0 (0.00%) | 5.28 | 5 ms | 13 ms | 20 ms | 26 ms |
-| 50 | 735 | 0 (0.00%) | 24.88 | 5 ms | 49 ms | 80 ms | 88 ms |
-| 100 | 1,500 | 0 (0.00%) | 50.74 | 5 ms | 90 ms | 140 ms | 160 ms |
-| 200 | 2,971 | 0 (0.00%) | 100.43 | 6 ms | 130 ms | 260 ms | 310 ms |
-| 300 | 4,261 | 0 (0.00%) | 144.07 | 6 ms | 65 ms | 160 ms | 180 ms |
-| 500 | 7,036 | 0 (0.00%) | 237.21 | 7 ms | 130 ms | 290 ms | 500 ms |
-| 1000 | 13,200 | **0 (0.00%)** | 444.51 | **130 ms** | 370 ms | 1,100 ms | 2,900 ms |
-
-**k6** (same levels, same endpoints):
-
-| VUs | Requests | Failures | req/s | Median | p95 | Max |
-|---|---|---|---|---|---|---|
-| 10 | 150 | 0 (0.00%) | 4.64 | 4.29 ms | 17.24 ms | 30.19 ms |
-| 50 | 760 | 0 (0.00%) | 23.56 | 4.34 ms | 47.41 ms | 132.08 ms |
-| 100 | 1,543 | 0 (0.00%) | 47.43 | 4.2 ms | 73.5 ms | 270.33 ms |
-| 200 | 3,080 | 0 (0.00%) | 93.55 | 4.22 ms | 113.74 ms | 574.14 ms |
-| 300 | 4,622 | **1.88%** | 140.67 | 3.76 ms | 28.5 ms | 466.56 ms |
-| 500 | 7,715 | **3.56%** | 234.59 | 4.25 ms | 22.1 ms | 503.73 ms |
-| 1000 | 14,352 | **5.36%** | 435.33 | **145 ms** | 439.62 ms | 1.99 s |
-
-**The actual breaking point, found by pushing past the comfortable numbers:**
-
-- **10-200 users: zero failures, from either tool.** Median latency flat (~4-6ms); only
-  the tail (p95/max) grows. This is the region the original 20-user and 4-level tests
-  covered, and it holds up - the system genuinely handles this range cleanly.
-- **300+ users is where it actually breaks - but the two tools disagree on how, which
-  is itself the most important finding here.** k6 starts reporting real failures at 300
-  users (1.88%, rising to 5.36% at 1000) with the exact error
-  `dial tcp 127.0.0.1:9000: connectex: ... actively refused it` - a **TCP
-  connection-level rejection**, confirmed by checking the backend's own log for the
-  same time window, which shows **no application errors at all** (no 500s, no
-  exceptions - the FastAPI app itself never saw these requests). This points to the
-  single uvicorn process's TCP accept/listen backlog filling up under very high
-  concurrent *connection* attempts, rejecting new connections at the OS/socket level
-  before they ever reach the application.
-- **Locust reports 0.00% failures at every level tested, including 1000 users** - but
-  its latency at 1000 users tells the same story from a different angle: median jumps
-  from ~6ms (at ≤500 users) to **130ms**, p99 to 1,100ms, max to 2,900ms. Locust's
-  `gevent`-based HTTP client evidently retries or queues at the socket level rather than
-  surfacing a connection refusal as a failed request the way k6's Go-based client does
-  - so the same underlying backlog-saturation event shows up as "everything succeeded,
-  just very slowly" in Locust instead of "some requests were rejected" in k6.
-- **This is a genuinely useful, non-obvious lesson for whoever uses either tool for
-  capacity planning later: don't trust a 0%-failure result alone as proof of headroom -
-  check the latency distribution too, because a tool's retry/queueing behaviour can
-  mask a real capacity ceiling that a different tool reports as outright failures.**
-  Relying on Locust's failure rate alone at 1000 users would have missed this entirely;
-  its own latency numbers still exposed it once looked at.
-- **Practical takeaway for this system specifically**: comfortably handles up to ~200
-  concurrent users with no meaningful degradation; between 200 and 300 is where a
-  single uvicorn worker's connection-accept capacity starts being visibly tested;
-  by 1000 concurrent users the single process is clearly saturated (both tools agree
-  something is wrong by then, just measured differently). The fix, if this needed to
-  scale beyond a few hundred concurrent users, would be running uvicorn with multiple
-  worker processes (`--workers N`) or behind a proper ASGI server pool - not a code bug
-  to fix, but a deployment configuration limit worth knowing about.
-
-### Locust vs k6 - the actual comparison
-
-| | Locust | k6 |
-|---|---|---|
-| Requests (baseline: 60s, 20 users) | 578 | 604 |
-| Requests (stress: 30s @ 200 users) | 2,971 | 3,080 |
-| Failures @ 200 users | 0 | 0 |
-| Failures @ 1000 users | **0.00%** (but median latency 130ms, up from ~6ms) | **5.36%** (explicit connection-refused errors) |
-| How each reports the same real ceiling | Silent - only visible via latency | Explicit - visible via failure rate |
-| Script language | Python | JavaScript |
-| Install | `pip install locust` (already in `requirements-dev.txt`) | separate binary (`winget install k6` / package manager) |
-| Setup for this project | No new tooling - same language/venv as everything else | One extra tool to install and keep on `PATH`, but nothing Python-environment-specific to conflict with |
-
-**Both tools are equally real and trustworthy within the range they agree on (up to
-~200 users) - the interesting result is that they disagree on how to report the same
-underlying ceiling once the system is actually pushed past it.** Neither is objectively
-"better" for that reason alone; k6 makes the failure more immediately visible in a CI
-threshold/alert (`http_req_failed` crossing a % threshold), while Locust would need
-someone to also watch latency, not just its failure-rate summary, to catch the same
-problem. **Recommendation: Locust**, for this project specifically, primarily because
-test scripts stay in Python alongside everything else the team already writes - not
-because of anything found in this stress comparison, where k6's explicit failure
-reporting is arguably the safer default for unattended capacity checks. k6 remains a
-perfectly reasonable choice; teams more JS/TypeScript-heavy, wanting k6's built-in cloud
-reporting, or wanting failures (not just latency) to surface capacity ceilings
-automatically, would reasonably pick the other way. Whichever tool is used going
-forward, **re-run the full escalating-load pattern above, past the point where it looks
-fine** (not just one comfortable fixed level) whenever checking whether a change affects
-capacity - and check latency even when a tool's failure-rate summary says 0%.
-
-### HMI unit test (`node --test`)
-
-First-ever test for `middleware/verifySignup.js`'s `confirmPassword` - a small, pure
-Express middleware (compares two request-body fields, no DB) that had zero coverage
-before this:
+### HMI unit test
 
 ```powershell
 cd src/production/hmi/ui
 npm test
 ```
+**Expect: 19 passed** (17 pre-existing + 2 new, including the first-ever test for
+`middleware/verifySignup.js`).
 
-Result: **19 passed** (17 pre-existing + 2 new). Same TDD spirit as the backend
-example - writing the *first* test for previously-untested code is itself the valuable
-step, whether or not it's phrased as red-green.
+## 5. Known Gotchas
 
-**Node.js wasn't installed on the machine this guide was written on at all** - installed
-via `winget install OpenJS.NodeJS.LTS` to actually verify the test runs, rather than
-writing it blind. If you're setting this up fresh and don't have Node, that's the
-fastest way to get it.
+Quick reference - full explanations in the report PDF:
 
-## 5. Real Bugs This Work Surfaced (beyond the sklearn one above)
-
-Testing found these; none were fixed here beyond what's noted, since fixing them
-wasn't this task's scope - flagging them for whoever owns that code:
-
-- **`GET /insights/overview` (and likely `/insights/species`) 500s in any real
-  deployment.** `app/routers/insights.py` reads `os.getenv("MONGO_URI")` - a
-  *different* env var name than every other file in the backend, which uses
-  `MONGODB_URI` - with no fallback default. Unset (which it is everywhere today,
-  including `docker-compose.yml`), it connects to Mongo with zero credentials and
-  fails with `command find requires authentication`. This is why those two routes are
-  excluded from the Locust target list above.
-- **`app/main.py` crashes on startup whenever its stdout isn't a real interactive
-  terminal** (redirected to a file, launched by a process manager, etc.) - it prints a
-  ✅ character unconditionally at import time
-  (`export_openapi_to_file()`), and Windows' default console codepage (cp1252) can't
-  encode it: `UnicodeEncodeError: 'charmap' codec can't encode character '✅'`.
-  Workaround used throughout this guide: `PYTHONIOENCODING=utf-8`. (The exact same
-  class of bug - an emoji hitting cp1252 under output redirection - was independently
-  found this sprint in a different script, `run_validation_experiment.py`; worth a
-  project-wide search for `print(f"✅` / similar before it bites someone else.)
-- A hardcoded Gmail app password is committed in `app/routers/sim.py`
-  (`MAIL_PASSWORD="oocr srvw ndoj bwte"`) - a real secret in source control, unrelated
-  to testing but found while getting the app to import cleanly. Worth rotating and
-  moving to an env var/secret store regardless of this guide.
+- Backend needs its own venv (section 3).
+- MongoDB: use `localhost` + `authSource=admin`, not the container's internal hostname.
+- `PYTHONIOENCODING=utf-8` is required to start the backend outside a real terminal -
+  `app/main.py` prints a ✅ that crashes on Windows' default console codepage otherwise.
+- `GET /insights/overview` (and `/species`) 500 in any real deployment - a env-var-name
+  mismatch (`MONGO_URI` vs the rest of the app's `MONGODB_URI`), not a testing artifact.
+  Excluded from the load-test target list for this reason.
+- A live Gmail app password is committed in `app/routers/sim.py` - unrelated to
+  testing, found while getting the app to import cleanly. Needs rotating.
 
 ## 6. Writing Your Own Tests From Here
 
-- **Unit test** (Python): put it under `src/tests/unit/<area>/test_*.py`, following
-  `test_errors.py`'s pattern - import the module under test directly, no server needed.
-  Run just that file the same way shown above.
-- **Integration/e2e test** (Backend route): follow `test_public_routes.py` - use
-  `TestClient`, and check whether your route touches Mongo/Redis first (like the
-  Locust section explains) before assuming it'll run without them.
+- **Unit test** (Python): `src/tests/unit/<area>/test_*.py`, following
+  `test_errors.py` - import the module directly, no server needed.
+- **Integration/e2e** (Backend route): follow `test_public_routes.py` with
+  `TestClient` - check whether the route touches Mongo/Redis first.
 - **Unit test** (HMI): follow `verifySignup.test.mjs` - mock `req`/`res`/`next` by
-  hand (no extra mocking library needed for something this small), add the new file to
-  `package.json`'s `test` script.
-- **Load test**: add a new `@task` method to `EchoApiUser` in `locustfile.py` for a new
-  endpoint - check first whether it needs auth or writes real data, same caveats as
-  the integration test section.
-- Whenever you're adding a test for code that has none yet (which is most of this
-  codebase right now), the TDD sequence is the same one used twice above: write the
-  test for the behaviour you want first, confirm it fails for the reason you expect
-  (not a typo or import error), then write the smallest change that makes it pass.
+  hand, add the file to `package.json`'s `test` script.
+- **Load test**: add a new `@task` (Locust) or entry in `endpoints` (k6) for a new
+  route - check auth/write requirements first, same as above.
+- General TDD sequence for any of the above: write the test for the behaviour you
+  want, confirm it fails for the right reason, make the smallest change that passes it.
 
 ## 7. What's Still Missing
 
 - CI doesn't run any of this yet - `.github/workflows/docker-image.yml` only builds
-  images and checks containers start. A follow-up (not done here, out of this task's
-  scope) would add a `pytest` job and a `node --test` job, both straightforward given
-  everything above already runs cleanly outside CI.
-- Coverage is only wired up for Engine in this guide; Backend has 2 tests total (by
-  design - depth over breadth for a first example) and HMI has 3 files. Expanding
-  either is exactly "writing your own tests from here" above, not a new pattern.
-- The two `/insights/*` bugs and the `app/main.py` startup-encoding bug are real and
-  still open - not fixed as part of this task (see section 5).
+  images and checks containers start. Adding a `pytest` job and a `node --test` job is
+  the natural next step; everything above already runs cleanly outside CI.
+- Backend has 2 tests (depth over breadth for a first example) and HMI has 3 files -
+  expanding either is "writing your own tests from here," not a new pattern.
+- The `/insights/*` bug and the `app/main.py` startup-encoding bug are real and still
+  open (section 5) - not fixed as part of this task.
