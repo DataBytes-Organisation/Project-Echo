@@ -920,6 +920,9 @@ class EchoEngine():
             "sampleRate": sample_rate
         }
 
+        if audio_event.get("sourceType") == "real":
+            detection_event["sourceType"] = "real"
+
         url = self.config['API_URL']
         x = requests.post(url, json = detection_event)
         print(x.text)
@@ -1144,6 +1147,7 @@ class EchoEngine():
 
         lla = [lat, lon, 0.0]
         audio_event = {
+            "sourceType":         "real",
             "timestamp":          payload.get("timestamp", str(int(time.time()))),
             "sensorId":           payload.get("sensor_id", "unknown_edge_node"),
             "microphoneLLA":      lla,
@@ -1220,6 +1224,7 @@ class EchoEngine():
             # Build audio_event in the format expected by echo_api_send_detection_event
             lla = [lat, lon, 0.0]
             audio_event = {
+                "sourceType": "real",
                 "timestamp": timestamp,
                 "sensorId": sensor_id,
                 "microphoneLLA": lla,

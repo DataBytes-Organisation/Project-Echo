@@ -5,12 +5,34 @@ Automated tests for the Engine prediction output contract.
 import unittest
 from unittest.mock import MagicMock, patch
 
-from test_iot_integration import EchoEngine
+from test_iot_integration import EchoEngine, _make_msg, _valid_payload
 
 import echo_engine as engine_module
 
 
 class TestEnginePredictionOutput(unittest.TestCase):
+
+    def test_real_source_survives_both_iot_paths_to_http(self):
+        for edge in (False, True):
+            with self.subTest(edge=edge):
+                payload = _valid_payload(
+                    sensor_id="esp32-001", timestamp="2026-08-06T10:30:00Z"
+                )
+                if edge:
+                    payload.update(type="prediction", species="Magpie", confidence=91.5)
+                with patch.object(
+                    self.engine, "efficientnetv2_tflite_predict_from_audio_bytes",
+                    return_value=("Magpie", 91.5, [], 48000, []),
+                ), patch.object(engine_module.requests, "post") as post:
+                    self.engine.on_iot_message(None, None, _make_msg(payload))
+                post.assert_called_once()
+                event = post.call_args.kwargs["json"]
+                self.assertEqual(event.get("sourceType"), "real")
+                self.assertEqual(event["microphoneLLA"], [-37.8136, 144.9631, 0.0])
+                self.assertEqual(event["sensorId"], "esp32-001")
+                self.assertEqual(event["species"], "Magpie")
+                self.assertEqual(event["confidence"], 91.5)
+                self.assertEqual(event["timestamp"], "2026-08-06T10:30:00Z")
 
     def setUp(self):
         self.engine = EchoEngine()
