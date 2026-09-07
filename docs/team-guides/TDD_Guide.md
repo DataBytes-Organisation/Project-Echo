@@ -271,10 +271,11 @@ Real results from this run:
 ### How the system behaves under increasing load (the actual point of load testing)
 
 Krish's brief specifically asked to look at "how the system behaves when many users or
-requests access it at the same time" - a single fixed load level (20 users) doesn't
-answer that; it only proves the system survives *one* load level. So both tools were
-re-run at **4 escalating levels - 10, 50, 100, 200 concurrent users, 30 seconds each** -
-against the same 4 endpoints, to see the actual trend, not just one data point.
+requests access it at the same time" - a single fixed load level only proves the system
+survives *one* level, not where it actually starts to strain. So both tools were run
+across **7 escalating levels - 10, 50, 100, 200, 300, 500, 1000 concurrent users, 30
+seconds each** - against the same 4 endpoints, pushed until real failures actually
+appeared, not stopped at an arbitrary comfortable number.
 
 **Locust:**
 
@@ -284,8 +285,11 @@ against the same 4 endpoints, to see the actual trend, not just one data point.
 | 50 | 735 | 0 (0.00%) | 24.88 | 5 ms | 49 ms | 80 ms | 88 ms |
 | 100 | 1,500 | 0 (0.00%) | 50.74 | 5 ms | 90 ms | 140 ms | 160 ms |
 | 200 | 2,971 | 0 (0.00%) | 100.43 | 6 ms | 130 ms | 260 ms | 310 ms |
+| 300 | 4,261 | 0 (0.00%) | 144.07 | 6 ms | 65 ms | 160 ms | 180 ms |
+| 500 | 7,036 | 0 (0.00%) | 237.21 | 7 ms | 130 ms | 290 ms | 500 ms |
+| 1000 | 13,200 | **0 (0.00%)** | 444.51 | **130 ms** | 370 ms | 1,100 ms | 2,900 ms |
 
-**k6** (same 4 levels, same endpoints, same duration):
+**k6** (same levels, same endpoints):
 
 | VUs | Requests | Failures | req/s | Median | p95 | Max |
 |---|---|---|---|---|---|---|
@@ -293,35 +297,46 @@ against the same 4 endpoints, to see the actual trend, not just one data point.
 | 50 | 760 | 0 (0.00%) | 23.56 | 4.34 ms | 47.41 ms | 132.08 ms |
 | 100 | 1,543 | 0 (0.00%) | 47.43 | 4.2 ms | 73.5 ms | 270.33 ms |
 | 200 | 3,080 | 0 (0.00%) | 93.55 | 4.22 ms | 113.74 ms | 574.14 ms |
+| 300 | 4,622 | **1.88%** | 140.67 | 3.76 ms | 28.5 ms | 466.56 ms |
+| 500 | 7,715 | **3.56%** | 234.59 | 4.25 ms | 22.1 ms | 503.73 ms |
+| 1000 | 14,352 | **5.36%** | 435.33 | **145 ms** | 439.62 ms | 1.99 s |
 
-**What this actually shows** (both tools agree on the same pattern, independently):
+**The actual breaking point, found by pushing past the comfortable numbers:**
 
-- **Zero failures at every level tested, up to 200 concurrent users.** The backend
-  doesn't fall over or start returning errors under this load range - that's the
-  headline result Krish's "important" load-testing ask needed answered, and both tools
-  confirm it independently.
-- **Median latency stays flat (~4-6ms) at every level** - a typical individual request
-  is just as fast at 200 concurrent users as at 10. What changes is the **tail**: p95
-  grows roughly 10x (13ms → 130ms for Locust, 17ms → 114ms for k6) between 10 and 200
-  users, and the max response time grows even faster (k6: 30ms → 574ms).
-- **Root cause, checked directly in the code, not guessed**: the tested routes
-  (`app/routers/public.py`'s `public_test`, `app/routers/hmi.py`'s `list_microphones`,
-  and the others) are defined as plain `def`, not `async def`. FastAPI runs synchronous
-  route handlers in a bounded background thread pool (Starlette's
-  `run_in_threadpool`, via anyio's worker thread limiter, capped at 40 threads by
-  default). With a single uvicorn worker process, once concurrent requests exceed that
-  thread-pool capacity, extra requests queue for a free thread instead of being
-  rejected - explaining exactly the pattern seen: fast once a request is actually being
-  handled (flat median), but growing queue-wait time in the tail as concurrency rises
-  past the mid-double-digits (the p95 jump between 10 and 50 users lines up with this).
-  This is a genuine, verifiable finding about the system's real behaviour under load,
-  not just a tooling exercise.
-- **k6's max values run higher than Locust's at the same nominal user count** (e.g. 200:
-  574ms vs 310ms). Both tools show the same *trend*; the exact numbers differ slightly
-  because they're not identical measurement methodologies (k6 measures full HTTP
-  round-trip per request from its own event loop, Locust's from a `gevent`-based
-  Python event loop with its own overhead) - a small, expected discrepancy that doesn't
-  change the conclusion above.
+- **10-200 users: zero failures, from either tool.** Median latency flat (~4-6ms); only
+  the tail (p95/max) grows. This is the region the original 20-user and 4-level tests
+  covered, and it holds up - the system genuinely handles this range cleanly.
+- **300+ users is where it actually breaks - but the two tools disagree on how, which
+  is itself the most important finding here.** k6 starts reporting real failures at 300
+  users (1.88%, rising to 5.36% at 1000) with the exact error
+  `dial tcp 127.0.0.1:9000: connectex: ... actively refused it` - a **TCP
+  connection-level rejection**, confirmed by checking the backend's own log for the
+  same time window, which shows **no application errors at all** (no 500s, no
+  exceptions - the FastAPI app itself never saw these requests). This points to the
+  single uvicorn process's TCP accept/listen backlog filling up under very high
+  concurrent *connection* attempts, rejecting new connections at the OS/socket level
+  before they ever reach the application.
+- **Locust reports 0.00% failures at every level tested, including 1000 users** - but
+  its latency at 1000 users tells the same story from a different angle: median jumps
+  from ~6ms (at ≤500 users) to **130ms**, p99 to 1,100ms, max to 2,900ms. Locust's
+  `gevent`-based HTTP client evidently retries or queues at the socket level rather than
+  surfacing a connection refusal as a failed request the way k6's Go-based client does
+  - so the same underlying backlog-saturation event shows up as "everything succeeded,
+  just very slowly" in Locust instead of "some requests were rejected" in k6.
+- **This is a genuinely useful, non-obvious lesson for whoever uses either tool for
+  capacity planning later: don't trust a 0%-failure result alone as proof of headroom -
+  check the latency distribution too, because a tool's retry/queueing behaviour can
+  mask a real capacity ceiling that a different tool reports as outright failures.**
+  Relying on Locust's failure rate alone at 1000 users would have missed this entirely;
+  its own latency numbers still exposed it once looked at.
+- **Practical takeaway for this system specifically**: comfortably handles up to ~200
+  concurrent users with no meaningful degradation; between 200 and 300 is where a
+  single uvicorn worker's connection-accept capacity starts being visibly tested;
+  by 1000 concurrent users the single process is clearly saturated (both tools agree
+  something is wrong by then, just measured differently). The fix, if this needed to
+  scale beyond a few hundred concurrent users, would be running uvicorn with multiple
+  worker processes (`--workers N`) or behind a proper ASGI server pool - not a code bug
+  to fix, but a deployment configuration limit worth knowing about.
 
 ### Locust vs k6 - the actual comparison
 
@@ -329,22 +344,29 @@ against the same 4 endpoints, to see the actual trend, not just one data point.
 |---|---|---|
 | Requests (baseline: 60s, 20 users) | 578 | 604 |
 | Requests (stress: 30s @ 200 users) | 2,971 | 3,080 |
-| Failures, any level tested (10-200 users) | 0 | 0 |
-| p95 @ 200 users | 130 ms | 113.74 ms |
+| Failures @ 200 users | 0 | 0 |
+| Failures @ 1000 users | **0.00%** (but median latency 130ms, up from ~6ms) | **5.36%** (explicit connection-refused errors) |
+| How each reports the same real ceiling | Silent - only visible via latency | Explicit - visible via failure rate |
 | Script language | Python | JavaScript |
 | Install | `pip install locust` (already in `requirements-dev.txt`) | separate binary (`winget install k6` / package manager) |
 | Setup for this project | No new tooling - same language/venv as everything else | One extra tool to install and keep on `PATH`, but nothing Python-environment-specific to conflict with |
 
-**Both tools produced equally real, equally trustworthy results and agree with each
-other on the system's actual behaviour** - neither is "faster" or "more accurate" here.
-The real difference is ecosystem fit. **Recommendation: Locust**, for this project
-specifically, purely because test scripts stay in Python alongside everything else the
-team already writes - no second language, no separate binary to manage in CI later. k6
-remains a perfectly reasonable choice; teams more JS/TypeScript-heavy, or wanting k6's
-built-in cloud reporting integration, would reasonably pick the other way. Whichever
-tool is used going forward, **re-run the escalating-load pattern above** (not just one
-fixed level) whenever checking whether a change affects capacity - one number at one
-load level doesn't tell you where the system actually starts to strain.
+**Both tools are equally real and trustworthy within the range they agree on (up to
+~200 users) - the interesting result is that they disagree on how to report the same
+underlying ceiling once the system is actually pushed past it.** Neither is objectively
+"better" for that reason alone; k6 makes the failure more immediately visible in a CI
+threshold/alert (`http_req_failed` crossing a % threshold), while Locust would need
+someone to also watch latency, not just its failure-rate summary, to catch the same
+problem. **Recommendation: Locust**, for this project specifically, primarily because
+test scripts stay in Python alongside everything else the team already writes - not
+because of anything found in this stress comparison, where k6's explicit failure
+reporting is arguably the safer default for unattended capacity checks. k6 remains a
+perfectly reasonable choice; teams more JS/TypeScript-heavy, wanting k6's built-in cloud
+reporting, or wanting failures (not just latency) to surface capacity ceilings
+automatically, would reasonably pick the other way. Whichever tool is used going
+forward, **re-run the full escalating-load pattern above, past the point where it looks
+fine** (not just one comfortable fixed level) whenever checking whether a change affects
+capacity - and check latency even when a tool's failure-rate summary says 0%.
 
 ### HMI unit test (`node --test`)
 
