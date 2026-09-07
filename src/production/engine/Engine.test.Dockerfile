@@ -43,14 +43,21 @@ RUN apt-get update && apt-get install -y --no-install-recommends --fix-missing \
 	libgl1-mesa-glx \
 	libglib2.0-0 \
 	curl \
-	gnupg \
 	ca-certificates \
-	&& echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list \
-	&& curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg add - \
-	&& apt-get update -y \
-	&& apt-get install -y google-cloud-cli \
 	&& apt-get clean \
-	&& rm -rf /var/lib/apt/lists/* 
+	&& rm -rf /var/lib/apt/lists/*
+
+# Google Cloud CLI, installed from Google's own tarball rather than through
+# apt/apt-key + Google's apt repo. This avoids pulling in gnupg/gnupg2 as an
+# apt dependency purely to verify the repo signature - the previous approach
+# broke when Debian's bullseye-security archive started rejecting that
+# dependency chain around bullseye's 2026-08-31 end-of-life.
+RUN curl -sSL -o /tmp/gcloud.tar.gz \
+		https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-linux-x86_64.tar.gz \
+	&& tar -xzf /tmp/gcloud.tar.gz -C /usr/local \
+	&& rm /tmp/gcloud.tar.gz \
+	&& /usr/local/google-cloud-sdk/install.sh --quiet --path-update false --usage-reporting false
+ENV PATH="/usr/local/google-cloud-sdk/bin:$PATH"
 
 COPY --from=echo_engine_builder /opt/venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"

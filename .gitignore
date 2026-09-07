@@ -72,7 +72,14 @@ src/prototypes/engine/reproducible_training_pipeline/.cache/
 # Local prototype datasets (not tracked, too large / personal-machine paths)
 # -----------------------------------------------------------------------------
 src/prototypes/data_files/
+src/prototypes/data_files_excluded/
 src/prototypes/spectrograms/
+
+# -----------------------------------------------------------------------------
+# Sprint 2 personal working notes (interview-prep log, raw run logs) - not
+# meant to be shared/reviewed, kept local only
+# -----------------------------------------------------------------------------
+docs/sprint2/
 
 # -----------------------------------------------------------------------------
 # Databases
