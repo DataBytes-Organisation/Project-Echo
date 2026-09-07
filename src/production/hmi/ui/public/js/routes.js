@@ -68,6 +68,10 @@ export function retrieveIotNodes() {
   return withRetry(() => api.get("/iot/nodes"), RETRY_OPTS);
 }
 
+export function retrieveDetections() {
+  return withRetry(() => api.get("/api/detections"), RETRY_OPTS);
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Movement / truth events
 // ─────────────────────────────────────────────────────────────────────────────

@@ -37,6 +37,7 @@ import {
   stopSimulator,
 } from "./routes.js";
 import { addIoTNodesToMap } from "./nodes-overlay.js";
+import { loadRealDetections } from "./real-detections.js";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
@@ -608,6 +609,8 @@ export function initialiseHMI(hmiState) {
 
   createBasemap(hmiState);
 
+  const detectionLoad = loadRealDetections(hmiState);
+
   if (isFirstInit) {
     addVocalisationLayers(hmiState);
     addTruthLayers(hmiState);
@@ -659,6 +662,7 @@ export function initialiseHMI(hmiState) {
       showMapError(userMsg, () => initialiseHMI(hmiState));
       showToast(userMsg, "error");
     });
+  return detectionLoad;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -809,6 +813,7 @@ export function updateVocalizationLayerFromPastData(hmiState, results) {
   hmiState.vocalizationEvents = [];
 
   for (let data of results) {
+    if (data.sourceType === "real") continue;
     hmiState.vocalizationEvents.push(convertJSONtoAnimalVocalizationEvent(hmiState, data));
   }
 
@@ -867,6 +872,7 @@ export function updateAnimalMovementLayerFromLiveData(hmiState, results) {
 export function updateVocalizationLayerFromLiveData(hmiState, results) {
   const newEvents = [];
   for (let data of results) {
+    if (data.sourceType === "real") continue;
     const event = convertJSONtoAnimalVocalizationEvent(hmiState, data);
     hmiState.vocalizationEvents.push(event);
     newEvents.push(event);

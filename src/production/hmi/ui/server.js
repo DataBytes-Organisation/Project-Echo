@@ -392,6 +392,7 @@ razorpayPayment.registerRazorpayBrowserRoutes(app, {
 
 
 
+app.get("/index.html", checkUserSession);
 app.use(express.static(path.join(__dirname, 'public'), { index: path.join(__dirname, 'public/login.html')}))
 
 var corsOptions = {

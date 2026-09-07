@@ -1568,34 +1568,6 @@
       hmiState.layers         = {};
       hmiState.layerPool      = 1000;
 
-      const microphoneLocations = [
-        { lat: -38.808, lon: 143.554, id: 1 },
-        { lat: -38.813, lon: 143.537, id: 2 },
-        { lat: -38.794, lon: 143.52,  id: 3 },
-        { lat: -38.824, lon: 143.51,  id: 4 },
-        { lat: -38.812, lon: 143.573, id: 5 },
-      ];
-
-      const vocalizationEvents = [
-        { eventId: "6457a315e03129cb130fa270", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Tawny Frogmouth",      speciesScientificName: "Podargus strigoides",  speciesIdentificationConfidence: 90.98, locationLat: -38.80266562762370, locationLon: 143.563, locationConfidence: 90.98, animalType: "bird",      animalStatus: "normal",         animalDiet: "herbavore" },
-        { eventId: "6457a315e03129cb130fa271", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Cane toad",           speciesScientificName: "Rhinella marina",       speciesIdentificationConfidence: 90.98, locationLat: -38.81905478815443, locationLon: 143.529, locationConfidence: 90.98, animalType: "amphibian", animalStatus: "invasive",       animalDiet: "herbavore" },
-        { eventId: "6457a315e03129cb130fa272", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Wild Boar",           speciesScientificName: "Sus scrofa",           speciesIdentificationConfidence: 90.98, locationLat: -38.80166562762364, locationLon: 143.545, locationConfidence: 90.98, animalType: "mammal",    animalStatus: "endangered",     animalDiet: "omnivore"  },
-        { eventId: "6457a315e03129cb130fa273", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Redeye",              speciesScientificName: "Psaltoda moerens",     speciesIdentificationConfidence: 90.98, locationLat: -38.82166562762360, locationLon: 143.545, locationConfidence: 90.98, animalType: "insect",    animalStatus: "near-threatened",animalDiet: "carnivore" },
-        { eventId: "6457a315e03129cb130fa274", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Brown Rat",           speciesScientificName: "Rattus norvegicus",    speciesIdentificationConfidence: 90.98, locationLat: -38.80266562762380, locationLon: 143.565, locationConfidence: 90.98, animalType: "reptile",   animalStatus: "vulnerable",     animalDiet: "herbavore" },
-      ];
-
-      const movementEvents = {
-        "M_1": { animalId: "M_1", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Brown Rat",             speciesScientificName: "unknown",              speciesIdentificationConfidence: 100, locationLat: -38.80266562762367, locationLon: 143.560, locationConfidence: 100, animalType: "reptile",   animalStatus: "vulnerable",     animalDiet: "herbavore" },
-        "M_2": { animalId: "M_2", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Tawny Frogmouth",       speciesScientificName: "Podargus strigoides",  speciesIdentificationConfidence: 100, locationLat: -38.81905478815439, locationLon: 143.524, locationConfidence: 100, animalType: "bird",      animalStatus: "normal",         animalDiet: "herbavore" },
-        "M_3": { animalId: "M_3", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Cane toad",             speciesScientificName: "Rhinella marina",      speciesIdentificationConfidence: 100, locationLat: -38.80166562762367, locationLon: 143.540, locationConfidence: 100, animalType: "amphibian", animalStatus: "invasive",       animalDiet: "omnivore"  },
-        "M_4": { animalId: "M_4", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Red fox",               speciesScientificName: "Vulpes vulpes",        speciesIdentificationConfidence: 100, locationLat: -38.82166562762367, locationLon: 143.550, locationConfidence: 100, animalType: "mammal",    animalStatus: "endangered",     animalDiet: "carnivore" },
-        "M_5": { animalId: "M_5", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Brown Rat",             speciesScientificName: "Rattus norvegicus",    speciesIdentificationConfidence: 100, locationLat: -38.80266562762367, locationLon: 143.570, locationConfidence: 100, animalType: "reptile",   animalStatus: "vulnerable",     animalDiet: "herbavore" },
-        "M_6": { animalId: "M_6", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Australian Fairy Martin",speciesScientificName: "Petrochelidon ariel", speciesIdentificationConfidence: 100, locationLat: -38.81905478815439, locationLon: 143.580, locationConfidence: 100, animalType: "bird",      animalStatus: "normal",         animalDiet: "herbavore" },
-        "M_7": { animalId: "M_7", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Cane toad",             speciesScientificName: "Rhinella marina",      speciesIdentificationConfidence: 100, locationLat: -38.80166562762367, locationLon: 143.510, locationConfidence: 100, animalType: "amphibian", animalStatus: "invasive",       animalDiet: "omnivore"  },
-        "M_8": { animalId: "M_8", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Red fox",               speciesScientificName: "Vulpes vulpes",        speciesIdentificationConfidence: 100, locationLat: -38.82166562762367, locationLon: 143.520, locationConfidence: 100, animalType: "mammal",    animalStatus: "endangered",     animalDiet: "carnivore" },
-        "M_9": { animalId: "M_9", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Redeye",               speciesScientificName: "Psaltoda moerens",     speciesIdentificationConfidence: 100, locationLat: -38.80066562762367, locationLon: 143.555, locationConfidence: 100, animalType: "insect",    animalStatus: "near-threatened",animalDiet: "herbavore" },
-      };
-
       const sampleJSONmovementEvents = [
         { animalId: "M_1", timestamp: 1690765721, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Brown Rat",             speciesScientificName: "Rattus norvegicus",    speciesIdentificationConfidence: 100, locationLat: -38.80266562762367, locationLon: 143.560, locationConfidence: 100, animalType: "reptile",   animalStatus: "vulnerable",     animalDiet: "herbavore" },
         { animalId: "M_2", timestamp: 1672448921, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Tawny Frogmouth",       speciesScientificName: "Podargus strigoides",  speciesIdentificationConfidence: 100, locationLat: -38.81905478815439, locationLon: 143.524, locationConfidence: 100, animalType: "bird",      animalStatus: "normal",         animalDiet: "herbavore" },
@@ -1608,9 +1580,9 @@
         { animalId: "M_9", timestamp: 1690765721, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Redeye",               speciesScientificName: "Psaltoda moerens",     speciesIdentificationConfidence: 100, locationLat: -38.80066562762367, locationLon: 143.555, locationConfidence: 100, animalType: "insect",    animalStatus: "near-threatened",animalDiet: "herbavore" },
       ];
 
-      hmiState.movementEvents     = movementEvents;
-      hmiState.vocalizationEvents = vocalizationEvents;
-      hmiState.microphoneLocations = microphoneLocations;
+      hmiState.movementEvents     = {};
+      hmiState.vocalizationEvents = [];
+      hmiState.microphoneLocations = [];
 
       const elArea      = document.getElementById("basemap");
       const simulatorOl = document.getElementById("screen");

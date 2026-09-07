@@ -53,7 +53,7 @@ async function ensureRedisConnected() {
 // condition directly — keeping the lists here makes auditing straightforward.
 // ─────────────────────────────────────────────────────────────────────────────
 
-const PUBLIC_ROUTES = new Set(["/login", "/signup", "/map"]);
+const PUBLIC_ROUTES = new Set(["/login", "/signup"]);
 
 /**
  * Path prefixes that are always public regardless of the full path.

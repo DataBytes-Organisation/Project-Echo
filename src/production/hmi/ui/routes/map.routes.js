@@ -1,4 +1,4 @@
-const { verifySignUp, client } = require("../middleware");
+const { verifySignUp, client, checkUserSession } = require("../middleware");
 const axios = require('axios');
 require('dotenv').config();
 const API_BASE_URL = `http://${process.env.API_HOST || 'localhost'}:9000`;
@@ -9,6 +9,24 @@ const MESSAGE_API_URL = `${API_BASE_URL}/hmi`;
 let latestSensorData = null;
 
 module.exports = function(app) {
+  app.get("/api/detections", checkUserSession, async (req, res) => {
+    try {
+      const response = await axios.get(`${MESSAGE_API_URL}/detections`, {
+        headers: { Authorization: `Bearer ${req.session.token}` },
+        timeout: 10000,
+      });
+      res.json(response.data);
+    } catch (error) {
+      const upstreamStatus = error.response?.status;
+      const status = [401, 403].includes(upstreamStatus) ? upstreamStatus : 502;
+      res.status(status).json({ error: {
+        code: status === 401 ? "UNAUTHENTICATED" : status === 403 ? "FORBIDDEN" : "UPSTREAM_ERROR",
+        message: status === 502 ? "Detections are currently unavailable." : "You are not authorised to access this data.",
+        details: null,
+      } });
+    }
+  });
+
   app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Headers", "Origin, Content-Type, Accept");
     next();
