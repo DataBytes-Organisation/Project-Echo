@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import logging
 from typing import Any, Dict, List, Optional
 
 from bson import ObjectId
@@ -10,6 +11,7 @@ from fastapi.encoders import jsonable_encoder
 from app.database import Events, Nodes, SensorReboots, SensorSettings
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
 
 DEFAULT_SETTINGS: Dict[str, Any] = {
@@ -19,6 +21,12 @@ DEFAULT_SETTINGS: Dict[str, Any] = {
     "onlineWindowMinutes": 5,
     "degradedWindowMinutes": 15,
 }
+
+
+def _server_error(message: str, error: Exception) -> HTTPException:
+    """Return a short client-safe 500 and keep the exception details in the log."""
+    logger.exception("%s: %s", message, error)
+    return HTTPException(status_code=500, detail=message)
 
 
 def _parse_iso_datetime(value: Any) -> Optional[datetime.datetime]:
@@ -536,7 +544,7 @@ def get_sensor_updates(
 
         return jsonable_encoder({"items": updates, "count": len(updates)})
     except Exception as error:
-        raise HTTPException(status_code=500, detail=f"Error deriving sensor updates: {str(error)}")
+        raise _server_error("Failed to load sensor updates", error)
 
 
 @router.get("/alerts", response_description="Derived alerts from sensor health")
@@ -588,7 +596,7 @@ def get_sensor_alerts(
     except HTTPException:
         raise
     except Exception as error:
-        raise HTTPException(status_code=500, detail=f"Error deriving alerts: {str(error)}")
+        raise _server_error("Failed to load sensor alerts", error)
 
 
 @router.get("/{sensor_id}/settings", response_description="Get sensor settings (sensor-specific or global defaults)")
@@ -597,7 +605,7 @@ def get_sensor_settings(sensor_id: str):
         settings = _get_settings_for_sensor(sensor_id)
         return jsonable_encoder({"sensorId": sensor_id, "settings": settings})
     except Exception as error:
-        raise HTTPException(status_code=500, detail=f"Error retrieving settings: {str(error)}")
+        raise _server_error("Failed to load sensor settings", error)
 
 
 @router.put("/{sensor_id}/settings", response_description="Upsert sensor settings")
@@ -623,7 +631,7 @@ def put_sensor_settings(sensor_id: str, payload: Dict[str, Any] = Body(...)):
     except HTTPException:
         raise
     except Exception as error:
-        raise HTTPException(status_code=500, detail=f"Error saving settings: {str(error)}")
+        raise _server_error("Failed to save sensor settings", error)
 
 
 @router.post("/{sensor_id}/reboot", response_description="Queue a reboot command (records intent only)")
@@ -644,7 +652,7 @@ def queue_reboot(sensor_id: str, payload: Dict[str, Any] = Body(default={})):  #
         result = SensorReboots.insert_one(doc)
         return jsonable_encoder({"rebootId": str(result.inserted_id), "sensorId": sensor_id, "status": "Queued"})
     except Exception as error:
-        raise HTTPException(status_code=500, detail=f"Error queuing reboot: {str(error)}")
+        raise _server_error("Failed to queue reboot", error)
 
 
 @router.get("/{sensor_id}/reboots", response_description="Reboot history for a sensor")
@@ -659,7 +667,7 @@ def get_reboot_history(sensor_id: str, limit: int = Query(50, ge=1, le=200)):
             items.append(doc)
         return jsonable_encoder({"items": items, "count": len(items)})
     except Exception as error:
-        raise HTTPException(status_code=500, detail=f"Error retrieving reboot history: {str(error)}")
+        raise _server_error("Failed to load reboot history", error)
 
 
 @router.get("/reboots/recent", response_description="Recent reboot history across all sensors")
@@ -674,7 +682,7 @@ def get_recent_reboots(limit: int = Query(50, ge=1, le=200)):
             items.append(doc)
         return jsonable_encoder({"items": items, "count": len(items)})
     except Exception as error:
-        raise HTTPException(status_code=500, detail=f"Error retrieving recent reboots: {str(error)}")
+        raise _server_error("Failed to load recent reboots", error)
 
 
 @router.get("/{sensor_id}", response_description="Get a single sensor's current health, location, and recent audio metadata")
@@ -718,4 +726,4 @@ def get_sensor_detail(
     except HTTPException:
         raise
     except Exception as error:
-        raise HTTPException(status_code=500, detail=f"Error retrieving sensor detail: {str(error)}")
+        raise _server_error("Failed to load sensor detail", error)

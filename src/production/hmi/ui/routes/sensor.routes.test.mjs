@@ -68,19 +68,33 @@ function jsonResponse(status, data) {
   };
 }
 
-test("alertsFrom skips Online and Unknown, and raises Offline as Critical", () => {
-  const alerts = registerSensorRoutes.alertsFrom([
-    { sensorId: "a", status: "Online" },
-    { sensorId: "b", status: "Unknown" },
-    { sensorId: "c", status: "Offline", lastSeenMinutesAgo: 40 },
-    { sensorId: "d", status: "Low Battery", batteryPct: 12 },
-  ]);
+test("demo-fallback alerts show Offline as Critical and Low Battery as High", async (t) => {
+  const previousFetch = globalThis.fetch;
+  t.after(() => {
+    globalThis.fetch = previousFetch;
+  });
 
-  assert.equal(alerts.length, 2);
-  assert.equal(alerts[0].sensorId, "c");
-  assert.equal(alerts[0].severity, "Critical");
-  assert.equal(alerts[1].sensorId, "d");
-  assert.equal(alerts[1].severity, "High");
+  globalThis.fetch = async () => {
+    throw new Error("backend down");
+  };
+
+  const app = createApp();
+  const res = await app.invoke("GET", "/sensors/alerts");
+
+  assert.equal(res.body.source, "demo-fallback");
+  assert.ok(Array.isArray(res.body.items));
+
+  const byId = Object.fromEntries(res.body.items.map((item) => [item.sensorId, item]));
+
+  // Online demo sensor must not appear in the shown alerts list.
+  assert.equal(byId["LIVE-001"], undefined);
+
+  assert.equal(byId["LIVE-002"].severity, "Critical");
+  assert.equal(byId["LIVE-002"].issue, "Offline");
+
+  assert.equal(byId["LIVE-003"].severity, "High");
+  assert.equal(byId["LIVE-003"].issue, "Low Battery");
+  assert.match(String(byId["LIVE-003"].details), /15%/);
 });
 
 test("empty backend alerts list is trusted, not replaced with demo data", async (t) => {
@@ -115,7 +129,7 @@ test("unreachable alerts backend falls back to demo sensors", async (t) => {
 
   assert.equal(res.body.source, "demo-fallback");
   assert.ok(res.body.count > 0);
-  assert.ok(res.body.items.some((item) => item.sensorId === "LIVE-002"));
+  assert.ok(res.body.items.some((item) => item.sensorId === "LIVE-002" && item.issue === "Offline"));
 });
 
 test("non-2xx alerts response falls back to demo sensors", async (t) => {

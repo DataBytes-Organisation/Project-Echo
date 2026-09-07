@@ -89,54 +89,8 @@ function showMessage(elementId, message, type = "success") {
   }, 30);
 }
 
-// ================================================================
-// API helper
-// ================================================================
-async function apiFetch(path, options = {}) {
-  const { timeoutMs = 8000, headers, signal, ...rest } = options;
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeoutMs);
-
-  if (signal) {
-    if (signal.aborted) controller.abort();
-    else signal.addEventListener("abort", () => controller.abort(), { once: true });
-  }
-
-  try {
-    const response = await fetch(path, {
-      headers: { "Content-Type": "application/json", ...(headers || {}) },
-      signal: controller.signal,
-      ...rest,
-    });
-
-    const contentType = response.headers.get("content-type") || "";
-    const isJson = contentType.includes("application/json");
-    const payload = isJson
-      ? await response.json().catch(() => null)
-      : await response.text().catch(() => "");
-
-    if (!response.ok) {
-      const detail =
-        payload && typeof payload === "object"
-          ? payload.detail || payload.error || JSON.stringify(payload)
-          : payload;
-      const error = new Error(detail || `Request failed: ${response.status}`);
-      error.status = response.status;
-      throw error;
-    }
-
-    return payload;
-  } catch (error) {
-    if (error.name === "AbortError") {
-      const timeoutError = new Error("Request timed out while loading sensor data");
-      timeoutError.status = 408;
-      throw timeoutError;
-    }
-    throw error;
-  } finally {
-    clearTimeout(timer);
-  }
-}
+// API calls use the shared EchoHttp client (FR-D1): /js/http-client.js
+// Loaded before this file on every Sensor Health page.
 
 function escapeHtml(value) {
   return String(value ?? "")

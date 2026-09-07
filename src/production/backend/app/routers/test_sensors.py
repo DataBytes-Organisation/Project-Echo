@@ -1,7 +1,8 @@
 """Tests for the Sensor Health router.
 
-Covers the fallback-heavy helpers and the GET /{sensor_id} detail endpoint
-without talking to a real MongoDB. Run from src/production/backend:
+Assert what callers actually see from the public endpoints (status text,
+battery %, GPS, component readings, alerts), not private helpers.
+Run from src/production/backend:
 
     python -m unittest app.routers.test_sensors -v
 """
@@ -12,7 +13,6 @@ import datetime
 import sys
 import unittest
 from pathlib import Path
-from types import SimpleNamespace
 from unittest.mock import MagicMock
 
 BACKEND_ROOT = Path(__file__).resolve().parents[2]
@@ -33,11 +33,16 @@ from fastapi import HTTPException  # noqa: E402
 from app.routers import sensors  # noqa: E402
 
 
-NOW = datetime.datetime(2026, 8, 31, 5, 0, tzinfo=datetime.timezone.utc)
+def _recent_iso(minutes: int = 1) -> str:
+    return (
+        datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(minutes=minutes)
+    ).isoformat().replace("+00:00", "Z")
 
 
-def _iso_minutes_ago(minutes: int) -> str:
-    return (NOW - datetime.timedelta(minutes=minutes)).isoformat().replace("+00:00", "Z")
+def _stale_iso(minutes: int = 40) -> str:
+    return (
+        datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(minutes=minutes)
+    ).isoformat().replace("+00:00", "Z")
 
 
 def _battery_node(**overrides):
@@ -67,6 +72,48 @@ def _battery_node(**overrides):
     return node
 
 
+def _solar_fan_node(**overrides):
+    node = {
+        "_id": "node_1",
+        "name": "Node Alpha",
+        "type": "master",
+        "model": "RaspberryPi4",
+        "customProperties": {
+            "processorSpeed": "1.5GHz",
+            "memory": "8GB",
+            "storage": "64GB",
+        },
+        "connectedNodes": ["node_1_1", "node_1_2"],
+        "location": {"latitude": -38.7789, "longitude": 143.5705},
+        "components": [
+            {
+                "id": "comp_solar",
+                "type": "solar_panel",
+                "category": "power",
+                "model": "SunPower X22-360",
+                "customProperties": {
+                    "wattage": 360,
+                    "efficiency": 0.85,
+                    "currentOutput": 320,
+                },
+            },
+            {
+                "id": "comp_fan",
+                "type": "fan",
+                "category": "cooling",
+                "model": "CoolMaster Pro",
+                "customProperties": {
+                    "speed": 1200,
+                    "maxSpeed": 2000,
+                    "temperature": 35,
+                },
+            },
+        ],
+    }
+    node.update(overrides)
+    return node
+
+
 class FakeCursor:
     def __init__(self, docs):
         self._docs = list(docs)
@@ -81,188 +128,177 @@ class FakeCursor:
         return iter(self._docs)
 
 
-class TestAsPctAndFloat(unittest.TestCase):
-    def test_fraction_scales_to_percent(self):
-        self.assertEqual(sensors._as_pct(0.75), 75.0)
-
-    def test_already_scaled_percent_is_kept(self):
-        self.assertEqual(sensors._as_pct(75), 75.0)
-
-    def test_rejects_missing_negative_and_over_100(self):
-        self.assertIsNone(sensors._as_pct(None))
-        self.assertIsNone(sensors._as_pct(-1))
-        self.assertIsNone(sensors._as_pct(140))
-        self.assertIsNone(sensors._as_pct(True))
-
-
-class TestComponentPropsMerge(unittest.TestCase):
-    def test_live_sensor_data_overrides_seeded_custom_properties(self):
-        component = {
-            "customProperties": {"currentCharge": 0.4, "health": 0.9},
-            "sensorData": {"currentCharge": 0.81},
-        }
-        props = sensors._component_props(component)
-        self.assertEqual(props["currentCharge"], 0.81)
-        self.assertEqual(props["health"], 0.9)
-
-    def test_seeded_custom_properties_used_when_no_live_telemetry(self):
-        component = {"customProperties": {"currentCharge": 0.65}}
-        self.assertEqual(sensors._component_props(component)["currentCharge"], 0.65)
-
-    def test_battery_pct_reads_current_charge_from_custom_properties(self):
-        self.assertEqual(sensors._extract_battery_pct(_battery_node()), 75.0)
-
-    def test_battery_pct_none_when_device_has_no_battery(self):
-        node = {
-            "_id": "node_1",
-            "components": [
-                {
-                    "type": "solar_panel",
-                    "customProperties": {"wattage": 360, "currentOutput": 320},
-                }
-            ],
-        }
-        self.assertIsNone(sensors._extract_battery_pct(node))
-
-
-class TestGpsFallbackChain(unittest.TestCase):
-    def test_location_dict_wins(self):
-        node = {
-            "location": {"latitude": -38.1, "longitude": 143.5},
-            "customProperties": {"lat": 0, "lon": 0},
-            "microphoneLLA": [-10.0, 10.0],
-        }
-        self.assertEqual(sensors._extract_gps(node), {"lat": -38.1, "lon": 143.5})
-
-    def test_falls_back_to_custom_properties(self):
-        node = {"customProperties": {"lat": -38.2, "lng": 143.6}}
-        self.assertEqual(sensors._extract_gps(node), {"lat": -38.2, "lon": 143.6})
-
-    def test_falls_back_to_microphone_lla(self):
-        node = {"microphoneLLA": [-38.3, 143.7, 10]}
-        self.assertEqual(sensors._extract_gps(node), {"lat": -38.3, "lon": 143.7})
-
-    def test_falls_back_to_component_gps(self):
-        node = {
-            "components": [
-                {"sensorData": {"gps": {"lat": -38.4, "longitude": 143.8}}}
-            ]
-        }
-        self.assertEqual(sensors._extract_gps(node), {"lat": -38.4, "lon": 143.8})
-
-    def test_returns_none_when_no_coordinates_exist(self):
-        self.assertIsNone(sensors._extract_gps({"_id": "bare"}))
-
-
-class TestMetricHeuristics(unittest.TestCase):
-    def test_efficiency_and_charge_render_as_percent(self):
-        self.assertEqual(sensors._format_metric("efficiency", 0.85), "85.0%")
-        self.assertEqual(sensors._format_metric("currentCharge", 0.75), "75.0%")
-
-    def test_wattage_keeps_unit(self):
-        self.assertEqual(sensors._format_metric("wattage", 360), "360 W")
-
-    def test_solar_output_percentage(self):
-        node = {
-            "components": [
-                {
-                    "type": "solar_panel",
-                    "customProperties": {
-                        "wattage": 360,
-                        "currentOutput": 320,
-                        "efficiency": 0.85,
-                    },
-                }
-            ]
-        }
-        power = sensors._extract_power(node)
-        self.assertEqual(power["solarRatedW"], 360.0)
-        self.assertEqual(power["solarOutputW"], 320.0)
-        self.assertEqual(power["solarOutputPct"], 88.9)
-        self.assertEqual(power["solarEfficiencyPct"], 85.0)
-
-    def test_temperature_from_fan_component(self):
-        node = {
-            "components": [
-                {"type": "fan", "customProperties": {"temperature": 35}}
-            ]
-        }
-        self.assertEqual(sensors._extract_temperature_c(node), 35.0)
-
-
-class TestHealthStatus(unittest.TestCase):
+class SensorEndpointTestCase(unittest.TestCase):
     def setUp(self):
         sensors.SensorSettings.find_one.return_value = None
+        sensors.Events.aggregate.return_value = []
+        sensors.Events.find.return_value = FakeCursor([])
+        sensors.Events.find_one.return_value = None
+        sensors.Nodes.find.return_value = FakeCursor([])
 
-    def test_missing_last_seen_is_unknown_not_offline(self):
-        payload = sensors._sensor_health_payload(_battery_node(), None, NOW)
+    def stub_nodes(self, *nodes):
+        # get_sensor_updates does list(Nodes.find(...).limit(...)); FakeCursor.limit
+        # returns itself, so iterating the find result yields the full node docs.
+        sensors.Nodes.find.return_value = FakeCursor(list(nodes))
+
+    def detail_for(self, node, *, last_audio=None, recent_audio=None, neighbours=None):
+        sensors.Nodes.find_one.return_value = node
+        sensors.Events.find_one.return_value = last_audio
+        sensors.Events.find.return_value = FakeCursor(recent_audio or [])
+        if neighbours is not None:
+            sensors.Nodes.find.return_value = FakeCursor(neighbours)
+        elif node.get("connectedNodes"):
+            sensors.Nodes.find.return_value = FakeCursor(
+                [
+                    {
+                        "_id": neighbour_id,
+                        "name": neighbour_id,
+                        "type": "arduino",
+                        "model": "Arduino Uno",
+                    }
+                    for neighbour_id in node["connectedNodes"]
+                ]
+            )
+        else:
+            sensors.Nodes.find.return_value = FakeCursor([])
+        return sensors.get_sensor_detail(node["_id"])
+
+
+class TestShownStatusAndAlerts(SensorEndpointTestCase):
+    def test_missing_heartbeat_shows_unknown_not_offline(self):
+        payload = self.detail_for(_battery_node())
         self.assertEqual(payload["status"], "Unknown")
         self.assertEqual(payload["batteryPct"], 75.0)
         self.assertIsNone(payload["lastSeenMinutesAgo"])
 
-    def test_recent_heartbeat_is_online(self):
-        node = _battery_node(lastSeen=_iso_minutes_ago(2))
-        payload = sensors._sensor_health_payload(node, None, NOW)
+    def test_recent_heartbeat_shows_online(self):
+        payload = self.detail_for(_battery_node(lastSeen=_recent_iso(1)))
         self.assertEqual(payload["status"], "Online")
 
-    def test_stale_heartbeat_is_offline(self):
-        node = _battery_node(lastSeen=_iso_minutes_ago(40), components=[])
-        payload = sensors._sensor_health_payload(node, None, NOW)
+    def test_stale_heartbeat_shows_offline(self):
+        payload = self.detail_for(_battery_node(lastSeen=_stale_iso(40), components=[]))
         self.assertEqual(payload["status"], "Offline")
 
-    def test_low_battery_overrides_online_but_not_unknown(self):
+    def test_low_battery_shows_on_online_device_but_not_unknown(self):
         low_battery = [
-            {
-                "type": "battery",
-                "customProperties": {"currentCharge": 0.1},
-            }
+            {"type": "battery", "customProperties": {"currentCharge": 0.1}}
         ]
-        online = _battery_node(lastSeen=_iso_minutes_ago(1), components=low_battery)
-        self.assertEqual(sensors._sensor_health_payload(online, None, NOW)["status"], "Low Battery")
+        online = self.detail_for(
+            _battery_node(lastSeen=_recent_iso(1), components=low_battery)
+        )
+        self.assertEqual(online["status"], "Low Battery")
+        self.assertEqual(online["batteryPct"], 10.0)
 
-        never_seen = _battery_node(components=low_battery)
-        self.assertEqual(sensors._sensor_health_payload(never_seen, None, NOW)["status"], "Unknown")
+        never_seen = self.detail_for(_battery_node(components=low_battery))
+        self.assertEqual(never_seen["status"], "Unknown")
 
-    def test_invalid_node_id_returns_none(self):
-        self.assertIsNone(sensors._sensor_health_payload({"_id": 12}, None, NOW))
-
-
-class TestAlertDerivation(unittest.TestCase):
-    def test_unknown_and_online_are_not_alerts(self):
-        recent = datetime.datetime.now(datetime.timezone.utc).isoformat().replace("+00:00", "Z")
-        sensors.Nodes.find.return_value.limit.return_value = [
+    def test_unknown_and_online_do_not_appear_in_alerts(self):
+        self.stub_nodes(
             _battery_node(),
-            _battery_node(_id="online", lastSeen=recent, components=[]),
-        ]
-        sensors.Events.aggregate.return_value = []
-        sensors.SensorSettings.find_one.return_value = None
-
+            _battery_node(_id="online", lastSeen=_recent_iso(1), components=[]),
+        )
         result = sensors.get_sensor_alerts()
         self.assertEqual(result["count"], 0)
         self.assertEqual(result["items"], [])
 
-    def test_offline_becomes_critical_alert(self):
-        sensors.Nodes.find.return_value.limit.return_value = [
-            _battery_node(_id="gone", lastSeen=_iso_minutes_ago(40), components=[]),
-        ]
-        sensors.Events.aggregate.return_value = []
-        sensors.SensorSettings.find_one.return_value = None
-
+    def test_offline_device_raises_critical_alert(self):
+        self.stub_nodes(_battery_node(_id="gone", lastSeen=_stale_iso(40), components=[]))
         result = sensors.get_sensor_alerts()
         self.assertEqual(result["count"], 1)
         self.assertEqual(result["items"][0]["severity"], "Critical")
         self.assertEqual(result["items"][0]["issue"], "Offline")
 
 
-class TestSensorDetailEndpoint(unittest.TestCase):
-    def setUp(self):
-        sensors.SensorSettings.find_one.return_value = None
-        sensors.Events.aggregate.return_value = []
-        sensors.Events.find.return_value = FakeCursor([])
-        sensors.Nodes.find.return_value = FakeCursor(
-            [{"_id": "node_1", "name": "Node Alpha", "type": "master", "model": "RaspberryPi4"}]
+class TestShownHealthValues(SensorEndpointTestCase):
+    def test_live_sensor_data_wins_over_seeded_custom_properties(self):
+        node = _battery_node(
+            components=[
+                {
+                    "id": "comp_bat",
+                    "type": "battery",
+                    "category": "power",
+                    "model": "LithiumPro 2000",
+                    "customProperties": {"currentCharge": 0.4, "health": 0.9},
+                    "sensorData": {"currentCharge": 0.81},
+                }
+            ]
         )
+        payload = self.detail_for(node)
+        self.assertEqual(payload["batteryPct"], 81.0)
+        self.assertEqual(payload["power"]["batteryHealthPct"], 90.0)
 
+    def test_seeded_battery_charge_shows_as_percent(self):
+        payload = self.detail_for(_battery_node())
+        self.assertEqual(payload["batteryPct"], 75.0)
+        charge = next(
+            metric
+            for metric in payload["components"][0]["metrics"]
+            if metric["key"] == "currentCharge"
+        )
+        self.assertEqual(charge["display"], "75.0%")
+
+    def test_device_without_battery_shows_null_battery(self):
+        payload = self.detail_for(_solar_fan_node())
+        self.assertIsNone(payload["batteryPct"])
+        self.assertEqual(payload["temperatureC"], 35.0)
+        self.assertEqual(payload["power"]["solarRatedW"], 360.0)
+        self.assertEqual(payload["power"]["solarOutputW"], 320.0)
+        self.assertEqual(payload["power"]["solarOutputPct"], 88.9)
+        self.assertEqual(payload["power"]["solarEfficiencyPct"], 85.0)
+
+    def test_component_readings_show_units_users_can_read(self):
+        payload = self.detail_for(_solar_fan_node())
+        solar = payload["components"][0]
+        fan = payload["components"][1]
+        solar_displays = {metric["key"]: metric["display"] for metric in solar["metrics"]}
+        fan_displays = {metric["key"]: metric["display"] for metric in fan["metrics"]}
+
+        self.assertEqual(solar_displays["wattage"], "360 W")
+        self.assertEqual(solar_displays["efficiency"], "85.0%")
+        self.assertEqual(fan_displays["temperature"], "35 °C")
+        self.assertEqual(fan_displays["speed"], "1200 RPM")
+
+
+class TestShownLocation(SensorEndpointTestCase):
+    def test_location_field_is_what_the_map_uses(self):
+        payload = self.detail_for(_battery_node())
+        self.assertEqual(payload["gps"], {"lat": -38.7789, "lon": 143.5705})
+
+    def test_falls_back_to_custom_properties_when_location_missing(self):
+        payload = self.detail_for(
+            _battery_node(
+                location=None,
+                customProperties={"lat": -38.2, "lng": 143.6, "memory": "512MB"},
+            )
+        )
+        self.assertEqual(payload["gps"], {"lat": -38.2, "lon": 143.6})
+
+    def test_falls_back_to_microphone_lla(self):
+        payload = self.detail_for(
+            _battery_node(location=None, customProperties={"memory": "512MB"}, microphoneLLA=[-38.3, 143.7, 10])
+        )
+        self.assertEqual(payload["gps"], {"lat": -38.3, "lon": 143.7})
+
+    def test_falls_back_to_component_gps(self):
+        payload = self.detail_for(
+            _battery_node(
+                location=None,
+                customProperties={"memory": "512MB"},
+                components=[
+                    {"type": "battery", "sensorData": {"gps": {"lat": -38.4, "longitude": 143.8}}}
+                ],
+            )
+        )
+        self.assertEqual(payload["gps"], {"lat": -38.4, "lon": 143.8})
+
+    def test_missing_coordinates_show_as_null(self):
+        payload = self.detail_for(
+            _battery_node(location=None, customProperties={"memory": "512MB"}, components=[])
+        )
+        self.assertIsNone(payload["gps"])
+
+
+class TestSensorDetailEndpoint(SensorEndpointTestCase):
     def test_missing_sensor_raises_404(self):
         sensors.Nodes.find_one.return_value = None
         with self.assertRaises(HTTPException) as ctx:
@@ -270,17 +306,17 @@ class TestSensorDetailEndpoint(unittest.TestCase):
         self.assertEqual(ctx.exception.status_code, 404)
         self.assertIn("does-not-exist", ctx.exception.detail)
 
-    def test_detail_includes_health_location_components_and_audio(self):
-        last_audio_ts = NOW - datetime.timedelta(minutes=12)
-        sensors.Nodes.find_one.return_value = _battery_node()
-        sensors.Events.find_one.return_value = {
-            "timestamp": last_audio_ts,
-            "species": "Colluricincla harmonica",
-            "confidence": 81.5,
-            "sampleRate": 48000,
-        }
-        sensors.Events.find.return_value = FakeCursor(
-            [
+    def test_detail_shows_health_location_components_and_audio(self):
+        last_audio_ts = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(minutes=12)
+        payload = self.detail_for(
+            _battery_node(),
+            last_audio={
+                "timestamp": last_audio_ts,
+                "species": "Colluricincla harmonica",
+                "confidence": 81.5,
+                "sampleRate": 48000,
+            },
+            recent_audio=[
                 {
                     "_id": "evt-1",
                     "timestamp": last_audio_ts,
@@ -288,10 +324,16 @@ class TestSensorDetailEndpoint(unittest.TestCase):
                     "confidence": 81.5,
                     "sampleRate": 48000,
                 }
-            ]
+            ],
+            neighbours=[
+                {
+                    "_id": "node_1",
+                    "name": "Node Alpha",
+                    "type": "master",
+                    "model": "RaspberryPi4",
+                }
+            ],
         )
-
-        payload = sensors.get_sensor_detail("node_1_2")
 
         self.assertEqual(payload["sensorId"], "node_1_2")
         self.assertEqual(payload["status"], "Unknown")
@@ -302,16 +344,24 @@ class TestSensorDetailEndpoint(unittest.TestCase):
         self.assertEqual(len(payload["recentAudio"]), 1)
         self.assertEqual(payload["components"][0]["type"], "battery")
         self.assertEqual(payload["connectedDevices"][0]["sensorId"], "node_1")
+        self.assertEqual(payload["connectedDevices"][0]["name"], "Node Alpha")
         self.assertTrue(payload["connectedDevices"][0]["known"])
 
     def test_detail_without_audio_still_returns_empty_history(self):
-        sensors.Nodes.find_one.return_value = _battery_node()
-        sensors.Events.find_one.return_value = None
-        sensors.Events.find.return_value = FakeCursor([])
-
-        payload = sensors.get_sensor_detail("node_1_2")
+        payload = self.detail_for(_battery_node())
         self.assertIsNone(payload["lastAudio"])
         self.assertEqual(payload["recentAudio"], [])
+
+    def test_updates_list_shows_the_same_status_users_see_on_detail(self):
+        self.stub_nodes(_battery_node(), _solar_fan_node(lastSeen=_recent_iso(1)))
+        result = sensors.get_sensor_updates()
+        by_id = {item["sensorId"]: item for item in result["items"]}
+
+        self.assertEqual(by_id["node_1_2"]["status"], "Unknown")
+        self.assertEqual(by_id["node_1_2"]["batteryPct"], 75.0)
+        self.assertEqual(by_id["node_1"]["status"], "Online")
+        self.assertEqual(by_id["node_1"]["temperatureC"], 35.0)
+        self.assertIsNone(by_id["node_1"]["batteryPct"])
 
 
 if __name__ == "__main__":

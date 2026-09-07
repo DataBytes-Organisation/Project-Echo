@@ -57,13 +57,7 @@ async function drawAlertsChart() {
   root.innerHTML = '<p class="card-subtitle">Loading alert summary…</p>';
 
   try {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 4000);
-    const res = await fetch("/sensors/alerts", { signal: controller.signal });
-    clearTimeout(timer);
-
-    if (!res.ok) throw new Error(`Failed to load alerts: ${res.status}`);
-    const data = await res.json();
+    const data = await apiFetch("/sensors/alerts", { timeoutMs: 4000 });
     renderAlertsChart(Array.isArray(data.items) ? data.items : []);
   } catch (e) {
     console.warn("Alerts chart fallback in use:", e);

@@ -4,6 +4,8 @@ try {
   // Environment variables may already be provided by the HMI server.
 }
 
+const { request: httpRequest } = require("../public/js/http-client.js");
+
 const API_BASE_URL = `http://${process.env.API_HOST || "localhost"}:9000`;
 const BACKEND_TIMEOUT_MS = 3000;
 
@@ -183,28 +185,17 @@ function alertsFrom(items) {
 
 async function tryBackend(req) {
   const url = new URL(req.originalUrl, API_BASE_URL);
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), BACKEND_TIMEOUT_MS);
-
-  try {
-    const init = {
-      method: req.method,
-      signal: controller.signal,
-      headers: { Accept: "application/json", "Content-Type": "application/json" },
-    };
-    if (!["GET", "HEAD"].includes(String(req.method).toUpperCase()) && req.body) {
-      init.body = JSON.stringify(req.body);
-    }
-
-    const response = await fetch(url, init);
-    const contentType = response.headers.get("content-type") || "";
-    const data = contentType.includes("application/json")
-      ? await response.json().catch(() => null)
-      : await response.text().catch(() => "");
-    return { status: response.status, data };
-  } finally {
-    clearTimeout(timer);
+  const init = {
+    method: req.method,
+    timeoutMs: BACKEND_TIMEOUT_MS,
+    headers: { Accept: "application/json", "Content-Type": "application/json" },
+  };
+  if (!["GET", "HEAD"].includes(String(req.method).toUpperCase()) && req.body) {
+    init.body = JSON.stringify(req.body);
   }
+
+  const response = await httpRequest(url, init);
+  return { status: response.status, data: response.data };
 }
 
 function sendBackend(res, response) {
@@ -390,11 +381,6 @@ function registerSensorRoutes(app) {
   });
 }
 
-registerSensorRoutes.alertsFrom = alertsFrom;
-registerSensorRoutes.getDemoSensors = getDemoSensors;
-registerSensorRoutes.findDemoSensor = findDemoSensor;
-registerSensorRoutes.asDetailPayload = asDetailPayload;
-registerSensorRoutes.toListItem = toListItem;
 registerSensorRoutes.resetStores = function resetStores() {
   for (const key of Object.keys(settingsStore)) delete settingsStore[key];
   rebootStore.length = 0;
