@@ -26,9 +26,16 @@ try, that's noted too, because those are usually the parts worth knowing.
   changes** to run under it (verified below). Jest wasn't chosen for the Python side
   because it's a JavaScript framework; it wasn't needed for HMI either, since
   `node --test` (Node's built-in runner, zero extra dependency) already does the job.
-- **Locust** for load/performance testing, over k6 and Artillery. Load test scripts are
-  plain Python (`locustfile.py`), matching the rest of the team's stack - no new
-  language/DSL to learn, no separate binary to install system-wide.
+- **Locust and k6** both practically tested for load/performance testing, per Krish's
+  direct request ("no need to test all frameworks, maybe locust and k6 - load testing
+  is important too"). Both were run against the *same* live backend with the *same*
+  load shape (20 virtual users, 60 seconds, the same 4 endpoints) for a fair,
+  apples-to-apples comparison - see section 4 for the real numbers from both. Locust
+  scripts are plain Python (`locustfile.py`), matching the rest of the team's stack;
+  k6 scripts are JavaScript (`k6_loadtest.js`) and k6 itself is a separate compiled
+  binary (installed here via `winget install k6`), not a pip package. Artillery wasn't
+  practically tested - Krish's follow-up narrowed the comparison to Locust and k6
+  specifically.
 - **HMI stays on `node --test`.** It already works (2 passing test files before this
   guide); introducing Jest would be a real migration cost for no concrete benefit at
   this project's current scale.
@@ -230,6 +237,58 @@ Per-endpoint breakdown (median response time): `/public/public-test` 2ms,
 `/hmi/microphones` 5ms, `/iot/nodes` 5ms, `/engine/animal_records` 11ms (this one is
 CSV-serialising every record on every request - the slowest of the four, worth knowing
 if it ever needs to handle real traffic).
+
+### Backend load test (k6) - same backend, same load shape, for direct comparison
+
+Krish asked specifically for Locust *and* k6 to be compared, not just one load tool
+picked over the other. k6 is a separate compiled binary (not a Python package):
+
+```powershell
+winget install k6
+```
+
+`src/tests/load/k6_loadtest.js` hits the exact same 4 endpoints, with the same request
+mix (weighted 3:2:2:1, matching `locustfile.py`'s `@task` weights) and the same load
+shape (20 virtual users, 60 seconds), so the two tools' results are directly
+comparable rather than testing different things. With the backend already running
+(same setup as the Locust section above):
+
+```powershell
+k6 run src/tests/load/k6_loadtest.js
+```
+
+Real results from this run:
+
+| Metric | Value |
+|---|---|
+| Total requests | 604 |
+| Failures | 0 (0.00%) |
+| Median response time (`http_req_duration`) | 3.91 ms |
+| 95th percentile | 11.76 ms |
+| Max response time | 39.28 ms |
+| Requests/sec | ~9.67 |
+
+### Locust vs k6 - the actual comparison
+
+| | Locust | k6 |
+|---|---|---|
+| Requests (60s, 20 users) | 578 | 604 |
+| Failures | 0 | 0 |
+| Median latency | 5 ms | 3.91 ms |
+| 95th percentile | 12 ms | 11.76 ms |
+| Requests/sec | ~9.8 | ~9.67 |
+| Script language | Python | JavaScript |
+| Install | `pip install locust` (already in `requirements-dev.txt`) | separate binary (`winget install k6` / package manager) |
+| Setup for this project | No new tooling - same language/venv as everything else | One extra tool to install and keep on `PATH`, but nothing Python-environment-specific to conflict with |
+
+**Numbers are essentially identical** (same backend, same load, small run-to-run
+variance) - neither tool is "faster" or "more accurate" here; the real difference is
+ecosystem fit. **Recommendation: Locust**, for this project specifically, purely
+because test scripts stay in Python alongside everything else the team already
+writes - no second language, no separate binary to manage in CI later. k6 remains a
+perfectly reasonable choice and produced equally clean, real results; teams more
+JS/TypeScript-heavy, or wanting k6's built-in Grafana Cloud reporting integration,
+would reasonably pick the other way.
 
 ### HMI unit test (`node --test`)
 
