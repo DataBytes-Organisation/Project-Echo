@@ -13,6 +13,7 @@ from app.errors import (
 )
 from app.exceptions import DetectionError
 from app.middleware.correlation_id import add_correlation_id
+from app.metrics import PrometheusMiddleware, metrics_router
 from app.routers import species_predictor
 from app.routers import auth_router
 from app.routers import admin_budget, admin_services
@@ -75,6 +76,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.add_middleware(PrometheusMiddleware)
+app.include_router(metrics_router)
 
 logger = logging.getLogger(__name__)
 
