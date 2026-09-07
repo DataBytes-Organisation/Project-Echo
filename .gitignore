@@ -115,3 +115,4 @@ src/prototypes/engine/benchmarking/results_efficientnet/variants/
 
 .claude/
 CLAUDE.md
+.test-deps/
