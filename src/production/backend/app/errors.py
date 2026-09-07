@@ -49,7 +49,9 @@ class StandardizeErrorResponseMiddleware(BaseHTTPMiddleware):
         except (TypeError, ValueError):
             return response
         if isinstance(payload, dict) and isinstance(payload.get("error"), dict) and {"code", "message", "details"} <= set(payload["error"]):
-            return response
+            # body_iterator is single-use; rebuild so the inspected body still reaches the client.
+            headers = {key: value for key, value in response.headers.items() if key.lower() not in {"content-length", "content-type"}}
+            return Response(content=body, status_code=response.status_code, headers=headers, media_type="application/json")
         raw_message = payload.get("message", payload.get("detail", payload.get("error"))) if isinstance(payload, dict) else None
         message = raw_message if isinstance(raw_message, str) else "The request could not be completed."
         details = payload if not isinstance(raw_message, str) else None
