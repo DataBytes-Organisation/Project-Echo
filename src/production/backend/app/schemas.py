@@ -1,6 +1,7 @@
 ## app.schemas.py
 from datetime import datetime
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Literal
+import math
 from pydantic import BaseModel, Field, validator, constr, conlist, condecimal
 from bson.objectid import ObjectId
 from app.database import GENDER, STATES_CODE, AUS_STATES
@@ -24,6 +25,7 @@ class PyObjectId(ObjectId):
 
 # Schema to validate event data with input fields like sensorId, location, etc.
 class EventSchema(BaseModel):
+    sourceType: Optional[Literal["real"]] = None
     timestamp: datetime  # Event timestamp
     sensorId: constr(min_length=1)  # Non-empty string for sensor ID
     species: constr(min_length=1)  # Non-empty string for species name
@@ -34,6 +36,16 @@ class EventSchema(BaseModel):
     audioClip: str  # Audio clip data
     confidence: float = Field(gt=0, lt=100) # Confidence value between 0 and 100
     sampleRate: int  # Audio sample rate
+
+    @validator("microphoneLLA", pre=True)
+    def validate_real_microphone_lla(cls, value, values):
+        if values.get("sourceType") == "real":
+            if (not isinstance(value, list) or len(value) != 3
+                    or any(isinstance(item, bool) or not isinstance(item, (int, float))
+                           or not math.isfinite(item) for item in value)
+                    or not -90 <= value[0] <= 90 or not -180 <= value[1] <= 180):
+                raise ValueError("Real detections require valid microphone coordinates.")
+        return value
 
     # Configuration and schema example
     class Config:
@@ -395,8 +407,8 @@ class DetectionListResponses(BaseModel):
     page: int
     page_size: int
 
-    class config:
-        allow_population_by_fiels_name = True
+    class Config:
+        allow_population_by_field_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
 

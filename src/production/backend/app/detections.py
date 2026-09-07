@@ -5,7 +5,7 @@ from fastapi import HTTPException
 from bson import ObjectId
 from pymongo import ReturnDocument
 
-from app.database import Detections
+from app.database import Detections, Events
 from app.schemas import DetectionCreate, Detection
 
 def _doc_to_detection(doc: Dict[str, Any]) -> Optional[Detection]:
@@ -29,7 +29,7 @@ def get_detection(detection_id: str) -> Optional[Detection]:
     except Exception:
         return None
 
-    doc = Detections.find_one({"_id": oid})
+    doc = Detections.find_one({"_id": oid}) or Events.find_one({"_id": oid})
     if not doc:
         return None
 
@@ -45,8 +45,12 @@ def list_detections(
     radius_km: Optional[float] = None,
     page: int = 1,
     page_size: int = 20,
+    source_type: Optional[str] = None,
 ) -> Dict[str, Any]:
     query: Dict[str, Any] = {}
+
+    if source_type:
+        query["sourceType"] = source_type
 
     if species:
         query["species"] = species
@@ -76,14 +80,18 @@ def list_detections(
 
     skip = (page - 1) * page_size
 
-    total = Detections.count_documents(query)
-    cursor = (
-        Detections.find(query)
-        .sort("timestamp", -1)
-        .skip(skip)
-        .limit(page_size)
-    )
-
+    # Engine events and manual detections share a read contract, without dual writes.
+    pipeline = [
+        {"$unionWith": "events"},
+        {"$match": query},
+    ]
+    counts = list(Detections.aggregate(pipeline + [{"$count": "count"}]))
+    total = counts[0]["count"] if counts else 0
+    cursor = Detections.aggregate(pipeline + [
+        {"$sort": {"timestamp": -1, "_id": -1}},
+        {"$skip": skip},
+        {"$limit": page_size},
+    ])
     items: List[Detection] = [Detection(**doc) for doc in cursor]
 
     return {

@@ -1,6 +1,7 @@
 ## app.serializers.py
 def eventEntity(event) -> dict:
     return {
+        **({"sourceType": event["sourceType"]} if event.get("sourceType") else {}),
         "_id": str(event["_id"]),
         "timestamp": event["timestamp"],
         "sensorId": event["sensorId"],
@@ -14,6 +15,7 @@ def eventEntity(event) -> dict:
 
 def eventSpeciesEntity(event) -> dict:
     return {
+        **({"sourceType": event["sourceType"]} if event.get("sourceType") else {}),
         "_id": str(event["_id"]),
         "commonName": event.get("commonName", "Unknown"),
         "type": event.get("type", "Unknown"),

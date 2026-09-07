@@ -9,6 +9,7 @@ from bson import ObjectId
 import datetime
 from app import serializers
 from app import schemas
+from app import detections as detections_service
 from app.database import Events, Movements, Microphones, User, Role, ROLES, Requests, Guest, ForgotPassword, LogoutToken, Species
 from fastapi.responses import JSONResponse
 import paho.mqtt.publish as publish
@@ -33,6 +34,12 @@ import pandas as pd
 jwtBearer = JWTBearer()
 
 router = APIRouter()
+
+
+@router.get("/detections", dependencies=[Depends(jwtBearer)])
+def list_real_detections():
+    result = detections_service.list_detections(source_type="real", page_size=100)
+    return serializers.eventListEntity([item.dict(by_alias=True) for item in result["items"]])
 
 MQTT_BROKER_URL = "ts-mqtt-server-cont"
 MQTT_ENGINE_URL = "projectecho/engine/2"
