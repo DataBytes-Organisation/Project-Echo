@@ -117,7 +117,7 @@ for _, row in df.iterrows():
     records.append({
         **row.to_dict(),
         "resolved_file_path":
-            str(actual_path) if actual_path else "",
+            raw_path if file_exists else "",
         "file_exists":
             file_exists,
         "extension":
