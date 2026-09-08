@@ -174,7 +174,12 @@ async function runAction(action, failureMessage) {
     applyResult(response.data);
   } catch (error) {
     console.error(failureMessage, error);
-    if (pageState) pageState.showError(getApiErrorMessage(error, failureMessage));
+    // The API sends a specific reason for the cases it knows about, an expired
+    // session in particular, so prefer that over the generic mapping.
+    const serverMessage = error && error.response && error.response.data && error.response.data.error;
+    if (pageState) {
+      pageState.showError(serverMessage || getApiErrorMessage(error, failureMessage));
+    }
   } finally {
     if (pageState) pageState.hideLoading();
   }

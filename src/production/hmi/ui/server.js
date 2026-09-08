@@ -5,7 +5,7 @@ const fs = require('fs');
 const cookieSession = require('cookie-session');
 const helmet = require('helmet');
 const jwt = require('jsonwebtoken');
-const { client, checkUserSession } = require('./middleware');
+const { client, checkUserSession, requireApiSession } = require('./middleware');
 const controller = require('./controller/auth.controller');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
@@ -758,7 +758,10 @@ async function setNotificationFlags(ids, flags) {
   return result.upsertedCount + result.modifiedCount;
 }
 
-app.get('/api/notifications', async (req, res) => {
+// The feed carries donor emails and account details, so every route here is
+// behind a session. requireApiSession answers 401 JSON rather than redirecting
+// to /login the way the page guard does, which a browser API caller cannot use.
+app.get('/api/notifications', requireApiSession, async (req, res) => {
   try {
     res.json(await listNotifications());
   } catch (error) {
@@ -769,7 +772,7 @@ app.get('/api/notifications', async (req, res) => {
 
 // Declared before the /:id routes below, otherwise "read-all" and "read" get
 // swallowed as an id.
-app.patch('/api/notifications/read-all', async (req, res) => {
+app.patch('/api/notifications/read-all', requireApiSession, async (req, res) => {
   try {
     const { notifications } = await listNotifications();
     const unreadIds = notifications.filter(item => !item.read).map(item => item.id);
@@ -781,7 +784,7 @@ app.patch('/api/notifications/read-all', async (req, res) => {
   }
 });
 
-app.delete('/api/notifications/read', async (req, res) => {
+app.delete('/api/notifications/read', requireApiSession, async (req, res) => {
   try {
     const { notifications } = await listNotifications();
     const readIds = notifications.filter(item => item.read).map(item => item.id);
@@ -793,7 +796,7 @@ app.delete('/api/notifications/read', async (req, res) => {
   }
 });
 
-app.patch('/api/notifications/:id/read', async (req, res) => {
+app.patch('/api/notifications/:id/read', requireApiSession, async (req, res) => {
   try {
     await setNotificationFlags([req.params.id], { read: true });
     res.json(await listNotifications());
@@ -803,7 +806,7 @@ app.patch('/api/notifications/:id/read', async (req, res) => {
   }
 });
 
-app.delete('/api/notifications/:id', async (req, res) => {
+app.delete('/api/notifications/:id', requireApiSession, async (req, res) => {
   try {
     await setNotificationFlags([req.params.id], { deleted: true });
     res.json(await listNotifications());
