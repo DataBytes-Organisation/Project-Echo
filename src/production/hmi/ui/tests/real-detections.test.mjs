@@ -38,7 +38,8 @@ class Source {
 class Layer {
   constructor(options) { this.source = options.source; }
   getSource() { return this.source; }
-  set() {}
+  set(key, value) { this[key] = value; }
+  setZIndex(zIndex) { this.zIndex = zIndex; }
 }
 class Feature {
   constructor(properties) { this.properties = properties; }
@@ -93,6 +94,23 @@ test("real marker uses microphone coordinates and refresh reuses its layer/contr
   assert.equal(features[0].get("sourceType"), "real");
   assert.equal(features[0].get("sensorId"), "esp32-001");
   assert.match(hmi.realDetectionStatus.textContent, /1 real-device detection/);
+});
+
+test("real layer sits above microphone layers sharing the same coordinate", async () => {
+  assert.ok(detections, "real detection loader exists");
+  const hmi = { ...state(), layerPool: 1000 };
+  result = { data: [record] };
+  await detections.loadRealDetections(hmi);
+  assert.equal(hmi.realDetectionLayer.zIndex, 1000);
+  assert.equal(hmi.layerPool, 999);
+  // A microphone layer allocated afterwards from the same pool renders below.
+  assert.ok(hmi.realDetectionLayer.zIndex > hmi.layerPool);
+});
+
+test("real layer still renders on top without a layer pool", async () => {
+  const hmi = state(); result = { data: [record] };
+  await detections.loadRealDetections(hmi);
+  assert.ok(hmi.realDetectionLayer.zIndex > 1000);
 });
 
 test("invalid real coordinates never create a marker and show a safe data error", async () => {

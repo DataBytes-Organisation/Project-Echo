@@ -15,6 +15,13 @@ export async function loadRealDetections(hmiState) {
       }) }),
     });
     layer.set("name", "real_detections");
+    // Microphone layers take z-indices near 1000 from the shared pool, and
+    // this layer is created before they exist: claim the pool top so a
+    // microphone icon never covers the detection circle at its coordinate.
+    if (typeof layer.setZIndex === "function") {
+      layer.setZIndex(Number.isFinite(hmiState.layerPool) ? hmiState.layerPool : 1001);
+      if (Number.isFinite(hmiState.layerPool)) hmiState.layerPool -= 1;
+    }
     hmiState.basemap.addLayer(layer);
     hmiState.realDetectionLayer = layer;
 
