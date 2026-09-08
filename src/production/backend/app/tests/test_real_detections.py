@@ -116,6 +116,7 @@ class RealDetectionTests(unittest.TestCase):
             (engine, "Events", self.events), (hmi, "Events", self.events),
             (service, "Detections", self.detections),
             (detections, "enforce_and_consume", lambda *args, **kwargs: None),
+            (hmi, "enforce_and_consume", lambda *args, **kwargs: None),
         ]:
             patcher = patch.object(target, name, value)
             patcher.start()
@@ -200,6 +201,16 @@ class RealDetectionTests(unittest.TestCase):
         self.assertEqual(response.json()["error"]["code"], "FORBIDDEN")
         self.app.dependency_overrides[hmi.jwtBearer] = lambda: "session-jwt"
         self.assertEqual(self.client.get("/hmi/detections").json(), [])
+
+    def test_hmi_detection_read_honours_pause_guard_and_budget(self):
+        self.app.dependency_overrides[hmi.jwtBearer] = lambda: "session-jwt"
+        with patch.object(hmi, "enforce_and_consume") as budget:
+            self.assertEqual(self.client.get("/hmi/detections").status_code, 200)
+            budget.assert_called_once_with("detections", cost=1)
+        with patch("app.middleware.pause_guard.get_service_state", return_value=True):
+            paused = self.client.get("/hmi/detections")
+        self.assertEqual(paused.status_code, 503)
+        self.assertEqual(paused.json()["error"]["code"], "SERVICE_UNAVAILABLE")
 
     def test_legacy_hmi_serializer_preserves_real_source_and_structured_location(self):
         event = {**PAYLOAD, "_id": ObjectId()}

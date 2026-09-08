@@ -22,6 +22,8 @@ import json
 import paho.mqtt.client as paho
 from app.middleware.auth import signJWT, decodeJWT
 from app.middleware.auth_bearer import JWTBearer
+from app.middleware.pause_guard import pause_guard
+from app.services.budget import enforce_and_consume
 from app.middleware.random import randompassword
 from app.middleware.random import genotp
 from bson.objectid import ObjectId
@@ -36,8 +38,9 @@ jwtBearer = JWTBearer()
 router = APIRouter()
 
 
-@router.get("/detections", dependencies=[Depends(jwtBearer)])
+@router.get("/detections", dependencies=[Depends(jwtBearer), Depends(pause_guard("detections"))])
 def list_real_detections():
+    enforce_and_consume("detections", cost=1)
     result = detections_service.list_real_events(page_size=100)
     return serializers.eventListEntity([item.dict(by_alias=True) for item in result["items"]])
 
