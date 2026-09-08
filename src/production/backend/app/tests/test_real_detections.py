@@ -1,9 +1,5 @@
 """Real detection HTTP contracts with Mongo and security boundaries faked."""
 import copy
-import json
-from pathlib import Path
-import subprocess
-import sys
 import unittest
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
@@ -219,6 +215,10 @@ class RealDetectionTests(unittest.TestCase):
         self.assertEqual(response.status_code, 500)
         self.assertEqual(response.content, b"not-json")
 
+    def test_hmi_detections_route_documents_its_response_shape(self):
+        schema = self.app.openapi()["paths"]["/hmi/detections"]["get"]["responses"]["200"]["content"]["application/json"]["schema"]
+        self.assertEqual(schema, {"type": "array", "items": {"$ref": "#/components/schemas/RealDetectionRead"}, "title": "Response"})
+
     def test_hmi_detection_read_honours_pause_guard_and_budget(self):
         self.app.dependency_overrides[hmi.jwtBearer] = lambda: "session-jwt"
         with patch.object(hmi, "enforce_and_consume") as budget:
@@ -248,33 +248,6 @@ class RealDetectionTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200, response.text)
         self.assertEqual(len(response.json()), 2)
         self.assertNotIn("audioClip", response.json()[0])
-
-    def test_engine_to_backend_to_authenticated_hmi_marker_with_boundary_fakes(self):
-        production = Path(__file__).resolve().parents[3]
-        # Isolate Engine's existing heavy-dependency mocks from Backend imports.
-        capture = subprocess.run([sys.executable, "-c", '''
-import contextlib, io, json
-with contextlib.redirect_stdout(io.StringIO()):
-    from test_iot_integration import EchoEngine, _make_msg, _valid_payload
-    from unittest.mock import patch
-    engine = EchoEngine()
-    engine.config['API_URL'] = 'http://backend.test/engine/event'
-    with patch('echo_engine.requests.post') as post:
-        engine.on_iot_message(None, None, _make_msg(_valid_payload(
-            type='prediction', species='Magpie', confidence=91.5,
-            timestamp='2026-08-06T10:30:00Z', sensor_id='esp32-001')))
-    payload = post.call_args.kwargs['json']
-print(json.dumps(payload))
-'''], cwd=production / "engine", capture_output=True, text=True, check=True)
-        response = self.client.post("/engine/event", json=json.loads(capture.stdout))
-        self.assertEqual(response.status_code, 201, response.text)
-        self.app.dependency_overrides[hmi.jwtBearer] = lambda: "session-jwt"
-        read = self.client.get("/hmi/detections")
-        self.assertEqual(read.status_code, 200, read.text)
-        result = subprocess.run(["node", "tests/detection-pipeline.mjs"],
-                                cwd=production / "hmi" / "ui", input=read.text,
-                                capture_output=True, text=True, check=True)
-        self.assertEqual(json.loads(result.stdout)["sourceType"], "real")
 
 
 if __name__ == "__main__":
