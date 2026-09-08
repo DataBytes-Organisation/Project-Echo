@@ -45,6 +45,30 @@
         }
       }
     },
+    "/hmi/detections": {
+      "get": {
+        "tags": [
+          "hmi"
+        ],
+        "summary": "List Real Detections",
+        "operationId": "list_real_detections_hmi_detections_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWTBearer": []
+          }
+        ]
+      }
+    },
     "/hmi/weather": {
       "get": {
         "tags": [
@@ -3192,6 +3216,13 @@
       },
       "Detection": {
         "properties": {
+          "sourceType": {
+            "type": "string",
+            "enum": [
+              "real"
+            ],
+            "title": "Sourcetype"
+          },
           "timestamp": {
             "type": "string",
             "format": "date-time",
@@ -3298,6 +3329,13 @@
       },
       "DetectionCreate": {
         "properties": {
+          "sourceType": {
+            "type": "string",
+            "enum": [
+              "real"
+            ],
+            "title": "Sourcetype"
+          },
           "timestamp": {
             "type": "string",
             "format": "date-time",
@@ -3454,6 +3492,13 @@
       },
       "EventSchema": {
         "properties": {
+          "sourceType": {
+            "type": "string",
+            "enum": [
+              "real"
+            ],
+            "title": "Sourcetype"
+          },
           "timestamp": {
             "type": "string",
             "format": "date-time",
