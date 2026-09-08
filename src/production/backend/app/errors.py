@@ -44,13 +44,14 @@ class StandardizeErrorResponseMiddleware(BaseHTTPMiddleware):
         if response.status_code < 400 or "application/json" not in response.headers.get("content-type", ""):
             return response
         body = b"".join([chunk async for chunk in response.body_iterator])
+        # body_iterator is single-use; any path below must rebuild from these
+        # bytes instead of returning the drained response.
+        headers = {key: value for key, value in response.headers.items() if key.lower() not in {"content-length", "content-type"}}
         try:
             payload = json.loads(body)
         except (TypeError, ValueError):
-            return response
+            return Response(content=body, status_code=response.status_code, headers=headers, media_type="application/json")
         if isinstance(payload, dict) and isinstance(payload.get("error"), dict) and {"code", "message", "details"} <= set(payload["error"]):
-            # body_iterator is single-use; rebuild so the inspected body still reaches the client.
-            headers = {key: value for key, value in response.headers.items() if key.lower() not in {"content-length", "content-type"}}
             return Response(content=body, status_code=response.status_code, headers=headers, media_type="application/json")
         raw_message = payload.get("message", payload.get("detail", payload.get("error"))) if isinstance(payload, dict) else None
         message = raw_message if isinstance(raw_message, str) else "The request could not be completed."

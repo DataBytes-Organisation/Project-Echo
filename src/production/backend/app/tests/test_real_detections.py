@@ -10,6 +10,7 @@ from unittest.mock import MagicMock, patch
 
 from bson import BSON, ObjectId
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import Response
 from fastapi.exceptions import RequestValidationError
 from fastapi.testclient import TestClient
 from pydantic import ValidationError
@@ -201,6 +202,22 @@ class RealDetectionTests(unittest.TestCase):
         self.assertEqual(response.json()["error"]["code"], "FORBIDDEN")
         self.app.dependency_overrides[hmi.jwtBearer] = lambda: "session-jwt"
         self.assertEqual(self.client.get("/hmi/detections").json(), [])
+
+    def test_error_middleware_preserves_undecodable_json_bodies(self):
+        probe = FastAPI()
+        probe.add_middleware(StandardizeErrorResponseMiddleware)
+
+        @probe.get("/broken")
+        async def broken():
+            return Response(content=b"not-json", status_code=500, media_type="application/json")
+
+        client = TestClient(probe, raise_server_exceptions=False)
+        try:
+            response = client.get("/broken")
+        finally:
+            client.close()
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.content, b"not-json")
 
     def test_hmi_detection_read_honours_pause_guard_and_budget(self):
         self.app.dependency_overrides[hmi.jwtBearer] = lambda: "session-jwt"
