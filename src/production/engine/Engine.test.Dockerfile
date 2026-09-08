@@ -1,5 +1,8 @@
 # Builder (Compilers and heavy lifting)
-ARG BASE_IMAGE=python:3.10-slim-bullseye
+# bullseye (Debian 11) reached full end-of-life 2026-08-31; its apt archive
+# is being frozen/migrated, which breaks package installs unpredictably.
+# bookworm (Debian 12) is the current supported release.
+ARG BASE_IMAGE=python:3.10-slim-bookworm
 FROM ${BASE_IMAGE} AS echo_engine_builder
 
 WORKDIR /build
@@ -46,7 +49,6 @@ RUN apt-get update -o Acquire::Retries=5 -o Acquire::http::Timeout=30 \
 	libgl1-mesa-glx \
 	libglib2.0-0 \
 	curl \
-	gnupg \
 	ca-certificates \
 	&& echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list \
 	&& curl --retry 5 --retry-delay 5 --retry-connrefused https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg add - \

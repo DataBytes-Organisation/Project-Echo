@@ -43,4 +43,5 @@ After updating, the connection status badge on the admin dashboard will display:
 
 - **Badge shows "Cannot connect to backend API"** → The backend API service is not running or unreachable. Check that all Docker containers are up.
 - **Badge shows "Fallback Mode"** → `CLIENT_URL` is not set correctly in the `.env` file.
+- **Donation checkout reports that the payment service is unavailable** → Confirm the Backend Razorpay configuration uses a matching Test or Live Mode key pair, then restart the Backend service.
 - **Changes to `.env` not taking effect** → Restart Docker with `docker compose down && docker compose up --build`.
