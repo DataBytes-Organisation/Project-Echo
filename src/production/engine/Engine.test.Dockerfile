@@ -45,7 +45,7 @@ RUN apt-get update -o Acquire::Retries=5 -o Acquire::http::Timeout=30 \
 	&& apt-get install -y --no-install-recommends \
 	-o Acquire::Retries=5 \
 	-o Acquire::http::Timeout=30 \
-	libopenexr25 \
+	libopenexr-3-1-30 \
 	libgl1-mesa-glx \
 	libglib2.0-0 \
 	curl \
