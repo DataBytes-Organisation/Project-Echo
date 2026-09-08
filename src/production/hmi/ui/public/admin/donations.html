@@ -22,6 +22,7 @@
 
     <link type="text/css" rel="stylesheet" href="./css/requests.css" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="/admin/js/admin-layout.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
 
     <link
@@ -34,8 +35,6 @@
       src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"
     ></script>
 
-    <script type="text/javascript" src="/admin/js/sidebarmenu.js"></script>
-    <script type="text/javascript" src="/admin/js/app.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <link
@@ -140,19 +139,10 @@
       </div>
     </div>
 
-    <script type="text/javascript">
-      $(document).ready(function() {
-        $("#sidebar").load("/admin/component/sidebar-component.html", function() {
-          $.getScript('/admin/js/sidebarmenu.js');
-        });
-        $("#header").load("/admin/component/header-component.html");
-        $("#footer").load("/admin/component/footer-component.html");
-      });
-    </script>
-
     <script type="module">
       // FR-D1: module so the donations list can use the shared client. Nothing
       // outside this block reaches into it, so losing the globals costs nothing.
+      // The sidebar, header and footer are loaded by admin-layout.js now.
       import { retrieveDonations } from "/js/routes.js";
       import { getApiErrorMessage } from "/js/HMI-utils.js";
 

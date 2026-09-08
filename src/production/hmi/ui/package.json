@@ -4,10 +4,10 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "node --test \"public/js/**/*.test.mjs\" \"tests/**/*.test.mjs\" && jest",
-    "test:node": "node --test \"public/js/**/*.test.mjs\" \"tests/**/*.test.mjs\"",
+    "test": "node --test \"public/js/**/*.test.mjs\" \"tests/**/*.test.mjs\" \"tests/**/*.test.js\" && jest",
+    "test:node": "node --test \"public/js/**/*.test.mjs\" \"tests/**/*.test.mjs\" \"tests/**/*.test.js\"",
     "test:jest": "jest",
-    "dev": "nodemon --inspect=0.0.0.0  server.js"
+    "dev": "nodemon --inspect=0.0.0.0 server.js"
   },
   "author": "",
   "license": "ISC",

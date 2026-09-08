@@ -90,6 +90,7 @@ module.exports = function (app) {
           console.log("Set User roles successfully: ", res)
         }
       })
+      req.session.token = data.tkn;
       res.status(200).json({
         message: "Login Successful",
         token: data.tkn,
@@ -152,6 +153,7 @@ module.exports = function (app) {
           console.log("Set User roles successfully: ", res)
         }
       })
+      req.session.token = data.tkn;
       res.status(200).send(
       `<script>
         alert("Login Successfully");
