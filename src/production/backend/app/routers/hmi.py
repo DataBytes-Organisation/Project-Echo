@@ -38,7 +38,7 @@ jwtBearer = JWTBearer()
 router = APIRouter()
 
 
-@router.get("/detections", dependencies=[Depends(jwtBearer), Depends(pause_guard("detections"))])
+@router.get("/detections", response_model=List[schemas.RealDetectionRead], dependencies=[Depends(jwtBearer), Depends(pause_guard("detections"))])
 def list_real_detections():
     enforce_and_consume("detections", cost=1)
     result = detections_service.list_real_events(page_size=100)

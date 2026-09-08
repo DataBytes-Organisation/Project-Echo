@@ -465,6 +465,26 @@ class DetectionListResponse(DetectionListResponses):
     pass
 
 
+class RealDetectionRead(BaseModel):
+    """HMI read shape from serializers.eventEntity (no audio payload)."""
+
+    sourceType: Optional[Literal["real"]] = None
+    id: str = Field(..., alias="_id")
+    timestamp: datetime
+    sensorId: str
+    species: str
+    microphoneLLA: conlist(float, min_items=3, max_items=3)
+    animalEstLLA: conlist(float, min_items=3, max_items=3)
+    animalTrueLLA: conlist(float, min_items=3, max_items=3)
+    animalLLAUncertainty: int
+    confidence: float
+
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+
+
 class RazorpayOrderRequest(BaseModel):
     amount: int
 

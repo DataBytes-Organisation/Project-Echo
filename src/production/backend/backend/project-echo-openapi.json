@@ -57,7 +57,13 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/RealDetectionRead"
+                  },
+                  "type": "array",
+                  "title": "Response List Real Detections Hmi Detections Get"
+                }
               }
             }
           }
@@ -4179,6 +4185,83 @@
           "type"
         ],
         "title": "ValidationError"
+      },
+      "RealDetectionRead": {
+        "properties": {
+          "sourceType": {
+            "type": "string",
+            "enum": [
+              "real"
+            ],
+            "title": "Sourcetype"
+          },
+          "_id": {
+            "type": "string",
+            "title": " Id"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "sensorId": {
+            "type": "string",
+            "title": "Sensorid"
+          },
+          "species": {
+            "type": "string",
+            "title": "Species"
+          },
+          "microphoneLLA": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 3,
+            "title": "Microphonella"
+          },
+          "animalEstLLA": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 3,
+            "title": "Animalestlla"
+          },
+          "animalTrueLLA": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 3,
+            "title": "Animaltruella"
+          },
+          "animalLLAUncertainty": {
+            "type": "integer",
+            "title": "Animalllauncertainty"
+          },
+          "confidence": {
+            "type": "number",
+            "title": "Confidence"
+          }
+        },
+        "type": "object",
+        "required": [
+          "_id",
+          "timestamp",
+          "sensorId",
+          "species",
+          "microphoneLLA",
+          "animalEstLLA",
+          "animalTrueLLA",
+          "animalLLAUncertainty",
+          "confidence"
+        ],
+        "title": "RealDetectionRead",
+        "description": "HMI read shape from serializers.eventEntity (no audio payload)."
       }
     },
     "securitySchemes": {
