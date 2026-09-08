@@ -145,16 +145,18 @@ class RealDetectionTests(unittest.TestCase):
         self.assertIn("2026-08-06T10:30:00", record["timestamp"])
         self.assertIsInstance(record["microphoneLLA"], list)
 
-    def test_engine_ingest_is_persisted_once_and_readable_through_both_apis(self):
+    def test_engine_ingest_is_persisted_once_and_readable_only_through_authenticated_hmi(self):
         created = self.client.post("/engine/event", json=PAYLOAD)
         self.assertEqual(created.status_code, 201, created.text)
         self.assert_contract(created.json())
         self.assertEqual(len(self.events.documents), 1)
         self.assertEqual(len(self.detections.documents), 0)
+        # Engine events must not leak through the unauthenticated detection API.
+        self.assertIsNone(service.get_detection(created.json()["_id"]))
         listing = self.client.get("/detections")
         self.assertEqual(listing.status_code, 200, listing.text)
-        self.assertEqual(listing.json()["total"], 1)
-        self.assert_contract(listing.json()["items"][0])
+        self.assertEqual(listing.json()["total"], 0)
+        self.assertEqual(listing.json()["items"], [])
         self.app.dependency_overrides[hmi.jwtBearer] = lambda: "session-jwt"
         listing = self.client.get("/hmi/detections", headers={"Authorization": "Bearer session-jwt"})
         self.assertEqual(listing.status_code, 200, listing.text)
@@ -179,17 +181,18 @@ class RealDetectionTests(unittest.TestCase):
         self.assertEqual(self.events.documents, [])
         self.assertEqual(self.detections.documents, [])
 
-    def test_detection_create_and_legacy_records_remain_readable_with_pagination(self):
+    def test_manual_and_engine_records_stay_in_their_own_read_paths(self):
         response = self.client.post("/detections", json=PAYLOAD)
         self.assertEqual(response.status_code, 200, response.text)
         self.assert_contract(response.json())
-        legacy = {key: value for key, value in PAYLOAD.items() if key != "sourceType"}
-        self.assertEqual(self.client.post("/engine/event", json=legacy).status_code, 201)
-        listing = self.client.get("/detections?page_size=1&page=2").json()
-        self.assertEqual(listing["total"], 2)
-        self.assertEqual(len(listing["items"]), 1)
+        self.assertEqual(self.client.post("/engine/event", json=PAYLOAD).status_code, 201)
+        listing = self.client.get("/detections").json()
+        self.assertEqual(listing["total"], 1)
+        self.assert_contract(listing["items"][0])
         self.app.dependency_overrides[hmi.jwtBearer] = lambda: "session-jwt"
-        self.assertEqual(len(self.client.get("/hmi/detections").json()), 1)
+        hmi_items = self.client.get("/hmi/detections").json()
+        self.assertEqual(len(hmi_items), 1)
+        self.assert_contract(hmi_items[0])
 
     def test_hmi_detection_read_requires_authentication_and_empty_is_not_seeded(self):
         response = self.client.get("/hmi/detections")
