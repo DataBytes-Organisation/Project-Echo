@@ -35,6 +35,7 @@ import {
   setSimModeRecording,
   setSimModeRecordingV2,
   stopSimulator,
+  retrieveWeather,
 } from "./routes.js";
 import { addIoTNodesToMap } from "./nodes-overlay.js";
 
@@ -1386,11 +1387,10 @@ function createBasemap(hmiState) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 async function fetchWeatherData(timestamp, lat, lon) {
-  const response = await fetch(
-    `http://localhost:9000/hmi/weather?timestamp=${timestamp}&lat=${lat}&lon=${lon}`
-  );
-  if (!response.ok) throw new Error("Failed to fetch weather data");
-  return response.json();
+  // FR-D1: was hardcoded to http://localhost:9000, so weather never loaded
+  // anywhere but a dev machine. server.js proxies /hmi/* through to the API.
+  const response = await retrieveWeather(timestamp, lat, lon);
+  return response.data;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1816,29 +1816,53 @@ export function startAudioRecording() {
 
 export function stopAudioRecording() {
   const sourceToken = microphoneSourceGuard.begin();
+
   audioRecorder
     .stop()
-    .then(async (audioBlob) => {
+    .then(async (recordingResult) => {
       hideRecordingControls();
+
       if (!microphoneSourceGuard.isCurrent(sourceToken)) return;
+
+      const audioBlob =
+        recordingResult instanceof Blob
+          ? recordingResult
+          : recordingResult?.blob;
+
+      if (!(audioBlob instanceof Blob) || audioBlob.size === 0) {
+        throw new TypeError("Recorder did not return a valid audio Blob");
+      }
+
       fileContent = null;
-      const decodedAudio = await microphoneSpectrogramWorkflow?.load(audioBlob) || null;
+
+      const decodedAudio =
+        (await microphoneSpectrogramWorkflow?.load(audioBlob)) || null;
+
       if (!microphoneSourceGuard.isCurrent(sourceToken)) return;
+
       decodedAudioStore = decodedAudio;
+
       revokeObjectUrl(recordedAudioObjectUrl);
       recordedAudioObjectUrl = URL.createObjectURL(audioBlob);
+
       const audioElement = getAudioElemForRecordedPlayback();
-      if (audioElement) audioElement.src = recordedAudioObjectUrl;
+
+      if (audioElement) {
+        audioElement.src = recordedAudioObjectUrl;
+      }
+
       if (!decodedAudioStore) {
         showToast("Recorded audio could not be decoded", "error");
       }
     })
     .catch((error) => {
       if (!microphoneSourceGuard.isCurrent(sourceToken)) return;
+
       showToast("Error stopping recording", "error");
-      console.log("Stop recording error:", error.name);
+      console.error("Stop recording error:", error);
     });
 }
+
 
 export function cancelAudioRecording() {
   microphoneSourceGuard.invalidate();
@@ -1976,27 +2000,48 @@ document.addEventListener("playRecordedAudio",  function () { playNextRecordedTr
 document.addEventListener("stopRecordedAudio",  function () { playNextRecordedTrack = false; stopRecordingPlayback(); });
 
 function playRecording(recordedChunksOrBlob) {
-  let blob = null;
+  let blob;
 
-  const mimeType = recordedChunks[0]?.type || "audio/webm";
-  const blob = new Blob(recordedChunks, { type: mimeType });
+  if (recordedChunksOrBlob instanceof Blob) {
+    blob = recordedChunksOrBlob;
+  } else if (
+    Array.isArray(recordedChunksOrBlob) &&
+    recordedChunksOrBlob.length > 0
+  ) {
+    const mimeType = recordedChunksOrBlob[0]?.type || "audio/webm";
+    blob = new Blob(recordedChunksOrBlob, { type: mimeType });
+  } else {
+    return;
+  }
+
   if (blob.size === 0) return;
 
   audioRecordingElement = getAudioElemForRecordedPlayback();
+
   if (!audioRecordingElement) return;
 
   revokeObjectUrl(recordedAudioObjectUrl);
+
   recordedAudioObjectUrl = URL.createObjectURL(blob);
+
   audioRecordingElement.src = recordedAudioObjectUrl;
   audioRecordingElement.load();
 
   if (playNextRecordedTrack) {
-    recordingPlaybackAnimTimeout = setTimeout(muteRecordingPlaybackAnimation, 10000);
+    recordingPlaybackAnimTimeout = setTimeout(
+      muteRecordingPlaybackAnimation,
+      10000
+    );
+
     audioRecordingElement.onended = () => {
-      if (recordingPlaybackAnimTimeout) clearTimeout(recordingPlaybackAnimTimeout);
+      if (recordingPlaybackAnimTimeout) {
+        clearTimeout(recordingPlaybackAnimTimeout);
+      }
+
       recordingPlaybackAnimTimeout = null;
       muteRecordingPlaybackAnimation();
     };
+
     audioRecordingElement.play();
   }
 }
