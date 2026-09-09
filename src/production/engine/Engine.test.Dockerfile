@@ -1,4 +1,4 @@
-# Builder (Compilers and heavy lifting)
+﻿# Builder (Compilers and heavy lifting)
 # bullseye (Debian 11) reached full end-of-life 2026-08-31; its apt archive
 # is being frozen/migrated, which breaks package installs unpredictably.
 # bookworm (Debian 12) is the current supported release.
@@ -50,12 +50,18 @@ RUN apt-get update -o Acquire::Retries=5 -o Acquire::http::Timeout=30 \
 	libglib2.0-0 \
 	curl \
 	ca-certificates \
-	&& echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list \
-	&& curl --retry 5 --retry-delay 5 --retry-connrefused https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg add - \
-	&& apt-get update -y -o Acquire::Retries=5 -o Acquire::http::Timeout=30 \
-	&& apt-get install -y google-cloud-cli -o Acquire::Retries=5 -o Acquire::http::Timeout=30 \
 	&& apt-get clean \
 	&& rm -rf /var/lib/apt/lists/*
+
+# Google Cloud CLI, installed from Google tarball instead of apt/apt-key -
+# the apt-key path needs gnupg, which is not installed above, and was
+# failing here with exit code 255.
+RUN curl -sSL -o /tmp/gcloud.tar.gz \
+		https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-linux-x86_64.tar.gz \
+	&& tar -xzf /tmp/gcloud.tar.gz -C /usr/local \
+	&& rm /tmp/gcloud.tar.gz \
+	&& /usr/local/google-cloud-sdk/install.sh --quiet --path-update false --usage-reporting false
+ENV PATH="/usr/local/google-cloud-sdk/bin:$PATH"
 
 COPY --from=echo_engine_builder /opt/venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
