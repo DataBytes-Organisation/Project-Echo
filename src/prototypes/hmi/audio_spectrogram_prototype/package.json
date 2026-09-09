@@ -1,0 +1,10 @@
+{
+  "name": "project-echo-fr-b1-spectrogram-prototype",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "check": "node --check spectrogram.js && node --check demo.js && node --check server.js",
+    "start": "node server.js"
+  }
+}
