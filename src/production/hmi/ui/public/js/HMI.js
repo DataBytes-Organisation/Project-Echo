@@ -93,8 +93,15 @@ var current_mic_id   = "";
 
 var activeAudioNode     = null;
 var activeAudioContext  = null;
+var activeAudioEventId  = null;
 var audioAnimTimeout    = null;
 var playNextTrack       = false;
+
+const ANIMAL_AUDIO_READY =
+  "Audio ready. Press the audio button to play.";
+
+const ANIMAL_AUDIO_UNAVAILABLE =
+  "Audio unavailable for this detection.";
 
 var micAnimFrameIndex = 1;
 var animTimeout       = null;
@@ -146,6 +153,24 @@ function getStatusLabel()       { return document.getElementById("frb2-status-la
 function getFileInput()         { return document.getElementById("fileInput"); }
 function getAudioElemForRecordedPlayback() { return document.getElementById("audioElem"); }
 function getRecordingPlaybackStatus() { return document.getElementById("recording_playback_status"); }
+
+function getAnimalAudioStatus() {
+  return document.getElementById("animal-audio-status");
+}
+
+function setAnimalAudioStatus(message) {
+  const status = getAnimalAudioStatus();
+  if (status) status.textContent = message;
+}
+
+function markAnimalAudioReady(eventId) {
+  if (
+    eventId !== null &&
+    selectedVocalizationEventId === eventId
+  ) {
+    setAnimalAudioStatus(ANIMAL_AUDIO_READY);
+  }
+}
 
 function setRecordingPlaybackStatus(message) {
   const status = getRecordingPlaybackStatus();
@@ -892,11 +917,12 @@ export function muteRecordingPlaybackAnimation() {
 }
 
 export function stopAudioPlayback(updateAnimation = true) {
+  const stoppedEventId = activeAudioEventId;
   if (updateAnimation) muteAudioAnimation();
   if (audioAnimTimeout) clearTimeout(audioAnimTimeout);
   audioAnimTimeout = null;
   if (activeAudioNode !== null) {
-    try { activeAudioNode.stop(); } catch (_error) { /* Source may already have ended. */ }
+    try {activeAudioNode.stop(); } catch (_error) { /* Source may already have ended. */ }
     activeAudioNode.disconnect();
   }
   activeAudioNode = null;
@@ -904,9 +930,12 @@ export function stopAudioPlayback(updateAnimation = true) {
     void activeAudioContext.close().catch(() => {});
   }
   activeAudioContext = null;
+  activeAudioEventId = null;
+
+  markAnimalAudioReady(stoppedEventId);
 }
 
-function playDecodedAudio(decodedAudio) {
+function playDecodedAudio(decodedAudio, eventId) {
   if (!decodedAudio || !playNextTrack) return;
   stopAudioPlayback(false);
   playNextTrack = true;
@@ -928,13 +957,18 @@ function playDecodedAudio(decodedAudio) {
     audioAnimTimeout = null;
     activeAudioNode = null;
     activeAudioContext = null;
+    activeAudioEventId = null;
     source.disconnect();
     void context.close().catch(() => {});
     muteAudioAnimation();
+
+    markAnimalAudioReady(eventId);
   };
   activeAudioContext = context;
   activeAudioNode = source;
+  activeAudioEventId = eventId;
   source.start();
+  setAnimalAudioStatus("Playing audio...");
   audioAnimTimeout = setTimeout(muteAudioAnimation, audioBuffer.duration * 1000);
 }
 
@@ -944,13 +978,35 @@ document.addEventListener("playAudio", function () {
     muteAudioAnimation();
     return;
   }
+
+  const eventId = selectedVocalizationEventId;
+
   animalSpectrogramWorkflow.getSelectedAudio().then((decodedAudio) => {
-    if (!decodedAudio || !playNextTrack) {
+      if (!playNextTrack) {
+        muteAudioAnimation();
+        return;
+      }
+
+      // Ignore audio returned for an event that is no longer selected.
+      if (selectedVocalizationEventId !== eventId) {
+        muteAudioAnimation();
+        return;
+      }
+
+      if (!decodedAudio) {
+        muteAudioAnimation();
+        setAnimalAudioStatus(ANIMAL_AUDIO_UNAVAILABLE);
+        return;
+      }
+
+      playDecodedAudio(decodedAudio, eventId);
+    })
+    .catch(() => {
+      if (selectedVocalizationEventId !== eventId) return;
+
       muteAudioAnimation();
-      return;
-    }
-    playDecodedAudio(decodedAudio);
-  });
+      setAnimalAudioStatus(ANIMAL_AUDIO_UNAVAILABLE);
+    });
 });
 
 document.addEventListener("stopAudio", function () {
@@ -962,6 +1018,7 @@ function clearAnimalAudioSelection() {
   selectedVocalizationEventId = null;
   animalSpectrogramWorkflow?.clear();
   stopAudioPlayback();
+  setAnimalAudioStatus("No audio selected.");
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1412,11 +1469,37 @@ function createMapClickEvent(hmiState) {
         if (audioControl) audioControl.style.display = "flex";
         if (spectrogram)  spectrogram.style.display  = "block";
         selectedVocalizationEventId = values.eventId || null;
+
         if (selectedVocalizationEventId !== null) {
-          void animalSpectrogramWorkflow?.select(selectedVocalizationEventId);
+          const eventId = selectedVocalizationEventId;
+
+          setAnimalAudioStatus("Loading audio...");
+
+          if (!animalSpectrogramWorkflow) {
+            setAnimalAudioStatus(ANIMAL_AUDIO_UNAVAILABLE);
+          } else {
+            void animalSpectrogramWorkflow
+              .select(eventId)
+              .then((decodedAudio) => {
+                if (selectedVocalizationEventId !== eventId) return;
+
+                if (decodedAudio) {
+                  markAnimalAudioReady(eventId);
+                } else {
+                  setAnimalAudioStatus(ANIMAL_AUDIO_UNAVAILABLE);
+                }
+              })
+              .catch(() => {
+                if (selectedVocalizationEventId !== eventId) return;
+
+                setAnimalAudioStatus(ANIMAL_AUDIO_UNAVAILABLE);
+              });
+          }
         } else {
           animalSpectrogramWorkflow?.clear();
+          setAnimalAudioStatus("No audio selected.");
         }
+
       }
 
       if (values.animalSpecies) {
