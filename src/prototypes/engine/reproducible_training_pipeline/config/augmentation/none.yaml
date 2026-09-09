@@ -1,0 +1,9 @@
+# Augmentation preset: OFF.
+# Selected via: python main.py augmentation=none
+# `_target_: torchvision.transforms.Compose` builds a "chain of image
+# transforms" object. Compose with an empty `transforms` list does nothing
+# when called, so no masking happens at all. Useful as a true no-augmentation
+# baseline for comparison experiments.
+
+_target_: torchvision.transforms.Compose
+transforms: []

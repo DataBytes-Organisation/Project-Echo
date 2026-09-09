@@ -457,6 +457,15 @@
                       <div class="box box6"></div><div class="box box7"></div><div class="box box8"></div><div class="box box9"></div><div class="box box10"></div>
                     </div>
                   </div>
+                  <div id="animal-spectrogram" class="spectrogram-panel" data-state="empty">
+                    <div class="spectrogram-viewport" data-role="viewport">
+                      <canvas data-role="canvas"></canvas>
+                      <p class="spectrogram-state" data-role="empty">Select a vocalisation event to view its spectrogram.</p>
+                      <p class="spectrogram-state" data-role="loading" hidden>Decoding audio...</p>
+                      <p class="spectrogram-state spectrogram-state-error" data-role="error" role="alert" hidden></p>
+                    </div>
+                    <p class="spectrogram-summary" data-role="summary" aria-live="polite"></p>
+                  </div>
                   <p style="margin-top: 40px !important;">Is the information above inaccurate? <br>Request to make an edit.</p>
                   <button id="request-edit-button">Request Edit</button>
                 </div>
@@ -525,7 +534,15 @@
                     <div id="recording_controls_container" class="recording_controls hide"></div>
                     <div id="audio_playback_div"><p id="audio_playback_indicator" class="playback_indicator hide"></p></div>
                   </div>
-
+                  <div id="microphone-spectrogram" class="spectrogram-panel" data-state="empty">
+                    <div class="spectrogram-viewport" data-role="viewport">
+                      <canvas data-role="canvas"></canvas>
+                      <p class="spectrogram-state" data-role="empty">Record or select an audio clip to view its spectrogram.</p>
+                      <p class="spectrogram-state" data-role="loading" hidden>Decoding audio...</p>
+                      <p class="spectrogram-state spectrogram-state-error" data-role="error" role="alert" hidden></p>
+                    </div>
+                    <p class="spectrogram-summary" data-role="summary" aria-live="polite"></p>
+                  </div>
                   <h2 id="recordingSimulationHeader" style="margin-top: 20px !important;">Recording Simulation</h2>
                   <div id="recording_simulation_master_container">
                     <div id="recording_export_container" style="margin-top: 10px !important;" class="controls_item_row">
@@ -725,18 +742,12 @@
         function loadSelectedAnimalsFromBackend() {
           const token  = localStorage.getItem('token');
           const userId = localStorage.getItem('userId');
-          const backendUrl = 'http://localhost:9000';
 
-          fetch(`${backendUrl}/hmi/users/${userId}/notifications`, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ' + token
-            }
-          })
-            .then(response => response.json())
-            .then(data => {
-              selectedAnimals = data.notificationAnimals || [];
+          // FR-D1: was pointed straight at http://localhost:9000, which only ever
+          // worked on a dev machine. Shared client goes via the /hmi/* proxy instead.
+          window.retrieveUserNotifications(userId, token)
+            .then(response => {
+              selectedAnimals = response.data.notificationAnimals || [];
               updateSelectedAnimals();
             })
             .catch(error => {
@@ -748,7 +759,10 @@
             });
         }
 
-        loadSelectedAnimalsFromBackend();
+        // the shared client is bridged onto window by the module block further
+        // down, and modules only run once parsing is finished - so wait for
+        // DOMContentLoaded rather than calling this straight away
+        document.addEventListener('DOMContentLoaded', loadSelectedAnimalsFromBackend);
 
         searchForNotifications.addEventListener('keyup', function () {
           autocompleteAnimalsForNotifications();
@@ -821,24 +835,11 @@
         function saveNotificationToBackend(animal) {
           const token  = localStorage.getItem('token');
           const userId = localStorage.getItem('userId');
-          const backendUrl = 'http://localhost:9000';
 
-          fetch(`${backendUrl}/hmi/users/${userId}/notifications`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ' + token
-            },
-            body: JSON.stringify({ species: animal.species, common: animal.common })
-          })
-            .then(response => {
-              if (!response.ok) {
-                // TASK 7: replaced alert() with an error toast
-                if (window.showToast) {
-                  window.showToast('Could not add animal to notifications. Please try again.', 'error');
-                }
-                return;
-              }
+          // FR-D1: shared client via the /hmi/* proxy. axios rejects on any
+          // non-2xx, so the old !response.ok branch folds into the catch below.
+          window.addUserNotification(userId, animal, token)
+            .then(() => {
               // TASK 7: replaced alert() with a success toast
               if (window.showToast) {
                 window.showToast(`${animal.common} added to notifications.`, 'success');
@@ -855,20 +856,10 @@
         function removeNotificationFromBackend(animal) {
           const token  = localStorage.getItem('token');
           const userId = localStorage.getItem('userId');
-          const backendUrl = 'http://localhost:9000';
 
-          fetch(`${backendUrl}/hmi/users/${userId}/notifications/${animal.species}`, {
-            method: 'DELETE',
-            headers: { 'Authorization': 'Bearer ' + token }
-          })
-            .then(response => {
-              if (!response.ok) {
-                // TASK 7: replaced alert() with an error toast
-                if (window.showToast) {
-                  window.showToast('Could not remove animal from notifications. Please try again.', 'error');
-                }
-                return;
-              }
+          // FR-D1: shared client via the /hmi/* proxy, same as the save above.
+          window.removeUserNotification(userId, animal.species, token)
+            .then(() => {
               // TASK 7: replaced alert() with a success toast
               if (window.showToast) {
                 window.showToast(`${animal.common} removed from notifications.`, 'success');
@@ -1136,10 +1127,8 @@
         });
       });
 
-      let cart = [{ id: 1, quantity: 0 }];
-
       const donationButton = document.getElementById('donation-button');
-      donationButton.addEventListener("click", () => {
+      donationButton.addEventListener("click", async () => {
         if (donorAmount == undefined) {
           // TASK 7: replaced silent return with a warning toast
           if (window.showToast) {
@@ -1148,8 +1137,6 @@
           return;
         }
 
-        cart[0].quantity = donorAmount;
-
         if (!username || !email) {
           if (window.showToast) {
             window.showToast('User details are still loading. Please try again in a moment.', 'warning');
@@ -1157,28 +1144,36 @@
           return;
         }
 
-        var options = payment(username, donorAmount * 100, email);
-        var rzp1 = new Razorpay(options);
-        rzp1.open();
-        rzp1.on('payment.failed', function () { rzp1.close(); });
+        donationButton.disabled = true;
+        const releaseDonationButton = () => { donationButton.disabled = false; };
 
-        fetch("/api/create-checkout-session", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ items: cart, userEmail: email }),
-        })
-          .then(res => {
-            if (res.ok) return res.json();
-            return res.json().then(json => Promise.reject(json));
-          })
-          .then(({ url }) => { window.location = url; })
-          .catch(e => {
-            console.error(e.error);
+        try {
+          const response = await fetch("/api/create-razorpay-order", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ amount: Number(donorAmount) * 100 }),
+          });
+          if (!response.ok) throw new Error('Razorpay order creation failed');
+
+          const order = await response.json();
+          const options = payment(username, order, email, releaseDonationButton);
+          const rzp1 = new Razorpay(options);
+          rzp1.on('payment.failed', function () {
+            rzp1.close();
+            releaseDonationButton();
             if (window.showToast) {
-              window.showToast('Payment session could not be started. Please try again.', 'error');
+              window.showToast('Payment failed. Please try again.', 'error');
             }
           });
-      });
+          rzp1.open();
+        } catch (error) {
+          releaseDonationButton();
+          console.error('Razorpay order creation failed.');
+          if (window.showToast) {
+            window.showToast('Payment session could not be started. Please try again.', 'error');
+          }
+        }
+        });
     </script>
 
     <script>
@@ -1348,7 +1343,7 @@
       function loadRecordingEvent()     { document.dispatchEvent(new CustomEvent('loadRecording',     { detail: { message: "load" } })); }
       function simulateRecordingEvent() { document.dispatchEvent(new CustomEvent('simulateRecording', { detail: { message: "simulate" } })); }
 
-      toggleAudio();
+      animateAudioMute();
       animateRecordedAudioMute();
 
       document.addEventListener('muteAnimation',          () => animateAudioMute());
@@ -1424,20 +1419,15 @@
 
         requestData = { username, animal, requestingToChange, initial, modified, source };
 
-        fetch("/api/submit", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(requestData)
-        })
-          .then(response => {
-            if (response.status === 201) {
-              if (window.showToast) window.showToast("Your submission was received and is awaiting review.", 'success');
-            } else {
-              if (window.showToast) window.showToast("There was an error receiving your submission. Please try again.", 'error');
-            }
+        // FR-D1: shared client. axios rejects on any non-2xx, so the old
+        // status !== 201 branch is now just part of the catch.
+        window.submitAnimalRequest(requestData)
+          .then(() => {
+            if (window.showToast) window.showToast("Your submission was received and is awaiting review.", 'success');
           })
-          .catch(() => {
-            if (window.showToast) window.showToast("Something went wrong. Please try again.", 'error');
+          .catch(error => {
+            console.error('Could not submit the change request:', error);
+            if (window.showToast) window.showToast("There was an error receiving your submission. Please try again.", 'error');
           });
       }
 
@@ -1504,6 +1494,19 @@
       } from "./js/HMI.js";
 
       import { retrieveTruthEventsInTimeRange, retrieveVocalizationEventsInTimeRange } from "./js/routes.js";
+
+      // FR-D1: the notification, submission and profile blocks further up are
+      // plain scripts, so the shared client has to reach them through window,
+      // same as showToast already does below.
+      import {
+        retrieveUserNotifications, addUserNotification, removeUserNotification,
+        submitAnimalRequest, retrieveUserProfile
+      } from "./js/routes.js";
+      window.retrieveUserNotifications = retrieveUserNotifications;
+      window.addUserNotification      = addUserNotification;
+      window.removeUserNotification   = removeUserNotification;
+      window.submitAnimalRequest      = submitAnimalRequest;
+      window.retrieveUserProfile      = retrieveUserProfile;
 
       // TASK 7: import showToast from HMI-utils and expose it on window so
       // the non-module <script> blocks above can call window.showToast().
@@ -1756,12 +1759,11 @@
       let email;
 
       function getUser() {
-        fetch("/user_profile")
-          .then(res => {
-            if (res.ok) return res.json();
-            return res.json().then(json => Promise.reject(json));
-          })
-          .then(userData => {
+        // FR-D1: shared client, which already rejects on a non-2xx - no need to
+        // re-read the body just to turn a failure into a rejected promise.
+        window.retrieveUserProfile()
+          .then(response => {
+            const userData = response.data;
             username = String(userData.username);
             email    = `${userData.email}`;
           })
@@ -1774,7 +1776,9 @@
           });
       }
 
-      getUser();
+      // same as the notifications load above - the shared client only lands on
+      // window once the module block has run, which is after parsing
+      document.addEventListener('DOMContentLoaded', getUser);
 
       // Theme toggle
       document.addEventListener('DOMContentLoaded', () => {
