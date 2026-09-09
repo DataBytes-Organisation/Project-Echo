@@ -76,17 +76,64 @@ test("authenticated detection read forwards JWT and returns live data unchanged"
   assert.equal(h.calls[0].options.timeout, 10000);
 });
 
-test("empty and failed Backend reads produce no fallback and errors remain safe", async () => {
+test("empty reads stay empty and unknown failures stay generic and safe", async () => {
   const h = harness();
   assert.equal((await h.request("/api/detections", "session-jwt")).body.length, 0);
-  for (const status of [401, 403, 500]) {
-    h.http.get = async () => { throw { response: { status, data: { error: "private token http://internal" } } }; };
+  h.http.get = async () => { throw { response: { status: 500, data: { error: "private token http://internal" } } }; };
+  const response = await h.request("/api/detections", "session-jwt");
+  assert.equal(response.statusCode, 502);
+  assert.equal(typeof response.body.error.message, "string");
+  assert.ok("details" in response.body.error);
+  assert.doesNotMatch(JSON.stringify(response.body), /private|token|internal/);
+});
+
+test("upstream 401 tells the user to log in again", async () => {
+  const h = harness();
+  h.http.get = async () => { throw { response: { status: 401,
+    data: { error: { code: "UNAUTHENTICATED", message: "Invalid token or expired token.", details: null } } } }; };
+  const response = await h.request("/api/detections", "session-jwt");
+  assert.equal(response.statusCode, 401);
+  assert.match(response.body.error.message, /log in again/i);
+});
+
+test("upstream 403 with budget detail points to an administrator", async () => {
+  const h = harness();
+  for (const message of ["Budget is not configured for 'detections' (monthly_limit=0).",
+    "Budget exceeded for 'detections'. Used 100000/100000 this month."]) {
+    h.http.get = async () => { throw { response: { status: 403,
+      data: { error: { code: "FORBIDDEN", message, details: null } } } }; };
     const response = await h.request("/api/detections", "session-jwt");
-    assert.equal(response.statusCode, status === 500 ? 502 : status);
-    assert.equal(typeof response.body.error.message, "string");
-    assert.ok("details" in response.body.error);
-    assert.doesNotMatch(JSON.stringify(response.body), /private|token|internal/);
+    assert.equal(response.statusCode, 403);
+    assert.match(response.body.error.message, /administrator/i);
+    assert.doesNotMatch(JSON.stringify(response.body), /monthly_limit|Used \d+|log in again/i);
   }
+});
+
+test("upstream 403 with auth failure tells the user to log in again", async () => {
+  const h = harness();
+  h.http.get = async () => { throw { response: { status: 403,
+    data: { error: { code: "FORBIDDEN", message: "Invalid token or expired token.", details: null } } } }; };
+  const response = await h.request("/api/detections", "session-jwt");
+  assert.equal(response.statusCode, 401);
+  assert.match(response.body.error.message, /log in again/i);
+});
+
+test("upstream 429 asks the user to wait before retrying", async () => {
+  const h = harness();
+  h.http.get = async () => { throw { response: { status: 429,
+    data: { error: { code: "RATE_LIMIT_EXCEEDED", message: "Budget exceeded for 'detections'.", details: null } } } }; };
+  const response = await h.request("/api/detections", "session-jwt");
+  assert.equal(response.statusCode, 429);
+  assert.match(response.body.error.message, /too many|wait/i);
+});
+
+test("upstream 503 reports the service as temporarily unavailable", async () => {
+  const h = harness();
+  h.http.get = async () => { throw { response: { status: 503,
+    data: { error: { code: "SERVICE_UNAVAILABLE", message: "Service 'detections' is temporarily paused by admin.", details: null } } } }; };
+  const response = await h.request("/api/detections", "session-jwt");
+  assert.equal(response.statusCode, 503);
+  assert.match(response.body.error.message, /unavailable|later|paused/i);
 });
 
 test("the static map alias is session-protected before Express serves files", async () => {

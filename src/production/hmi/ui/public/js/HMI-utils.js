@@ -400,8 +400,11 @@ export function getApiErrorMessage(error, fallbackMessage = "Something went wron
 
   if (error.response) {
     const status = error.response.status;
-    if (status === 401 || status === 403) return "You are not authorised to access this data.";
+    if (status === 401) return "Your session has expired. Please log in again.";
+    if (status === 403) return "Access to this data is temporarily unavailable. Please try again later or contact an administrator.";
     if (status === 404)  return "Requested data was not found.";
+    if (status === 429)  return "Too many requests. Please wait a moment and try again.";
+    if (status === 503)  return "Service is temporarily unavailable. Please try again later.";
     if (status >= 500)   return "Server is currently unavailable. Please try again shortly.";
   }
 

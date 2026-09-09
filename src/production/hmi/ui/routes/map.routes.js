@@ -17,11 +17,46 @@ module.exports = function(app) {
       });
       res.json(response.data);
     } catch (error) {
+      // Backend failure classes share HTTP 403 (auth vs budget), so the
+      // upstream message — never forwarded — picks the safe user message.
+      // Coupling note: matches the two stable budget strings in
+      // backend/app/services/budget.py ("Budget is not configured ...",
+      // "Budget exceeded ..."). Auth failures mean the session is stale, so
+      // they answer 401 and the UI prompts a re-login.
       const upstreamStatus = error.response?.status;
-      const status = [401, 403].includes(upstreamStatus) ? upstreamStatus : 502;
-      res.status(status).json({ error: {
-        code: status === 401 ? "UNAUTHENTICATED" : status === 403 ? "FORBIDDEN" : "UPSTREAM_ERROR",
-        message: status === 502 ? "Detections are currently unavailable." : "You are not authorised to access this data.",
+      const upstreamMessage = error.response?.data?.error?.message;
+      const isBudget = typeof upstreamMessage === "string" && /budget/i.test(upstreamMessage);
+      if (upstreamStatus === 401 || (upstreamStatus === 403 && !isBudget)) {
+        return res.status(401).json({ error: {
+          code: "UNAUTHENTICATED",
+          message: "Your session has expired. Please log in again.",
+          details: null,
+        } });
+      }
+      if (upstreamStatus === 403) {
+        return res.status(403).json({ error: {
+          code: "FORBIDDEN",
+          message: "Detection access is temporarily unavailable. Please contact an administrator.",
+          details: null,
+        } });
+      }
+      if (upstreamStatus === 429) {
+        return res.status(429).json({ error: {
+          code: "RATE_LIMITED",
+          message: "Too many requests. Please wait a moment and try again.",
+          details: null,
+        } });
+      }
+      if (upstreamStatus === 503) {
+        return res.status(503).json({ error: {
+          code: "SERVICE_UNAVAILABLE",
+          message: "Detection service is temporarily unavailable. Please try again later.",
+          details: null,
+        } });
+      }
+      return res.status(502).json({ error: {
+        code: "UPSTREAM_ERROR",
+        message: "Detections are currently unavailable.",
         details: null,
       } });
     }

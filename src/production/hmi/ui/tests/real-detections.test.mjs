@@ -245,6 +245,27 @@ test("loading, empty, malformed and failed reads never substitute sample records
   assert.match(hmi.realDetectionStatus.textContent, /Unable to load detections/);
 });
 
+test("failure statuses show distinct safe guidance", async (t) => {
+  assert.ok(detections, "real detection loader exists");
+  t.mock.timers.enable({ apis: ["setTimeout"] });
+  const cases = [
+    [401, /log in again/i],
+    [403, /administrator/i],
+    [429, /too many|wait/i],
+    [503, /try again later/i],
+  ];
+  for (const [status, pattern] of cases) {
+    const hmi = state();
+    result = { then(_resolve, reject) { reject({ response: { status } }); } };
+    const failed = detections.loadRealDetections(hmi);
+    for (let i = 0; i < 10; i++) { await Promise.resolve(); t.mock.timers.tick(2000); }
+    await failed;
+    assert.equal(hmi.realDetectionLayer.getSource().getFeatures().length, 0);
+    assert.match(hmi.realDetectionStatus.textContent, pattern);
+    assert.doesNotMatch(hmi.realDetectionStatus.textContent, /http|undefined/i);
+  }
+});
+
 test("a late old response cannot overwrite newer live data", async () => {
   assert.ok(detections, "real detection loader exists");
   const hmi = state(); let resolve;
