@@ -777,12 +777,31 @@ export function convertJSONtoAnimalVocalizationEvent(hmiState, data) {
     locationConfidence:             data.animalLLAUncertainty == null ? null : 100 - data.animalLLAUncertainty,
     estLat:                         llaLat(data.animalEstLLA),
     estLon:                         llaLon(data.animalEstLLA),
-    locationLat:                    llaLat(data.animalTrueLLA) ?? sensorLat,
-    locationLon:                    llaLon(data.animalTrueLLA) ?? sensorLon,
+    locationLat:                    llaLat(data.animalTrueLLA),
+    locationLon:                    llaLon(data.animalTrueLLA),
     sensorId:                       data.sensorId,
     sensorLat:                      sensorLat,
     sensorLon:                      sensorLon,
   };
+}
+
+// Plot location keeps a null animal location null in the event model; the
+// microphone fallback happens here at render time so AC5 markers still sit at
+// microphoneLLA while Ticket 02 details can report the animal as unavailable.
+export function resolveVocalizationPlotLocation(entry) {
+  if (Number.isFinite(entry.locationLat) && Number.isFinite(entry.locationLon)) {
+    return { lat: entry.locationLat, lon: entry.locationLon, isFallback: false };
+  }
+  if (Number.isFinite(entry.sensorLat) && Number.isFinite(entry.sensorLon)) {
+    return { lat: entry.sensorLat, lon: entry.sensorLon, isFallback: true };
+  }
+  return null;
+}
+
+export function formatVocalizationDetailValue(value, suffix = "") {
+  if (value === null || value === undefined) return "unavailable";
+  if (typeof value === "number" && !Number.isFinite(value)) return "unavailable";
+  return `${value}${suffix}`;
 }
 
 export function convertJSONtoMicrophone(hmiState, data) {
@@ -1065,9 +1084,11 @@ function _addTruthFeature(hmiState, entry) {
 
 function _addVocalizationFeature(hmiState, entry) {
   const iconPath = _resolveVocalizationIconPath(entry);
+  const plot = resolveVocalizationPlotLocation(entry);
+  if (!plot) return;
 
   const feature = new ol.Feature({
-    geometry:          new ol.geom.Point(ol.proj.fromLonLat([entry.locationLon, entry.locationLat])),
+    geometry:          new ol.geom.Point(ol.proj.fromLonLat([plot.lon, plot.lat])),
     name:              "vocalisation_" + entry.speciesScientificName,
     animalType:        entry.animalType,
     animalStatus:      entry.animalStatus,
@@ -1081,6 +1102,7 @@ function _addVocalizationFeature(hmiState, entry) {
     animalRecordDate:  entry.timestamp,
     eventId:           entry.eventId,
     isAnimalMovement:  0,
+    isFallbackLocation: plot.isFallback,
   });
 
   feature.setStyle(_makeVocalizationIcon(iconPath));
@@ -1485,11 +1507,11 @@ function createMapClickEvent(hmiState) {
         const dateFormat = new Date(values.animalRecordDate);
         const markupImg  = document.getElementById("markup_img");
         if (markupImg) markupImg.src = values.animalIcon;
-        const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.innerHTML = val; };
+        const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; };
         setEl("markup_details",   values.animalType + " | " + values.animalDiet + " | " + statusPrintLookup[values.animalStatus]);
-        setEl("markup_loc_lon",   values.animalLon);
-        setEl("markup_loc_lat",   values.animalLat);
-        setEl("markup_confidence",values.animalLocConfidence + "%");
+        setEl("markup_loc_lon",   formatVocalizationDetailValue(values.animalLon));
+        setEl("markup_loc_lat",   formatVocalizationDetailValue(values.animalLat));
+        setEl("markup_confidence",formatVocalizationDetailValue(values.animalLocConfidence, "%"));
         setEl("markup_date",      dateFormat.toUTCString());
 
         animal_toggled = true;

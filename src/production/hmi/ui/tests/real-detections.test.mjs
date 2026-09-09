@@ -169,7 +169,7 @@ test("invalid object microphone coordinates never create a marker and show a saf
   }
 });
 
-test("vocalization converter reads object LLAs and falls back to the microphone location", async () => {
+test("vocalization converter reads object LLAs and preserves null animal locations", async () => {
   const hmiModule = await import("../public/js/HMI.js");
   const simRecord = { _id: "sim-1", sourceType: "simulator", species: "Magpie", confidence: 88,
     commonName: "Magpie", type: "Bird", status: "Least Concern", diet: "Omnivore",
@@ -189,9 +189,34 @@ test("vocalization converter reads object LLAs and falls back to the microphone 
   const nulls = hmiModule.convertJSONtoAnimalVocalizationEvent(
     {}, { ...simRecord, animalEstLLA: null, animalTrueLLA: null, animalLLAUncertainty: null });
   assert.equal(nulls.estLat, null);
-  assert.equal(nulls.locationLat, -37.8);
-  assert.equal(nulls.locationLon, 144.9);
+  assert.equal(nulls.locationLat, null);
+  assert.equal(nulls.locationLon, null);
   assert.equal(nulls.locationConfidence, null);
+  assert.equal(nulls.sensorLat, -37.8);
+  assert.equal(nulls.sensorLon, 144.9);
+});
+
+test("vocalization plot location falls back to the microphone only at render time", async () => {
+  const hmiModule = await import("../public/js/HMI.js");
+  assert.deepEqual(
+    hmiModule.resolveVocalizationPlotLocation({ locationLat: 30, locationLon: 40, sensorLat: -37.8, sensorLon: 144.9 }),
+    { lat: 30, lon: 40, isFallback: false });
+  assert.deepEqual(
+    hmiModule.resolveVocalizationPlotLocation({ locationLat: null, locationLon: null, sensorLat: -37.8, sensorLon: 144.9 }),
+    { lat: -37.8, lon: 144.9, isFallback: true });
+  assert.equal(
+    hmiModule.resolveVocalizationPlotLocation({ locationLat: null, locationLon: null, sensorLat: null, sensorLon: null }),
+    null);
+});
+
+test("vocalization detail values show unavailable instead of null or null%", async () => {
+  const hmiModule = await import("../public/js/HMI.js");
+  assert.equal(hmiModule.formatVocalizationDetailValue(null), "unavailable");
+  assert.equal(hmiModule.formatVocalizationDetailValue(undefined), "unavailable");
+  assert.equal(hmiModule.formatVocalizationDetailValue(NaN), "unavailable");
+  assert.equal(hmiModule.formatVocalizationDetailValue(null, "%"), "unavailable");
+  assert.equal(hmiModule.formatVocalizationDetailValue(95, "%"), "95%");
+  assert.equal(hmiModule.formatVocalizationDetailValue(-37.8), "-37.8");
 });
 
 test("loading, empty, malformed and failed reads never substitute sample records", async (t) => {
