@@ -114,7 +114,10 @@ services:
 
     stdin_open: false
     tty: true
-    command: uvicorn app.main:app --host 0.0.0.0 --port 9000 --reload
+    # --no-server-header suppresses uvicorn's "server: uvicorn" response
+    # header. It must be set here as well as in API.Dockerfile, because this
+    # command overrides the image's CMD.
+    command: uvicorn app.main:app --host 0.0.0.0 --port 9000 --reload --no-server-header
 
   mongo-express:
     image: mongo-express
