@@ -4,6 +4,8 @@ from datetime import datetime
 from typing import Optional
 import pymongo
 
+from app.cache import get_json, insights_overview_key, insights_species_key, set_json
+
 router = APIRouter(prefix="/insights", tags=["insights"])
 
 MONGO_URI = os.getenv("MONGO_URI")
@@ -29,6 +31,11 @@ def insights_overview(
     start: Optional[str] = Query(None),
     end: Optional[str] = Query(None),
 ):
+    cache_key = insights_overview_key(start, end)
+    cached = get_json(cache_key)
+    if cached is not None:
+        return cached
+
     events = list(db["events"].find())
     microphones = db["microphones"].count_documents({})
     nodes = db["nodes"].count_documents({})
@@ -49,7 +56,7 @@ def insights_overview(
 
     timestamps = [parse_ts(e["timestamp"]) for e in filtered if parse_ts(e.get("timestamp"))]
 
-    return {
+    payload = {
         "timeRange": {
             "start": min(timestamps).isoformat() if timestamps else None,
             "end": max(timestamps).isoformat() if timestamps else None,
@@ -61,12 +68,19 @@ def insights_overview(
             "microphones": microphones or nodes,
         }
     }
+    set_json(cache_key, payload)
+    return payload
 
 
 @router.get("/species")
 def insights_species(
     limit: int = Query(10, ge=1, le=50),
 ):
+    cache_key = insights_species_key(limit)
+    cached = get_json(cache_key)
+    if cached is not None:
+        return cached
+
     pipeline = [
         {"$match": {"species": {"$exists": True, "$ne": ""}}},
         {"$group": {"_id": "$species", "count": {"$sum": 1}}},
@@ -75,6 +89,8 @@ def insights_species(
         {"$project": {"_id": 0, "species": "$_id", "count": 1}},
     ]
 
-    return {
+    payload = {
         "items": list(db["events"].aggregate(pipeline))
     }
+    set_json(cache_key, payload)
+    return payload

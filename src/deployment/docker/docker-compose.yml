@@ -110,6 +110,13 @@ services:
     environment:
       MAIL_STARTTLS: "true"
       MAIL_SSL_TLS: "false"
+      REDIS_HOST: echo-redis
+      REDIS_PORT: "6379"
+      REDIS_CACHE_DB: "2"
+      CACHE_TTL_SECONDS: "300"
+      DB_HOST: "ts-mongodb-cont"
+      MONGODB_URI: "mongodb://root:root_password@ts-mongodb-cont:27017/EchoNet?authSource=admin"
+      MONGO_URI: "mongodb://root:root_password@ts-mongodb-cont:27017/EchoNet?authSource=admin"
 
 
     stdin_open: false
