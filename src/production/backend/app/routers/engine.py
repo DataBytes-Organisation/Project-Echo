@@ -1,5 +1,5 @@
 ## app.routers.engine.py
-from fastapi import status, APIRouter
+from fastapi import status, APIRouter, Depends
 from app import serializers
 from app import schemas
 from app.database import Events
@@ -10,11 +10,12 @@ from app.database import Events, Species
 import datetime
 from fastapi.responses import StreamingResponse
 import pandas as pd
+from app.middleware.api_key_auth import require_api_key
 
 
 router = APIRouter()
 
-@router.post("/event", status_code=status.HTTP_201_CREATED)
+@router.post("/event", status_code=status.HTTP_201_CREATED, dependencies=[Depends(require_api_key)])
 def create_event(event: schemas.EventSchema):
 
     result = Events.insert_one(event.dict())
