@@ -6,6 +6,25 @@
     "version": "1.0.0"
   },
   "paths": {
+    "/mqtt/connection-state": {
+      "get": {
+        "tags": [
+          "mqtt"
+        ],
+        "summary": "Mqtt Connection State",
+        "operationId": "mqtt_connection_state_mqtt_connection_state_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/audio/upload": {
       "post": {
         "tags": [
