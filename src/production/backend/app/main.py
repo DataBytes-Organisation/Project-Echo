@@ -6,6 +6,7 @@ from fastapi import FastAPI, Body, HTTPException, status, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
 from app.errors import StandardizeErrorResponseMiddleware, http_exception_handler, unhandled_exception_handler, validation_exception_handler
+from app.metrics import PrometheusMiddleware, metrics_router
 from app.routers import species_predictor
 from app.routers import auth_router
 from app.routers import admin_budget, admin_services
@@ -26,7 +27,7 @@ app = FastAPI()
 # Add the CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:8080"],  # 可根据实际需求配置
+    allow_origins=["http://localhost:8080"],  
 )
 # Routers
 from .routers import add_csv_output_option, audio_upload_router
@@ -65,6 +66,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.add_middleware(PrometheusMiddleware)
+app.include_router(metrics_router)
 
 
 # app.include_router(hmi.router, tags=['hmi'], prefix='/hmi')
