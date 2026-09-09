@@ -1,3 +1,4 @@
+setuptools<81  # librosa 0.9.2 imports pkg_resources, removed in setuptools 81+
 numpy>=1.21.0,<1.25.0
 ffmpeg-python==0.2.0
 tensorflow>=2.10.0,<2.15.0

@@ -25,16 +25,19 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
   <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
   <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="/admin/js/admin-layout.js" defer></script>
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 
-  <script type="text/javascript" src="/admin/js/sidebarmenu.js"></script>
-  <script type="text/javascript" src="/admin/js/app.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
   <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.css" />
   <script src="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.min.js"></script>
 
   <!-- Shared admin page state -->
   <script type="text/javascript" src="/admin/js/admin-page-state.js"></script>
+
+  <!-- axios has to load before the modules below - routes.js grabs window.axios
+       as soon as it evaluates, so this one can't be deferred -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 
 <body>
@@ -106,18 +109,13 @@
     </div>
   </div>
 
-  <script type="text/javascript">
-    $(document).ready(function () {
-      console.log("Start!");
-      $("#sidebar").load("/admin/component/sidebar-component.html", function () {
-        $.getScript('/admin/js/sidebarmenu.js');
-      });
-      $("#header").load("/admin/component/header-component.html");
-      $("#footer").load("/admin/component/footer-component.html");
-    });
-  </script>
 
-  <script>
+  <script type="module">
+    // pulling these in so we're using the shared retry-capable client instead of
+    // rolling our own fetch calls here - matches what map.js already does
+    import { retrieveAdminRequests, updateRequestStatus, updateConservationStatus } from "/js/routes.js";
+    import { getApiErrorMessage } from "/js/HMI-utils.js";
+
     const pageState = createAdminPageState();
     pageState.resetPageState();
 
@@ -153,13 +151,16 @@
       try {
         clearTable();
 
-        const response = await fetch('/api/requests');
+        const response = await retrieveAdminRequests();
+        const data = response.data;
 
-        if (!response.ok) {
-          throw new Error(`Status ${response.status}`);
+        // /api/requests 302s to the dashboard when the session has expired, and
+        // axios follows redirects - so a 2xx here can still be an HTML page rather
+        // than the array we asked for. Without this check the raw TypeError from
+        // data.forEach ends up in front of the user.
+        if (!Array.isArray(data)) {
+          throw new Error('Your session has expired. Please sign in again.');
         }
-
-        const data = await response.json();
 
         data.forEach(item => {
           const row = document.createElement('tr');
@@ -200,7 +201,7 @@
 
       } catch (error) {
         console.error('Error fetching data:', error);
-        pageState.showError("Failed to load requests. Please try again.");
+        pageState.showError(getApiErrorMessage(error, "Failed to load requests. Please try again."));
       } finally {
         pageState.hideLoading();
       }
@@ -253,40 +254,15 @@
           console.log("Request ID select:   ", requestId);
           console.log("Changing status to:  ", modified);
 
-          const conservationResponse = await fetch(`/api/updateConservationStatus/${animal}`, {
-            method: 'PATCH',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              status: modified
-            })
-          });
-
-          if (!conservationResponse.ok) {
-            throw new Error('Failed to update conservation status');
-          }
-
-          const requestResponse = await fetch(`/api/requests/${requestId}`, {
-            method: 'PATCH',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              status: 'approved'
-            })
-          });
-
-          if (!requestResponse.ok) {
-            throw new Error('Failed to approve request');
-          }
+          await updateConservationStatus(animal, modified);
+          await updateRequestStatus(requestId, 'approved');
 
           clearTable();
           await updateTable();
 
         } catch (error) {
           console.error('Error updating request status:', error);
-          pageState.showError("Failed to approve request.");
+          pageState.showError(getApiErrorMessage(error, "Failed to approve request."));
         } finally {
           pageState.hideLoading();
         }
@@ -302,26 +278,14 @@
           console.log(`Denying request...`);
           console.log("Request ID select:   ", requestId);
 
-          const response = await fetch(`/api/requests/${requestId}`, {
-            method: 'PATCH',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              status: 'denied'
-            })
-          });
-
-          if (!response.ok) {
-            throw new Error('Failed to deny request');
-          }
+          await updateRequestStatus(requestId, 'denied');
 
           clearTable();
           await updateTable();
 
         } catch (error) {
           console.error('Error updating request status:', error);
-          pageState.showError("Failed to deny request.");
+          pageState.showError(getApiErrorMessage(error, "Failed to deny request."));
         } finally {
           pageState.hideLoading();
         }

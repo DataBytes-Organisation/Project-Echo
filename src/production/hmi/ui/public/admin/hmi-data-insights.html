@@ -47,9 +47,8 @@
         Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
     }
 
-    .page-wrapper {
-      min-height: 100vh;
-      padding: 1.5rem 1.5rem 3rem 1.5rem;
+    .data-insights-content {
+      padding: 1.5rem 1.5rem 3rem;
     }
 
     .card {
@@ -124,9 +123,10 @@
     }
 
     @media (max-width: 768px) {
-      .page-wrapper {
+      .data-insights-content {
         padding: 1rem;
       }
+
       .chart-container {
         height: 260px;
       }
@@ -149,7 +149,7 @@
     <div class="body-wrapper">
       <div id="header"></div>
 
-      <div class="container-fluid">
+      <div class="container-fluid data-insights-content">
         <div class="admin-page-status">
           <div class="admin-error-banner d-none" role="alert" aria-live="polite">
             <div class="admin-error-banner__content">
@@ -422,24 +422,14 @@
         </div>
 
       </div>
+      <div id="footer"></div>
     </div>
-
-    <div id="footer"></div>
   </div>
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script type="text/javascript" src="/admin/js/sidebarmenu.js"></script>
-  <script type="text/javascript" src="/admin/js/app.min.js"></script>
+  <script src="/admin/js/admin-layout.js" defer></script>
 
   <script type="text/javascript">
-    $(document).ready(function() {
-      $("#sidebar").load("/admin/component/sidebar-component.html", function() {
-        $.getScript('/admin/js/sidebarmenu.js');
-      });
-      $("#header").load("/admin/component/header-component.html");
-      $("#footer").load("/admin/component/footer-component.html");
-    });
-
     const pageState = createAdminPageState();
     pageState.resetPageState();
   </script>

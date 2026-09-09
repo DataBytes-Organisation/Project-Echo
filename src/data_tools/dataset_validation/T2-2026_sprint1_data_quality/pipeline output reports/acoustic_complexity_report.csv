@@ -1,0 +1,47 @@
+file_path,silence_ratio,mean_energy,energy_variance,spectral_centroid,quality_flag,error,species,source
+/content/datasets/XC181330 - Red-browed Pardalote - Pardalotus rubricatus rubricatus.mp3,0.1884,0.040669,0.004172,2295.178,GOOD,,unknown,unknown
+/content/datasets/XC143502 - Brown Gerygone - Gerygone mouki richmondi.mp3,0.1995,0.041076,0.001095,4496.439,GOOD,,unknown,unknown
+/content/datasets/XC36630 - Red-browed Pardalote - Pardalotus rubricatus.mp3,0.1679,0.042983,0.003881,1679.335,GOOD,,unknown,unknown
+/content/datasets/XC550699 - Rose Robin - Petroica rosea.mp3,0.0353,0.026699,4e-05,2452.758,GOOD,,unknown,unknown
+/content/datasets/XC350439 - Rose Robin - Petroica rosea.mp3,1.0,0.001867,0.0,2156.644,HIGH_SILENCE,,unknown,unknown
+/content/datasets/project_data_gcp/Capra Hircus/region_0.500-2.499.wav,0.0,0.112333,0.007029,3827.447,GOOD,,capra_hircus,project_data_gcp
+/content/datasets/project_data_gcp/Capra Hircus/region_0.400-2.399.wav,0.0,0.072397,0.002334,2925.417,GOOD,,capra_hircus,project_data_gcp
+/content/datasets/project_data_gcp/Capra Hircus/region_3.149-4.448.wav,0.3415,0.020949,0.000282,2995.482,GOOD,,capra_hircus,project_data_gcp
+/content/datasets/project_data_gcp/Pitta iris/region_0.300-1.500.mp3,0.3333,0.013553,9.8e-05,2309.703,GOOD,,pitta_iris,project_data_gcp
+/content/datasets/project_data_gcp/Pitta iris/region_6.100-8.100.mp3,0.0,0.152944,0.006616,1551.058,GOOD,,pitta_iris,project_data_gcp
+/content/datasets/project_data_gcp/Pitta iris/region_21.850-23.100.mp3,0.3659,0.014539,0.000128,2470.55,GOOD,,pitta_iris,project_data_gcp
+/content/datasets/project_data_gcp/Asio_flammeus/XC554830.ogg,0.9931,0.005499,4e-06,2183.408,HIGH_SILENCE,,asio_flammeus,project_data_gcp
+/content/datasets/project_data_gcp/Asio_flammeus/XC666499.ogg,0.9474,0.003233,9.3e-05,3579.039,HIGH_SILENCE,,asio_flammeus,project_data_gcp
+/content/datasets/project_data_gcp/Asio_flammeus/XC522575.ogg,1.0,0.000916,0.0,3375.562,HIGH_SILENCE,,asio_flammeus,project_data_gcp
+/content/datasets/project_data_gcp/Acanthiza reguloides/region_11.250-13.250.mp3,0.0923,0.013205,5e-06,2140.014,GOOD,,acanthiza_reguloides,project_data_gcp
+/content/datasets/project_data_gcp/Acanthiza reguloides/region_156.550-158.550.mp3,0.1719,0.049234,0.001322,4591.527,GOOD,,acanthiza_reguloides,project_data_gcp
+/content/datasets/project_data_gcp/Acanthiza reguloides/region_13.600-14.150.mp3,0.8421,0.006914,7e-06,4968.951,HIGH_SILENCE,,acanthiza_reguloides,project_data_gcp
+/content/datasets/project_data_gcp/Pezoporus wallicus/Ground_Parrot (12).mp3,0.2424,0.023742,0.00015,3019.235,GOOD,,pezoporus_wallicus,project_data_gcp
+/content/datasets/project_data_gcp/Pezoporus wallicus/Ground_Parrot (15).wav,0.381,0.011078,8e-06,2908.838,GOOD,,pezoporus_wallicus,project_data_gcp
+/content/datasets/project_data_gcp/Pezoporus wallicus/Ground_Parrot (15).mp3,0.381,0.010528,7e-06,2914.789,GOOD,,pezoporus_wallicus,project_data_gcp
+/content/datasets/project_data_gcp/Uperoleia altissima/region_32.100-34.100.mp3,0.3231,0.01886,0.000153,2303.124,GOOD,,uperoleia_altissima,project_data_gcp
+/content/datasets/project_data_gcp/Uperoleia altissima/region_29.700-31.700.mp3,0.0154,0.031372,9.3e-05,2163.905,GOOD,,uperoleia_altissima,project_data_gcp
+/content/datasets/project_data_gcp/Uperoleia altissima/region_30.100-32.100.mp3,0.1538,0.020812,0.000129,2044.032,GOOD,,uperoleia_altissima,project_data_gcp
+/content/datasets/project_data_gcp/Spilopelia_chinensis/XC190962.ogg,0.3772,0.058366,0.00606,1962.975,GOOD,,spilopelia_chinensis,project_data_gcp
+/content/datasets/project_data_gcp/Spilopelia_chinensis/XC245917.ogg,0.0006,0.047975,0.00018,3384.043,GOOD,,spilopelia_chinensis,project_data_gcp
+/content/datasets/project_data_gcp/Spilopelia_chinensis/XC153022.ogg,0.0,0.059835,9.4e-05,856.975,GOOD,,spilopelia_chinensis,project_data_gcp
+/content/datasets/project_data_gcp/Spilopelia_chinensis/tony264-australia-4802329_1920.mp3,,,,,ERROR,,spilopelia_chinensis,project_data_gcp
+/content/datasets/project_data_gcp/Falco cenchroides/region_10.900-12.750.mp3,0.1186,0.025445,0.000225,3073.316,GOOD,,falco_cenchroides,project_data_gcp
+/content/datasets/project_data_gcp/Falco cenchroides/region_2.000-4.000.mp3,0.0,0.023351,9.5e-05,2460.7,GOOD,,falco_cenchroides,project_data_gcp
+/content/datasets/project_data_gcp/Falco cenchroides/region_3.000-4.950.wav,0.1613,0.040294,0.000474,3743.456,GOOD,,falco_cenchroides,project_data_gcp
+/content/datasets/project_data_gcp/Stomiopera unicolor/region_0.750-2.750.mp3,0.0,0.052216,0.00353,2440.556,GOOD,,stomiopera_unicolor,project_data_gcp
+/content/datasets/project_data_gcp/Stomiopera unicolor/region_17.950-19.300.mp3,0.3636,0.014547,6.5e-05,4023.273,GOOD,,stomiopera_unicolor,project_data_gcp
+/content/datasets/project_data_gcp/Stomiopera unicolor/region_13.050-13.600.mp3,0.7895,0.006341,1.3e-05,2095.881,LOW_SIGNAL,,stomiopera_unicolor,project_data_gcp
+/content/datasets/project_data_gcp/Lalage leucomela/region_29.200-31.200.wav,0.0,0.044322,0.000287,1803.833,GOOD,,lalage_leucomela,project_data_gcp
+/content/datasets/project_data_gcp/Lalage leucomela/region_31.200-33.200.mp3,0.0156,0.041907,0.000276,1574.062,GOOD,,lalage_leucomela,project_data_gcp
+/content/datasets/project_data_gcp/Lalage leucomela/region_5.200-7.200.mp3,0.0,0.06046,0.000673,2194.187,GOOD,,lalage_leucomela,project_data_gcp
+/content/datasets/project_data_gcp/Branta_bernical_nigricans/XC352831.ogg,0.1716,0.026648,0.001675,1599.651,GOOD,,branta_bernical_nigricans,project_data_gcp
+/content/datasets/project_data_gcp/Branta_bernical_nigricans/XC164608.ogg,0.0807,0.055257,0.001872,1558.162,GOOD,,branta_bernical_nigricans,project_data_gcp
+/content/datasets/project_data_gcp/Branta_bernical_nigricans/XC143518.ogg,0.0064,0.052521,0.00115,2057.076,GOOD,,branta_bernical_nigricans,project_data_gcp
+/content/datasets/project_data_gcp/Ceyx azureus/region_19.700-21.700.mp3,0.0308,0.016679,7e-06,3668.696,GOOD,,ceyx_azureus,project_data_gcp
+/content/datasets/project_data_gcp/Ceyx azureus/region_15.700-17.700.mp3,0.0308,0.022112,0.000215,3822.978,GOOD,,ceyx_azureus,project_data_gcp
+/content/datasets/project_data_gcp/Ceyx azureus/region_5.050-7.050.mp3,0.0308,0.02198,5.5e-05,3460.473,GOOD,,ceyx_azureus,project_data_gcp
+/content/datasets/project_data_gcp/Parvipsitta pusilla/region_10.350-12.350.mp3,0.0462,0.018519,8.3e-05,2584.362,GOOD,,parvipsitta_pusilla,project_data_gcp
+/content/datasets/project_data_gcp/Parvipsitta pusilla/pen_ash-little-pied-cormorant-7911240_1920.jpg,,,,,ERROR,,parvipsitta_pusilla,project_data_gcp
+/content/datasets/project_data_gcp/Parvipsitta pusilla/region_16.300-18.300.mp3,0.0625,0.036941,0.000322,6088.556,GOOD,,parvipsitta_pusilla,project_data_gcp
+/content/datasets/project_data_gcp/Parvipsitta pusilla/region_19.650-20.500.mp3,0.3929,0.017045,0.000103,4684.524,GOOD,,parvipsitta_pusilla,project_data_gcp
