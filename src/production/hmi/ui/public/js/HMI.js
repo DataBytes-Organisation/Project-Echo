@@ -91,8 +91,15 @@ var current_mic_id   = "";
 
 var activeAudioNode     = null;
 var activeAudioContext  = null;
+var activeAudioEventId  = null;
 var audioAnimTimeout    = null;
 var playNextTrack       = false;
+
+const ANIMAL_AUDIO_READY =
+  "Audio ready. Press the audio button to play.";
+
+const ANIMAL_AUDIO_UNAVAILABLE =
+  "Audio unavailable for this detection.";
 
 var micAnimFrameIndex = 1;
 var animTimeout       = null;
@@ -152,6 +159,15 @@ function getAnimalAudioStatus() {
 function setAnimalAudioStatus(message) {
   const status = getAnimalAudioStatus();
   if (status) status.textContent = message;
+}
+
+function markAnimalAudioReady(eventId) {
+  if (
+    eventId !== null &&
+    selectedVocalizationEventId === eventId
+  ) {
+    setAnimalAudioStatus(ANIMAL_AUDIO_READY);
+  }
 }
 
 function setRecordingPlaybackStatus(message) {
@@ -896,11 +912,12 @@ export function muteRecordingPlaybackAnimation() {
 }
 
 export function stopAudioPlayback(updateAnimation = true) {
+  const stoppedEventId = activeAudioEventId;
   if (updateAnimation) muteAudioAnimation();
   if (audioAnimTimeout) clearTimeout(audioAnimTimeout);
   audioAnimTimeout = null;
   if (activeAudioNode !== null) {
-    try { activeAudioNode.stop(); } catch (_error) { /* Source may already have ended. */ }
+    try {activeAudioNode.stop(); } catch (_error) { /* Source may already have ended. */ }
     activeAudioNode.disconnect();
   }
   activeAudioNode = null;
@@ -908,15 +925,12 @@ export function stopAudioPlayback(updateAnimation = true) {
     void activeAudioContext.close().catch(() => {});
   }
   activeAudioContext = null;
+  activeAudioEventId = null;
 
-  if (selectedVocalizationEventId !== null) {
-  setAnimalAudioStatus(
-    "Audio ready. Press the audio button to play."
-  );
-  }
+  markAnimalAudioReady(stoppedEventId);
 }
 
-function playDecodedAudio(decodedAudio) {
+function playDecodedAudio(decodedAudio, eventId) {
   if (!decodedAudio || !playNextTrack) return;
   stopAudioPlayback(false);
   playNextTrack = true;
@@ -938,18 +952,16 @@ function playDecodedAudio(decodedAudio) {
     audioAnimTimeout = null;
     activeAudioNode = null;
     activeAudioContext = null;
+    activeAudioEventId = null;
     source.disconnect();
     void context.close().catch(() => {});
     muteAudioAnimation();
 
-    if (selectedVocalizationEventId !== null) {
-      setAnimalAudioStatus(
-        "Audio ready. Press the audio button to play."
-      );
-    }
+    markAnimalAudioReady(eventId);
   };
   activeAudioContext = context;
   activeAudioNode = source;
+  activeAudioEventId = eventId;
   source.start();
   setAnimalAudioStatus("Playing audio...");
   audioAnimTimeout = setTimeout(muteAudioAnimation, audioBuffer.duration * 1000);
@@ -961,13 +973,35 @@ document.addEventListener("playAudio", function () {
     muteAudioAnimation();
     return;
   }
+
+  const eventId = selectedVocalizationEventId;
+
   animalSpectrogramWorkflow.getSelectedAudio().then((decodedAudio) => {
-    if (!decodedAudio || !playNextTrack) {
+      if (!playNextTrack) {
+        muteAudioAnimation();
+        return;
+      }
+
+      // Ignore audio returned for an event that is no longer selected.
+      if (selectedVocalizationEventId !== eventId) {
+        muteAudioAnimation();
+        return;
+      }
+
+      if (!decodedAudio) {
+        muteAudioAnimation();
+        setAnimalAudioStatus(ANIMAL_AUDIO_UNAVAILABLE);
+        return;
+      }
+
+      playDecodedAudio(decodedAudio, eventId);
+    })
+    .catch(() => {
+      if (selectedVocalizationEventId !== eventId) return;
+
       muteAudioAnimation();
-      return;
-    }
-    playDecodedAudio(decodedAudio);
-  });
+      setAnimalAudioStatus(ANIMAL_AUDIO_UNAVAILABLE);
+    });
 });
 
 document.addEventListener("stopAudio", function () {
@@ -1438,23 +1472,23 @@ function createMapClickEvent(hmiState) {
           setAnimalAudioStatus("Loading audio...");
 
           if (!animalSpectrogramWorkflow) {
-            setAnimalAudioStatus("Audio unavailable for this detection.");
+            setAnimalAudioStatus(ANIMAL_AUDIO_UNAVAILABLE);
           } else {
             void animalSpectrogramWorkflow
               .select(eventId)
               .then((decodedAudio) => {
-                // Ignore an old response if the user selected another event.
                 if (selectedVocalizationEventId !== eventId) return;
 
                 if (decodedAudio) {
-                  setAnimalAudioStatus(
-                    "Audio ready. Press the audio button to play."
-                  );
+                  markAnimalAudioReady(eventId);
                 } else {
-                  setAnimalAudioStatus(
-                    "Audio unavailable for this detection."
-                  );
+                  setAnimalAudioStatus(ANIMAL_AUDIO_UNAVAILABLE);
                 }
+              })
+              .catch(() => {
+                if (selectedVocalizationEventId !== eventId) return;
+
+                setAnimalAudioStatus(ANIMAL_AUDIO_UNAVAILABLE);
               });
           }
         } else {
