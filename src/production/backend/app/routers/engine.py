@@ -63,11 +63,11 @@ def list_species_data(species: str = "", event_start: str = "", event_end: str =
         pipeline.append(
             {'$match': {'timestamp': {'$gte': datetime_start, '$lt': datetime_end}}})
     if (microphoneLLA_0):
-        pipeline.append({'$match': {'microphoneLLA.0': microphoneLLA_0}})
+        pipeline.append({'$match': {'microphoneLLA.latitude': microphoneLLA_0}})
     if (microphoneLLA_1):
-        pipeline.append({'$match': {'microphoneLLA.1': microphoneLLA_1}})
+        pipeline.append({'$match': {'microphoneLLA.longitude': microphoneLLA_1}})
     if (microphoneLLA_2):
-        pipeline.append({'$match': {'microphoneLLA.2': microphoneLLA_2}})
+        pipeline.append({'$match': {'microphoneLLA.altitude': microphoneLLA_2}})
 
     # Convering to csv format
     df = pd.DataFrame(serializers.animalListEntity(

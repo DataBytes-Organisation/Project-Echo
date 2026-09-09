@@ -65,7 +65,7 @@ test("detection API rejects missing or mismatched sessions before Backend access
 
 test("authenticated detection read forwards JWT and returns live data unchanged", async () => {
   const h = harness();
-  const live = [{ _id: "event-1", sourceType: "real", microphoneLLA: [-37, 144, 0],
+  const live = [{ _id: "event-1", sourceType: "real", microphoneLLA: { latitude: -37, longitude: 144, altitude: 0 },
     species: "Magpie", confidence: 91.5, timestamp: "2026-08-06T10:30:00Z", sensorId: "esp32-001" }];
   h.http.get = async (url, options) => { h.calls.push({ url, options }); return { data: live }; };
   const response = await h.request("/api/detections", "session-jwt");

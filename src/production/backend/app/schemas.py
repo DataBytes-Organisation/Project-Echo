@@ -23,29 +23,60 @@ class PyObjectId(ObjectId):
         # Update schema to represent ObjectId as a string
         field_schema.update(type="string")
 
+# Structured ESP32 location: latitude/longitude/altitude object.
+class LLA(BaseModel):
+    latitude: float  # Degrees, -90 to 90
+    longitude: float  # Degrees, -180 to 180
+    altitude: float  # Altitude
+
+    @validator("latitude", pre=True)
+    def _check_latitude(cls, value):
+        if (isinstance(value, bool) or not isinstance(value, (int, float))
+                or not math.isfinite(value) or not -90 <= value <= 90):
+            raise ValueError("latitude must be a finite number between -90 and 90.")
+        return float(value)
+
+    @validator("longitude", pre=True)
+    def _check_longitude(cls, value):
+        if (isinstance(value, bool) or not isinstance(value, (int, float))
+                or not math.isfinite(value) or not -180 <= value <= 180):
+            raise ValueError("longitude must be a finite number between -180 and 180.")
+        return float(value)
+
+    @validator("altitude", pre=True)
+    def _check_altitude(cls, value):
+        if (isinstance(value, bool) or not isinstance(value, (int, float))
+                or not math.isfinite(value)):
+            raise ValueError("altitude must be a finite number.")
+        return float(value)
+
+
+def _coerce_lla(value):
+    # Tolerant reader: legacy [lat, lon, alt] lists become LLA objects.
+    if isinstance(value, (list, tuple)) and len(value) == 3:
+        return {"latitude": value[0], "longitude": value[1], "altitude": value[2]}
+    return value
+
 # Schema to validate event data with input fields like sensorId, location, etc.
+# Producer contract: real devices MUST send sourceType "real". A missing
+# field defaults to "simulator" so the untouched engine sim path keeps
+# working; list_real_events() and the HMI treat missing as simulator too.
 class EventSchema(BaseModel):
-    sourceType: Optional[Literal["real"]] = None
+    sourceType: Literal["real", "simulator"] = "simulator"
     timestamp: datetime  # Event timestamp
     sensorId: constr(min_length=1)  # Non-empty string for sensor ID
     species: constr(min_length=1)  # Non-empty string for species name
-    microphoneLLA: conlist(float, min_items=3, max_items=3)  # List of exactly 3 floats for microphone location
-    animalEstLLA: conlist(float, min_items=3, max_items=3)  # List of exactly 3 floats for estimated animal location
-    animalTrueLLA: conlist(float, min_items=3, max_items=3)  # List of exactly 3 floats for true animal location
-    animalLLAUncertainty: int  # Uncertainty value
+    microphoneLLA: LLA  # Structured microphone location
+    animalEstLLA: Optional[LLA] = None  # Estimated animal location; null for real ESP32
+    animalTrueLLA: Optional[LLA] = None  # True animal location; null for real ESP32
+    animalLLAUncertainty: Optional[float] = None  # Uncertainty value; null for real ESP32
     audioClip: str  # Audio clip data
     confidence: float = Field(gt=0, lt=100) # Confidence value between 0 and 100
     sampleRate: int  # Audio sample rate
 
-    @validator("microphoneLLA", pre=True)
-    def validate_real_microphone_lla(cls, value, values):
-        if values.get("sourceType") == "real":
-            if (not isinstance(value, list) or len(value) != 3
-                    or any(isinstance(item, bool) or not isinstance(item, (int, float))
-                           or not math.isfinite(item) for item in value)
-                    or not -90 <= value[0] <= 90 or not -180 <= value[1] <= 180):
-                raise ValueError("Real detections require valid microphone coordinates.")
-        return value
+    @validator("microphoneLLA", "animalEstLLA", "animalTrueLLA", pre=True)
+    def _coerce_lla_fields(cls, value):
+        return _coerce_lla(value)
 
     # Configuration and schema example
     class Config:
@@ -54,12 +85,13 @@ class EventSchema(BaseModel):
         json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
+                "sourceType": "real",
                 "timestamp": "2023-03-22T13:45:12.000Z",
                 "sensorId": "2",
                 "species": "Sus Scrofa",
-                "microphoneLLA": [-33.1101, 150.0567, 23],
-                "animalEstLLA": [-33.1105, 150.0569, 23],
-                "animalTrueLLA": [-33.1106, 150.0570, 23],
+                "microphoneLLA": {"latitude": -33.1101, "longitude": 150.0567, "altitude": 23},
+                "animalEstLLA": {"latitude": -33.1105, "longitude": 150.0569, "altitude": 23},
+                "animalTrueLLA": {"latitude": -33.1106, "longitude": 150.0570, "altitude": 23},
                 "animalLLAUncertainty": 10,
                 "audioClip": "some audio_base64 data",
                 "confidence": 99.4,
@@ -351,33 +383,6 @@ class TwoFactorVerifySchema(BaseModel):
 class DetectionCreate(EventSchema):
     pass
 
-
-class Detection(EventSchema):
-    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-
-    class Config:
-        allow_population_by_field_name = True
-        arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str}
-        schema_extra = {
-            "example": {
-                "_id": "651f2a9f4d1f1b1c3e2a4567",
-                "timestamp": "2023-03-22T13:45:12.000Z",
-                "sensorId": "2",
-                "species": "Sus Scrofa",
-                "microphoneLLA": [-33.1101, 150.0567, 23],
-                "animalEstLLA": [-33.1105, 150.0569, 23],
-                "animalTrueLLA": [-33.1106, 150.0570, 23],
-                "animalLLAUncertainty": 10,
-                "audioClip": "some audio_base64 data",
-                "confidence": 99.4,
-                "sampleRate": 48000
-            }
-        }
-
-class DetectionCreate(EventSchema):
-    pass
-
 class Detection(EventSchema):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
 
@@ -468,16 +473,20 @@ class DetectionListResponse(DetectionListResponses):
 class RealDetectionRead(BaseModel):
     """HMI read shape from serializers.eventEntity (no audio payload)."""
 
-    sourceType: Optional[Literal["real"]] = None
+    sourceType: Literal["real", "simulator"] = "simulator"
     id: str = Field(..., alias="_id")
     timestamp: datetime
     sensorId: str
     species: str
-    microphoneLLA: conlist(float, min_items=3, max_items=3)
-    animalEstLLA: conlist(float, min_items=3, max_items=3)
-    animalTrueLLA: conlist(float, min_items=3, max_items=3)
-    animalLLAUncertainty: int
+    microphoneLLA: LLA
+    animalEstLLA: Optional[LLA] = None
+    animalTrueLLA: Optional[LLA] = None
+    animalLLAUncertainty: Optional[float] = None
     confidence: float
+
+    @validator("microphoneLLA", "animalEstLLA", "animalTrueLLA", pre=True)
+    def _coerce_lla_fields(cls, value):
+        return _coerce_lla(value)
 
     class Config:
         allow_population_by_field_name = True

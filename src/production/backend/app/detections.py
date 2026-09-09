@@ -82,8 +82,8 @@ def list_detections(
         lon_min = lon - delta_deg
         lon_max = lon + delta_deg
 
-        query["microphoneLLA.0"] = {"$gte": lat_min, "$lte": lat_max}
-        query["microphoneLLA.1"] = {"$gte": lon_min, "$lte": lon_max}
+        query["microphoneLLA.latitude"] = {"$gte": lat_min, "$lte": lat_max}
+        query["microphoneLLA.longitude"] = {"$gte": lon_min, "$lte": lon_max}
 
     if page < 1:
         page = 1

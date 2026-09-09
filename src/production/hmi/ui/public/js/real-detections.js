@@ -1,8 +1,15 @@
 import { retrieveDetections, getApiErrorMessage } from "./routes.js";
 
 function validMicrophoneLLA(lla) {
-  return Array.isArray(lla) && lla.length === 3 && lla.every(Number.isFinite) &&
-    Math.abs(lla[0]) <= 90 && Math.abs(lla[1]) <= 180;
+  if (Array.isArray(lla)) {
+    return lla.length === 3 && lla.every(Number.isFinite) &&
+      Math.abs(lla[0]) <= 90 && Math.abs(lla[1]) <= 180;
+  }
+  if (lla && typeof lla === "object") {
+    return Number.isFinite(lla.latitude) && Number.isFinite(lla.longitude) &&
+      Math.abs(lla.latitude) <= 90 && Math.abs(lla.longitude) <= 180;
+  }
+  return false;
 }
 
 export async function loadRealDetections(hmiState) {
@@ -65,7 +72,10 @@ export async function loadRealDetections(hmiState) {
       if (!validMicrophoneLLA(detection.microphoneLLA)) { invalid++; continue; }
       if (ids.has(detection._id)) continue;
       ids.add(detection._id);
-      const [lat, lon] = detection.microphoneLLA;
+      const lat = Array.isArray(detection.microphoneLLA)
+        ? detection.microphoneLLA[0] : detection.microphoneLLA.latitude;
+      const lon = Array.isArray(detection.microphoneLLA)
+        ? detection.microphoneLLA[1] : detection.microphoneLLA.longitude;
       const feature = new ol.Feature({
         ...detection, geometry: new ol.geom.Point(ol.proj.fromLonLat([lon, lat])),
       });

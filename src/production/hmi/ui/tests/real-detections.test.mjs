@@ -126,6 +126,74 @@ test("invalid real coordinates never create a marker and show a safe data error"
   }
 });
 
+const objectRecord = {
+  _id: "esp32-object", sourceType: "real", species: "Magpie", confidence: 91.5,
+  timestamp: "2026-08-06T10:30:00Z", sensorId: "esp32-002",
+  microphoneLLA: { latitude: -37.8136, longitude: 144.9631, altitude: 0 },
+  animalTrueLLA: null, animalEstLLA: null, animalLLAUncertainty: null,
+};
+
+test("real marker uses object microphone coordinates and tolerates null animal fields", async () => {
+  assert.ok(detections, "real detection loader exists");
+  const hmi = state(); result = { data: [objectRecord] };
+  await detections.loadRealDetections(hmi);
+  const features = hmi.realDetectionLayer.getSource().getFeatures();
+  assert.equal(features.length, 1);
+  assert.deepEqual(features[0].get("geometry").coords, [144.9631, -37.8136]);
+  assert.equal(features[0].get("sourceType"), "real");
+  assert.equal(features[0].get("sensorId"), "esp32-002");
+  assert.match(hmi.realDetectionStatus.textContent, /1 real-device detection/);
+});
+
+test("simulator records never create real markers", async () => {
+  assert.ok(detections, "real detection loader exists");
+  const hmi = state();
+  result = { data: [{ ...objectRecord, _id: "sim-1", sourceType: "simulator" }] };
+  await detections.loadRealDetections(hmi);
+  assert.equal(hmi.realDetectionLayer.getSource().getFeatures().length, 0);
+  assert.match(hmi.realDetectionStatus.textContent, /No real-device detections/);
+});
+
+test("invalid object microphone coordinates never create a marker and show a safe data error", async () => {
+  assert.ok(detections, "real detection loader exists");
+  for (const microphoneLLA of [{ longitude: 0, altitude: 0 }, { latitude: 0, altitude: 0 },
+    { latitude: -91, longitude: 0, altitude: 0 }, { latitude: 0, longitude: 181, altitude: 0 },
+    { latitude: "-37.8", longitude: 144.9, altitude: 0 }, { latitude: true, longitude: 0, altitude: 0 },
+    { latitude: NaN, longitude: 0, altitude: 0 }, { latitude: 0, longitude: Infinity, altitude: 0 },
+    null, "[-37.8, 144.9, 0]"]) {
+    const hmi = state(); result = { data: [{ ...objectRecord, microphoneLLA }] };
+    await detections.loadRealDetections(hmi);
+    assert.equal(hmi.realDetectionLayer.getSource().getFeatures().length, 0);
+    assert.match(hmi.realDetectionStatus.textContent, /invalid microphone coordinates/i);
+    assert.doesNotMatch(hmi.realDetectionStatus.textContent, /NaN|Infinity|undefined|http/);
+  }
+});
+
+test("vocalization converter reads object LLAs and falls back to the microphone location", async () => {
+  const hmiModule = await import("../public/js/HMI.js");
+  const simRecord = { _id: "sim-1", sourceType: "simulator", species: "Magpie", confidence: 88,
+    commonName: "Magpie", type: "Bird", status: "Least Concern", diet: "Omnivore",
+    timestamp: "2026-08-06T10:30:00Z", sensorId: "sim-001",
+    microphoneLLA: { latitude: -37.8, longitude: 144.9, altitude: 0 },
+    animalEstLLA: { latitude: 10, longitude: 20, altitude: 0 },
+    animalTrueLLA: { latitude: 30, longitude: 40, altitude: 0 },
+    animalLLAUncertainty: 5 };
+  const event = hmiModule.convertJSONtoAnimalVocalizationEvent({}, simRecord);
+  assert.equal(event.sensorLat, -37.8);
+  assert.equal(event.sensorLon, 144.9);
+  assert.equal(event.estLat, 10);
+  assert.equal(event.estLon, 20);
+  assert.equal(event.locationLat, 30);
+  assert.equal(event.locationLon, 40);
+  assert.equal(event.locationConfidence, 95);
+  const nulls = hmiModule.convertJSONtoAnimalVocalizationEvent(
+    {}, { ...simRecord, animalEstLLA: null, animalTrueLLA: null, animalLLAUncertainty: null });
+  assert.equal(nulls.estLat, null);
+  assert.equal(nulls.locationLat, -37.8);
+  assert.equal(nulls.locationLon, 144.9);
+  assert.equal(nulls.locationConfidence, null);
+});
+
 test("loading, empty, malformed and failed reads never substitute sample records", async (t) => {
   assert.ok(detections, "real detection loader exists");
   t.mock.timers.enable({ apis: ["setTimeout"] });

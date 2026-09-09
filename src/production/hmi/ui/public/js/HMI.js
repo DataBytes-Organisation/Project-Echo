@@ -730,6 +730,20 @@ export function clearMicrophoneLayer(hmiState) {
 // Data converters
 // ─────────────────────────────────────────────────────────────────────────────
 
+// Tolerant LLA reader: {latitude, longitude} objects, legacy [lat, lon, alt]
+// lists, or null when the animal location is unknown (real ESP32).
+function llaLat(lla) {
+  if (Array.isArray(lla)) return Number.isFinite(lla[0]) ? lla[0] : null;
+  if (lla && typeof lla === "object") return Number.isFinite(lla.latitude) ? lla.latitude : null;
+  return null;
+}
+
+function llaLon(lla) {
+  if (Array.isArray(lla)) return Number.isFinite(lla[1]) ? lla[1] : null;
+  if (lla && typeof lla === "object") return Number.isFinite(lla.longitude) ? lla.longitude : null;
+  return null;
+}
+
 export function convertJSONtoAnimalMovementEvent(hmiState, data) {
   return {
     animalId:                      data.animalId,
@@ -748,6 +762,8 @@ export function convertJSONtoAnimalMovementEvent(hmiState, data) {
 }
 
 export function convertJSONtoAnimalVocalizationEvent(hmiState, data) {
+  const sensorLat = llaLat(data.microphoneLLA);
+  const sensorLon = llaLon(data.microphoneLLA);
   return {
     timestamp:                      hmiState.currentTime,
     eventTimestamp:                 data.timestamp,
@@ -758,14 +774,14 @@ export function convertJSONtoAnimalVocalizationEvent(hmiState, data) {
     animalType:                     data.type.toLowerCase(),
     animalStatus:                   matchStatus(data.status.toLowerCase()),
     animalDiet:                     data.diet.toLowerCase(),
-    locationConfidence:             100 - data.animalLLAUncertainty,
-    estLat:                         data.animalEstLLA[0],
-    estLon:                         data.animalEstLLA[1],
-    locationLat:                    data.animalTrueLLA[0],
-    locationLon:                    data.animalTrueLLA[1],
+    locationConfidence:             data.animalLLAUncertainty == null ? null : 100 - data.animalLLAUncertainty,
+    estLat:                         llaLat(data.animalEstLLA),
+    estLon:                         llaLon(data.animalEstLLA),
+    locationLat:                    llaLat(data.animalTrueLLA) ?? sensorLat,
+    locationLon:                    llaLon(data.animalTrueLLA) ?? sensorLon,
     sensorId:                       data.sensorId,
-    sensorLat:                      data.microphoneLLA[0],
-    sensorLon:                      data.microphoneLLA[1],
+    sensorLat:                      sensorLat,
+    sensorLon:                      sensorLon,
   };
 }
 

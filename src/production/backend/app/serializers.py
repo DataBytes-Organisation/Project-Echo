@@ -1,21 +1,36 @@
 ## app.serializers.py
+def _lla_object(lla):
+    # Tolerant reader: legacy [lat, lon, alt] lists read back as LLA objects.
+    if isinstance(lla, dict):
+        return {"latitude": lla.get("latitude"), "longitude": lla.get("longitude"),
+                "altitude": lla.get("altitude")}
+    if isinstance(lla, (list, tuple)) and len(lla) == 3:
+        return {"latitude": lla[0], "longitude": lla[1], "altitude": lla[2]}
+    return lla
+
+
+def _source_type(event):
+    # Legacy documents without a source read back as simulator detections.
+    return event.get("sourceType") or "simulator"
+
+
 def eventEntity(event) -> dict:
     return {
-        **({"sourceType": event["sourceType"]} if event.get("sourceType") else {}),
+        "sourceType": _source_type(event),
         "_id": str(event["_id"]),
         "timestamp": event["timestamp"],
         "sensorId": event["sensorId"],
         "species": event["species"],
-        "microphoneLLA": event["microphoneLLA"],
-        "animalEstLLA": event["animalEstLLA"],
-        "animalTrueLLA": event["animalTrueLLA"],
+        "microphoneLLA": _lla_object(event["microphoneLLA"]),
+        "animalEstLLA": _lla_object(event["animalEstLLA"]),
+        "animalTrueLLA": _lla_object(event["animalTrueLLA"]),
         "animalLLAUncertainty": event["animalLLAUncertainty"],
         "confidence": event["confidence"],
     }
 
 def eventSpeciesEntity(event) -> dict:
     return {
-        **({"sourceType": event["sourceType"]} if event.get("sourceType") else {}),
+        "sourceType": _source_type(event),
         "_id": str(event["_id"]),
         "commonName": event.get("commonName", "Unknown"),
         "type": event.get("type", "Unknown"),
@@ -24,9 +39,9 @@ def eventSpeciesEntity(event) -> dict:
         "timestamp": event["timestamp"],
         "sensorId": event["sensorId"],
         "species": event["species"],
-        "microphoneLLA": event["microphoneLLA"],
-        "animalEstLLA": event["animalEstLLA"],
-        "animalTrueLLA": event["animalTrueLLA"],
+        "microphoneLLA": _lla_object(event["microphoneLLA"]),
+        "animalEstLLA": _lla_object(event["animalEstLLA"]),
+        "animalTrueLLA": _lla_object(event["animalTrueLLA"]),
         "animalLLAUncertainty": event["animalLLAUncertainty"],
         "confidence": event["confidence"],
     }

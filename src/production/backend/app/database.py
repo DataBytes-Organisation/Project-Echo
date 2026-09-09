@@ -86,9 +86,13 @@ Detections.create_index(
     [("species", pymongo.ASCENDING), ("timestamp", pymongo.DESCENDING)],
     name="idx_species_timestamp_desc"
 )
+try:
+    Detections.drop_index("idx_microphone_lat_lon")
+except Exception:
+    pass
 Detections.create_index(
-    [("microphoneLLA.0", pymongo.ASCENDING), ("microphoneLLA.1", pymongo.ASCENDING)],
-    name="idx_microphone_lat_lon"
+    [("microphoneLLA.latitude", pymongo.ASCENDING), ("microphoneLLA.longitude", pymongo.ASCENDING)],
+    name="idx_microphone_lla_obj"
 )
 
 AdminBudgets = db.admin_budgets
