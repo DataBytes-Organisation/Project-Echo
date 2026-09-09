@@ -110,11 +110,14 @@ services:
     environment:
       MAIL_STARTTLS: "true"
       MAIL_SSL_TLS: "false"
-
-
     stdin_open: false
     tty: true
     command: uvicorn app.main:app --host 0.0.0.0 --port 9000 --reload
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 512M
 
   mongo-express:
     image: mongo-express
@@ -131,6 +134,11 @@ services:
       - echo_store
     networks:
       - echo-net
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 256M
 
   echo_store:
     build:
@@ -149,6 +157,11 @@ services:
       - "27017:27017"
     volumes:
       - db-data:/data/db
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 512M
 
   echo-redis:
     image: redis:latest
