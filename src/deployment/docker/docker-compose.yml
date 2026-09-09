@@ -110,6 +110,7 @@ services:
     environment:
       MAIL_STARTTLS: "true"
       MAIL_SSL_TLS: "false"
+      ALLOWED_ORIGINS: "http://localhost:3000,http://127.0.0.1:3000"
 
 
     stdin_open: false

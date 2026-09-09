@@ -23,11 +23,6 @@ from app.routers import hmi, engine, sim, two_factor
 from app.routers import public
 app = FastAPI()
 
-# Add the CORS middleware
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:8080"],  # 可根据实际需求配置
-)
 # Routers
 from .routers import add_csv_output_option, audio_upload_router
 from app.routers import species_predictor, auth_router, hmi, engine, sim, two_factor, public, iot, live, sensors, payments #Websocket
@@ -57,13 +52,23 @@ app.add_exception_handler(Exception, unhandled_exception_handler)
 app.add_middleware(StandardizeErrorResponseMiddleware)
 
 # ✅ CORS Middleware
+# Only the HMI frontend may call this API from a browser.
+# Override with the ALLOWED_ORIGINS env var (comma-separated) per environment.
+ALLOWED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv(
+        "ALLOWED_ORIGINS",
+        "http://localhost:3000,http://127.0.0.1:3000",
+    ).split(",")
+    if origin.strip()
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins
-
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "x-api-key"],
 )
 
 
