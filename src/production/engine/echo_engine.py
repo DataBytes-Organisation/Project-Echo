@@ -1086,8 +1086,84 @@ class EchoEngine():
         }
 
         url = self.config['API_URL']
-        x = requests.post(url, json = detection_event)
-        print(x.text)
+        timeout_seconds = self.config.get("API_TIMEOUT_SECONDS", 5)
+        retry_count = self.config.get("API_RETRY_COUNT", 2)
+        max_attempts = retry_count + 1
+
+        last_error_message = None
+
+        for attempt in range(1, max_attempts + 1):
+            try:
+                response = requests.post(
+                    url,
+                    json=detection_event,
+                    timeout=timeout_seconds,
+                )
+            except requests.exceptions.Timeout as error:
+                last_error_message = (
+                    "Backend delivery timeout on attempt "
+                    f"{attempt}/{max_attempts}"
+                )
+                print(last_error_message, flush=True)
+                if attempt >= max_attempts:
+                    raise RuntimeError(
+                        "Backend delivery failed after "
+                        f"{max_attempts} attempts: timeout"
+                    ) from error
+                continue
+            except requests.exceptions.ConnectionError as error:
+                last_error_message = (
+                    "Backend delivery connection failure on attempt "
+                    f"{attempt}/{max_attempts}"
+                )
+                print(last_error_message, flush=True)
+                if attempt >= max_attempts:
+                    raise RuntimeError(
+                        "Backend delivery failed after "
+                        f"{max_attempts} attempts: connection failure"
+                    ) from error
+                continue
+
+            status_code = response.status_code
+            response_text = response.text
+
+            if 200 <= status_code < 300:
+                print(
+                    "Backend delivery succeeded with HTTP "
+                    f"{status_code}: {response_text}",
+                    flush=True
+                )
+                return
+
+            if 400 <= status_code < 500:
+                error_message = (
+                    "Backend delivery failed with HTTP "
+                    f"{status_code}: {response_text}"
+                )
+                print(error_message, flush=True)
+                raise RuntimeError(error_message)
+
+            if 500 <= status_code < 600:
+                last_error_message = (
+                    "Backend delivery HTTP "
+                    f"{status_code} on attempt {attempt}/{max_attempts}: "
+                    f"{response_text}"
+                )
+                print(last_error_message, flush=True)
+                if attempt >= max_attempts:
+                    raise RuntimeError(
+                        "Backend delivery failed after "
+                        f"{max_attempts} attempts: HTTP {status_code}: "
+                        f"{response_text}"
+                    )
+                continue
+
+            error_message = (
+                "Backend delivery failed with unexpected HTTP "
+                f"{status_code}: {response_text}"
+            )
+            print(error_message, flush=True)
+            raise RuntimeError(error_message)
 
     def weather_pipeline(self, audio_clip):
         """

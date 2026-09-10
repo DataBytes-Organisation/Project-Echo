@@ -17,6 +17,8 @@ class TestEnginePredictionOutput(unittest.TestCase):
         self.engine.config["API_URL"] = (
             "http://mock-backend/engine/event"
         )
+        self.engine.config["API_TIMEOUT_SECONDS"] = 5
+        self.engine.config["API_RETRY_COUNT"] = 2
 
         self.audio_event = {
             "sourceType": "simulator",
@@ -43,6 +45,7 @@ class TestEnginePredictionOutput(unittest.TestCase):
 
     def test_complete_prediction_payload_sent(self):
         mock_response = MagicMock()
+        mock_response.status_code = 201
         mock_response.text = "accepted"
 
         with patch.object(
@@ -85,11 +88,13 @@ class TestEnginePredictionOutput(unittest.TestCase):
 
         mock_post.assert_called_once_with(
             "http://mock-backend/engine/event",
-            json=expected_payload
+            json=expected_payload,
+            timeout=5,
         )
 
     def test_mqtt_sample_rate_used_when_provided(self):
         mock_response = MagicMock()
+        mock_response.status_code = 201
         mock_response.text = "accepted"
         event_with_sample_rate = dict(self.audio_event)
         event_with_sample_rate["sampleRate"] = 16000
@@ -113,6 +118,7 @@ class TestEnginePredictionOutput(unittest.TestCase):
 
     def test_inference_sample_rate_used_when_mqtt_omits_it(self):
         mock_response = MagicMock()
+        mock_response.status_code = 201
         mock_response.text = "accepted"
 
         with patch.object(
@@ -132,6 +138,7 @@ class TestEnginePredictionOutput(unittest.TestCase):
 
     def test_nullable_animal_location_fields_preserved(self):
         mock_response = MagicMock()
+        mock_response.status_code = 201
         mock_response.text = "accepted"
         event_with_nulls = dict(self.audio_event)
         event_with_nulls["sourceType"] = "real"
@@ -165,6 +172,7 @@ class TestEnginePredictionOutput(unittest.TestCase):
         self.engine.config["API_URL"] = expected_url
 
         mock_response = MagicMock()
+        mock_response.status_code = 201
         mock_response.text = "accepted"
 
         with patch.object(
