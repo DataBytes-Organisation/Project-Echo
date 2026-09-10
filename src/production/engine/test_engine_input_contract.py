@@ -259,6 +259,7 @@ class TestOnMessagePostsStandardEvent(unittest.TestCase):
 
     def test_esp32_sample_rate_and_source_type_reach_backend_payload(self):
         mock_response = MagicMock()
+        mock_response.status_code = 201
         mock_response.text = "accepted"
 
         with patch.object(
@@ -285,6 +286,7 @@ class TestOnMessagePostsStandardEvent(unittest.TestCase):
 
     def test_legacy_simulator_uses_inference_sample_rate(self):
         mock_response = MagicMock()
+        mock_response.status_code = 201
         mock_response.text = "accepted"
 
         with patch.object(
