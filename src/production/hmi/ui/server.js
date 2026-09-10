@@ -659,6 +659,16 @@ app.get("/login", (req, res) => {
   res.sendFile(path.join(__dirname, 'public/login.html'));
 })
 
+// FR-D4: expose reCAPTCHA site key from environment config (never hardcoded in HTML).
+// Returns enabled:false when no key is set so the frontend can degrade gracefully.
+app.get("/api/config/recaptcha", (req, res) => {
+  const siteKey = process.env.RECAPTCHA_SITE_KEY || "";
+  res.json({
+    enabled: Boolean(siteKey),
+    siteKey: siteKey
+  });
+})
+
 //API Endpoint for the submission requests
 app.post("/api/submit", async (req, res) => {
   let token = await client.get('JWT', (err, storedToken) => {

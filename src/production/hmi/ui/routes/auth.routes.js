@@ -56,12 +56,14 @@ module.exports = function (app) {
     let pw = req.body.password;
 
     let email = req.body.email;
+    let captchaToken = req.body.captchaToken; // FR-D4: forwarded to backend for verification
       
     try {
       const axiosResponse = await axios.post(`${API_BASE_URL}/hmi/signin`,{
         username: uname,
         email: email,
-        password: pw
+        password: pw,
+        captchaToken: captchaToken
       });
       
       if (axiosResponse.status === 200) {
@@ -286,3 +288,5 @@ module.exports = function (app) {
 
   // app.post("/api/auth/guestsignin", controller.guestsignin);
 };
+
+

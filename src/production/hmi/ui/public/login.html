@@ -9,7 +9,7 @@
 
     <script type="text/javascript" src="./js/ol.js"></script>
 
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <script src="https://www.google.com/recaptcha/api.js?render=explicit" async defer></script>
     <!-- reCAPTCHA v2 - using new key -->
 
     <!-- Your code -->
@@ -103,9 +103,11 @@
                     <!--                        <button type="button" onclick="VerifyCaptcha('login-form')"> Verify</button>-->
                     <!--                    </div>-->
 
-                    <!-- <div class="g-recaptcha" data-sitekey="6LdD2lIsAAAAAMF9ArlGZr3aIJ4iCZx17wIxVCiu" -->
-									  <div class="g-recaptcha" data-sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" data-action="LOGIN"
-                        data-callback="checkCaptcha"></div>
+                    <!-- FR-D4: site key is injected at load from /api/config/recaptcha (env-backed), not hardcoded here -->
+                    <div id="login-recaptcha" class="g-recaptcha" data-sitekey="" data-action="LOGIN"
+                        data-callback="checkCaptcha" data-expired-callback="expireCaptcha"
+                        data-error-callback="errorCaptcha"></div>
+                    <span id="login-captcha-error" class="error-text" style="display:none;color:#c0392b;"></span>
                     <button id="login-form-container-submit" type="submit" class="btn10 animate disabled"
                         disabled><span>Login</span></button>
                     <label>
@@ -304,10 +306,85 @@
 
     </script>
     <script>
-        function checkCaptcha(token) {
-            document.getElementById('login-form-container-submit').disabled = false;
-            document.getElementById('login-form-container-submit').classList.remove("disabled");
+        // FR-D4: captcha state + config-driven site key.
+        // window.__captchaEnabled starts false; set true only once a real key renders.
+        window.__captchaEnabled = false;
+        window.__loginCaptchaWidgetId = null;
+
+        function _setLoginSubmitEnabled(enabled) {
+            var btn = document.getElementById('login-form-container-submit');
+            if (!btn) return;
+            btn.disabled = !enabled;
+            if (enabled) { btn.classList.remove("disabled"); }
+            else { btn.classList.add("disabled"); }
         }
+
+        function _showLoginCaptchaError(msg) {
+            var el = document.getElementById('login-captcha-error');
+            if (!el) return;
+            el.textContent = msg || '';
+            el.style.display = msg ? 'block' : 'none';
+        }
+
+        // Success callback (referenced by data-callback on the widget)
+        function checkCaptcha(token) {
+            _showLoginCaptchaError('');
+            _setLoginSubmitEnabled(true);
+        }
+
+        // Expiry callback: token no longer valid, force re-solve
+        function expireCaptcha() {
+            _setLoginSubmitEnabled(false);
+            _showLoginCaptchaError('Verification expired — please tick the box again.');
+        }
+
+        // Error callback: reCAPTCHA hit a network/other error
+        function errorCaptcha() {
+            _setLoginSubmitEnabled(false);
+            _showLoginCaptchaError('Verification could not load. Check your connection and retry.');
+        }
+
+        // Pull the env-backed site key and render the widget explicitly so the
+        // key never lives in committed HTML.
+        (async function initLoginCaptcha() {
+            try {
+                const resp = await fetch('/api/config/recaptcha');
+                const cfg = await resp.json();
+
+                if (!cfg || !cfg.enabled || !cfg.siteKey) {
+                    // Captcha not configured yet (no key). Leave login usable so the
+                    // app isn't blocked before a real key exists.
+                    window.__captchaEnabled = false;
+                    var host = document.getElementById('login-recaptcha');
+                    if (host) { host.style.display = 'none'; }
+                    _setLoginSubmitEnabled(true);
+                    return;
+                }
+
+                window.__captchaEnabled = true;
+                _setLoginSubmitEnabled(false);
+
+                // grecaptcha may still be loading (api.js is async/defer)
+                function renderWhenReady() {
+                    if (window.grecaptcha && grecaptcha.render) {
+                        window.__loginCaptchaWidgetId = grecaptcha.render('login-recaptcha', {
+                            sitekey: cfg.siteKey,
+                            callback: checkCaptcha,
+                            'expired-callback': expireCaptcha,
+                            'error-callback': errorCaptcha
+                        });
+                    } else {
+                        setTimeout(renderWhenReady, 300);
+                    }
+                }
+                renderWhenReady();
+            } catch (e) {
+                // Config endpoint unreachable — treat as "unavailable", don't hard-block login.
+                console.error('reCAPTCHA config load failed:', e);
+                window.__captchaEnabled = false;
+                _setLoginSubmitEnabled(true);
+            }
+        })();
     </script>
 
 </body>
@@ -389,6 +466,19 @@
         const password = document.querySelector('input[name="password"]').value;
         const email = document.querySelector('input[name="email"]') ? document.querySelector('input[name="email"]').value : '';
 
+        // FR-D4: read the captcha token when captcha is enabled, and block submit if missing.
+        let captchaToken = '';
+        if (window.__captchaEnabled) {
+            captchaToken = (window.grecaptcha && grecaptcha.getResponse)
+                ? grecaptcha.getResponse(window.__loginCaptchaWidgetId ?? undefined)
+                : '';
+            if (!captchaToken) {
+                _showLoginCaptchaError('Please complete the verification before logging in.');
+                _setLoginSubmitEnabled(false);
+                return;
+            }
+        }
+
         try {
             const response = await fetch('/api/auth/signin', {
                 method: 'POST',
@@ -398,7 +488,8 @@
                 body: JSON.stringify({
                     username: username,
                     password: password,
-                    email: email
+                    email: email,
+                    captchaToken: captchaToken
                 })
             });
 
@@ -415,6 +506,11 @@
             } else {
                 const errorData = await response.json();
                 alert(errorData.message);
+                // FR-D4: reset captcha so a used/invalid token isn't resubmitted.
+                if (window.__captchaEnabled && window.grecaptcha && grecaptcha.reset) {
+                    grecaptcha.reset(window.__loginCaptchaWidgetId ?? undefined);
+                    _setLoginSubmitEnabled(false);
+                }
             }
         } catch (err) {
             console.error('Login error:', err);
