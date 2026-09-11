@@ -4,6 +4,7 @@ from .routers import add_csv_output_option, audio_upload_router
 
 from fastapi import FastAPI, Body, HTTPException, status, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.exceptions import RequestValidationError
 from app.errors import StandardizeErrorResponseMiddleware, http_exception_handler, unhandled_exception_handler, validation_exception_handler
 from app.routers import species_predictor
@@ -49,6 +50,15 @@ app = FastAPI(
     - Interface with HMI and audio engine modules
     """,
     version="1.0.0"
+)
+
+# Compress larger API responses for clients that advertise GZip support.
+# This is registered before BaseHTTPMiddleware so the minimum-size check sees
+# the original response rather than the streaming wrapper it creates.
+app.add_middleware(
+    GZipMiddleware,
+    minimum_size=1000,
+    compresslevel=6,
 )
 
 app.add_exception_handler(HTTPException, http_exception_handler)
