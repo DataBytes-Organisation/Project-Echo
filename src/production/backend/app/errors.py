@@ -14,7 +14,10 @@ STATUS_CODES = {400: "BAD_REQUEST", 401: "UNAUTHENTICATED", 403: "FORBIDDEN", 40
 
 
 def error_body(status_code: int, message: str, details: Optional[Any] = None) -> dict:
-    return {"error": {"code": STATUS_CODES.get(status_code, "REQUEST_FAILED"), "message": message, "details": details}}
+    error = {"code": STATUS_CODES.get(status_code, "REQUEST_FAILED"), "message": message}
+    if details is not None:
+        error["details"] = details
+    return {"status": "failed", "error": error}
 
 
 def error_response(status_code: int, message: str, details: Optional[Any] = None, headers: Optional[dict] = None) -> JSONResponse:
@@ -47,11 +50,24 @@ class StandardizeErrorResponseMiddleware(BaseHTTPMiddleware):
         try:
             payload = json.loads(body)
         except (TypeError, ValueError):
+            # Reading body_iterator consumes it. Restore the original bytes before
+            # returning an error response that is not JSON-decodable.
+            response.body_iterator = _single_chunk_iterator(body)
             return response
-        if isinstance(payload, dict) and isinstance(payload.get("error"), dict) and {"code", "message", "details"} <= set(payload["error"]):
+        if (
+            isinstance(payload, dict)
+            and payload.get("status") == "failed"
+            and isinstance(payload.get("error"), dict)
+            and {"code", "message"} <= set(payload["error"])
+        ):
+            response.body_iterator = _single_chunk_iterator(body)
             return response
         raw_message = payload.get("message", payload.get("detail", payload.get("error"))) if isinstance(payload, dict) else None
         message = raw_message if isinstance(raw_message, str) else "The request could not be completed."
         details = payload if not isinstance(raw_message, str) else None
         headers = {key: value for key, value in response.headers.items() if key.lower() not in {"content-length", "content-type"}}
         return error_response(response.status_code, message, details, headers)
+
+
+async def _single_chunk_iterator(body: bytes):
+    yield body
