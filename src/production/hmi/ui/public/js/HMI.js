@@ -642,6 +642,28 @@ function startMqttConnectionPolling() {
 
 const _seenMqttEventIds = new Set();
 let _mqttPollingPaused = false;
+let _eventTypeFilter = "all";
+let _speciesFilter = "all";
+const _knownSpecies = new Set();
+
+function passesFilters(event) {
+  if (_eventTypeFilter !== "all" && event.eventType !== _eventTypeFilter) return false;
+  if (_speciesFilter !== "all" && event.species !== _speciesFilter) return false;
+  return true;
+}
+
+function updateSpeciesFilterOptions() {
+  const select = document.getElementById("species-filter");
+  if (!select) return;
+  for (const species of _knownSpecies) {
+    if (![...select.options].some((opt) => opt.value === species)) {
+      const opt = document.createElement("option");
+      opt.value = species;
+      opt.textContent = species;
+      select.appendChild(opt);
+    }
+  }
+}
 
 async function pollMqttLatestEvents(hmiState) {
   if (_mqttPollingPaused) return;
@@ -664,6 +686,16 @@ async function pollMqttLatestEvents(hmiState) {
     for (const event of events) {
       if (_seenMqttEventIds.has(event._id)) continue;
       _seenMqttEventIds.add(event._id);
+
+      // Real species data only exists for movement events today — vocalization
+      // events are hardcoded to "unclassified" until DB enrichment lands (see
+      // normalize_payload in mqtt_client.py), so we don't add those as filter options.
+      if (event.species && event.species !== "unclassified" && !_knownSpecies.has(event.species)) {
+        _knownSpecies.add(event.species);
+        updateSpeciesFilterOptions();
+      }
+
+      if (!passesFilters(event)) continue;
 
       switch (event.eventType) {
       case "vocalization":
@@ -700,6 +732,20 @@ async function pollMqttLatestEvents(hmiState) {
 function setupLiveMapControls(hmiState) {
   const pauseBtn = document.getElementById("pause-resume-btn");
   const refreshBtn = document.getElementById("manual-refresh-btn");
+  const eventTypeSelect = document.getElementById("event-type-filter");
+  const speciesSelect = document.getElementById("species-filter");
+
+  if (eventTypeSelect) {
+    eventTypeSelect.addEventListener("change", () => {
+      _eventTypeFilter = eventTypeSelect.value;
+    });
+  }
+
+  if (speciesSelect) {
+    speciesSelect.addEventListener("change", () => {
+      _speciesFilter = speciesSelect.value;
+    });
+  }
 
   if (pauseBtn) {
     pauseBtn.addEventListener("click", () => {
