@@ -596,9 +596,12 @@ fetch("./js/sample_data.json")
 
 let _lastMqttState = null;
 
+
+
 async function pollMqttConnectionState() {
   try {
-    const response = await fetch("http://localhost:9000/mqtt/connection-state");
+    
+    const response = await fetch(`/mqtt/connection-state`);
     if (!response.ok) throw new Error("Failed to fetch connection state");
     const data = await response.json();
     const state = data.state;
@@ -643,7 +646,8 @@ const _seenMqttEventIds = new Set();
 
 async function pollMqttLatestEvents(hmiState) {
   try {
-    const response = await fetch("http://localhost:9000/mqtt/latest-events");
+    
+    const response = await fetch(`/mqtt/latest-events`);
     if (!response.ok) throw new Error("Failed to fetch latest events");
     const data = await response.json();
     const events = data.events || [];

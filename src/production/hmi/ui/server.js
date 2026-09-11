@@ -903,6 +903,9 @@ app.get('/iot/nodes', async (req, res) => {
   }
 });
 
+app.all('/hmi/*', proxyToApi);
+app.all('/mqtt/*', proxyToApi);
+
 // The API implements /iot/nodes/{node_id} (iot.py) but there was no Node route for
 // it, so admin-nodes.html was calling http://localhost:9000 straight from the
 // browser - which only ever works in local dev. Same shape as the route above so
