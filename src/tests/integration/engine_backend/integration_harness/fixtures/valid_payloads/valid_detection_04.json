@@ -1,0 +1,12 @@
+{
+  "timestamp": "2026-08-06T00:18:00Z",
+  "sensorId": "engine-test-sensor-04",
+  "species": "Australian Magpie",
+  "microphoneLLA": [-35.2809, 149.13, 20.0],
+  "animalEstLLA": [-35.2811, 149.1303, 18.0],
+  "animalTrueLLA": [-35.281, 149.1302, 19.0],
+  "animalLLAUncertainty": 12,
+  "audioClip": "VGVzdCBhdWRpbyA0",
+  "confidence": 74.1,
+  "sampleRate": 22050
+}

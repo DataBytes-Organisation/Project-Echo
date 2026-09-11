@@ -1,0 +1,12 @@
+{
+  "timestamp": "2026-08-06T10:16:00Z",
+  "sensorId": "engine-test-sensor-02",
+  "species": "Uperoleia mimula",
+  "microphoneLLA": [-38.808104, 143.591356, 10.0],
+  "animalEstLLA": [-38.808294, 143.592951, 4.607966],
+  "animalTrueLLA": [-38.808298, 143.592957, 10.0],
+  "animalLLAUncertainty": 0,
+  "audioClip": "VGVzdCBhdWRpbyAy",
+  "confidence": 99.36,
+  "sampleRate": 32000
+}
