@@ -125,6 +125,22 @@ export function retrieveMicrophones() {
 export function retrieveAudio(id) {
   return withRetry(() => api.get(`/audio/${id}`), RETRY_OPTS);
 }
+/**
+ * Submit an audio file for species analysis.
+ * POST is not retried because prediction requests should not be duplicated.
+ *
+ * @param {Blob|File} audioBlob
+ * @param {string} [filename="recording.wav"]
+ * @param {AbortSignal} [signal]
+ * @returns {Promise<AxiosResponse>}
+ */
+export function analyseAudio(audioBlob, filename = "recording.wav", signal) {
+  const formData = new FormData();
+  formData.append("audio", audioBlob, filename);
+
+  return api.post("/predict", formData, { signal });
+}
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Recordings  (POST — not retried: could create duplicate records)

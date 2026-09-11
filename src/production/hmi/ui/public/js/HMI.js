@@ -29,6 +29,7 @@ import {
   retrieveVocalizationEventsInTimeRange,
   retrieveMicrophones,
   retrieveAudio,
+  analyseAudio,
   retrieveSimTime,
   postRecording,
   setSimModeAnimal,
@@ -119,6 +120,7 @@ var lastBrowserRecordingUrl       = null;
 var lastRecordingDurationLabel    = null;
 var lastRecordingSamples          = null;
 var lastRecordingSampleRate       = 44100;
+let audioAnalysisController       = null;
 var playbackSourceNode            = null;
 var playbackAudioContext          = null;
 
@@ -1894,6 +1896,8 @@ export function startAudioRecording() {
         audioRecorder.cancel();
         return;
       }
+
+      clearBrowserRecordingPlayback();
       fileContent = null;
       decodedAudioStore = null;
       microphoneSpectrogramWorkflow?.clear();
@@ -1948,7 +1952,9 @@ export function stopAudioRecording() {
       if (!(audioBlob instanceof Blob) || audioBlob.size === 0) {
         throw new TypeError("Recorder did not return a valid audio Blob");
       }
-
+      prepareBrowserRecordingPlayback(recordingResult);
+      const analysisStatus = document.getElementById("audio_analysis_status");
+      if (analysisStatus) analysisStatus.textContent = "Audio ready for analysis.";
       fileContent = null;
 
       const decodedAudio =
@@ -2019,7 +2025,65 @@ export function playRecordingClip() {
       showToast("Unable to play recording: " + (err.message || "unknown error"), "error");
     });
 }
+export async function startAudioAnalysis() {
+  const statusElement = document.getElementById("audio_analysis_status");
+  const resultElement = document.getElementById("audio_analysis_result");
+  const startButton = document.getElementById("start_analysis_button");
+  const stopButton = document.getElementById("stop_analysis_button");
 
+  if (!(lastBrowserRecordingBlob instanceof Blob) || lastBrowserRecordingBlob.size === 0) {
+    showToast("Record an audio clip before starting analysis.", "error");
+    if (statusElement) statusElement.textContent = "No recorded audio available.";
+    return;
+  }
+
+  audioAnalysisController = new AbortController();
+
+  if (startButton) startButton.disabled = true;
+  if (stopButton) stopButton.disabled = false;
+  if (statusElement) statusElement.textContent = "Analysing audio...";
+  if (resultElement) resultElement.textContent = "";
+
+  try {
+    const response = await analyseAudio(
+      lastBrowserRecordingBlob,
+      "recording.wav",
+      audioAnalysisController.signal
+    );
+
+    const prediction = response?.data || response;
+
+    if (statusElement) statusElement.textContent = "Analysis complete.";
+
+    if (resultElement) {
+      const species = prediction?.species || "Unknown";
+      const confidence = prediction?.confidence;
+
+      resultElement.textContent =
+        confidence !== undefined
+          ? `Predicted species: ${species} | Confidence: ${confidence}`
+          : `Predicted species: ${species}`;
+    }
+  } catch (error) {
+    if (error?.name === "CanceledError" || error?.code === "ERR_CANCELED") {
+      if (statusElement) statusElement.textContent = "Analysis stopped.";
+    } else {
+      console.error("Audio analysis error:", error);
+      if (statusElement) statusElement.textContent = "Audio analysis failed.";
+      showToast("Unable to analyse audio.", "error");
+    }
+  } finally {
+    audioAnalysisController = null;
+    if (startButton) startButton.disabled = false;
+    if (stopButton) stopButton.disabled = true;
+  }
+}
+
+export function stopAudioAnalysis() {
+  if (audioAnalysisController) {
+    audioAnalysisController.abort();
+  }
+}
 document.addEventListener("saveRecording",     function () { save(); });
 document.addEventListener("simulateRecording", function () { simulateRecording(window.hmiState); });
 

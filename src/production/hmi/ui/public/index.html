@@ -533,7 +533,36 @@
                       <audio id="audioElem" class="frb2-audio frb2-audio-muted" controls preload="metadata" controlsList="nodownload"></audio>
                     </div>
                   </section>
+                  <section id="frb4-analysis-panel" class="frb2-panel">
+                    <h2>Audio Analysis Controls</h2>
 
+                    <p class="frb2-help">
+                      Analyse the most recent recorded audio clip using the species prediction service.
+                    </p>
+
+                    <div class="frb2-actions">
+                      <button type="button"
+                              id="start_analysis_button"
+                              class="frb2-btn frb2-btn-record"
+                              onclick="startAudioAnalysis()">
+                        Start Analysis
+                      </button>
+
+                      <button type="button"
+                              id="stop_analysis_button"
+                              class="frb2-btn frb2-btn-stop"
+                              onclick="stopAudioAnalysis()"
+                              disabled>
+                        Stop Analysis
+                      </button>
+                    </div>
+
+                    <p id="audio_analysis_status" class="frb2-playback-status">
+                      Record an audio clip before starting analysis.
+                    </p>
+
+                    <div id="audio_analysis_result"></div>
+                  </section>
                   <!-- Keep legacy class hooks used by older helpers -->
                   <div id="audio_recording_container" class="frb2-legacy-hidden" aria-hidden="true">
                     <div id="recording_controls_container" class="recording_controls hide"></div>
@@ -1495,6 +1524,7 @@
         resetWildlifeLayers, MapOpenNav, MapCloseNav, getAnimalToggled,
         enableMicAnimation, disableMicAnimation, getUTC,
         startAudioRecording, stopAudioRecording, cancelAudioRecording,
+        startAudioAnalysis, stopAudioAnalysis,
         playRecordingClip, testFunct, convertCSV
       } from "./js/HMI.js";
 
@@ -1521,6 +1551,8 @@
       window.startAudioRecording = startAudioRecording;
       window.stopAudioRecording = stopAudioRecording;
       window.cancelAudioRecording = cancelAudioRecording;
+      window.startAudioAnalysis = startAudioAnalysis;
+      window.stopAudioAnalysis = stopAudioAnalysis;
 
       window.updateMics              = updateMics;
       window.downloadCSV             = downloadCSV;
