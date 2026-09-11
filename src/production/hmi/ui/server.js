@@ -909,6 +909,8 @@ async function proxyToApi(req, res) {
 app.all('/sensors', proxyToApi);
 app.all('/sensors/*', proxyToApi);
 // Proxy all remaining API routes to the Python backend
+app.all('/detections', proxyToApi);
+app.all('/detections/*', proxyToApi);
 app.all('/movement_time/*', proxyToApi);
 app.all('/events_time/*', proxyToApi);
 app.all('/microphones', proxyToApi);
