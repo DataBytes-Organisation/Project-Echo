@@ -32,3 +32,4 @@ fastapi_mail
 twilio==8.5.0
 python-multipart
 redis==5.0.8
+pytest

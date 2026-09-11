@@ -110,15 +110,21 @@ services:
     environment:
       MAIL_STARTTLS: "true"
       MAIL_SSL_TLS: "false"
+      MQTT_BROKER_URL: "ts-mqtt-server-cont"
+      MQTT_BROKER_PORT: "1883"
+      MQTT_PUBLISH_URL: "projectecho/engine/2"
       REDIS_HOST: "echo-redis"
       REDIS_PORT: "6379"
-    depends_on:
-      echo-redis:
-        condition: service_healthy
     stdin_open: false
     tty: true
     command: uvicorn app.main:app --host 0.0.0.0 --port 9000 --reload
-
+    restart: on-failure
+    depends_on:
+      echo_store:
+        condition: service_healthy
+      echo-redis:
+        condition: service_healthy
+        
   mongo-express:
     image: mongo-express
     container_name: mongo-express
@@ -152,6 +158,25 @@ services:
       - "27017:27017"
     volumes:
       - db-data:/data/db
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mongo",
+          "--quiet",
+          "-u",
+          "root",
+          "-p",
+          "root_password",
+          "--authenticationDatabase",
+          "admin",
+          "--eval",
+          "db.adminCommand('ping').ok"
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 40s
 
   echo-redis:
     image: redis:latest

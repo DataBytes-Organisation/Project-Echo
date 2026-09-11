@@ -1,0 +1,10 @@
+# Recovered datasets are stored separately and are not committed.
+recovered_data/ala/*
+recovered_data/inaturalist/*
+
+# Keep directory structure if needed later.
+!recovered_data/ala/.gitkeep
+!recovered_data/inaturalist/.gitkeep
+
+# macOS
+.DS_Store

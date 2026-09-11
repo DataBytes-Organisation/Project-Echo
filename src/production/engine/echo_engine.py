@@ -747,6 +747,148 @@ class EchoEngine():
         return base64_message
 
 
+    def _normalise_lla_field(self, value, field_name, allow_null=False):
+        """
+        Convert one LLA field to the standard object shape.
+
+        Accepts a 3-element [lat, lon, alt] array, an already-valid
+        {latitude, longitude, altitude} object, or null when allowed.
+        """
+
+        if value is None:
+            if allow_null:
+                return None
+            raise ValueError(
+                f"Malformed LLA for {field_name}: "
+                "field is required and cannot be null."
+            )
+
+        if isinstance(value, dict):
+            required_keys = ("latitude", "longitude", "altitude")
+            missing_keys = [
+                key for key in required_keys if key not in value
+            ]
+            if missing_keys:
+                raise ValueError(
+                    f"Malformed LLA for {field_name}: "
+                    "expected keys latitude, longitude, altitude. "
+                    f"Missing: {missing_keys}."
+                )
+            try:
+                return {
+                    "latitude": float(value["latitude"]),
+                    "longitude": float(value["longitude"]),
+                    "altitude": float(value["altitude"]),
+                }
+            except (TypeError, ValueError) as error:
+                raise ValueError(
+                    f"Malformed LLA for {field_name}: "
+                    "latitude, longitude and altitude must be numeric."
+                ) from error
+
+        if isinstance(value, (list, tuple)):
+            if len(value) != 3:
+                raise ValueError(
+                    f"Malformed LLA for {field_name}: "
+                    "expected a 3-element array "
+                    "[latitude, longitude, altitude], "
+                    f"got length {len(value)}."
+                )
+            try:
+                return {
+                    "latitude": float(value[0]),
+                    "longitude": float(value[1]),
+                    "altitude": float(value[2]),
+                }
+            except (TypeError, ValueError) as error:
+                raise ValueError(
+                    f"Malformed LLA for {field_name}: "
+                    "array values must be numeric "
+                    "[latitude, longitude, altitude]."
+                ) from error
+
+        raise ValueError(
+            f"Malformed LLA for {field_name}: "
+            "expected an object with latitude, longitude and altitude, "
+            "a 3-element array, or null."
+        )
+
+
+    def _is_legacy_simulator_payload(self, audio_event):
+        """
+        Identify the current Simulator / HMI MQTT shape so sourceType
+        can be defaulted only for those messages.
+        """
+
+        if audio_event.get("audioFile") is not None:
+            return True
+        if audio_event.get("mode") is not None:
+            return True
+
+        for field_name in (
+            "microphoneLLA",
+            "animalEstLLA",
+            "animalTrueLLA",
+        ):
+            if isinstance(audio_event.get(field_name), (list, tuple)):
+                return True
+
+        return False
+
+
+    def normalise_mqtt_audio_event(self, audio_event):
+        """
+        Normalise an MQTT audio event at the Engine input boundary.
+
+        Standard-schema messages are accepted unchanged (aside from
+        numeric LLA coercion). Legacy Simulator 3-element LLA arrays
+        are converted to objects. sourceType is preserved when present
+        and defaulted to "simulator" only for legacy Simulator messages.
+        """
+
+        if not isinstance(audio_event, dict):
+            raise ValueError(
+                "Malformed MQTT payload: expected a JSON object."
+            )
+
+        # Preserve extra legacy fields such as mode and audioFile.
+        normalised = dict(audio_event)
+
+        source_type = normalised.get("sourceType")
+        if source_type in (None, ""):
+            if self._is_legacy_simulator_payload(audio_event):
+                normalised["sourceType"] = "simulator"
+            else:
+                raise ValueError(
+                    "Malformed MQTT payload: sourceType is required "
+                    "for standard messages and must be 'real' or "
+                    "'simulator'."
+                )
+        elif source_type not in ("real", "simulator"):
+            raise ValueError(
+                "Malformed MQTT payload: sourceType must be "
+                f"'real' or 'simulator', got {source_type!r}."
+            )
+
+        normalised["microphoneLLA"] = self._normalise_lla_field(
+            normalised.get("microphoneLLA"),
+            "microphoneLLA",
+            allow_null=False,
+        )
+        normalised["animalEstLLA"] = self._normalise_lla_field(
+            normalised.get("animalEstLLA"),
+            "animalEstLLA",
+            allow_null=True,
+        )
+        normalised["animalTrueLLA"] = self._normalise_lla_field(
+            normalised.get("animalTrueLLA"),
+            "animalTrueLLA",
+            allow_null=True,
+        )
+
+        return normalised
+
+
     ########################################################################################
     ########################################################################################
     def on_subscribe(self, client, userdata, mid, granted_qos):
@@ -759,13 +901,18 @@ class EchoEngine():
         print("Recieved audio message, processing via engine model...")
         try:
             audio_event = json.loads(msg.payload)
+            audio_event = self.normalise_mqtt_audio_event(audio_event)
             print(audio_event['timestamp'])
 
             audio_clip = ""
             image = None
             sample_rate = 0
 
-            if(audio_event['audioFile'] == "Recording_Mode"): # classic model
+            # audioFile is legacy Simulator/HMI routing only.
+            # Standard ESP32/Simulator messages omit it and use EfficientNetV2.
+            audio_file = audio_event.get("audioFile")
+
+            if(audio_file == "Recording_Mode"): # classic model
 
                 print("Recording_Mode - EfficientNetV2 TFLite")
 
@@ -803,7 +950,7 @@ class EchoEngine():
                     predicted_probability
                 )
 
-            elif(audio_event['audioFile'] == "Recording_Mode_V2"):
+            elif(audio_file == "Recording_Mode_V2"):
                 # convert to string representation of audio to binary for processing
                 print("Recording_Mode_V2")
                 sample_rate = 16000
@@ -832,16 +979,22 @@ class EchoEngine():
                     # update the audio event with the re-sampled audio
                     audio_event["audioClip"] = self.audio_to_string(audio_subsection)
 
-                    new_lat = audio_event['animalEstLLA'][0]
-                    new_lon = audio_event['animalEstLLA'][1]
+                    # LLA fields are objects after MQTT input normalisation.
+                    estimated_lla = audio_event['animalEstLLA'] or {}
+                    new_lat = estimated_lla.get("latitude")
+                    new_lon = estimated_lla.get("longitude")
 
                     if(iteration_count > 0):
-                        lat = audio_event['animalEstLLA'][0]
-                        lon = audio_event['animalEstLLA'][1]
+                        lat = estimated_lla.get("latitude")
+                        lon = estimated_lla.get("longitude")
 
                         new_lat, new_lon = self.generate_random_location(lat, lon, 50, 100)
 
-                    new_lla = [new_lat, new_lon, 0.0]
+                    new_lla = {
+                        "latitude": new_lat,
+                        "longitude": new_lon,
+                        "altitude": 0.0,
+                    }
 
                     audio_event['animalEstLLA'] = new_lla
                     audio_event['animalTrueLLA'] = new_lla
@@ -907,22 +1060,110 @@ class EchoEngine():
     ########################################################################################
     def echo_api_send_detection_event(self, audio_event, sample_rate, predicted_class, predicted_probability):
 
+        # Prefer the original MQTT sampleRate when the standard schema
+        # provided one. Legacy Simulator messages omit it, so keep the
+        # inference-derived value used today.
+        if (
+            "sampleRate" in audio_event
+            and audio_event["sampleRate"] is not None
+        ):
+            output_sample_rate = audio_event["sampleRate"]
+        else:
+            output_sample_rate = sample_rate
+
         detection_event = {
+            "sourceType": audio_event["sourceType"],
             "timestamp": audio_event["timestamp"],
+            "sensorId": audio_event["sensorId"],
             "species": predicted_class,
             "confidence": predicted_probability,
-            "sensorId": audio_event["sensorId"],
             "microphoneLLA": audio_event["microphoneLLA"],
             "animalEstLLA": audio_event["animalEstLLA"],
             "animalTrueLLA": audio_event["animalTrueLLA"],
             "animalLLAUncertainty": audio_event["animalLLAUncertainty"],
             "audioClip": audio_event["audioClip"],
-            "sampleRate": sample_rate
+            "sampleRate": output_sample_rate
         }
 
         url = self.config['API_URL']
-        x = requests.post(url, json = detection_event)
-        print(x.text)
+        timeout_seconds = self.config.get("API_TIMEOUT_SECONDS", 5)
+        retry_count = self.config.get("API_RETRY_COUNT", 2)
+        max_attempts = retry_count + 1
+
+        last_error_message = None
+
+        for attempt in range(1, max_attempts + 1):
+            try:
+                response = requests.post(
+                    url,
+                    json=detection_event,
+                    timeout=timeout_seconds,
+                )
+            except requests.exceptions.Timeout as error:
+                last_error_message = (
+                    "Backend delivery timeout on attempt "
+                    f"{attempt}/{max_attempts}"
+                )
+                print(last_error_message, flush=True)
+                if attempt >= max_attempts:
+                    raise RuntimeError(
+                        "Backend delivery failed after "
+                        f"{max_attempts} attempts: timeout"
+                    ) from error
+                continue
+            except requests.exceptions.ConnectionError as error:
+                last_error_message = (
+                    "Backend delivery connection failure on attempt "
+                    f"{attempt}/{max_attempts}"
+                )
+                print(last_error_message, flush=True)
+                if attempt >= max_attempts:
+                    raise RuntimeError(
+                        "Backend delivery failed after "
+                        f"{max_attempts} attempts: connection failure"
+                    ) from error
+                continue
+
+            status_code = response.status_code
+            response_text = response.text
+
+            if 200 <= status_code < 300:
+                print(
+                    "Backend delivery succeeded with HTTP "
+                    f"{status_code}: {response_text}",
+                    flush=True
+                )
+                return
+
+            if 400 <= status_code < 500:
+                error_message = (
+                    "Backend delivery failed with HTTP "
+                    f"{status_code}: {response_text}"
+                )
+                print(error_message, flush=True)
+                raise RuntimeError(error_message)
+
+            if 500 <= status_code < 600:
+                last_error_message = (
+                    "Backend delivery HTTP "
+                    f"{status_code} on attempt {attempt}/{max_attempts}: "
+                    f"{response_text}"
+                )
+                print(last_error_message, flush=True)
+                if attempt >= max_attempts:
+                    raise RuntimeError(
+                        "Backend delivery failed after "
+                        f"{max_attempts} attempts: HTTP {status_code}: "
+                        f"{response_text}"
+                    )
+                continue
+
+            error_message = (
+                "Backend delivery failed with unexpected HTTP "
+                f"{status_code}: {response_text}"
+            )
+            print(error_message, flush=True)
+            raise RuntimeError(error_message)
 
     def weather_pipeline(self, audio_clip):
         """
@@ -1142,8 +1383,13 @@ class EchoEngine():
             print("Edge prediction missing GPS coordinates, skipping.")
             return
 
-        lla = [lat, lon, 0.0]
+        lla = {
+            "latitude": float(lat),
+            "longitude": float(lon),
+            "altitude": 0.0,
+        }
         audio_event = {
+            "sourceType":         payload.get("sourceType", "real"),
             "timestamp":          payload.get("timestamp", str(int(time.time()))),
             "sensorId":           payload.get("sensor_id", "unknown_edge_node"),
             "microphoneLLA":      lla,
@@ -1218,8 +1464,13 @@ class EchoEngine():
             print(f"IoT Predicted probability : {predicted_probability}")
 
             # Build audio_event in the format expected by echo_api_send_detection_event
-            lla = [lat, lon, 0.0]
+            lla = {
+                "latitude": float(lat),
+                "longitude": float(lon),
+                "altitude": 0.0,
+            }
             audio_event = {
+                "sourceType": payload.get("sourceType", "real"),
                 "timestamp": timestamp,
                 "sensorId": sensor_id,
                 "microphoneLLA": lla,
