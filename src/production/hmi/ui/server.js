@@ -12,13 +12,10 @@ const bcrypt = require('bcryptjs');
 client.connect();
 const cors = require('cors');
 require('dotenv').config();
-const apiClient = require('./services/apiClient');
-const API_BASE_URL = apiClient.API_BASE_URL;
+const API_BASE_URL = `http://${process.env.API_HOST || 'localhost'}:9000`;
 const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY);
-const axios = require('axios'); // still needed directly for proxyToApi's pass-through behaviour below
+const axios = require('axios');
 const { MongoClient, ObjectId } = require('mongodb');
-const razorpayPayment = require('./routes/razorpay.routes');
-let connectedDB;
 
 
 
@@ -37,20 +34,7 @@ const validation = require('deep-email-validator')
 const storeItems = new Map([[
   1, { priceInCents: 100, name: "donation"}
 ]])
-app.post('/api/razorpay-webhook', express.raw({ type: 'application/json' }), (req, res) => {
-  return razorpayPayment.handleWebhook(req, res, { apiBaseUrl: API_BASE_URL });
-});
 app.use(express.json({limit: '10mb'}));
-const cookieSecret = process.env.COOKIE_SECRET || crypto.randomBytes(32).toString("hex");
-// ponytail: ephemeral fallback invalidates sessions on restart; configure COOKIE_SECRET for stable sessions.
-app.use(
-  cookieSession({
-    name: "echo-session",
-    keys: [cookieSecret],
-    httpOnly: true,
-    sameSite: "lax"
-  })
-);
 
 // Import the User model
 const { User } = require('./model/user.model'); // Add this line
@@ -119,7 +103,7 @@ app.use(
   helmet({
     contentSecurityPolicy: {
       useDefaults: true,
-      directives: razorpayPayment.withRazorpayCsp({
+      directives: {
         defaultSrc: ["'self'"],
 
         scriptSrc: [
@@ -181,11 +165,6 @@ app.use(
           "https:"
         ],
 
-        mediaSrc: [
-        "'self'",
-        "blob:"
-        ],
-
         connectSrc: [
           "'self'",
           "ws:",
@@ -210,7 +189,7 @@ app.use(
 
         objectSrc: ["'none'"],
         upgradeInsecureRequests: null
-      })
+      }
     }
   })
 );
@@ -376,6 +355,8 @@ const donationClient = new MongoClient(process.env.MONGODB_URI || `mongodb://${p
   useUnifiedTopology: true
 });
 
+let connectedDB;
+
 (async () => {
   try {
     await donationClient.connect();
@@ -386,9 +367,28 @@ const donationClient = new MongoClient(process.env.MONGODB_URI || `mongodb://${p
   }
 })();
 
-razorpayPayment.registerRazorpayBrowserRoutes(app, {
-  apiBaseUrl: API_BASE_URL,
-  checkUserSession,
+app.post('/api/save-razorpay-payment', async (req, res) => {
+  const { paymentId, name, email, amount, currency, method } = req.body;
+
+  try {
+    const donations = connectedDB.collection("donations");
+
+    await donations.insertOne({
+      paymentId,
+      name,
+      email,
+      amount,
+      currency,
+      method,
+      status: 'succeeded',
+      timestamp: new Date()
+    });
+
+    res.status(201).json({ status: 'success' });
+  } catch (error) {
+    console.error('❌ Error saving donation:', error);
+    res.status(500).send("Error retrieving session details.");
+  }
 });
 
 
@@ -408,6 +408,14 @@ app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }))
 
 //const serveIndex = require('serve-index'); 
 //app.use('/images/bio', serveIndex(express.static(path.join(__dirname, '/images/bio'))));
+
+app.use(
+  cookieSession({
+    name: "echo-session",
+    keys: ["COOKIE_SECRET"], // should use as secret environment variable
+    httpOnly: true
+  })
+);
 
 const nodemailer = require('nodemailer');
 var transporter = nodemailer.createTransport({
@@ -651,6 +659,16 @@ app.get("/login", (req, res) => {
   res.sendFile(path.join(__dirname, 'public/login.html'));
 })
 
+// FR-D4: expose reCAPTCHA site key from environment config (never hardcoded in HTML).
+// Returns enabled:false when no key is set so the frontend can degrade gracefully.
+app.get("/api/config/recaptcha", (req, res) => {
+  const siteKey = process.env.RECAPTCHA_SITE_KEY || "";
+  res.json({
+    enabled: Boolean(siteKey),
+    siteKey: siteKey
+  });
+})
+
 //API Endpoint for the submission requests
 app.post("/api/submit", async (req, res) => {
   let token = await client.get('JWT', (err, storedToken) => {
@@ -668,11 +686,16 @@ app.post("/api/submit", async (req, res) => {
   schema.date = new Date();
   try {
     console.log("Request submission data: ", JSON.stringify(schema));
-    // apiClient throws on any non-2xx, so getting here means it succeeded - no need to check the status manually
-    await apiClient.post('/hmi/api/submit', schema, { headers: {"Authorization" : `Bearer ${token}`, 'Content-Type': 'application/json'}})
-    res.status(201).send(`<script> window.location.href = "/login"; alert("Request Submitted successfully");</script>`);
+    const axiosResponse = await axios.post(`${API_BASE_URL}/hmi/api/submit`, JSON.stringify(schema), { headers: {"Authorization" : `Bearer ${token}`, 'Content-Type': 'application/json'}})
+    //If successful return a 201 status code
+    if (axiosResponse.status === 201) {
+      console.log('Status Code: ' + axiosResponse.status + ' ' + axiosResponse.statusText)
+      res.status(201).send(`<script> window.location.href = "/login"; alert("Request Submitted successfully");</script>`);
+    } else {
+      res.status(400).send(`<script> window.location.href = "/login"; alert("Ooops! Something went wrong");</script>`);
+    }
   } catch (error) {
-    console.error(error.message);
+    console.error(error.data);
     res.status(500).send("An error occurred");
   }
 });
@@ -711,10 +734,15 @@ app.patch('/api/requests/:id', async (req, res) => {
   })
   try {
     console.log("Admin Request update data: ", JSON.stringify(schema));
-    await apiClient.patch('/hmi/api/requests', schema, { headers: {"Authorization" : `Bearer ${token}`, 'Content-Type': 'application/json'}})
-    res.status(200).send(`<script> window.location.href = "/login"; alert("Request data updated successfully");</script>`);
+    const axiosResponse = await axios.patch(`${API_BASE_URL}/hmi/api/requests`, JSON.stringify(schema), { headers: {"Authorization" : `Bearer ${token}`, 'Content-Type': 'application/json'}})
+    if (axiosResponse.status === 200) {
+      console.log('Status Code: ' + axiosResponse.status + ' ' + axiosResponse.statusText)
+      res.status(200).send(`<script> window.location.href = "/login"; alert("Request data updated successfully");</script>`);
+    } else {
+      res.status(400).send(`<script> window.location.href = "/login"; alert("Ooops! Something went wrong with updating request table");</script>`);
+    }
   } catch (error) {
-    console.error(error.message);
+    console.error(error.data);
     res.status(500).send({ error: 'Error updating request status' });
   }
 });
@@ -737,10 +765,15 @@ app.patch('/api/updateConservationStatus/:animal', async (req, res) => {
   })
   try {
     console.log("Admin update species data: ", JSON.stringify(schema));
-    await apiClient.patch('/hmi/api/updateConservationStatus', schema, { headers: {"Authorization" : `Bearer ${token}`, 'Content-Type': 'application/json'}})
-    res.status(200).send(`<script> window.location.href = "/login"; alert("Species Data updated successfully");</script>`);
+    const axiosResponse = await axios.patch(`${API_BASE_URL}/hmi/api/updateConservationStatus`, JSON.stringify(schema), { headers: {"Authorization" : `Bearer ${token}`, 'Content-Type': 'application/json'}})
+    if (axiosResponse.status === 200) {
+      console.log('Status Code: ' + axiosResponse.status + ' ' + axiosResponse.statusText)
+      res.status(200).send(`<script> window.location.href = "/login"; alert("Species Data updated successfully");</script>`);
+    } else {
+      res.status(400).send(`<script> window.location.href = "/login"; alert("Ooops! Something went wrong with updating species data");</script>`);
+    }
   } catch (error) {
-    console.error(error.message);
+    console.error(error.data);
     res.status(500).send({ error: 'Error updating species status' });
   }
 });
@@ -758,8 +791,13 @@ app.get('/api/requests', async (req, res) => {
       }
     })
 
-    const data = await apiClient.get('/hmi/requests', { headers: {"Authorization" : `Bearer ${token}`}})
-    res.json(data);
+    const axiosResponse = await axios.get(`${API_BASE_URL}/hmi/requests`, { headers: {"Authorization" : `Bearer ${token}`}})
+  
+    if (axiosResponse.status === 200) {
+      res.json(axiosResponse.data);
+    } else {
+      res.status(500).json({ error: 'Error fetching data' });
+    }
   } catch (err) {
     console.log('Requests error: ', err)
     res.status(401).redirect('/admin-dashboard')
@@ -854,9 +892,6 @@ app.post('/suspendUser', async (req, res) => {
 //Page direction to the map
 // Proxy route for IoT nodes API
 // Proxy routes for Sensor Health API
-// Deliberately kept on raw axios rather than apiClient here - this needs to forward
-// whatever status the backend actually returns (even error ones), whereas apiClient
-// always throws on non-2xx. Still points at the same shared API_BASE_URL though.
 async function proxyToApi(req, res) {
   try {
     const url = `${API_BASE_URL}${req.originalUrl}`;
@@ -896,23 +931,11 @@ app.all('/hmi/*', proxyToApi);
 
 app.get('/iot/nodes', async (req, res) => {
   try {
-    const data = await apiClient.get('/iot/nodes');
-    res.json(data);
+    const response = await axios.get(`${API_BASE_URL}/iot/nodes`);
+    res.json(response.data);
   } catch (error) {
-    apiClient.sendApiError(res, error, 'Error fetching IoT nodes');
-  }
-});
-
-// The API implements /iot/nodes/{node_id} (iot.py) but there was no Node route for
-// it, so admin-nodes.html was calling http://localhost:9000 straight from the
-// browser - which only ever works in local dev. Same shape as the route above so
-// the page can go through the shared client like everything else.
-app.get('/iot/nodes/:nodeId', async (req, res) => {
-  try {
-    const data = await apiClient.get(`/iot/nodes/${encodeURIComponent(req.params.nodeId)}`);
-    res.json(data);
-  } catch (error) {
-    apiClient.sendApiError(res, error, 'Error fetching IoT node details');
+    console.error('Error fetching IoT nodes:', error);
+    res.status(500).json({ error: 'Error fetching IoT nodes' });
   }
 });
 

@@ -9,7 +9,7 @@
 
     <script type="text/javascript" src="./js/ol.js"></script>
 
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <script src="https://www.google.com/recaptcha/api.js?render=explicit" async defer></script>
     <!-- reCAPTCHA v2 - using new key -->
 
     <!-- Your code -->
@@ -43,16 +43,7 @@
     <script type="text/javascript" src="./js/audio.js"></script>
     <!-- <script type="module" src='./js/HMI.js'></script> -->
     <script type="text/javascript" src="./js/animation.js"></script>
-    <!-- don't need the full HMI-utils.js loaded as a bare module here (that's a no-op,
-         doesn't expose anything to the plain scripts below) - just bridging the couple
-         of helpers this page actually needs onto window, same as index.html does -->
-    <script type="module">
-      import { showToast, getApiErrorMessage } from "./js/HMI-utils.js";
-      import { signIn } from "./js/routes.js";
-      window.showToast = showToast;
-      window.getApiErrorMessage = getApiErrorMessage;
-      window.signIn = signIn;
-    </script>
+    <!-- <script type="module" src='./js/HMI-utils.js'></script> -->
     <link rel="stylesheet" href="./css/auth-form.css" type="text/css">
     <!-- End Imports -->
     <title>Echo | Login</title>
@@ -112,9 +103,11 @@
                     <!--                        <button type="button" onclick="VerifyCaptcha('login-form')"> Verify</button>-->
                     <!--                    </div>-->
 
-                    <!-- <div class="g-recaptcha" data-sitekey="6LdD2lIsAAAAAMF9ArlGZr3aIJ4iCZx17wIxVCiu" -->
-									  <div class="g-recaptcha" data-sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" data-action="LOGIN"
-                        data-callback="checkCaptcha"></div>
+                    <!-- FR-D4: site key is injected at load from /api/config/recaptcha (env-backed), not hardcoded here -->
+                    <div id="login-recaptcha" class="g-recaptcha" data-sitekey="" data-action="LOGIN"
+                        data-callback="checkCaptcha" data-expired-callback="expireCaptcha"
+                        data-error-callback="errorCaptcha"></div>
+                    <span id="login-captcha-error" class="error-text" style="display:none;color:#c0392b;"></span>
                     <button id="login-form-container-submit" type="submit" class="btn10 animate disabled"
                         disabled><span>Login</span></button>
                     <label>
@@ -313,10 +306,99 @@
 
     </script>
     <script>
-        function checkCaptcha(token) {
-            document.getElementById('login-form-container-submit').disabled = false;
-            document.getElementById('login-form-container-submit').classList.remove("disabled");
+        // FR-D4: captcha state + config-driven site key.
+        // window.__captchaEnabled starts false; set true only once a real key renders.
+        window.__captchaEnabled = false;
+        window.__loginCaptchaWidgetId = null;
+
+        function _setLoginSubmitEnabled(enabled) {
+            var btn = document.getElementById('login-form-container-submit');
+            if (!btn) return;
+            btn.disabled = !enabled;
+            if (enabled) { btn.classList.remove("disabled"); }
+            else { btn.classList.add("disabled"); }
         }
+
+        function _showLoginCaptchaError(msg) {
+            var el = document.getElementById('login-captcha-error');
+            if (!el) return;
+            el.textContent = msg || '';
+            el.style.display = msg ? 'block' : 'none';
+        }
+
+        // Success callback (referenced by data-callback on the widget)
+        function checkCaptcha(token) {
+            _showLoginCaptchaError('');
+            _setLoginSubmitEnabled(true);
+        }
+
+        // Expiry callback: token no longer valid, force re-solve
+        function expireCaptcha() {
+            _setLoginSubmitEnabled(false);
+            _showLoginCaptchaError('Verification expired — please tick the box again.');
+        }
+
+        // Error callback: reCAPTCHA hit a network/other error
+        function errorCaptcha() {
+            _setLoginSubmitEnabled(false);
+            _showLoginCaptchaError('Verification could not load. Check your connection and retry.');
+        }
+
+        // Pull the env-backed site key and render the widget explicitly so the
+        // key never lives in committed HTML.
+        (async function initLoginCaptcha() {
+            try {
+                const resp = await fetch('/api/config/recaptcha');
+                const cfg = await resp.json();
+
+                if (!cfg || !cfg.enabled || !cfg.siteKey) {
+                    // Captcha not configured yet (no key). Leave login usable so the
+                    // app isn't blocked before a real key exists.
+                    window.__captchaEnabled = false;
+                    var host = document.getElementById('login-recaptcha');
+                    if (host) { host.style.display = 'none'; }
+                    _setLoginSubmitEnabled(true);
+                    return;
+                }
+
+                window.__captchaEnabled = true;
+                _setLoginSubmitEnabled(false);
+
+                // grecaptcha may still be loading (api.js is async/defer).
+                // FR-D4: cap retries so a blocked/missing api.js doesn't poll forever
+                // and leave the login button permanently disabled — fall back to the
+                // "unavailable" state (login re-enabled, message shown) instead.
+                var _captchaRenderTries = 0;
+                var _captchaRenderMaxTries = 20; // ~6s at 300ms
+                function renderWhenReady() {
+                    if (window.grecaptcha && grecaptcha.render) {
+                        window.__loginCaptchaWidgetId = grecaptcha.render('login-recaptcha', {
+                            sitekey: cfg.siteKey,
+                            callback: checkCaptcha,
+                            'expired-callback': expireCaptcha,
+                            'error-callback': errorCaptcha
+                        });
+                    } else if (_captchaRenderTries < _captchaRenderMaxTries) {
+                        _captchaRenderTries++;
+                        setTimeout(renderWhenReady, 300);
+                    } else {
+                        // reCAPTCHA script never loaded — treat as unavailable, don't hard-block login.
+                        console.error('reCAPTCHA script failed to load — proceeding without captcha.');
+                        window.__captchaEnabled = false;
+                        var host = document.getElementById('login-recaptcha');
+                        if (host) { host.style.display = 'none'; }
+                        _showLoginCaptchaError('Verification is unavailable right now — you can still log in.');
+                        _setLoginSubmitEnabled(true);
+                    }
+                }
+                renderWhenReady();
+            } catch (e) {
+                // Config endpoint unreachable — treat as "unavailable", don't hard-block login.
+                console.error('reCAPTCHA config load failed:', e);
+                window.__captchaEnabled = false;
+                _setLoginSubmitEnabled(true);
+            }
+        })();
     </script>
 
 </body>
@@ -398,40 +480,55 @@
         const password = document.querySelector('input[name="password"]').value;
         const email = document.querySelector('input[name="email"]') ? document.querySelector('input[name="email"]').value : '';
 
+        // FR-D4: read the captcha token when captcha is enabled, and block submit if missing.
+        let captchaToken = '';
+        if (window.__captchaEnabled) {
+            captchaToken = (window.grecaptcha && grecaptcha.getResponse)
+                ? grecaptcha.getResponse(window.__loginCaptchaWidgetId ?? undefined)
+                : '';
+            if (!captchaToken) {
+                _showLoginCaptchaError('Please complete the verification before logging in.');
+                _setLoginSubmitEnabled(false);
+                return;
+            }
+        }
+
         try {
-            // signIn comes off the shared client (bridged onto window by the module
-            // in <head>, since this block has to stay a classic script - the inline
-            // oninput handlers above depend on its functions being global)
-            if (typeof window.signIn !== 'function') {
-                throw new Error('Sign-in is still loading. Please try again in a moment.');
-            }
+            const response = await fetch('/api/auth/signin', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username: username,
+                    password: password,
+                    email: email,
+                    captchaToken: captchaToken
+                })
+            });
 
-            const response = await window.signIn({ username, password, email });
-            const data = response.data;
+            if (response.ok) {
+                const data = await response.json();
 
-            // Store JWT token, userId, and currentUser in localStorage
-            localStorage.setItem('token', data.token);
-            localStorage.setItem('userId', data.userId);
-            localStorage.setItem('currentUser', username); // Set the currentUser to the entered username
+                // Store JWT token, userId, and currentUser in localStorage
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('userId', data.userId);
+                localStorage.setItem('currentUser', username); // Set the currentUser to the entered username
 
-            // Redirect user to the admin dashboard
-            window.location.href = "/admin-dashboard"; // CHANGED: Redirect to admin-dashboard instead of index.html
-        } catch (err) {
-            // axios throws on any non-2xx, so the old ok/else split collapses into
-            // this one branch. The route sends {message} for 401/502/500, so prefer
-            // that over the generic mapping - it's the specific reason we asked for.
-            console.error('Login error:', err);
-            const serverMessage = err && err.response && err.response.data && err.response.data.message;
-            const message = serverMessage
-                || (window.getApiErrorMessage
-                    ? window.getApiErrorMessage(err, 'An error occurred during login.')
-                    : 'An error occurred during login.');
-
-            if (window.showToast) {
-                window.showToast(message, 'error');
+                // Redirect user to the admin dashboard
+                window.location.href = "/admin-dashboard"; // CHANGED: Redirect to admin-dashboard instead of index.html
             } else {
-                alert(message);
+                const errorData = await response.json();
+                alert(errorData.message);
+                // FR-D4: reset captcha so a used/invalid token isn't resubmitted.
+                if (window.__captchaEnabled && window.grecaptcha && grecaptcha.reset) {
+                    grecaptcha.reset(window.__loginCaptchaWidgetId ?? undefined);
+                    _setLoginSubmitEnabled(false);
+                }
             }
+        } catch (err) {
+            console.error('Login error:', err);
+            alert("An error occurred during login.");
         }
     });
 </script>
