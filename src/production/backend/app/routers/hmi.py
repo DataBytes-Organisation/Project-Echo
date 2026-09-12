@@ -134,6 +134,34 @@ def show_event_from_time(start: str, end: str):
     events = serializers.eventSpeciesListEntity(Events.aggregate(aggregate))
     return events
 
+@router.get("/latest_events", response_description="Get most recent classified detection events")
+def show_latest_events(limit: int = 20):
+    aggregate = [
+        { "$sort": { "timestamp": -1 } },
+        { "$limit": limit },
+        {
+            '$lookup': {
+                'from': 'species',
+                'localField': 'species',
+                'foreignField': '_id',
+                'as': 'info'
+            }
+        },
+        {
+            "$replaceRoot": { "newRoot": { "$mergeObjects": [ { "$arrayElemAt": [ "$info", 0 ] }, "$$ROOT" ] } }
+        },
+        {
+            '$project': { "audioClip": 0, "sampleRate": 0}
+        },
+        {
+            "$addFields": {
+                "timestamp": { "$toLong": "$timestamp" }
+            }
+        }
+    ]
+    events = serializers.eventSpeciesListEntity(Events.aggregate(aggregate))
+    return events
+
 @router.get("/audio", response_description="returns audio given ID")
 def show_audio(id: str):
     aggregate = [

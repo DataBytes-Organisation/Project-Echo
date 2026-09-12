@@ -1,0 +1,2 @@
+variant,size_mb,latency_ms_mean,latency_ms_median,latency_ms_p95,latency_ms_std,n_iters,input_shape,output_shape,n_model_output_classes,n_mapping_labels,class_count_match
+efficientnetv2_tflite_fp32,85.2,135.793,133.188,180.213,30.721,100,1x1x128x313,1x123,123,123,True
