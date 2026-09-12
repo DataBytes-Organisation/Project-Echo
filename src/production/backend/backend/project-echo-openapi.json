@@ -1306,6 +1306,17 @@
         ],
         "summary": "Create Event",
         "operationId": "create_event_engine_event_post",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "X-Engine-Api-Key"
+            },
+            "name": "x-engine-api-key",
+            "in": "header"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -3336,25 +3347,35 @@
             "minLength": 1,
             "title": "Species"
           },
-          "sourceType": {
-            "type": "string",
-            "enum": [
-              "real",
-              "simulator"
-            ],
-            "title": "Sourcetype"
-          },
           "microphoneLLA": {
-            "$ref": "#/components/schemas/LLA"
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 3,
+            "title": "Microphonella"
           },
           "animalEstLLA": {
-            "$ref": "#/components/schemas/LLA"
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 3,
+            "title": "Animalestlla"
           },
           "animalTrueLLA": {
-            "$ref": "#/components/schemas/LLA"
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 3,
+            "title": "Animaltruella"
           },
           "animalLLAUncertainty": {
-            "type": "number",
+            "type": "integer",
             "title": "Animalllauncertainty"
           },
           "audioClip": {
@@ -3363,18 +3384,13 @@
           },
           "confidence": {
             "type": "number",
-            "maximum": 100.0,
-            "minimum": 0.0,
+            "exclusiveMaximum": 100.0,
+            "exclusiveMinimum": 0.0,
             "title": "Confidence"
           },
           "sampleRate": {
             "type": "integer",
             "title": "Samplerate"
-          },
-          "source_model": {
-            "type": "string",
-            "title": "Source Model",
-            "default": "unknown"
           },
           "_id": {
             "type": "string",
@@ -3386,23 +3402,35 @@
           "timestamp",
           "sensorId",
           "species",
-          "sourceType",
           "microphoneLLA",
+          "animalEstLLA",
+          "animalTrueLLA",
+          "animalLLAUncertainty",
           "audioClip",
           "confidence",
           "sampleRate"
         ],
         "title": "Detection",
         "example": {
+          "_id": "651f2a9f4d1f1b1c3e2a4567",
           "timestamp": "2023-03-22T13:45:12.000Z",
           "sensorId": "2",
           "species": "Sus Scrofa",
-          "sourceType": "real",
-          "microphoneLLA": {
-            "latitude": -33.1101,
-            "longitude": 150.0567,
-            "altitude": 23
-          },
+          "microphoneLLA": [
+            -33.1101,
+            150.0567,
+            23
+          ],
+          "animalEstLLA": [
+            -33.1105,
+            150.0569,
+            23
+          ],
+          "animalTrueLLA": [
+            -33.1106,
+            150.057,
+            23
+          ],
           "animalLLAUncertainty": 10,
           "audioClip": "some audio_base64 data",
           "confidence": 99.4,
@@ -3426,25 +3454,35 @@
             "minLength": 1,
             "title": "Species"
           },
-          "sourceType": {
-            "type": "string",
-            "enum": [
-              "real",
-              "simulator"
-            ],
-            "title": "Sourcetype"
-          },
           "microphoneLLA": {
-            "$ref": "#/components/schemas/LLA"
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 3,
+            "title": "Microphonella"
           },
           "animalEstLLA": {
-            "$ref": "#/components/schemas/LLA"
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 3,
+            "title": "Animalestlla"
           },
           "animalTrueLLA": {
-            "$ref": "#/components/schemas/LLA"
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 3,
+            "title": "Animaltruella"
           },
           "animalLLAUncertainty": {
-            "type": "number",
+            "type": "integer",
             "title": "Animalllauncertainty"
           },
           "audioClip": {
@@ -3453,18 +3491,13 @@
           },
           "confidence": {
             "type": "number",
-            "maximum": 100.0,
-            "minimum": 0.0,
+            "exclusiveMaximum": 100.0,
+            "exclusiveMinimum": 0.0,
             "title": "Confidence"
           },
           "sampleRate": {
             "type": "integer",
             "title": "Samplerate"
-          },
-          "source_model": {
-            "type": "string",
-            "title": "Source Model",
-            "default": "unknown"
           }
         },
         "type": "object",
@@ -3472,8 +3505,10 @@
           "timestamp",
           "sensorId",
           "species",
-          "sourceType",
           "microphoneLLA",
+          "animalEstLLA",
+          "animalTrueLLA",
+          "animalLLAUncertainty",
           "audioClip",
           "confidence",
           "sampleRate"
@@ -3483,12 +3518,21 @@
           "timestamp": "2023-03-22T13:45:12.000Z",
           "sensorId": "2",
           "species": "Sus Scrofa",
-          "sourceType": "real",
-          "microphoneLLA": {
-            "latitude": -33.1101,
-            "longitude": 150.0567,
-            "altitude": 23
-          },
+          "microphoneLLA": [
+            -33.1101,
+            150.0567,
+            23
+          ],
+          "animalEstLLA": [
+            -33.1105,
+            150.0569,
+            23
+          ],
+          "animalTrueLLA": [
+            -33.1106,
+            150.057,
+            23
+          ],
           "animalLLAUncertainty": 10,
           "audioClip": "some audio_base64 data",
           "confidence": 99.4,

@@ -1082,7 +1082,8 @@ class EchoEngine():
             "animalTrueLLA": audio_event["animalTrueLLA"],
             "animalLLAUncertainty": audio_event["animalLLAUncertainty"],
             "audioClip": audio_event["audioClip"],
-            "sampleRate": output_sample_rate
+            "sampleRate": output_sample_rate,
+            "source_model": self.config.get("ACTIVE_INFERENCE_MODEL") or "unknown",
         }
 
         url = self.config['API_URL']
@@ -1090,14 +1091,21 @@ class EchoEngine():
         retry_count = self.config.get("API_RETRY_COUNT", 2)
         max_attempts = retry_count + 1
 
+        engine_api_key = os.getenv("ENGINE_API_KEY", "").strip()
+        post_kwargs = {
+            "json": detection_event,
+            "timeout": timeout_seconds,
+        }
+        if engine_api_key:
+            post_kwargs["headers"] = {"X-Engine-Api-Key": engine_api_key}
+
         last_error_message = None
 
         for attempt in range(1, max_attempts + 1):
             try:
                 response = requests.post(
                     url,
-                    json=detection_event,
-                    timeout=timeout_seconds,
+                    **post_kwargs,
                 )
             except requests.exceptions.Timeout as error:
                 last_error_message = (
