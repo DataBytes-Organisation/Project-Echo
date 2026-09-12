@@ -17,6 +17,13 @@ globalThis.window = { axios: { create(options) {
 class Element {
   constructor() { this.children = []; this.style = {}; this.listeners = {}; this.classList = { add() {}, remove() {} }; }
   appendChild(el) { this.children.push(el); return el; }
+  replaceChildren(...children) {
+  this.children = [...children];
+}
+
+focus() {
+  this.focused = true;
+}
   setAttribute(key, value) { this[key] = value; }
   addEventListener(key, fn) { this.listeners[key] = fn; }
   querySelector() { return null; }
@@ -47,12 +54,63 @@ class Feature {
   get(key) { return this.properties[key]; }
 }
 class Style { constructor(options) { this.options = options; } }
+
+class Select {
+  constructor(options = {}) {
+    this.options = options;
+    this.handlers = {};
+    this.selectedFeatures = {
+      clear() {},
+    };
+  }
+
+  on(eventName, handler) {
+    this.handlers[eventName] = handler;
+  }
+
+  getFeatures() {
+    return this.selectedFeatures;
+  }
+}
+
+
 globalThis.ol = {
-  source: { Vector: Source }, layer: { Vector: Layer }, Feature,
-  geom: { Point: class { constructor(coords) { this.coords = coords; } } },
-  proj: { fromLonLat: coords => coords },
-  style: { Style, Circle: Style, Fill: Style, Stroke: Style },
-  control: { Control: class { constructor(options) { this.element = options.element; } } },
+  source: { Vector: Source },
+
+  layer: { Vector: Layer },
+
+  Feature,
+
+  geom: {
+    Point: class {
+      constructor(coords) {
+        this.coords = coords;
+      }
+    }
+  },
+
+  proj: {
+    fromLonLat: coords => coords
+  },
+
+  style: {
+    Style,
+    Circle: Style,
+    Fill: Style,
+    Stroke: Style
+  },
+
+  control: {
+    Control: class {
+      constructor(options) {
+        this.element = options.element;
+      }
+    }
+  },
+
+  interaction: {
+    Select
+  },
 };
 const routes = await import("../public/js/routes.js");
 // The production module may not exist yet during RED.
@@ -65,11 +123,47 @@ const record = {
   timestamp: "2026-08-06T10:30:00Z", sensorId: "esp32-001",
   microphoneLLA: [-37.8136, 144.9631, 0], animalTrueLLA: [10, 20, 0], animalEstLLA: [30, 40, 0],
 };
+
+const snakeCaseRealRecord = {
+  _id: "esp32-snake-case",
+  source_type: "real",
+  species: "Kookaburra",
+  confidence: 88.2,
+  timestamp: "2026-09-12T08:30:00Z",
+  sensorId: "esp32-002",
+  microphoneLLA: [-37.814, 144.964, 0],
+  animalTrueLLA: null,
+  animalEstLLA: null,
+  animalLLAUncertainty: null,
+};
+
 function state() {
-  return { basemap: { layers: [], controls: [], fits: [],
-    getView() { return { fit: (...args) => this.fits.push(args) }; },
-    addLayer(layer) { this.layers.push(layer); },
-    addControl(control) { this.controls.push(control); } } };
+  return {
+    basemap: {
+      layers: [],
+      controls: [],
+      interactions: [],
+      fits: [],
+
+      getView() {
+        return {
+          fit: (...args) => this.fits.push(args)
+        };
+      },
+
+      addLayer(layer) {
+        this.layers.push(layer);
+      },
+
+      addControl(control) {
+        this.controls.push(control);
+      },
+
+      addInteraction(interaction) {
+        this.interactions.push(interaction);
+      }
+    }
+  };
 }
 
 test("shared detection client uses same-origin endpoint and timeout", async () => {
@@ -152,6 +246,224 @@ test("simulator records never create real markers", async () => {
   await detections.loadRealDetections(hmi);
   assert.equal(hmi.realDetectionLayer.getSource().getFeatures().length, 0);
   assert.match(hmi.realDetectionStatus.textContent, /No real-device detections/);
+});
+
+test("echonet.events source_type real creates a real marker", async () => {
+  assert.ok(detections, "real detection loader exists");
+
+  const hmi = state();
+
+  result = {
+    data: [snakeCaseRealRecord]
+  };
+
+  await detections.loadRealDetections(hmi);
+
+  const features =
+    hmi.realDetectionLayer
+      .getSource()
+      .getFeatures();
+
+  assert.equal(features.length, 1);
+
+  assert.equal(
+    features[0].get("sourceType"),
+    "real"
+  );
+
+  assert.equal(
+    features[0].get("species"),
+    "Kookaburra"
+  );
+
+  assert.equal(
+    features[0].get("sensorId"),
+    "esp32-002"
+  );
+});
+
+
+test("echonet.events simulator records do not create real markers", async () => {
+  assert.ok(detections, "real detection loader exists");
+
+  const hmi = state();
+
+  result = {
+    data: [
+      {
+        ...snakeCaseRealRecord,
+        _id: "sim-event",
+        source_type: "simulator"
+      }
+    ]
+  };
+
+  await detections.loadRealDetections(hmi);
+
+  const features =
+    hmi.realDetectionLayer
+      .getSource()
+      .getFeatures();
+
+  assert.equal(features.length, 0);
+
+  assert.match(
+    hmi.realDetectionStatus.textContent,
+    /No real-device detections/
+  );
+});
+
+
+test("selecting a real marker shows its detection details", async () => {
+  assert.ok(detections, "real detection loader exists");
+
+  const hmi = state();
+
+  result = {
+    data: [snakeCaseRealRecord]
+  };
+
+  await detections.loadRealDetections(hmi);
+
+  const feature =
+    hmi.realDetectionLayer
+      .getSource()
+      .getFeatures()[0];
+
+  assert.ok(feature);
+
+  hmi.realDetectionSelect.handlers.select({
+    selected: [feature]
+  });
+
+  const details = hmi.realDetectionDetails;
+
+  assert.equal(
+    details.hidden,
+    false
+  );
+
+  assert.equal(
+    details.focused,
+    true
+  );
+
+  const text = details.children
+    .flatMap(child =>
+      child.children?.length
+        ? child.children.map(
+            grandchild => grandchild.textContent
+          )
+        : [child.textContent]
+    )
+    .filter(Boolean)
+    .join(" ");
+
+  assert.match(text, /Kookaburra/);
+  assert.match(text, /88\.2%/);
+  assert.match(text, /esp32-002/);
+  assert.match(text, /real/);
+});
+
+
+test("missing optional detection details show unavailable", async () => {
+  assert.ok(detections, "real detection loader exists");
+
+  const hmi = state();
+
+  result = {
+    data: [
+      {
+        ...snakeCaseRealRecord,
+        _id: "null-fields",
+        species: null,
+        confidence: null,
+        sensorId: null,
+        animalEstLLA: null,
+        animalLLAUncertainty: null
+      }
+    ]
+  };
+
+  await detections.loadRealDetections(hmi);
+
+  const feature =
+    hmi.realDetectionLayer
+      .getSource()
+      .getFeatures()[0];
+
+  assert.ok(feature);
+
+  hmi.realDetectionSelect.handlers.select({
+    selected: [feature]
+  });
+
+  const text =
+    hmi.realDetectionDetails.children
+      .flatMap(child =>
+        child.children?.length
+          ? child.children.map(
+              grandchild => grandchild.textContent
+            )
+          : [child.textContent]
+      )
+      .filter(Boolean)
+      .join(" ");
+
+  assert.match(
+    text,
+    /unavailable/
+  );
+});
+
+
+test("unsafe backend text is rendered as inert text", async () => {
+  assert.ok(detections, "real detection loader exists");
+
+  const hmi = state();
+
+  const unsafeSpecies =
+    "<img src=x onerror=alert(1)>";
+
+  result = {
+    data: [
+      {
+        ...snakeCaseRealRecord,
+        _id: "unsafe-record",
+        species: unsafeSpecies
+      }
+    ]
+  };
+
+  await detections.loadRealDetections(hmi);
+
+  const feature =
+    hmi.realDetectionLayer
+      .getSource()
+      .getFeatures()[0];
+
+  assert.ok(feature);
+
+  hmi.realDetectionSelect.handlers.select({
+    selected: [feature]
+  });
+
+  const text =
+    hmi.realDetectionDetails.children
+      .flatMap(child =>
+        child.children?.length
+          ? child.children.map(
+              grandchild => grandchild.textContent
+            )
+          : [child.textContent]
+      )
+      .filter(Boolean)
+      .join(" ");
+
+  assert.match(
+    text,
+    /<img src=x onerror=alert\(1\)>/
+  );
 });
 
 test("invalid object microphone coordinates never create a marker and show a safe data error", async () => {
