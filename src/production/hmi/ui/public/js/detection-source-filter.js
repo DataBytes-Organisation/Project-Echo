@@ -31,9 +31,12 @@ export function formatDetectionSourceLabel(sourceType) {
 }
 
 export function detectionMatchesSourceFilter(sourceType, filter) {
+  // All is fail-open: unrecognised values (e.g. the spec typo "simulated")
+  // stay visible under All so a filter can never silently drop records.
+  // Explicit Simulated/Real filters still exclude them.
+  if (filter === DETECTION_SOURCE_FILTERS.ALL) return true;
   const normalized = normalizeDetectionSource(sourceType);
   if (normalized === "unknown") return false;
-  if (filter === DETECTION_SOURCE_FILTERS.ALL) return true;
   return normalized === filter;
 }
 
@@ -106,8 +109,9 @@ function setVocalizationLayersVisible(hmiState, visible, speciesFilterState) {
 }
 
 function setTruthLayersVisible(hmiState, visible, speciesFilterState) {
-  // Animal-simulation movement markers are simulator-side context. Hide them
-  // for Real-device so the filter cannot look broken during review.
+  // Deliberate: animal-simulation movement markers are simulator-side context,
+  // so Real-device hides them. Ticket 03 handoff only asked for real/sim
+  // vocalization layers — this extra hiding is intentional, locked by tests.
   for (const status of VOCALIZATION_STATUSES) {
     for (const animalType of VOCALIZATION_TYPES) {
       const layer = hmiState.layers?.[`${status}_${animalType}_truth`];

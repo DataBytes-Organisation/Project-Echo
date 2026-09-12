@@ -790,7 +790,7 @@ export function convertJSONtoAnimalVocalizationEvent(hmiState, data) {
     sensorLat:                      sensorLat,
     sensorLon:                      sensorLon,
     // Preserve Backend/Engine contract ("simulator" | "real"); unknown values
-    // stay unknown so Ticket 03 filters can exclude them.
+    // stay unknown so explicit Simulated/Real filters exclude them (All shows them).
     sourceType:                     normalizeDetectionSource(data.sourceType) === "unknown"
       ? String(data.sourceType)
       : normalizeDetectionSource(data.sourceType),
@@ -859,10 +859,14 @@ export function updateVocalizationLayerFromPastData(hmiState, results) {
   clearAllVocalizationLayers(hmiState);
   hmiState.vocalizationEvents = [];
 
+  // Unknown sourceType values render under All (fail-open) but stay out of
+  // explicit Simulated/Real views; canonical contract remains "simulator".
+  const allowUnknownSource =
+    (hmiState.detectionSourceFilter || DETECTION_SOURCE_FILTERS.ALL) === DETECTION_SOURCE_FILTERS.ALL;
+
   for (let data of results) {
     if (data.sourceType === "real") continue;
-    // Unknown sourceType values are excluded from simulated markers (Ticket 03).
-    if (normalizeDetectionSource(data.sourceType) === "unknown") continue;
+    if (!allowUnknownSource && normalizeDetectionSource(data.sourceType) === "unknown") continue;
     hmiState.vocalizationEvents.push(convertJSONtoAnimalVocalizationEvent(hmiState, data));
   }
 
@@ -924,9 +928,13 @@ export function updateAnimalMovementLayerFromLiveData(hmiState, results) {
 
 export function updateVocalizationLayerFromLiveData(hmiState, results) {
   const newEvents = [];
+  // Unknown sourceType values render under All (fail-open) but stay out of
+  // explicit Simulated/Real views; canonical contract remains "simulator".
+  const allowUnknownSource =
+    (hmiState.detectionSourceFilter || DETECTION_SOURCE_FILTERS.ALL) === DETECTION_SOURCE_FILTERS.ALL;
   for (let data of results) {
     if (data.sourceType === "real") continue;
-    if (normalizeDetectionSource(data.sourceType) === "unknown") continue;
+    if (!allowUnknownSource && normalizeDetectionSource(data.sourceType) === "unknown") continue;
     const event = convertJSONtoAnimalVocalizationEvent(hmiState, data);
     hmiState.vocalizationEvents.push(event);
     newEvents.push(event);

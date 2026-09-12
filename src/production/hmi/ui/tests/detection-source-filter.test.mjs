@@ -31,6 +31,7 @@ class Source {
   addFeature(feature) { this.features.push(feature); }
   getFeatures() { return this.features; }
   getExtent() { return [0, 0, 0, 0]; }
+  changed() {}
 }
 class Layer {
   constructor(options = {}) {
@@ -42,6 +43,7 @@ class Layer {
   set(key, value) { this[key] = value; }
   setZIndex(zIndex) { this.zIndex = zIndex; }
   setVisible(visible) { this.visible = visible; }
+  changed() {}
 }
 class Feature {
   constructor(properties) { this.properties = properties; this.style = null; }
@@ -110,8 +112,13 @@ test("source filter labels keep simulator contract and human-readable names", ()
   assert.equal(filter.normalizeDetectionSource("simulated"), "unknown");
 });
 
-test("unknown sourceType never matches All/Simulated/Real filters", () => {
-  for (const mode of ["all", "simulator", "real"]) {
+test("unknown sourceType is visible under All but hidden under explicit filters", () => {
+  // Canonical contract is "simulator" only; the spec spelling "simulated" stays
+  // unknown (wrong), yet All is fail-open so such records never vanish silently.
+  assert.equal(filter.normalizeDetectionSource("simulated"), "unknown");
+  assert.equal(filter.detectionMatchesSourceFilter("bogus", "all"), true);
+  assert.equal(filter.detectionMatchesSourceFilter("simulated", "all"), true);
+  for (const mode of ["simulator", "real"]) {
     assert.equal(filter.detectionMatchesSourceFilter("bogus", mode), false);
     assert.equal(filter.detectionMatchesSourceFilter("simulated", mode), false);
   }
@@ -264,4 +271,68 @@ test("/map offers All/Simulated/Real-device as segmented buttons", () => {
   assert.match(html, /data-detection-source="all"[^>]*aria-pressed="true"/);
   assert.doesNotMatch(html, /<input[^>]*name="detectionSource"/);
   assert.match(html, /id="detection-source-status"/);
+});
+
+function vocalizationRecord(sourceType) {
+  return {
+    _id: `vocal-${sourceType}`, sourceType, species: "Magpie", confidence: 88,
+    commonName: "Magpie", type: "Bird", status: "Normal", diet: "Omnivore",
+    timestamp: "2026-08-06T10:30:00Z", sensorId: "sim-001",
+    microphoneLLA: { latitude: -37.8, longitude: 144.9, altitude: 0 },
+    animalEstLLA: { latitude: 10, longitude: 20, altitude: 0 },
+    animalTrueLLA: { latitude: 30, longitude: 40, altitude: 0 },
+    animalLLAUncertainty: 5,
+  };
+}
+
+test("unknown-source vocalizations are ingested for All and skipped for explicit filters", async () => {
+  const hmiModule = await import("../public/js/HMI.js");
+  for (const loader of ["updateVocalizationLayerFromLiveData", "updateVocalizationLayerFromPastData"]) {
+    const all = makeHmi();
+    all.vocalizationEvents = [];
+    all.detectionSourceFilter = "all";
+    hmiModule[loader](all, [vocalizationRecord("simulated")]);
+    assert.equal(all.vocalizationEvents.length, 1, `${loader} keeps unknown sources under All`);
+
+    const sim = makeHmi();
+    sim.vocalizationEvents = [];
+    sim.detectionSourceFilter = "simulator";
+    hmiModule[loader](sim, [vocalizationRecord("simulated")]);
+    assert.equal(sim.vocalizationEvents.length, 0, `${loader} skips unknown sources under Simulated`);
+
+    const real = makeHmi();
+    real.vocalizationEvents = [];
+    real.detectionSourceFilter = "real";
+    hmiModule[loader](real, [vocalizationRecord("bogus")]);
+    assert.equal(real.vocalizationEvents.length, 0, `${loader} skips unknown sources under Real`);
+
+    const known = makeHmi();
+    known.vocalizationEvents = [];
+    known.detectionSourceFilter = "all";
+    hmiModule[loader](known, [vocalizationRecord("simulator")]);
+    assert.equal(known.vocalizationEvents.length, 1, `${loader} still ingests simulator sources`);
+  }
+});
+
+test("repeated filtering with unknown sources creates no duplicates or demo data", () => {
+  const hmi = makeHmi();
+  layersSeed(hmi);
+  hmi.layers.normal_bird.getSource().addFeature(new Feature({ sourceType: "bogus" }));
+  for (let i = 0; i < 5; i++) {
+    filter.applyDetectionSourceFilter(hmi, "simulator");
+    filter.applyDetectionSourceFilter(hmi, "real");
+    filter.applyDetectionSourceFilter(hmi, "all");
+  }
+  assert.equal(hmi.layers.normal_bird.getSource().getFeatures().length, 3);
+  assert.equal(hmi.realDetectionLayer.getSource().getFeatures().length, 1);
+  assert.doesNotMatch(hmi.detectionSourceStatus.textContent, /demo|sample|hardcoded|fallback/i);
+});
+
+test("movement markers keep a blank source line while detection markers state theirs", () => {
+  // Q5A lock-in: only detection markers report Simulated/Real-device; movement
+  // markers blank markup_source and are identified as movement elsewhere.
+  const source = fs.readFileSync(new URL("../public/js/HMI.js", import.meta.url), "utf8");
+  assert.match(source, /only detection markers report Simulated\/Real-device/);
+  assert.match(source, /if \(values\.isAnimalMovement\) \{\s*\n\s*const sourceEl = document\.getElementById\("markup_source"\);\s*\n\s*if \(sourceEl\) sourceEl\.innerText = "";/);
+  assert.match(source, /setDetectionSourceDetail\(values\.sourceType \|\| DETECTION_SOURCE_FILTERS\.SIMULATOR\)/);
 });
