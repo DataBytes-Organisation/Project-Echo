@@ -4,7 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-     "test": "node --test tests/nodes-overlay.test.mjs public/js/audio_recorder.test.mjs tests/razorpay-payment.test.js tests/paymentgateway.test.js tests/real-detections.test.mjs tests/detection-api.test.js",
+    "test": "node --test tests/nodes-overlay.test.mjs public/js/audio_recorder.test.mjs tests/razorpay-payment.test.js tests/paymentgateway.test.js tests/real-detections.test.mjs tests/detection-api.test.js tests/detection-source-filter.test.mjs",
     "dev": "nodemon --inspect=0.0.0.0 server.js"
   },
   "author": "",

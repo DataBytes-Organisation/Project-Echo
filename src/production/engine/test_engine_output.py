@@ -101,6 +101,7 @@ class TestEnginePredictionOutput(unittest.TestCase):
             "animalLLAUncertainty": 5.0,
             "audioClip": "base64-test-audio",
             "sampleRate": 48000,
+            "sourceType": "simulator",
         }
 
         mock_post.assert_called_once_with(
@@ -150,6 +151,25 @@ class TestEnginePredictionOutput(unittest.TestCase):
                 )
 
         mock_post.assert_not_called()
+
+    def test_simulator_detections_publish_explicit_simulator_source_type(self):
+        mock_response = MagicMock()
+        mock_response.text = "accepted"
+
+        with patch.object(
+            engine_module.requests,
+            "post",
+            return_value=mock_response,
+        ) as mock_post:
+            self.engine.echo_api_send_detection_event(
+                self.audio_event,
+                48000,
+                "Magpie",
+                91.5,
+            )
+
+        event = mock_post.call_args.kwargs["json"]
+        self.assertEqual(event["sourceType"], "simulator")
 
 
 if __name__ == "__main__":

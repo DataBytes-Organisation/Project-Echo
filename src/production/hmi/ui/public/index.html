@@ -444,6 +444,7 @@
                     </div>
                     <div class="markup_column"><div class="markup_row_left"><div>Longitude</div></div><div class="markup_row_right"><div id="markup_loc_lon"></div></div></div>
                     <div class="markup_column"><div class="markup_row_left"><div>Latitude</div></div><div class="markup_row_right"><div id="markup_loc_lat"></div></div></div>
+                    <div class="markup_column"><div class="markup_row_left"><div>Detection source</div></div><div class="markup_row_right"><div id="markup_source"></div></div></div>
                     <div class="markup_column"><div class="markup_row_left" style="width: 100px !important"><div>Date</div></div><div class="markup_row_right" style="text-align: right !important; width: 400px !important"><div id="markup_date"></div></div></div>
                     <div class="markup_column"><div class="markup_row_left"><div>Location Confidence</div></div><div class="markup_row_right"><div id="markup_confidence"></div></div></div>
                   </div>
@@ -599,6 +600,22 @@
                     <div class="time-range-picker">
                       <input type="text" id="datetime-range" name="datetime-range" style="width:100%" value="" />
                     </div>
+                  </div>
+                  <div class="container" id="detection-source-filter">
+                    <span>Detection source</span>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="detectionSource" id="source-all" value="all" checked>
+                      <label class="form-check-label" for="source-all">All</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="detectionSource" id="source-simulator" value="simulator">
+                      <label class="form-check-label" for="source-simulator">Simulated</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="detectionSource" id="source-real" value="real">
+                      <label class="form-check-label" for="source-real">Real-device</label>
+                    </div>
+                    <p id="detection-source-status" role="status" aria-live="polite" style="margin-top: 8px;"></p>
                   </div>
                   <div class="container">
                     <input type="text" id="searchInput" placeholder="Search for an animal">
@@ -1476,7 +1493,7 @@
     <script>
       // ── Filter checkboxes ───────────────────────────────────────────────
 
-      const myClass   = document.querySelectorAll('.form-check-input');
+      const myClass   = document.querySelectorAll('.form-check-input:not([name="detectionSource"])');
       const sim       = document.querySelectorAll('.s');
       const voc       = document.querySelectorAll('.v');
       const checkboxIDs = [];
@@ -1494,7 +1511,10 @@
           const index = filterState.indexOf(checkbox);
           if (index > -1) filterState.splice(index, 1);
         }
-        updateLayers(hmiState, filterState);
+        if (window.hmiState) {
+          window.hmiState.speciesFilterState = [...filterState];
+          updateLayers(window.hmiState, filterState);
+        }
       }
 
       function microphoneDisplay() { updateMics(); }
@@ -1509,8 +1529,13 @@
         } else if (filter === '_all') {
           voc.forEach(id => { if (!filterState.includes(id.id)) filterState.push(id.id); id.checked = true; });
         }
-        updateLayers(hmiState, filterState);
+        if (window.hmiState) {
+          window.hmiState.speciesFilterState = [...filterState];
+          updateLayers(window.hmiState, filterState);
+        }
       }
+
+      window.getSpeciesFilterState = () => [...filterState];
     </script>
 
     <script type="module">
@@ -1521,7 +1546,7 @@
         resetWildlifeLayers, MapOpenNav, MapCloseNav, getAnimalToggled,
         enableMicAnimation, disableMicAnimation, getUTC,
         startAudioRecording, stopAudioRecording, cancelAudioRecording,
-        playRecordingClip, testFunct, convertCSV
+        playRecordingClip, testFunct, convertCSV, setDetectionSourceFilter
       } from "./js/HMI.js";
 
       import { retrieveTruthEventsInTimeRange, retrieveVocalizationEventsInTimeRange } from "./js/routes.js";
@@ -1541,10 +1566,23 @@
       window.updateMicrophoneAnimation = updateMicrophoneAnimation;
       window.updateLayers            = updateLayers;
       window.closeNav                = MapCloseNav;
+      window.setDetectionSourceFilter = (filter) => setDetectionSourceFilter(hmiState, filter);
 
       let hmiState = {};
       window.hmiState = hmiState;
       hmiState.truthEventId = 10;
+      hmiState.detectionSourceFilter = "all";
+      hmiState.detectionSourceStatus = document.getElementById("detection-source-status");
+      if (typeof window.getSpeciesFilterState === "function") {
+        hmiState.speciesFilterState = window.getSpeciesFilterState();
+      }
+
+      document.querySelectorAll('input[name="detectionSource"]').forEach((input) => {
+        input.addEventListener("change", () => {
+          if (!input.checked) return;
+          setDetectionSourceFilter(hmiState, input.value);
+        });
+      });
 
       let datepickerStart = hmiState.currentTime;
       let datepickerEnd   = hmiState.previousUpdateTime;

@@ -38,6 +38,13 @@ import {
 } from "./routes.js";
 import { addIoTNodesToMap } from "./nodes-overlay.js";
 import { loadRealDetections } from "./real-detections.js";
+import {
+  DETECTION_SOURCE_FILTERS,
+  applyDetectionSourceFilter,
+  buildSimulatorVocalizationStyle,
+  formatDetectionSourceLabel,
+  normalizeDetectionSource,
+} from "./detection-source-filter.js";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
@@ -782,6 +789,11 @@ export function convertJSONtoAnimalVocalizationEvent(hmiState, data) {
     sensorId:                       data.sensorId,
     sensorLat:                      sensorLat,
     sensorLon:                      sensorLon,
+    // Preserve Backend/Engine contract ("simulator" | "real"); unknown values
+    // stay unknown so Ticket 03 filters can exclude them.
+    sourceType:                     normalizeDetectionSource(data.sourceType) === "unknown"
+      ? String(data.sourceType)
+      : normalizeDetectionSource(data.sourceType),
   };
 }
 
@@ -849,10 +861,16 @@ export function updateVocalizationLayerFromPastData(hmiState, results) {
 
   for (let data of results) {
     if (data.sourceType === "real") continue;
+    // Unknown sourceType values are excluded from simulated markers (Ticket 03).
+    if (normalizeDetectionSource(data.sourceType) === "unknown") continue;
     hmiState.vocalizationEvents.push(convertJSONtoAnimalVocalizationEvent(hmiState, data));
   }
 
   addAllVocalizationFeatures(hmiState);
+  applyDetectionSourceFilter(
+    hmiState,
+    hmiState.detectionSourceFilter || DETECTION_SOURCE_FILTERS.ALL,
+  );
 }
 
 export function updateMicrophoneLayer(hmiState, results) {
@@ -908,11 +926,16 @@ export function updateVocalizationLayerFromLiveData(hmiState, results) {
   const newEvents = [];
   for (let data of results) {
     if (data.sourceType === "real") continue;
+    if (normalizeDetectionSource(data.sourceType) === "unknown") continue;
     const event = convertJSONtoAnimalVocalizationEvent(hmiState, data);
     hmiState.vocalizationEvents.push(event);
     newEvents.push(event);
   }
   addNewVocalizationFeatures(hmiState, newEvents);
+  applyDetectionSourceFilter(
+    hmiState,
+    hmiState.detectionSourceFilter || DETECTION_SOURCE_FILTERS.ALL,
+  );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1005,27 +1028,17 @@ function clearAnimalAudioSelection() {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function updateLayers(hmiState, filterState) {
-  for (let stat of statuses) {
-    for (let animalType of animalTypes) {
-      const layer = findMapLayerWithName(hmiState, deriveLayerName(stat, animalType));
-      if (layer) {
-        layer.setVisible(
-          filterState.includes("_" + stat) && filterState.includes("_" + animalType)
-        );
-      }
-    }
-  }
+  hmiState.speciesFilterState = Array.isArray(filterState) ? [...filterState] : filterState;
 
-  for (let stat of statuses) {
-    for (let animalType of animalTypes) {
-      const layer = findMapLayerWithName(hmiState, deriveTruthLayerName(stat, animalType));
-      if (layer) {
-        layer.setVisible(
-          filterState.includes(stat) && filterState.includes(animalType)
-        );
-      }
-    }
-  }
+  const sourceFilter = hmiState.detectionSourceFilter || DETECTION_SOURCE_FILTERS.ALL;
+  // Single path for source + species visibility: avoids drift between the
+  // checkbox handler and the All/Simulated/Real-device radios.
+  applyDetectionSourceFilter(hmiState, sourceFilter);
+}
+
+/** Ticket 03: switch All / Simulated / Real-device without recreating map state. */
+export function setDetectionSourceFilter(hmiState, filter) {
+  return applyDetectionSourceFilter(hmiState, filter);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1039,9 +1052,8 @@ function _makeAnimalIcon(iconPath) {
 }
 
 function _makeVocalizationIcon(iconPath) {
-  return new ol.style.Style({
-    image: new ol.style.Icon({ src: iconPath, anchor: [0.5, 1], scale: 0.75, className: "vocalization-icon" }),
-  });
+  // Icon shape plus SIM text label — distinguishable from real circles by more than colour.
+  return buildSimulatorVocalizationStyle(iconPath);
 }
 
 function _resolveSimIconPath(entry) {
@@ -1103,6 +1115,10 @@ function _addVocalizationFeature(hmiState, entry) {
     eventId:           entry.eventId,
     isAnimalMovement:  0,
     isFallbackLocation: plot.isFallback,
+    sourceType:        normalizeDetectionSource(entry.sourceType) === "unknown"
+      ? entry.sourceType
+      : normalizeDetectionSource(entry.sourceType),
+    sensorId:          entry.sensorId,
   });
 
   feature.setStyle(_makeVocalizationIcon(iconPath));
@@ -1331,6 +1347,11 @@ async function fetchWeatherData(timestamp, lat, lon) {
 // Map click handler
 // ─────────────────────────────────────────────────────────────────────────────
 
+function setDetectionSourceDetail(sourceType) {
+  const el = document.getElementById("markup_source");
+  if (el) el.innerText = formatDetectionSourceLabel(sourceType);
+}
+
 function createMapClickEvent(hmiState) {
   hmiState.basemap.on("click", function (evt) {
     const feature = hmiState.basemap.forEachFeatureAtPixel(evt.pixel, (f) => f);
@@ -1432,6 +1453,46 @@ function createMapClickEvent(hmiState) {
       animal_toggled = true;
       document.dispatchEvent(new CustomEvent("nodeToggled", { detail: { message: "Node toggled:" } }));
 
+    } else if (normalizeDetectionSource(values.sourceType) === DETECTION_SOURCE_FILTERS.REAL
+      && !values.animalSpecies) {
+      // Ticket 03 only: real markers state their source; full detail is Ticket 02.
+      stopAudioPlayback();
+      clearAnimalAudioSelection();
+      active_content.show();       default_content.hide();
+      active_mic_content.hide();   default_mic_content.show();
+      active_node_content.hide();  default_node_content.show();
+
+      const audioHeader  = document.getElementById("animalAudioHeader");
+      const audioControl = document.getElementById("animalAudioControl");
+      const spectrogram  = document.getElementById("animal-spectrogram");
+      if (audioHeader)  audioHeader.style.display  = "none";
+      if (audioControl) audioControl.style.display = "none";
+      if (spectrogram)  spectrogram.style.display  = "none";
+
+      const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; };
+      const species = values.species || "Real-device detection";
+      setEl("desc_name", species);
+      setEl("desc_confidence", values.confidence != null ? `${values.confidence}%` : "unavailable");
+      setEl("desc_species", species);
+      setEl("desc_summary", "Real-device detection details.");
+      const summary = document.getElementById("desc_details");
+      if (summary) summary.innerHTML = "";
+      setEl("markup_details", values.sensorId ? `Sensor ${values.sensorId}` : "Real-device detection");
+      setDetectionSourceDetail(values.sourceType);
+      const lat = Array.isArray(values.microphoneLLA)
+        ? values.microphoneLLA[0]
+        : values.microphoneLLA?.latitude;
+      const lon = Array.isArray(values.microphoneLLA)
+        ? values.microphoneLLA[1]
+        : values.microphoneLLA?.longitude;
+      setEl("markup_loc_lat", formatVocalizationDetailValue(lat));
+      setEl("markup_loc_lon", formatVocalizationDetailValue(lon));
+      setEl("markup_confidence", "unavailable");
+      setEl("markup_date", values.timestamp ? new Date(values.timestamp).toUTCString() : "unavailable");
+
+      animal_toggled = true;
+      document.dispatchEvent(new CustomEvent("animalToggled", { detail: { message: "Animal toggled:" } }));
+
     } else {
       stopAudioPlayback();
 
@@ -1509,6 +1570,13 @@ function createMapClickEvent(hmiState) {
         if (markupImg) markupImg.src = values.animalIcon;
         const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; };
         setEl("markup_details",   values.animalType + " | " + values.animalDiet + " | " + statusPrintLookup[values.animalStatus]);
+        // Ticket 03: only detection markers report Simulated/Real-device.
+        if (values.isAnimalMovement) {
+          const sourceEl = document.getElementById("markup_source");
+          if (sourceEl) sourceEl.innerText = "";
+        } else {
+          setDetectionSourceDetail(values.sourceType || DETECTION_SOURCE_FILTERS.SIMULATOR);
+        }
         setEl("markup_loc_lon",   formatVocalizationDetailValue(values.animalLon));
         setEl("markup_loc_lat",   formatVocalizationDetailValue(values.animalLat));
         setEl("markup_confidence",formatVocalizationDetailValue(values.animalLocConfidence, "%"));

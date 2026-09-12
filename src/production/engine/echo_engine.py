@@ -920,8 +920,13 @@ class EchoEngine():
             "sampleRate": sample_rate
         }
 
+        # Explicit producer contract: real ESP32 paths tag "real"; every
+        # other Engine publish (simulator / legacy) tags "simulator" so the
+        # Backend and HMI never have to infer source from a missing field.
         if audio_event.get("sourceType") == "real":
             detection_event["sourceType"] = "real"
+        else:
+            detection_event["sourceType"] = "simulator"
 
         url = self.config['API_URL']
         x = requests.post(url, json = detection_event)

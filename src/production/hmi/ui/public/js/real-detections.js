@@ -1,4 +1,10 @@
 import { retrieveDetections, getApiErrorMessage } from "./routes.js";
+import {
+  DETECTION_SOURCE_FILTERS,
+  applyDetectionSourceFilter,
+  buildRealDetectionStyle,
+  normalizeDetectionSource,
+} from "./detection-source-filter.js";
 
 function validMicrophoneLLA(lla) {
   if (Array.isArray(lla)) {
@@ -16,10 +22,7 @@ export async function loadRealDetections(hmiState) {
   if (!hmiState.realDetectionLayer) {
     const layer = new ol.layer.Vector({
       source: new ol.source.Vector(),
-      style: new ol.style.Style({ image: new ol.style.Circle({
-        radius: 8, fill: new ol.style.Fill({ color: "#007f73" }),
-        stroke: new ol.style.Stroke({ color: "#fff", width: 2 }),
-      }) }),
+      style: buildRealDetectionStyle(),
     });
     layer.set("name", "real_detections");
     // Microphone layers take z-indices near 1000 from the shared pool, and
@@ -57,18 +60,28 @@ export async function loadRealDetections(hmiState) {
   const source = hmiState.realDetectionLayer.getSource();
   const status = hmiState.realDetectionStatus;
   status.textContent = "Loading real-device detections…";
+  applyDetectionSourceFilter(
+    hmiState,
+    hmiState.detectionSourceFilter || DETECTION_SOURCE_FILTERS.ALL,
+    { loading: true },
+  );
   try {
     const response = await retrieveDetections();
     if (request !== hmiState.realDetectionRequest) return;
     source.clear();
     if (!Array.isArray(response.data)) {
       status.textContent = "The server returned invalid detection data.";
+      applyDetectionSourceFilter(
+        hmiState,
+        hmiState.detectionSourceFilter || DETECTION_SOURCE_FILTERS.ALL,
+        { errorMessage: "Unable to filter detections: the server returned invalid data." },
+      );
       return;
     }
     let invalid = 0;
     const ids = new Set();
     for (const detection of response.data) {
-      if (detection?.sourceType !== "real") continue;
+      if (normalizeDetectionSource(detection?.sourceType) !== DETECTION_SOURCE_FILTERS.REAL) continue;
       if (!validMicrophoneLLA(detection.microphoneLLA)) { invalid++; continue; }
       if (ids.has(detection._id)) continue;
       ids.add(detection._id);
@@ -77,9 +90,12 @@ export async function loadRealDetections(hmiState) {
       const lon = Array.isArray(detection.microphoneLLA)
         ? detection.microphoneLLA[1] : detection.microphoneLLA.longitude;
       const feature = new ol.Feature({
-        ...detection, geometry: new ol.geom.Point(ol.proj.fromLonLat([lon, lat])),
+        ...detection,
+        sourceType: "real",
+        geometry: new ol.geom.Point(ol.proj.fromLonLat([lon, lat])),
       });
       feature.setId(detection._id);
+      feature.setStyle(buildRealDetectionStyle());
       source.addFeature(feature);
     }
     if (ids.size && !hmiState.realDetectionFitted) {
@@ -90,6 +106,10 @@ export async function loadRealDetections(hmiState) {
       ? "Some detections have invalid microphone coordinates and cannot be shown."
       : ids.size ? `${ids.size} real-device detection${ids.size === 1 ? "" : "s"} loaded.`
         : "No real-device detections found.";
+    applyDetectionSourceFilter(
+      hmiState,
+      hmiState.detectionSourceFilter || DETECTION_SOURCE_FILTERS.ALL,
+    );
   } catch (error) {
     if (request !== hmiState.realDetectionRequest) return;
     source.clear();
@@ -97,6 +117,11 @@ export async function loadRealDetections(hmiState) {
     status.textContent = getApiErrorMessage(
       { code: error.code, response: error.response && { status: error.response.status } },
       "Unable to load detections. Please try again."
+    );
+    applyDetectionSourceFilter(
+      hmiState,
+      hmiState.detectionSourceFilter || DETECTION_SOURCE_FILTERS.ALL,
+      { errorMessage: status.textContent },
     );
   }
 }
