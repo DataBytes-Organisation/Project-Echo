@@ -1,9 +1,10 @@
 ## app.routers.engine.py
-from fastapi import status, APIRouter
+from fastapi import status, APIRouter, Depends
 from app import serializers
 from app import schemas
 from app.database import Events
 from app.services.detection_stream import detection_stream_manager
+from app.middleware.engine_auth import verify_engine_api_key
 import asyncio
 import datetime
 import logging
@@ -50,12 +51,14 @@ def _build_stream_payload(inserted_id):
     )[0]
 
 
-@router.post("/event", status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/event",
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(verify_engine_api_key)],
+)
 async def create_event(event: schemas.EventSchema):
     # Keep Mongo work off the event loop so open WebSocket clients stay responsive.
     result = await asyncio.to_thread(Events.insert_one, event.dict())
-    new_post = await asyncio.to_thread(_build_created_event, result.inserted_id)
-
     # Persistence already succeeded. Broadcast failures must not turn this into a 500.
     try:
         stream_payload = await asyncio.to_thread(
@@ -69,13 +72,13 @@ async def create_event(event: schemas.EventSchema):
             exc_info=True,
         )
 
-    return new_post
+    return {"status": "success", "eventId": str(result.inserted_id)}
 
     
 # Return all species data
 
 @router.get("/animal_records", response_description="Get all record of animals")
-def list_species_data(species: str = "", event_start: str = "", event_end: str = "", microphoneLLA_0: float = None, microphoneLLA_1: float = None,  microphoneLLA_2: float = None):
+def list_species_data(species: str = "", event_start: str = "", event_end: str = "", microphoneLLA_0: float = None, microphoneLLA_1: float = None,  microphoneLLA_2: float = None, sourceType: str = "all"):
     pipeline = [
 
         {'$lookup': {
@@ -92,6 +95,7 @@ def list_species_data(species: str = "", event_start: str = "", event_end: str =
         {'$addFields': {
             'timestamp': "$events.timestamp",
             'sensorId': "$events.sensorId",
+            'sourceType': "$events.sourceType",
             'microphoneLLA': "$events.microphoneLLA",
             'animalEstLLA': "$events.animalEstLLA",
             'animalTrueLLA': "$events.animalTrueLLA",
@@ -104,6 +108,11 @@ def list_species_data(species: str = "", event_start: str = "", event_end: str =
 
     if species:
         pipeline.append({'$match': {'_id': species}})
+    if sourceType not in ("all", "real", "simulator"):
+        from fastapi import HTTPException
+        raise HTTPException(status_code=422, detail="sourceType must be all, real, or simulator")
+    if sourceType != "all":
+        pipeline.append({'$match': {'sourceType': sourceType}})
     if event_end and event_start:
         datetime_start = datetime.datetime.fromtimestamp(float(event_start))
         datetime_end = datetime.datetime.fromtimestamp(float(event_end))
@@ -130,5 +139,4 @@ def filter_name():
     algorithm_name = {'Echo-Engine' : "Echo-Engine-Algorithm", 'Echo-Simulator' : "Echo-Simulator-Algorithm", 
                       'Echo-search' : "Echo-Search-Algorithm", 'Echo-lookup' : "Echo-lookup-Algorithm" }
     return algorithm_name
-
 
