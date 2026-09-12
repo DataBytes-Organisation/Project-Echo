@@ -364,12 +364,22 @@ class TwoFactorVerifySchema(BaseModel):
         schema_extra = {}
 
 
-class DetectionCreate(EventSchema):
-    pass
-
-
-class Detection(EventSchema):
-    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+# Detection/DetectionCreate intentionally do not inherit EventSchema: they back the
+# separate /detections collection and API, which has its own consumers and tests.
+# Inheriting from EventSchema previously meant any change to the Engine/HMI event
+# contract silently changed this contract too (see the sourceType/LLA-object change
+# that broke tests/test_detection_retrieval.py before this was split out).
+class DetectionCreate(BaseModel):
+    timestamp: datetime  # Event timestamp
+    sensorId: constr(min_length=1)  # Non-empty string for sensor ID
+    species: constr(min_length=1)  # Non-empty string for species name
+    microphoneLLA: conlist(float, min_items=3, max_items=3)  # List of exactly 3 floats for microphone location
+    animalEstLLA: conlist(float, min_items=3, max_items=3)  # List of exactly 3 floats for estimated animal location
+    animalTrueLLA: conlist(float, min_items=3, max_items=3)  # List of exactly 3 floats for true animal location
+    animalLLAUncertainty: int  # Uncertainty value
+    audioClip: str  # Audio clip data
+    confidence: float = Field(gt=0, lt=100)  # Confidence value between 0 and 100
+    sampleRate: int  # Audio sample rate
 
     class Config:
         allow_population_by_field_name = True
@@ -377,7 +387,6 @@ class Detection(EventSchema):
         json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
-                "_id": "651f2a9f4d1f1b1c3e2a4567",
                 "timestamp": "2023-03-22T13:45:12.000Z",
                 "sensorId": "2",
                 "species": "Sus Scrofa",
@@ -391,13 +400,11 @@ class Detection(EventSchema):
             }
         }
 
-class DetectionCreate(EventSchema):
-    pass
 
-class Detection(EventSchema):
+class Detection(DetectionCreate):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
 
-    class config:
+    class Config:
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
