@@ -1,54 +1,27 @@
-/* Alert severity bars for sensor health */
+/* Charts helper for sensor health (moved into /admin/sensor_health/) */
 
-function renderAlertsChart(items) {
-  const root = document.getElementById("alertsChart");
-  if (!root) return;
+// same shared client as script.js on these pages - this was the last raw fetch
+// left on the sensor health screens. Silent retry: the chart is decorative and
+// already falls back to zeroes, so it shouldn't stack toasts on top of the ones
+// loadAlertsPage() is already showing for the same endpoint.
+import { retrieveSensorAlerts } from "/js/routes.js";
 
-  const counts = { Critical: 0, High: 0, Medium: 0, Low: 0 };
-  for (const alert of Array.isArray(items) ? items : []) {
-    const issue = String(alert.issue || "").toLowerCase();
-    const sev = String(alert.severity || "");
-    if (counts[sev] !== undefined) {
-      counts[sev] += 1;
-    } else if (issue.includes("offline")) {
-      counts.Critical += 1;
-    } else if (issue.includes("battery")) {
-      counts.High += 1;
-    } else {
-      counts.Medium += 1;
-    }
-  }
+document.addEventListener("DOMContentLoaded", () => {
+  drawAlertsChart();
+});
 
-  const rows = [
-    { label: "Critical", value: counts.Critical, color: "#C8473C" },
-    { label: "High", value: counts.High, color: "#D29B38" },
-    { label: "Medium", value: counts.Medium, color: "#F59E0B" },
-    { label: "Low", value: counts.Low, color: "#2F6E4F" },
-  ];
+async function drawAlertsChart() {
+  const canvas = document.getElementById("alertsChart");
+  if (!canvas) return;
 
-  const total = rows.reduce((sum, row) => sum + row.value, 0);
-  if (total === 0) {
-    root.innerHTML = '<p class="card-subtitle">No active alerts.</p>';
-    return;
-  }
+  const ctx = canvas.getContext("2d");
+  const labels = ["Critical", "High", "Medium", "Low"];
+  let values = [0, 0, 0, 0];
 
-  const maxValue = Math.max(...rows.map((row) => row.value), 1);
-
-  root.innerHTML = rows
-    .map((row) => {
-      const width = Math.max(6, Math.round((row.value / maxValue) * 100));
-      return `
-        <div class="alert-bar-row">
-          <span class="alert-bar-label">${row.label}</span>
-          <div class="alert-bar-track">
-            <div class="alert-bar-fill" style="width:${width}%; background:${row.color};"></div>
-          </div>
-          <span class="alert-bar-value">${row.value}</span>
-        </div>
-      `;
-    })
-    .join("");
-}
+  try {
+    const response = await retrieveSensorAlerts({ silent: true });
+    const data = response.data;
+    const items = Array.isArray(data.items) ? data.items : [];
 
 async function drawAlertsChart() {
   const root = document.getElementById("alertsChart");

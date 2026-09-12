@@ -1,8 +1,7 @@
 const { verifySignUp, client } = require("../middleware");
-const axios = require('axios');
+const apiClient = require('../services/apiClient');
 require('dotenv').config();
-const API_BASE_URL = `http://${process.env.API_HOST || 'localhost'}:9000`;
-const MESSAGE_API_URL = `${API_BASE_URL}/hmi`;
+const MESSAGE_API_URL = '/hmi';
 
 module.exports = function(app) {
   app.use(function(req, res, next) {
@@ -12,64 +11,72 @@ module.exports = function(app) {
 
   app.get(`/movement_time/:start/:end`, async (req, res) => {
     try {
-      const response = await axios.get(`${MESSAGE_API_URL}/movement_time?start=${req.params.start}&end=${req.params.end}`);
-      res.send(response.data || []);
+      const data = await apiClient.get(`${MESSAGE_API_URL}/movement_time`, {
+        params: { start: req.params.start, end: req.params.end },
+      });
+      res.send(data || []);
     } catch (err) {
-      if (!res.headersSent) res.status(502).json({ error: 'API unavailable' });
+      if (!res.headersSent) apiClient.sendApiError(res, err);
     }
   });
 
   app.get(`/movement_time_daily/:start/:end`, async (req, res) => {
     try {
-      const response = await axios.get(`${MESSAGE_API_URL}/movement_time_daily?start=${req.params.start}&end=${req.params.end}`);
-      res.send(response.data || []);
+      const data = await apiClient.get(`${MESSAGE_API_URL}/movement_time_daily`, {
+        params: { start: req.params.start, end: req.params.end },
+      });
+      res.send(data || []);
     } catch (err) {
-      if (!res.headersSent) res.status(502).json({ error: 'API unavailable' });
+      if (!res.headersSent) apiClient.sendApiError(res, err);
     }
   });
 
   app.get(`/events_time/:start/:end`, async (req, res) => {
     try {
-      const response = await axios.get(`${MESSAGE_API_URL}/events_time?start=${req.params.start}&end=${req.params.end}`);
-      res.send(response.data || []);
+      const data = await apiClient.get(`${MESSAGE_API_URL}/events_time`, {
+        params: { start: req.params.start, end: req.params.end },
+      });
+      res.send(data || []);
     } catch (err) {
-      if (!res.headersSent) res.status(502).json({ error: 'API unavailable' });
+      if (!res.headersSent) apiClient.sendApiError(res, err);
     }
   });
 
   app.get(`/microphones`, async (req, res) => {
     try {
-      const response = await axios.get(`${MESSAGE_API_URL}/microphones`);
-      res.send(response.data);
+      const data = await apiClient.get(`${MESSAGE_API_URL}/microphones`);
+      res.send(data);
     } catch (err) {
-      if (!res.headersSent) res.status(502).json({ error: 'API unavailable' });
+      if (!res.headersSent) apiClient.sendApiError(res, err);
     }
   });
 
   app.get(`/audio/:id`, async (req, res) => {
     try {
-      const response = await axios.get(`${MESSAGE_API_URL}/audio?id=${req.params.id}`);
-      res.send(response.data);
+      const data = await apiClient.get(`${MESSAGE_API_URL}/audio`, { params: { id: req.params.id } });
+      res.send(data);
     } catch (err) {
-      if (!res.headersSent) res.status(502).json({ error: 'API unavailable' });
+      if (!res.headersSent) apiClient.sendApiError(res, err);
     }
   });
 
   app.post(`/post_recording`, async (req, res) => {
     try {
-      const response = await axios.post(`${MESSAGE_API_URL}/post_recording`, req.body);
-      res.send(response.data);
+      const data = await apiClient.post(`${MESSAGE_API_URL}/post_recording`, req.body);
+      res.send(data);
     } catch (err) {
-      if (!res.headersSent) res.status(502).json({ error: 'API unavailable' });
+      if (!res.headersSent) apiClient.sendApiError(res, err);
     }
   });
 
   app.post(`/sim_control/:control`, async (req, res) => {
     try {
-      const response = await axios.post(`${MESSAGE_API_URL}/sim_control?control=${req.params.control}`);
-      res.send(response.data);
+      const data = await apiClient.post(`${MESSAGE_API_URL}/sim_control`, undefined, {
+        params: { control: req.params.control },
+      });
+      res.send(data);
     } catch (err) {
-      if (!res.headersSent) res.status(502).json({ error: 'API unavailable' });
+      if (!res.headersSent) apiClient.sendApiError(res, err);
     }
   });
 
@@ -78,10 +85,10 @@ module.exports = function(app) {
 
   app.get(`/latest_movement`, async (req, res) => {
     try {
-      const response = await axios.get(`${MESSAGE_API_URL}/latest_movement`);
-      res.send(response.data);
+      const data = await apiClient.get(`${MESSAGE_API_URL}/latest_movement`);
+      res.send(data);
     } catch (err) {
-      if (!res.headersSent) res.status(502).json({ error: 'API unavailable' });
+      if (!res.headersSent) apiClient.sendApiError(res, err);
     }
   });
 }
