@@ -1,0 +1,33 @@
+config:
+  target: "http://localhost:9000"
+
+  phases:
+    - name: "Warm up"
+      duration: 20
+      arrivalRate: 5
+
+    - name: "Medium load"
+      duration: 30
+      arrivalRate: 20
+
+    - name: "High load"
+      duration: 30
+      arrivalRate: 50
+
+    - name: "Traffic spike"
+      duration: 20
+      arrivalRate: 100
+
+  ensure:
+    thresholds:
+      - http.response_time.p95: 1500
+      - http.errors: 5
+
+scenarios:
+  - name: "Stress retrieve IoT nodes"
+    flow:
+      - get:
+          url: "/iot/nodes"
+          expect:
+            - statusCode: 200
+

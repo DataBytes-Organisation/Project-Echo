@@ -18,7 +18,6 @@ import pandas as pd
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
-
 def _build_created_event(inserted_id):
     pipeline = [
         {"$match": {"_id": inserted_id}},
@@ -52,8 +51,11 @@ def _build_stream_payload(inserted_id):
 
 @router.post("/event", status_code=status.HTTP_201_CREATED)
 async def create_event(event: schemas.EventSchema):
+    event_data = event.dict()
+    event_data["confidence"] = float(event_data["confidence"])
+
     # Keep Mongo work off the event loop so open WebSocket clients stay responsive.
-    result = await asyncio.to_thread(Events.insert_one, event.dict())
+    result = await asyncio.to_thread(Events.insert_one, event_data)
     new_post = await asyncio.to_thread(_build_created_event, result.inserted_id)
 
     # Persistence already succeeded. Broadcast failures must not turn this into a 500.
@@ -70,7 +72,6 @@ async def create_event(event: schemas.EventSchema):
         )
 
     return new_post
-
     
 # Return all species data
 
