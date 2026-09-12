@@ -36,4 +36,10 @@ function createCheckUserSession(redisClient, isPublicRoute = () => false) {
   };
 }
 
-module.exports = { createCheckUserSession };
+function resolveLandingPath(requestToken, storedToken, role) {
+  if (!tokensMatch(requestToken, storedToken)) return "/login";
+  if (typeof role === "string" && role.toLowerCase().includes("admin")) return "/admin-dashboard";
+  return "/map";
+}
+
+module.exports = { createCheckUserSession, tokensMatch, resolveLandingPath };

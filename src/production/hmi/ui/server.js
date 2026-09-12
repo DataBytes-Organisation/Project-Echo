@@ -5,7 +5,7 @@ const fs = require('fs');
 const cookieSession = require('cookie-session');
 const helmet = require('helmet');
 const jwt = require('jsonwebtoken');
-const { client, checkUserSession } = require('./middleware');
+const { client, checkUserSession, resolveLandingPath } = require('./middleware');
 const controller = require('./controller/auth.controller');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
@@ -577,32 +577,21 @@ require('./routes/user.routes')(app);
 require('./routes/map.routes')(app);
 //updated 2026/01/26 to serve mongodb api endpoints to admin folder for data integration
 app.get(
-  ['/admin/*', '/map', '/requests', '/notifications'],
+  ['/admin*', '/map', '/requests', '/notifications'],
   checkUserSession
 );
 app.get("/verify-otp", (req, res) => {
   res.sendFile(path.join(__dirname, 'public/verify-otp.html'));
 });
 app.get("/", async (req, res) => {
-  console.log("token: ", await client.get('JWT', (err, storedToken) => {
-          if (err) {
-            return `Error retrieving token from Redis: ${err}`
-          } else {
-            return storedToken
-          }
-  }))
-  let role = await client.get('Roles', (err, storedToken) => {
-    if (err) {
-      return `Error retrieving user role from Redis: ${err}`
-    } else {
-      return storedToken
-    }
-  })
-
-  if (role && role.toLowerCase().includes("admin")) {
-    res.redirect("/admin-dashboard")
-  } else {
-    res.redirect("/map")
+  try {
+    if (!client.isOpen) await client.connect();
+    const storedToken = await client.get("JWT");
+    const role = await client.get("Roles");
+    return res.redirect(resolveLandingPath(req.session?.token, storedToken, role));
+  } catch (error) {
+    console.error("Landing redirect failed.");
+    return res.redirect("/login");
   }
 })
 //Serve the admin dashboard
@@ -788,27 +777,13 @@ app.get('/api/requests', async (req, res) => {
 //Page Direction to Welcome page after logging in
 app.get("/welcome", async (req,res) => {
   try {
-    console.log("token: ", await client.get('JWT', (err, storedToken) => {
-            if (err) {
-              return `Error retrieving token from Redis: ${err}`
-            } else {
-              return storedToken
-            }
-    }))
-    let role = await client.get('Roles', (err, storedToken) => {
-      if (err) {
-        return `Error retrieving user role from Redis: ${err}`
-      } else {
-        return storedToken
-      }
-    })
+    if (!client.isOpen) await client.connect();
+    const storedToken = await client.get("JWT");
+    const role = await client.get("Roles");
     //If the user that has just logged in is an admin, direct them
     //to the admin dashboard. Otherwise direct them to the map.
-    if (role.toLowerCase().includes("admin")) {
-      res.redirect("/admin-dashboard")
-    } else {
-      res.redirect("/map")
-    }
+    //Strangers without a matching session go back to login.
+    return res.redirect(resolveLandingPath(req.session?.token, storedToken, role));
   }
   catch {
     res.send(`<script> alert("No user info detected! Please login again"); window.location.href = "/login"; </script>`);
