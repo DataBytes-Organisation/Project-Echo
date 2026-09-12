@@ -52,7 +52,7 @@ from google.cloud import storage
 
 # yamnet related imports
 from yamnet_dir import params as params
-from yamnet_dir import yamnet as yamnet_model
+from yamnet_dir import yamnet as yamnet_module
 
 # lat long approximation
 import random
@@ -87,17 +87,13 @@ with open(YAMNET_DIR / "class_names.pkl", "rb") as f:
 with open(YAMNET_DIR / "label_encoder.pkl", "rb") as f:
     le = pickle.load(f)
 
-yamnet = yamnet_model.yamnet_frames_model(params)
+yamnet = yamnet_module.yamnet_frames_model(params)
 yamnet.load_weights(str(YAMNET_DIR / "yamnet.h5"))
-yamnet_classes = yamnet_model.class_names(str(YAMNET_DIR / "yamnet_class_map.csv"))
+yamnet_classes = yamnet_module.class_names(str(YAMNET_DIR / "yamnet_class_map.csv"))
 model = load_model(str(YAMNET_DIR / "model_3_82_16000.h5"))
 
-# Load the YAMNet model
-# yamnet_model_handle = 'https://tfhub.dev/google/yamnet/1'
-# yamnet_model = hub.load(yamnet_model_handle)
-#TODO: Fix for above macOS, as installing tensorflow hub causes issue
-model = load_model(str(YAMNET_DIR / "model_3_82_16000.h5"))
-
+# Load the YAMNet SavedModel for feature extraction
+yamnet_model = tf.saved_model.load(str(YAMNET_DIR / "model"))
 
 class EchoEngine():
 
@@ -521,12 +517,6 @@ class EchoEngine():
                 error_message=error["message"]
             )
 
-            backend_payload = BackendAdapter.to_backend_payload(response)
-
-            url = 'http://ts-api-cont:9000/engine/event'
-            x = requests.post(url, json=backend_payload)
-            print(x.text)
-
             return
 
         # ---------------------------------------------------------
@@ -544,12 +534,6 @@ class EchoEngine():
                 error_code=error["code"],
                 error_message=error["message"]
             )
-
-            backend_payload = BackendAdapter.to_backend_payload(response)
-
-            url = 'http://ts-api-cont:9000/engine/event'
-            x = requests.post(url, json=backend_payload)
-            print(x.text)
 
             return
 
@@ -569,12 +553,6 @@ class EchoEngine():
                 error_message=error["message"]
             )
 
-            backend_payload = BackendAdapter.to_backend_payload(response)
-
-            url = 'http://ts-api-cont:9000/engine/event'
-            x = requests.post(url, json=backend_payload)
-            print(x.text)
-
             return
 
         # ---------------------------------------------------------
@@ -593,12 +571,6 @@ class EchoEngine():
                 error_code=error["code"],
                 error_message=error["message"]
             )
-
-            backend_payload = BackendAdapter.to_backend_payload(response)
-
-            url = 'http://ts-api-cont:9000/engine/event'
-            x = requests.post(url, json=backend_payload)
-            print(x.text)
 
             return
 

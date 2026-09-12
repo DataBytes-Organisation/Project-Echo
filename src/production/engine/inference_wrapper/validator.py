@@ -84,10 +84,10 @@ class InferenceValidator:
                 "message": "Confidence score missing."
             }
 
-        if confidence < 0 or confidence > 100:
+        if confidence < 0 or confidence > 1:
             return False, {
                 "code": "INVALID_CONFIDENCE",
-                "message": "Confidence must be between 0 and 100."
+                "message": "Confidence must be between 0 and 1."
             }
 
         return True, None

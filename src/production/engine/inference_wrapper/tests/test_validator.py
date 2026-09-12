@@ -42,12 +42,30 @@ def test_invalid_audio():
 def test_invalid_confidence():
     valid, error = InferenceValidator.validate_prediction(
         "Koala",
-        120
+        1.1
     )
 
     assert valid is False
     assert error["code"] == "INVALID_CONFIDENCE"
 
+def test_valid_confidence():
+    valid, error = InferenceValidator.validate_prediction(
+        "Koala",
+        0.96
+    )
+
+    assert valid is True
+    assert error is None
+
+
+def test_confidence_upper_boundary():
+    valid, error = InferenceValidator.validate_prediction(
+        "Koala",
+        1.0
+    )
+
+    assert valid is True
+    assert error is None
 
 def test_invalid_sample_rate():
     valid, error = InferenceValidator.validate_sample_rate(0)
