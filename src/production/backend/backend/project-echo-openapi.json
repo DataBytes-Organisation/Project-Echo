@@ -3065,6 +3065,132 @@
         }
       }
     },
+    "/detections/cursor": {
+      "get": {
+        "tags": [
+          "detections"
+        ],
+        "summary": "List detections with cursor pagination",
+        "operationId": "list_detections_cursor_endpoint_detections_cursor_get",
+        "parameters": [
+          {
+            "description": "Filter by species name (exact match)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Species",
+              "description": "Filter by species name (exact match)"
+            },
+            "name": "species",
+            "in": "query"
+          },
+          {
+            "description": "Filter detections from this timestamp (inclusive, ISO 8601)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Start Time",
+              "description": "Filter detections from this timestamp (inclusive, ISO 8601)"
+            },
+            "name": "start_time",
+            "in": "query"
+          },
+          {
+            "description": "Filter detections up to this timestamp (inclusive, ISO 8601)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "title": "End Time",
+              "description": "Filter detections up to this timestamp (inclusive, ISO 8601)"
+            },
+            "name": "end_time",
+            "in": "query"
+          },
+          {
+            "description": "Latitude for location filter (requires lon & radius_km)",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "title": "Lat",
+              "description": "Latitude for location filter (requires lon & radius_km)"
+            },
+            "name": "lat",
+            "in": "query"
+          },
+          {
+            "description": "Longitude for location filter (requires lat & radius_km)",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "title": "Lon",
+              "description": "Longitude for location filter (requires lat & radius_km)"
+            },
+            "name": "lon",
+            "in": "query"
+          },
+          {
+            "description": "Radius in kilometres for location filter (requires lat & lon)",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "title": "Radius Km",
+              "description": "Radius in kilometres for location filter (requires lat & lon)"
+            },
+            "name": "radius_km",
+            "in": "query"
+          },
+          {
+            "description": "Number of detections per page (max 100)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100.0,
+              "minimum": 1.0,
+              "title": "Limit",
+              "description": "Number of detections per page (max 100)",
+              "default": 20
+            },
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "description": "Opaque cursor from a previous cursor response",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Cursor",
+              "description": "Opaque cursor from a previous cursor response"
+            },
+            "name": "cursor",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DetectionCursorListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/detections/{detection_id}": {
       "get": {
         "tags": [
@@ -3538,6 +3664,31 @@
           "confidence": 99.4,
           "sampleRate": 48000
         }
+      },
+      "DetectionCursorListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/Detection"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "next_cursor": {
+            "type": "string",
+            "title": "Next Cursor"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "limit"
+        ],
+        "title": "DetectionCursorListResponse"
       },
       "DetectionListResponses": {
         "properties": {
