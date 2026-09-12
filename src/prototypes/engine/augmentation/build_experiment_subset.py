@@ -1,11 +1,21 @@
 """
-Builds the small dataset subset used for running a small
-baseline experiment to confirm that augmented training data remains valid.
+Builds the dataset subset used for the Sprint 2 augmentation benchmark.
 
 Selects the N species with the most audio files in data_files/ (so every selected
 species has enough clips for a meaningful train/val split), then copies the
 first FILES_PER_SPECIES files (sorted by filename for determinism) from
 each into a new subset folder.
+
+Sized per sprint_2_augmentation_comparison_plan.md's scale requirement:
+"roughly 500+ test samples per arm (not per class - in aggregate)". With a
+0.2 val_split, that needs 2500+ files overall. Sprint 1's values
+(N_SPECIES=10, FILES_PER_SPECIES=100 -> 1000 files, ~200 val samples) were
+sized only for a quick validity check, not a real benchmark - the real
+per-species file counts in data_files/ mean the 10th-ranked species only
+has 174 files total, so reaching 2500+ needs more species, not just a
+higher per-species cap. N_SPECIES=15/FILES_PER_SPECIES=200 below yields
+~2737 files (~547 val samples) against the real dataset - verified by
+counting files directly, not assumed.
 
 Does not modify data_files/ - only copies files out of it.
 Safe to re-run: existing copies are simply overwritten with identical
@@ -16,8 +26,8 @@ import shutil
 from pathlib import Path
 
 # ---Configuration---
-N_SPECIES = 10 # number of species to include in the subset
-FILES_PER_SPECIES = 100 # number of clips to copy per species
+N_SPECIES = 15 # number of species to include in the subset
+FILES_PER_SPECIES = 200 # number of clips to copy per species (per-species cap - see module docstring for why this needs more species, not just a higher cap)
 AUDIO_EXTENSIONS = (".wav", ".mp3", ".ogg", ".flac")
 
 # Four `.parent`s reach the repo root (Project-Echo/) from this file's folder
