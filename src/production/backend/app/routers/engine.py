@@ -1,9 +1,10 @@
 ## app.routers.engine.py
-from fastapi import status, APIRouter
+from fastapi import status, APIRouter, Depends
 from app import serializers
 from app import schemas
 from app.database import Events
 from app.services.detection_stream import detection_stream_manager
+from app.middleware.engine_auth import verify_engine_api_key
 import asyncio
 import datetime
 import logging
@@ -50,7 +51,11 @@ def _build_stream_payload(inserted_id):
     )[0]
 
 
-@router.post("/event", status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/event",
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(verify_engine_api_key)],
+)
 async def create_event(event: schemas.EventSchema):
     # Keep Mongo work off the event loop so open WebSocket clients stay responsive.
     result = await asyncio.to_thread(Events.insert_one, event.dict())
