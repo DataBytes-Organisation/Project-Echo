@@ -603,17 +603,10 @@
                   </div>
                   <div class="container" id="detection-source-filter">
                     <span>Detection source</span>
-                    <div class="form-check">
-                      <input class="form-check-input" type="radio" name="detectionSource" id="source-all" value="all" checked>
-                      <label class="form-check-label" for="source-all">All</label>
-                    </div>
-                    <div class="form-check">
-                      <input class="form-check-input" type="radio" name="detectionSource" id="source-simulator" value="simulator">
-                      <label class="form-check-label" for="source-simulator">Simulated</label>
-                    </div>
-                    <div class="form-check">
-                      <input class="form-check-input" type="radio" name="detectionSource" id="source-real" value="real">
-                      <label class="form-check-label" for="source-real">Real-device</label>
+                    <div class="seg-control" role="group" aria-label="Detection source">
+                      <button type="button" class="toggle-button btn btn-secondary seg-btn" data-detection-source="all" aria-pressed="true">All</button>
+                      <button type="button" class="toggle-button btn btn-secondary seg-btn" data-detection-source="simulator" aria-pressed="false">Simulated</button>
+                      <button type="button" class="toggle-button btn btn-secondary seg-btn" data-detection-source="real" aria-pressed="false">Real-device</button>
                     </div>
                     <p id="detection-source-status" role="status" aria-live="polite" style="margin-top: 8px;"></p>
                   </div>
@@ -1577,10 +1570,12 @@
         hmiState.speciesFilterState = window.getSpeciesFilterState();
       }
 
-      document.querySelectorAll('input[name="detectionSource"]').forEach((input) => {
-        input.addEventListener("change", () => {
-          if (!input.checked) return;
-          setDetectionSourceFilter(hmiState, input.value);
+      document.querySelectorAll('[data-detection-source]').forEach((button) => {
+        button.addEventListener("click", () => {
+          document.querySelectorAll('[data-detection-source]').forEach((other) => {
+            other.setAttribute("aria-pressed", String(other === button));
+          });
+          setDetectionSourceFilter(hmiState, button.dataset.detectionSource);
         });
       });
 

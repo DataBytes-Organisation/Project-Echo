@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import fs from "node:fs";
 
 class Element {
   constructor() {
@@ -233,4 +234,34 @@ test("species filter state still gates simulated layers under All", () => {
 test("detail labels map contract values to Simulated and Real-device", () => {
   assert.equal(filter.formatDetectionSourceLabel("simulator"), "Simulated");
   assert.equal(filter.formatDetectionSourceLabel("real"), "Real-device");
+});
+
+test("truth layers follow production checkbox state (underscore ids)", () => {
+  // Production speciesFilterState holds checkbox ids (_normal, _bird, ...),
+  // not bare status/type names. Truth layers must follow it like vocalization
+  // layers do, or movement markers never render and the toggle looks dead.
+  const hmi = makeHmi();
+  layersSeed(hmi);
+  hmi.speciesFilterState = [
+    "_endangered", "_vulnerable", "_near-threatened", "_normal", "_invasive",
+    "_mammal", "_bird", "_amphibian", "_reptile", "_insect",
+  ];
+  filter.applyDetectionSourceFilter(hmi, "simulator");
+  assert.equal(hmi.layers.normal_bird_truth.visible, true);
+  assert.equal(hmi.layers.normal_bird.visible, true);
+  filter.applyDetectionSourceFilter(hmi, "real");
+  assert.equal(hmi.layers.normal_bird_truth.visible, false);
+  assert.equal(hmi.layers.normal_bird.visible, false);
+  filter.applyDetectionSourceFilter(hmi, "all");
+  assert.equal(hmi.layers.normal_bird_truth.visible, true);
+});
+
+test("/map offers All/Simulated/Real-device as segmented buttons", () => {
+  const html = fs.readFileSync(new URL("../public/index.html", import.meta.url), "utf8");
+  for (const value of ["all", "simulator", "real"]) {
+    assert.match(html, new RegExp(`data-detection-source="${value}"`));
+  }
+  assert.match(html, /data-detection-source="all"[^>]*aria-pressed="true"/);
+  assert.doesNotMatch(html, /<input[^>]*name="detectionSource"/);
+  assert.match(html, /id="detection-source-status"/);
 });

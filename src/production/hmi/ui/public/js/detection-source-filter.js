@@ -87,7 +87,10 @@ function speciesAllowsVocalization(filterState, status, animalType) {
 
 function speciesAllowsTruth(filterState, status, animalType) {
   if (!Array.isArray(filterState)) return true;
-  return filterState.includes(status) && filterState.includes(animalType);
+  // Production speciesFilterState holds checkbox ids (_normal, _bird, ...).
+  const statusOk = filterState.includes(status) || filterState.includes(`_${status}`);
+  const typeOk = filterState.includes(animalType) || filterState.includes(`_${animalType}`);
+  return statusOk && typeOk;
 }
 
 function setVocalizationLayersVisible(hmiState, visible, speciesFilterState) {
