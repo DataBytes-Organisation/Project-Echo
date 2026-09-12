@@ -17,31 +17,35 @@ class TestEnginePredictionOutput(unittest.TestCase):
         self.engine.config["API_URL"] = (
             "http://mock-backend/engine/event"
         )
+        self.engine.config["API_TIMEOUT_SECONDS"] = 5
+        self.engine.config["API_RETRY_COUNT"] = 2
 
         self.audio_event = {
+            "sourceType": "simulator",
             "timestamp": "2026-08-06T10:30:00Z",
             "sensorId": "sensor-001",
-            "microphoneLLA": [
-                -37.8136,
-                144.9631,
-                0.0,
-            ],
-            "animalEstLLA": [
-                -37.8136,
-                144.9631,
-                0.0,
-            ],
-            "animalTrueLLA": [
-                -37.8136,
-                144.9631,
-                0.0,
-            ],
+            "microphoneLLA": {
+                "latitude": -37.8136,
+                "longitude": 144.9631,
+                "altitude": 0.0,
+            },
+            "animalEstLLA": {
+                "latitude": -37.8136,
+                "longitude": 144.9631,
+                "altitude": 0.0,
+            },
+            "animalTrueLLA": {
+                "latitude": -37.8136,
+                "longitude": 144.9631,
+                "altitude": 0.0,
+            },
             "animalLLAUncertainty": 5.0,
             "audioClip": "base64-test-audio",
         }
 
     def test_complete_prediction_payload_sent(self):
         mock_response = MagicMock()
+        mock_response.status_code = 201
         mock_response.text = "accepted"
 
         with patch.object(
@@ -57,25 +61,26 @@ class TestEnginePredictionOutput(unittest.TestCase):
             )
 
         expected_payload = {
+            "sourceType": "simulator",
             "timestamp": "2026-08-06T10:30:00Z",
             "species": "Magpie",
             "confidence": 91.5,
             "sensorId": "sensor-001",
-            "microphoneLLA": [
-                -37.8136,
-                144.9631,
-                0.0,
-            ],
-            "animalEstLLA": [
-                -37.8136,
-                144.9631,
-                0.0,
-            ],
-            "animalTrueLLA": [
-                -37.8136,
-                144.9631,
-                0.0,
-            ],
+            "microphoneLLA": {
+                "latitude": -37.8136,
+                "longitude": 144.9631,
+                "altitude": 0.0,
+            },
+            "animalEstLLA": {
+                "latitude": -37.8136,
+                "longitude": 144.9631,
+                "altitude": 0.0,
+            },
+            "animalTrueLLA": {
+                "latitude": -37.8136,
+                "longitude": 144.9631,
+                "altitude": 0.0,
+            },
             "animalLLAUncertainty": 5.0,
             "audioClip": "base64-test-audio",
             "sampleRate": 48000,
@@ -83,8 +88,82 @@ class TestEnginePredictionOutput(unittest.TestCase):
 
         mock_post.assert_called_once_with(
             "http://mock-backend/engine/event",
-            json=expected_payload
+            json=expected_payload,
+            timeout=5,
         )
+
+    def test_mqtt_sample_rate_used_when_provided(self):
+        mock_response = MagicMock()
+        mock_response.status_code = 201
+        mock_response.text = "accepted"
+        event_with_sample_rate = dict(self.audio_event)
+        event_with_sample_rate["sampleRate"] = 16000
+        event_with_sample_rate["sourceType"] = "real"
+
+        with patch.object(
+            engine_module.requests,
+            "post",
+            return_value=mock_response
+        ) as mock_post:
+            self.engine.echo_api_send_detection_event(
+                event_with_sample_rate,
+                32000,
+                "Magpie",
+                91.5,
+            )
+
+        posted_payload = mock_post.call_args.kwargs["json"]
+        self.assertEqual(posted_payload["sampleRate"], 16000)
+        self.assertEqual(posted_payload["sourceType"], "real")
+
+    def test_inference_sample_rate_used_when_mqtt_omits_it(self):
+        mock_response = MagicMock()
+        mock_response.status_code = 201
+        mock_response.text = "accepted"
+
+        with patch.object(
+            engine_module.requests,
+            "post",
+            return_value=mock_response
+        ) as mock_post:
+            self.engine.echo_api_send_detection_event(
+                self.audio_event,
+                32000,
+                "Magpie",
+                91.5,
+            )
+
+        posted_payload = mock_post.call_args.kwargs["json"]
+        self.assertEqual(posted_payload["sampleRate"], 32000)
+
+    def test_nullable_animal_location_fields_preserved(self):
+        mock_response = MagicMock()
+        mock_response.status_code = 201
+        mock_response.text = "accepted"
+        event_with_nulls = dict(self.audio_event)
+        event_with_nulls["sourceType"] = "real"
+        event_with_nulls["animalEstLLA"] = None
+        event_with_nulls["animalTrueLLA"] = None
+        event_with_nulls["animalLLAUncertainty"] = None
+        event_with_nulls["sampleRate"] = 16000
+
+        with patch.object(
+            engine_module.requests,
+            "post",
+            return_value=mock_response
+        ) as mock_post:
+            self.engine.echo_api_send_detection_event(
+                event_with_nulls,
+                32000,
+                "Magpie",
+                91.5,
+            )
+
+        posted_payload = mock_post.call_args.kwargs["json"]
+        self.assertIsNone(posted_payload["animalEstLLA"])
+        self.assertIsNone(posted_payload["animalTrueLLA"])
+        self.assertIsNone(posted_payload["animalLLAUncertainty"])
+        self.assertEqual(posted_payload["sampleRate"], 16000)
 
     def test_backend_url_read_from_configuration(self):
         expected_url = (
@@ -93,6 +172,7 @@ class TestEnginePredictionOutput(unittest.TestCase):
         self.engine.config["API_URL"] = expected_url
 
         mock_response = MagicMock()
+        mock_response.status_code = 201
         mock_response.text = "accepted"
 
         with patch.object(

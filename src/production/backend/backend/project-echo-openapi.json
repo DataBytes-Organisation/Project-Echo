@@ -6,6 +6,44 @@
     "version": "1.0.0"
   },
   "paths": {
+    "/mqtt/connection-state": {
+      "get": {
+        "tags": [
+          "mqtt"
+        ],
+        "summary": "Mqtt Connection State",
+        "operationId": "mqtt_connection_state_mqtt_connection_state_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mqtt/latest-events": {
+      "get": {
+        "tags": [
+          "mqtt"
+        ],
+        "summary": "Mqtt Latest Events",
+        "operationId": "mqtt_latest_events_mqtt_latest_events_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/audio/upload": {
       "post": {
         "tags": [
@@ -133,6 +171,47 @@
         "responses": {
           "200": {
             "description": "Get detection events within certain duration",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/hmi/latest_events": {
+      "get": {
+        "tags": [
+          "hmi"
+        ],
+        "summary": "Show Latest Events",
+        "operationId": "show_latest_events_hmi_latest_events_get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "title": "Limit",
+              "default": 20
+            },
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get most recent classified detection events",
             "content": {
               "application/json": {
                 "schema": {}
@@ -2382,6 +2461,134 @@
         }
       }
     },
+    "/payments/razorpay/orders": {
+      "post": {
+        "tags": [
+          "payments"
+        ],
+        "summary": "Create Razorpay Order",
+        "operationId": "create_razorpay_order_payments_razorpay_orders_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RazorpayOrderRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RazorpayOrderResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWTBearer": []
+          }
+        ]
+      }
+    },
+    "/payments/razorpay/verify": {
+      "post": {
+        "tags": [
+          "payments"
+        ],
+        "summary": "Verify Razorpay Checkout",
+        "operationId": "verify_razorpay_checkout_payments_razorpay_verify_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RazorpayCheckoutProof"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentStatusResponse"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentStatusResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payments/razorpay/webhook": {
+      "post": {
+        "tags": [
+          "payments"
+        ],
+        "summary": "Receive Razorpay Webhook",
+        "operationId": "receive_razorpay_webhook_payments_razorpay_webhook_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentStatusResponse"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentStatusResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/predict": {
       "post": {
         "tags": [
@@ -3136,13 +3343,18 @@
           },
           "confidence": {
             "type": "number",
-            "exclusiveMaximum": 100.0,
-            "exclusiveMinimum": 0.0,
+            "maximum": 100.0,
+            "minimum": 0.0,
             "title": "Confidence"
           },
           "sampleRate": {
             "type": "integer",
             "title": "Samplerate"
+          },
+          "source_model": {
+            "type": "string",
+            "title": "Source Model",
+            "default": "unknown"
           },
           "_id": {
             "type": "string",
@@ -3242,13 +3454,18 @@
           },
           "confidence": {
             "type": "number",
-            "exclusiveMaximum": 100.0,
-            "exclusiveMinimum": 0.0,
+            "maximum": 100.0,
+            "minimum": 0.0,
             "title": "Confidence"
           },
           "sampleRate": {
             "type": "integer",
             "title": "Samplerate"
+          },
+          "source_model": {
+            "type": "string",
+            "title": "Source Model",
+            "default": "unknown"
           }
         },
         "type": "object",
@@ -3398,13 +3615,18 @@
           },
           "confidence": {
             "type": "number",
-            "exclusiveMaximum": 100.0,
-            "exclusiveMinimum": 0.0,
+            "maximum": 100.0,
+            "minimum": 0.0,
             "title": "Confidence"
           },
           "sampleRate": {
             "type": "integer",
             "title": "Samplerate"
+          },
+          "source_model": {
+            "type": "string",
+            "title": "Source Model",
+            "default": "unknown"
           }
         },
         "type": "object",
@@ -3596,6 +3818,87 @@
           "otp"
         ],
         "title": "OTPVerifyRequest"
+      },
+      "PaymentStatusResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "title": "PaymentStatusResponse"
+      },
+      "RazorpayCheckoutProof": {
+        "properties": {
+          "paymentId": {
+            "type": "string",
+            "title": "Paymentid"
+          },
+          "orderId": {
+            "type": "string",
+            "title": "Orderid"
+          },
+          "signature": {
+            "type": "string",
+            "title": "Signature"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "paymentId",
+          "orderId",
+          "signature"
+        ],
+        "title": "RazorpayCheckoutProof"
+      },
+      "RazorpayOrderRequest": {
+        "properties": {
+          "amount": {
+            "type": "integer",
+            "title": "Amount"
+          }
+        },
+        "type": "object",
+        "required": [
+          "amount"
+        ],
+        "title": "RazorpayOrderRequest"
+      },
+      "RazorpayOrderResponse": {
+        "properties": {
+          "keyId": {
+            "type": "string",
+            "title": "Keyid"
+          },
+          "orderId": {
+            "type": "string",
+            "title": "Orderid"
+          },
+          "amount": {
+            "type": "integer",
+            "title": "Amount"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          }
+        },
+        "type": "object",
+        "required": [
+          "keyId",
+          "orderId",
+          "amount",
+          "currency"
+        ],
+        "title": "RazorpayOrderResponse"
       },
       "RecordingData": {
         "properties": {
