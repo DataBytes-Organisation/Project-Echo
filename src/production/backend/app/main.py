@@ -4,6 +4,8 @@ from .routers import add_csv_output_option, audio_upload_router
 
 from fastapi import FastAPI, Body, HTTPException, status, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.exceptions import RequestValidationError
+from app.errors import StandardizeErrorResponseMiddleware, http_exception_handler, unhandled_exception_handler, validation_exception_handler
 from app.routers import species_predictor
 from app.routers import auth_router
 from app.routers import admin_budget, admin_services
@@ -28,7 +30,7 @@ app.add_middleware(
 )
 # Routers
 from .routers import add_csv_output_option, audio_upload_router
-from app.routers import species_predictor, auth_router, hmi, engine, sim, two_factor, public, iot, live, sensors #Websocket
+from app.routers import species_predictor, auth_router, hmi, engine, sim, two_factor, public, iot, live, sensors, payments #Websocket
 
 from app.routers import projects
 app.include_router(projects.router)
@@ -49,6 +51,11 @@ app = FastAPI(
     version="1.0.0"
 )
 
+app.add_exception_handler(HTTPException, http_exception_handler)
+app.add_exception_handler(RequestValidationError, validation_exception_handler)
+app.add_exception_handler(Exception, unhandled_exception_handler)
+app.add_middleware(StandardizeErrorResponseMiddleware)
+
 # ✅ CORS Middleware
 app.add_middleware(
     CORSMiddleware,
@@ -59,24 +66,33 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ✅ Global exception handlers (task C4.3)
-# Attached to this FastAPI instance deliberately. The module creates FastAPI()
-# twice; the instance built above line 22 is discarded when the name `app` is
-# reassigned, so handlers registered there would silently have no effect.
-from app.error_handlers import register_exception_handlers
 
-register_exception_handlers(app)
+######### MQTT live event handling (FR-A2)
+from app.services.mqtt_client import start_mqtt_client, get_connection_state, get_latest_events
 
-# ✅ Security response headers
-# Adds X-Content-Type-Options, X-Frame-Options, Referrer-Policy,
-# Content-Security-Policy and related headers to every response. The Python
-# equivalent of Helmet. Strict-Transport-Security is opt-in via the
-# SECURITY_HSTS_ENABLED environment variable, because it is correct behind
-# TLS and wrong on a local HTTP development server.
-from app import config
-from app.middleware.security_headers import add_security_headers
+@app.on_event("startup")
+def startup_mqtt():
+    start_mqtt_client()
 
-add_security_headers(app, hsts_enabled=config.hsts_enabled())
+@app.get("/mqtt/connection-state", tags=["mqtt"])
+def mqtt_connection_state():
+    return {"state": get_connection_state()}
+
+@app.get("/mqtt/latest-events", tags=["mqtt"])
+def mqtt_latest_events():
+    from app.routers.hmi import show_latest_events
+
+    events = [
+        {"eventType": "vocalization", **event}
+        for event in show_latest_events(limit=20)
+    ]
+    events += [
+        event for event in get_latest_events()
+        if event.get("eventType") != "vocalization"
+    ]
+
+    return {"events": events}
+
 
 
 # app.include_router(hmi.router, tags=['hmi'], prefix='/hmi')
@@ -108,6 +124,8 @@ print(f" database names: {client.list_database_names()}")
 
 app.include_router(iot.router, tags=['iot'], prefix='/iot')
 app.include_router(sensors.router, tags=['sensors'], prefix='/sensors')
+app.include_router(payments.router)
+app.include_router(live.router, tags=["live"])
 app.include_router(species_predictor.router, tags=["predict"])
 
 

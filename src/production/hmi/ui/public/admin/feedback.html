@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="/admin/css/icons/tabler-icons/tabler-icons.css" />
 
   <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script type="text/javascript" src="/admin/js/app.min.js"></script>
+  <script src="/admin/js/admin-layout.js" defer></script>
 
   <style>
     :root{
@@ -444,13 +444,6 @@
   </div>
 
   <script>
-    $(document).ready(function() {
-      $("#sidebar").load("/admin/component/sidebar-component.html", function() {
-        $.getScript('/admin/js/sidebarmenu.js');
-      });
-      $("#header").load("/admin/component/header-component.html");
-      $("#footer").load("/admin/component/footer-component.html");
-
       document.getElementById('toolbarSubmit')?.addEventListener('click', () => {
         document.getElementById('submitBtn').click();
       });
@@ -458,7 +451,6 @@
       document.getElementById('toolbarClear')?.addEventListener('click', () => {
         document.getElementById('clearBtn').click();
       });
-    });
 
     const form = document.getElementById("feedbackForm");
     const successBanner = document.getElementById("successBanner");

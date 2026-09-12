@@ -457,6 +457,20 @@
                       <div class="box box6"></div><div class="box box7"></div><div class="box box8"></div><div class="box box9"></div><div class="box box10"></div>
                     </div>
                   </div>
+
+                  <p id="animal-audio-status" class="animal-audio-status" role="status" aria-live="polite">
+                    No audio selected.
+                  </p>
+
+                  <div id="animal-spectrogram" class="spectrogram-panel" data-state="empty">
+                    <div class="spectrogram-viewport" data-role="viewport">
+                      <canvas data-role="canvas"></canvas>
+                      <p class="spectrogram-state" data-role="empty">Select a vocalisation event to view its spectrogram.</p>
+                      <p class="spectrogram-state" data-role="loading" hidden>Decoding audio...</p>
+                      <p class="spectrogram-state spectrogram-state-error" data-role="error" role="alert" hidden></p>
+                    </div>
+                    <p class="spectrogram-summary" data-role="summary" aria-live="polite"></p>
+                  </div>
                   <p style="margin-top: 40px !important;">Is the information above inaccurate? <br>Request to make an edit.</p>
                   <button id="request-edit-button">Request Edit</button>
                 </div>
@@ -489,44 +503,61 @@
                     <div class="markup_column"><div class="markup_row_left"><div>Latitude</div></div><div class="markup_row_right"><div id="mic_markup_loc_lat"></div></div></div>
                     <div class="markup_column"><div class="markup_row_left" style="width: 100px !important"><div>Date</div></div><div class="markup_row_right" style="text-align: right !important; width: 400px !important"><div id="mic_markup_date"></div></div></div>
                   </div>
-                  <h2 style="margin-top: 20px !important;">Record Live Audio</h2>
-                  <div id="audio_recording_container">
-                    <button type="button" id="record_audio_button" class="toggle-button btn btn-secondary btn-no-background select-all-btn" onclick="record()">Record</button>
-                    <div id="recording_controls_container" class="recording_controls controls_item_row hide">
-                      <i id="cancel_recording_button" class="toggle-button btn btn-secondary btn-no-background select-all-btn" onclick="{cancelRecording()}" aria-hidden="true">Cancel</i>
-                      <div id="recording_info" class="controls_item_row">
-                        <i id="recording_indicator" class="fa fa-circle" aria-hidden="true"></i>
-                        <p id="recording_duration">"00:00:00"</p>
+                  <section id="frb2-recording-panel" class="frb2-panel">
+                    <h2>Record Live Audio</h2>
+                    <p class="frb2-help">
+                      Record from your browser mic (max 20 seconds), then use the green play button to replay.
+                    </p>
+
+                    <div class="frb2-actions">
+                      <button type="button" id="record_audio_button" class="frb2-btn frb2-btn-record" onclick="record()">Record</button>
+                      <button type="button" id="stop_recording_button" class="frb2-btn frb2-btn-stop" onclick="stopRecording()" disabled>Stop</button>
+                      <button type="button" id="cancel_recording_button" class="frb2-btn frb2-btn-cancel" onclick="cancelRecording()" disabled>Cancel</button>
+                    </div>
+
+                    <div id="frb2-live-status" class="frb2-live-status" data-state="idle">
+                      <span id="recording_indicator" class="frb2-rec-dot" aria-hidden="true"></span>
+                      <span id="recording_duration" class="frb2-timer">00:00</span>
+                      <span id="frb2-status-label" class="frb2-status-label">Ready to record</span>
+                    </div>
+
+                    <div class="frb2-playback">
+                      <h3 id="recordingPlaybackHeader">Recording Playback</h3>
+                      <p id="recording_playback_status" class="frb2-playback-status">No recording yet. Press Record, then Stop.</p>
+                      <div class="frb2-play-row">
+                        <button type="button" id="frb2-play-button" class="frb2-play-fab" onclick="playRecordingClip()" disabled title="Play last recording" aria-label="Play last recording">
+                          <span class="frb2-play-fab-icon" aria-hidden="true"></span>
+                        </button>
+                        <span id="frb2-play-label" class="frb2-play-label">Play recording</span>
                       </div>
-                      <i id="stop_recording_button" class="toggle-button btn btn-secondary btn-no-background select-all-btn" onclick="{stopRecording()}" aria-hidden="true">Stop</i>
+                      <audio id="audioElem" class="frb2-audio frb2-audio-muted" controls preload="metadata" controlsList="nodownload"></audio>
                     </div>
-                    <div id="audio_playback_div">
-                      <p id="audio_playback_indicator" class="playback_indicator hide">Audio is playing<span>.</span><span>.</span><span>.</span></p>
-                    </div>
+                  </section>
+
+                  <!-- Keep legacy class hooks used by older helpers -->
+                  <div id="audio_recording_container" class="frb2-legacy-hidden" aria-hidden="true">
+                    <div id="recording_controls_container" class="recording_controls hide"></div>
+                    <div id="audio_playback_div"><p id="audio_playback_indicator" class="playback_indicator hide"></p></div>
                   </div>
-                  <h2 id="recordingPlaybackHeader" style="margin-top: 20px !important;">Recording Playback</h2>
-                  <div id="audio_playback_container">
-                    <div id="recordingAudioControl" class="audio_component">
-                      <span><i id="recordingI" class="fa fa-volume-up fa-2x" style="color:rgba(247, 186, 206, 0.6);" onclick="{toggleRecordingAudio()}"></i></span>
-                      <div class="audioContainer">
-                        <div class="boxR box1"></div><div class="boxR box2"></div><div class="boxR box3"></div><div class="boxR box4"></div><div class="boxR box5"></div>
-                        <div class="boxR box6"></div><div class="boxR box7"></div><div class="boxR box8"></div><div class="boxR box9"></div><div class="boxR box10"></div>
-                        <div class="boxR box1"></div><div class="boxR box2"></div><div class="boxR box3"></div><div class="boxR box4"></div><div class="boxR box5"></div>
-                        <div class="boxR box6"></div><div class="boxR box7"></div><div class="boxR box8"></div><div class="boxR box9"></div><div class="boxR box10"></div>
-                      </div>
+                  <div id="microphone-spectrogram" class="spectrogram-panel" data-state="empty">
+                    <div class="spectrogram-viewport" data-role="viewport">
+                      <canvas data-role="canvas"></canvas>
+                      <p class="spectrogram-state" data-role="empty">Record or select an audio clip to view its spectrogram.</p>
+                      <p class="spectrogram-state" data-role="loading" hidden>Decoding audio...</p>
+                      <p class="spectrogram-state spectrogram-state-error" data-role="error" role="alert" hidden></p>
                     </div>
+                    <p class="spectrogram-summary" data-role="summary" aria-live="polite"></p>
                   </div>
                   <h2 id="recordingSimulationHeader" style="margin-top: 20px !important;">Recording Simulation</h2>
                   <div id="recording_simulation_master_container">
-                    <div id="recording_export_container" style="margin-top: 10px !important;" class="recording_controls controls_item_row">
+                    <div id="recording_export_container" style="margin-top: 10px !important;" class="controls_item_row">
                       <input type="file" style="display: inline-block !important; width: 250px !important" id="fileInput">
                     </div>
-                    <div id="recording_simulation_container" style="margin-top: 10px !important;" class="recording_controls controls_item_row">
+                    <div id="recording_simulation_container" style="margin-top: 10px !important;" class="controls_item_row">
                       <i id="simulate_recording_button" style="width:120px !important" class="toggle-button btn btn-secondary btn-no-background select-all-btn" onclick="{simulateRecordingEvent()}" aria-hidden="true">Simulate</i>
                     </div>
                     <div id="downloadLink"></div>
                   </div>
-                  <audio controls id="audioElem" class="audio-element hide"></audio>
                 </div>
                 <div id="mic-default-content">
                   <h2 style="text-align: left; color: rgba(247, 186, 206, 1) !important;">Microphone Bio Data</h2>
@@ -716,18 +747,12 @@
         function loadSelectedAnimalsFromBackend() {
           const token  = localStorage.getItem('token');
           const userId = localStorage.getItem('userId');
-          const backendUrl = 'http://localhost:9000';
 
-          fetch(`${backendUrl}/hmi/users/${userId}/notifications`, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ' + token
-            }
-          })
-            .then(response => response.json())
-            .then(data => {
-              selectedAnimals = data.notificationAnimals || [];
+          // FR-D1: was pointed straight at http://localhost:9000, which only ever
+          // worked on a dev machine. Shared client goes via the /hmi/* proxy instead.
+          window.retrieveUserNotifications(userId, token)
+            .then(response => {
+              selectedAnimals = response.data.notificationAnimals || [];
               updateSelectedAnimals();
             })
             .catch(error => {
@@ -739,7 +764,10 @@
             });
         }
 
-        loadSelectedAnimalsFromBackend();
+        // the shared client is bridged onto window by the module block further
+        // down, and modules only run once parsing is finished - so wait for
+        // DOMContentLoaded rather than calling this straight away
+        document.addEventListener('DOMContentLoaded', loadSelectedAnimalsFromBackend);
 
         searchForNotifications.addEventListener('keyup', function () {
           autocompleteAnimalsForNotifications();
@@ -812,24 +840,11 @@
         function saveNotificationToBackend(animal) {
           const token  = localStorage.getItem('token');
           const userId = localStorage.getItem('userId');
-          const backendUrl = 'http://localhost:9000';
 
-          fetch(`${backendUrl}/hmi/users/${userId}/notifications`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ' + token
-            },
-            body: JSON.stringify({ species: animal.species, common: animal.common })
-          })
-            .then(response => {
-              if (!response.ok) {
-                // TASK 7: replaced alert() with an error toast
-                if (window.showToast) {
-                  window.showToast('Could not add animal to notifications. Please try again.', 'error');
-                }
-                return;
-              }
+          // FR-D1: shared client via the /hmi/* proxy. axios rejects on any
+          // non-2xx, so the old !response.ok branch folds into the catch below.
+          window.addUserNotification(userId, animal, token)
+            .then(() => {
               // TASK 7: replaced alert() with a success toast
               if (window.showToast) {
                 window.showToast(`${animal.common} added to notifications.`, 'success');
@@ -846,20 +861,10 @@
         function removeNotificationFromBackend(animal) {
           const token  = localStorage.getItem('token');
           const userId = localStorage.getItem('userId');
-          const backendUrl = 'http://localhost:9000';
 
-          fetch(`${backendUrl}/hmi/users/${userId}/notifications/${animal.species}`, {
-            method: 'DELETE',
-            headers: { 'Authorization': 'Bearer ' + token }
-          })
-            .then(response => {
-              if (!response.ok) {
-                // TASK 7: replaced alert() with an error toast
-                if (window.showToast) {
-                  window.showToast('Could not remove animal from notifications. Please try again.', 'error');
-                }
-                return;
-              }
+          // FR-D1: shared client via the /hmi/* proxy, same as the save above.
+          window.removeUserNotification(userId, animal.species, token)
+            .then(() => {
               // TASK 7: replaced alert() with a success toast
               if (window.showToast) {
                 window.showToast(`${animal.common} removed from notifications.`, 'success');
@@ -1127,10 +1132,8 @@
         });
       });
 
-      let cart = [{ id: 1, quantity: 0 }];
-
       const donationButton = document.getElementById('donation-button');
-      donationButton.addEventListener("click", () => {
+      donationButton.addEventListener("click", async () => {
         if (donorAmount == undefined) {
           // TASK 7: replaced silent return with a warning toast
           if (window.showToast) {
@@ -1139,8 +1142,6 @@
           return;
         }
 
-        cart[0].quantity = donorAmount;
-
         if (!username || !email) {
           if (window.showToast) {
             window.showToast('User details are still loading. Please try again in a moment.', 'warning');
@@ -1148,28 +1149,36 @@
           return;
         }
 
-        var options = payment(username, donorAmount * 100, email);
-        var rzp1 = new Razorpay(options);
-        rzp1.open();
-        rzp1.on('payment.failed', function () { rzp1.close(); });
+        donationButton.disabled = true;
+        const releaseDonationButton = () => { donationButton.disabled = false; };
 
-        fetch("/api/create-checkout-session", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ items: cart, userEmail: email }),
-        })
-          .then(res => {
-            if (res.ok) return res.json();
-            return res.json().then(json => Promise.reject(json));
-          })
-          .then(({ url }) => { window.location = url; })
-          .catch(e => {
-            console.error(e.error);
+        try {
+          const response = await fetch("/api/create-razorpay-order", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ amount: Number(donorAmount) * 100 }),
+          });
+          if (!response.ok) throw new Error('Razorpay order creation failed');
+
+          const order = await response.json();
+          const options = payment(username, order, email, releaseDonationButton);
+          const rzp1 = new Razorpay(options);
+          rzp1.on('payment.failed', function () {
+            rzp1.close();
+            releaseDonationButton();
             if (window.showToast) {
-              window.showToast('Payment session could not be started. Please try again.', 'error');
+              window.showToast('Payment failed. Please try again.', 'error');
             }
           });
-      });
+          rzp1.open();
+        } catch (error) {
+          releaseDonationButton();
+          console.error('Razorpay order creation failed.');
+          if (window.showToast) {
+            window.showToast('Payment session could not be started. Please try again.', 'error');
+          }
+        }
+        });
     </script>
 
     <script>
@@ -1309,8 +1318,18 @@
         }
       }
 
-      function animateRecordedAudioPlay() { $(".boxmutedR").removeClass("boxmutedR"); recordingAud = true;  document.getElementById("recordingI").style.opacity = ".5"; }
-      function animateRecordedAudioMute() { $(".boxR").addClass("boxmutedR");          recordingAud = false; document.getElementById("recordingI").style.opacity = "1"; }
+      function animateRecordedAudioPlay() {
+        recordingAud = true;
+        const icon = document.getElementById("recordingI");
+        if (icon) icon.style.opacity = ".5";
+        $(".boxmutedR").removeClass("boxmutedR");
+      }
+      function animateRecordedAudioMute() {
+        recordingAud = false;
+        const icon = document.getElementById("recordingI");
+        if (icon) icon.style.opacity = "1";
+        $(".boxR").addClass("boxmutedR");
+      }
 
       function toggleRecordingAudio() {
         if (!recordingAud) {
@@ -1329,7 +1348,7 @@
       function loadRecordingEvent()     { document.dispatchEvent(new CustomEvent('loadRecording',     { detail: { message: "load" } })); }
       function simulateRecordingEvent() { document.dispatchEvent(new CustomEvent('simulateRecording', { detail: { message: "simulate" } })); }
 
-      toggleAudio();
+      animateAudioMute();
       animateRecordedAudioMute();
 
       document.addEventListener('muteAnimation',          () => animateAudioMute());
@@ -1405,20 +1424,15 @@
 
         requestData = { username, animal, requestingToChange, initial, modified, source };
 
-        fetch("/api/submit", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(requestData)
-        })
-          .then(response => {
-            if (response.status === 201) {
-              if (window.showToast) window.showToast("Your submission was received and is awaiting review.", 'success');
-            } else {
-              if (window.showToast) window.showToast("There was an error receiving your submission. Please try again.", 'error');
-            }
+        // FR-D1: shared client. axios rejects on any non-2xx, so the old
+        // status !== 201 branch is now just part of the catch.
+        window.submitAnimalRequest(requestData)
+          .then(() => {
+            if (window.showToast) window.showToast("Your submission was received and is awaiting review.", 'success');
           })
-          .catch(() => {
-            if (window.showToast) window.showToast("Something went wrong. Please try again.", 'error');
+          .catch(error => {
+            console.error('Could not submit the change request:', error);
+            if (window.showToast) window.showToast("There was an error receiving your submission. Please try again.", 'error');
           });
       }
 
@@ -1481,15 +1495,32 @@
         resetWildlifeLayers, MapOpenNav, MapCloseNav, getAnimalToggled,
         enableMicAnimation, disableMicAnimation, getUTC,
         startAudioRecording, stopAudioRecording, cancelAudioRecording,
-        testFunct, convertCSV
+        playRecordingClip, testFunct, convertCSV
       } from "./js/HMI.js";
 
       import { retrieveTruthEventsInTimeRange, retrieveVocalizationEventsInTimeRange } from "./js/routes.js";
+
+      // FR-D1: the notification, submission and profile blocks further up are
+      // plain scripts, so the shared client has to reach them through window,
+      // same as showToast already does below.
+      import {
+        retrieveUserNotifications, addUserNotification, removeUserNotification,
+        submitAnimalRequest, retrieveUserProfile
+      } from "./js/routes.js";
+      window.retrieveUserNotifications = retrieveUserNotifications;
+      window.addUserNotification      = addUserNotification;
+      window.removeUserNotification   = removeUserNotification;
+      window.submitAnimalRequest      = submitAnimalRequest;
+      window.retrieveUserProfile      = retrieveUserProfile;
 
       // TASK 7: import showToast from HMI-utils and expose it on window so
       // the non-module <script> blocks above can call window.showToast().
       import { showToast } from "./js/HMI-utils.js";
       window.showToast = showToast;
+      window.playRecordingClip = playRecordingClip;
+      window.startAudioRecording = startAudioRecording;
+      window.stopAudioRecording = stopAudioRecording;
+      window.cancelAudioRecording = cancelAudioRecording;
 
       window.updateMics              = updateMics;
       window.downloadCSV             = downloadCSV;
@@ -1717,13 +1748,13 @@
 
       // ── Audio recording ─────────────────────────────────────────────────
 
-      function record()         { startAudioRecording();  }
-      function stopRecording()  { stopAudioRecording();   }
-      function cancelRecording(){ cancelAudioRecording(); }
+      function record()          { startAudioRecording(); }
+      function stopRecording()   { stopAudioRecording(); }
+      function cancelRecording() { cancelAudioRecording(); }
 
-      window.record          = record;
-      window.cancelRecording = cancelRecording;
-      window.stopRecording   = stopRecording;
+      window.record            = record;
+      window.cancelRecording   = cancelRecording;
+      window.stopRecording     = stopRecording;
     </script>
 
     <script>
@@ -1733,12 +1764,11 @@
       let email;
 
       function getUser() {
-        fetch("/user_profile")
-          .then(res => {
-            if (res.ok) return res.json();
-            return res.json().then(json => Promise.reject(json));
-          })
-          .then(userData => {
+        // FR-D1: shared client, which already rejects on a non-2xx - no need to
+        // re-read the body just to turn a failure into a rejected promise.
+        window.retrieveUserProfile()
+          .then(response => {
+            const userData = response.data;
             username = String(userData.username);
             email    = `${userData.email}`;
           })
@@ -1751,7 +1781,9 @@
           });
       }
 
-      getUser();
+      // same as the notifications load above - the shared client only lands on
+      // window once the module block has run, which is after parsing
+      document.addEventListener('DOMContentLoaded', getUser);
 
       // Theme toggle
       document.addEventListener('DOMContentLoaded', () => {
