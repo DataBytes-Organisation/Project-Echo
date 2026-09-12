@@ -79,6 +79,57 @@ function _isPublicRoute(path) {
 const checkUserSession = createCheckUserSession(client, _isPublicRoute);
 
 // ─────────────────────────────────────────────────────────────────────────────
+// API session guard
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Build a session guard for routes that answer with JSON.
+ *
+ * checkUserSession above redirects to /login when there is no session, which is
+ * right for a page but wrong for an API: axios follows the redirect, gets the
+ * login page back with a 200, and the caller ends up parsing HTML as JSON. That
+ * is the same failure that had to be fixed in the sign-in route. This replies
+ * with a status the caller can actually act on instead.
+ *
+ * The token lookup is passed in so the guard can be tested without Redis.
+ *
+ * @param {() => Promise<string|null>} getToken
+ * @returns {import('express').RequestHandler}
+ */
+function createApiSessionGuard(getToken) {
+  return async function apiSessionGuard(req, res, next) {
+    try {
+      const token = await getToken();
+
+      if (!token) {
+        return res.status(401).json({
+          error: "Your session has expired. Please sign in again."
+        });
+      }
+
+      return next();
+    } catch (error) {
+      // Redis being unreachable is our problem rather than the caller's, so this
+      // is a 503 and not a 401. A 401 would tell them to sign in again, which
+      // would not help and would lose whatever they were doing.
+      console.error("API session check failed (Redis error):", error);
+      return res.status(503).json({
+        error: "Unable to verify your session. Please try again shortly."
+      });
+    }
+  };
+}
+
+/**
+ * Session guard for JSON API routes, backed by the same Redis JWT that
+ * checkUserSession reads.
+ */
+const requireApiSession = createApiSessionGuard(async () => {
+  await ensureRedisConnected();
+  return client.get("JWT");
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Session helpers
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -110,6 +161,8 @@ async function clearUserSession() {
 module.exports = {
   verifySignUp,
   checkUserSession,
+  createApiSessionGuard,
+  requireApiSession,
   clearUserSession,
   client,
 };

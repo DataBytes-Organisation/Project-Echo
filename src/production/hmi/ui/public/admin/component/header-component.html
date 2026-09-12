@@ -27,6 +27,28 @@
       background-color: var(--echo-green) !important;
       color: #ffffff !important;
     }
+
+    /* Unread count that sits on the bell. Lives with the header so it styles
+       the same on every admin page the component is dropped into. */
+    .nav-icon-hover { position: relative; }
+
+    .notification-badge {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 5px;
+      border-radius: 9px;
+      background-color: #C8473C;
+      color: #ffffff;
+      font-size: 11px;
+      line-height: 18px;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .notification-badge[hidden] { display: none; }
   </style>
     <nav class="navbar navbar-expand-lg navbar-light">
       <ul class="navbar-nav">
@@ -36,10 +58,12 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link nav-icon-hover" href="javascript:void(0)">
+          <a class="nav-link nav-icon-hover" href="/notifications">
             <i class="ti ti-bell-ringing" style="color: #2F6E4F;"></i>
-            <class id="notification-badge" >
-            </class>
+            <!-- was a <class> tag, which is not an element at all, so the unread
+                 count had nothing to render into. Hidden until there is a count
+                 to show. -->
+            <span id="notification-badge" class="notification-badge" hidden></span>
           </a>
         </li>
       </ul>
