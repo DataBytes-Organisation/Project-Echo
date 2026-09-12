@@ -1,12 +1,12 @@
-ARG BASE_IMAGE=python:3.9-slim
+ARG BASE_IMAGE=python:3.9-slim-bookworm
 FROM ${BASE_IMAGE} AS echo_simulator_builder
 
 WORKDIR /build
 
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends --fix-missing \
 	build-essential \
-	&& rm -rf /var/lib/apt/lists/* 
+	&& rm -rf /var/lib/apt/lists/*
 
 RUN python -m venv /opt/venv 
 ENV PATH="/opt/venv/bin:$PATH" 
@@ -26,7 +26,7 @@ WORKDIR /app
 
 # libgomp1 is needed for XGBoost, libsndfile1 for Librosa
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends --fix-missing \
 	libgomp1 \
 	libsndfile1 \
 	&& rm -rf /var/lib/apt/lists/*

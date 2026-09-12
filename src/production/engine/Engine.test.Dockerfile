@@ -1,7 +1,4 @@
 # Builder (Compilers and heavy lifting)
-# bullseye (Debian 11) reached full end-of-life 2026-08-31; its apt archive
-# is being frozen/migrated, which breaks package installs unpredictably.
-# bookworm (Debian 12) is the current supported release.
 ARG BASE_IMAGE=python:3.10-slim-bookworm
 FROM ${BASE_IMAGE} AS echo_engine_builder
 
@@ -9,11 +6,11 @@ WORKDIR /build
 
 # Install build-time dependencies only
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends --fix-missing \
 	libopenexr-dev \
 	pkg-config \
 	build-essential \
-	&& rm -rf /var/lib/apt/lists/* 
+	&& rm -rf /var/lib/apt/lists/*
 
 # Create a virtual environment to isolate packages
 RUN python -m venv /opt/venv 
@@ -28,7 +25,7 @@ RUN pip3 install --upgrade pip && \
 
 # Handle script formatting here so it doesn't create layers in the final image
 COPY ./echo_engine.sh .
-RUN apt-get update && apt-get install -y dos2unix && \
+RUN apt-get update && apt-get install -y --no-install-recommends --fix-missing dos2unix && \
 	dos2unix ./echo_engine.sh && \
 	chmod +x ./echo_engine.sh 
 
@@ -41,7 +38,7 @@ WORKDIR /app
 # We also add the gcloud CLI here in a single consolidated step
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get install -y --no-install-recommends --fix-missing \
 	libopenexr-3-1-30 \
 	libgl1-mesa-glx \
 	libglib2.0-0 \

@@ -2461,77 +2461,42 @@
         }
       }
     },
-    "/payments/razorpay/orders": {
-      "post": {
+    "/sensors/{sensor_id}": {
+      "get": {
         "tags": [
-          "payments"
+          "sensors"
         ],
-        "summary": "Create Razorpay Order",
-        "operationId": "create_razorpay_order_payments_razorpay_orders_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RazorpayOrderRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RazorpayOrderResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        },
-        "security": [
+        "summary": "Get Sensor Detail",
+        "operationId": "get_sensor_detail_sensors__sensor_id__get",
+        "parameters": [
           {
-            "JWTBearer": []
-          }
-        ]
-      }
-    },
-    "/payments/razorpay/verify": {
-      "post": {
-        "tags": [
-          "payments"
-        ],
-        "summary": "Verify Razorpay Checkout",
-        "operationId": "verify_razorpay_checkout_payments_razorpay_verify_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RazorpayCheckoutProof"
-              }
-            }
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Sensor Id"
+            },
+            "name": "sensor_id",
+            "in": "path"
           },
-          "required": true
-        },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 50.0,
+              "minimum": 1.0,
+              "title": "History Limit",
+              "default": 10
+            },
+            "name": "history_limit",
+            "in": "query"
+          }
+        ],
         "responses": {
           "200": {
-            "description": "Successful Response",
+            "description": "Get a single sensor's current health, location, and recent audio metadata",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PaymentStatusResponse"
-                }
+                "schema": {}
               }
             }
           },
