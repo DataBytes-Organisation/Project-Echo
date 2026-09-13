@@ -50,6 +50,12 @@ h2 {
     /*border-radius: 10px;*/
 }
 
+#basemap:focus-visible,
+#animal-popup-content:focus-visible {
+    outline: 3px solid #007f73;
+    outline-offset: 3px;
+}
+
 .main {
     left: 0;
     width: 100vw;

@@ -122,7 +122,7 @@
       <div class="row main bg-black" style="padding: 0px !important;">
         <div class="col-md-12 col-main" style="padding: 0px !important;">
 
-          <div id="basemap" class="map_view"></div>
+          <div id="basemap" class="map_view" tabindex="0" aria-label="Detection map"></div>
 
           <div id="editFormWrapper">
             <form id="editForm">
@@ -414,7 +414,7 @@
             <!-- ── Animal popup tab ───────────────────────────────────── -->
             <div id="animal-popup">
               <div class="wrapper">
-                <div id="animal-popup-content">
+                <div id="animal-popup-content" role="region" aria-label="Detection details" tabindex="-1">
                   <div class="markup_form">
                     <div class="markup_column">
                       <div class="markup_row_left markup_row_title" style="width: 420px !important; margin: 0px !important;"><h2 id="desc_name"></h2></div>
@@ -426,6 +426,7 @@
                   <h2>Animal Summary</h2>
                   <div id="desc_summary" class="desc"></div>
                   <div id="desc_details" class="desc"></div>
+                  <div id="animal_weather_section">
                   <h2 style="margin-top: 20px !important;">Weather</h2>
                   <div class="markup_form">
                     <div class="markup_column"><div class="markup_row_left"><div>Date</div></div><div class="markup_row_right"><div id="weather_date"></div></div></div>
@@ -435,6 +436,7 @@
                     <div class="markup_column"><div class="markup_row_left"><div>Wind speed</div></div><div class="markup_row_right"><div id="weather_windspeed"></div></div></div>
                     <div class="markup_column"><div class="markup_row_left"><div>Maximum Humiditiy</div></div><div class="markup_row_right"><div id="weather_maxhumidity"></div></div></div>
                     <div class="markup_column"><div class="markup_row_left"><div>Minimum Humiditiy</div></div><div class="markup_row_right"><div id="weather_minhumidity"></div></div></div>
+                  </div>
                   </div>
                   <h2 style="margin-top: 20px !important;">Event Details</h2>
                   <div class="markup_form">
@@ -446,7 +448,7 @@
                     <div class="markup_column"><div class="markup_row_left"><div>Latitude</div></div><div class="markup_row_right"><div id="markup_loc_lat"></div></div></div>
                     <div class="markup_column"><div class="markup_row_left"><div>Detection source</div></div><div class="markup_row_right"><div id="markup_source"></div></div></div>
                     <div class="markup_column"><div class="markup_row_left" style="width: 100px !important"><div>Date</div></div><div class="markup_row_right" style="text-align: right !important; width: 400px !important"><div id="markup_date"></div></div></div>
-                    <div class="markup_column"><div class="markup_row_left"><div>Location Confidence</div></div><div class="markup_row_right"><div id="markup_confidence"></div></div></div>
+                    <div class="markup_column"><div class="markup_row_left"><div id="markup_location_metric_label">Location Confidence</div></div><div class="markup_row_right"><div id="markup_confidence"></div></div></div>
                   </div>
                   <h2 id="animalAudioHeader" style="margin-top: 20px !important;">Audio</h2>
                   <div id="animalAudioControl" class="audio_component">
@@ -1320,7 +1322,13 @@
 
       document.addEventListener('animalToggled', function () {
         closeTab();
-        setTimeout(() => { currentTab = document.getElementById('animal-popup'); openNav('animal-popup'); }, 10);
+        setTimeout(() => { currentTab = document.getElementById('animal-popup'); openNav("animal-popup"); document.getElementById("animal-popup-content").focus(); }, 10);
+      });
+      document.getElementById("animal-popup-content").addEventListener("keydown", function (event) {
+        if (event.key === "Escape") {
+          closeMenu();
+          document.getElementById("basemap").focus();
+        }
       });
       document.addEventListener('micToggled', function () {
         closeTab();

@@ -15,11 +15,13 @@ globalThis.window = { axios: { create(options) {
   } };
 } }, addEventListener() {} };
 class Element {
-  constructor() { this.children = []; this.style = {}; this.listeners = {}; this.classList = { add() {}, remove() {} }; }
+  constructor(tagName = "div") { this.tagName = tagName; this.children = []; this.style = {}; this.listeners = {}; this.textContent = ""; this.innerText = ""; this._innerHTML = ""; this.classList = { add() {}, remove() {} }; }
   appendChild(el) { this.children.push(el); return el; }
   replaceChildren(...children) {
   this.children = [...children];
 }
+  get innerHTML() { return this._innerHTML; }
+  set innerHTML(value) { this._innerHTML = String(value); if (String(value) === "") this.children = []; }
 
 focus() {
   this.focused = true;
@@ -29,9 +31,28 @@ focus() {
   querySelector() { return null; }
   remove() {}
 }
+const SIDEBAR_IDS = [
+  "desc_name", "desc_confidence", "desc_species", "desc_summary", "desc_details",
+  "desc_img", "markup_details", "markup_loc_lat", "markup_loc_lon", "markup_source",
+  "markup_date", "markup_confidence", "markup_location_metric_label",
+  "animal_weather_section", "animalAudioHeader", "animalAudioControl",
+  "animal-spectrogram", "request-edit-button", "animal-popup-content", "basemap",
+];
+const sidebarRegistry = {};
+function resetSidebarDOM() {
+  for (const id of SIDEBAR_IDS) sidebarRegistry[id] = new Element();
+  return sidebarRegistry;
+}
+resetSidebarDOM();
+function sidebarText(el) {
+  if (!el) return "";
+  const own = el.textContent || el.innerText || "";
+  const kids = (el.children || []).map(sidebarText).join(" ");
+  return [own, kids].filter(Boolean).join(" ");
+}
 globalThis.document = {
   readyState: "loading", addEventListener() {}, head: new Element(), body: new Element(),
-  createElement: () => new Element(), getElementById: () => null, querySelector: () => null,
+  createElement: (tag) => new Element(tag), getElementById: (id) => sidebarRegistry[id] || null, querySelector: () => null,
 };
 globalThis.requestAnimationFrame = () => {};
 globalThis.getComputedStyle = () => ({ position: "relative" });
@@ -43,38 +64,18 @@ class Source {
   getExtent() { return [144.9631, -37.8136, 144.9631, -37.8136]; }
 }
 class Layer {
-  constructor(options) { this.source = options.source; this.visible = true; }
+  constructor(options) { this.source = options.source; this.style = options.style; this.visible = true; }
   getSource() { return this.source; }
   set(key, value) { this[key] = value; }
   setZIndex(zIndex) { this.zIndex = zIndex; }
   setVisible(visible) { this.visible = visible; }
 }
 class Feature {
-  constructor(properties) { this.properties = properties; this.style = null; }
+  constructor(properties) { this.properties = properties; }
   setId(id) { this.id = id; }
   get(key) { return this.properties[key]; }
-  setStyle(style) { this.style = style; }
 }
 class Style { constructor(options) { this.options = options; } }
-
-class Select {
-  constructor(options = {}) {
-    this.options = options;
-    this.handlers = {};
-    this.selectedFeatures = {
-      clear() {},
-    };
-  }
-
-  on(eventName, handler) {
-    this.handlers[eventName] = handler;
-  }
-
-  getFeatures() {
-    return this.selectedFeatures;
-  }
-}
-
 
 globalThis.ol = {
   source: { Vector: Source }, layer: { Vector: Layer }, Feature,
@@ -93,19 +94,6 @@ const record = {
   _id: "esp32-detection", sourceType: "real", species: "Magpie", confidence: 91.5,
   timestamp: "2026-08-06T10:30:00Z", sensorId: "esp32-001",
   microphoneLLA: [-37.8136, 144.9631, 0], animalTrueLLA: [10, 20, 0], animalEstLLA: [30, 40, 0],
-};
-
-const snakeCaseRealRecord = {
-  _id: "esp32-snake-case",
-  source_type: "real",
-  species: "Kookaburra",
-  confidence: 88.2,
-  timestamp: "2026-09-12T08:30:00Z",
-  sensorId: "esp32-002",
-  microphoneLLA: [-37.814, 144.964, 0],
-  animalTrueLLA: null,
-  animalEstLLA: null,
-  animalLLAUncertainty: null,
 };
 
 function state() {
@@ -219,222 +207,42 @@ test("simulator records never create real markers", async () => {
   assert.match(hmi.realDetectionStatus.textContent, /No real-device detections/);
 });
 
-test("echonet.events source_type real creates a real marker", async () => {
+test("repeated loads keep one layer and one status/refresh control with no extra interaction", async () => {
   assert.ok(detections, "real detection loader exists");
-
-  const hmi = state();
-
-  result = {
-    data: [snakeCaseRealRecord]
-  };
-
+  const hmi = state(); result = { data: [record] };
   await detections.loadRealDetections(hmi);
-
-  const features =
-    hmi.realDetectionLayer
-      .getSource()
-      .getFeatures();
-
-  assert.equal(features.length, 1);
-
-  assert.equal(
-    features[0].get("sourceType"),
-    "real"
-  );
-
-  assert.equal(
-    features[0].get("species"),
-    "Kookaburra"
-  );
-
-  assert.equal(
-    features[0].get("sensorId"),
-    "esp32-002"
-  );
+  await detections.loadRealDetections(hmi);
+  assert.equal(hmi.basemap.layers.length, 1);
+  assert.equal(hmi.basemap.controls.length, 1);
+  assert.equal(hmi.basemap.interactions.length, 0);
+  const panel = hmi.basemap.controls[0].element;
+  assert.equal(panel.children.length, 2);
+  assert.equal(panel.children[1].textContent, "Refresh detections");
+  assert.equal(hmi.realDetectionSelect, undefined);
+  assert.equal(hmi.realDetectionDetails, undefined);
 });
 
-
-test("echonet.events simulator records do not create real markers", async () => {
+test("loading real detections creates no Select interaction", async () => {
   assert.ok(detections, "real detection loader exists");
-
-  const hmi = state();
-
-  result = {
-    data: [
-      {
-        ...snakeCaseRealRecord,
-        _id: "sim-event",
-        source_type: "simulator"
-      }
-    ]
-  };
-
+  const hmi = state(); result = { data: [record] };
   await detections.loadRealDetections(hmi);
-
-  const features =
-    hmi.realDetectionLayer
-      .getSource()
-      .getFeatures();
-
-  assert.equal(features.length, 0);
-
-  assert.match(
-    hmi.realDetectionStatus.textContent,
-    /No real-device detections/
-  );
+  assert.equal(hmi.basemap.interactions.length, 0);
+  assert.equal(hmi.realDetectionSelect, undefined);
+  assert.equal(typeof ol.interaction, "undefined");
+  const source = await readFile(new URL("../public/js/real-detections.js", import.meta.url), "utf8");
+  assert.doesNotMatch(source, /ol\.interaction\.Select/);
+  assert.doesNotMatch(source, /realDetectionSelect/);
+  assert.doesNotMatch(source, /realDetectionDetails/);
+  assert.doesNotMatch(source, /document\.addEventListener/);
 });
 
-
-test("selecting a real marker shows its detection details", async () => {
+test("real layer style comes from buildRealDetectionStyle and includes REAL label", async () => {
   assert.ok(detections, "real detection loader exists");
-
-  const hmi = state();
-
-  result = {
-    data: [snakeCaseRealRecord]
-  };
-
+  const { buildRealDetectionStyle } = await import("../public/js/detection-source-filter.js");
+  assert.match(JSON.stringify(buildRealDetectionStyle()), /REAL/);
+  const hmi = state(); result = { data: [record] };
   await detections.loadRealDetections(hmi);
-
-  const feature =
-    hmi.realDetectionLayer
-      .getSource()
-      .getFeatures()[0];
-
-  assert.ok(feature);
-
-  hmi.realDetectionSelect.handlers.select({
-    selected: [feature]
-  });
-
-  const details = hmi.realDetectionDetails;
-
-  assert.equal(
-    details.hidden,
-    false
-  );
-
-  assert.equal(
-    details.focused,
-    true
-  );
-
-  const text = details.children
-    .flatMap(child =>
-      child.children?.length
-        ? child.children.map(
-            grandchild => grandchild.textContent
-          )
-        : [child.textContent]
-    )
-    .filter(Boolean)
-    .join(" ");
-
-  assert.match(text, /Kookaburra/);
-  assert.match(text, /88\.2%/);
-  assert.match(text, /esp32-002/);
-  assert.match(text, /real/);
-});
-
-
-test("missing optional detection details show unavailable", async () => {
-  assert.ok(detections, "real detection loader exists");
-
-  const hmi = state();
-
-  result = {
-    data: [
-      {
-        ...snakeCaseRealRecord,
-        _id: "null-fields",
-        species: null,
-        confidence: null,
-        sensorId: null,
-        animalEstLLA: null,
-        animalLLAUncertainty: null
-      }
-    ]
-  };
-
-  await detections.loadRealDetections(hmi);
-
-  const feature =
-    hmi.realDetectionLayer
-      .getSource()
-      .getFeatures()[0];
-
-  assert.ok(feature);
-
-  hmi.realDetectionSelect.handlers.select({
-    selected: [feature]
-  });
-
-  const text =
-    hmi.realDetectionDetails.children
-      .flatMap(child =>
-        child.children?.length
-          ? child.children.map(
-              grandchild => grandchild.textContent
-            )
-          : [child.textContent]
-      )
-      .filter(Boolean)
-      .join(" ");
-
-  assert.match(
-    text,
-    /unavailable/
-  );
-});
-
-
-test("unsafe backend text is rendered as inert text", async () => {
-  assert.ok(detections, "real detection loader exists");
-
-  const hmi = state();
-
-  const unsafeSpecies =
-    "<img src=x onerror=alert(1)>";
-
-  result = {
-    data: [
-      {
-        ...snakeCaseRealRecord,
-        _id: "unsafe-record",
-        species: unsafeSpecies
-      }
-    ]
-  };
-
-  await detections.loadRealDetections(hmi);
-
-  const feature =
-    hmi.realDetectionLayer
-      .getSource()
-      .getFeatures()[0];
-
-  assert.ok(feature);
-
-  hmi.realDetectionSelect.handlers.select({
-    selected: [feature]
-  });
-
-  const text =
-    hmi.realDetectionDetails.children
-      .flatMap(child =>
-        child.children?.length
-          ? child.children.map(
-              grandchild => grandchild.textContent
-            )
-          : [child.textContent]
-      )
-      .filter(Boolean)
-      .join(" ");
-
-  assert.match(
-    text,
-    /<img src=x onerror=alert\(1\)>/
-  );
+  assert.match(JSON.stringify(hmi.realDetectionLayer.style), /REAL/);
 });
 
 test("invalid object microphone coordinates never create a marker and show a safe data error", async () => {
@@ -586,4 +394,145 @@ test("HMI initialization loads real detections without waiting for microphone or
     hmiModule.updateVocalizationLayerFromLiveData(hmi, [record]);
     assert.equal(hmi.vocalizationEvents.length, 0);
   } finally { holdAncillary = false; }
+});
+
+const completeReal = {
+  _id: "esp32-001", sourceType: "real", species: "Magpie", confidence: 91.5,
+  timestamp: "2026-08-06T10:30:00Z", sensorId: "esp32-001",
+  microphoneLLA: [-37.8136, 144.9631, 10],
+  animalEstLLA: [-37.82, 144.97, 5],
+  animalTrueLLA: null, animalLLAUncertainty: 12,
+};
+const missingFieldReal = {
+  _id: "esp32-002", sourceType: "real", species: "Magpie", confidence: null,
+  timestamp: "not-a-date", sensorId: "",
+  microphoneLLA: [-37.8136, 144.9631, 10],
+  animalEstLLA: null, animalTrueLLA: null, animalLLAUncertainty: null,
+};
+const unsafeReal = {
+  ...completeReal, _id: "esp32-unsafe",
+  species: '<img src=x onerror="alert(1)">',
+  sensorId: '<script>alert("xss")</script>',
+};
+
+test("real sidebar shows species, confidence, sensor, source, timestamp, mic and estimated location", async () => {
+  const hmiModule = await import("../public/js/HMI.js");
+  resetSidebarDOM();
+  hmiModule.showRealDetectionDetails(completeReal);
+  assert.equal(sidebarRegistry.desc_name.textContent, "Magpie");
+  assert.equal(sidebarRegistry.desc_species.textContent, "Magpie");
+  assert.equal(sidebarRegistry.desc_confidence.textContent, "91.5%");
+  assert.doesNotMatch(sidebarText(sidebarRegistry.markup_details), /%/);
+  assert.doesNotMatch(sidebarText(sidebarRegistry.desc_details), /91\.5/);
+  assert.match(sidebarText(sidebarRegistry.markup_details), /esp32-001/);
+  assert.equal(sidebarRegistry.markup_source.textContent, "Real-device");
+  assert.equal(sidebarRegistry.markup_date.textContent, new Date("2026-08-06T10:30:00Z").toUTCString());
+  assert.equal(sidebarRegistry.markup_loc_lat.textContent, "-37.8136");
+  assert.equal(sidebarRegistry.markup_loc_lon.textContent, "144.9631");
+  assert.match(sidebarText(sidebarRegistry.desc_details), /Estimated animal location/);
+  assert.match(sidebarText(sidebarRegistry.desc_details), /-37\.82/);
+  assert.match(sidebarText(sidebarRegistry.desc_details), /144\.97/);
+  assert.equal(sidebarRegistry.markup_confidence.textContent, "12");
+});
+
+test("real sidebar shows unavailable for invalid timestamp, missing estimate and null uncertainty", async () => {
+  const hmiModule = await import("../public/js/HMI.js");
+  resetSidebarDOM();
+  hmiModule.showRealDetectionDetails({ ...missingFieldReal, timestamp: "not-a-date" });
+  assert.equal(sidebarRegistry.markup_date.textContent, "unavailable");
+  assert.doesNotMatch(sidebarRegistry.markup_date.textContent, /Invalid Date/);
+  assert.match(sidebarText(sidebarRegistry.desc_details), /unavailable/);
+  assert.equal(sidebarRegistry.markup_confidence.textContent, "unavailable");
+  resetSidebarDOM();
+  hmiModule.showRealDetectionDetails({ ...missingFieldReal, timestamp: undefined });
+  assert.equal(sidebarRegistry.markup_date.textContent, "unavailable");
+  assert.doesNotMatch(sidebarRegistry.markup_date.textContent, /Invalid Date/);
+  assert.match(sidebarText(sidebarRegistry.desc_details), /unavailable/);
+  assert.equal(sidebarRegistry.markup_confidence.textContent, "unavailable");
+});
+
+test("real sidebar keeps unsafe species and sensor text without child markup", async () => {
+  const hmiModule = await import("../public/js/HMI.js");
+  resetSidebarDOM();
+  hmiModule.showRealDetectionDetails(unsafeReal);
+  assert.match(sidebarText(sidebarRegistry.desc_name), /<img/);
+  assert.match(sidebarText(sidebarRegistry.markup_details), /<script>/);
+  assert.equal(sidebarRegistry.desc_name.children.length, 0);
+  assert.equal(sidebarRegistry.desc_species.children.length, 0);
+  assert.equal(sidebarRegistry.markup_details.children.length, 0);
+  assert.doesNotMatch(sidebarRegistry.desc_name.innerHTML, /</);
+  assert.doesNotMatch(sidebarRegistry.markup_details.innerHTML, /</);
+});
+
+test("real sidebar mode hides unsupported sections and restores simulator state", async () => {
+  const hmiModule = await import("../public/js/HMI.js");
+  resetSidebarDOM();
+  hmiModule.setRealDetectionSidebarMode(true);
+  assert.equal(sidebarRegistry.animal_weather_section.style.display, "none");
+  assert.equal(sidebarRegistry.desc_img.style.display, "none");
+  assert.equal(sidebarRegistry["request-edit-button"].style.display, "none");
+  assert.equal(sidebarRegistry.animalAudioHeader.style.display, "none");
+  assert.equal(sidebarRegistry.animalAudioControl.style.display, "none");
+  assert.equal(sidebarRegistry["animal-spectrogram"].style.display, "none");
+  assert.equal(sidebarRegistry.markup_location_metric_label.textContent, "Location uncertainty");
+  hmiModule.setRealDetectionSidebarMode(false);
+  assert.notEqual(sidebarRegistry.animal_weather_section.style.display, "none");
+  assert.notEqual(sidebarRegistry.desc_img.style.display, "none");
+  assert.notEqual(sidebarRegistry["request-edit-button"].style.display, "none");
+  assert.equal(sidebarRegistry.markup_location_metric_label.textContent, "Location Confidence");
+  assert.equal(sidebarRegistry.animalAudioHeader.style.display, "none");
+});
+
+test("detection map has keyboard focus and accessible label", async () => {
+  const html = await readFile(new URL("../public/index.html", import.meta.url), "utf8");
+  const basemap = html.match(/<div[^>]*id="basemap"[^>]*>/);
+  assert.ok(basemap, "#basemap exists");
+  assert.match(basemap[0], /tabindex="0"/);
+  assert.match(basemap[0], /aria-label="Detection map"/);
+});
+
+test("detection details region has accessible name and focus target", async () => {
+  const html = await readFile(new URL("../public/index.html", import.meta.url), "utf8");
+  const region = html.match(/<div[^>]*id="animal-popup-content"[^>]*>/);
+  assert.ok(region, "#animal-popup-content exists");
+  assert.match(region[0], /role="region"/);
+  assert.match(region[0], /aria-label="Detection details"/);
+  assert.match(region[0], /tabindex="-1"/);
+});
+
+test("animalToggled handler focuses detail region after opening sidebar", async () => {
+  const html = await readFile(new URL("../public/index.html", import.meta.url), "utf8");
+  const toggledIndex = html.indexOf("animalToggled");
+  assert.notEqual(toggledIndex, -1, "animalToggled handler exists");
+  const handlerSlice = html.slice(toggledIndex, toggledIndex + 800);
+  const openDouble = handlerSlice.indexOf('openNav("animal-popup")');
+  const openSingle = handlerSlice.indexOf("openNav('animal-popup')");
+  const openIndex = openDouble !== -1 ? openDouble : openSingle;
+  assert.notEqual(openIndex, -1, "openNav animal-popup call exists");
+  const focusDouble = handlerSlice.indexOf('getElementById("animal-popup-content").focus');
+  const focusSingle = handlerSlice.indexOf("getElementById('animal-popup-content').focus");
+  const focusIndex = focusDouble !== -1 ? focusDouble : focusSingle;
+  assert.notEqual(focusIndex, -1, "detail region focus call exists");
+  assert.ok(focusIndex > openIndex, "focus runs after openNav");
+});
+
+test("detail-region Escape handler closes menu before returning focus to map", async () => {
+  const html = await readFile(new URL("../public/index.html", import.meta.url), "utf8");
+  const keydownMatches = html.match(/getElementById\(["']animal-popup-content["']\)\.addEventListener\(["']keydown["']/g) || [];
+  assert.equal(keydownMatches.length, 1, "one detail-region keydown handler");
+  const anchorDouble = html.indexOf('getElementById("animal-popup-content").addEventListener("keydown"');
+  const anchorSingle = html.indexOf("getElementById('animal-popup-content').addEventListener('keydown'");
+  const anchor = anchorDouble !== -1 ? anchorDouble : anchorSingle;
+  assert.notEqual(anchor, -1, "detail-region keydown registration exists");
+  const handlerSlice = html.slice(anchor, anchor + 800);
+  const escapeDouble = handlerSlice.indexOf('event.key === "Escape"');
+  const escapeSingle = handlerSlice.indexOf("event.key === 'Escape'");
+  assert.ok(escapeDouble !== -1 || escapeSingle !== -1, "Escape key check exists");
+  const closeIndex = handlerSlice.indexOf("closeMenu()");
+  assert.notEqual(closeIndex, -1, "closeMenu call exists");
+  const mapFocusDouble = handlerSlice.indexOf('getElementById("basemap").focus');
+  const mapFocusSingle = handlerSlice.indexOf("getElementById('basemap').focus");
+  const mapFocusIndex = mapFocusDouble !== -1 ? mapFocusDouble : mapFocusSingle;
+  assert.notEqual(mapFocusIndex, -1, "basemap focus call exists");
+  assert.ok(closeIndex < mapFocusIndex, "closeMenu runs before basemap focus");
 });

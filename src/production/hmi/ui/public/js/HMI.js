@@ -1360,6 +1360,62 @@ function setDetectionSourceDetail(sourceType) {
   if (el) el.innerText = formatDetectionSourceLabel(sourceType);
 }
 
+export function setRealDetectionSidebarMode(isReal) {
+  const setDisplay = (id, value) => { const el = document.getElementById(id); if (el) el.style.display = value; };
+  const label = document.getElementById("markup_location_metric_label");
+  if (isReal) {
+    setDisplay("animal_weather_section", "none");
+    setDisplay("desc_img", "none");
+    setDisplay("request-edit-button", "none");
+    setDisplay("animalAudioHeader", "none");
+    setDisplay("animalAudioControl", "none");
+    setDisplay("animal-spectrogram", "none");
+    if (label) label.textContent = "Location uncertainty";
+  } else {
+    setDisplay("animal_weather_section", "");
+    setDisplay("desc_img", "");
+    setDisplay("request-edit-button", "");
+    if (label) label.textContent = "Location Confidence";
+  }
+}
+
+export function showRealDetectionDetails(values) {
+  const setText = (id, text) => { const el = document.getElementById(id); if (el) el.textContent = text; };
+  const record = values || {};
+  const species = typeof record.species === "string" && record.species.trim() !== ""
+    ? record.species
+    : "unavailable";
+  setText("desc_name", species);
+  setText("desc_species", species);
+  setText("desc_confidence", record.confidence === "" ? "unavailable" : formatVocalizationDetailValue(record.confidence, "%"));
+  setText("desc_summary", "Real-device detection details.");
+  const sensorText = record.sensorId != null && String(record.sensorId).trim() !== ""
+    ? `Sensor ${record.sensorId}`
+    : "unavailable";
+  setText("markup_details", sensorText);
+  setText("markup_source", formatDetectionSourceLabel(record.sourceType));
+  let dateText = "unavailable";
+  if (record.timestamp != null && record.timestamp !== "") {
+    const parsed = new Date(record.timestamp);
+    if (Number.isFinite(parsed.getTime())) dateText = parsed.toUTCString();
+  }
+  setText("markup_date", dateText);
+  setText("markup_loc_lat", formatVocalizationDetailValue(llaLat(record.microphoneLLA)));
+  setText("markup_loc_lon", formatVocalizationDetailValue(llaLon(record.microphoneLLA)));
+  const details = document.getElementById("desc_details");
+  if (details) {
+    details.replaceChildren();
+    const estLat = llaLat(record.animalEstLLA);
+    const estLon = llaLon(record.animalEstLLA);
+    const row = document.createElement("p");
+    row.textContent = Number.isFinite(estLat) && Number.isFinite(estLon)
+      ? `Estimated animal location: ${estLat}, ${estLon}`
+      : "Estimated animal location: unavailable";
+    details.appendChild(row);
+  }
+  setText("markup_confidence", record.animalLLAUncertainty === "" ? "unavailable" : formatVocalizationDetailValue(record.animalLLAUncertainty));
+}
+
 function createMapClickEvent(hmiState) {
   hmiState.basemap.on("click", function (evt) {
     const feature = hmiState.basemap.forEachFeatureAtPixel(evt.pixel, (f) => f);
@@ -1463,45 +1519,20 @@ function createMapClickEvent(hmiState) {
 
     } else if (normalizeDetectionSource(values.sourceType) === DETECTION_SOURCE_FILTERS.REAL
       && !values.animalSpecies) {
-      // Ticket 03 only: real markers state their source; full detail is Ticket 02.
+      setRealDetectionSidebarMode(true);
       stopAudioPlayback();
       clearAnimalAudioSelection();
       active_content.show();       default_content.hide();
       active_mic_content.hide();   default_mic_content.show();
       active_node_content.hide();  default_node_content.show();
 
-      const audioHeader  = document.getElementById("animalAudioHeader");
-      const audioControl = document.getElementById("animalAudioControl");
-      const spectrogram  = document.getElementById("animal-spectrogram");
-      if (audioHeader)  audioHeader.style.display  = "none";
-      if (audioControl) audioControl.style.display = "none";
-      if (spectrogram)  spectrogram.style.display  = "none";
-
-      const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; };
-      const species = values.species || "Real-device detection";
-      setEl("desc_name", species);
-      setEl("desc_confidence", values.confidence != null ? `${values.confidence}%` : "unavailable");
-      setEl("desc_species", species);
-      setEl("desc_summary", "Real-device detection details.");
-      const summary = document.getElementById("desc_details");
-      if (summary) summary.innerHTML = "";
-      setEl("markup_details", values.sensorId ? `Sensor ${values.sensorId}` : "Real-device detection");
-      setDetectionSourceDetail(values.sourceType);
-      const lat = Array.isArray(values.microphoneLLA)
-        ? values.microphoneLLA[0]
-        : values.microphoneLLA?.latitude;
-      const lon = Array.isArray(values.microphoneLLA)
-        ? values.microphoneLLA[1]
-        : values.microphoneLLA?.longitude;
-      setEl("markup_loc_lat", formatVocalizationDetailValue(lat));
-      setEl("markup_loc_lon", formatVocalizationDetailValue(lon));
-      setEl("markup_confidence", "unavailable");
-      setEl("markup_date", values.timestamp ? new Date(values.timestamp).toUTCString() : "unavailable");
+      showRealDetectionDetails(values);
 
       animal_toggled = true;
       document.dispatchEvent(new CustomEvent("animalToggled", { detail: { message: "Animal toggled:" } }));
 
     } else {
+      setRealDetectionSidebarMode(false);
       stopAudioPlayback();
 
       active_content.show();       default_content.hide();
