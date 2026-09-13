@@ -43,15 +43,17 @@ class Source {
   getExtent() { return [144.9631, -37.8136, 144.9631, -37.8136]; }
 }
 class Layer {
-  constructor(options) { this.source = options.source; }
+  constructor(options) { this.source = options.source; this.visible = true; }
   getSource() { return this.source; }
   set(key, value) { this[key] = value; }
   setZIndex(zIndex) { this.zIndex = zIndex; }
+  setVisible(visible) { this.visible = visible; }
 }
 class Feature {
-  constructor(properties) { this.properties = properties; }
+  constructor(properties) { this.properties = properties; this.style = null; }
   setId(id) { this.id = id; }
   get(key) { return this.properties[key]; }
+  setStyle(style) { this.style = style; }
 }
 class Style { constructor(options) { this.options = options; } }
 
@@ -75,42 +77,11 @@ class Select {
 
 
 globalThis.ol = {
-  source: { Vector: Source },
-
-  layer: { Vector: Layer },
-
-  Feature,
-
-  geom: {
-    Point: class {
-      constructor(coords) {
-        this.coords = coords;
-      }
-    }
-  },
-
-  proj: {
-    fromLonLat: coords => coords
-  },
-
-  style: {
-    Style,
-    Circle: Style,
-    Fill: Style,
-    Stroke: Style
-  },
-
-  control: {
-    Control: class {
-      constructor(options) {
-        this.element = options.element;
-      }
-    }
-  },
-
-  interaction: {
-    Select
-  },
+  source: { Vector: Source }, layer: { Vector: Layer }, Feature,
+  geom: { Point: class { constructor(coords) { this.coords = coords; } } },
+  proj: { fromLonLat: coords => coords },
+  style: { Style, Circle: Style, Fill: Style, Stroke: Style, Icon: Style, Text: Style },
+  control: { Control: class { constructor(options) { this.element = options.element; } } },
 };
 const routes = await import("../public/js/routes.js");
 // The production module may not exist yet during RED.
@@ -498,6 +469,7 @@ test("vocalization converter reads object LLAs and preserves null animal locatio
   assert.equal(event.locationLat, 30);
   assert.equal(event.locationLon, 40);
   assert.equal(event.locationConfidence, 95);
+  assert.equal(event.sourceType, "simulator");
   const nulls = hmiModule.convertJSONtoAnimalVocalizationEvent(
     {}, { ...simRecord, animalEstLLA: null, animalTrueLLA: null, animalLLAUncertainty: null });
   assert.equal(nulls.estLat, null);
@@ -506,6 +478,10 @@ test("vocalization converter reads object LLAs and preserves null animal locatio
   assert.equal(nulls.locationConfidence, null);
   assert.equal(nulls.sensorLat, -37.8);
   assert.equal(nulls.sensorLon, 144.9);
+  assert.equal(nulls.sourceType, "simulator");
+  const unknown = hmiModule.convertJSONtoAnimalVocalizationEvent(
+    {}, { ...simRecord, sourceType: "bogus" });
+  assert.equal(unknown.sourceType, "bogus");
 });
 
 test("vocalization plot location falls back to the microphone only at render time", async () => {

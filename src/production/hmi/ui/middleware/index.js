@@ -15,7 +15,7 @@
 
 const verifySignUp = require("./verifySignup");
 const redis = require("redis");
-const { createCheckUserSession } = require("./session");
+const { createCheckUserSession, tokensMatch, resolveLandingPath } = require("./session");
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Redis client
@@ -59,7 +59,7 @@ const PUBLIC_ROUTES = new Set(["/login", "/signup"]);
  * Path prefixes that are always public regardless of the full path.
  * e.g. "/admin" covers "/admin", "/admin/users", "/admin/settings".
  */
-const PUBLIC_PREFIXES = ["/admin", "/public", "/static"];
+const PUBLIC_PREFIXES = ["/public", "/static"];
 
 /**
  * Return true if the given path should be accessible without a session token.
@@ -112,4 +112,6 @@ module.exports = {
   checkUserSession,
   clearUserSession,
   client,
+  tokensMatch,
+  resolveLandingPath,
 };

@@ -2933,3 +2933,28 @@ z-index: 1;
     height: 210px;
   }
 }
+
+/* Detection source segmented control (local styles, no CDN dependency) */
+.seg-control {
+  display: flex;
+  gap: 4px;
+  margin-top: 6px;
+  background: #000;
+  padding: 4px;
+  border-radius: 6px;
+}
+.seg-btn {
+  flex: 1;
+  background-color: #000;
+  border: 1px solid rgba(247, 186, 206, 0.6);
+  color: #eee;
+}
+.seg-btn[aria-pressed="true"] {
+  background-color: rgba(247, 186, 206, 0.8);
+  border-color: rgba(247, 186, 206, 0.8);
+  color: #000;
+}
+.seg-btn:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}

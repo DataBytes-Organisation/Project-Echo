@@ -1,4 +1,10 @@
 import { retrieveDetections, getApiErrorMessage } from "./routes.js";
+import {
+  DETECTION_SOURCE_FILTERS,
+  applyDetectionSourceFilter,
+  buildRealDetectionStyle,
+  normalizeDetectionSource,
+} from "./detection-source-filter.js";
 
 function validMicrophoneLLA(lla) {
   if (Array.isArray(lla)) {
@@ -285,16 +291,14 @@ export async function loadRealDetections(hmiState) {
     (hmiState.realDetectionRequest || 0) + 1;
 
   hmiState.realDetectionRequest = request;
-
-  const source =
-    hmiState.realDetectionLayer.getSource();
-
-  const status =
-    hmiState.realDetectionStatus;
-
-  status.textContent =
-    "Loading real-device detections…";
-
+  const source = hmiState.realDetectionLayer.getSource();
+  const status = hmiState.realDetectionStatus;
+  status.textContent = "Loading real-device detections…";
+  applyDetectionSourceFilter(
+    hmiState,
+    hmiState.detectionSourceFilter || DETECTION_SOURCE_FILTERS.ALL,
+    { loading: true },
+  );
   try {
     const response =
       await retrieveDetections();
@@ -308,9 +312,12 @@ export async function loadRealDetections(hmiState) {
     source.clear();
 
     if (!Array.isArray(response.data)) {
-      status.textContent =
-        "The server returned invalid detection data.";
-
+      status.textContent = "The server returned invalid detection data.";
+      applyDetectionSourceFilter(
+        hmiState,
+        hmiState.detectionSourceFilter || DETECTION_SOURCE_FILTERS.ALL,
+        { errorMessage: "Unable to filter detections: the server returned invalid data." },
+      );
       return;
     }
 
@@ -318,25 +325,9 @@ export async function loadRealDetections(hmiState) {
     const ids = new Set();
 
     for (const detection of response.data) {
-      const sourceType = getSourceType(detection);
-
-      if (sourceType !== "real") {
-        continue;
-      }
-
-      if (
-        !validMicrophoneLLA(
-          detection.microphoneLLA
-        )
-      ) {
-        invalid++;
-        continue;
-      }
-
-      if (ids.has(detection._id)) {
-        continue;
-      }
-
+      if (normalizeDetectionSource(detection?.sourceType) !== DETECTION_SOURCE_FILTERS.REAL) continue;
+      if (!validMicrophoneLLA(detection.microphoneLLA)) { invalid++; continue; }
+      if (ids.has(detection._id)) continue;
       ids.add(detection._id);
 
       const lat = Array.isArray(
@@ -353,16 +344,12 @@ export async function loadRealDetections(hmiState) {
 
       const feature = new ol.Feature({
         ...detection,
-
-        // Normalize backend field name for the HMI.
-        sourceType,
-
-        geometry: new ol.geom.Point(
-          ol.proj.fromLonLat([lon, lat])
-        ),
+        sourceType: "real",
+        geometry: new ol.geom.Point(ol.proj.fromLonLat([lon, lat])),
       });
 
       feature.setId(detection._id);
+      feature.setStyle(buildRealDetectionStyle());
       source.addFeature(feature);
     }
 
@@ -386,7 +373,10 @@ export async function loadRealDetections(hmiState) {
       : ids.size
         ? `${ids.size} real-device detection${ids.size === 1 ? "" : "s"} loaded.`
         : "No real-device detections found.";
-
+    applyDetectionSourceFilter(
+      hmiState,
+      hmiState.detectionSourceFilter || DETECTION_SOURCE_FILTERS.ALL,
+    );
   } catch (error) {
     if (
       request !== hmiState.realDetectionRequest
@@ -395,17 +385,15 @@ export async function loadRealDetections(hmiState) {
     }
 
     source.clear();
-
-    status.textContent =
-      getApiErrorMessage(
-        {
-          code: error.code,
-          response:
-            error.response && {
-              status: error.response.status,
-            },
-        },
-        "Unable to load detections. Please try again."
-      );
+    // The shared formatter receives only status/code; provider messages stay private.
+    status.textContent = getApiErrorMessage(
+      { code: error.code, response: error.response && { status: error.response.status } },
+      "Unable to load detections. Please try again."
+    );
+    applyDetectionSourceFilter(
+      hmiState,
+      hmiState.detectionSourceFilter || DETECTION_SOURCE_FILTERS.ALL,
+      { errorMessage: status.textContent },
+    );
   }
 }
