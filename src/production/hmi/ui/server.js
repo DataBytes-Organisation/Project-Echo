@@ -875,20 +875,20 @@ async function proxyToApi(req, res) {
 
 app.all('/sensors', proxyToApi);
 app.all('/sensors/*', proxyToApi);
-// Proxy all remaining API routes to the Python backend
-app.all('/movement_time/*', proxyToApi);
-app.all('/events_time/*', proxyToApi);
-app.all('/microphones', proxyToApi);
-app.all('/microphones/*', proxyToApi);
-app.all('/latest_movement', proxyToApi);
-app.all('/audio/*', proxyToApi);
-app.all('/post_recording', proxyToApi);
-app.all('/sim_control/*', proxyToApi);
+// Map/detail reads are owned by routes/map.routes.js (session-protected).
+// No duplicate unauthenticated proxies here: that keeps one production path
+// (authenticated HMI -> Backend API) for movement, vocalization, microphone,
+// audio, weather, and detection reads.
+// Direct calls to the authenticated detection read must also carry an HMI session.
+app.all('/hmi/detections', checkUserSession, proxyToApi);
 app.all('/hmi/*', proxyToApi);
 
-app.get('/iot/nodes', async (req, res) => {
+app.get('/iot/nodes', checkUserSession, async (req, res) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/iot/nodes`);
+    const response = await axios.get(`${API_BASE_URL}/iot/nodes`, {
+      headers: { Authorization: `Bearer ${req.session.token}` },
+      timeout: 10000,
+    });
     res.json(response.data);
   } catch (error) {
     console.error('Error fetching IoT nodes:', error);

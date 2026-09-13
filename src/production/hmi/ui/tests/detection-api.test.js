@@ -24,15 +24,18 @@ function harness() {
     "./session": { createCheckUserSession },
   });
   const calls = [];
-  const http = { async get(url, options) { calls.push({ url, options }); return { data: [] }; } };
+  const http = {
+    async get(url, options) { calls.push({ url, options }); return { data: [] }; },
+    async post(url, data, options) { calls.push({ url, data, options }); return { data: [] }; },
+  };
   const register = load("../routes/map.routes.js", {
     "../middleware": middleware, axios: http, dotenv: { config() {} },
   });
   const routes = new Map();
-  const app = { use() {}, get(route, ...handlers) { routes.set(route, handlers); }, post() {}, put() {} };
+  const app = { use() {}, get(route, ...handlers) { routes.set(route, handlers); }, post(route, ...handlers) { routes.set(route, handlers); }, put() {} };
   register(app);
-  async function request(route, token) {
-    const req = { path: route, session: token ? { token } : {} };
+  async function request(route, token, extra = {}) {
+    const req = { path: route, session: token ? { token } : {}, params: extra.params || {}, query: extra.query || {} };
     const res = { statusCode: 200, status(code) { this.statusCode = code; return this; },
       json(body) { this.body = body; return this; }, send(body) { this.body = body; return this; },
       redirect(url) { this.statusCode = 302; this.location = url; } };
@@ -42,8 +45,17 @@ function harness() {
     const next = async () => { if (handlers[i]) return handlers[i++](req, res, next); };
     await next(); return res;
   }
-  return { request, calls, http };
+  return { request, calls, http, routes, middleware };
 }
+
+const MAP_DETAIL_GET_ROUTES = [
+  { route: "/movement_time/:start/:end", params: { start: "1", end: "2" } },
+  { route: "/events_time/:start/:end", params: { start: "1", end: "2" } },
+  { route: "/microphones", params: {} },
+  { route: "/audio/:id", params: { id: "event-1" } },
+  { route: "/latest_movement", params: {} },
+  { route: "/api/weather", query: { timestamp: "1721997541", lat: "-38.8", lon: "143.5" } },
+];
 
 test("map redirects unauthenticated users despite public route configuration", async () => {
   const h = harness();
@@ -134,6 +146,61 @@ test("upstream 503 reports the service as temporarily unavailable", async () => 
   const response = await h.request("/api/detections", "session-jwt");
   assert.equal(response.statusCode, 503);
   assert.match(response.body.error.message, /unavailable|later|paused/i);
+});
+
+test("map and detail reads require a matching session before Backend access", async () => {
+  const h = harness();
+  for (const entry of MAP_DETAIL_GET_ROUTES) {
+    const handlers = h.routes.get(entry.route);
+    assert.ok(handlers, `${entry.route} is registered`);
+    assert.equal(handlers[0], h.middleware.checkUserSession);
+  }
+  for (const entry of MAP_DETAIL_GET_ROUTES) {
+    for (const token of [undefined, "another-jwt"]) {
+      const before = h.calls.length;
+      const response = await h.request(entry.route, token, entry);
+      if (entry.route.startsWith("/api/")) {
+        assert.equal(response.statusCode, 401, `${entry.route} without a matching session`);
+        assert.match(JSON.stringify(response.body), /Authentication required/);
+      } else {
+        assert.equal(response.statusCode, 302, `${entry.route} without a matching session`);
+        assert.equal(response.location, "/login");
+      }
+      assert.equal(h.calls.length, before, `${entry.route} must not reach the Backend`);
+    }
+  }
+});
+
+test("any matching session can read map data, regardless of role", async () => {
+  const h = harness();
+  const live = [{ _id: "event-1", species: "Magpie" }];
+  h.http.get = async (url, options) => { h.calls.push({ url, options }); return { data: live }; };
+  const response = await h.request("/events_time/:start/:end", "session-jwt",
+    { params: { start: "1", end: "2" } });
+  assert.equal(response.body, live);
+  assert.equal(h.calls.length, 1);
+  assert.match(h.calls[0].url, /\/hmi\/events_time/);
+  assert.equal(h.calls[0].options.headers.Authorization, "Bearer session-jwt");
+  assert.equal(h.calls[0].options.timeout, 10000);
+});
+
+test("authenticated map reads stay safe when the Backend fails", async () => {
+  const h = harness();
+  h.http.get = async () => { throw { response: { status: 500, data: { error: "private token http://internal" } } }; };
+  const response = await h.request("/events_time/:start/:end", "session-jwt",
+    { params: { start: "1", end: "2" } });
+  assert.equal(response.statusCode, 502);
+  assert.doesNotMatch(JSON.stringify(response.body), /private|token|internal/);
+});
+
+test("the HMI server keeps one session-protected owner for map reads", async () => {
+  const source = fs.readFileSync(path.join(__dirname, "../server.js"), "utf8");
+  assert.doesNotMatch(source, /app\.all\('\/movement_time\/\*'/);
+  assert.doesNotMatch(source, /app\.all\('\/events_time\/\*'/);
+  assert.doesNotMatch(source, /app\.all\('\/microphones'/);
+  assert.doesNotMatch(source, /app\.all\('\/latest_movement'/);
+  assert.doesNotMatch(source, /app\.all\('\/audio\/\*'/);
+  assert.match(source, /app\.get\('\/iot\/nodes', checkUserSession/);
 });
 
 test("the static map alias is session-protected before Express serves files", async () => {

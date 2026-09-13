@@ -72,6 +72,19 @@ export function retrieveDetections() {
   return withRetry(() => api.get("/api/detections"), RETRY_OPTS);
 }
 
+/**
+ * Fetch weather for a detection location through the authenticated HMI proxy.
+ * Same-origin only: the browser never calls the Backend host directly.
+ *
+ * @param {number|string} timestamp - Unix seconds for the detection date.
+ * @param {number|string} lat - Latitude of the detection location.
+ * @param {number|string} lon - Longitude of the detection location.
+ * @returns {Promise<AxiosResponse>}
+ */
+export function retrieveWeatherData(timestamp, lat, lon) {
+  return withRetry(() => api.get(`/api/weather?timestamp=${timestamp}&lat=${lat}&lon=${lon}`), RETRY_OPTS);
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Movement / truth events
 // ─────────────────────────────────────────────────────────────────────────────

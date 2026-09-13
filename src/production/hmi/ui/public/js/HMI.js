@@ -30,6 +30,7 @@ import {
   retrieveMicrophones,
   retrieveAudio,
   retrieveSimTime,
+  retrieveWeatherData,
   postRecording,
   setSimModeAnimal,
   setSimModeRecording,
@@ -1344,11 +1345,8 @@ function createBasemap(hmiState) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 async function fetchWeatherData(timestamp, lat, lon) {
-  const response = await fetch(
-    `http://localhost:9000/hmi/weather?timestamp=${timestamp}&lat=${lat}&lon=${lon}`
-  );
-  if (!response.ok) throw new Error("Failed to fetch weather data");
-  return response.json();
+  const response = await retrieveWeatherData(timestamp, lat, lon);
+  return response.data;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

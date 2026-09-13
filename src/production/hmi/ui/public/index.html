@@ -1609,18 +1609,6 @@
       hmiState.layers         = {};
       hmiState.layerPool      = 1000;
 
-      const sampleJSONmovementEvents = [
-        { animalId: "M_1", timestamp: 1690765721, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Brown Rat",             speciesScientificName: "Rattus norvegicus",    speciesIdentificationConfidence: 100, locationLat: -38.80266562762367, locationLon: 143.560, locationConfidence: 100, animalType: "reptile",   animalStatus: "vulnerable",     animalDiet: "herbavore" },
-        { animalId: "M_2", timestamp: 1672448921, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Tawny Frogmouth",       speciesScientificName: "Podargus strigoides",  speciesIdentificationConfidence: 100, locationLat: -38.81905478815439, locationLon: 143.524, locationConfidence: 100, animalType: "bird",      animalStatus: "normal",         animalDiet: "herbavore" },
-        { animalId: "M_3", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Cane toad",             speciesScientificName: "Rhinella marina",      speciesIdentificationConfidence: 100, locationLat: -38.80166562762367, locationLon: 143.540, locationConfidence: 100, animalType: "amphibian", animalStatus: "invasive",       animalDiet: "omnivore"  },
-        { animalId: "M_4", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Red fox",               speciesScientificName: "Vulpes vulpes",        speciesIdentificationConfidence: 100, locationLat: -38.82166562762367, locationLon: 143.550, locationConfidence: 100, animalType: "mammal",    animalStatus: "endangered",     animalDiet: "carnivore" },
-        { animalId: "M_5", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Brown Rat",             speciesScientificName: "Rattus norvegicus",    speciesIdentificationConfidence: 100, locationLat: -38.80266562762367, locationLon: 143.570, locationConfidence: 100, animalType: "reptile",   animalStatus: "vulnerable",     animalDiet: "herbavore" },
-        { animalId: "M_6", timestamp: 1672448921, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Australian Fairy Martin",speciesScientificName: "Petrochelidon ariel", speciesIdentificationConfidence: 100, locationLat: -38.81905478815439, locationLon: 143.580, locationConfidence: 100, animalType: "bird",      animalStatus: "normal",         animalDiet: "herbavore" },
-        { animalId: "M_7", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Cane toad",             speciesScientificName: "Rhinella marina",      speciesIdentificationConfidence: 100, locationLat: -38.80166562762367, locationLon: 143.510, locationConfidence: 100, animalType: "amphibian", animalStatus: "invasive",       animalDiet: "omnivore"  },
-        { animalId: "M_8", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Red fox",               speciesScientificName: "Vulpes vulpes",        speciesIdentificationConfidence: 100, locationLat: -38.82166562762367, locationLon: 143.520, locationConfidence: 100, animalType: "mammal",    animalStatus: "endangered",     animalDiet: "carnivore" },
-        { animalId: "M_9", timestamp: 1690765721, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Redeye",               speciesScientificName: "Psaltoda moerens",     speciesIdentificationConfidence: 100, locationLat: -38.80066562762367, locationLon: 143.555, locationConfidence: 100, animalType: "insect",    animalStatus: "near-threatened",animalDiet: "herbavore" },
-      ];
-
       hmiState.movementEvents     = {};
       hmiState.vocalizationEvents = [];
       hmiState.microphoneLocations = [];
@@ -1736,9 +1724,9 @@
         retrieveTruthEventsInTimeRange(datepickerStart, datepickerEnd).then(res => {
           let data = dataCleansing(res.data);
           if (!data) {
-            // TASK 7: replaced ErrDisplay() with showToast
+            // Empty stays empty: never substitute sample records for live data.
             if (window.showToast) window.showToast('No results found for the selected time range.', 'warning');
-            data = dataCleansing(sampleJSONmovementEvents);
+            return;
           }
           const csv = convertCSV(data);
           exportCSV("exportedCSV.csv", csv);
@@ -1749,11 +1737,15 @@
         datepickerStart = hmiState.currentTime;
         datepickerEnd   = hmiState.previousUpdateTime;
         retrieveTruthEventsInTimeRange(datepickerStart, datepickerEnd).then(res => {
-          let data = (!res.data || res.data.length === 0) ? sampleJSONmovementEvents : res.data;
           if (!res.data || res.data.length === 0) {
-            if (window.showToast) window.showToast('No results found. Exporting sample data.', 'warning');
+            if (window.showToast) window.showToast('No results found for the selected time range.', 'warning');
+            return;
           }
-          data = dataCleansing(data);
+          const data = dataCleansing(res.data);
+          if (!data) {
+            if (window.showToast) window.showToast('No results found for the selected time range.', 'warning');
+            return;
+          }
           const ws = XLSX.utils.json_to_sheet(data);
           const wb = XLSX.utils.book_new();
           ws["!autofilter"] = { ref: XLSX.utils.encode_range(XLSX.utils.decode_range(ws['!ref'])) };

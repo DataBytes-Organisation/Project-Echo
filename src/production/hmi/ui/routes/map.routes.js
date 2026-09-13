@@ -62,68 +62,110 @@ module.exports = function(app) {
     }
   });
 
+  app.get("/api/weather", checkUserSession, async (req, res) => {
+    try {
+      const { timestamp, lat, lon } = req.query || {};
+      if (timestamp === undefined || lat === undefined || lon === undefined) {
+        return res.status(400).json({ error: {
+          code: "BAD_REQUEST",
+          message: "Weather data is currently unavailable.",
+          details: null,
+        } });
+      }
+      const response = await axios.get(`${MESSAGE_API_URL}/weather`, {
+        params: { timestamp, lat, lon },
+        headers: { Authorization: `Bearer ${req.session.token}` },
+        timeout: 10000,
+      });
+      res.send(response.data);
+    } catch (err) {
+      if (!res.headersSent) res.status(502).json({ error: 'API unavailable' });
+    }
+  });
+
   app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Headers", "Origin, Content-Type, Accept");
     next();
   });
 
-  app.get(`/movement_time/:start/:end`, async (req, res) => {
+  app.get(`/movement_time/:start/:end`, checkUserSession, async (req, res) => {
     try {
-      const response = await axios.get(`${MESSAGE_API_URL}/movement_time?start=${req.params.start}&end=${req.params.end}`);
+      const response = await axios.get(`${MESSAGE_API_URL}/movement_time?start=${req.params.start}&end=${req.params.end}`, {
+        headers: { Authorization: `Bearer ${req.session.token}` },
+        timeout: 10000,
+      });
       res.send(response.data || []);
     } catch (err) {
       if (!res.headersSent) res.status(502).json({ error: 'API unavailable' });
     }
   });
 
-  app.get(`/movement_time_daily/:start/:end`, async (req, res) => {
+  app.get(`/movement_time_daily/:start/:end`, checkUserSession, async (req, res) => {
     try {
-      const response = await axios.get(`${MESSAGE_API_URL}/movement_time_daily?start=${req.params.start}&end=${req.params.end}`);
+      const response = await axios.get(`${MESSAGE_API_URL}/movement_time_daily?start=${req.params.start}&end=${req.params.end}`, {
+        headers: { Authorization: `Bearer ${req.session.token}` },
+        timeout: 10000,
+      });
       res.send(response.data || []);
     } catch (err) {
       if (!res.headersSent) res.status(502).json({ error: 'API unavailable' });
     }
   });
 
-  app.get(`/events_time/:start/:end`, async (req, res) => {
+  app.get(`/events_time/:start/:end`, checkUserSession, async (req, res) => {
     try {
-      const response = await axios.get(`${MESSAGE_API_URL}/events_time?start=${req.params.start}&end=${req.params.end}`);
+      const response = await axios.get(`${MESSAGE_API_URL}/events_time?start=${req.params.start}&end=${req.params.end}`, {
+        headers: { Authorization: `Bearer ${req.session.token}` },
+        timeout: 10000,
+      });
       res.send(response.data || []);
     } catch (err) {
       if (!res.headersSent) res.status(502).json({ error: 'API unavailable' });
     }
   });
 
-  app.get(`/microphones`, async (req, res) => {
+  app.get(`/microphones`, checkUserSession, async (req, res) => {
     try {
-      const response = await axios.get(`${MESSAGE_API_URL}/microphones`);
+      const response = await axios.get(`${MESSAGE_API_URL}/microphones`, {
+        headers: { Authorization: `Bearer ${req.session.token}` },
+        timeout: 10000,
+      });
       res.send(response.data);
     } catch (err) {
       if (!res.headersSent) res.status(502).json({ error: 'API unavailable' });
     }
   });
 
-  app.get(`/audio/:id`, async (req, res) => {
+  app.get(`/audio/:id`, checkUserSession, async (req, res) => {
     try {
-      const response = await axios.get(`${MESSAGE_API_URL}/audio?id=${req.params.id}`);
+      const response = await axios.get(`${MESSAGE_API_URL}/audio?id=${req.params.id}`, {
+        headers: { Authorization: `Bearer ${req.session.token}` },
+        timeout: 10000,
+      });
       res.send(response.data);
     } catch (err) {
       if (!res.headersSent) res.status(502).json({ error: 'API unavailable' });
     }
   });
 
-  app.post(`/post_recording`, async (req, res) => {
+  app.post(`/post_recording`, checkUserSession, async (req, res) => {
     try {
-      const response = await axios.post(`${MESSAGE_API_URL}/post_recording`, req.body);
+      const response = await axios.post(`${MESSAGE_API_URL}/post_recording`, req.body, {
+        headers: { Authorization: `Bearer ${req.session.token}` },
+        timeout: 10000,
+      });
       res.send(response.data);
     } catch (err) {
       if (!res.headersSent) res.status(502).json({ error: 'API unavailable' });
     }
   });
 
-  app.post(`/sim_control/:control`, async (req, res) => {
+  app.post(`/sim_control/:control`, checkUserSession, async (req, res) => {
     try {
-      const response = await axios.post(`${MESSAGE_API_URL}/sim_control?control=${req.params.control}`);
+      const response = await axios.post(`${MESSAGE_API_URL}/sim_control?control=${req.params.control}`, null, {
+        headers: { Authorization: `Bearer ${req.session.token}` },
+        timeout: 10000,
+      });
       res.send(response.data);
     } catch (err) {
       if (!res.headersSent) res.status(502).json({ error: 'API unavailable' });
@@ -301,9 +343,12 @@ module.exports = function(app) {
     }
   });
 
-  app.get(`/latest_movement`, async (req, res) => {
+  app.get(`/latest_movement`, checkUserSession, async (req, res) => {
     try {
-      const response = await axios.get(`${MESSAGE_API_URL}/latest_movement`);
+      const response = await axios.get(`${MESSAGE_API_URL}/latest_movement`, {
+        headers: { Authorization: `Bearer ${req.session.token}` },
+        timeout: 10000,
+      });
       res.send(response.data);
     } catch (err) {
       if (!res.headersSent) res.status(502).json({ error: 'API unavailable' });

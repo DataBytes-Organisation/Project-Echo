@@ -378,6 +378,35 @@ test("production startup has no embedded detection assignments", async () => {
   assert.doesNotMatch(html, /const vocalizationEvents\s*=\s*\[\s*\{/);
 });
 
+test("map and detail reads use the shared request boundary, not page-local backend calls", async () => {
+  assert.equal(typeof routes.retrieveDetections, "function");
+  assert.equal(typeof routes.retrieveVocalizationEventsInTimeRange, "function");
+  assert.equal(typeof routes.retrieveTruthEventsInTimeRange, "function");
+  assert.equal(typeof routes.retrieveMicrophones, "function");
+  assert.equal(typeof routes.retrieveAudio, "function");
+  assert.equal(typeof routes.retrieveWeatherData, "function");
+  calls = []; result = { data: [] };
+  await routes.retrieveWeatherData(1721997541, -38.8, 143.5);
+  assert.deepEqual(calls, ["/api/weather?timestamp=1721997541&lat=-38.8&lon=143.5"]);
+  assert.equal(config.timeout, 10000);
+  const hmiSource = await readFile(new URL("../public/js/HMI.js", import.meta.url), "utf8");
+  assert.doesNotMatch(hmiSource, /localhost:9000/);
+  assert.doesNotMatch(hmiSource, /fetch\(\s*[`'"]http/);
+  const loaderSource = await readFile(new URL("../public/js/real-detections.js", import.meta.url), "utf8");
+  assert.doesNotMatch(loaderSource, /localhost:9000/);
+  assert.doesNotMatch(loaderSource, /fetch\(/);
+});
+
+test("no embedded, localStorage, or seeded records can populate the live success path", async () => {
+  const html = await readFile(new URL("../public/index.html", import.meta.url), "utf8");
+  assert.doesNotMatch(html, /sampleJSONmovementEvents/);
+  const hmiSource = await readFile(new URL("../public/js/HMI.js", import.meta.url), "utf8");
+  assert.doesNotMatch(hmiSource, /localStorage/);
+  const loaderSource = await readFile(new URL("../public/js/real-detections.js", import.meta.url), "utf8");
+  assert.doesNotMatch(loaderSource, /localStorage/);
+  assert.doesNotMatch(loaderSource, /sample_data/);
+});
+
 test("HMI initialization loads real detections without waiting for microphone or simulator services", async () => {
   globalThis.fetch = async () => ({ json: async () => ({ data: [] }) });
   const hmiModule = await import("../public/js/HMI.js");
