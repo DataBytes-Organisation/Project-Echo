@@ -17,6 +17,7 @@ def test_echo_engine_sends_backend_payload():
     }
 
     mock_response = MagicMock()
+    mock_response.status_code = 200
     mock_response.text = "OK"
 
     with patch("echo_engine.requests.post", return_value=mock_response) as mock_post:

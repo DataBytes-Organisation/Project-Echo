@@ -19,8 +19,8 @@ YAMNET_DIR = Path(__file__).resolve().parent
 import numpy as np
 import tensorflow as tf
 
-from yamnet_dir import params
-from yamnet_dir import yamnet
+from . import params
+from . import yamnet
 
 class YAMNetTest(tf.test.TestCase):
 
