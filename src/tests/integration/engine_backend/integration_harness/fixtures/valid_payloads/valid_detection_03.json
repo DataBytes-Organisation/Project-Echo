@@ -1,0 +1,12 @@
+{
+  "timestamp": "2026-08-06T10:17:00+10:00",
+  "sensorId": "engine-test-sensor-03",
+  "species": "Sulphur-crested Cockatoo",
+  "microphoneLLA": [-37.8136, 144.9631, 12.0],
+  "animalEstLLA": [-37.8134, 144.9634, 9.0],
+  "animalTrueLLA": [-37.8133, 144.9635, 10.0],
+  "animalLLAUncertainty": 5,
+  "audioClip": "VGVzdCBhdWRpbyAz",
+  "confidence": 82.75,
+  "sampleRate": 44100
+}

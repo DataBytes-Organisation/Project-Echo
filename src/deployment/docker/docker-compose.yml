@@ -6,8 +6,8 @@ services:
       context: ../../production/engine
       dockerfile: Model.Dockerfile
       args:
-        BASE_IMAGE: tensorflow/serving:latest
-        # BASE_IMAGE: emacski/tensorflow-serving # Uncomment if on macos and comment above line
+       BASE_IMAGE: tensorflow/serving:latest
+       # BASE_IMAGE: emacski/tensorflow-serving # Uncomment if on macos and comment above line
     image: ts-echo-model
     container_name: ts-echo-model-cont
     command: --model_config_file=/models/models.config
@@ -110,12 +110,18 @@ services:
     environment:
       MAIL_STARTTLS: "true"
       MAIL_SSL_TLS: "false"
-
+      MQTT_BROKER_URL: "ts-mqtt-server-cont"
+      MQTT_BROKER_PORT: "1883"
+      MQTT_PUBLISH_URL: "projectecho/engine/2"
 
     stdin_open: false
     tty: true
     command: uvicorn app.main:app --host 0.0.0.0 --port 9000 --reload
-
+    restart: on-failure
+    depends_on:
+      echo_store:
+        condition: service_healthy
+        
   mongo-express:
     image: mongo-express
     container_name: mongo-express
@@ -149,6 +155,25 @@ services:
       - "27017:27017"
     volumes:
       - db-data:/data/db
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mongo",
+          "--quiet",
+          "-u",
+          "root",
+          "-p",
+          "root_password",
+          "--authenticationDatabase",
+          "admin",
+          "--eval",
+          "db.adminCommand('ping').ok"
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 40s
 
   echo-redis:
     image: redis:latest

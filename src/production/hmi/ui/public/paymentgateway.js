@@ -1,12 +1,13 @@
 
 
-    function payment(name, Amount, email) {
+    function payment(name, order, email, onSettled = function () {}) {
 
         var options = {
 
-            "key": "rzp_test_FUo44CLqbVzQj4",
-            "amount": Amount,
-            "currency": "AUD",
+            "key": order.keyId,
+            "amount": order.amount,
+            "currency": order.currency,
+            "order_id": order.orderId,
             "name": "Donate Now",
             "description": "Payment Test",
             "image": "https://iconape.com/wp-content/files/sw/12497/png/donate.png",
@@ -44,26 +45,33 @@
             "modal": {
                 "ondismiss": function () {
                     paymentcancel();
+                    onSettled();
                 }
             },
-            "handler": function (response) {
-                alert("Payment Success: " + response.razorpay_payment_id); // merged from both
-
-                fetch('/api/save-razorpay-payment', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        paymentId: response.razorpay_payment_id,
-                        name: options.prefill.name,
-                        email: options.prefill.email,
-                        amount: options.amount / 100,
-                        currency: options.currency,
-                        method: "Razorpay"
-                    })
-                })
-                .then(res => res.json())
-                .then(data => console.log('✅ Donation saved:', data))
-                .catch(err => console.error('❌ Error saving donation:', err));
+            "handler": async function (response) {
+                try {
+                    var verificationResponse = await fetch('/api/save-razorpay-payment', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            paymentId: response.razorpay_payment_id,
+                            orderId: response.razorpay_order_id,
+                            signature: response.razorpay_signature,
+                            name: options.prefill.name
+                        })
+                    });
+                    if (!verificationResponse.ok) throw new Error('Payment verification failed');
+                    await verificationResponse.json();
+                    if (typeof window !== 'undefined' && window.showToast) {
+                        window.showToast('Donation verified. Thank you!', 'success');
+                    }
+                } catch (error) {
+                    if (typeof window !== 'undefined' && window.showToast) {
+                        window.showToast('Payment could not be verified. Please contact support.', 'error');
+                    }
+                } finally {
+                    onSettled();
+                }
             }
 
                 
@@ -105,4 +113,8 @@
             }, 800);
     
         }, processingDuration);
+    }
+
+    if (typeof module !== 'undefined' && module.exports) {
+        module.exports = { payment };
     }

@@ -1,0 +1,11 @@
+{
+  "timestamp": "2026-08-06T10:15:30Z",
+  "sensorId": "engine-test-invalid-01",
+  "microphoneLLA": [-38.143, 144.361, 15.0],
+  "animalEstLLA": [-38.142, 144.36, 15.0],
+  "animalTrueLLA": [-38.142, 144.36, 15.0],
+  "animalLLAUncertainty": 8,
+  "audioClip": "VGVzdCBhdWRpbw==",
+  "confidence": 96.42,
+  "sampleRate": 48000
+}

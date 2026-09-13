@@ -8,6 +8,7 @@
 
   <link rel="shortcut icon" type="image/png" href="/admin/images/logos/project-title.png" />
   <link type="text/css" rel="stylesheet" href="/admin/css/styles.min.css" />
+  <link rel="stylesheet" href="/admin/dashboard.css" />
   <link rel="stylesheet" href="/admin/css/icons/tabler-icons/tabler-icons.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
     crossorigin="anonymous" />
@@ -17,31 +18,37 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="/admin/js/admin-layout.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
   <script src="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.min.js"></script>
 
-  <script type="text/javascript" src="/admin/js/sidebarmenu.js"></script>
-  <script type="text/javascript" src="/admin/js/app.min.js"></script>
   <script type="text/javascript" src="/admin/js/dashboard.js"></script>
   <script type="text/javascript" src="/admin/js/admin-page-state.js"></script>
+
+  <!-- axios has to load before the modules below - routes.js grabs window.axios
+       as soon as it evaluates, so this one can't be deferred -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 
 <body>
 
-<!-- Sprint 2: API Status Badge -->
-<div id="api-status-badge" style="position: fixed; top: 10px; right: 10px; z-index: 9999;">Loading status...</div>
-<script src="/js/api-status.js"></script>
+  <div
+    class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full" data-sidebar-position="fixed" data-header-position="fixed">
 
-  <!--  Body Wrapper -->
-  <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
-    data-sidebar-position="fixed" data-header-position="fixed">
     <div id="sidebar"></div>
 
     <div class="body-wrapper">
       <div id="header"></div>
 
       <div class="container-fluid">
+
+        <!-- Sprint 2: API Status Badge -->
+        <div id="api-status-badge" class="api-status-badge">
+        Loading status...
+        </div>
+        <script type="module" src="/js/api-status.js"></script>
+
         <div class="admin-page-status">
           <div class="admin-error-banner d-none" role="alert" aria-live="polite">
             <div class="admin-error-banner__content">
@@ -303,15 +310,13 @@
     <div id="footer"></div>
   </div>
 
-  <script type="text/javascript">
-    $(document).ready(function() {
-      $("#sidebar").load("/admin/component/sidebar-component.html", function() {
-        $.getScript('/admin/js/sidebarmenu.js');
-      });
-      $("#header").load("/admin/component/header-component.html");
-      $("#footer").load("/admin/component/footer-component.html");
-    });
-  
+  <script type="module">
+    // FR-D1: module so the donations call can use the shared client. Nothing
+    // outside this block reaches into it, so losing the globals costs nothing.
+    // The sidebar, header and footer are loaded by admin-layout.js now.
+    import { retrieveCumulativeDonations } from "/js/routes.js";
+    import { getApiErrorMessage } from "/js/HMI-utils.js";
+
     const pageState = createAdminPageState();
     pageState.resetPageState();
   
@@ -320,21 +325,13 @@
   
       pageState.hideError();
       pageState.showLoading();
-  
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 2000);
-  
+
       try {
-        const response = await fetch('/cumulativeDonations', {
-          signal: controller.signal
-        });
-  
-        if (!response.ok) {
-          throw new Error(`Request failed with status ${response.status}`);
-        }
-  
-        const data = await response.json();
-  
+        // FR-D1: shared client, which carries its own timeout and retry - the
+        // AbortController that used to be here is doing the same job twice now.
+        const response = await retrieveCumulativeDonations();
+        const data = response.data;
+
         if (data === 0 || data === undefined || data.cumulativeTotal === undefined) {
           totalDonationsElement.innerHTML = "Total Donations: Connect Stripe Account";
         } else {
@@ -342,14 +339,8 @@
         }
       } catch (error) {
         console.error('Error:', error);
-  
-        if (error.name === 'AbortError') {
-          pageState.showError('Loading donation data timed out. Please try again.');
-        } else {
-          pageState.showError('Failed to load donation data. Please try again.');
-        }
+        pageState.showError(getApiErrorMessage(error, 'Failed to load donation data. Please try again.'));
       } finally {
-        clearTimeout(timeoutId);
         pageState.hideLoading();
       }
     }

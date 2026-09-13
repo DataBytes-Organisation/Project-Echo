@@ -15,6 +15,7 @@
 
 const verifySignUp = require("./verifySignup");
 const redis = require("redis");
+const { createCheckUserSession } = require("./session");
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Redis client
@@ -45,7 +46,7 @@ async function ensureRedisConnected() {
 // Route lists
 //
 // PUBLIC_ROUTES  — accessible without a session token.
-// All other routes are treated as protected and require a valid JWT in Redis.
+// All other routes require the request's cookie-session JWT to match Redis.
 //
 // To add a new public route, add its exact path string to PUBLIC_ROUTES or
 // its prefix to PUBLIC_PREFIXES below.  Do not add it to the middleware
@@ -75,42 +76,7 @@ function _isPublicRoute(path) {
 // Session middleware
 // ─────────────────────────────────────────────────────────────────────────────
 
-/**
- * Express middleware that checks for a valid JWT stored in Redis.
- *
- * - Public routes (defined above) pass through without a token check.
- * - All other routes require a JWT to be present in Redis under the key "JWT".
- * - If no token is found, or Redis errors, the request is redirected to /login.
- *
- * @param {import('express').Request}  req
- * @param {import('express').Response} res
- * @param {import('express').NextFunction} next
- */
-async function checkUserSession(req, res, next) {
-  console.log("Session check:", req.path);
-
-  // Public routes skip the token check entirely
-  if (_isPublicRoute(req.path)) {
-    return next();
-  }
-
-  // Protected route — verify a token exists in Redis
-  try {
-    await ensureRedisConnected();
-
-    const token = await client.get("JWT");
-
-    if (!token) {
-      console.log("No stored token — redirecting to login");
-      return res.redirect("/login");
-    }
-
-    return next();
-  } catch (error) {
-    console.error("Session check failed (Redis error):", error);
-    return res.redirect("/login");
-  }
-}
+const checkUserSession = createCheckUserSession(client, _isPublicRoute);
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Session helpers
