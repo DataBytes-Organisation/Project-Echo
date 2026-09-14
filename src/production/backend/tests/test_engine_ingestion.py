@@ -1,4 +1,5 @@
 from types import SimpleNamespace
+import asyncio
 
 import pytest
 from pydantic import ValidationError
@@ -12,10 +13,11 @@ def valid_payload():
         "timestamp": "2026-08-31T01:00:00Z",
         "sensorId": "unit-test-sensor",
         "species": "Uperoleia mimula",
-        "microphoneLLA": [-38.8081, 143.5913, 10.0],
-        "animalEstLLA": [-38.8082, 143.5929, 4.6],
-        "animalTrueLLA": [-38.8082, 143.5929, 10.0],
-        "animalLLAUncertainty": 0,
+        "sourceType": "simulator",
+        "microphoneLLA": {"latitude": -38.8081, "longitude": 143.5913, "altitude": 10.0},
+        "animalEstLLA": {"latitude": -38.8082, "longitude": 143.5929, "altitude": 4.6},
+        "animalTrueLLA": {"latitude": -38.8082, "longitude": 143.5929, "altitude": 10.0},
+        "animalLLAUncertainty": 0.0,
         "audioClip": "unit-test-audio",
         "confidence": 99.36,
         "sampleRate": 32000,
@@ -50,16 +52,14 @@ def test_create_event_inserts_into_events_collection(monkeypatch):
     monkeypatch.setattr(engine, "Events", fake_events)
 
     event = EventSchema(**valid_payload())
-    response = engine.create_event(event)
+    response = asyncio.run(engine.create_event(event))
 
     assert fake_events.inserted_document is not None
     assert fake_events.inserted_document["sensorId"] == "unit-test-sensor"
     assert fake_events.inserted_document["species"] == "Uperoleia mimula"
     assert fake_events.inserted_document["confidence"] == 99.36
 
-    assert response["_id"] == "fake-event-id"
-    assert response["sensorId"] == "unit-test-sensor"
-    assert response["species"] == "Uperoleia mimula"
+    assert response == {"status": "success", "eventId": "fake-event-id"}
 
 
 def test_empty_species_is_rejected():
@@ -70,17 +70,32 @@ def test_empty_species_is_rejected():
         EventSchema(**payload)
 
 
-def test_confidence_100_is_rejected():
+def test_confidence_100_is_accepted():
     payload = valid_payload()
     payload["confidence"] = 100
 
-    with pytest.raises(ValidationError):
-        EventSchema(**payload)
+    assert EventSchema(**payload).confidence == 100
 
 
 def test_invalid_microphone_location_length_is_rejected():
     payload = valid_payload()
-    payload["microphoneLLA"] = [-38.8081, 143.5913]
+    payload["microphoneLLA"] = {"latitude": -38.8081, "longitude": 143.5913}
 
     with pytest.raises(ValidationError):
         EventSchema(**payload)
+
+
+def test_real_event_can_omit_animal_location_fields():
+    payload = valid_payload()
+    payload.update({
+        "sourceType": "real",
+        "animalEstLLA": None,
+        "animalTrueLLA": None,
+        "animalLLAUncertainty": None,
+    })
+
+    event = EventSchema(**payload)
+
+    assert event.animalEstLLA is None
+    assert event.animalTrueLLA is None
+    assert event.animalLLAUncertainty is None
