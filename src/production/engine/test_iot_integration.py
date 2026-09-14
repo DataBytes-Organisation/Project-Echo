@@ -85,6 +85,23 @@ def _patched_open(path, *args, **kwargs):
 builtins.open = _patched_open
 from echo_engine import EchoEngine  # noqa: E402
 
+# sklearn (unlike tensorflow/librosa/etc.) isn't referenced again anywhere in
+# this file after the import above, and echo_engine.py only needs it mocked
+# at *its own* import time (`from sklearn.preprocessing import LabelEncoder`,
+# already bound into echo_engine's namespace by now). Left mocked, it stays a
+# MagicMock in sys.modules for the rest of the pytest process once this file
+# is collected - pytest imports every test file up front during collection,
+# before running any of them, so a later file's real
+# `from sklearn.metrics import ...` (e.g. test_heldout_baseline.py, unrelated
+# to this one) gets the mock instead and fails with "ModuleNotFoundError: No
+# module named 'sklearn.metrics'; 'sklearn' is not a package". A
+# tearDownModule() cleanup runs too late to fix this - it only fires after
+# this file's own tests execute, by which point collection has already
+# polluted every other file. Restoring it right here, immediately after the
+# only import that needed it mocked, is what actually fixes the leak.
+for _mod in ("sklearn.preprocessing", "sklearn"):
+    sys.modules.pop(_mod, None)
+
 
 # ===========================================================================
 # Helpers
