@@ -24,9 +24,9 @@ class TestErrorBody:
         assert body["error"]["message"] == "Bad input"
         assert body["error"]["details"] == {"field": "email"}
 
-    def test_details_defaults_to_none_when_not_given(self):
+    def test_details_key_omitted_when_not_given(self):
         body = error_body(404, "Not found")
-        assert body["error"]["details"] is None
+        assert "details" not in body["error"]
 
     def test_unmapped_status_code_falls_back_to_generic_code(self):
         # 418 isn't (and doesn't need to be) in STATUS_CODES.
