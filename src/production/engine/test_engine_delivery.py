@@ -2,6 +2,7 @@
 Automated tests for Engine Backend delivery reliability.
 """
 
+import os
 import unittest
 from unittest.mock import MagicMock, patch
 
@@ -28,6 +29,12 @@ class TestEngineBackendDelivery(unittest.TestCase):
         )
         self.engine.config["API_TIMEOUT_SECONDS"] = 5
         self.engine.config["API_RETRY_COUNT"] = 2
+        self._clear_api_key = patch.dict(
+            os.environ,
+            {"ENGINE_API_KEY": ""},
+        )
+        self._clear_api_key.start()
+        self.addCleanup(self._clear_api_key.stop)
 
         self.audio_event = {
             "sourceType": "simulator",
@@ -208,6 +215,35 @@ class TestEngineBackendDelivery(unittest.TestCase):
 
         self.assertEqual(mock_post.call_count, 1)
         self.assertIn("HTTP 422", str(raised.exception))
+
+    def test_api_key_header_sent_when_configured(self):
+        with patch.dict(os.environ, {"ENGINE_API_KEY": "secret-value"}):
+            with patch.object(
+                engine_module.requests,
+                "post",
+                return_value=_response(201, "created"),
+            ) as mock_post:
+                self._send()
+
+        mock_post.assert_called_once_with(
+            "http://mock-backend/engine/event",
+            json=mock_post.call_args.kwargs["json"],
+            timeout=5,
+            headers={"X-Engine-Api-Key": "secret-value"},
+        )
+
+    def test_api_key_header_omitted_when_unset_or_empty(self):
+        for env_value in ("", "   "):
+            with self.subTest(ENGINE_API_KEY=env_value):
+                with patch.dict(os.environ, {"ENGINE_API_KEY": env_value}):
+                    with patch.object(
+                        engine_module.requests,
+                        "post",
+                        return_value=_response(201, "created"),
+                    ) as mock_post:
+                        self._send()
+
+                self.assertNotIn("headers", mock_post.call_args.kwargs)
 
 
 if __name__ == "__main__":

@@ -50,6 +50,16 @@ tensorboard_logs/
 # MLflow experiment tracking runs
 # mlruns/
 
+# Sprint 2 augmentation benchmark - raw per-run artifacts (full training
+# logs, tensorboard events). Reproducible from the archived Hydra config +
+# seed; condensed metrics are tracked instead, under
+# src/prototypes/engine/augmentation/results/. Checkpoints already covered
+# by the *.pth rule below.
+src/prototypes/engine/augmentation/experiment_results/
+src/prototypes/engine/augmentation/experiment_results_balanced/
+src/prototypes/engine/augmentation/experiment_results_ceiling20_seed0_archived/
+src/prototypes/engine/augmentation/experiment_data_subset/
+
 # -----------------------------------------------------------------------------
 # Model weights & large binaries (tracked via DVC instead of git)
 # -----------------------------------------------------------------------------
