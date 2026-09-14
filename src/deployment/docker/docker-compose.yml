@@ -28,6 +28,8 @@ services:
     container_name: ts-echo-engine-cont
     networks:
       - echo-net
+    environment:
+      ENGINE_API_KEY: ${ENGINE_API_KEY:-}
     volumes:
       - credentials_volume:/root/.config/gcloud/
     stdin_open: true
@@ -113,6 +115,7 @@ services:
       MQTT_BROKER_URL: "ts-mqtt-server-cont"
       MQTT_BROKER_PORT: "1883"
       MQTT_PUBLISH_URL: "projectecho/engine/2"
+      ENGINE_API_KEY: ${ENGINE_API_KEY:-}
 
     stdin_open: false
     tty: true
