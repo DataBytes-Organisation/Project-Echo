@@ -147,7 +147,7 @@ class TestOnMessageContractRouting(unittest.TestCase):
             MagicMock(
                 return_value=(
                     "Magpie",
-                    91.5,
+                    0.915,
                     None,
                     32000,
                     [],
@@ -249,7 +249,7 @@ class TestOnMessagePostsStandardEvent(unittest.TestCase):
             MagicMock(
                 return_value=(
                     "Magpie",
-                    91.5,
+                    0.915,
                     None,
                     32000,
                     [],
@@ -277,11 +277,11 @@ class TestOnMessagePostsStandardEvent(unittest.TestCase):
         self.assertEqual(posted_payload["sourceType"], "real")
         self.assertEqual(posted_payload["sampleRate"], 16000)
         self.assertEqual(posted_payload["species"], "Magpie")
-        self.assertEqual(posted_payload["confidence"], 91.5)
+        self.assertEqual(posted_payload["confidence"], 0.915)
         self.assertIsNone(posted_payload["animalEstLLA"])
         self.assertEqual(
-            posted_payload["microphoneLLA"]["longitude"],
-            144.9631,
+            posted_payload["microphoneLLA"][1],
+            144.9631
         )
 
     def test_legacy_simulator_uses_inference_sample_rate(self):
@@ -304,12 +304,8 @@ class TestOnMessagePostsStandardEvent(unittest.TestCase):
         self.assertEqual(posted_payload["sourceType"], "simulator")
         self.assertEqual(posted_payload["sampleRate"], 32000)
         self.assertEqual(
-            posted_payload["animalEstLLA"],
-            {
-                "latitude": -37.8136,
-                "longitude": 144.9631,
-                "altitude": 0.0,
-            },
+             posted_payload["animalEstLLA"],
+                 [-37.8136, 144.9631, 0.0],
         )
 
 

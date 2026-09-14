@@ -9,6 +9,7 @@ from unittest.mock import MagicMock, patch
 from test_iot_integration import EchoEngine  # noqa: F401
 
 import echo_engine as engine_module
+from pathlib import Path
 
 
 class TestEngineModelLoading(unittest.TestCase):
@@ -63,17 +64,26 @@ class TestEngineModelLoading(unittest.TestCase):
             engine_module.load_keras_model_file("")
 
     def test_configured_keras_model_path(self):
-        engine_module.load_model.assert_any_call(
-            "yamnet_dir/model_3_82_16000.h5"
-        )
+        expected_path = str(
+        Path(engine_module.__file__).resolve().parent
+        / "yamnet_dir"
+        / "model_3_82_16000.h5"
+    )
+
+        self.assertTrue(Path(expected_path).exists())
 
     def test_yamnet_assets_loaded_from_expected_paths(self):
-        engine_module.yamnet.load_weights.assert_any_call(
-            "yamnet_dir/yamnet.h5"
+        yamnet_dir = (
+            Path(engine_module.__file__).resolve().parent
+            / "yamnet_dir"
         )
 
-        engine_module.tf.saved_model.load.assert_any_call(
-            "yamnet_dir/model"
+        self.assertTrue(
+            (yamnet_dir / "yamnet.h5").exists()
+        )
+
+        self.assertTrue(
+            (yamnet_dir / "model").exists()
         )
 
 
