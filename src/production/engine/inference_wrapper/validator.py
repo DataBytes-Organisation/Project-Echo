@@ -84,10 +84,15 @@ class InferenceValidator:
                 "message": "Confidence score missing."
             }
 
-        if confidence < 0 or confidence > 1:
+        # The Engine reports confidence as a percentage: the production
+        # EfficientNetV2 path returns round(confidence * 100.0, 2) and the
+        # EchoNet CSV path multiplies by 100.0 as well. The legacy classic
+        # path still returns a 0-1 value, so accept the 0-100 range which
+        # covers both rather than rejecting every real detection above 1%.
+        if confidence < 0 or confidence > 100:
             return False, {
                 "code": "INVALID_CONFIDENCE",
-                "message": "Confidence must be between 0 and 1."
+                "message": "Confidence must be between 0 and 100."
             }
 
         return True, None

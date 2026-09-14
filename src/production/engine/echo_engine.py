@@ -1223,6 +1223,13 @@ class EchoEngine():
         # ---------------------------------------------------------
         config = getattr(self, "config", {})
 
+        # Report which inference model produced the detection. Kept on the
+        # Backend payload rather than the wrapper response so the standard
+        # inference schema stays transport-agnostic.
+        backend_payload["source_model"] = (
+            config.get("ACTIVE_INFERENCE_MODEL") or "unknown"
+        )
+
         url = config.get(
          "API_URL",
          "http://ts-api-cont:9000/engine/event"

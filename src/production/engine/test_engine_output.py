@@ -72,6 +72,7 @@ class TestEnginePredictionOutput(unittest.TestCase):
             "animalLLAUncertainty": 5.0,
             "audioClip": "base64-test-audio",
             "sampleRate": 48000,
+            "source_model": "classic",
         }
 
         mock_post.assert_called_once_with(
@@ -195,6 +196,59 @@ class TestEnginePredictionOutput(unittest.TestCase):
             )
 
         mock_post.assert_not_called()
+
+    def test_source_model_follows_active_inference_model(self):
+        self.engine.config["ACTIVE_INFERENCE_MODEL"] = (
+            "efficientnetv2_tflite"
+        )
+        mock_response = MagicMock()
+        mock_response.status_code = 201
+        mock_response.text = "accepted"
+
+        with patch.object(
+            engine_module.requests,
+            "post",
+            return_value=mock_response
+        ) as mock_post:
+            self.engine.echo_api_send_detection_event(
+                self.audio_event,
+                48000,
+                "Magpie",
+                91.5,
+            )
+
+        posted_payload = mock_post.call_args.kwargs["json"]
+        self.assertEqual(
+            posted_payload["source_model"],
+            "efficientnetv2_tflite",
+        )
+
+    def test_source_model_unknown_when_active_inference_model_missing_or_empty(self):
+        mock_response = MagicMock()
+        mock_response.status_code = 201
+        mock_response.text = "accepted"
+
+        for model_name in (None, ""):
+            with self.subTest(ACTIVE_INFERENCE_MODEL=model_name):
+                if model_name is None:
+                    self.engine.config.pop("ACTIVE_INFERENCE_MODEL", None)
+                else:
+                    self.engine.config["ACTIVE_INFERENCE_MODEL"] = model_name
+
+                with patch.object(
+                    engine_module.requests,
+                    "post",
+                    return_value=mock_response
+                ) as mock_post:
+                    self.engine.echo_api_send_detection_event(
+                        self.audio_event,
+                        48000,
+                        "Magpie",
+                        91.5,
+                    )
+
+                posted_payload = mock_post.call_args.kwargs["json"]
+                self.assertEqual(posted_payload["source_model"], "unknown")
 
 
 if __name__ == "__main__":
