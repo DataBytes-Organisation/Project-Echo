@@ -303,10 +303,18 @@ def find_duplicate_records(df, subset=None):
         species_label
         source
         size_bytes
+        file_name
 
     Records with unknown species/source are excluded
     because identical file size alone is not sufficient
     evidence of a duplicate metadata record.
+
+    `file_name` is part of the fingerprint because much of this
+    dataset is sliding-window segments of longer recordings
+    (region_START-END.mp3). Those segments are fixed length, so
+    they encode to near-identical byte sizes, and matching on
+    size alone flags genuinely different, non-overlapping audio
+    as duplicate records.
     """
 
     if subset is None:
@@ -314,7 +322,8 @@ def find_duplicate_records(df, subset=None):
         subset = [
             "species_label",
             "source",
-            "size_bytes"
+            "size_bytes",
+            "file_name"
         ]
 
     subset = [
@@ -442,6 +451,42 @@ def hash_file(
         return f"ERROR:{e}"
 
 
+def resolve_audio_path(row):
+    """
+    Resolve a manifest row to a file path on the current machine.
+
+    `absolute_path` is recorded by whichever environment built the
+    manifest, so a manifest generated in Colab stores paths such as
+    /content/datasets/... that do not exist anywhere else. Resolving
+    `relative_path` against the local DATASET_PATH first keeps the
+    hash check working on any machine, and the recorded absolute path
+    is still used as a fallback when the manifest was built here.
+    """
+
+    relative = str(row.get("relative_path") or "").strip()
+    species = str(row.get("species") or "").strip()
+    file_name = str(row.get("file_name") or "").strip()
+
+    candidates = []
+
+    if relative:
+        candidates.append(DATASET_PATH / relative)
+
+    # Some manifests record a bare file name while the local copy is
+    # organised into per-species folders (or the other way round), so
+    # try both layouts before giving up.
+    if file_name:
+        if species and species.lower() != "unknown":
+            candidates.append(DATASET_PATH / species / file_name)
+        candidates.append(DATASET_PATH / file_name)
+
+    for candidate in candidates:
+        if candidate.exists():
+            return str(candidate)
+
+    return str(row.get("absolute_path") or "")
+
+
 def find_duplicate_hashes(df):
     """
     Detects byte-for-byte duplicate audio files
@@ -463,8 +508,10 @@ def find_duplicate_hashes(df):
     )
 
     df["file_hash"] = (
-        df["absolute_path"]
-        .progress_apply(hash_file)
+        df.progress_apply(
+            lambda row: hash_file(resolve_audio_path(row)),
+            axis=1
+        )
     )
 
     # Successfully hashed files
