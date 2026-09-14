@@ -204,9 +204,15 @@ class TestIoTMessageHandler(unittest.TestCase):
     def test_gps_coordinates_in_event(self):
         self.engine.on_iot_message(None, None, _make_msg(_valid_payload()))
         event = self.engine.echo_api_send_detection_event.call_args[0][0]
-        self.assertEqual(event["microphoneLLA"], [-37.8136, 144.9631, 0.0])
-        self.assertEqual(event["animalEstLLA"], [-37.8136, 144.9631, 0.0])
-        self.assertEqual(event["animalTrueLLA"], [-37.8136, 144.9631, 0.0])
+        expected_lla = {
+            "latitude": -37.8136,
+            "longitude": 144.9631,
+            "altitude": 0.0,
+        }
+        self.assertEqual(event["sourceType"], "real")
+        self.assertEqual(event["microphoneLLA"], expected_lla)
+        self.assertEqual(event["animalEstLLA"], expected_lla)
+        self.assertEqual(event["animalTrueLLA"], expected_lla)
 
     def test_gps_uncertainty_from_payload(self):
         self.engine.on_iot_message(None, None, _make_msg(_valid_payload(gps_uncertainty=5.0)))

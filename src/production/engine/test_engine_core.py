@@ -120,9 +120,22 @@ class TestEdgePredictionHandling(unittest.TestCase):
             audio_event["sensorId"],
             "edge-device-01"
         )
+        self.assertEqual(audio_event["sourceType"], "real")
         self.assertEqual(
             audio_event["microphoneLLA"],
-            [-37.8136, 144.9631, 0.0]
+            {
+                "latitude": -37.8136,
+                "longitude": 144.9631,
+                "altitude": 0.0,
+            }
+        )
+        self.assertEqual(
+            audio_event["animalEstLLA"],
+            audio_event["microphoneLLA"]
+        )
+        self.assertEqual(
+            audio_event["animalTrueLLA"],
+            audio_event["microphoneLLA"]
         )
 
     def test_edge_prediction_without_gps_rejected(self):

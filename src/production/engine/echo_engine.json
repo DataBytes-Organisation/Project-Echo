@@ -36,6 +36,8 @@
     "BUCKET_NAME": "project_echo_bucket_1",
 
     "API_URL": "http://ts-api-cont:9000/engine/event",
+    "API_TIMEOUT_SECONDS": 5,
+    "API_RETRY_COUNT": 2,
     "MODEL_SERVER": "http://ts-echo-model-cont:8501/v1/models/echo_model/versions/1:predict",
     "WEATHER_SERVER": "http://ts-echo-model-cont:8501/v1/models/weather_model/versions/1:predict",
 
