@@ -929,6 +929,13 @@ export function convertJSONtoAnimalMovementEvent(hmiState, data) {
 export function convertJSONtoAnimalVocalizationEvent(hmiState, data) {
   const speciesName = (data.species || "unknown").toLowerCase();
 
+  // Any of these arrays can be missing/null on a real (non-simulator)
+  // detection — read them defensively rather than dereferencing directly,
+  // so a malformed payload produces an incomplete pair instead of throwing.
+  const [estLat, estLon]       = _safeLatLon(data.animalEstLLA);
+  const [locationLat, locationLon] = _safeLatLon(data.animalTrueLLA);
+  const [sensorLat, sensorLon] = _safeLatLon(data.microphoneLLA);
+
   return {
     timestamp:                      hmiState.currentTime,
     eventTimestamp:                 data.timestamp,
@@ -941,13 +948,13 @@ export function convertJSONtoAnimalVocalizationEvent(hmiState, data) {
     animalDiet:                   (data.diet || "herbivore").toLowerCase(),
     locationConfidence:           100 - data.animalLLAUncertainty, // legacy popup "%" label only, see note above
     locationUncertaintyM:         data.animalLLAUncertainty,        // metres — used for the map confidence ring
-    estLat:                         data.animalEstLLA[0],
-    estLon:                         data.animalEstLLA[1],
-    locationLat:                    data.animalTrueLLA[0],
-    locationLon:                    data.animalTrueLLA[1],
+    estLat:                         estLat,
+    estLon:                         estLon,
+    locationLat:                    locationLat,
+    locationLon:                    locationLon,
     sensorId:                       data.sensorId,
-    sensorLat:                      data.microphoneLLA[0],
-    sensorLon:                      data.microphoneLLA[1],
+    sensorLat:                      sensorLat,
+    sensorLon:                      sensorLon,
   };
 }
 
@@ -1358,26 +1365,40 @@ function _addTruthFeature(hmiState, entry) {
 function _addVocalizationFeature(hmiState, entry) {
   const iconPath = _resolveVocalizationIconPath(entry);
 
-  // ASSUMPTION (please confirm against the real data model): a vocalization
-  // detection's "estimated location" is entry.estLat/estLon, derived from
-  // data.animalEstLLA — the acoustic triangulation estimate. entry.locationLat/
-  // locationLon (data.animalTrueLLA) is the simulator's ground-truth position;
-  // a real deployment would not have that for a vocalization-only detection.
-  // It is kept on the feature (animalTrueLon/animalTrueLat) for debugging
-  // only and is never used to place the marker or the confidence ring.
-  // If the estimated fields are ever missing, fall back to the true location
-  // rather than silently dropping the marker.
-  const estLon = Number.isFinite(entry.estLon) ? entry.estLon : entry.locationLon;
-  const estLat = Number.isFinite(entry.estLat) ? entry.estLat : entry.locationLat;
+  // A vocalization detection's "estimated location" is entry.estLat/estLon,
+  // derived from data.animalEstLLA — the acoustic triangulation estimate.
+  // entry.locationLat/locationLon (data.animalTrueLLA) is the simulator's
+  // ground-truth position; a real deployment would not have that for a
+  // vocalization-only detection. It is kept on the feature
+  // (animalTrueLon/animalTrueLat) for debugging only and is never used to
+  // place the marker or the confidence ring.
+  //
+  // Coordinates are validated as complete lat/lon PAIRS — both fields
+  // present and each within its valid range — never independently, so an
+  // estimated longitude can never be combined with a true latitude (or
+  // vice versa). Prefer the estimate; fall back to the true location only
+  // if it is itself a complete, valid pair; otherwise skip this malformed
+  // event rather than plotting a marker at a bogus position.
+  let lat, lon;
+  if (_isValidCoordPair(entry.estLat, entry.estLon)) {
+    lat = entry.estLat;
+    lon = entry.estLon;
+  } else if (_isValidCoordPair(entry.locationLat, entry.locationLon)) {
+    lat = entry.locationLat;
+    lon = entry.locationLon;
+  } else {
+    console.warn(`Skipping vocalization event ${entry.eventId}: no valid coordinate pair`, entry);
+    return;
+  }
 
   const feature = new ol.Feature({
-    geometry:          new ol.geom.Point(ol.proj.fromLonLat([estLon, estLat])),
+    geometry:          new ol.geom.Point(ol.proj.fromLonLat([lon, lat])),
     name:              "vocalisation_" + entry.speciesScientificName,
     animalType:        entry.animalType,
     animalStatus:      entry.animalStatus,
     animalSpecies:     entry.speciesScientificName,
-    animalLon:         estLon,
-    animalLat:         estLat,
+    animalLon:         lon,
+    animalLat:         lat,
     animalTrueLon:     entry.locationLon,
     animalTrueLat:     entry.locationLat,
     animalConfidence:  entry.speciesIdentificationConfidence,
@@ -1389,6 +1410,13 @@ function _addVocalizationFeature(hmiState, entry) {
     eventId:           entry.eventId,
     isAnimalMovement:  0,
   });
+
+  feature.setStyle(_makeVocalizationStyleFn(hmiState, iconPath));
+  feature.setId(entry.eventId);
+
+  const layer = findMapLayerWithName(hmiState, deriveLayerName(entry.animalStatus, entry.animalType));
+  if (layer) { layer.getSource().addFeature(feature); layer.getSource().changed(); layer.changed(); }
+}
 
   feature.setStyle(_makeVocalizationStyleFn(hmiState, iconPath));
   feature.setId(entry.eventId);
