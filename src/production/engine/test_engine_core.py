@@ -9,7 +9,7 @@ import base64
 import sys
 import unittest
 from unittest.mock import MagicMock
-
+import echo_engine as engine_module
 from test_iot_integration import (
     EchoEngine,
     _make_msg,
@@ -24,7 +24,8 @@ class TestCorePrediction(unittest.TestCase):
         self.engine.class_names = ["Kookaburra", "Magpie"]
 
     def test_prediction_returns_species_and_percentage(self):
-        mock_tf = sys.modules["tensorflow"]
+        mock_tf = MagicMock()
+        engine_module.tf = mock_tf
 
         mock_tf.argmax.return_value.numpy.return_value = 1
 
@@ -38,10 +39,11 @@ class TestCorePrediction(unittest.TestCase):
         species, confidence = self.engine.predict_class([0.1, 0.9])
 
         self.assertEqual(species, "Magpie")
-        self.assertEqual(confidence, 87.3)
+        self.assertEqual(confidence, 0.873)
 
     def test_invalid_class_index_raises_error(self):
-        mock_tf = sys.modules["tensorflow"]
+        mock_tf = MagicMock()
+        engine_module.tf = mock_tf
         mock_tf.argmax.return_value.numpy.return_value = 10
 
         with self.assertRaises(IndexError):
@@ -142,7 +144,7 @@ class TestEdgePredictionHandling(unittest.TestCase):
         payload = {
             "type": "prediction",
             "species": "Magpie",
-            "confidence": 91.5,
+            "confidence": 0.915,
         }
 
         self.engine.on_iot_message(

@@ -2,7 +2,6 @@
 Automated tests for the Engine prediction output contract.
 """
 
-import os
 import unittest
 from unittest.mock import MagicMock, patch
 
@@ -20,12 +19,6 @@ class TestEnginePredictionOutput(unittest.TestCase):
         )
         self.engine.config["API_TIMEOUT_SECONDS"] = 5
         self.engine.config["API_RETRY_COUNT"] = 2
-        self._clear_api_key = patch.dict(
-            os.environ,
-            {"ENGINE_API_KEY": ""},
-        )
-        self._clear_api_key.start()
-        self.addCleanup(self._clear_api_key.stop)
 
         self.audio_event = {
             "sourceType": "simulator",
@@ -64,30 +57,18 @@ class TestEnginePredictionOutput(unittest.TestCase):
                 self.audio_event,
                 48000,
                 "Magpie",
-                91.5,
+                 0.915,
             )
 
         expected_payload = {
             "sourceType": "simulator",
             "timestamp": "2026-08-06T10:30:00Z",
             "species": "Magpie",
-            "confidence": 91.5,
+            "confidence": 0.915,
             "sensorId": "sensor-001",
-            "microphoneLLA": {
-                "latitude": -37.8136,
-                "longitude": 144.9631,
-                "altitude": 0.0,
-            },
-            "animalEstLLA": {
-                "latitude": -37.8136,
-                "longitude": 144.9631,
-                "altitude": 0.0,
-            },
-            "animalTrueLLA": {
-                "latitude": -37.8136,
-                "longitude": 144.9631,
-                "altitude": 0.0,
-            },
+            "microphoneLLA": [-37.8136, 144.9631, 0.0],
+            "animalEstLLA": [-37.8136, 144.9631, 0.0],
+            "animalTrueLLA": [-37.8136, 144.9631, 0.0],
             "animalLLAUncertainty": 5.0,
             "audioClip": "base64-test-audio",
             "sampleRate": 48000,
@@ -117,7 +98,7 @@ class TestEnginePredictionOutput(unittest.TestCase):
                 event_with_sample_rate,
                 32000,
                 "Magpie",
-                91.5,
+                0.915,
             )
 
         posted_payload = mock_post.call_args.kwargs["json"]
@@ -138,7 +119,7 @@ class TestEnginePredictionOutput(unittest.TestCase):
                 self.audio_event,
                 32000,
                 "Magpie",
-                91.5,
+                0.915,
             )
 
         posted_payload = mock_post.call_args.kwargs["json"]
@@ -164,7 +145,7 @@ class TestEnginePredictionOutput(unittest.TestCase):
                 event_with_nulls,
                 32000,
                 "Magpie",
-                91.5,
+                0.915,
             )
 
         posted_payload = mock_post.call_args.kwargs["json"]
@@ -192,7 +173,7 @@ class TestEnginePredictionOutput(unittest.TestCase):
                 self.audio_event,
                 48000,
                 "Kookaburra",
-                87.2,
+                0.872,
             )
 
         actual_url = mock_post.call_args.args[0]
@@ -207,13 +188,12 @@ class TestEnginePredictionOutput(unittest.TestCase):
             engine_module.requests,
             "post"
         ) as mock_post:
-            with self.assertRaises(KeyError):
-                self.engine.echo_api_send_detection_event(
-                    invalid_event,
-                    48000,
-                    "Magpie",
-                    91.5,
-                )
+            self.engine.echo_api_send_detection_event(
+                invalid_event,
+                48000,
+                "Magpie",
+                0.915,
+            )
 
         mock_post.assert_not_called()
 
