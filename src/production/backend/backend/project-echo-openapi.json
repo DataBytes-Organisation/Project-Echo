@@ -2502,77 +2502,42 @@
         }
       }
     },
-    "/payments/razorpay/orders": {
-      "post": {
+    "/sensors/{sensor_id}": {
+      "get": {
         "tags": [
-          "payments"
+          "sensors"
         ],
-        "summary": "Create Razorpay Order",
-        "operationId": "create_razorpay_order_payments_razorpay_orders_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RazorpayOrderRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RazorpayOrderResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        },
-        "security": [
+        "summary": "Get Sensor Detail",
+        "operationId": "get_sensor_detail_sensors__sensor_id__get",
+        "parameters": [
           {
-            "JWTBearer": []
-          }
-        ]
-      }
-    },
-    "/payments/razorpay/verify": {
-      "post": {
-        "tags": [
-          "payments"
-        ],
-        "summary": "Verify Razorpay Checkout",
-        "operationId": "verify_razorpay_checkout_payments_razorpay_verify_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RazorpayCheckoutProof"
-              }
-            }
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Sensor Id"
+            },
+            "name": "sensor_id",
+            "in": "path"
           },
-          "required": true
-        },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 50.0,
+              "minimum": 1.0,
+              "title": "History Limit",
+              "default": 10
+            },
+            "name": "history_limit",
+            "in": "query"
+          }
+        ],
         "responses": {
           "200": {
-            "description": "Successful Response",
+            "description": "Get a single sensor's current health, location, and recent audio metadata",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PaymentStatusResponse"
-                }
+                "schema": {}
               }
             }
           },
@@ -2720,21 +2685,47 @@
         "operationId": "insights_overview_insights_overview_get",
         "parameters": [
           {
+            "description": "Inclusive start timestamp (ISO 8601)",
             "required": false,
             "schema": {
               "type": "string",
-              "title": "Start"
+              "title": "Start",
+              "description": "Inclusive start timestamp (ISO 8601)"
             },
             "name": "start",
             "in": "query"
           },
           {
+            "description": "Inclusive end timestamp (ISO 8601)",
             "required": false,
             "schema": {
               "type": "string",
-              "title": "End"
+              "title": "End",
+              "description": "Inclusive end timestamp (ISO 8601)"
             },
             "name": "end",
+            "in": "query"
+          },
+          {
+            "description": "Filter by species name (exact match)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Species",
+              "description": "Filter by species name (exact match)"
+            },
+            "name": "species",
+            "in": "query"
+          },
+          {
+            "description": "Filter by sensor ID (exact match)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Sensorid",
+              "description": "Filter by sensor ID (exact match)"
+            },
+            "name": "sensorId",
             "in": "query"
           }
         ],
@@ -2769,6 +2760,50 @@
         "summary": "Insights Species",
         "operationId": "insights_species_insights_species_get",
         "parameters": [
+          {
+            "description": "Inclusive start timestamp (ISO 8601)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Start",
+              "description": "Inclusive start timestamp (ISO 8601)"
+            },
+            "name": "start",
+            "in": "query"
+          },
+          {
+            "description": "Inclusive end timestamp (ISO 8601)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "End",
+              "description": "Inclusive end timestamp (ISO 8601)"
+            },
+            "name": "end",
+            "in": "query"
+          },
+          {
+            "description": "Filter by species name (exact match)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Species",
+              "description": "Filter by species name (exact match)"
+            },
+            "name": "species",
+            "in": "query"
+          },
+          {
+            "description": "Filter by sensor ID (exact match)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Sensorid",
+              "description": "Filter by sensor ID (exact match)"
+            },
+            "name": "sensorId",
+            "in": "query"
+          },
           {
             "required": false,
             "schema": {
@@ -3049,6 +3084,49 @@
                 "schema": {
                   "$ref": "#/components/schemas/Detection"
                 }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/detections/dashboard-summary": {
+      "get": {
+        "tags": [
+          "detections"
+        ],
+        "summary": "Detection counts by sensor and day for the dashboard",
+        "operationId": "dashboard_summary_endpoint_detections_dashboard_summary_get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 30.0,
+              "minimum": 1.0,
+              "title": "Days",
+              "default": 8
+            },
+            "name": "days",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
               }
             }
           },
