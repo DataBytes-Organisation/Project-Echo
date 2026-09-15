@@ -1,4 +1,7 @@
-# Builder (Compilers and heavy lifting)
+﻿# Builder (Compilers and heavy lifting)
+# bullseye (Debian 11) reached full end-of-life 2026-08-31; its apt archive
+# is being frozen/migrated, which breaks package installs unpredictably.
+# bookworm (Debian 12) is the current supported release.
 ARG BASE_IMAGE=python:3.10-slim-bookworm
 FROM ${BASE_IMAGE} AS echo_engine_builder
 
@@ -38,7 +41,10 @@ WORKDIR /app
 # We also add the gcloud CLI here in a single consolidated step
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update && apt-get install -y --no-install-recommends --fix-missing \
+RUN apt-get update -o Acquire::Retries=5 -o Acquire::http::Timeout=30 \
+	&& apt-get install -y --no-install-recommends --fix-missing \
+	-o Acquire::Retries=5 \
+	-o Acquire::http::Timeout=30 \
 	libopenexr-3-1-30 \
 	libgl1-mesa-glx \
 	libglib2.0-0 \
@@ -47,11 +53,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends --fix-missing \
 	&& apt-get clean \
 	&& rm -rf /var/lib/apt/lists/*
 
-# Google Cloud CLI, installed from Google's own tarball rather than through
-# apt/apt-key + Google's apt repo. This avoids pulling in gnupg/gnupg2 as an
-# apt dependency purely to verify the repo signature - the previous approach
-# broke when Debian's bullseye-security archive started rejecting that
-# dependency chain around bullseye's 2026-08-31 end-of-life.
+# Google Cloud CLI, installed from Google tarball instead of apt/apt-key -
+# the apt-key path needs gnupg, which is not installed above, and was
+# failing here with exit code 255.
 RUN curl -sSL -o /tmp/gcloud.tar.gz \
 		https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-linux-x86_64.tar.gz \
 	&& tar -xzf /tmp/gcloud.tar.gz -C /usr/local \
