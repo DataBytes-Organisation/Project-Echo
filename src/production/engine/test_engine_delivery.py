@@ -50,7 +50,7 @@ class TestEngineBackendDelivery(unittest.TestCase):
             self.audio_event,
             32000,
             "Magpie",
-            91.5,
+            0.915,
         )
 
     def test_successful_http_201(self):
