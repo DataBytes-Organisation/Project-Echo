@@ -577,6 +577,70 @@ def evaluate_efficientnet(
     return metrics, probs, y
 
 
+def efficientnet_fp32_baseline(
+    model_dir: str,
+    n_iters: int = 100,
+    warmup: int = 5,
+    out_dir: str = "results_efficientnet",
+):
+    import pandas as pd
+
+    os.makedirs(out_dir, exist_ok=True)
+
+    interp, names, pre, size_kb = load_efficientnet_bundle(model_dir)
+    inp = interp.get_input_details()[0]
+    out = interp.get_output_details()[0]
+
+    in_shape = tuple(int(v) for v in inp["shape"])
+    out_shape = tuple(int(v) for v in out["shape"])
+
+    n_model_classes = int(out_shape[-1])
+    n_mapping_labels = len(names)
+
+    rng = np.random.default_rng(0)
+    x = rng.standard_normal(in_shape).astype(inp["dtype"])
+
+    for _ in range(warmup):  # warm-up (exclude from timing)
+        interp.set_tensor(inp["index"], x); interp.invoke()
+
+    times = []
+    for _ in range(n_iters):
+        t0 = time.perf_counter()
+        interp.set_tensor(inp["index"], x); interp.invoke()
+        times.append((time.perf_counter() - t0) * 1000.0)
+    times = np.asarray(times)
+
+    row = {
+        "variant": "efficientnetv2_tflite_fp32",
+        "size_mb": round(size_kb / 1024.0, 1),
+        "latency_ms_mean": round(float(times.mean()), 3),
+        "latency_ms_median": round(float(np.median(times)), 3),
+        "latency_ms_p95": round(float(np.percentile(times, 95)), 3),
+        "latency_ms_std": round(float(times.std()), 3),
+        "n_iters": n_iters,
+        "input_shape": "x".join(map(str, in_shape)),
+        "output_shape": "x".join(map(str, out_shape)),
+        "n_model_output_classes": n_model_classes,
+        "n_mapping_labels": n_mapping_labels,
+        "class_count_match": bool(n_model_classes == n_mapping_labels),
+    }
+    df = pd.DataFrame([row])
+    csv_path = os.path.join(out_dir, "efficientnet_fp32_baseline.csv")
+    df.to_csv(csv_path, index=False)
+
+    print("\nEfficientNetV2 fp32 baseline (synthetic input, no labels needed)")
+    print(f"  input {in_shape} -> output {out_shape}")
+    print(f"  model output classes : {n_model_classes}")
+    print(f"  class_mapping labels : {n_mapping_labels}"
+          + ("" if n_model_classes == n_mapping_labels else "   <-- MISMATCH"))
+    print(f"  size                 : {size_kb / 1024:.1f} MB")
+    print(f"  latency (ms/inference): mean {row['latency_ms_mean']}, "
+          f"median {row['latency_ms_median']}, p95 {row['latency_ms_p95']}")
+    print(f"\nSaved: {csv_path}")
+
+    return row
+
+
 # CLI
 
 def _load_keras(model_path: str):
@@ -614,6 +678,9 @@ def main():
     ap.add_argument("--efficientnet", metavar="MODEL_DIR",
                     help="dir with efficientnetv2_project_echo.tflite + class_mapping.json "
                          "+ preprocess_config.json (production model, PR #948)")
+    ap.add_argument("--fp32-baseline", action="store_true",
+                    help="latency+size+shape/label audit on the shipped EfficientNetV2 "
+                         "fp32 .tflite (needs --efficientnet, no --data)")
     ap.add_argument("--model", help="path to Keras .h5 / SavedModel dir")
     ap.add_argument("--data", help="dataset dir (folder per class of audio)")
     ap.add_argument("--labels", help="optional text file: one class name per line, in model order")
@@ -627,6 +694,16 @@ def main():
 
     if args.selftest:
         _selftest(); return
+
+    if args.fp32_baseline:
+        if not args.efficientnet:
+            ap.error("--fp32-baseline requires --efficientnet MODEL_DIR")
+        efficientnet_fp32_baseline(
+            args.efficientnet,
+            out_dir=args.out_dir if args.out_dir != "results" else "results_efficientnet",
+        )
+        return
+
     if args.efficientnet:
         if not args.data:
             ap.error("--efficientnet requires --data")
@@ -634,19 +711,24 @@ def main():
                               max_per_class=args.max_per_class,
                               n_bins=15, out_dir=args.out_dir)
         return
+
     if not (args.model and args.data):
         ap.error("provide --efficientnet+--data, --model+--data, or --selftest")
 
     class_names = None
+
     if args.labels:
         with open(args.labels) as f:
             class_names = [ln.strip() for ln in f if ln.strip()]
 
     print("Loading model:", args.model)
+
     model = _load_keras(args.model)
+
     print("Building eval set from:", args.data)
     X, y, names = build_eval_set(args.data, class_names, args.max_per_class,
                                  sr=args.sr, n_mels=args.n_mels, img_size=args.img_size)
+                                 
     print(f"Eval set: {len(X)} samples across {len(set(y.tolist()))} classes")
     benchmark_variants(model, X, y, names,
                        config=BenchmarkConfig(modes=args.modes, out_dir=args.out_dir))

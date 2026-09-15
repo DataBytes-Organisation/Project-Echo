@@ -17,6 +17,7 @@
 __pycache__/
 .ipynb_checkpoints/
 .pytest_cache/
+.coverage
 *.egg-info/
 build/
 dist/
@@ -50,6 +51,16 @@ tensorboard_logs/
 # MLflow experiment tracking runs
 # mlruns/
 
+# Sprint 2 augmentation benchmark - raw per-run artifacts (full training
+# logs, tensorboard events). Reproducible from the archived Hydra config +
+# seed; condensed metrics are tracked instead, under
+# src/prototypes/engine/augmentation/results/. Checkpoints already covered
+# by the *.pth rule below.
+src/prototypes/engine/augmentation/experiment_results/
+src/prototypes/engine/augmentation/experiment_results_balanced/
+src/prototypes/engine/augmentation/experiment_results_ceiling20_seed0_archived/
+src/prototypes/engine/augmentation/experiment_data_subset/
+
 # -----------------------------------------------------------------------------
 # Model weights & large binaries (tracked via DVC instead of git)
 # -----------------------------------------------------------------------------
@@ -59,6 +70,27 @@ tensorboard_logs/
 #models/
 # Engine model weights (large binaries)
 #src/production/engine/models/*
+
+# -----------------------------------------------------------------------------
+# PyTorch training pipeline (src/prototypes/engine/reproducible_training_pipeline/)
+# -----------------------------------------------------------------------------
+*.pth
+*.onnx
+src/prototypes/engine/reproducible_training_pipeline/outputs/
+src/prototypes/engine/reproducible_training_pipeline/.cache/
+
+# -----------------------------------------------------------------------------
+# Local prototype datasets (not tracked, too large / personal-machine paths)
+# -----------------------------------------------------------------------------
+src/prototypes/data_files/
+src/prototypes/data_files_excluded/
+src/prototypes/spectrograms/
+
+# -----------------------------------------------------------------------------
+# Sprint 2 personal working notes (interview-prep log, raw run logs) - not
+# meant to be shared/reviewed, kept local only
+# -----------------------------------------------------------------------------
+docs/sprint2/
 
 # -----------------------------------------------------------------------------
 # Databases
@@ -83,5 +115,19 @@ src/production/iot/management_application/audioUpload
 # Environment-specific generated file
 src/production/backend/app/main.py
 
+# Generated on every `import app.main` (app/main.py's export_openapi_to_file()
+# runs unconditionally at module import time, including from tests) - not
+# something to commit.
+/backend/project-echo-openapi.json
+
 # Benchmarking self-test throwaway output
 results_selftest/
+dataset/
+dataset_v2/
+
+# Generated TFLite quantisation variants (large, reproducible via
+# quantise_efficientnetv2.py)
+src/prototypes/engine/benchmarking/results_efficientnet/variants/
+
+.claude/
+CLAUDE.md
