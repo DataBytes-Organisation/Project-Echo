@@ -2685,21 +2685,47 @@
         "operationId": "insights_overview_insights_overview_get",
         "parameters": [
           {
+            "description": "Inclusive start timestamp (ISO 8601)",
             "required": false,
             "schema": {
               "type": "string",
-              "title": "Start"
+              "title": "Start",
+              "description": "Inclusive start timestamp (ISO 8601)"
             },
             "name": "start",
             "in": "query"
           },
           {
+            "description": "Inclusive end timestamp (ISO 8601)",
             "required": false,
             "schema": {
               "type": "string",
-              "title": "End"
+              "title": "End",
+              "description": "Inclusive end timestamp (ISO 8601)"
             },
             "name": "end",
+            "in": "query"
+          },
+          {
+            "description": "Filter by species name (exact match)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Species",
+              "description": "Filter by species name (exact match)"
+            },
+            "name": "species",
+            "in": "query"
+          },
+          {
+            "description": "Filter by sensor ID (exact match)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Sensorid",
+              "description": "Filter by sensor ID (exact match)"
+            },
+            "name": "sensorId",
             "in": "query"
           }
         ],
@@ -2734,6 +2760,50 @@
         "summary": "Insights Species",
         "operationId": "insights_species_insights_species_get",
         "parameters": [
+          {
+            "description": "Inclusive start timestamp (ISO 8601)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Start",
+              "description": "Inclusive start timestamp (ISO 8601)"
+            },
+            "name": "start",
+            "in": "query"
+          },
+          {
+            "description": "Inclusive end timestamp (ISO 8601)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "End",
+              "description": "Inclusive end timestamp (ISO 8601)"
+            },
+            "name": "end",
+            "in": "query"
+          },
+          {
+            "description": "Filter by species name (exact match)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Species",
+              "description": "Filter by species name (exact match)"
+            },
+            "name": "species",
+            "in": "query"
+          },
+          {
+            "description": "Filter by sensor ID (exact match)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Sensorid",
+              "description": "Filter by sensor ID (exact match)"
+            },
+            "name": "sensorId",
+            "in": "query"
+          },
           {
             "required": false,
             "schema": {
@@ -3014,6 +3084,49 @@
                 "schema": {
                   "$ref": "#/components/schemas/Detection"
                 }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/detections/dashboard-summary": {
+      "get": {
+        "tags": [
+          "detections"
+        ],
+        "summary": "Detection counts by sensor and day for the dashboard",
+        "operationId": "dashboard_summary_endpoint_detections_dashboard_summary_get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 30.0,
+              "minimum": 1.0,
+              "title": "Days",
+              "default": 8
+            },
+            "name": "days",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
               }
             }
           },
