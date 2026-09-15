@@ -46,6 +46,12 @@ ftp_directory = "/anon/gen/clim_data/IDCKWCDEA0/tables/vic"
 weather_station_list_directory = "/anon/gen/clim_data/IDCKWCDEA0/tables"
 
 
+def _source_type_match_stage(source_type: str):
+    if source_type not in ("all", "real", "simulator"):
+        raise HTTPException(status_code=422, detail="sourceType must be all, real, or simulator")
+    return {"$match": {"sourceType": source_type}} if source_type != "all" else None
+
+
 @router.get('/weather', response_description="Get weather data for the day and location provided")
 def get_weather(timestamp: int,
                 lat: float,
@@ -101,7 +107,7 @@ def get_weather(timestamp: int,
     
 
 @router.get("/events_time", response_description="Get detection events within certain duration")
-def show_event_from_time(start: str, end: str):
+def show_event_from_time(start: str, end: str, sourceType: str = "all"):
     datetime_start = datetime.datetime.fromtimestamp(float(start))
     datetime_end = datetime.datetime.fromtimestamp(float(end))
     # print(f'we think query date is {datetime_start}', flush=True)
@@ -131,12 +137,20 @@ def show_event_from_time(start: str, end: str):
         }       
 
     ]
+    source_type_match = _source_type_match_stage(sourceType)
+    if source_type_match:
+        aggregate.insert(1, source_type_match)
     events = serializers.eventSpeciesListEntity(Events.aggregate(aggregate))
     return events
 
 @router.get("/latest_events", response_description="Get most recent classified detection events")
-def show_latest_events(limit: int = 20):
+def show_latest_events(
+    limit: int = 20,
+    sourceType: str = "all",
+):
+    source_type_match = _source_type_match_stage(sourceType)
     aggregate = [
+        *([source_type_match] if source_type_match else []),
         { "$sort": { "timestamp": -1 } },
         { "$limit": limit },
         {
@@ -760,4 +774,3 @@ def increment_user_visit(username: str, visit_duration: float = 5.0):
         {"$inc": {"visits": 1, "totalTime": visit_duration}}
     )
     return {"message": f"Visit recorded for {username}"}
-

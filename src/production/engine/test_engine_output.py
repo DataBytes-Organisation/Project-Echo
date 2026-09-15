@@ -57,33 +57,22 @@ class TestEnginePredictionOutput(unittest.TestCase):
                 self.audio_event,
                 48000,
                 "Magpie",
-                91.5,
+                 0.915,
             )
 
         expected_payload = {
             "sourceType": "simulator",
             "timestamp": "2026-08-06T10:30:00Z",
             "species": "Magpie",
-            "confidence": 91.5,
+            "confidence": 0.915,
             "sensorId": "sensor-001",
-            "microphoneLLA": {
-                "latitude": -37.8136,
-                "longitude": 144.9631,
-                "altitude": 0.0,
-            },
-            "animalEstLLA": {
-                "latitude": -37.8136,
-                "longitude": 144.9631,
-                "altitude": 0.0,
-            },
-            "animalTrueLLA": {
-                "latitude": -37.8136,
-                "longitude": 144.9631,
-                "altitude": 0.0,
-            },
+            "microphoneLLA": [-37.8136, 144.9631, 0.0],
+            "animalEstLLA": [-37.8136, 144.9631, 0.0],
+            "animalTrueLLA": [-37.8136, 144.9631, 0.0],
             "animalLLAUncertainty": 5.0,
             "audioClip": "base64-test-audio",
             "sampleRate": 48000,
+            "source_model": "classic",
         }
 
         mock_post.assert_called_once_with(
@@ -109,7 +98,7 @@ class TestEnginePredictionOutput(unittest.TestCase):
                 event_with_sample_rate,
                 32000,
                 "Magpie",
-                91.5,
+                0.915,
             )
 
         posted_payload = mock_post.call_args.kwargs["json"]
@@ -130,7 +119,7 @@ class TestEnginePredictionOutput(unittest.TestCase):
                 self.audio_event,
                 32000,
                 "Magpie",
-                91.5,
+                0.915,
             )
 
         posted_payload = mock_post.call_args.kwargs["json"]
@@ -156,7 +145,7 @@ class TestEnginePredictionOutput(unittest.TestCase):
                 event_with_nulls,
                 32000,
                 "Magpie",
-                91.5,
+                0.915,
             )
 
         posted_payload = mock_post.call_args.kwargs["json"]
@@ -184,7 +173,7 @@ class TestEnginePredictionOutput(unittest.TestCase):
                 self.audio_event,
                 48000,
                 "Kookaburra",
-                87.2,
+                0.872,
             )
 
         actual_url = mock_post.call_args.args[0]
@@ -199,15 +188,67 @@ class TestEnginePredictionOutput(unittest.TestCase):
             engine_module.requests,
             "post"
         ) as mock_post:
-            with self.assertRaises(KeyError):
-                self.engine.echo_api_send_detection_event(
-                    invalid_event,
-                    48000,
-                    "Magpie",
-                    91.5,
-                )
+            self.engine.echo_api_send_detection_event(
+                invalid_event,
+                48000,
+                "Magpie",
+                0.915,
+            )
 
         mock_post.assert_not_called()
+
+    def test_source_model_follows_active_inference_model(self):
+        self.engine.config["ACTIVE_INFERENCE_MODEL"] = (
+            "efficientnetv2_tflite"
+        )
+        mock_response = MagicMock()
+        mock_response.status_code = 201
+        mock_response.text = "accepted"
+
+        with patch.object(
+            engine_module.requests,
+            "post",
+            return_value=mock_response
+        ) as mock_post:
+            self.engine.echo_api_send_detection_event(
+                self.audio_event,
+                48000,
+                "Magpie",
+                91.5,
+            )
+
+        posted_payload = mock_post.call_args.kwargs["json"]
+        self.assertEqual(
+            posted_payload["source_model"],
+            "efficientnetv2_tflite",
+        )
+
+    def test_source_model_unknown_when_active_inference_model_missing_or_empty(self):
+        mock_response = MagicMock()
+        mock_response.status_code = 201
+        mock_response.text = "accepted"
+
+        for model_name in (None, ""):
+            with self.subTest(ACTIVE_INFERENCE_MODEL=model_name):
+                if model_name is None:
+                    self.engine.config.pop("ACTIVE_INFERENCE_MODEL", None)
+                else:
+                    self.engine.config["ACTIVE_INFERENCE_MODEL"] = model_name
+
+                with patch.object(
+                    engine_module.requests,
+                    "post",
+                    return_value=mock_response
+                ) as mock_post:
+                    self.engine.echo_api_send_detection_event(
+                        self.audio_event,
+                        48000,
+                        "Magpie",
+                        91.5,
+                    )
+
+                posted_payload = mock_post.call_args.kwargs["json"]
+                self.assertEqual(posted_payload["source_model"], "unknown")
 
 
 if __name__ == "__main__":
