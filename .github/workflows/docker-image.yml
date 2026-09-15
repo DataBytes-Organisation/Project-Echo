@@ -1,4 +1,4 @@
-name: Docker Image CI
+﻿name: Docker Image CI
 
 on:
   push:
@@ -45,8 +45,15 @@ jobs:
     - name: Build containers
       run: |
         cd src/deployment/docker
-        docker compose -f docker-compose.test.yml build --no-cache --force-rm
-        
+        for i in 1 2 3; do
+          docker compose -f docker-compose.test.yml build --no-cache --force-rm && break
+          echo "Build attempt $i failed -- retrying in 20s..."
+          sleep 20
+          if [ "$i" -eq 3 ]; then
+            echo "All build attempts failed."
+            exit 1
+          fi
+        done
     - name: Start containers
       run: |
         cd src/deployment/docker

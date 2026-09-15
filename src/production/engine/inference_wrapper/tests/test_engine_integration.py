@@ -40,23 +40,23 @@ def test_echo_engine_sends_backend_payload():
     assert payload["confidence"] == 0.9642
     assert payload["sensorId"] == "mic_01"
 
-    assert payload["microphoneLLA"] == [
-        -38.143,
-        144.361,
-        15
-    ]
+    assert payload["microphoneLLA"] == {
+        "latitude": -38.143,
+        "longitude": 144.361,
+        "altitude": 15,
+    }
 
-    assert payload["animalEstLLA"] == [
-        -38.142,
-        144.360,
-        15
-    ]
+    assert payload["animalEstLLA"] == {
+        "latitude": -38.142,
+        "longitude": 144.360,
+        "altitude": 15,
+    }
 
-    assert payload["animalTrueLLA"] == [
-        -38.142,
-        144.360,
-        15
-    ]
+    assert payload["animalTrueLLA"] == {
+        "latitude": -38.142,
+        "longitude": 144.360,
+        "altitude": 15,
+    }
 
     assert payload["animalLLAUncertainty"] == 8.5
     assert payload["audioClip"] == "test-audio"
