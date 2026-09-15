@@ -9,11 +9,11 @@ WORKDIR /build
 
 # Install build-time dependencies only
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends --fix-missing \
 	libopenexr-dev \
 	pkg-config \
 	build-essential \
-	&& rm -rf /var/lib/apt/lists/* 
+	&& rm -rf /var/lib/apt/lists/*
 
 # Create a virtual environment to isolate packages
 RUN python -m venv /opt/venv 
@@ -28,7 +28,7 @@ RUN pip3 install --upgrade pip && \
 
 # Handle script formatting here so it doesn't create layers in the final image
 COPY ./echo_engine.sh .
-RUN apt-get update && apt-get install -y dos2unix && \
+RUN apt-get update && apt-get install -y --no-install-recommends --fix-missing dos2unix && \
 	dos2unix ./echo_engine.sh && \
 	chmod +x ./echo_engine.sh 
 
@@ -42,7 +42,7 @@ WORKDIR /app
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update -o Acquire::Retries=5 -o Acquire::http::Timeout=30 \
-	&& apt-get install -y --no-install-recommends \
+	&& apt-get install -y --no-install-recommends --fix-missing \
 	-o Acquire::Retries=5 \
 	-o Acquire::http::Timeout=30 \
 	libopenexr-3-1-30 \
