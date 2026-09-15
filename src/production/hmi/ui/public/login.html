@@ -9,6 +9,7 @@
 
     <script type="text/javascript" src="./js/ol.js"></script>
 
+
     <script src="https://www.google.com/recaptcha/api.js?render=explicit" async defer></script>
     <!-- reCAPTCHA v2 - using new key -->
 
@@ -43,7 +44,13 @@
     <script type="text/javascript" src="./js/audio.js"></script>
     <!-- <script type="module" src='./js/HMI.js'></script> -->
     <script type="text/javascript" src="./js/animation.js"></script>
-    <!-- <script type="module" src='./js/HMI-utils.js'></script> -->
+    <script type="module">
+      import { showToast, getApiErrorMessage } from "./js/HMI-utils.js";
+      import { signIn } from "./js/routes.js";
+      window.showToast = showToast;
+      window.getApiErrorMessage = getApiErrorMessage;
+      window.signIn = signIn;
+    </script>
     <link rel="stylesheet" href="./css/auth-form.css" type="text/css">
     <!-- End Imports -->
     <title>Echo | Login</title>
@@ -103,7 +110,8 @@
                     <!--                        <button type="button" onclick="VerifyCaptcha('login-form')"> Verify</button>-->
                     <!--                    </div>-->
 
-                    <!-- FR-D4: site key is injected at load from /api/config/recaptcha (env-backed), not hardcoded here -->
+                    <!-- <div class="g-recaptcha" data-sitekey="6LdD2lIsAAAAAMF9ArlGZr3aIJ4iCZx17wIxVCiu" -->
+                    <!-- FR-D4: site key injected at load from /api/config/recaptcha (env-backed), not hardcoded here -->
                     <div id="login-recaptcha" class="g-recaptcha" data-sitekey="" data-action="LOGIN"
                         data-callback="checkCaptcha" data-expired-callback="expireCaptcha"
                         data-error-callback="errorCaptcha"></div>
@@ -366,7 +374,7 @@
 
                 // grecaptcha may still be loading (api.js is async/defer).
                 // FR-D4: cap retries so a blocked/missing api.js doesn't poll forever
-                // and leave the login button permanently disabled — fall back to the
+                // and leave the login button permanently disabled, fall back to the
                 // "unavailable" state (login re-enabled, message shown) instead.
                 var _captchaRenderTries = 0;
                 var _captchaRenderMaxTries = 20; // ~6s at 300ms
@@ -494,41 +502,38 @@
         }
 
         try {
-            const response = await fetch('/api/auth/signin', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    username: username,
-                    password: password,
-                    email: email,
-                    captchaToken: captchaToken
-                })
-            });
 
-            if (response.ok) {
-                const data = await response.json();
-
-                // Store JWT token, userId, and currentUser in localStorage
-                localStorage.setItem('token', data.token);
-                localStorage.setItem('userId', data.userId);
-                localStorage.setItem('currentUser', username); // Set the currentUser to the entered username
-
-                // Redirect user to the admin dashboard
-                window.location.href = "/admin-dashboard"; // CHANGED: Redirect to admin-dashboard instead of index.html
-            } else {
-                const errorData = await response.json();
-                alert(errorData.message);
-                // FR-D4: reset captcha so a used/invalid token isn't resubmitted.
-                if (window.__captchaEnabled && window.grecaptcha && grecaptcha.reset) {
-                    grecaptcha.reset(window.__loginCaptchaWidgetId ?? undefined);
-                    _setLoginSubmitEnabled(false);
-                }
+            if (typeof window.signIn !== 'function') {
+                throw new Error('Sign-in is still loading. Please try again in a moment.');
             }
+
+            const response = await window.signIn({ username, password, email, captchaToken });
+            const data = response.data;
+
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('userId', data.userId);
+            localStorage.setItem('currentUser', username);
+
+            window.location.href = "/admin-dashboard";
         } catch (err) {
             console.error('Login error:', err);
-            alert("An error occurred during login.");
+            const serverMessage = err && err.response && err.response.data && err.response.data.message;
+            const message = serverMessage
+                || (window.getApiErrorMessage
+                    ? window.getApiErrorMessage(err, 'An error occurred during login.')
+                    : 'An error occurred during login.');
+
+            if (window.showToast) {
+                window.showToast(message, 'error');
+            } else {
+                alert(message);
+            }
+
+            // FR-D4: reset captcha so a used/invalid token isn't resubmitted.
+            if (window.__captchaEnabled && window.grecaptcha && grecaptcha.reset) {
+                grecaptcha.reset(window.__loginCaptchaWidgetId ?? undefined);
+                _setLoginSubmitEnabled(false);
+            }
         }
     });
 </script>
