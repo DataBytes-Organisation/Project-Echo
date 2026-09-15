@@ -74,7 +74,15 @@ class SpectrogramDataset(Dataset):
 		self.use_cache = cfg.system.get("use_disk_cache", False)
 		self.env = None  # Lazy init for multi-processing safety
 		if self.use_cache:
-			self.cache_path = Path(cfg.system.cache_directory)
+			# Separate subdirectory per split: train_dataset and val_dataset are
+			# distinct SpectrogramDataset instances that each lazily open their
+			# own lmdb.Environment. With num_workers=0 both live in the same
+			# process, and lmdb refuses to open the same environment path twice
+			# in one process ("The environment '...' is already open in this
+			# process") - this crashed the first real (non-synthetic) training
+			# run as soon as validation started. Giving each split its own path
+			# avoids the collision while still caching each split independently.
+			self.cache_path = Path(cfg.system.cache_directory) / ("train" if self.is_train else "val")
 			self.cache_path.mkdir(parents=True, exist_ok=True)
 
 			# Map size: 1TB (Virtual memory, doesn't allocate physical RAM)

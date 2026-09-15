@@ -43,7 +43,16 @@
     <script type="text/javascript" src="./js/audio.js"></script>
     <!-- <script type="module" src='./js/HMI.js'></script> -->
     <script type="text/javascript" src="./js/animation.js"></script>
-    <!-- <script type="module" src='./js/HMI-utils.js'></script> -->
+    <!-- don't need the full HMI-utils.js loaded as a bare module here (that's a no-op,
+         doesn't expose anything to the plain scripts below) - just bridging the couple
+         of helpers this page actually needs onto window, same as index.html does -->
+    <script type="module">
+      import { showToast, getApiErrorMessage } from "./js/HMI-utils.js";
+      import { signIn } from "./js/routes.js";
+      window.showToast = showToast;
+      window.getApiErrorMessage = getApiErrorMessage;
+      window.signIn = signIn;
+    </script>
     <link rel="stylesheet" href="./css/auth-form.css" type="text/css">
     <!-- End Imports -->
     <title>Echo | Login</title>
@@ -390,35 +399,39 @@
         const email = document.querySelector('input[name="email"]') ? document.querySelector('input[name="email"]').value : '';
 
         try {
-            const response = await fetch('/api/auth/signin', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    username: username,
-                    password: password,
-                    email: email
-                })
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-
-                // Store JWT token, userId, and currentUser in localStorage
-                localStorage.setItem('token', data.token);
-                localStorage.setItem('userId', data.userId);
-                localStorage.setItem('currentUser', username); // Set the currentUser to the entered username
-
-                // Redirect user to the admin dashboard
-                window.location.href = "/admin-dashboard"; // CHANGED: Redirect to admin-dashboard instead of index.html
-            } else {
-                const errorData = await response.json();
-                alert(errorData.message);
+            // signIn comes off the shared client (bridged onto window by the module
+            // in <head>, since this block has to stay a classic script - the inline
+            // oninput handlers above depend on its functions being global)
+            if (typeof window.signIn !== 'function') {
+                throw new Error('Sign-in is still loading. Please try again in a moment.');
             }
+
+            const response = await window.signIn({ username, password, email });
+            const data = response.data;
+
+            // Store JWT token, userId, and currentUser in localStorage
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('userId', data.userId);
+            localStorage.setItem('currentUser', username); // Set the currentUser to the entered username
+
+            // Redirect user to the admin dashboard
+            window.location.href = "/admin-dashboard"; // CHANGED: Redirect to admin-dashboard instead of index.html
         } catch (err) {
+            // axios throws on any non-2xx, so the old ok/else split collapses into
+            // this one branch. The route sends {message} for 401/502/500, so prefer
+            // that over the generic mapping - it's the specific reason we asked for.
             console.error('Login error:', err);
-            alert("An error occurred during login.");
+            const serverMessage = err && err.response && err.response.data && err.response.data.message;
+            const message = serverMessage
+                || (window.getApiErrorMessage
+                    ? window.getApiErrorMessage(err, 'An error occurred during login.')
+                    : 'An error occurred during login.');
+
+            if (window.showToast) {
+                window.showToast(message, 'error');
+            } else {
+                alert(message);
+            }
         }
     });
 </script>

@@ -23,6 +23,7 @@ class Trainer:
 		self.train_loader = train_loader
 		self.val_loader = val_loader
 		self.device = device
+		self.start_epoch = 0
 
 		self.dtype = getattr(torch, cfg.training.get("dtype", "bfloat16"))
 		self.use_amp = (self.dtype == torch.float16) and ("cuda" in self.device.type)
@@ -81,7 +82,10 @@ class Trainer:
 		self.best_model_path = (
 			Path(hydra.core.hydra_config.HydraConfig.get().runtime.output_dir) / f"best_{self.name}.pth"
 		)
-
+		self.latest_checkpoint_path = (
+		    Path(hydra.core.hydra_config.HydraConfig.get().runtime.output_dir)
+		    / f"checkpoint_{self.name}.pth"
+		)
 		self.early_stopping_patience = self.cfg.training.get("early_stopping_patience", 3)
 		self.epochs_no_improve = 0
 		self.best_epoch = 0
@@ -257,7 +261,7 @@ class Trainer:
 
 		metrics_dict = {"phase": "train", "best_metric": f"{self.best_metric:.4f}"}
 
-		for epoch in range(self.epochs):
+		for epoch in range(self.start_epoch, self.epochs):
 			self.current_epoch = epoch + 1
 			pbar.set_description(f"Epoch {self.current_epoch}/{self.epochs}")
 			train_loss, train_acc = self._train_one_epoch(pbar, metrics_dict)
@@ -281,7 +285,7 @@ class Trainer:
 			if is_better:
 				self.best_metric = current_metric
 				self.best_epoch = self.current_epoch
-				torch.save(self.model.state_dict(), self.best_model_path)
+				self.save_checkpoint(self.best_model_path, self.current_epoch, best=False)
 				self.epochs_no_improve = 0
 				metrics_dict["best_metric"] = f"{self.best_metric:.4f}"
 			else:
@@ -295,6 +299,12 @@ class Trainer:
 				else:
 					self.scheduler.step()
 
+			# Save latest training state so interrupted training can resume.
+			self.save_checkpoint(
+				self.latest_checkpoint_path,
+				self.current_epoch,
+				best=False,
+			)
 			# Check for early stopping
 			if self.epochs_no_improve >= self.early_stopping_patience:
 				print(f"\nEarly stopping triggered after {self.epochs_no_improve} epochs with no improvement.")
@@ -305,7 +315,8 @@ class Trainer:
 		print(f"\nTraining complete. Best model from epoch {self.best_epoch} saved to {self.best_model_path}")
 
 		print("Loading best model weights...")
-		self.model.load_state_dict(torch.load(self.best_model_path, map_location=self.device))
+		checkpoint = torch.load(self.best_model_path, map_location=self.device)
+		self.model.load_state_dict(checkpoint["model_state_dict"])
 		print("Best model loaded successfully.")
 
 	def test(self, test_loader, model_to_test=None, device=None):

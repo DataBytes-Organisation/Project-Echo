@@ -12,8 +12,18 @@
  *              No changes to map logic, layer management, or audio handling.
  */
 
-import { showToast, getApiErrorMessage, withRetry } from "./HMI-utils.js";
+import { showToast, getApiErrorMessage, withRetry, showPageBanner, hidePageBanner } from "./HMI-utils.js";
 import { getAudioRecorder } from "./audio_recorder.js";
+import {
+  AudioDecoder,
+  SpectrogramView,
+  decodeFloat32PcmBase64,
+} from "./spectrogram.js";
+import {
+  AnimalSpectrogramWorkflow,
+  LatestSourceGuard,
+  MicrophoneSpectrogramWorkflow,
+} from "./spectrogram-workflow.js";
 import {
   retrieveTruthEventsInTimeRange,
   retrieveVocalizationEventsInTimeRange,
@@ -25,8 +35,10 @@ import {
   setSimModeRecording,
   setSimModeRecordingV2,
   stopSimulator,
+  retrieveWeather,
 } from "./routes.js";
 import { addIoTNodesToMap } from "./nodes-overlay.js";
+import { connectDetectionStream } from "./detection_stream_client.js";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
@@ -37,6 +49,51 @@ const MIC_DETECTION_RANGE  = 300;
 const MAX_RECORDING_SECONDS = 20;
 const DEG_TO_RAD           = Math.PI / 180;
 const RAD_TO_DEG           = 180 / Math.PI;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Live-event visualisation (location confidence + event age)
+//
+// HMI Planner (Sprint 2, Project Echo) — "The HMI map shall visually
+// represent live detections with location, confidence, event type, and
+// event age."
+//
+// Confidence -> ring radius (vocalization events only):
+//   CONFIRMED against src/production/iot/edge_inference/README.md
+//   ("GPS accuracy estimate in metres") and echo_engine.py / comms_manager.py:
+//   `animalLLAUncertainty` is a real distance in METRES (default 10.0),
+//   not a 0-100 score. It is carried through onto the event as
+//   `locationUncertaintyM` and used directly below for the ring radius.
+//   (`locationConfidence` = `100 - animalLLAUncertainty`, computed in
+//   convertJSONtoAnimalVocalizationEvent, is kept only for the existing
+//   popup's "Location Confidence %" label — a pre-existing approximation
+//   that reads oddly once uncertainty exceeds ~100m; not changed here since
+//   fixing that display is outside this feature's scope.)
+//   Movement/truth events are ground truth (uncertainty is always 0),
+//   so they get no ring — only vocalization detections carry real
+//   location uncertainty.
+//
+// Event age -> fade -> expiry:
+//   hmiState.liveWindow (ms, set once in index.html) is the single source
+//   of truth for how long a live event stays on the map. Default is
+//   60000 ms (60s), inside the 60-120s range suggested for this feature.
+//   To change the window, edit hmiState.liveWindow in index.html — nothing
+//   else needs to change. purgeVocalizationEvents/purgeTruthEvents (below)
+//   remove a feature once its age passes that window; the constants here
+//   only control when a *visible* marker starts fading before that happens,
+//   so fade and removal always agree (a marker reaches MIN_LIVE_EVENT_OPACITY
+//   right as it is purged).
+// ─────────────────────────────────────────────────────────────────────────────
+
+const CONFIDENCE_RING_BASE_RADIUS_M = 15;  // minimum ring radius (m), so a very precise fix is still visible
+const CONFIDENCE_RING_MAX_RADIUS_M  = 300; // cap on displayed radius (m), so one outlier reading can't dominate the map
+const LIVE_EVENT_FADE_START_RATIO        = 0.5;  // start fading at 50% of hmiState.liveWindow elapsed
+const MIN_LIVE_EVENT_OPACITY             = 0.15; // opacity immediately before purge removes the marker
+
+// Vocalization (detected) vs movement/truth markers are told apart by BOTH
+// color and shape (circle+amber vs diamond+teal), not color alone, so the
+// distinction still reads for colour-blind users and in greyscale printouts.
+const VOCALIZATION_MARKER_COLOR = "255, 167, 38"; // amber
+const TRUTH_MARKER_COLOR        = "0, 172, 193";  // teal
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Module-level state
@@ -80,8 +137,16 @@ var current_mic_lon  = 0.0;
 var current_mic_id   = "";
 
 var activeAudioNode     = null;
+var activeAudioContext  = null;
+var activeAudioEventId  = null;
 var audioAnimTimeout    = null;
 var playNextTrack       = false;
+
+const ANIMAL_AUDIO_READY =
+  "Audio ready. Press the audio button to play.";
+
+const ANIMAL_AUDIO_UNAVAILABLE =
+  "Audio unavailable for this detection.";
 
 var micAnimFrameIndex = 1;
 var animTimeout       = null;
@@ -102,10 +167,16 @@ var lastRecordingSampleRate       = 44100;
 var playbackSourceNode            = null;
 var playbackAudioContext          = null;
 
-var audioContext    = null;
+var recordingPlaybackContext = null;
 var a_source        = null;
 var decodedAudioStore = null;
 var fileContent     = null;
+var microphoneSourceGuard = new LatestSourceGuard();
+var selectedFileObjectUrl = null;
+var recordedAudioObjectUrl = null;
+
+var animalSpectrogramWorkflow = null;
+var microphoneSpectrogramWorkflow = null;
 
 export var animal_toggled = false;
 
@@ -127,6 +198,24 @@ function getStatusLabel()       { return document.getElementById("frb2-status-la
 function getFileInput()         { return document.getElementById("fileInput"); }
 function getAudioElemForRecordedPlayback() { return document.getElementById("audioElem"); }
 function getRecordingPlaybackStatus() { return document.getElementById("recording_playback_status"); }
+
+function getAnimalAudioStatus() {
+  return document.getElementById("animal-audio-status");
+}
+
+function setAnimalAudioStatus(message) {
+  const status = getAnimalAudioStatus();
+  if (status) status.textContent = message;
+}
+
+function markAnimalAudioReady(eventId) {
+  if (
+    eventId !== null &&
+    selectedVocalizationEventId === eventId
+  ) {
+    setAnimalAudioStatus(ANIMAL_AUDIO_READY);
+  }
+}
 
 function setRecordingPlaybackStatus(message) {
   const status = getRecordingPlaybackStatus();
@@ -264,6 +353,33 @@ function playPcmRecording() {
       };
     });
   });
+}
+
+function revokeObjectUrl(url) {
+  if (url) URL.revokeObjectURL(url);
+}
+
+function initializeSpectrogramWorkflows() {
+  if (!animalSpectrogramWorkflow) {
+    const animalRoot = document.getElementById("animal-spectrogram");
+    if (animalRoot) {
+      animalSpectrogramWorkflow = new AnimalSpectrogramWorkflow({
+        decodePcm: decodeFloat32PcmBase64,
+        retrieveAudio,
+        view: new SpectrogramView(animalRoot),
+      });
+    }
+  }
+
+  if (!microphoneSpectrogramWorkflow) {
+    const microphoneRoot = document.getElementById("microphone-spectrogram");
+    if (microphoneRoot) {
+      microphoneSpectrogramWorkflow = new MicrophoneSpectrogramWorkflow({
+        decoder: new AudioDecoder(),
+        view: new SpectrogramView(microphoneRoot),
+      });
+    }
+  }
 }
 
 function isJQueryAvailable() {
@@ -437,6 +553,8 @@ export function getUTC() {
 }
 
 function initializeStaticDOMHooks() {
+  initializeSpectrogramWorkflows();
+
   const audioElement = getAudioElement();
   if (audioElement && !audioElement.dataset.hmiBound) {
     audioElement.onended = hidePlaybackIndicator;
@@ -446,25 +564,46 @@ function initializeStaticDOMHooks() {
   const fileInput = getFileInput();
   if (fileInput && !fileInput.dataset.hmiBound) {
     fileInput.dataset.hmiBound = "true";
-    fileInput.addEventListener("change", function (event) {
-      const selectedFile = event.target.files[0];
-      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    fileInput.addEventListener("change", async function (event) {
+      const selection = microphoneSourceGuard.begin();
+      const selectedFile = event.target.files?.[0] || null;
 
-      if (selectedFile) {
-        const reader = new FileReader();
-        reader.onload = function (loadEvent) {
-          fileContent = loadEvent.target.result;
-          audioContext.decodeAudioData(fileContent.slice(0), function (decodedAudio) {
-            decodedAudioStore = decodedAudio;
-            a_source = null;
+      if (!selectedFile) {
+        fileContent = null;
+        decodedAudioStore = null;
+        microphoneSpectrogramWorkflow?.clear();
+        revokeObjectUrl(selectedFileObjectUrl);
+        selectedFileObjectUrl = null;
+        return;
+      }
 
-            const audioElementRef = getAudioElement();
-            if (audioElementRef) {
-              audioElementRef.src = URL.createObjectURL(selectedFile);
-            }
-          });
-        };
-        reader.readAsArrayBuffer(selectedFile);
+      stopRecordingPlayback();
+      audioRecorder.audioBlobs = [];
+      revokeObjectUrl(selectedFileObjectUrl);
+      revokeObjectUrl(recordedAudioObjectUrl);
+      selectedFileObjectUrl = null;
+      recordedAudioObjectUrl = null;
+
+      const [encodedData, decodedAudio] = await Promise.all([
+        selectedFile.arrayBuffer().catch(() => null),
+        microphoneSpectrogramWorkflow?.load(selectedFile) ?? Promise.resolve(null),
+      ]);
+      if (!microphoneSourceGuard.isCurrent(selection)) return;
+
+      if (!encodedData || !decodedAudio) {
+        fileContent = null;
+        decodedAudioStore = null;
+        return;
+      }
+
+      fileContent = encodedData;
+      decodedAudioStore = decodedAudio;
+      a_source = null;
+      const audioElementRef = getAudioElement();
+      if (audioElementRef) {
+        revokeObjectUrl(selectedFileObjectUrl);
+        selectedFileObjectUrl = URL.createObjectURL(selectedFile);
+        audioElementRef.src = selectedFileObjectUrl;
       }
     });
   }
@@ -475,6 +614,27 @@ if (document.readyState === "loading") {
 } else {
   initializeStaticDOMHooks();
 }
+
+async function destroyAudioFeatures() {
+  microphoneSourceGuard.invalidate();
+  playNextTrack = false;
+  playNextRecordedTrack = false;
+  stopAudioPlayback();
+  stopRecordingPlayback();
+  revokeObjectUrl(selectedFileObjectUrl);
+  revokeObjectUrl(recordedAudioObjectUrl);
+  selectedFileObjectUrl = null;
+  recordedAudioObjectUrl = null;
+  if (audioRecorder.mediaRecorder) audioRecorder.cancel();
+  await Promise.allSettled([
+    animalSpectrogramWorkflow?.destroy(),
+    microphoneSpectrogramWorkflow?.destroy(),
+  ]);
+  animalSpectrogramWorkflow = null;
+  microphoneSpectrogramWorkflow = null;
+}
+
+window.addEventListener("beforeunload", () => { void destroyAudioFeatures(); }, { once: true });
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Sample data loader
@@ -501,8 +661,118 @@ fetch("./js/sample_data.json")
  * Task 7: error message now routed through getApiErrorMessage so the wording
  * is consistent with every other error surface in the application.
  */
+// ─────────────────────────────────────────────────────────────────────────────
+// MQTT connection state polling (FR-A2)
+// ─────────────────────────────────────────────────────────────────────────────
+
+let _lastMqttState = null;
+
+async function pollMqttConnectionState() {
+  try {
+    const response = await fetch("http://localhost:9000/mqtt/connection-state");
+    if (!response.ok) throw new Error("Failed to fetch connection state");
+    const data = await response.json();
+    const state = data.state;
+
+    if (state !== _lastMqttState) {
+      if (state === "connected") {
+        hidePageBanner("warning");
+        hidePageBanner("error");
+        if (_lastMqttState !== null) {
+          showToast("Live data connection restored", "success");
+        }
+      } else if (state === "reconnecting") {
+        showPageBanner("Live data connection lost — reconnecting…", "warning", false);
+        showToast("Live data connection lost, reconnecting…", "warning");
+      } else if (state === "disconnected") {
+        showPageBanner("Live data unavailable", "error", false);
+      }
+      _lastMqttState = state;
+    }
+  } catch (err) {
+    console.error("Error polling MQTT connection state:", err);
+
+    // The status check itself failed (backend unreachable) — treat this
+    // as unavailable rather than silently keeping the last-known state.
+    if (_lastMqttState !== "unavailable") {
+      showPageBanner("Live data unavailable — unable to check connection status", "error", false);
+      _lastMqttState = "unavailable";
+    }
+  }
+}
+
+function startMqttConnectionPolling() {
+  pollMqttConnectionState();
+  setInterval(pollMqttConnectionState, 5000);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Live MQTT events → map layers (FR-A2)
+// ─────────────────────────────────────────────────────────────────────────────
+
+const _seenMqttEventIds = new Set();
+
+async function pollMqttLatestEvents(hmiState) {
+  try {
+    const response = await fetch("http://localhost:9000/mqtt/latest-events");
+    if (!response.ok) throw new Error("Failed to fetch latest events");
+    const data = await response.json();
+    const events = data.events || [];
+
+
+    const newVocalizationEvents = [];
+    const newMovementEvents = [];
+
+    for (const event of events) {
+      if (_seenMqttEventIds.has(event._id)) continue;
+      _seenMqttEventIds.add(event._id);
+
+      switch (event.eventType) {
+      case "vocalization":
+        newVocalizationEvents.push(event);
+        break;
+      case "movement":
+        newMovementEvents.push(event);
+        break;
+      case "sensor_health":
+      case "iot_node":
+        document.dispatchEvent(
+          new CustomEvent(`mqtt:${event.eventType}`, { detail: event })
+        );
+        break;
+      }
+
+      
+    }
+
+    if (newVocalizationEvents.length > 0) {
+      updateVocalizationLayerFromLiveData(hmiState, newVocalizationEvents);
+    }
+    if (newMovementEvents.length > 0) {
+      updateAnimalMovementLayerFromLiveData(hmiState, newMovementEvents);
+    }
+
+
+  } catch (err) {
+    console.error("Error polling MQTT latest events:", err);
+  }
+}
+
+function startMqttEventPolling(hmiState) {
+  pollMqttLatestEvents(hmiState);
+  setInterval(() => pollMqttLatestEvents(hmiState), 5000);
+}
+
+
+
+
+
+
+
 export function initialiseHMI(hmiState) {
   console.log("initialising");
+  startMqttConnectionPolling();
+  startMqttEventPolling(hmiState);
 
   showMapSpinner("Loading map data…");
   hideMapError();
@@ -556,6 +826,7 @@ export function initialiseHMI(hmiState) {
       await addIoTNodesToMap(hmiState);
 
       queueSimUpdate(hmiState);
+      startDetectionStream(hmiState);
       showToast("Map data loaded successfully", "success");
     })
     .catch((error) => {
@@ -656,24 +927,34 @@ export function convertJSONtoAnimalMovementEvent(hmiState, data) {
 }
 
 export function convertJSONtoAnimalVocalizationEvent(hmiState, data) {
+  const speciesName = (data.species || "unknown").toLowerCase();
+
+  // Any of these arrays can be missing/null on a real (non-simulator)
+  // detection — read them defensively rather than dereferencing directly,
+  // so a malformed payload produces an incomplete pair instead of throwing.
+  const [estLat, estLon]       = _safeLatLon(data.animalEstLLA);
+  const [locationLat, locationLon] = _safeLatLon(data.animalTrueLLA);
+  const [sensorLat, sensorLon] = _safeLatLon(data.microphoneLLA);
+
   return {
     timestamp:                      hmiState.currentTime,
     eventTimestamp:                 data.timestamp,
     eventId:                        data._id,
     speciesIdentificationConfidence:data.confidence,
-    speciesScientificName:          data.species.toLowerCase(),
-    commonName:                     data.commonName.toLowerCase(),
-    animalType:                     data.type.toLowerCase(),
-    animalStatus:                   matchStatus(data.status.toLowerCase()),
-    animalDiet:                     data.diet.toLowerCase(),
-    locationConfidence:             100 - data.animalLLAUncertainty,
-    estLat:                         data.animalEstLLA[0],
-    estLon:                         data.animalEstLLA[1],
-    locationLat:                    data.animalTrueLLA[0],
-    locationLon:                    data.animalTrueLLA[1],
+    speciesScientificName:        speciesName,
+    commonName:                   (data.commonName || data.species || "unknown").toLowerCase(),
+    animalType:                   (data.type || "mammal").toLowerCase(),
+    animalStatus:                 matchStatus((data.status || "least concern").toLowerCase()),
+    animalDiet:                   (data.diet || "herbivore").toLowerCase(),
+    locationConfidence:           100 - data.animalLLAUncertainty, // legacy popup "%" label only, see note above
+    locationUncertaintyM:         data.animalLLAUncertainty,        // metres — used for the map confidence ring
+    estLat:                         estLat,
+    estLon:                         estLon,
+    locationLat:                    locationLat,
+    locationLon:                    locationLon,
     sensorId:                       data.sensorId,
-    sensorLat:                      data.microphoneLLA[0],
-    sensorLon:                      data.microphoneLLA[1],
+    sensorLat:                      sensorLat,
+    sensorLon:                      sensorLon,
   };
 }
 
@@ -798,48 +1079,110 @@ export function muteRecordingPlaybackAnimation() {
   document.dispatchEvent(new CustomEvent("muteRecordingAnimation", { detail: { message: "mute animation" } }));
 }
 
-export function stopAudioPlayback() {
-  muteAudioAnimation();
+export function stopAudioPlayback(updateAnimation = true) {
+  const stoppedEventId = activeAudioEventId;
+  if (updateAnimation) muteAudioAnimation();
   if (audioAnimTimeout) clearTimeout(audioAnimTimeout);
-  if (activeAudioNode !== null) activeAudioNode.stop();
+  audioAnimTimeout = null;
+  if (activeAudioNode !== null) {
+    try {activeAudioNode.stop(); } catch (_error) { /* Source may already have ended. */ }
+    activeAudioNode.disconnect();
+  }
   activeAudioNode = null;
+  if (activeAudioContext !== null) {
+    void activeAudioContext.close().catch(() => {});
+  }
+  activeAudioContext = null;
+  activeAudioEventId = null;
+
+  markAnimalAudioReady(stoppedEventId);
 }
 
-function playAudioString(audioDataString, sampleRate) {
-  const audioData = new Uint8Array(
-    atob(audioDataString).split("").map((char) => char.charCodeAt(0))
-  );
+function playDecodedAudio(decodedAudio, eventId) {
+  if (!decodedAudio || !playNextTrack) return;
+  stopAudioPlayback(false);
+  playNextTrack = true;
 
-  const localAudioContext = new AudioContext();
-  const audioBuffer       = localAudioContext.createBuffer(1, audioData.length / 2, sampleRate);
-  audioBuffer.copyToChannel(new Float32Array(audioData.buffer), 0);
-
-  activeAudioNode = localAudioContext.createBufferSource();
-  activeAudioNode.buffer = audioBuffer;
-  activeAudioNode.connect(localAudioContext.destination);
-
-  if (playNextTrack) {
-    activeAudioNode.start();
-    audioAnimTimeout = setTimeout(muteAudioAnimation, audioBuffer.duration * 1000);
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  const context = new AudioContextClass();
+  const channelCount = Math.max(1, decodedAudio.numberOfChannels || 1);
+  const audioBuffer = context.createBuffer(channelCount, decodedAudio.length, decodedAudio.sampleRate);
+  for (let channel = 0; channel < channelCount; channel += 1) {
+    audioBuffer.copyToChannel(decodedAudio.getChannelData(channel), channel);
   }
+
+  const source = context.createBufferSource();
+  source.buffer = audioBuffer;
+  source.connect(context.destination);
+  source.onended = () => {
+    if (activeAudioNode !== source) return;
+    if (audioAnimTimeout) clearTimeout(audioAnimTimeout);
+    audioAnimTimeout = null;
+    activeAudioNode = null;
+    activeAudioContext = null;
+    activeAudioEventId = null;
+    source.disconnect();
+    void context.close().catch(() => {});
+    muteAudioAnimation();
+
+    markAnimalAudioReady(eventId);
+  };
+  activeAudioContext = context;
+  activeAudioNode = source;
+  activeAudioEventId = eventId;
+  source.start();
+  setAnimalAudioStatus("Playing audio...");
+  audioAnimTimeout = setTimeout(muteAudioAnimation, audioBuffer.duration * 1000);
 }
 
 document.addEventListener("playAudio", function () {
   playNextTrack = true;
-  if (selectedVocalizationEventId !== null) {
-    retrieveAudio(selectedVocalizationEventId)
-      .then((res) => { playAudioString(res.data.audioClip, res.data.sampleRate); })
-      .catch((error) => {
-        console.error("Error loading audio:", error);
-        showToast(getApiErrorMessage(error, "Failed to load audio clip"), "error");
-      });
+  if (!animalSpectrogramWorkflow || selectedVocalizationEventId === null) {
+    muteAudioAnimation();
+    return;
   }
+
+  const eventId = selectedVocalizationEventId;
+
+  animalSpectrogramWorkflow.getSelectedAudio().then((decodedAudio) => {
+      if (!playNextTrack) {
+        muteAudioAnimation();
+        return;
+      }
+
+      // Ignore audio returned for an event that is no longer selected.
+      if (selectedVocalizationEventId !== eventId) {
+        muteAudioAnimation();
+        return;
+      }
+
+      if (!decodedAudio) {
+        muteAudioAnimation();
+        setAnimalAudioStatus(ANIMAL_AUDIO_UNAVAILABLE);
+        return;
+      }
+
+      playDecodedAudio(decodedAudio, eventId);
+    })
+    .catch(() => {
+      if (selectedVocalizationEventId !== eventId) return;
+
+      muteAudioAnimation();
+      setAnimalAudioStatus(ANIMAL_AUDIO_UNAVAILABLE);
+    });
 });
 
 document.addEventListener("stopAudio", function () {
   playNextTrack = false;
   stopAudioPlayback();
 });
+
+function clearAnimalAudioSelection() {
+  selectedVocalizationEventId = null;
+  animalSpectrogramWorkflow?.clear();
+  stopAudioPlayback();
+  setAnimalAudioStatus("No audio selected.");
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Layer visibility
@@ -873,16 +1216,112 @@ export function updateLayers(hmiState, filterState) {
 // Map features
 // ─────────────────────────────────────────────────────────────────────────────
 
-function _makeAnimalIcon(iconPath) {
-  return new ol.style.Style({
-    image: new ol.style.Icon({ src: iconPath, anchor: [0.5, 1], scale: 0.75, className: "true-icon" }),
-  });
+/**
+ * Fraction of hmiState.liveWindow elapsed for a live event, measured from
+ * the same `timestamp` field purgeTruthEvents/purgeVocalizationEvents use
+ * to expire it (stored on the feature as animalRecordDate), so fade and
+ * expiry always agree.
+ */
+function _liveEventAgeRatio(hmiState, recordTimestampSeconds) {
+  const windowSeconds = hmiState.liveWindow / 1000;
+  if (!windowSeconds || !hmiState.currentTime) return 0;
+  const ageSeconds = hmiState.currentTime - recordTimestampSeconds;
+  return ageSeconds / windowSeconds;
 }
 
-function _makeVocalizationIcon(iconPath) {
-  return new ol.style.Style({
-    image: new ol.style.Icon({ src: iconPath, anchor: [0.5, 1], scale: 0.75, className: "vocalization-icon" }),
-  });
+/** Opacity (1 = fresh, MIN_LIVE_EVENT_OPACITY = about to be purged) for a live event's age. */
+function _computeFadeOpacity(hmiState, recordTimestampSeconds) {
+  const ratio = _liveEventAgeRatio(hmiState, recordTimestampSeconds);
+  if (ratio <= LIVE_EVENT_FADE_START_RATIO) return 1;
+  if (ratio >= 1) return MIN_LIVE_EVENT_OPACITY;
+
+  const fadeRatio = (ratio - LIVE_EVENT_FADE_START_RATIO) / (1 - LIVE_EVENT_FADE_START_RATIO);
+  return 1 - fadeRatio * (1 - MIN_LIVE_EVENT_OPACITY);
+}
+
+/**
+ * Maps a location-uncertainty reading in metres (animalLLAUncertainty /
+ * locationUncertaintyM — see the "Confidence -> ring radius" note above) to
+ * an on-map ring radius in metres. Missing/invalid uncertainty is treated as
+ * CONFIDENCE_RING_MAX_RADIUS_M (worst case) rather than 0, so a data gap
+ * shows as "we don't know", never as false confidence.
+ */
+function _uncertaintyToRingRadiusMeters(uncertaintyMeters) {
+  const safeUncertainty = Number.isFinite(uncertaintyMeters) && uncertaintyMeters >= 0
+    ? uncertaintyMeters
+    : CONFIDENCE_RING_MAX_RADIUS_M;
+  return Math.min(CONFIDENCE_RING_BASE_RADIUS_M + safeUncertainty, CONFIDENCE_RING_MAX_RADIUS_M);
+}
+
+/**
+ * Style FUNCTION (not a static Style) for movement/truth markers.
+ * OpenLayers calls this at render time only for features actually on
+ * screen, so age-based fade updates automatically as hmiState.currentTime
+ * advances — nothing here loops over features or rebuilds styles itself
+ * (see the per-tick source.changed() calls in queueSimUpdate, which just
+ * mark each layer dirty so OpenLayers repaints it on its next frame).
+ * Ground-truth locations have no location uncertainty, so there is no
+ * confidence ring — only the diamond/teal shape+colour marker (AC2) drawn
+ * underneath the existing per-species icon.
+ */
+function _makeTruthStyleFn(hmiState, iconPath) {
+  return function truthStyle(feature) {
+    const opacity = _computeFadeOpacity(hmiState, feature.get("animalRecordDate"));
+
+    return [
+      new ol.style.Style({
+        image: new ol.style.RegularShape({
+          points: 4,
+          radius: 9,
+          angle: Math.PI / 4, // rotate square -> diamond
+          fill:   new ol.style.Fill({ color: `rgba(${TRUTH_MARKER_COLOR}, ${opacity})` }),
+          stroke: new ol.style.Stroke({ color: `rgba(255, 255, 255, ${opacity})`, width: 1.5 }),
+        }),
+      }),
+      new ol.style.Style({
+        image: new ol.style.Icon({
+          src: iconPath, anchor: [0.5, 1], scale: 0.75, opacity, className: "true-icon",
+        }),
+      }),
+    ];
+  };
+}
+
+/**
+ * Style FUNCTION for vocalization (detected) markers. Same fade behaviour
+ * as _makeTruthStyleFn, plus a translucent confidence ring (AC3) drawn as a
+ * real ol.geom.Circle in map units (metres) centred on the marker, so it
+ * scales correctly with zoom and with the event's own reported location
+ * uncertainty (in metres) — see _uncertaintyToRingRadiusMeters. The ring
+ * uses a fixed low alpha (not the
+ * age-fade opacity) so overlapping detections stay legible instead of a
+ * cluster of fading rings compounding into an unreadable smear.
+ */
+function _makeVocalizationStyleFn(hmiState, iconPath) {
+  return function vocalizationStyle(feature) {
+    const opacity = _computeFadeOpacity(hmiState, feature.get("animalRecordDate"));
+    const radiusM = _uncertaintyToRingRadiusMeters(feature.get("animalLocUncertaintyM"));
+
+    return [
+      new ol.style.Style({
+        geometry: (feat) => new ol.geom.Circle(feat.getGeometry().getCoordinates(), radiusM),
+        fill:   new ol.style.Fill({ color: `rgba(${VOCALIZATION_MARKER_COLOR}, 0.18)` }),
+        stroke: new ol.style.Stroke({ color: `rgba(${VOCALIZATION_MARKER_COLOR}, 0.6)`, width: 1 }),
+      }),
+      new ol.style.Style({
+        image: new ol.style.Circle({
+          radius: 9,
+          fill:   new ol.style.Fill({ color: `rgba(${VOCALIZATION_MARKER_COLOR}, ${opacity})` }),
+          stroke: new ol.style.Stroke({ color: `rgba(255, 255, 255, ${opacity})`, width: 1.5 }),
+        }),
+      }),
+      new ol.style.Style({
+        image: new ol.style.Icon({
+          src: iconPath, anchor: [0.5, 1], scale: 0.75, opacity, className: "vocalization-icon",
+        }),
+      }),
+    ];
+  };
 }
 
 function _resolveSimIconPath(entry) {
@@ -916,7 +1355,7 @@ function _addTruthFeature(hmiState, entry) {
     isAnimalMovement:  1,
   });
 
-  feature.setStyle(_makeAnimalIcon(iconPath));
+  feature.setStyle(_makeTruthStyleFn(hmiState, iconPath));
   feature.setId(entry.animalId);
 
   const layer = findMapLayerWithName(hmiState, deriveTruthLayerName(entry.animalStatus, entry.animalType));
@@ -926,16 +1365,45 @@ function _addTruthFeature(hmiState, entry) {
 function _addVocalizationFeature(hmiState, entry) {
   const iconPath = _resolveVocalizationIconPath(entry);
 
+  // A vocalization detection's "estimated location" is entry.estLat/estLon,
+  // derived from data.animalEstLLA — the acoustic triangulation estimate.
+  // entry.locationLat/locationLon (data.animalTrueLLA) is the simulator's
+  // ground-truth position; a real deployment would not have that for a
+  // vocalization-only detection. It is kept on the feature
+  // (animalTrueLon/animalTrueLat) for debugging only and is never used to
+  // place the marker or the confidence ring.
+  //
+  // Coordinates are validated as complete lat/lon PAIRS — both fields
+  // present and each within its valid range — never independently, so an
+  // estimated longitude can never be combined with a true latitude (or
+  // vice versa). Prefer the estimate; fall back to the true location only
+  // if it is itself a complete, valid pair; otherwise skip this malformed
+  // event rather than plotting a marker at a bogus position.
+  let lat, lon;
+  if (_isValidCoordPair(entry.estLat, entry.estLon)) {
+    lat = entry.estLat;
+    lon = entry.estLon;
+  } else if (_isValidCoordPair(entry.locationLat, entry.locationLon)) {
+    lat = entry.locationLat;
+    lon = entry.locationLon;
+  } else {
+    console.warn(`Skipping vocalization event ${entry.eventId}: no valid coordinate pair`, entry);
+    return;
+  }
+
   const feature = new ol.Feature({
-    geometry:          new ol.geom.Point(ol.proj.fromLonLat([entry.locationLon, entry.locationLat])),
+    geometry:          new ol.geom.Point(ol.proj.fromLonLat([lon, lat])),
     name:              "vocalisation_" + entry.speciesScientificName,
     animalType:        entry.animalType,
     animalStatus:      entry.animalStatus,
     animalSpecies:     entry.speciesScientificName,
-    animalLon:         entry.locationLon,
-    animalLat:         entry.locationLat,
+    animalLon:         lon,
+    animalLat:         lat,
+    animalTrueLon:     entry.locationLon,
+    animalTrueLat:     entry.locationLat,
     animalConfidence:  entry.speciesIdentificationConfidence,
     animalLocConfidence: entry.locationConfidence,
+    animalLocUncertaintyM: entry.locationUncertaintyM,
     animalDiet:        entry.animalDiet,
     animalIcon:        iconPath,
     animalRecordDate:  entry.timestamp,
@@ -943,7 +1411,14 @@ function _addVocalizationFeature(hmiState, entry) {
     isAnimalMovement:  0,
   });
 
-  feature.setStyle(_makeVocalizationIcon(iconPath));
+  feature.setStyle(_makeVocalizationStyleFn(hmiState, iconPath));
+  feature.setId(entry.eventId);
+
+  const layer = findMapLayerWithName(hmiState, deriveLayerName(entry.animalStatus, entry.animalType));
+  if (layer) { layer.getSource().addFeature(feature); layer.getSource().changed(); layer.changed(); }
+}
+
+  feature.setStyle(_makeVocalizationStyleFn(hmiState, iconPath));
   feature.setId(entry.eventId);
 
   const layer = findMapLayerWithName(hmiState, deriveLayerName(entry.animalStatus, entry.animalType));
@@ -1158,11 +1633,10 @@ function createBasemap(hmiState) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 async function fetchWeatherData(timestamp, lat, lon) {
-  const response = await fetch(
-    `http://localhost:9000/hmi/weather?timestamp=${timestamp}&lat=${lat}&lon=${lon}`
-  );
-  if (!response.ok) throw new Error("Failed to fetch weather data");
-  return response.json();
+  // FR-D1: was hardcoded to http://localhost:9000, so weather never loaded
+  // anywhere but a dev machine. server.js proxies /hmi/* through to the API.
+  const response = await retrieveWeather(timestamp, lat, lon);
+  return response.data;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1174,6 +1648,7 @@ function createMapClickEvent(hmiState) {
     const feature = hmiState.basemap.forEachFeatureAtPixel(evt.pixel, (f) => f);
 
     if (!feature) {
+      clearAnimalAudioSelection();
       safeHideJQuery("#animal-popup-content");
       safeHideJQuery("#mic-popup-content");
       safeHideJQuery("#node-popup-content");
@@ -1223,6 +1698,7 @@ function createMapClickEvent(hmiState) {
     }
 
     if (values.isMic) {
+      clearAnimalAudioSelection();
       active_mic_content.show();  default_mic_content.hide();
       active_node_content.hide(); default_node_content.show();
       active_content.hide();      default_content.show();
@@ -1253,6 +1729,7 @@ function createMapClickEvent(hmiState) {
       document.dispatchEvent(new CustomEvent("micToggled", { detail: { message: "Mic toggled:" } }));
 
     } else if (values.isNode) {
+      clearAnimalAudioSelection();
       active_node_content.show();  default_node_content.hide();
       active_mic_content.hide();   default_mic_content.show();
       active_content.hide();       default_content.show();
@@ -1274,16 +1751,50 @@ function createMapClickEvent(hmiState) {
       active_mic_content.hide();   default_mic_content.show();
       active_node_content.hide();  default_node_content.show();
 
-      if (values.eventId) selectedVocalizationEventId = values.eventId;
-
-      const audioHeader  = document.getElementById("audioHeader");
-      const audioControl = document.getElementById("audioControl");
+      const audioHeader  = document.getElementById("animalAudioHeader");
+      const audioControl = document.getElementById("animalAudioControl");
+      const spectrogram  = document.getElementById("animal-spectrogram");
       if (values.isAnimalMovement) {
+        clearAnimalAudioSelection();
         if (audioHeader)  audioHeader.style.display  = "none";
         if (audioControl) audioControl.style.display = "none";
+        if (spectrogram)  spectrogram.style.display  = "none";
       } else {
         if (audioHeader)  audioHeader.style.display  = "flex";
         if (audioControl) audioControl.style.display = "flex";
+        if (spectrogram)  spectrogram.style.display  = "block";
+        selectedVocalizationEventId = values.eventId || null;
+
+        if (selectedVocalizationEventId !== null) {
+          const eventId = selectedVocalizationEventId;
+
+          setAnimalAudioStatus("Loading audio...");
+
+          if (!animalSpectrogramWorkflow) {
+            setAnimalAudioStatus(ANIMAL_AUDIO_UNAVAILABLE);
+          } else {
+            void animalSpectrogramWorkflow
+              .select(eventId)
+              .then((decodedAudio) => {
+                if (selectedVocalizationEventId !== eventId) return;
+
+                if (decodedAudio) {
+                  markAnimalAudioReady(eventId);
+                } else {
+                  setAnimalAudioStatus(ANIMAL_AUDIO_UNAVAILABLE);
+                }
+              })
+              .catch(() => {
+                if (selectedVocalizationEventId !== eventId) return;
+
+                setAnimalAudioStatus(ANIMAL_AUDIO_UNAVAILABLE);
+              });
+          }
+        } else {
+          animalSpectrogramWorkflow?.clear();
+          setAnimalAudioStatus("No audio selected.");
+        }
+
       }
 
       if (values.animalSpecies) {
@@ -1366,6 +1877,35 @@ export function MapCloseNav() {
 // ─────────────────────────────────────────────────────────────────────────────
 // Live updates
 // ─────────────────────────────────────────────────────────────────────────────
+
+let disconnectDetectionStream = null;
+
+function startDetectionStream(hmiState) {
+  if (disconnectDetectionStream) return;
+
+  disconnectDetectionStream = connectDetectionStream({
+    onStatus: (status) => console.log("Detection stream:", status),
+    onDetection: (data) => {
+      console.log("[B1.2 WS] map handler received detection:", {
+        _id: data._id,
+        species: data.species,
+        sensorId: data.sensorId,
+        confidence: data.confidence,
+      });
+
+      const alreadySeen = hmiState.vocalizationEvents.some(
+        (event) => event.eventId === data._id
+      );
+      if (alreadySeen) {
+        console.log("[B1.2 WS] duplicate ignored:", data._id);
+        return;
+      }
+
+      updateVocalizationLayerFromLiveData(hmiState, [data]);
+      showToast(`Live detection: ${data.species}`, "success");
+    },
+  });
+}
 
 function updateTruthEvents(hmiState) {
   retrieveTruthEventsInTimeRange(hmiState.currentTime - 5, hmiState.currentTime)
@@ -1454,10 +1994,20 @@ function queueSimUpdate(hmiState) {
 
       if (simUpdateTimeout) clearTimeout(simUpdateTimeout);
 
+      // Re-invalidate every live-event layer each tick so age-based fade
+      // (computed inside the style functions in the "Live-event
+      // visualisation" section above) repaints smoothly. This does NOT
+      // rebuild features or re-render the whole map — it only marks each
+      // vector layer's own canvas dirty, so OpenLayers repaints just that
+      // layer's on-screen features on its next frame, same as the
+      // pre-existing truth-layer refresh this replaces.
       for (let stat of statuses) {
         for (let animalType of animalTypes) {
-          const layer = findMapLayerWithName(hmiState, deriveTruthLayerName(stat, animalType));
-          if (layer) { layer.changed(); layer.getSource().changed(); }
+          const truthLayer = findMapLayerWithName(hmiState, deriveTruthLayerName(stat, animalType));
+          if (truthLayer) { truthLayer.changed(); truthLayer.getSource().changed(); }
+
+          const vocalizationLayer = findMapLayerWithName(hmiState, deriveLayerName(stat, animalType));
+          if (vocalizationLayer) { vocalizationLayer.changed(); vocalizationLayer.getSource().changed(); }
         }
       }
 
@@ -1511,8 +2061,11 @@ export function hidePlaybackIndicator() {
 export function testFunct() { console.log("Recording started 1"); }
 
 export function startAudioRecording() {
-  const audioElement = getAudioElement();
-  if (audioElement && !audioElement.paused) {
+  const sourceToken = microphoneSourceGuard.begin();
+  const audioElement       = getAudioElement();
+  const audioElementSource = getAudioElementSource();
+
+  if (audioElementSource && audioElement && !audioElement.paused) {
     audioElement.pause();
     hidePlaybackIndicator();
   }
@@ -1532,6 +2085,18 @@ export function startAudioRecording() {
   audioRecorder
     .start()
     .then(() => {
+      if (!microphoneSourceGuard.isCurrent(sourceToken)) {
+        audioRecorder.cancel();
+        return;
+      }
+      fileContent = null;
+      decodedAudioStore = null;
+      microphoneSpectrogramWorkflow?.clear();
+      revokeObjectUrl(selectedFileObjectUrl);
+      revokeObjectUrl(recordedAudioObjectUrl);
+      selectedFileObjectUrl = null;
+      recordedAudioObjectUrl = null;
+      stopRecordingPlayback();
       audioRecordStartTime = new Date();
       showRecordingControls();
       showToast("Recording started", "info");
@@ -1561,51 +2126,60 @@ export function startAudioRecording() {
 }
 
 export function stopAudioRecording() {
-  if (stopRecordingInProgress) return;
-  stopRecordingInProgress = true;
-
-  if (durationTimer) {
-    clearInterval(durationTimer);
-    durationTimer = null;
-  }
-
-  const durationLabel = getDurationTag() ? getDurationTag().textContent : null;
+  const sourceToken = microphoneSourceGuard.begin();
 
   audioRecorder
     .stop()
-    .then((result) => {
+    .then(async (recordingResult) => {
       hideRecordingControls();
-      setLiveRecordingState("idle", "Recording stopped");
 
-      const audioBlob = result && result.blob ? result.blob : result;
-      if (!audioBlob || audioBlob.size === 0) {
-        clearBrowserRecordingPlayback();
-        showToast("Recording stopped, but no audio was captured. Try again.", "error");
-        return;
+      if (!microphoneSourceGuard.isCurrent(sourceToken)) return;
+
+      const audioBlob =
+        recordingResult instanceof Blob
+          ? recordingResult
+          : recordingResult?.blob;
+
+      if (!(audioBlob instanceof Blob) || audioBlob.size === 0) {
+        throw new TypeError("Recorder did not return a valid audio Blob");
       }
 
-      prepareBrowserRecordingPlayback(result, durationLabel);
-      showToast("Recording ready — press the green play button", "success");
+      fileContent = null;
+
+      const decodedAudio =
+        (await microphoneSpectrogramWorkflow?.load(audioBlob)) || null;
+
+      if (!microphoneSourceGuard.isCurrent(sourceToken)) return;
+
+      decodedAudioStore = decodedAudio;
+
+      revokeObjectUrl(recordedAudioObjectUrl);
+      recordedAudioObjectUrl = URL.createObjectURL(audioBlob);
+
+      const audioElement = getAudioElemForRecordedPlayback();
+
+      if (audioElement) {
+        audioElement.src = recordedAudioObjectUrl;
+      }
+
+      if (!decodedAudioStore) {
+        showToast("Recorded audio could not be decoded", "error");
+      }
     })
     .catch((error) => {
-      hideRecordingControls();
-      setLiveRecordingState("idle", "Ready to record");
-      showToast(
-        "Error stopping recording: " + (error.message || error.name || "unknown error"),
-        "error"
-      );
-      console.log("Stop recording error:", error);
-    })
-    .finally(() => {
-      stopRecordingInProgress = false;
+      if (!microphoneSourceGuard.isCurrent(sourceToken)) return;
+
+      showToast("Error stopping recording", "error");
+      console.error("Stop recording error:", error);
     });
 }
 
+
 export function cancelAudioRecording() {
+  microphoneSourceGuard.invalidate();
   audioRecorder.cancel();
-  stopRecordingPlayback();
-  playNextRecordedTrack = false;
-  clearBrowserRecordingPlayback();
+  decodedAudioStore = null;
+  microphoneSpectrogramWorkflow?.clear();
   hideRecordingControls();
   setLiveRecordingState("idle", "Recording cancelled");
   showToast("Recording cancelled", "info");
@@ -1737,77 +2311,56 @@ document.addEventListener("playRecordedAudio",  function () { playNextRecordedTr
 document.addEventListener("stopRecordedAudio",  function () { playNextRecordedTrack = false; stopRecordingPlayback(); });
 
 function playRecording(recordedChunksOrBlob) {
-  let blob = null;
+  let blob;
 
   if (recordedChunksOrBlob instanceof Blob) {
     blob = recordedChunksOrBlob;
-  } else if (Array.isArray(recordedChunksOrBlob) && recordedChunksOrBlob.length > 0) {
-    const type = recordedChunksOrBlob[0].type || "audio/wav";
-    blob = new Blob(recordedChunksOrBlob, { type });
-  } else if (lastBrowserRecordingBlob) {
-    blob = lastBrowserRecordingBlob;
-  }
-
-  if (!blob || blob.size === 0) {
-    showToast("No recording available to play. Record audio first.", "error");
+  } else if (
+    Array.isArray(recordedChunksOrBlob) &&
+    recordedChunksOrBlob.length > 0
+  ) {
+    const mimeType = recordedChunksOrBlob[0]?.type || "audio/webm";
+    blob = new Blob(recordedChunksOrBlob, { type: mimeType });
+  } else {
     return;
   }
 
+  if (blob.size === 0) return;
+
   audioRecordingElement = getAudioElemForRecordedPlayback();
+
   if (!audioRecordingElement) return;
 
-  // Reuse the prepared player from Stop — do not reload (avoids play() races).
-  const alreadyPrepared =
-    lastBrowserRecordingBlob === blob &&
-    lastBrowserRecordingUrl &&
-    audioRecordingElement.src;
+  revokeObjectUrl(recordedAudioObjectUrl);
 
-  if (!alreadyPrepared) {
-    if (lastBrowserRecordingUrl) URL.revokeObjectURL(lastBrowserRecordingUrl);
-    lastBrowserRecordingUrl = URL.createObjectURL(blob);
-    lastBrowserRecordingBlob = blob;
-    audioRecordingElement.src = lastBrowserRecordingUrl;
-    audioRecordingElement.classList.remove("hide");
-    audioRecordingElement.load();
-  } else {
-    audioRecordingElement.classList.remove("hide");
-  }
+  recordedAudioObjectUrl = URL.createObjectURL(blob);
 
-  if (!playNextRecordedTrack) return;
+  audioRecordingElement.src = recordedAudioObjectUrl;
+  audioRecordingElement.load();
 
-  recordingPlaybackAnimTimeout = setTimeout(muteRecordingPlaybackAnimation, 10000);
+  if (playNextRecordedTrack) {
+    recordingPlaybackAnimTimeout = setTimeout(
+      muteRecordingPlaybackAnimation,
+      10000
+    );
 
-  const playPromise = audioRecordingElement.play();
-  if (playPromise && typeof playPromise.then === "function") {
-    playPromise.catch((err) => {
-      // Fallback: decode WAV/PCM via AudioContext if the element fails.
-      blob.arrayBuffer()
-        .then((arrayBuffer) => {
-          const ctx = new (window.AudioContext || window.webkitAudioContext)();
-          audioContext = ctx;
-          return ctx.decodeAudioData(arrayBuffer.slice(0)).then((decoded) => {
-            a_source = ctx.createBufferSource();
-            a_source.buffer = decoded;
-            a_source.connect(ctx.destination);
-            a_source.start();
-          });
-        })
-        .catch(() => {
-          showToast(
-            "Unable to play recording: " + (err.message || "unsupported audio format"),
-            "error"
-          );
-          playNextRecordedTrack = false;
-          muteRecordingPlaybackAnimation();
-        });
-    });
+    audioRecordingElement.onended = () => {
+      if (recordingPlaybackAnimTimeout) {
+        clearTimeout(recordingPlaybackAnimTimeout);
+      }
+
+      recordingPlaybackAnimTimeout = null;
+      muteRecordingPlaybackAnimation();
+    };
+
+    audioRecordingElement.play();
   }
 }
 
-function stopRecordingPlayback() {
-  muteRecordingPlaybackAnimation();
+function stopRecordingPlayback(updateAnimation = true) {
+  if (updateAnimation) muteRecordingPlaybackAnimation();
   if (recordingPlaybackAnimTimeout) clearTimeout(recordingPlaybackAnimTimeout);
-  stopPcmPlayback();
+  recordingPlaybackAnimTimeout = null;
 
   if (a_source === null) {
     if (audioRecordingElement !== null) {
@@ -1815,8 +2368,13 @@ function stopRecordingPlayback() {
       audioRecordingElement.currentTime = 0;
     }
   } else {
-    try { a_source.stop(); } catch (_err) { /* ignore */ }
+    try { a_source.stop(); } catch (_error) { /* Source may already have ended. */ }
+    a_source.disconnect();
     a_source = null;
+  }
+  if (recordingPlaybackContext !== null) {
+    void recordingPlaybackContext.close().catch(() => {});
+    recordingPlaybackContext = null;
   }
 }
 
@@ -1832,14 +2390,37 @@ export function playAudio() {
     return;
   }
 
-  audioContext = new (window.AudioContext || window.webkitAudioContext)();
-
   if (playNextRecordedTrack) {
-    recordingPlaybackAnimTimeout = setTimeout(muteRecordingPlaybackAnimation, 10000);
-    a_source = audioContext.createBufferSource();
-    a_source.buffer = decodedAudioStore;
-    a_source.connect(audioContext.destination);
-    a_source.start();
+    stopRecordingPlayback(false);
+    playNextRecordedTrack = true;
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    recordingPlaybackContext = new AudioContextClass();
+    const context = recordingPlaybackContext;
+    const channelCount = Math.max(1, decodedAudioStore.numberOfChannels || 1);
+    const audioBuffer = context.createBuffer(
+      channelCount,
+      decodedAudioStore.length,
+      decodedAudioStore.sampleRate
+    );
+    for (let channel = 0; channel < channelCount; channel += 1) {
+      audioBuffer.copyToChannel(decodedAudioStore.getChannelData(channel), channel);
+    }
+    recordingPlaybackAnimTimeout = setTimeout(muteRecordingPlaybackAnimation, audioBuffer.duration * 1000);
+    const source = context.createBufferSource();
+    source.buffer = audioBuffer;
+    source.connect(context.destination);
+    source.onended = () => {
+      if (a_source !== source) return;
+      if (recordingPlaybackAnimTimeout) clearTimeout(recordingPlaybackAnimTimeout);
+      recordingPlaybackAnimTimeout = null;
+      source.disconnect();
+      a_source = null;
+      recordingPlaybackContext = null;
+      void context.close().catch(() => {});
+      muteRecordingPlaybackAnimation();
+    };
+    a_source = source;
+    source.start();
   }
 }
 
