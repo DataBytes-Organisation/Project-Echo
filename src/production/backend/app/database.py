@@ -16,6 +16,7 @@ client = pymongo.MongoClient(connection_string)
 db = client["EchoNet"]
 # db = client['mydatabase']
 Events = db.events
+Events.create_index([("sourceType", pymongo.ASCENDING), ("timestamp", pymongo.DESCENDING)], name="idx_events_source_type_timestamp")
 Movements = db.movements
 Species = db.species
 Microphones = db.microphones
