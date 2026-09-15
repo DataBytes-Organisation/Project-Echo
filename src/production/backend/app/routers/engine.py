@@ -1,9 +1,13 @@
 ## app.routers.engine.py
-from fastapi import status, APIRouter
+from fastapi import status, APIRouter, Depends
 from app import serializers
 from app import schemas
 from app.database import Events
+from app.services.detection_stream import detection_stream_manager
+from app.middleware.engine_auth import verify_engine_api_key
+import asyncio
 import datetime
+import logging
 from app import serializers
 from app import schemas
 from app.database import Events, Species
@@ -12,23 +16,69 @@ from fastapi.responses import StreamingResponse
 import pandas as pd
 
 
+logger = logging.getLogger(__name__)
 router = APIRouter()
 
-@router.post("/event", status_code=status.HTTP_201_CREATED)
-def create_event(event: schemas.EventSchema):
 
-    result = Events.insert_one(event.dict())
+def _build_created_event(inserted_id):
     pipeline = [
-            {'$match': {'_id': result.inserted_id}},
-        ]
-    new_post = serializers.eventListEntity(Events.aggregate(pipeline))[0]
-    return new_post
+        {"$match": {"_id": inserted_id}},
+    ]
+    return serializers.eventListEntity(Events.aggregate(pipeline))[0]
+
+
+def _build_stream_payload(inserted_id):
+    stream_pipeline = [
+        {"$match": {"_id": inserted_id}},
+        {
+            "$lookup": {
+                "from": "species",
+                "localField": "species",
+                "foreignField": "_id",
+                "as": "info",
+            }
+        },
+        {
+            "$replaceRoot": {
+                "newRoot": {
+                    "$mergeObjects": [{"$arrayElemAt": ["$info", 0]}, "$$ROOT"]
+                }
+            }
+        },
+    ]
+    return serializers.eventSpeciesListEntity(
+        Events.aggregate(stream_pipeline)
+    )[0]
+
+
+@router.post(
+    "/event",
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(verify_engine_api_key)],
+)
+async def create_event(event: schemas.EventSchema):
+    # Keep Mongo work off the event loop so open WebSocket clients stay responsive.
+    result = await asyncio.to_thread(Events.insert_one, event.dict())
+    # Persistence already succeeded. Broadcast failures must not turn this into a 500.
+    try:
+        stream_payload = await asyncio.to_thread(
+            _build_stream_payload, result.inserted_id
+        )
+        await detection_stream_manager.broadcast(stream_payload)
+    except Exception:
+        logger.warning(
+            "Event %s persisted but live broadcast failed",
+            result.inserted_id,
+            exc_info=True,
+        )
+
+    return {"status": "success", "eventId": str(result.inserted_id)}
 
     
 # Return all species data
 
 @router.get("/animal_records", response_description="Get all record of animals")
-def list_species_data(species: str = "", event_start: str = "", event_end: str = "", microphoneLLA_0: float = None, microphoneLLA_1: float = None,  microphoneLLA_2: float = None):
+def list_species_data(species: str = "", event_start: str = "", event_end: str = "", microphoneLLA_0: float = None, microphoneLLA_1: float = None,  microphoneLLA_2: float = None, sourceType: str = "all"):
     pipeline = [
 
         {'$lookup': {
@@ -45,6 +95,7 @@ def list_species_data(species: str = "", event_start: str = "", event_end: str =
         {'$addFields': {
             'timestamp': "$events.timestamp",
             'sensorId': "$events.sensorId",
+            'sourceType': "$events.sourceType",
             'microphoneLLA': "$events.microphoneLLA",
             'animalEstLLA': "$events.animalEstLLA",
             'animalTrueLLA': "$events.animalTrueLLA",
@@ -57,6 +108,11 @@ def list_species_data(species: str = "", event_start: str = "", event_end: str =
 
     if species:
         pipeline.append({'$match': {'_id': species}})
+    if sourceType not in ("all", "real", "simulator"):
+        from fastapi import HTTPException
+        raise HTTPException(status_code=422, detail="sourceType must be all, real, or simulator")
+    if sourceType != "all":
+        pipeline.append({'$match': {'sourceType': sourceType}})
     if event_end and event_start:
         datetime_start = datetime.datetime.fromtimestamp(float(event_start))
         datetime_end = datetime.datetime.fromtimestamp(float(event_end))
@@ -83,5 +139,4 @@ def filter_name():
     algorithm_name = {'Echo-Engine' : "Echo-Engine-Algorithm", 'Echo-Simulator' : "Echo-Simulator-Algorithm", 
                       'Echo-search' : "Echo-Search-Algorithm", 'Echo-lookup' : "Echo-lookup-Algorithm" }
     return algorithm_name
-
 

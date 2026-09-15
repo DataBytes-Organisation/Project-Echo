@@ -14,12 +14,20 @@ shape/extent of masking.
 """
 
 import random
+import sys
 from pathlib import Path
 
 import librosa
 import numpy as np
 import matplotlib.pyplot as plt
 import torch
+# Import SpecAugment from the consolidated training pipeline rather than
+# keeping a second duplicate augment.py under augmentation/.
+PIPELINE_DIR = (
+    Path(__file__).resolve().parent.parent
+    / "reproducible_training_pipeline"
+)
+sys.path.insert(0, str(PIPELINE_DIR))
 
 from augment import SpecAugment
 

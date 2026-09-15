@@ -32,7 +32,7 @@ app.add_middleware(
 )
 # Routers
 from .routers import add_csv_output_option, audio_upload_router
-from app.routers import species_predictor, auth_router, hmi, engine, sim, two_factor, public, iot, live, sensors #Websocket
+from app.routers import species_predictor, auth_router, hmi, engine, sim, two_factor, public, iot, live, sensors, payments #Websocket
 
 from app.routers import projects
 app.include_router(projects.router)
@@ -91,6 +91,34 @@ app.add_exception_handler(ConnectionFailure, database_unavailable_handler)
 app.add_exception_handler(ExecutionTimeout, database_unavailable_handler)
 
 
+######### MQTT live event handling (FR-A2)
+from app.services.mqtt_client import start_mqtt_client, get_connection_state, get_latest_events
+
+@app.on_event("startup")
+def startup_mqtt():
+    start_mqtt_client()
+
+@app.get("/mqtt/connection-state", tags=["mqtt"])
+def mqtt_connection_state():
+    return {"state": get_connection_state()}
+
+@app.get("/mqtt/latest-events", tags=["mqtt"])
+def mqtt_latest_events():
+    from app.routers.hmi import show_latest_events
+
+    events = [
+        {"eventType": "vocalization", **event}
+        for event in show_latest_events(limit=20)
+    ]
+    events += [
+        event for event in get_latest_events()
+        if event.get("eventType") != "vocalization"
+    ]
+
+    return {"events": events}
+
+
+
 # app.include_router(hmi.router, tags=['hmi'], prefix='/hmi')
 # app.include_router(engine.router, tags=['engine'], prefix='/engine')
 # app.include_router(sim.router, tags=['sim'], prefix='/sim')
@@ -120,6 +148,8 @@ print(f" database names: {client.list_database_names()}")
 
 app.include_router(iot.router, tags=['iot'], prefix='/iot')
 app.include_router(sensors.router, tags=['sensors'], prefix='/sensors')
+app.include_router(payments.router)
+app.include_router(live.router, tags=["live"])
 app.include_router(species_predictor.router, tags=["predict"])
 
 
