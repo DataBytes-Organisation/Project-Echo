@@ -6,6 +6,7 @@ from typing import List
 from app import serializers
 from app import schemas
 from app.database import Movements, Microphones, User
+from app.config import settings
 from fastapi_mail import FastMail, MessageSchema, ConnectionConfig
 import asyncio
 from datetime import datetime, timedelta
@@ -13,13 +14,13 @@ from datetime import datetime, timedelta
 router = APIRouter()
 # Email configuration for sending notifications
 conf = ConnectionConfig(
-    MAIL_USERNAME="projectechodeakintest@gmail.com",
-    MAIL_PASSWORD="oocr srvw ndoj bwte",  #App password
-    MAIL_FROM="projectechodeakintest@gmail.com",
-    MAIL_PORT=587,
-    MAIL_SERVER="smtp.gmail.com",
-    # MAIL_STARTTLS=True,
-    # MAIL_SSL_TLS=False,
+    MAIL_USERNAME=settings.mail_username,
+    MAIL_PASSWORD=settings.mail_password,
+    MAIL_FROM=settings.mail_from,
+    MAIL_PORT=settings.mail_port,
+    MAIL_SERVER=settings.mail_server,
+    MAIL_STARTTLS=settings.mail_starttls,
+    MAIL_SSL_TLS=settings.mail_use_ssl,
     USE_CREDENTIALS=True
 )
 

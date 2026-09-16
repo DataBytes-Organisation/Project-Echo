@@ -29,6 +29,8 @@ focus() {
   setAttribute(key, value) { this[key] = value; }
   addEventListener(key, fn) { this.listeners[key] = fn; }
   querySelector() { return null; }
+  querySelectorAll() { return []; }
+  insertAdjacentElement() {}
   remove() {}
 }
 const SIDEBAR_IDS = [

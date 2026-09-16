@@ -9,7 +9,6 @@ from bson import ObjectId
 import datetime
 from app import serializers
 from app import schemas
-from app import detections as detections_service
 from app.database import Events, Movements, Microphones, User, Role, ROLES, Requests, Guest, ForgotPassword, LogoutToken, Species
 from fastapi.responses import JSONResponse
 import paho.mqtt.publish as publish
@@ -22,31 +21,23 @@ import json
 import paho.mqtt.client as paho
 from app.middleware.auth import signJWT, decodeJWT
 from app.middleware.auth_bearer import JWTBearer
-from app.middleware.pause_guard import pause_guard
-from app.services.budget import enforce_and_consume
 from app.middleware.random import randompassword
 from app.middleware.random import genotp
 from bson.objectid import ObjectId
 import uuid
 from .weather_data import download_file_from_ftp,read_file,download_weather_stations_from_ftp,find_closest_station
 import tempfile
-import os 
+import os
 import pandas as pd
+from app.config import settings
 
 jwtBearer = JWTBearer()
 
 router = APIRouter()
 
-
-@router.get("/detections", response_model=List[schemas.RealDetectionRead], dependencies=[Depends(jwtBearer), Depends(pause_guard("detections"))])
-def list_real_detections():
-    enforce_and_consume("detections", cost=1)
-    result = detections_service.list_real_events(page_size=100)
-    return serializers.eventListEntity([item.dict(by_alias=True) for item in result["items"]])
-
-MQTT_BROKER_URL = "ts-mqtt-server-cont"
-MQTT_ENGINE_URL = "projectecho/engine/2"
-MQTT_BROKER_PORT = 1883
+MQTT_BROKER_URL = settings.mqtt_host
+MQTT_ENGINE_URL = settings.mqtt_engine_topic
+MQTT_BROKER_PORT = settings.mqtt_port
 #mqtt_client = paho.Client()
 #mqtt_client.connect(MQTT_BROKER_URL, MQTT_BROKER_PORT)
 
@@ -54,6 +45,12 @@ MQTT_BROKER_PORT = 1883
 ftp_server = "ftp.bom.gov.au"
 ftp_directory = "/anon/gen/clim_data/IDCKWCDEA0/tables/vic"
 weather_station_list_directory = "/anon/gen/clim_data/IDCKWCDEA0/tables"
+
+
+def _source_type_match_stage(source_type: str):
+    if source_type not in ("all", "real", "simulator"):
+        raise HTTPException(status_code=422, detail="sourceType must be all, real, or simulator")
+    return {"$match": {"sourceType": source_type}} if source_type != "all" else None
 
 
 @router.get('/weather', response_description="Get weather data for the day and location provided")
@@ -111,7 +108,7 @@ def get_weather(timestamp: int,
     
 
 @router.get("/events_time", response_description="Get detection events within certain duration")
-def show_event_from_time(start: str, end: str):
+def show_event_from_time(start: str, end: str, sourceType: str = "all"):
     datetime_start = datetime.datetime.fromtimestamp(float(start))
     datetime_end = datetime.datetime.fromtimestamp(float(end))
     # print(f'we think query date is {datetime_start}', flush=True)
@@ -140,6 +137,42 @@ def show_event_from_time(start: str, end: str):
             "timestamp": { "$toLong": "$timestamp" }}
         }       
 
+    ]
+    source_type_match = _source_type_match_stage(sourceType)
+    if source_type_match:
+        aggregate.insert(1, source_type_match)
+    events = serializers.eventSpeciesListEntity(Events.aggregate(aggregate))
+    return events
+
+@router.get("/latest_events", response_description="Get most recent classified detection events")
+def show_latest_events(
+    limit: int = 20,
+    sourceType: str = "all",
+):
+    source_type_match = _source_type_match_stage(sourceType)
+    aggregate = [
+        *([source_type_match] if source_type_match else []),
+        { "$sort": { "timestamp": -1 } },
+        { "$limit": limit },
+        {
+            '$lookup': {
+                'from': 'species',
+                'localField': 'species',
+                'foreignField': '_id',
+                'as': 'info'
+            }
+        },
+        {
+            "$replaceRoot": { "newRoot": { "$mergeObjects": [ { "$arrayElemAt": [ "$info", 0 ] }, "$$ROOT" ] } }
+        },
+        {
+            '$project': { "audioClip": 0, "sampleRate": 0}
+        },
+        {
+            "$addFields": {
+                "timestamp": { "$toLong": "$timestamp" }
+            }
+        }
     ]
     events = serializers.eventSpeciesListEntity(Events.aggregate(aggregate))
     return events
@@ -364,7 +397,7 @@ def signin(user: schemas.UserLoginSchema):
         headers = {"Authorization": f"Bearer {jwtToken}"}
         try:
             response = requests.post(
-                "http://localhost:9000/2fa/generate",
+                f"{settings.internal_api_base_url}/2fa/generate",
                 headers=headers
             )
             print(response.json())
@@ -676,7 +709,7 @@ def forgotpassword(user: schemas.ResetPasswordSchema):
 @router.get("/filter_algorithm/{algorithm_type}", status_code=status.HTTP_200_OK, response_description="returns the running filter algorithm name")
 def filter_name(algorithm_type : str):
     try:
-        algorithms_running = requests.get("http://ts-api-cont:9000/engine/algorithms_data")
+        algorithms_running = requests.get(f"{settings.internal_api_base_url}/engine/algorithms_data")
         algorithm_name = algorithms_running.json()[algorithm_type]
         if(algorithm_name is not None):
             response = {"message": algorithm_name}
@@ -742,4 +775,3 @@ def increment_user_visit(username: str, visit_duration: float = 5.0):
         {"$inc": {"visits": 1, "totalTime": visit_duration}}
     )
     return {"message": f"Visit recorded for {username}"}
-

@@ -5,16 +5,17 @@ const fs = require('fs');
 const cookieSession = require('cookie-session');
 const helmet = require('helmet');
 const jwt = require('jsonwebtoken');
-const { client, checkUserSession, resolveLandingPath } = require('./middleware');
+const { client, checkUserSession, resolveLandingPath, requireApiSession } = require('./middleware');
 const controller = require('./controller/auth.controller');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 client.connect();
 const cors = require('cors');
 require('dotenv').config();
-const API_BASE_URL = `http://${process.env.API_HOST || 'localhost'}:9000`;
+const apiClient = require('./services/apiClient');
+const API_BASE_URL = apiClient.API_BASE_URL;
 const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY);
-const axios = require('axios');
+const axios = require('axios'); // still needed directly for proxyToApi's pass-through behaviour below
 const { MongoClient, ObjectId } = require('mongodb');
 const razorpayPayment = require('./routes/razorpay.routes');
 let connectedDB;
@@ -575,6 +576,7 @@ app.post('/api/applyAlgorithm', (req, res) => {
 require('./routes/auth.routes')(app);
 require('./routes/user.routes')(app);
 require('./routes/map.routes')(app);
+require('./routes/sensor.routes')(app);
 //updated 2026/01/26 to serve mongodb api endpoints to admin folder for data integration
 app.get(
   ['/admin*', '/map', '/requests', '/notifications'],
@@ -657,16 +659,11 @@ app.post("/api/submit", async (req, res) => {
   schema.date = new Date();
   try {
     console.log("Request submission data: ", JSON.stringify(schema));
-    const axiosResponse = await axios.post(`${API_BASE_URL}/hmi/api/submit`, JSON.stringify(schema), { headers: {"Authorization" : `Bearer ${token}`, 'Content-Type': 'application/json'}})
-    //If successful return a 201 status code
-    if (axiosResponse.status === 201) {
-      console.log('Status Code: ' + axiosResponse.status + ' ' + axiosResponse.statusText)
-      res.status(201).send(`<script> window.location.href = "/login"; alert("Request Submitted successfully");</script>`);
-    } else {
-      res.status(400).send(`<script> window.location.href = "/login"; alert("Ooops! Something went wrong");</script>`);
-    }
+    // apiClient throws on any non-2xx, so getting here means it succeeded - no need to check the status manually
+    await apiClient.post('/hmi/api/submit', schema, { headers: {"Authorization" : `Bearer ${token}`, 'Content-Type': 'application/json'}})
+    res.status(201).send(`<script> window.location.href = "/login"; alert("Request Submitted successfully");</script>`);
   } catch (error) {
-    console.error(error.data);
+    console.error(error.message);
     res.status(500).send("An error occurred");
   }
 });
@@ -689,6 +686,123 @@ app.get("/notifications", (req,res) => {
   res.sendFile(path.join(__dirname, 'public/admin/notifications.html'))
 })
 
+// ============================================================
+// Admin notifications
+//
+// The admin notification list used to be a hardcoded array in the browser, so
+// nothing survived a refresh. The feed is now built from records we already
+// hold (donations and user registrations) and the read/deleted state is kept in
+// its own collection, keyed by a stable id per source record. That way marking
+// something read is still true after a reload, and we are not duplicating the
+// donation or user documents just to track a flag against them.
+// ============================================================
+
+const NOTIFICATION_STATE_COLLECTION = 'notificationState';
+const notificationFeed = require('./services/notifications');
+
+async function getEchoNetDb() {
+  if (!connectedDB) {
+    await donationClient.connect();
+    connectedDB = donationClient.db('EchoNet');
+    console.log('Reconnected to MongoDB for notifications');
+  }
+  return connectedDB;
+}
+
+// Reads only. The shaping and the read/deleted join live in
+// services/notifications.js so they can be tested without Mongo or the server.
+async function listNotifications() {
+  const db = await getEchoNetDb();
+
+  const donations = await db.collection('donations').find({}).toArray();
+  const users = await donationClient
+    .db('UserSample')
+    .collection('users')
+    .find({}, { projection: { email: 1, username: 1, createdAt: 1 } })
+    .toArray();
+  const stateRows = await db.collection(NOTIFICATION_STATE_COLLECTION).find({}).toArray();
+
+  return notificationFeed.applyState(
+    notificationFeed.buildFeed({ donations, users }),
+    stateRows
+  );
+}
+
+// One place to write a flag so the four actions cannot drift apart.
+async function setNotificationFlags(ids, flags) {
+  if (ids.length === 0) return 0;
+
+  const db = await getEchoNetDb();
+  const operations = ids.map(id => ({
+    updateOne: {
+      filter: { _id: id },
+      update: { $set: { ...flags, updatedAt: new Date() } },
+      upsert: true
+    }
+  }));
+
+  const result = await db.collection(NOTIFICATION_STATE_COLLECTION).bulkWrite(operations);
+  return result.upsertedCount + result.modifiedCount;
+}
+
+// The feed carries donor emails and account details, so every route here is
+// behind a session. requireApiSession answers 401 JSON rather than redirecting
+// to /login the way the page guard does, which a browser API caller cannot use.
+app.get('/api/notifications', requireApiSession, async (req, res) => {
+  try {
+    res.json(await listNotifications());
+  } catch (error) {
+    console.error('Error loading notifications:', error);
+    res.status(500).json({ error: 'Unable to load notifications.' });
+  }
+});
+
+// Declared before the /:id routes below, otherwise "read-all" and "read" get
+// swallowed as an id.
+app.patch('/api/notifications/read-all', requireApiSession, async (req, res) => {
+  try {
+    const { notifications } = await listNotifications();
+    const unreadIds = notifications.filter(item => !item.read).map(item => item.id);
+    await setNotificationFlags(unreadIds, { read: true });
+    res.json(await listNotifications());
+  } catch (error) {
+    console.error('Error marking all notifications read:', error);
+    res.status(500).json({ error: 'Unable to mark notifications as read.' });
+  }
+});
+
+app.delete('/api/notifications/read', requireApiSession, async (req, res) => {
+  try {
+    const { notifications } = await listNotifications();
+    const readIds = notifications.filter(item => item.read).map(item => item.id);
+    await setNotificationFlags(readIds, { deleted: true });
+    res.json(await listNotifications());
+  } catch (error) {
+    console.error('Error deleting read notifications:', error);
+    res.status(500).json({ error: 'Unable to delete read notifications.' });
+  }
+});
+
+app.patch('/api/notifications/:id/read', requireApiSession, async (req, res) => {
+  try {
+    await setNotificationFlags([req.params.id], { read: true });
+    res.json(await listNotifications());
+  } catch (error) {
+    console.error('Error marking notification read:', error);
+    res.status(500).json({ error: 'Unable to mark the notification as read.' });
+  }
+});
+
+app.delete('/api/notifications/:id', requireApiSession, async (req, res) => {
+  try {
+    await setNotificationFlags([req.params.id], { deleted: true });
+    res.json(await listNotifications());
+  } catch (error) {
+    console.error('Error deleting notification:', error);
+    res.status(500).json({ error: 'Unable to delete the notification.' });
+  }
+});
+
 //API endpoint for patching the new review status to the newly reviewed edit request
 app.patch('/api/requests/:id', async (req, res) => {
   const requestId = req.params.id; // Get the request ID from the URL parameter
@@ -705,15 +819,10 @@ app.patch('/api/requests/:id', async (req, res) => {
   })
   try {
     console.log("Admin Request update data: ", JSON.stringify(schema));
-    const axiosResponse = await axios.patch(`${API_BASE_URL}/hmi/api/requests`, JSON.stringify(schema), { headers: {"Authorization" : `Bearer ${token}`, 'Content-Type': 'application/json'}})
-    if (axiosResponse.status === 200) {
-      console.log('Status Code: ' + axiosResponse.status + ' ' + axiosResponse.statusText)
-      res.status(200).send(`<script> window.location.href = "/login"; alert("Request data updated successfully");</script>`);
-    } else {
-      res.status(400).send(`<script> window.location.href = "/login"; alert("Ooops! Something went wrong with updating request table");</script>`);
-    }
+    await apiClient.patch('/hmi/api/requests', schema, { headers: {"Authorization" : `Bearer ${token}`, 'Content-Type': 'application/json'}})
+    res.status(200).send(`<script> window.location.href = "/login"; alert("Request data updated successfully");</script>`);
   } catch (error) {
-    console.error(error.data);
+    console.error(error.message);
     res.status(500).send({ error: 'Error updating request status' });
   }
 });
@@ -736,15 +845,10 @@ app.patch('/api/updateConservationStatus/:animal', async (req, res) => {
   })
   try {
     console.log("Admin update species data: ", JSON.stringify(schema));
-    const axiosResponse = await axios.patch(`${API_BASE_URL}/hmi/api/updateConservationStatus`, JSON.stringify(schema), { headers: {"Authorization" : `Bearer ${token}`, 'Content-Type': 'application/json'}})
-    if (axiosResponse.status === 200) {
-      console.log('Status Code: ' + axiosResponse.status + ' ' + axiosResponse.statusText)
-      res.status(200).send(`<script> window.location.href = "/login"; alert("Species Data updated successfully");</script>`);
-    } else {
-      res.status(400).send(`<script> window.location.href = "/login"; alert("Ooops! Something went wrong with updating species data");</script>`);
-    }
+    await apiClient.patch('/hmi/api/updateConservationStatus', schema, { headers: {"Authorization" : `Bearer ${token}`, 'Content-Type': 'application/json'}})
+    res.status(200).send(`<script> window.location.href = "/login"; alert("Species Data updated successfully");</script>`);
   } catch (error) {
-    console.error(error.data);
+    console.error(error.message);
     res.status(500).send({ error: 'Error updating species status' });
   }
 });
@@ -762,13 +866,8 @@ app.get('/api/requests', async (req, res) => {
       }
     })
 
-    const axiosResponse = await axios.get(`${API_BASE_URL}/hmi/requests`, { headers: {"Authorization" : `Bearer ${token}`}})
-  
-    if (axiosResponse.status === 200) {
-      res.json(axiosResponse.data);
-    } else {
-      res.status(500).json({ error: 'Error fetching data' });
-    }
+    const data = await apiClient.get('/hmi/requests', { headers: {"Authorization" : `Bearer ${token}`}})
+    res.json(data);
   } catch (err) {
     console.log('Requests error: ', err)
     res.status(401).redirect('/admin-dashboard')
@@ -849,6 +948,9 @@ app.post('/suspendUser', async (req, res) => {
 //Page direction to the map
 // Proxy route for IoT nodes API
 // Proxy routes for Sensor Health API
+// Deliberately kept on raw axios rather than apiClient here - this needs to forward
+// whatever status the backend actually returns (even error ones), whereas apiClient
+// always throws on non-2xx. Still points at the same shared API_BASE_URL though.
 async function proxyToApi(req, res) {
   try {
     const url = `${API_BASE_URL}${req.originalUrl}`;
@@ -875,6 +977,12 @@ async function proxyToApi(req, res) {
 
 app.all('/sensors', proxyToApi);
 app.all('/sensors/*', proxyToApi);
+// Same-origin MQTT status/event polling for the map (HMI.js calls /mqtt/*
+// relatively so no host is hardcoded in the browser). The Backend does not
+// expose these routes yet, so they 404 through the proxy until it does —
+// identical UX to the previous direct-backend call failing.
+app.all('/mqtt', proxyToApi);
+app.all('/mqtt/*', proxyToApi);
 // Map/detail reads are owned by routes/map.routes.js (session-protected).
 // No duplicate unauthenticated proxies here: that keeps one production path
 // (authenticated HMI -> Backend API) for movement, vocalization, microphone,
@@ -891,8 +999,20 @@ app.get('/iot/nodes', checkUserSession, async (req, res) => {
     });
     res.json(response.data);
   } catch (error) {
-    console.error('Error fetching IoT nodes:', error);
-    res.status(500).json({ error: 'Error fetching IoT nodes' });
+    apiClient.sendApiError(res, error, 'Error fetching IoT nodes');
+  }
+});
+
+// The API implements /iot/nodes/{node_id} (iot.py) but there was no Node route for
+// it, so admin-nodes.html was calling http://localhost:9000 straight from the
+// browser - which only ever works in local dev. Same shape as the route above so
+// the page can go through the shared client like everything else.
+app.get('/iot/nodes/:nodeId', async (req, res) => {
+  try {
+    const data = await apiClient.get(`/iot/nodes/${encodeURIComponent(req.params.nodeId)}`);
+    res.json(data);
+  } catch (error) {
+    apiClient.sendApiError(res, error, 'Error fetching IoT node details');
   }
 });
 

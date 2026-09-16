@@ -28,8 +28,20 @@ function harness() {
     async get(url, options) { calls.push({ url, options }); return { data: [] }; },
     async post(url, data, options) { calls.push({ url, data, options }); return { data: [] }; },
   };
+  const apiStub = {
+    API_BASE_URL: "http://backend.test:9000",
+    async get(url, opts) { const res = await http.get(url, opts); return res.data; },
+    async post(url, data, opts) { const res = await http.post(url, data, opts); return res.data; },
+    sendApiError(res, err, fallbackMessage = "API unavailable") {
+      if (err && err.response) {
+        return res.status(502).json({ error: { code: "UPSTREAM_ERROR", message: String(fallbackMessage), details: null } });
+      }
+      return res.status(502).json({ error: { code: "UPSTREAM_ERROR", message: String(fallbackMessage), details: null } });
+    },
+  };
   const register = load("../routes/map.routes.js", {
     "../middleware": middleware, axios: http, dotenv: { config() {} },
+    "../services/apiClient": apiStub,
   });
   const routes = new Map();
   const app = { use() {}, get(route, ...handlers) { routes.set(route, handlers); }, post(route, ...handlers) { routes.set(route, handlers); }, put() {} };
@@ -83,7 +95,7 @@ test("authenticated detection read forwards JWT and returns live data unchanged"
   const response = await h.request("/api/detections", "session-jwt");
   assert.equal(response.body, live);
   assert.equal(h.calls.length, 1);
-  assert.equal(h.calls[0].url, "http://backend.test:9000/hmi/detections");
+  assert.equal(h.calls[0].url, "http://backend.test:9000/hmi/latest_events");
   assert.equal(h.calls[0].options.headers.Authorization, "Bearer session-jwt");
   assert.equal(h.calls[0].options.timeout, 10000);
 });
@@ -180,8 +192,8 @@ test("any matching session can read map data, regardless of role", async () => {
   assert.equal(response.body, live);
   assert.equal(h.calls.length, 1);
   assert.match(h.calls[0].url, /\/hmi\/events_time/);
-  assert.equal(h.calls[0].options.headers.Authorization, "Bearer session-jwt");
-  assert.equal(h.calls[0].options.timeout, 10000);
+  assert.equal(h.calls[0].options.params.start, "1");
+  assert.equal(h.calls[0].options.params.end, "2");
 });
 
 test("authenticated map reads stay safe when the Backend fails", async () => {

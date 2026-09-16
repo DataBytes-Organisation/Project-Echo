@@ -1,8 +1,7 @@
 ## app.schemas.py
 from datetime import datetime
 from typing import Optional, List, Dict, Any, Literal
-import math
-from pydantic import BaseModel, Field, validator, constr, conlist, condecimal
+from pydantic import BaseModel, Field, validator, constr, conlist, condecimal, root_validator
 from bson.objectid import ObjectId
 from app.database import GENDER, STATES_CODE, AUS_STATES
 
@@ -23,60 +22,45 @@ class PyObjectId(ObjectId):
         # Update schema to represent ObjectId as a string
         field_schema.update(type="string")
 
-# Structured ESP32 location: latitude/longitude/altitude object.
 class LLA(BaseModel):
-    latitude: float  # Degrees, -90 to 90
-    longitude: float  # Degrees, -180 to 180
-    altitude: float  # Altitude
+    """A geographic position used by Engine and HMI event contracts."""
 
-    @validator("latitude", pre=True)
-    def _check_latitude(cls, value):
-        if (isinstance(value, bool) or not isinstance(value, (int, float))
-                or not math.isfinite(value) or not -90 <= value <= 90):
-            raise ValueError("latitude must be a finite number between -90 and 90.")
-        return float(value)
+    latitude: float
+    longitude: float
+    altitude: float
 
-    @validator("longitude", pre=True)
-    def _check_longitude(cls, value):
-        if (isinstance(value, bool) or not isinstance(value, (int, float))
-                or not math.isfinite(value) or not -180 <= value <= 180):
-            raise ValueError("longitude must be a finite number between -180 and 180.")
-        return float(value)
-
-    @validator("altitude", pre=True)
-    def _check_altitude(cls, value):
-        if (isinstance(value, bool) or not isinstance(value, (int, float))
-                or not math.isfinite(value)):
-            raise ValueError("altitude must be a finite number.")
-        return float(value)
-
-
-def _coerce_lla(value):
-    # Tolerant reader: legacy [lat, lon, alt] lists become LLA objects.
-    if isinstance(value, (list, tuple)) and len(value) == 3:
-        return {"latitude": value[0], "longitude": value[1], "altitude": value[2]}
-    return value
 
 # Schema to validate event data with input fields like sensorId, location, etc.
-# Producer contract: real devices MUST send sourceType "real". A missing
-# field defaults to "simulator" so the untouched engine sim path keeps
-# working; list_real_events() and the HMI treat missing as simulator too.
 class EventSchema(BaseModel):
-    sourceType: Literal["real", "simulator"] = "simulator"
     timestamp: datetime  # Event timestamp
     sensorId: constr(min_length=1)  # Non-empty string for sensor ID
     species: constr(min_length=1)  # Non-empty string for species name
-    microphoneLLA: LLA  # Structured microphone location
-    animalEstLLA: Optional[LLA] = None  # Estimated animal location; null for real ESP32
-    animalTrueLLA: Optional[LLA] = None  # True animal location; null for real ESP32
-    animalLLAUncertainty: Optional[float] = None  # Uncertainty value; null for real ESP32
+    sourceType: Literal["real", "simulator"]
+    microphoneLLA: LLA
+    animalEstLLA: Optional[LLA] = None
+    animalTrueLLA: Optional[LLA] = None
+    animalLLAUncertainty: Optional[float] = None
     audioClip: str  # Audio clip data
-    confidence: float = Field(gt=0, lt=100) # Confidence value between 0 and 100
+    confidence: float = Field(ge=0, le=100) # Confidence value between 0 and 100
     sampleRate: int  # Audio sample rate
+    source_model: str = "unknown" # Model used for prediction
 
-    @validator("microphoneLLA", "animalEstLLA", "animalTrueLLA", pre=True)
-    def _coerce_lla_fields(cls, value):
-        return _coerce_lla(value)
+    @root_validator(pre=True)
+    def normalize_payload(cls, values):
+        # Normalize species field (Resnet uses 'label', PANNs uses 'class')
+        species = values.get('species') or values.get('species_name') or values.get('label') or values.get('class')
+        if species is not None:
+            values['species'] = species
+            
+        # Normalize confidence field (Resnet uses 'score', PANNs uses 'probability')
+        confidence = values.get('confidence') or values.get('confidence_score') or values.get('score') or values.get('probability')
+        if confidence is not None:
+            # If the engine sends a probability between 0 and 1, convert it to a percentage (0-100)
+            if isinstance(confidence, (int, float)) and confidence <= 1.0:
+                confidence = float(confidence) * 100.0
+            values['confidence'] = confidence
+            
+        return values
 
     # Configuration and schema example
     class Config:
@@ -85,13 +69,13 @@ class EventSchema(BaseModel):
         json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
-                "sourceType": "real",
                 "timestamp": "2023-03-22T13:45:12.000Z",
                 "sensorId": "2",
                 "species": "Sus Scrofa",
+                "sourceType": "real",
                 "microphoneLLA": {"latitude": -33.1101, "longitude": 150.0567, "altitude": 23},
-                "animalEstLLA": {"latitude": -33.1105, "longitude": 150.0569, "altitude": 23},
-                "animalTrueLLA": {"latitude": -33.1106, "longitude": 150.0570, "altitude": 23},
+                "animalEstLLA": None,
+                "animalTrueLLA": None,
                 "animalLLAUncertainty": 10,
                 "audioClip": "some audio_base64 data",
                 "confidence": 99.4,
@@ -380,13 +364,47 @@ class TwoFactorVerifySchema(BaseModel):
         schema_extra = {}
 
 
-class DetectionCreate(EventSchema):
-    pass
+# Detection/DetectionCreate intentionally do not inherit EventSchema: they back the
+# separate /detections collection and API, which has its own consumers and tests.
+# Inheriting from EventSchema previously meant any change to the Engine/HMI event
+# contract silently changed this contract too (see the sourceType/LLA-object change
+# that broke tests/test_detection_retrieval.py before this was split out).
+class DetectionCreate(BaseModel):
+    timestamp: datetime  # Event timestamp
+    sensorId: constr(min_length=1)  # Non-empty string for sensor ID
+    species: constr(min_length=1)  # Non-empty string for species name
+    microphoneLLA: conlist(float, min_items=3, max_items=3)  # List of exactly 3 floats for microphone location
+    animalEstLLA: conlist(float, min_items=3, max_items=3)  # List of exactly 3 floats for estimated animal location
+    animalTrueLLA: conlist(float, min_items=3, max_items=3)  # List of exactly 3 floats for true animal location
+    animalLLAUncertainty: int  # Uncertainty value
+    audioClip: str  # Audio clip data
+    confidence: float = Field(gt=0, lt=100)  # Confidence value between 0 and 100
+    sampleRate: int  # Audio sample rate
 
-class Detection(EventSchema):
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+        schema_extra = {
+            "example": {
+                "timestamp": "2023-03-22T13:45:12.000Z",
+                "sensorId": "2",
+                "species": "Sus Scrofa",
+                "microphoneLLA": [-33.1101, 150.0567, 23],
+                "animalEstLLA": [-33.1105, 150.0569, 23],
+                "animalTrueLLA": [-33.1106, 150.0570, 23],
+                "animalLLAUncertainty": 10,
+                "audioClip": "some audio_base64 data",
+                "confidence": 99.4,
+                "sampleRate": 48000
+            }
+        }
+
+
+class Detection(DetectionCreate):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
 
-    class config:
+    class Config:
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
@@ -412,8 +430,8 @@ class DetectionListResponses(BaseModel):
     page: int
     page_size: int
 
-    class Config:
-        allow_population_by_field_name = True
+    class config:
+        allow_population_by_fiels_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
 
@@ -468,30 +486,6 @@ class ProjectListResponse(BaseModel):
 # Backwards/expected import name used by app.routers.detections
 class DetectionListResponse(DetectionListResponses):
     pass
-
-
-class RealDetectionRead(BaseModel):
-    """HMI read shape from serializers.eventEntity (no audio payload)."""
-
-    sourceType: Literal["real", "simulator"] = "simulator"
-    id: str = Field(..., alias="_id")
-    timestamp: datetime
-    sensorId: str
-    species: str
-    microphoneLLA: LLA
-    animalEstLLA: Optional[LLA] = None
-    animalTrueLLA: Optional[LLA] = None
-    animalLLAUncertainty: Optional[float] = None
-    confidence: float
-
-    @validator("microphoneLLA", "animalEstLLA", "animalTrueLLA", pre=True)
-    def _coerce_lla_fields(cls, value):
-        return _coerce_lla(value)
-
-    class Config:
-        allow_population_by_field_name = True
-        arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str}
 
 
 class RazorpayOrderRequest(BaseModel):

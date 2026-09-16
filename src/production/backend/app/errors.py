@@ -10,11 +10,14 @@ from fastapi.responses import JSONResponse, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 
 logger = logging.getLogger(__name__)
-STATUS_CODES = {400: "BAD_REQUEST", 401: "UNAUTHENTICATED", 403: "FORBIDDEN", 404: "RESOURCE_NOT_FOUND", 405: "METHOD_NOT_ALLOWED", 409: "CONFLICT", 410: "RESOURCE_GONE", 413: "PAYLOAD_TOO_LARGE", 422: "VALIDATION_ERROR", 429: "RATE_LIMIT_EXCEEDED", 500: "INTERNAL_ERROR", 502: "UPSTREAM_ERROR", 503: "SERVICE_UNAVAILABLE"}
+STATUS_CODES = {400: "BAD_REQUEST", 401: "UNAUTHENTICATED", 403: "FORBIDDEN", 404: "RESOURCE_NOT_FOUND", 405: "METHOD_NOT_ALLOWED", 409: "CONFLICT", 410: "RESOURCE_GONE", 413: "PAYLOAD_TOO_LARGE", 422: "VALIDATION_ERROR", 423: "LOCKED", 429: "RATE_LIMIT_EXCEEDED", 500: "INTERNAL_ERROR", 502: "UPSTREAM_ERROR", 503: "SERVICE_UNAVAILABLE"}
 
 
 def error_body(status_code: int, message: str, details: Optional[Any] = None) -> dict:
-    return {"error": {"code": STATUS_CODES.get(status_code, "REQUEST_FAILED"), "message": message, "details": details}}
+    error = {"code": STATUS_CODES.get(status_code, "REQUEST_FAILED"), "message": message}
+    if details is not None:
+        error["details"] = details
+    return {"status": "failed", "error": error}
 
 
 def error_response(status_code: int, message: str, details: Optional[Any] = None, headers: Optional[dict] = None) -> JSONResponse:
@@ -44,17 +47,27 @@ class StandardizeErrorResponseMiddleware(BaseHTTPMiddleware):
         if response.status_code < 400 or "application/json" not in response.headers.get("content-type", ""):
             return response
         body = b"".join([chunk async for chunk in response.body_iterator])
-        # body_iterator is single-use; any path below must rebuild from these
-        # bytes instead of returning the drained response.
-        headers = {key: value for key, value in response.headers.items() if key.lower() not in {"content-length", "content-type"}}
         try:
             payload = json.loads(body)
         except (TypeError, ValueError):
-            return Response(content=body, status_code=response.status_code, headers=headers, media_type="application/json")
-        if isinstance(payload, dict) and isinstance(payload.get("error"), dict) and {"code", "message", "details"} <= set(payload["error"]):
-            return Response(content=body, status_code=response.status_code, headers=headers, media_type="application/json")
+            # Reading body_iterator consumes it. Restore the original bytes before
+            # returning an error response that is not JSON-decodable.
+            response.body_iterator = _single_chunk_iterator(body)
+            return response
+        if (
+            isinstance(payload, dict)
+            and payload.get("status") == "failed"
+            and isinstance(payload.get("error"), dict)
+            and {"code", "message"} <= set(payload["error"])
+        ):
+            response.body_iterator = _single_chunk_iterator(body)
+            return response
         raw_message = payload.get("message", payload.get("detail", payload.get("error"))) if isinstance(payload, dict) else None
         message = raw_message if isinstance(raw_message, str) else "The request could not be completed."
         details = payload if not isinstance(raw_message, str) else None
         headers = {key: value for key, value in response.headers.items() if key.lower() not in {"content-length", "content-type"}}
         return error_response(response.status_code, message, details, headers)
+
+
+async def _single_chunk_iterator(body: bytes):
+    yield body
