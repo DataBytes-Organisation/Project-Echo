@@ -280,7 +280,7 @@ class TestOnMessagePostsStandardEvent(unittest.TestCase):
         self.assertEqual(posted_payload["confidence"], 0.915)
         self.assertIsNone(posted_payload["animalEstLLA"])
         self.assertEqual(
-            posted_payload["microphoneLLA"][1],
+            posted_payload["microphoneLLA"]["longitude"],
             144.9631
         )
 
@@ -304,8 +304,12 @@ class TestOnMessagePostsStandardEvent(unittest.TestCase):
         self.assertEqual(posted_payload["sourceType"], "simulator")
         self.assertEqual(posted_payload["sampleRate"], 32000)
         self.assertEqual(
-             posted_payload["animalEstLLA"],
-                 [-37.8136, 144.9631, 0.0],
+            posted_payload["animalEstLLA"],
+            {
+                "latitude": -37.8136,
+                "longitude": 144.9631,
+                "altitude": 0.0,
+            },
         )
 
 
