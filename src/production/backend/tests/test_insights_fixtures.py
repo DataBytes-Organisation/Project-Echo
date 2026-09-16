@@ -105,9 +105,9 @@ def build_b2_fixtures():
 
 def cleanup_test_collections(real_database):
     """
-    Remove B2.4 test records only.
+    Remove only B2.4 test data.
 
-    No real EchoNet collection is targeted and dropDatabase is never used.
+    Normal EchoNet collections are never targeted.
     """
     for collection_name in (
         TEST_EVENTS_COLLECTION,
@@ -120,10 +120,16 @@ def cleanup_test_collections(real_database):
 @pytest.fixture
 def isolated_insights_database(monkeypatch):
     """
-    Redirect insights.py to dedicated collections inside EchoNet.
+    Redirect the collection objects imported by insights.py
+    to dedicated B2.4 collections inside EchoNet.
 
-    This avoids requiring permission to create/drop another MongoDB
-    database while keeping B2.4 tests isolated from real data.
+    The current insights module imports:
+        Events
+        Microphones
+        Nodes
+
+    directly from app.database, so those module globals are
+    patched rather than patching an old `db` object.
     """
     try:
         project_mongo_client.admin.command("ping")
@@ -134,24 +140,35 @@ def isolated_insights_database(monkeypatch):
 
     real_database = project_mongo_client["EchoNet"]
 
-    # Ensure a failed/previous test run cannot contaminate this run.
     cleanup_test_collections(real_database)
 
-    test_database = InsightsTestDatabase(
-        real_database
+    test_collections = {
+        "events": real_database[TEST_EVENTS_COLLECTION],
+        "microphones": real_database[TEST_MICROPHONES_COLLECTION],
+        "nodes": real_database[TEST_NODES_COLLECTION],
+    }
+
+    monkeypatch.setattr(
+        insights,
+        "Events",
+        test_collections["events"],
     )
 
     monkeypatch.setattr(
         insights,
-        "db",
-        test_database,
+        "Microphones",
+        test_collections["microphones"],
+    )
+
+    monkeypatch.setattr(
+        insights,
+        "Nodes",
+        test_collections["nodes"],
     )
 
     try:
-        yield test_database
+        yield test_collections
     finally:
-        # Safety cleanup uses delete_many only on dedicated
-        # B2.4 collections. No dropDatabase privilege is required.
         cleanup_test_collections(real_database)
 
 
@@ -282,3 +299,60 @@ def test_insights_species_total_matches_overview_detection_total(
         species_total
         == overview["counts"]["detections"]
     )
+
+def test_overview_species_filter_returns_expected_totals(
+    populated_insights_database,
+):
+    result = insights.insights_overview(
+        species="Sus Scrofa"
+    )
+
+    assert result["counts"]["detections"] == 4
+    assert result["counts"]["uniqueSpecies"] == 1
+    assert result["counts"]["sensorsWithDetections"] == 2
+
+
+def test_overview_sensor_filter_returns_expected_totals(
+    populated_insights_database,
+):
+    result = insights.insights_overview(
+        sensorId="2"
+    )
+
+    assert result["counts"]["detections"] == 6
+    assert result["counts"]["uniqueSpecies"] == 3
+    assert result["counts"]["sensorsWithDetections"] == 1
+
+
+def test_overview_date_filter_returns_expected_totals(
+    populated_insights_database,
+):
+    result = insights.insights_overview(
+        start="2026-09-03T00:00:00Z",
+        end="2026-09-06T00:00:00Z",
+    )
+
+    assert result["counts"]["detections"] == 4
+    assert result["counts"]["uniqueSpecies"] == 3
+    assert result["counts"]["sensorsWithDetections"] == 2
+
+    assert result["timeRange"]["start"].startswith(
+        "2026-09-03"
+    )
+    assert result["timeRange"]["end"].startswith(
+        "2026-09-06"
+    )
+
+
+def test_species_endpoint_combined_filters_return_expected_total(
+    populated_insights_database,
+):
+    result = insights.insights_species(
+        species="Dingo",
+        sensorId="3",
+        limit=10,
+    )
+
+    assert len(result["items"]) == 1
+    assert result["items"][0]["species"] == "Dingo"
+    assert result["items"][0]["count"] == 2
