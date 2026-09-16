@@ -142,6 +142,8 @@ def show_home():
 app.include_router(auth_router.router, tags=["auth"], prefix="/api")
 from app.routers import detections
 app.include_router(detections.router)
+from app.routers import similar_detections
+app.include_router(similar_detections.router)
 
 # ✅ /openapi-export - fetch live OpenAPI spec
 @app.get("/openapi-export", include_in_schema=False)
