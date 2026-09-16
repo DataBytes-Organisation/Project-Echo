@@ -1,12 +1,13 @@
 from typing import List, Optional, Dict, Any
 from datetime import datetime
-from fastapi import HTTPException
 
 from bson import ObjectId
 from pymongo import ReturnDocument
 
 from app.database import Detections
 from app.schemas import DetectionCreate, Detection
+from app.jobs.queue import enqueue_detection_webhook
+
 
 def _doc_to_detection(doc: Dict[str, Any]) -> Optional[Detection]:
     if not doc:
@@ -19,6 +20,7 @@ def create_detection(detection_in: DetectionCreate) -> Detection:
 
     result = Detections.insert_one(payload)
     created = Detections.find_one({"_id": result.inserted_id})
+    enqueue_detection_webhook(str(result.inserted_id))
 
     return _doc_to_detection(created)
 
@@ -92,7 +94,6 @@ def list_detections(
         "page": page,
         "page_size": page_size,
     }
-
 
 
 def delete_detection(detection_id: str) -> bool:
