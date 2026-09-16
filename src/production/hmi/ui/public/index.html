@@ -124,6 +124,14 @@
 
           <div id="basemap" class="map_view"></div>
 
+      <div id="live-map-controls" style="position:absolute; z-index:1000; top:10px; left:10px; background:rgba(20,20,20,0.9); color:white; padding:10px 14px; border-radius:8px; font-size:14px; font-family:sans-serif; box-shadow:0 2px 8px rgba(0,0,0,0.5);">
+        <div style="display:flex; gap:8px; margin-bottom:6px;">
+          <button id="pause-resume-btn" style="background:#2c7a3f; color:white; border:none; padding:6px 14px; border-radius:4px; font-size:13px; cursor:pointer;">Pause</button>
+          <button id="manual-refresh-btn" style="background:#2c5f8a; color:white; border:none; padding:6px 14px; border-radius:4px; font-size:13px; cursor:pointer;">Refresh</button>
+        </div>
+        <div id="last-update-label" style="color:#ddd; font-size:12px;">Last update: —</div>
+      </div>
+
           <div id="editFormWrapper">
             <form id="editForm">
               <h2 id="formSpeciesName"></h2>
