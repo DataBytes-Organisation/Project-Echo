@@ -1,7 +1,7 @@
 ## app.schemas.py
 from datetime import datetime
-from typing import Optional, List, Dict, Any
-from pydantic import BaseModel, Field, validator, constr, conlist, condecimal
+from typing import Optional, List, Dict, Any, Literal
+from pydantic import BaseModel, Field, validator, constr, conlist, condecimal, root_validator
 from bson.objectid import ObjectId
 from app.database import GENDER, STATES_CODE, AUS_STATES
 
@@ -22,18 +22,45 @@ class PyObjectId(ObjectId):
         # Update schema to represent ObjectId as a string
         field_schema.update(type="string")
 
+class LLA(BaseModel):
+    """A geographic position used by Engine and HMI event contracts."""
+
+    latitude: float
+    longitude: float
+    altitude: float
+
+
 # Schema to validate event data with input fields like sensorId, location, etc.
 class EventSchema(BaseModel):
     timestamp: datetime  # Event timestamp
     sensorId: constr(min_length=1)  # Non-empty string for sensor ID
     species: constr(min_length=1)  # Non-empty string for species name
-    microphoneLLA: conlist(float, min_items=3, max_items=3)  # List of exactly 3 floats for microphone location
-    animalEstLLA: conlist(float, min_items=3, max_items=3)  # List of exactly 3 floats for estimated animal location
-    animalTrueLLA: conlist(float, min_items=3, max_items=3)  # List of exactly 3 floats for true animal location
-    animalLLAUncertainty: int  # Uncertainty value
+    sourceType: Literal["real", "simulator"]
+    microphoneLLA: LLA
+    animalEstLLA: Optional[LLA] = None
+    animalTrueLLA: Optional[LLA] = None
+    animalLLAUncertainty: Optional[float] = None
     audioClip: str  # Audio clip data
-    confidence: float = Field(gt=0, lt=100) # Confidence value between 0 and 100
+    confidence: float = Field(ge=0, le=100) # Confidence value between 0 and 100
     sampleRate: int  # Audio sample rate
+    source_model: str = "unknown" # Model used for prediction
+
+    @root_validator(pre=True)
+    def normalize_payload(cls, values):
+        # Normalize species field (Resnet uses 'label', PANNs uses 'class')
+        species = values.get('species') or values.get('species_name') or values.get('label') or values.get('class')
+        if species is not None:
+            values['species'] = species
+            
+        # Normalize confidence field (Resnet uses 'score', PANNs uses 'probability')
+        confidence = values.get('confidence') or values.get('confidence_score') or values.get('score') or values.get('probability')
+        if confidence is not None:
+            # If the engine sends a probability between 0 and 1, convert it to a percentage (0-100)
+            if isinstance(confidence, (int, float)) and confidence <= 1.0:
+                confidence = float(confidence) * 100.0
+            values['confidence'] = confidence
+            
+        return values
 
     # Configuration and schema example
     class Config:
@@ -45,9 +72,10 @@ class EventSchema(BaseModel):
                 "timestamp": "2023-03-22T13:45:12.000Z",
                 "sensorId": "2",
                 "species": "Sus Scrofa",
-                "microphoneLLA": [-33.1101, 150.0567, 23],
-                "animalEstLLA": [-33.1105, 150.0569, 23],
-                "animalTrueLLA": [-33.1106, 150.0570, 23],
+                "sourceType": "real",
+                "microphoneLLA": {"latitude": -33.1101, "longitude": 150.0567, "altitude": 23},
+                "animalEstLLA": None,
+                "animalTrueLLA": None,
                 "animalLLAUncertainty": 10,
                 "audioClip": "some audio_base64 data",
                 "confidence": 99.4,
@@ -336,12 +364,22 @@ class TwoFactorVerifySchema(BaseModel):
         schema_extra = {}
 
 
-class DetectionCreate(EventSchema):
-    pass
-
-
-class Detection(EventSchema):
-    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+# Detection/DetectionCreate intentionally do not inherit EventSchema: they back the
+# separate /detections collection and API, which has its own consumers and tests.
+# Inheriting from EventSchema previously meant any change to the Engine/HMI event
+# contract silently changed this contract too (see the sourceType/LLA-object change
+# that broke tests/test_detection_retrieval.py before this was split out).
+class DetectionCreate(BaseModel):
+    timestamp: datetime  # Event timestamp
+    sensorId: constr(min_length=1)  # Non-empty string for sensor ID
+    species: constr(min_length=1)  # Non-empty string for species name
+    microphoneLLA: conlist(float, min_items=3, max_items=3)  # List of exactly 3 floats for microphone location
+    animalEstLLA: conlist(float, min_items=3, max_items=3)  # List of exactly 3 floats for estimated animal location
+    animalTrueLLA: conlist(float, min_items=3, max_items=3)  # List of exactly 3 floats for true animal location
+    animalLLAUncertainty: int  # Uncertainty value
+    audioClip: str  # Audio clip data
+    confidence: float = Field(gt=0, lt=100)  # Confidence value between 0 and 100
+    sampleRate: int  # Audio sample rate
 
     class Config:
         allow_population_by_field_name = True
@@ -349,7 +387,6 @@ class Detection(EventSchema):
         json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
-                "_id": "651f2a9f4d1f1b1c3e2a4567",
                 "timestamp": "2023-03-22T13:45:12.000Z",
                 "sensorId": "2",
                 "species": "Sus Scrofa",
@@ -363,13 +400,11 @@ class Detection(EventSchema):
             }
         }
 
-class DetectionCreate(EventSchema):
-    pass
 
-class Detection(EventSchema):
+class Detection(DetectionCreate):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
 
-    class config:
+    class Config:
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
@@ -451,3 +486,25 @@ class ProjectListResponse(BaseModel):
 # Backwards/expected import name used by app.routers.detections
 class DetectionListResponse(DetectionListResponses):
     pass
+
+
+class RazorpayOrderRequest(BaseModel):
+    amount: int
+
+
+class RazorpayCheckoutProof(BaseModel):
+    paymentId: str
+    orderId: str
+    signature: str
+    name: Optional[str] = None
+
+
+class RazorpayOrderResponse(BaseModel):
+    keyId: str
+    orderId: str
+    amount: int
+    currency: str
+
+
+class PaymentStatusResponse(BaseModel):
+    status: str

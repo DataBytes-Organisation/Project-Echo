@@ -1,4 +1,5 @@
 ## app.database.py
+import os
 import pymongo
 import datetime
 import time
@@ -6,13 +7,27 @@ import time
 
 from app.config import settings
 
-client = pymongo.MongoClient(settings.mongodb_uri)
+MONGODB_TIMEOUT_MS = int(os.getenv("MONGODB_TIMEOUT_MS", "3000"))
+MONGODB_CLIENT_OPTIONS = {
+    "serverSelectionTimeoutMS": MONGODB_TIMEOUT_MS,
+    "connectTimeoutMS": MONGODB_TIMEOUT_MS,
+    "socketTimeoutMS": MONGODB_TIMEOUT_MS,
+}
+
+# prefer environment variable inside containers; fallback to service hostname (EchoNet DB)
+# legacy (kept for reference):
+# connection_string = "mongodb://modelUser:EchoNetAccess2023@ts-mongodb-cont:27017/EchoNet"
+
+client = pymongo.MongoClient(settings.mongodb_uri, **MONGODB_CLIENT_OPTIONS)
 db = client[settings.mongo_db_name]
 # db = client['mydatabase']
 Events = db.events
+Events.create_index([("sourceType", pymongo.ASCENDING), ("timestamp", pymongo.DESCENDING)], name="idx_events_source_type_timestamp")
 Movements = db.movements
 Species = db.species
 Microphones = db.microphones
+Donations = db.donations
+RazorpayOrders = db.razorpay_orders
 
 Nodes = db.nodes
 Components = db.components
@@ -28,8 +43,12 @@ SensorReboots.create_index(
     name="idx_sensor_reboots_sensor_requestedAt_desc",
 )
 
+# User DB connection (env first, then service hostname)
+# legacy (kept for reference):
+# User_connection_string = "mongodb://root:root_password@ts-mongodb-cont/UserSample?authSource=admin"
+
 # User DB connection
-Userclient = pymongo.MongoClient(settings.user_mongodb_uri)
+Userclient = pymongo.MongoClient(settings.user_mongodb_uri, **MONGODB_CLIENT_OPTIONS)
 Userdb = Userclient['UserSample']
 User = Userdb.users
 Role = Userdb.roles
