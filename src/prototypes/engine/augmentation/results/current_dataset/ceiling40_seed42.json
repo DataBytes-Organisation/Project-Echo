@@ -1,0 +1,61 @@
+{
+  "dataset": "current (unbalanced subset)",
+  "species": 15,
+  "files": 2737,
+  "held_out_val_samples_approx": 547,
+  "seed": 42,
+  "epoch_ceiling": 40,
+  "note": "test acc/macro_f1 = evaluate_checkpoint() against this dataset's own internal held-out split (no separate test set exists for this dataset). final_* = last training epoch; best_val_loss = lowest validation loss reached at any point during training (checkpoint-selection criterion).",
+  "arms": {
+    "none": {
+      "hydra_preset": "none",
+      "final_train_loss": 15.2301,
+      "final_train_acc": 0.141,
+      "final_val_loss": 1.7647,
+      "final_val_acc": 0.522,
+      "best_val_loss": 1.7647,
+      "accuracy": 0.522,
+      "macro_f1": 0.498
+    },
+    "original_unfixed": {
+      "hydra_preset": "original_unfixed_reference",
+      "final_train_loss": 18.6718,
+      "final_train_acc": 0.0018,
+      "final_val_loss": 2.7367,
+      "final_val_acc": 0.1264,
+      "best_val_loss": 2.5061,
+      "accuracy": 0.218,
+      "macro_f1": 0.147
+    },
+    "light": {
+      "hydra_preset": "light",
+      "final_train_loss": 10.2097,
+      "final_train_acc": 0.3076,
+      "final_val_loss": 2.0937,
+      "final_val_acc": 0.7527,
+      "best_val_loss": 2.027,
+      "accuracy": 0.52,
+      "macro_f1": 0.478
+    },
+    "default": {
+      "hydra_preset": "default",
+      "final_train_loss": 18.4658,
+      "final_train_acc": 0.0,
+      "final_val_loss": 2.3697,
+      "final_val_acc": 0.2289,
+      "best_val_loss": 2.3667,
+      "accuracy": 0.255,
+      "macro_f1": 0.152
+    },
+    "heavy": {
+      "hydra_preset": "heavy",
+      "final_train_loss": 18.6138,
+      "final_train_acc": 0.0005,
+      "final_val_loss": 2.7952,
+      "final_val_acc": 0.1484,
+      "best_val_loss": 2.5729,
+      "accuracy": 0.179,
+      "macro_f1": 0.084
+    }
+  }
+}
