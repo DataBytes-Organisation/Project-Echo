@@ -32,6 +32,7 @@ import {
   retrieveAudio,
   analyseAudio,
   retrieveSimTime,
+  retrieveWeatherData,
   postRecording,
   setSimModeAnimal,
   setSimModeRecording,
@@ -40,7 +41,15 @@ import {
   retrieveWeather,
 } from "./routes.js";
 import { addIoTNodesToMap } from "./nodes-overlay.js";
-import { connectDetectionStream } from "./detection_stream_client.js";
+import { loadRealDetections } from "./real-detections.js";
+import {
+  DETECTION_SOURCE_FILTERS,
+  applyDetectionSourceFilter,
+  buildSimulatorVocalizationStyle,
+  detectionMatchesSourceFilter,
+  formatDetectionSourceLabel,
+  normalizeDetectionSource,
+} from "./detection-source-filter.js";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
@@ -673,7 +682,7 @@ let _lastMqttState = null;
 
 async function pollMqttConnectionState() {
   try {
-    const response = await fetch("http://localhost:9000/mqtt/connection-state");
+    const response = await fetch("/mqtt/connection-state");
     if (!response.ok) throw new Error("Failed to fetch connection state");
     const data = await response.json();
     const state = data.state;
@@ -707,7 +716,10 @@ async function pollMqttConnectionState() {
 
 function startMqttConnectionPolling() {
   pollMqttConnectionState();
-  setInterval(pollMqttConnectionState, 5000);
+  const id = setInterval(pollMqttConnectionState, 5000);
+  // Background poller only: never hold a Node process (tests) open. Browsers
+  // return a number here, so this is a no-op in production.
+  if (id && typeof id.unref === "function") id.unref();
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -742,7 +754,7 @@ function updateSpeciesFilterOptions() {
 async function pollMqttLatestEvents(hmiState) {
   if (_mqttPollingPaused) return;
   try {
-    const response = await fetch("http://localhost:9000/mqtt/latest-events");
+    const response = await fetch("/mqtt/latest-events");
     if (!response.ok) throw new Error("Failed to fetch latest events");
     const data = await response.json();
     const events = data.events || [];
@@ -802,6 +814,13 @@ async function pollMqttLatestEvents(hmiState) {
   }
 }
 
+function startMqttEventPolling(hmiState) {
+  pollMqttLatestEvents(hmiState);
+  const id = setInterval(() => pollMqttLatestEvents(hmiState), 5000);
+  // Background poller only: never hold a Node process (tests) open. Browsers
+  // return a number here, so this is a no-op in production.
+  if (id && typeof id.unref === "function") id.unref();
+}
 
 function setupLiveMapControls(hmiState) {
   const pauseBtn = document.getElementById("pause-resume-btn");
@@ -866,6 +885,8 @@ hideMapError();
 
   createBasemap(hmiState);
 
+  const detectionLoad = loadRealDetections(hmiState);
+
   if (isFirstInit) {
     addVocalisationLayers(hmiState);
     addTruthLayers(hmiState);
@@ -902,7 +923,6 @@ hideMapError();
       await addIoTNodesToMap(hmiState);
 
       queueSimUpdate(hmiState);
-      startDetectionStream(hmiState);
       showToast("Map data loaded successfully", "success");
     })
     .catch((error) => {
@@ -918,6 +938,7 @@ hideMapError();
       showMapError(userMsg, () => initialiseHMI(hmiState));
       showToast(userMsg, "error");
     });
+  return detectionLoad;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -985,6 +1006,20 @@ export function clearMicrophoneLayer(hmiState) {
 // Data converters
 // ─────────────────────────────────────────────────────────────────────────────
 
+// Tolerant LLA reader: {latitude, longitude} objects, legacy [lat, lon, alt]
+// lists, or null when the animal location is unknown (real ESP32).
+function llaLat(lla) {
+  if (Array.isArray(lla)) return Number.isFinite(lla[0]) ? lla[0] : null;
+  if (lla && typeof lla === "object") return Number.isFinite(lla.latitude) ? lla.latitude : null;
+  return null;
+}
+
+function llaLon(lla) {
+  if (Array.isArray(lla)) return Number.isFinite(lla[1]) ? lla[1] : null;
+  if (lla && typeof lla === "object") return Number.isFinite(lla.longitude) ? lla.longitude : null;
+  return null;
+}
+
 export function convertJSONtoAnimalMovementEvent(hmiState, data) {
   return {
     animalId:                      data.animalId,
@@ -1003,35 +1038,66 @@ export function convertJSONtoAnimalMovementEvent(hmiState, data) {
 }
 
 export function convertJSONtoAnimalVocalizationEvent(hmiState, data) {
-  const speciesName = (data.species || "unknown").toLowerCase();
-
-  // Any of these arrays can be missing/null on a real (non-simulator)
-  // detection — read them defensively rather than dereferencing directly,
-  // so a malformed payload produces an incomplete pair instead of throwing.
-  const [estLat, estLon]       = _safeLatLon(data.animalEstLLA);
-  const [locationLat, locationLon] = _safeLatLon(data.animalTrueLLA);
-  const [sensorLat, sensorLon] = _safeLatLon(data.microphoneLLA);
-
+  const sensorLat = llaLat(data.microphoneLLA);
+  const sensorLon = llaLon(data.microphoneLLA);
   return {
     timestamp:                      hmiState.currentTime,
     eventTimestamp:                 data.timestamp,
     eventId:                        data._id,
     speciesIdentificationConfidence:data.confidence,
-    speciesScientificName:        speciesName,
-    commonName:                   (data.commonName || data.species || "unknown").toLowerCase(),
-    animalType:                   (data.type || "mammal").toLowerCase(),
-    animalStatus:                 matchStatus((data.status || "least concern").toLowerCase()),
-    animalDiet:                   (data.diet || "herbivore").toLowerCase(),
-    locationConfidence:           100 - data.animalLLAUncertainty, // legacy popup "%" label only, see note above
-    locationUncertaintyM:         data.animalLLAUncertainty,        // metres — used for the map confidence ring
-    estLat:                         estLat,
-    estLon:                         estLon,
-    locationLat:                    locationLat,
-    locationLon:                    locationLon,
+    speciesScientificName:          (data.species || "unknown").toLowerCase(),
+    commonName:                     (data.commonName || data.species || "unknown").toLowerCase(),
+    animalType:                     (data.type || "mammal").toLowerCase(),
+    animalStatus:                   matchStatus((data.status || "least concern").toLowerCase()),
+    animalDiet:                     (data.diet || "herbivore").toLowerCase(),
+    locationConfidence:             data.animalLLAUncertainty == null ? null : 100 - data.animalLLAUncertainty,
+    locationUncertaintyM:           data.animalLLAUncertainty,
+    estLat:                         llaLat(data.animalEstLLA),
+    estLon:                         llaLon(data.animalEstLLA),
+    locationLat:                    llaLat(data.animalTrueLLA),
+    locationLon:                    llaLon(data.animalTrueLLA),
     sensorId:                       data.sensorId,
     sensorLat:                      sensorLat,
     sensorLon:                      sensorLon,
+    // Preserve Backend/Engine contract ("simulator" | "real"); unknown values
+    // stay unknown so explicit Simulated/Real filters exclude them (All shows them).
+    sourceType:                     normalizeDetectionSource(data.sourceType) === "unknown"
+      ? String(data.sourceType)
+      : normalizeDetectionSource(data.sourceType),
   };
+}
+
+// Plot location keeps a null animal location null in the event model; the
+// microphone fallback happens here at render time so AC5 markers still sit at
+// microphoneLLA while Ticket 02 details can report the animal as unavailable.
+export function resolveVocalizationPlotLocation(entry) {
+  if (Number.isFinite(entry.locationLat) && Number.isFinite(entry.locationLon)) {
+    return { lat: entry.locationLat, lon: entry.locationLon, isFallback: false };
+  }
+  if (Number.isFinite(entry.sensorLat) && Number.isFinite(entry.sensorLon)) {
+    return { lat: entry.sensorLat, lon: entry.sensorLon, isFallback: true };
+  }
+  return null;
+}
+
+export function formatVocalizationDetailValue(value, suffix = "") {
+  if (value === null || value === undefined || value === "") return "unavailable";
+  if (typeof value === "number" && !Number.isFinite(value)) return "unavailable";
+  return `${value}${suffix}`;
+}
+
+export function formatDetectionTimestamp(value) {
+  if (value === null || value === undefined || value === "") return "unavailable";
+  const parsed = new Date(value);
+  return Number.isFinite(parsed.getTime()) ? parsed.toUTCString() : "unavailable";
+}
+
+function toWeatherTimestamp(value) {
+  if (value === null || value === undefined || value === "") return null;
+  const numeric = Number(value);
+  if (Number.isFinite(numeric)) return Math.abs(numeric) >= 1e12 ? Math.floor(numeric / 1000) : Math.floor(numeric);
+  const parsed = new Date(value);
+  return Number.isFinite(parsed.getTime()) ? Math.floor(parsed.getTime() / 1000) : null;
 }
 
 export function convertJSONtoMicrophone(hmiState, data) {
@@ -1077,11 +1143,22 @@ export function updateVocalizationLayerFromPastData(hmiState, results) {
   clearAllVocalizationLayers(hmiState);
   hmiState.vocalizationEvents = [];
 
+  // Unknown sourceType values render under All (fail-open) but stay out of
+  // explicit Simulated/Real views; canonical contract remains "simulator".
+  const allowUnknownSource =
+    (hmiState.detectionSourceFilter || DETECTION_SOURCE_FILTERS.ALL) === DETECTION_SOURCE_FILTERS.ALL;
+
   for (let data of results) {
+    if (data.sourceType === "real") continue;
+    if (!allowUnknownSource && normalizeDetectionSource(data.sourceType) === "unknown") continue;
     hmiState.vocalizationEvents.push(convertJSONtoAnimalVocalizationEvent(hmiState, data));
   }
 
   addAllVocalizationFeatures(hmiState);
+  applyDetectionSourceFilter(
+    hmiState,
+    hmiState.detectionSourceFilter || DETECTION_SOURCE_FILTERS.ALL,
+  );
 }
 
 export function updateMicrophoneLayer(hmiState, results) {
@@ -1135,12 +1212,22 @@ export function updateAnimalMovementLayerFromLiveData(hmiState, results) {
 
 export function updateVocalizationLayerFromLiveData(hmiState, results) {
   const newEvents = [];
+  // Unknown sourceType values render under All (fail-open) but stay out of
+  // explicit Simulated/Real views; canonical contract remains "simulator".
+  const allowUnknownSource =
+    (hmiState.detectionSourceFilter || DETECTION_SOURCE_FILTERS.ALL) === DETECTION_SOURCE_FILTERS.ALL;
   for (let data of results) {
+    if (data.sourceType === "real") continue;
+    if (!allowUnknownSource && normalizeDetectionSource(data.sourceType) === "unknown") continue;
     const event = convertJSONtoAnimalVocalizationEvent(hmiState, data);
     hmiState.vocalizationEvents.push(event);
     newEvents.push(event);
   }
   addNewVocalizationFeatures(hmiState, newEvents);
+  applyDetectionSourceFilter(
+    hmiState,
+    hmiState.detectionSourceFilter || DETECTION_SOURCE_FILTERS.ALL,
+  );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1265,27 +1352,44 @@ function clearAnimalAudioSelection() {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function updateLayers(hmiState, filterState) {
-  for (let stat of statuses) {
-    for (let animalType of animalTypes) {
-      const layer = findMapLayerWithName(hmiState, deriveLayerName(stat, animalType));
-      if (layer) {
-        layer.setVisible(
-          filterState.includes("_" + stat) && filterState.includes("_" + animalType)
-        );
-      }
-    }
-  }
+  hmiState.speciesFilterState = Array.isArray(filterState) ? [...filterState] : filterState;
 
-  for (let stat of statuses) {
-    for (let animalType of animalTypes) {
-      const layer = findMapLayerWithName(hmiState, deriveTruthLayerName(stat, animalType));
-      if (layer) {
-        layer.setVisible(
-          filterState.includes(stat) && filterState.includes(animalType)
-        );
-      }
+  const sourceFilter = hmiState.detectionSourceFilter || DETECTION_SOURCE_FILTERS.ALL;
+  // Single path for source + species visibility: avoids drift between the
+  // checkbox handler and the All/Simulated/Real-device radios.
+  applySourceFilterWithRefresh(hmiState, sourceFilter);
+}
+
+/**
+ * Ticket 03: ingest-time filtering only reflects the filter active during the
+ * fetch, so records pulled in under All (including unknown sources) would
+ * otherwise stay rendered after switching to Simulated. Rebuilding the sim
+ * markers from the vocalizationEvents cache (no refetch, no new map, layers
+ * or listeners) keeps the visible markers matching the selection. The second
+ * apply() recomputes the status counts from the rebuilt layers.
+ */
+function refreshVocalizationFeaturesForSourceFilter(hmiState, filter) {
+  clearAllVocalizationLayers(hmiState);
+  for (const entry of hmiState.vocalizationEvents || []) {
+    if (detectionMatchesSourceFilter(entry.sourceType, filter)) {
+      _addVocalizationFeature(hmiState, entry);
     }
   }
+}
+
+function applySourceFilterWithRefresh(hmiState, filter) {
+  const applied = applyDetectionSourceFilter(hmiState, filter);
+  refreshVocalizationFeaturesForSourceFilter(hmiState, applied.filter);
+  return applyDetectionSourceFilter(hmiState, applied.filter);
+}
+
+/** Ticket 03: switch All / Simulated / Real-device without recreating map state. */
+export function setDetectionSourceFilter(hmiState, filter) {
+  const applied = applySourceFilterWithRefresh(hmiState, filter);
+  // ponytail: rapid switches stack guarded fetches (stale responses dropped by
+  // realDetectionRequest); per-switch abort if this ever shows up in profiles.
+  void loadRealDetections(hmiState);
+  return applied;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1303,6 +1407,11 @@ function _liveEventAgeRatio(hmiState, recordTimestampSeconds) {
   if (!windowSeconds || !hmiState.currentTime) return 0;
   const ageSeconds = hmiState.currentTime - recordTimestampSeconds;
   return ageSeconds / windowSeconds;
+}
+
+function _makeVocalizationIcon(iconPath) {
+  // Icon shape plus SIM text label — distinguishable from real circles by more than colour.
+  return buildSimulatorVocalizationStyle(iconPath);
 }
 
 /** Opacity (1 = fresh, MIN_LIVE_EVENT_OPACITY = about to be purged) for a live event's age. */
@@ -1440,41 +1549,17 @@ function _addTruthFeature(hmiState, entry) {
 
 function _addVocalizationFeature(hmiState, entry) {
   const iconPath = _resolveVocalizationIconPath(entry);
-
-  // A vocalization detection's "estimated location" is entry.estLat/estLon,
-  // derived from data.animalEstLLA — the acoustic triangulation estimate.
-  // entry.locationLat/locationLon (data.animalTrueLLA) is the simulator's
-  // ground-truth position; a real deployment would not have that for a
-  // vocalization-only detection. It is kept on the feature
-  // (animalTrueLon/animalTrueLat) for debugging only and is never used to
-  // place the marker or the confidence ring.
-  //
-  // Coordinates are validated as complete lat/lon PAIRS — both fields
-  // present and each within its valid range — never independently, so an
-  // estimated longitude can never be combined with a true latitude (or
-  // vice versa). Prefer the estimate; fall back to the true location only
-  // if it is itself a complete, valid pair; otherwise skip this malformed
-  // event rather than plotting a marker at a bogus position.
-  let lat, lon;
-  if (_isValidCoordPair(entry.estLat, entry.estLon)) {
-    lat = entry.estLat;
-    lon = entry.estLon;
-  } else if (_isValidCoordPair(entry.locationLat, entry.locationLon)) {
-    lat = entry.locationLat;
-    lon = entry.locationLon;
-  } else {
-    console.warn(`Skipping vocalization event ${entry.eventId}: no valid coordinate pair`, entry);
-    return;
-  }
+  const plot = resolveVocalizationPlotLocation(entry);
+  if (!plot) return;
 
   const feature = new ol.Feature({
-    geometry:          new ol.geom.Point(ol.proj.fromLonLat([lon, lat])),
+    geometry:          new ol.geom.Point(ol.proj.fromLonLat([plot.lon, plot.lat])),
     name:              "vocalisation_" + entry.speciesScientificName,
     animalType:        entry.animalType,
     animalStatus:      entry.animalStatus,
     animalSpecies:     entry.speciesScientificName,
-    animalLon:         lon,
-    animalLat:         lat,
+    animalLon:         entry.locationLon,
+    animalLat:         entry.locationLat,
     animalTrueLon:     entry.locationLon,
     animalTrueLat:     entry.locationLat,
     animalConfidence:  entry.speciesIdentificationConfidence,
@@ -1483,14 +1568,20 @@ function _addVocalizationFeature(hmiState, entry) {
     animalDiet:        entry.animalDiet,
     animalIcon:        iconPath,
     animalRecordDate:  entry.timestamp,
+    eventTimestamp:    entry.eventTimestamp,
     eventId:           entry.eventId,
     isAnimalMovement:  0,
+    isFallbackLocation: plot.isFallback,
+    sourceType:        normalizeDetectionSource(entry.sourceType) === "unknown"
+      ? entry.sourceType
+      : normalizeDetectionSource(entry.sourceType),
+    sensorId:          entry.sensorId,
   });
 
   feature.setStyle(_makeVocalizationStyleFn(hmiState, iconPath));
   feature.setId(entry.eventId);
 
-    const layer = findMapLayerWithName(hmiState, deriveLayerName(entry.animalStatus, entry.animalType));
+  const layer = findMapLayerWithName(hmiState, deriveLayerName(entry.animalStatus, entry.animalType));
   if (layer) { layer.getSource().addFeature(feature); layer.getSource().changed(); layer.changed(); }
 }
 
@@ -1702,9 +1793,7 @@ function createBasemap(hmiState) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 async function fetchWeatherData(timestamp, lat, lon) {
-  // FR-D1: was hardcoded to http://localhost:9000, so weather never loaded
-  // anywhere but a dev machine. server.js proxies /hmi/* through to the API.
-  const response = await retrieveWeather(timestamp, lat, lon);
+  const response = await retrieveWeatherData(timestamp, lat, lon);
   return response.data;
 }
 
@@ -1712,7 +1801,68 @@ async function fetchWeatherData(timestamp, lat, lon) {
 // Map click handler
 // ─────────────────────────────────────────────────────────────────────────────
 
-function createMapClickEvent(hmiState) {
+function setDetectionSourceDetail(sourceType) {
+  const el = document.getElementById("markup_source");
+  if (el) el.innerText = formatDetectionSourceLabel(sourceType);
+}
+
+export function setRealDetectionSidebarMode(isReal) {
+  const setDisplay = (id, value) => { const el = document.getElementById(id); if (el) el.style.display = value; };
+  const label = document.getElementById("markup_location_metric_label");
+  if (isReal) {
+    setDisplay("animal_weather_section", "none");
+    setDisplay("desc_img", "none");
+    setDisplay("request-edit-button", "none");
+    setDisplay("animalAudioHeader", "none");
+    setDisplay("animalAudioControl", "none");
+    setDisplay("animal-spectrogram", "none");
+    if (label) label.textContent = "Location uncertainty";
+  } else {
+    setDisplay("animal_weather_section", "");
+    setDisplay("desc_img", "");
+    setDisplay("request-edit-button", "");
+    if (label) label.textContent = "Location Confidence";
+  }
+}
+
+export function showRealDetectionDetails(values) {
+  const setText = (id, text) => { const el = document.getElementById(id); if (el) el.textContent = text; };
+  const record = values || {};
+  const species = typeof record.species === "string" && record.species.trim() !== ""
+    ? record.species
+    : "unavailable";
+  setText("desc_name", species);
+  setText("desc_species", species);
+  setText("desc_confidence", record.confidence === "" ? "unavailable" : formatVocalizationDetailValue(record.confidence, "%"));
+  setText("desc_summary", "Real-device detection details.");
+  const sensorText = record.sensorId != null && String(record.sensorId).trim() !== ""
+    ? `Sensor ${record.sensorId}`
+    : "unavailable";
+  setText("markup_details", sensorText);
+  setText("markup_source", formatDetectionSourceLabel(record.sourceType));
+  let dateText = "unavailable";
+  if (record.timestamp != null && record.timestamp !== "") {
+    const parsed = new Date(record.timestamp);
+    if (Number.isFinite(parsed.getTime())) dateText = parsed.toUTCString();
+  }
+  setText("markup_date", dateText);
+  setText("markup_loc_lat", formatVocalizationDetailValue(llaLat(record.microphoneLLA)));
+  setText("markup_loc_lon", formatVocalizationDetailValue(llaLon(record.microphoneLLA)));
+  const details = document.getElementById("desc_details");
+  if (details) {
+    details.replaceChildren();
+    const estLat = llaLat(record.animalEstLLA);
+    const estLon = llaLon(record.animalEstLLA);
+    const row = document.createElement("p");
+    row.textContent = Number.isFinite(estLat) && Number.isFinite(estLon)
+      ? `Estimated animal location: ${estLat}, ${estLon}`
+      : "Estimated animal location: unavailable";
+    details.appendChild(row);
+  }
+  setText("markup_confidence", record.animalLLAUncertainty === "" ? "unavailable" : formatVocalizationDetailValue(record.animalLLAUncertainty));
+}
+
+export function createMapClickEvent(hmiState) {
   hmiState.basemap.on("click", function (evt) {
     const feature = hmiState.basemap.forEachFeatureAtPixel(evt.pixel, (f) => f);
 
@@ -1743,7 +1893,10 @@ function createMapClickEvent(hmiState) {
     const values = feature.getProperties();
 
     if (values.hasOwnProperty("animalRecordDate")) {
-      fetchWeatherData(values.animalRecordDate, values.animalLat, values.animalLon)
+      const weatherTimestamp = values.isAnimalMovement
+        ? values.animalRecordDate
+        : toWeatherTimestamp(values.eventTimestamp);
+      if (weatherTimestamp !== null) fetchWeatherData(weatherTimestamp, values.animalLat, values.animalLon)
         .then((weatherData) => {
           const key = Object.keys(weatherData.Date)[0];
           const fields = {
@@ -1813,7 +1966,22 @@ function createMapClickEvent(hmiState) {
       animal_toggled = true;
       document.dispatchEvent(new CustomEvent("nodeToggled", { detail: { message: "Node toggled:" } }));
 
+    } else if (normalizeDetectionSource(values.sourceType) === DETECTION_SOURCE_FILTERS.REAL
+      && !values.animalSpecies) {
+      setRealDetectionSidebarMode(true);
+      stopAudioPlayback();
+      clearAnimalAudioSelection();
+      active_content.show();       default_content.hide();
+      active_mic_content.hide();   default_mic_content.show();
+      active_node_content.hide();  default_node_content.show();
+
+      showRealDetectionDetails(values);
+
+      animal_toggled = true;
+      document.dispatchEvent(new CustomEvent("animalToggled", { detail: { message: "Animal toggled:" } }));
+
     } else {
+      setRealDetectionSidebarMode(false);
       stopAudioPlayback();
 
       active_content.show();       default_content.hide();
@@ -1883,7 +2051,7 @@ function createMapClickEvent(hmiState) {
 
           const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; };
           setEl("desc_name",       result.common);
-          setEl("desc_confidence", values.animalConfidence + "%");
+          setEl("desc_confidence", formatVocalizationDetailValue(values.animalConfidence, "%"));
           setEl("desc_species",    result.species);
           setEl("desc_summary",    result.summary);
 
@@ -1904,22 +2072,31 @@ function createMapClickEvent(hmiState) {
           if (descImg) descImg.src = "../../images/bio/not_available_" + dice + "-bio.png";
           const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; };
           setEl("desc_name",       values.animalSpecies);
-          setEl("desc_confidence", values.animalConfidence + "%");
+          setEl("desc_confidence", formatVocalizationDetailValue(values.animalConfidence, "%"));
           setEl("desc_species",    values.animalSpecies);
           setEl("desc_summary",    "Bio data coming soon.");
           const summary = document.getElementById("desc_details");
           if (summary) summary.innerHTML = "";
         }
 
-        const dateFormat = new Date(values.animalRecordDate);
         const markupImg  = document.getElementById("markup_img");
         if (markupImg) markupImg.src = values.animalIcon;
-        const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.innerHTML = val; };
+        const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; };
         setEl("markup_details",   values.animalType + " | " + values.animalDiet + " | " + statusPrintLookup[values.animalStatus]);
-        setEl("markup_loc_lon",   values.animalLon);
-        setEl("markup_loc_lat",   values.animalLat);
-        setEl("markup_confidence",values.animalLocConfidence + "%");
-        setEl("markup_date",      dateFormat.toUTCString());
+        // Ticket 03: only detection markers report Simulated/Real-device.
+        if (values.isAnimalMovement) {
+          const sourceEl = document.getElementById("markup_source");
+          if (sourceEl) sourceEl.innerText = "";
+        } else {
+          setDetectionSourceDetail(values.sourceType || "unknown");
+        }
+        setEl("markup_loc_lon",   formatVocalizationDetailValue(values.animalLon));
+        setEl("markup_loc_lat",   formatVocalizationDetailValue(values.animalLat));
+        setEl("markup_confidence",formatVocalizationDetailValue(values.animalLocConfidence, "%"));
+        const detailTimestamp = values.isAnimalMovement
+          ? values.animalRecordDate
+          : values.eventTimestamp;
+        setEl("markup_date",      formatDetectionTimestamp(detailTimestamp));
 
         animal_toggled = true;
         document.dispatchEvent(new CustomEvent("animalToggled", { detail: { message: "Animal toggled:" } }));
@@ -1946,35 +2123,6 @@ export function MapCloseNav() {
 // ─────────────────────────────────────────────────────────────────────────────
 // Live updates
 // ─────────────────────────────────────────────────────────────────────────────
-
-let disconnectDetectionStream = null;
-
-function startDetectionStream(hmiState) {
-  if (disconnectDetectionStream) return;
-
-  disconnectDetectionStream = connectDetectionStream({
-    onStatus: (status) => console.log("Detection stream:", status),
-    onDetection: (data) => {
-      console.log("[B1.2 WS] map handler received detection:", {
-        _id: data._id,
-        species: data.species,
-        sensorId: data.sensorId,
-        confidence: data.confidence,
-      });
-
-      const alreadySeen = hmiState.vocalizationEvents.some(
-        (event) => event.eventId === data._id
-      );
-      if (alreadySeen) {
-        console.log("[B1.2 WS] duplicate ignored:", data._id);
-        return;
-      }
-
-      updateVocalizationLayerFromLiveData(hmiState, [data]);
-      showToast(`Live detection: ${data.species}`, "success");
-    },
-  });
-}
 
 function updateTruthEvents(hmiState) {
   retrieveTruthEventsInTimeRange(hmiState.currentTime - 5, hmiState.currentTime)
