@@ -127,6 +127,21 @@ The current event payload contains:
 
 A successful request returns HTTP `201`.
 
+### Live detection WebSocket
+
+The backend publishes every event that has been successfully persisted through:
+
+```text
+ws://localhost:9000/ws/detections
+```
+
+Clients must provide a valid JWT either as a `token` query parameter or as an
+`Authorization: Bearer <token>` header. The server sends the compact,
+species-enriched detection JSON after MongoDB persistence succeeds. Live
+delivery is best-effort: a broadcast failure never rolls back a stored event.
+Clients reconnecting after a network interruption must use the existing REST
+event APIs to retrieve any detections they missed while disconnected.
+
 ### 7. Verify MongoDB Persistence
 
 Open the MongoDB shell:
