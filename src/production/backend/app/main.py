@@ -40,7 +40,9 @@ app = FastAPI(
     - Simulate audio responses
     - Interface with HMI and audio engine modules
     """,
-    version="1.0.0"
+    version="1.0.0",
+    docs_url=None if settings.environment == "production" else "/docs",
+    openapi_url=None if settings.environment == "production" else "/openapi.json"
 )
 
 # Log API startup in structured JSON format

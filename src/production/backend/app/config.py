@@ -70,6 +70,9 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     cors_origins: List[str] = ["*"]
 
+    # --- Environment (controls docs visibility, etc.) ---
+    environment: str = Field("development", env="ENVIRONMENT")
+
     # --- Twilio (optional — SMS/2FA degrades gracefully if unset) ---
     twilio_account_sid: Optional[str] = None
     twilio_auth_token: Optional[str] = None

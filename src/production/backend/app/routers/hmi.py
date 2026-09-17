@@ -758,12 +758,12 @@ def remove_animal_from_notifications(user_id: str, species: str):
 
 
         
-@router.get("/users", response_description="Get all users with visit data")
+@router.get("/users",dependencies=[Depends(jwtBearer)], response_description="Get all users with visit data")
 def get_all_users():
     users = User.find()
     return serializers.userListEntity(users)
 
-@router.post("/users/{username}/visit", response_description="Increment user visit count and time")
+@router.post("/users/{username}/visit",dependencies=[Depends(jwtBearer)], response_description="Increment user visit count and time")
 def increment_user_visit(username: str, visit_duration: float = 5.0):
     user = User.find_one({"username": username})
     if user is None:
