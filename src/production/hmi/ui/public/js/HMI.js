@@ -1000,9 +1000,23 @@ export function resolveVocalizationPlotLocation(entry) {
 }
 
 export function formatVocalizationDetailValue(value, suffix = "") {
-  if (value === null || value === undefined) return "unavailable";
+  if (value === null || value === undefined || value === "") return "unavailable";
   if (typeof value === "number" && !Number.isFinite(value)) return "unavailable";
   return `${value}${suffix}`;
+}
+
+export function formatDetectionTimestamp(value) {
+  if (value === null || value === undefined || value === "") return "unavailable";
+  const parsed = new Date(value);
+  return Number.isFinite(parsed.getTime()) ? parsed.toUTCString() : "unavailable";
+}
+
+function toWeatherTimestamp(value) {
+  if (value === null || value === undefined || value === "") return null;
+  const numeric = Number(value);
+  if (Number.isFinite(numeric)) return Math.abs(numeric) >= 1e12 ? Math.floor(numeric / 1000) : Math.floor(numeric);
+  const parsed = new Date(value);
+  return Number.isFinite(parsed.getTime()) ? Math.floor(parsed.getTime() / 1000) : null;
 }
 
 export function convertJSONtoMicrophone(hmiState, data) {
@@ -1450,6 +1464,7 @@ function _addVocalizationFeature(hmiState, entry) {
     animalDiet:        entry.animalDiet,
     animalIcon:        iconPath,
     animalRecordDate:  entry.timestamp,
+    eventTimestamp:    entry.eventTimestamp,
     eventId:           entry.eventId,
     isAnimalMovement:  0,
     isFallbackLocation: plot.isFallback,
@@ -1743,7 +1758,7 @@ export function showRealDetectionDetails(values) {
   setText("markup_confidence", record.animalLLAUncertainty === "" ? "unavailable" : formatVocalizationDetailValue(record.animalLLAUncertainty));
 }
 
-function createMapClickEvent(hmiState) {
+export function createMapClickEvent(hmiState) {
   hmiState.basemap.on("click", function (evt) {
     const feature = hmiState.basemap.forEachFeatureAtPixel(evt.pixel, (f) => f);
 
@@ -1774,7 +1789,10 @@ function createMapClickEvent(hmiState) {
     const values = feature.getProperties();
 
     if (values.hasOwnProperty("animalRecordDate")) {
-      fetchWeatherData(values.animalRecordDate, values.animalLat, values.animalLon)
+      const weatherTimestamp = values.isAnimalMovement
+        ? values.animalRecordDate
+        : toWeatherTimestamp(values.eventTimestamp);
+      if (weatherTimestamp !== null) fetchWeatherData(weatherTimestamp, values.animalLat, values.animalLon)
         .then((weatherData) => {
           const key = Object.keys(weatherData.Date)[0];
           const fields = {
@@ -1929,7 +1947,7 @@ function createMapClickEvent(hmiState) {
 
           const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; };
           setEl("desc_name",       result.common);
-          setEl("desc_confidence", values.animalConfidence + "%");
+          setEl("desc_confidence", formatVocalizationDetailValue(values.animalConfidence, "%"));
           setEl("desc_species",    result.species);
           setEl("desc_summary",    result.summary);
 
@@ -1950,14 +1968,13 @@ function createMapClickEvent(hmiState) {
           if (descImg) descImg.src = "../../images/bio/not_available_" + dice + "-bio.png";
           const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; };
           setEl("desc_name",       values.animalSpecies);
-          setEl("desc_confidence", values.animalConfidence + "%");
+          setEl("desc_confidence", formatVocalizationDetailValue(values.animalConfidence, "%"));
           setEl("desc_species",    values.animalSpecies);
           setEl("desc_summary",    "Bio data coming soon.");
           const summary = document.getElementById("desc_details");
           if (summary) summary.innerHTML = "";
         }
 
-        const dateFormat = new Date(values.animalRecordDate);
         const markupImg  = document.getElementById("markup_img");
         if (markupImg) markupImg.src = values.animalIcon;
         const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; };
@@ -1972,7 +1989,10 @@ function createMapClickEvent(hmiState) {
         setEl("markup_loc_lon",   formatVocalizationDetailValue(values.animalLon));
         setEl("markup_loc_lat",   formatVocalizationDetailValue(values.animalLat));
         setEl("markup_confidence",formatVocalizationDetailValue(values.animalLocConfidence, "%"));
-        setEl("markup_date",      dateFormat.toUTCString());
+        const detailTimestamp = values.isAnimalMovement
+          ? values.animalRecordDate
+          : values.eventTimestamp;
+        setEl("markup_date",      formatDetectionTimestamp(detailTimestamp));
 
         animal_toggled = true;
         document.dispatchEvent(new CustomEvent("animalToggled", { detail: { message: "Animal toggled:" } }));

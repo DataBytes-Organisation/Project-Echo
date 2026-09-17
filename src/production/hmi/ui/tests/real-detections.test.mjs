@@ -4,12 +4,14 @@ import { readFile } from "node:fs/promises";
 
 let result = { data: [] };
 let calls = [];
+let callArgs = [];
 let config;
 let holdAncillary = false;
 globalThis.window = { axios: { create(options) {
   config = options;
-  return { async get(url) {
+  return { async get(url, options) {
     calls.push(url);
+    callArgs.push([url, options]);
     if (holdAncillary && url !== "/api/detections") return new Promise(() => {});
     return await result;
   } };
@@ -53,7 +55,7 @@ function sidebarText(el) {
   return [own, kids].filter(Boolean).join(" ");
 }
 globalThis.document = {
-  readyState: "loading", addEventListener() {}, head: new Element(), body: new Element(),
+  readyState: "loading", addEventListener() {}, dispatchEvent() {}, head: new Element(), body: new Element(),
   createElement: (tag) => new Element(tag), getElementById: (id) => sidebarRegistry[id] || null, querySelector: () => null,
 };
 globalThis.requestAnimationFrame = () => {};
@@ -62,6 +64,7 @@ class Source {
   constructor() { this.features = []; }
   clear() { this.features = []; }
   addFeature(feature) { this.features.push(feature); }
+  changed() {}
   getFeatures() { return this.features; }
   getExtent() { return [144.9631, -37.8136, 144.9631, -37.8136]; }
 }
@@ -71,11 +74,14 @@ class Layer {
   set(key, value) { this[key] = value; }
   setZIndex(zIndex) { this.zIndex = zIndex; }
   setVisible(visible) { this.visible = visible; }
+  changed() {}
 }
 class Feature {
   constructor(properties) { this.properties = properties; }
+  setStyle(style) { this.style = style; }
   setId(id) { this.id = id; }
   get(key) { return this.properties[key]; }
+  getProperties() { return this.properties; }
 }
 class Style { constructor(options) { this.options = options; } }
 
@@ -292,6 +298,16 @@ test("vocalization converter reads object LLAs and preserves null animal locatio
   const unknown = hmiModule.convertJSONtoAnimalVocalizationEvent(
     {}, { ...simRecord, sourceType: "bogus" });
   assert.equal(unknown.sourceType, "bogus");
+  const { detectionMatchesSourceFilter, formatDetectionSourceLabel } =
+    await import("../public/js/detection-source-filter.js");
+  for (const missing of [undefined, ""]) {
+    const sourceless = hmiModule.convertJSONtoAnimalVocalizationEvent(
+      {}, { ...simRecord, sourceType: missing });
+    assert.equal(detectionMatchesSourceFilter(sourceless.sourceType, "all"), true);
+    assert.equal(detectionMatchesSourceFilter(sourceless.sourceType, "simulator"), false);
+    assert.equal(detectionMatchesSourceFilter(sourceless.sourceType, "real"), false);
+    assert.equal(formatDetectionSourceLabel(sourceless.sourceType), "Unknown source");
+  }
 });
 
 test("vocalization plot location falls back to the microphone only at render time", async () => {
@@ -313,8 +329,103 @@ test("vocalization detail values show unavailable instead of null or null%", asy
   assert.equal(hmiModule.formatVocalizationDetailValue(undefined), "unavailable");
   assert.equal(hmiModule.formatVocalizationDetailValue(NaN), "unavailable");
   assert.equal(hmiModule.formatVocalizationDetailValue(null, "%"), "unavailable");
+  assert.equal(hmiModule.formatVocalizationDetailValue("", "%"), "unavailable");
   assert.equal(hmiModule.formatVocalizationDetailValue(95, "%"), "95%");
   assert.equal(hmiModule.formatVocalizationDetailValue(-37.8), "-37.8");
+});
+
+test("simulator details use the detection timestamp and preserve zero confidence", async () => {
+  const hmiModule = await import("../public/js/HMI.js");
+  const event = hmiModule.convertJSONtoAnimalVocalizationEvent(
+    { currentTime: 999999 },
+    { ...record, sourceType: "simulator", confidence: 0 },
+  );
+
+  assert.equal(event.timestamp, 999999, "session time remains available for live expiry");
+  assert.equal(event.eventTimestamp, record.timestamp);
+  assert.equal(
+    hmiModule.formatDetectionTimestamp(event.eventTimestamp),
+    new Date(record.timestamp).toUTCString(),
+  );
+  assert.equal(hmiModule.formatVocalizationDetailValue(event.speciesIdentificationConfidence, "%"), "0%");
+  assert.equal(hmiModule.formatVocalizationDetailValue(null, "%"), "unavailable");
+});
+
+test("simulator details show unavailable for a missing detection timestamp", async () => {
+  const hmiModule = await import("../public/js/HMI.js");
+  assert.equal(hmiModule.formatDetectionTimestamp(undefined), "unavailable");
+  assert.equal(hmiModule.formatDetectionTimestamp("not-a-date"), "unavailable");
+});
+
+test("simulator features retain detection time separately from session time", async () => {
+  const hmiModule = await import("../public/js/HMI.js");
+  const layer = new Layer({ source: new Source() });
+  const hmi = {
+    ...state(),
+    currentTime: 999999,
+    basemap: {},
+    layers: { normal_mammal: layer },
+    detectionSourceFilter: "all",
+    vocalizationEvents: [],
+  };
+
+  hmiModule.updateVocalizationLayerFromPastData(hmi, [{
+    ...record,
+    sourceType: "simulator",
+    type: undefined,
+    status: undefined,
+    diet: undefined,
+  }]);
+
+  const feature = layer.getSource().getFeatures()[0];
+  assert.equal(feature.get("animalRecordDate"), 999999);
+  assert.equal(feature.get("eventTimestamp"), record.timestamp);
+});
+
+test("selecting a simulator detection renders its event timestamp and safe confidence", async () => {
+  const hmiModule = await import("../public/js/HMI.js");
+  resetSidebarDOM();
+  const previousJQuery = globalThis.window.$;
+  const previousResult = result;
+  globalThis.window.$ = () => ({ show() {}, hide() {} });
+  calls = [];
+  result = {
+    data: {
+      Date: { 0: "2026-08-06" },
+      "Min Temperature (°C)": { 0: 0 },
+      "Max Temperature (°C)": { 0: 0 },
+      "Rainfall (mm)": { 0: 0 },
+      "Wind Speed (m/sec)": { 0: 0 },
+      "Max Humidity (%)": { 0: 0 },
+      "Min Humidity (%)": { 0: 0 },
+    },
+  };
+  let clickHandler;
+  const feature = new Feature({
+    animalSpecies: "magpie", animalType: "mammal", animalDiet: "herbivore",
+    animalStatus: "normal", animalIcon: "", animalLat: 0, animalLon: 0,
+    animalConfidence: null, animalLocConfidence: null, animalRecordDate: 999999,
+    eventTimestamp: record.timestamp, eventId: null, isAnimalMovement: 0,
+    sourceType: "simulator",
+  });
+  const hmi = { basemap: {
+    on(_event, handler) { clickHandler = handler; },
+    forEachFeatureAtPixel() { return feature; },
+  } };
+
+  try {
+    hmiModule.createMapClickEvent(hmi);
+    clickHandler({ pixel: [] });
+    await Promise.resolve();
+    assert.equal(sidebarRegistry.markup_date.innerText, new Date(record.timestamp).toUTCString());
+    assert.equal(sidebarRegistry.desc_confidence.innerText, "unavailable");
+    assert.ok(calls.includes(
+      `/api/weather?timestamp=${Math.floor(new Date(record.timestamp).getTime() / 1000)}&lat=0&lon=0`,
+    ));
+  } finally {
+    globalThis.window.$ = previousJQuery;
+    result = previousResult;
+  }
 });
 
 test("loading, empty, malformed and failed reads never substitute sample records", async (t) => {
@@ -566,4 +677,43 @@ test("detail-region Escape handler closes menu before returning focus to map", a
   const mapFocusIndex = mapFocusDouble !== -1 ? mapFocusDouble : mapFocusSingle;
   assert.notEqual(mapFocusIndex, -1, "basemap focus call exists");
   assert.ok(closeIndex < mapFocusIndex, "closeMenu runs before basemap focus");
+});
+
+test("detection client forwards the selected source and never sends sourceType=all", async () => {
+  calls = []; callArgs = []; result = { data: [] };
+  await routes.retrieveDetections("real");
+  assert.deepEqual(callArgs, [["/api/detections", { params: { sourceType: "real" } }]]);
+  calls = []; callArgs = [];
+  await routes.retrieveDetections("simulator");
+  assert.deepEqual(callArgs, [["/api/detections", { params: { sourceType: "simulator" } }]]);
+  for (const source of ["all", undefined, "simulated", ""]) {
+    calls = []; callArgs = [];
+    await routes.retrieveDetections(source);
+    assert.deepEqual(callArgs, [["/api/detections", undefined]]);
+    assert.doesNotMatch(JSON.stringify(callArgs), /sourceType/);
+  }
+});
+
+test("real loader fetches with the selected source filter", async () => {
+  assert.ok(detections, "real detection loader exists");
+  const hmi = { ...state(), detectionSourceFilter: "real" };
+  calls = []; callArgs = []; result = { data: [record] };
+  await detections.loadRealDetections(hmi);
+  assert.deepEqual(callArgs, [["/api/detections", { params: { sourceType: "real" } }]]);
+  assert.equal(hmi.realDetectionLayer.getSource().getFeatures().length, 1);
+});
+
+test("switching the source filter refetches without duplicating layers", async () => {
+  const hmiModule = await import("../public/js/HMI.js");
+  const hmi = { ...state(), detectionSourceFilter: "all" };
+  calls = []; callArgs = []; result = { data: [record] };
+  await detections.loadRealDetections(hmi);
+  assert.equal(hmi.basemap.layers.length, 1);
+  calls = []; callArgs = [];
+  const applied = hmiModule.setDetectionSourceFilter(hmi, "real");
+  assert.equal(applied.filter, "real");
+  for (let i = 0; i < 20; i++) await Promise.resolve();
+  assert.deepEqual(callArgs, [["/api/detections", { params: { sourceType: "real" } }]]);
+  assert.equal(hmi.basemap.layers.length, 1);
+  assert.equal(hmi.basemap.controls.length, 1);
 });
