@@ -13,6 +13,7 @@
  */
 
 import { showToast, getApiErrorMessage, withRetry, showPageBanner, hidePageBanner } from "./HMI-utils.js";
+// TEMP: audio_recorder.js has a pre-existing syntax error, commented out to test FR-A4 locally
 import { getAudioRecorder } from "./audio_recorder.js";
 import {
   AudioDecoder,
@@ -100,6 +101,7 @@ const TRUTH_MARKER_COLOR        = "0, 172, 193";  // teal
 // Module-level state
 // ─────────────────────────────────────────────────────────────────────────────
 
+//var audioRecorder = {}; //TEMP: stub, see note above
 var audioRecorder = getAudioRecorder();
 
 var statuses    = ["endangered", "vulnerable", "near-threatened", "normal", "invasive"];
@@ -713,13 +715,43 @@ function startMqttConnectionPolling() {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const _seenMqttEventIds = new Set();
+let _mqttPollingPaused = false;
+let _eventTypeFilter = "all";
+let _speciesFilter = "all";
+const _knownSpecies = new Set();
+
+function passesFilters(event) {
+  if (_eventTypeFilter !== "all" && event.eventType !== _eventTypeFilter) return false;
+  if (_speciesFilter !== "all" && event.species !== _speciesFilter) return false;
+  return true;
+}
+
+function updateSpeciesFilterOptions() {
+  const select = document.getElementById("species-filter");
+  if (!select) return;
+  for (const species of _knownSpecies) {
+    if (![...select.options].some((opt) => opt.value === species)) {
+      const opt = document.createElement("option");
+      opt.value = species;
+      opt.textContent = species;
+      select.appendChild(opt);
+    }
+  }
+}
 
 async function pollMqttLatestEvents(hmiState) {
+  if (_mqttPollingPaused) return;
   try {
     const response = await fetch("http://localhost:9000/mqtt/latest-events");
     if (!response.ok) throw new Error("Failed to fetch latest events");
     const data = await response.json();
     const events = data.events || [];
+
+    // Update last-updated timestamp label
+    const label = document.getElementById("last-update-label");
+    if (label) {
+      label.textContent = "Last update: " + new Date().toLocaleTimeString();
+    }
 
 
     const newVocalizationEvents = [];
@@ -728,6 +760,16 @@ async function pollMqttLatestEvents(hmiState) {
     for (const event of events) {
       if (_seenMqttEventIds.has(event._id)) continue;
       _seenMqttEventIds.add(event._id);
+
+      // Real species data only exists for movement events today — vocalization
+      // events are hardcoded to "unclassified" until DB enrichment lands (see
+      // normalize_payload in mqtt_client.py), so we don't add those as filter options.
+      if (event.species && event.species !== "unclassified" && !_knownSpecies.has(event.species)) {
+        _knownSpecies.add(event.species);
+        updateSpeciesFilterOptions();
+      }
+
+      if (!passesFilters(event)) continue;
 
       switch (event.eventType) {
       case "vocalization":
@@ -760,24 +802,56 @@ async function pollMqttLatestEvents(hmiState) {
   }
 }
 
+
+function setupLiveMapControls(hmiState) {
+  const pauseBtn = document.getElementById("pause-resume-btn");
+  const refreshBtn = document.getElementById("manual-refresh-btn");
+  const eventTypeSelect = document.getElementById("event-type-filter");
+  const speciesSelect = document.getElementById("species-filter");
+
+  if (eventTypeSelect) {
+    eventTypeSelect.addEventListener("change", () => {
+      _eventTypeFilter = eventTypeSelect.value;
+    });
+  }
+
+  if (speciesSelect) {
+    speciesSelect.addEventListener("change", () => {
+      _speciesFilter = speciesSelect.value;
+    });
+  }
+
+  if (pauseBtn) {
+    pauseBtn.addEventListener("click", () => {
+      _mqttPollingPaused = !_mqttPollingPaused;
+      pauseBtn.textContent = _mqttPollingPaused ? "Resume" : "Pause";
+    });
+  }
+
+  if (refreshBtn) {
+    refreshBtn.addEventListener("click", () => {
+      pollMqttLatestEvents(hmiState);
+      pollMqttConnectionState();
+    });
+  }
+}
+
 function startMqttEventPolling(hmiState) {
   pollMqttLatestEvents(hmiState);
   setInterval(() => pollMqttLatestEvents(hmiState), 5000);
 }
 
 
-
-
-
-
-
 export function initialiseHMI(hmiState) {
-  console.log("initialising");
-  startMqttConnectionPolling();
-  startMqttEventPolling(hmiState);
+console.log("initialising");
+startMqttConnectionPolling();
+startMqttEventPolling(hmiState);
+setupLiveMapControls(hmiState);
 
-  showMapSpinner("Loading map data…");
-  hideMapError();
+showMapSpinner("Loading map data…");
+hideMapError();
+
+
 
   // FR-A1: initialiseHMI() is re-entered by the map-error retry button
   // (see showMapError(userMsg, () => initialiseHMI(hmiState)) below), on
@@ -1416,14 +1490,7 @@ function _addVocalizationFeature(hmiState, entry) {
   feature.setStyle(_makeVocalizationStyleFn(hmiState, iconPath));
   feature.setId(entry.eventId);
 
-  const layer = findMapLayerWithName(hmiState, deriveLayerName(entry.animalStatus, entry.animalType));
-  if (layer) { layer.getSource().addFeature(feature); layer.getSource().changed(); layer.changed(); }
-}
-
-  feature.setStyle(_makeVocalizationStyleFn(hmiState, iconPath));
-  feature.setId(entry.eventId);
-
-  const layer = findMapLayerWithName(hmiState, deriveLayerName(entry.animalStatus, entry.animalType));
+    const layer = findMapLayerWithName(hmiState, deriveLayerName(entry.animalStatus, entry.animalType));
   if (layer) { layer.getSource().addFeature(feature); layer.getSource().changed(); layer.changed(); }
 }
 
