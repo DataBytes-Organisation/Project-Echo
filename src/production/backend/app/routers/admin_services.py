@@ -1,9 +1,11 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from app.schemas import ServicePauseIn, ServicePauseOut
 from app.services.service_state import get_service_state, set_service_state
 from datetime import datetime
+from app.middleware.auth_bearer import JWTBearer
 
 router = APIRouter()
+jwtBearer = JWTBearer()
 
 @router.get("/admin/services/{service}/status", response_model=ServicePauseOut)
 def get_pause_status(service: str):
@@ -11,7 +13,7 @@ def get_pause_status(service: str):
     # if no doc exists, we still return a valid status
     return ServicePauseOut(service=service, paused=paused, updated_at=datetime.utcnow())
 
-@router.post("/admin/services/pause", response_model=ServicePauseOut)
+@router.post("/admin/services/pause", dependencies=[Depends(jwtBearer)], response_model=ServicePauseOut)
 def pause_or_resume_service(payload: ServicePauseIn):
     result = set_service_state(payload.service, payload.paused)
     return ServicePauseOut(**result)
