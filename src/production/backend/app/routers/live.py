@@ -59,6 +59,8 @@ async def detection_stream(websocket: WebSocket):
         while True:
             await websocket.receive_text()
     except WebSocketDisconnect:
-        await detection_stream_manager.disconnect(
-            websocket
-        )
+        pass
+    finally:
+        # Always release the connection, including when the server closes the
+        # socket for a reason other than a client-initiated disconnect.
+        await detection_stream_manager.disconnect(websocket)
