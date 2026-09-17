@@ -5,6 +5,10 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from .auth import decodeJWT
 from bson import ObjectId
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 class JWTBearer(HTTPBearer):
     isVerified = False
     decodedUser = None
@@ -41,20 +45,27 @@ class JWTBearer(HTTPBearer):
         return (isTokenValid, payload)
     
     #Verify user role using JWT token
-    def verify_role(self, role: str) -> (bool, str):
-        res = None
+    def verify_role(self, role: str) -> tuple[bool, str]:
         try:
-            print("JWT Verification: {}".format(self.isVerified))
-            print("UserInfo: {}".format(self.decodedUser))
-            if self.isVerified:
-                print("decoded userInfo: {}".format(self.decodedUser))
-                res = [i for i in self.decodedUser["roles"] if role.upper() in i.upper()]
-                if res == None:
-                    return (False, "User does not have the role {}".format(role))
-                else:
-                    return (True, "User role is validated")
+            logger.debug("Starting JWT role verification")
 
-        except:
-            return (False, "An Error occured when validate role")
+            if not self.isVerified:
+                logger.warning("Role verification attempted with an unverified token")
+                return False, "Token is not verified"
 
-   
+            matching_roles = [
+                user_role
+                for user_role in self.decodedUser.get("roles", [])
+                if role.upper() in user_role.upper()
+            ]
+
+            if not matching_roles:
+                logger.warning("User role validation failed")
+                return False, f"User does not have the role {role}"
+
+            logger.info("User role validated successfully")
+            return True, "User role is validated"
+
+        except Exception:
+            logger.exception("An error occurred while validating the user role")
+            return False, "An error occurred when validating role"
