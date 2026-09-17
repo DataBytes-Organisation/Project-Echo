@@ -42,7 +42,10 @@ def list_real_events(page_size: int = 100) -> Dict[str, Any]:
 
     total = Events.count_documents(query)
     cursor = Events.find(query).sort("timestamp", -1).limit(page_size)
-    items: List[Detection] = [Detection(**doc) for doc in cursor]
+    # Raw docs: the /detections-collection Detection contract (list LLAs, no
+    # sourceType) must not coerce Engine event reads; the route serializes
+    # through eventListEntity and validates against RealDetectionRead.
+    items: List[Dict[str, Any]] = list(cursor)
 
     return {
         "items": items,
