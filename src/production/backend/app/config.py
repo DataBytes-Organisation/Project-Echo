@@ -2,9 +2,35 @@
 # Central typed configuration for the Backend API.
 # All Backend code should read configuration through `settings` rather than
 # calling os.getenv()/hardcoding values directly.
-from typing import List, Optional
+import os
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 from pydantic import BaseSettings, Field
+
+# Fields that may hold production secrets. Each can be supplied either as a
+# plain environment variable (e.g. JWT_SECRET, for local development) or as
+# a path in `<NAME>_FILE` (e.g. JWT_SECRET_FILE=/run/secrets/jwt_secret) that
+# points at a Docker/Kubernetes-mounted secret file. When both are set, the
+# `_FILE` variant wins, since it represents the deployment's secret store.
+_SECRET_FILE_ENV_VARS = (
+    "MONGODB_URI",
+    "USER_MONGODB_URI",
+    "JWT_SECRET",
+    "TWILIO_ACCOUNT_SID",
+    "TWILIO_AUTH_TOKEN",
+    "MAIL_PASSWORD",
+)
+
+
+def _secret_file_settings_source(_settings: "Settings") -> Dict[str, Any]:
+    resolved: Dict[str, Any] = {}
+    for env_var in _SECRET_FILE_ENV_VARS:
+        file_path = os.getenv(f"{env_var}_FILE")
+        if not file_path:
+            continue
+        resolved[env_var.lower()] = Path(file_path).read_text(encoding="utf-8").strip()
+    return resolved
 
 
 class Settings(BaseSettings):
@@ -61,6 +87,14 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         case_sensitive = False
+
+        @classmethod
+        def customise_sources(cls, init_settings, env_settings, file_secret_settings):
+            # Secret-file values (via `_secret_file_settings_source`) outrank
+            # `env_settings`, which already covers both the real environment
+            # and `env_file` above. `file_secret_settings` (pydantic's
+            # `secrets_dir` mechanism) is unused here but kept for parity.
+            return init_settings, _secret_file_settings_source, env_settings, file_secret_settings
 
 
 settings = Settings()
