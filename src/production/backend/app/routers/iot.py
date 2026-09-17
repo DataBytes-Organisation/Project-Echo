@@ -1,12 +1,14 @@
-from fastapi import APIRouter, HTTPException, status, Request, Body
+from fastapi import APIRouter, HTTPException, status, Request, Body, Depends
+from app.middleware.auth_bearer import JWTBearer
 from typing import List, Optional
 from app.database import Nodes
 from datetime import datetime
 from pymongo import UpdateOne
 
 router = APIRouter()
+jwtBearer = JWTBearer()
 
-@router.get("/nodes", response_description="List all nodes")
+@router.get("/nodes", dependencies=[Depends(jwtBearer)], response_description="List all nodes")
 def get_nodes():
     try:
         nodes = list(Nodes.find({}))
@@ -34,7 +36,7 @@ def get_node(node_id: str):
     except Exception as error:
         raise HTTPException(status_code=500, detail=f"Error retrieving node: {str(error)}")
 
-@router.get("/nodes/{node_id}/components", response_description="Get components for a node")
+@router.get("/nodes/{node_id}/components", dependencies=[Depends(jwtBearer)], response_description="Get components for a node")
 def get_node_components(node_id: str):
     try:
         node = Nodes.find_one({"_id": node_id})
@@ -46,7 +48,7 @@ def get_node_components(node_id: str):
     except Exception as error:
         raise HTTPException(status_code=500, detail=f"Error retrieving node components: {str(error)}")
 
-@router.get("/nodes/{node_id}/connections", response_description="Get connections for a node")
+@router.get("/nodes/{node_id}/connections", dependencies=[Depends(jwtBearer)], response_description="Get connections for a node")
 def get_node_connections(node_id: str):
     try:
         node = Nodes.find_one({"_id": node_id})
@@ -86,7 +88,7 @@ def register_node(node_id: str):
     except Exception as error:
         raise HTTPException(status_code=500, detail=f"Error registering node: {str(error)}")
 
-@router.put("/nodes/{node_id}/heartbeat", response_description="Update node's last message and connection status")
+@router.put("/nodes/{node_id}/heartbeat", dependencies=[Depends(jwtBearer)], response_description="Update node's last message and connection status")
 async def update_node_connection(node_id: str, request: Request):
     try:
         # Store time with timezone offset

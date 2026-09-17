@@ -225,7 +225,7 @@ def show_event_from_time(start: str, end: str):
     events = serializers.movementSpeciesListEntity(Movements.aggregate(aggregate))
     return events
 
-@router.get("/microphones", response_description="returns location of all microphones")
+@router.get("/microphones",dependencies=[Depends(jwtBearer)], response_description="returns location of all microphones")
 def list_microphones():
     results = Microphones.find()
     microphones = serializers.microphoneListEntity(results)

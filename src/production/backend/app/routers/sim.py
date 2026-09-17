@@ -1,5 +1,5 @@
 ## app.routers.sim.py
-from fastapi import FastAPI, Body, HTTPException, status, APIRouter
+from fastapi import FastAPI, Body, HTTPException, status, APIRouter, Depends
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from typing import List
@@ -12,6 +12,9 @@ import asyncio
 from datetime import datetime, timedelta
 
 router = APIRouter()
+from app.middleware.auth_bearer import JWTBearer
+jwtBearer = JWTBearer()
+
 # Email configuration for sending notifications
 conf = ConnectionConfig(
     MAIL_USERNAME=settings.mail_username,
@@ -117,14 +120,17 @@ def create_movement(movement: schemas.MovementSchema):
 
     return new_post
 
-@router.post("/microphones", status_code=status.HTTP_201_CREATED)
+@router.post("/microphones", dependencies=[Depends(jwtBearer)], status_code=status.HTTP_201_CREATED)
 def create_microphones(microphones: List[schemas.MicrophoneSchema]):
-    Microphones.drop()
     microphone_list = []
     for microphone in microphones:
         print(microphone)
+        mic_dict = microphone.dict()
+        Microphones.update_one(
+            {"sensorId": mic_dict.get("sensorId")},
+            {"$set": mic_dict},
+            upsert=True
+        )
+        microphone_list.append(mic_dict)
 
-        Microphones.insert_one(microphone.dict())
-        microphone_list.append(microphone.dict())
-        
     return JSONResponse(content = microphone_list)
