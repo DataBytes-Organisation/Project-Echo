@@ -6,6 +6,215 @@
     "version": "1.0.0"
   },
   "paths": {
+    "/projects": {
+      "get": {
+        "tags": [
+          "projects"
+        ],
+        "summary": "List projects",
+        "operationId": "get_projects_projects_get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Status"
+            },
+            "name": "status",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Location"
+            },
+            "name": "location",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Ecologist"
+            },
+            "name": "ecologist",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "projects"
+        ],
+        "summary": "Create a project",
+        "operationId": "create_project_projects_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Project"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/projects/{project_id}": {
+      "put": {
+        "tags": [
+          "projects"
+        ],
+        "summary": "Update a project (replace)",
+        "operationId": "update_project_projects__project_id__put",
+        "parameters": [
+          {
+            "description": "Mongo ObjectId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Project Id",
+              "description": "Mongo ObjectId"
+            },
+            "name": "project_id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Project"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "projects"
+        ],
+        "summary": "Delete a project",
+        "operationId": "delete_project_projects__project_id__delete",
+        "parameters": [
+          {
+            "description": "Mongo ObjectId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Project Id",
+              "description": "Mongo ObjectId"
+            },
+            "name": "project_id",
+            "in": "path"
+          }
+        ],
+    "/mqtt/connection-state": {
+      "get": {
+        "tags": [
+          "mqtt"
+        ],
+        "summary": "Mqtt Connection State",
+        "operationId": "mqtt_connection_state_mqtt_connection_state_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mqtt/latest-events": {
+      "get": {
+        "tags": [
+          "mqtt"
+        ],
+        "summary": "Mqtt Latest Events",
+        "operationId": "mqtt_latest_events_mqtt_latest_events_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/audio/upload": {
       "post": {
         "tags": [
@@ -128,11 +337,72 @@
             },
             "name": "end",
             "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Sourcetype",
+              "default": "all"
+            },
+            "name": "sourceType",
+            "in": "query"
           }
         ],
         "responses": {
           "200": {
             "description": "Get detection events within certain duration",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/hmi/latest_events": {
+      "get": {
+        "tags": [
+          "hmi"
+        ],
+        "summary": "Show Latest Events",
+        "operationId": "show_latest_events_hmi_latest_events_get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "title": "Limit",
+              "default": 20
+            },
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Sourcetype",
+              "default": "all"
+            },
+            "name": "sourceType",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get most recent classified detection events",
             "content": {
               "application/json": {
                 "schema": {}
@@ -1207,6 +1477,17 @@
         ],
         "summary": "Create Event",
         "operationId": "create_event_engine_event_post",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "X-Engine-Api-Key"
+            },
+            "name": "x-engine-api-key",
+            "in": "header"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1302,6 +1583,16 @@
               "title": "Microphonella 2"
             },
             "name": "microphoneLLA_2",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Sourcetype",
+              "default": "all"
+            },
+            "name": "sourceType",
             "in": "query"
           }
         ],
@@ -2382,72 +2673,47 @@
         }
       }
     },
-    "/payments/razorpay/orders": {
-      "post": {
+    "/sensors/{sensor_id}": {
+      "get": {
         "tags": [
-          "payments"
+          "sensors"
         ],
-        "summary": "Create Razorpay Order",
-        "operationId": "create_razorpay_order_payments_razorpay_orders_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RazorpayOrderRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RazorpayOrderResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        },
-        "security": [
+        "summary": "Get Sensor Detail",
+        "operationId": "get_sensor_detail_sensors__sensor_id__get",
+        "parameters": [
           {
-            "JWTBearer": []
-          }
-        ]
-      }
-    },
-    "/payments/razorpay/verify": {
-      "post": {
-        "tags": [
-          "payments"
-        ],
-        "summary": "Verify Razorpay Checkout",
-        "operationId": "verify_razorpay_checkout_payments_razorpay_verify_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RazorpayCheckoutProof"
-              }
-            }
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Sensor Id"
+            },
+            "name": "sensor_id",
+            "in": "path"
           },
-          "required": true
-        },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 50.0,
+              "minimum": 1.0,
+              "title": "History Limit",
+              "default": 10
+            },
+            "name": "history_limit",
+            "in": "query"
+          }
+        ],
         "responses": {
           "200": {
-            "description": "Successful Response",
+            "description": "Get a single sensor's current health, location, and recent audio metadata",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "201": {
+            "description": "Created",
             "content": {
               "application/json": {
                 "schema": {
@@ -2479,6 +2745,16 @@
         "responses": {
           "200": {
             "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentStatusResponse"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created",
             "content": {
               "application/json": {
                 "schema": {
@@ -2580,21 +2856,47 @@
         "operationId": "insights_overview_insights_overview_get",
         "parameters": [
           {
+            "description": "Inclusive start timestamp (ISO 8601)",
             "required": false,
             "schema": {
               "type": "string",
-              "title": "Start"
+              "title": "Start",
+              "description": "Inclusive start timestamp (ISO 8601)"
             },
             "name": "start",
             "in": "query"
           },
           {
+            "description": "Inclusive end timestamp (ISO 8601)",
             "required": false,
             "schema": {
               "type": "string",
-              "title": "End"
+              "title": "End",
+              "description": "Inclusive end timestamp (ISO 8601)"
             },
             "name": "end",
+            "in": "query"
+          },
+          {
+            "description": "Filter by species name (exact match)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Species",
+              "description": "Filter by species name (exact match)"
+            },
+            "name": "species",
+            "in": "query"
+          },
+          {
+            "description": "Filter by sensor ID (exact match)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Sensorid",
+              "description": "Filter by sensor ID (exact match)"
+            },
+            "name": "sensorId",
             "in": "query"
           }
         ],
@@ -2629,6 +2931,50 @@
         "summary": "Insights Species",
         "operationId": "insights_species_insights_species_get",
         "parameters": [
+          {
+            "description": "Inclusive start timestamp (ISO 8601)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Start",
+              "description": "Inclusive start timestamp (ISO 8601)"
+            },
+            "name": "start",
+            "in": "query"
+          },
+          {
+            "description": "Inclusive end timestamp (ISO 8601)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "End",
+              "description": "Inclusive end timestamp (ISO 8601)"
+            },
+            "name": "end",
+            "in": "query"
+          },
+          {
+            "description": "Filter by species name (exact match)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Species",
+              "description": "Filter by species name (exact match)"
+            },
+            "name": "species",
+            "in": "query"
+          },
+          {
+            "description": "Filter by sensor ID (exact match)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Sensorid",
+              "description": "Filter by sensor ID (exact match)"
+            },
+            "name": "sensorId",
+            "in": "query"
+          },
           {
             "required": false,
             "schema": {
@@ -2909,6 +3255,49 @@
                 "schema": {
                   "$ref": "#/components/schemas/Detection"
                 }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/detections/dashboard-summary": {
+      "get": {
+        "tags": [
+          "detections"
+        ],
+        "summary": "Detection counts by sensor and day for the dashboard",
+        "operationId": "dashboard_summary_endpoint_detections_dashboard_summary_get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 30.0,
+              "minimum": 1.0,
+              "title": "Days",
+              "default": 8
+            },
+            "name": "days",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
               }
             }
           },
@@ -3272,6 +3661,7 @@
         ],
         "title": "Detection",
         "example": {
+          "_id": "651f2a9f4d1f1b1c3e2a4567",
           "timestamp": "2023-03-22T13:45:12.000Z",
           "sensorId": "2",
           "species": "Sus Scrofa",
@@ -3469,35 +3859,25 @@
             "minLength": 1,
             "title": "Species"
           },
+          "sourceType": {
+            "type": "string",
+            "enum": [
+              "real",
+              "simulator"
+            ],
+            "title": "Sourcetype"
+          },
           "microphoneLLA": {
-            "items": {
-              "type": "number"
-            },
-            "type": "array",
-            "maxItems": 3,
-            "minItems": 3,
-            "title": "Microphonella"
+            "$ref": "#/components/schemas/LLA"
           },
           "animalEstLLA": {
-            "items": {
-              "type": "number"
-            },
-            "type": "array",
-            "maxItems": 3,
-            "minItems": 3,
-            "title": "Animalestlla"
+            "$ref": "#/components/schemas/LLA"
           },
           "animalTrueLLA": {
-            "items": {
-              "type": "number"
-            },
-            "type": "array",
-            "maxItems": 3,
-            "minItems": 3,
-            "title": "Animaltruella"
+            "$ref": "#/components/schemas/LLA"
           },
           "animalLLAUncertainty": {
-            "type": "integer",
+            "type": "number",
             "title": "Animalllauncertainty"
           },
           "audioClip": {
@@ -3506,13 +3886,18 @@
           },
           "confidence": {
             "type": "number",
-            "exclusiveMaximum": 100.0,
-            "exclusiveMinimum": 0.0,
+            "maximum": 100.0,
+            "minimum": 0.0,
             "title": "Confidence"
           },
           "sampleRate": {
             "type": "integer",
             "title": "Samplerate"
+          },
+          "source_model": {
+            "type": "string",
+            "title": "Source Model",
+            "default": "unknown"
           }
         },
         "type": "object",
@@ -3520,10 +3905,8 @@
           "timestamp",
           "sensorId",
           "species",
+          "sourceType",
           "microphoneLLA",
-          "animalEstLLA",
-          "animalTrueLLA",
-          "animalLLAUncertainty",
           "audioClip",
           "confidence",
           "sampleRate"
@@ -3533,21 +3916,12 @@
           "timestamp": "2023-03-22T13:45:12.000Z",
           "sensorId": "2",
           "species": "Sus Scrofa",
-          "microphoneLLA": [
-            -33.1101,
-            150.0567,
-            23
-          ],
-          "animalEstLLA": [
-            -33.1105,
-            150.0569,
-            23
-          ],
-          "animalTrueLLA": [
-            -33.1106,
-            150.057,
-            23
-          ],
+          "sourceType": "real",
+          "microphoneLLA": {
+            "latitude": -33.1101,
+            "longitude": 150.0567,
+            "altitude": 23
+          },
           "animalLLAUncertainty": 10,
           "audioClip": "some audio_base64 data",
           "confidence": 99.4,
@@ -3608,6 +3982,30 @@
         },
         "type": "object",
         "title": "HTTPValidationError"
+      },
+      "LLA": {
+        "properties": {
+          "latitude": {
+            "type": "number",
+            "title": "Latitude"
+          },
+          "longitude": {
+            "type": "number",
+            "title": "Longitude"
+          },
+          "altitude": {
+            "type": "number",
+            "title": "Altitude"
+          }
+        },
+        "type": "object",
+        "required": [
+          "latitude",
+          "longitude",
+          "altitude"
+        ],
+        "title": "LLA",
+        "description": "A geographic position used by Engine and HMI event contracts."
       },
       "MicrophoneSchema": {
         "properties": {

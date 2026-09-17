@@ -1,8 +1,9 @@
+import logging
 import os
 # from Components.API.app.routers import add_csv_output_option, audio_upload_router
 from .routers import add_csv_output_option, audio_upload_router
 
-from fastapi import FastAPI, Body, HTTPException, status, APIRouter
+from fastapi import FastAPI, Body, HTTPException, status, APIRouter, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
 from app.errors import StandardizeErrorResponseMiddleware, http_exception_handler, unhandled_exception_handler, validation_exception_handler
@@ -18,24 +19,15 @@ from app.routers import insights
 import datetime
 import pymongo
 import json 
+from pymongo.errors import ConnectionFailure, ExecutionTimeout
 
 from app.routers import hmi, engine, sim, two_factor
 from app.routers import public
-app = FastAPI()
+from app.logging_config import configure_logging
+from app.config import settings
 
-# Add the CORS middleware
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:8080"],  # 可根据实际需求配置
-)
-# Routers
-from .routers import add_csv_output_option, audio_upload_router
-from app.routers import species_predictor, auth_router, hmi, engine, sim, two_factor, public, iot, live, sensors, payments #Websocket
-
-from app.routers import projects
-app.include_router(projects.router)
-
-from app.routers import hmi, engine, sim, iot
+configure_logging() #
+logger = logging.getLogger(__name__)
 
 # ✅ Add metadata here
 app = FastAPI(
@@ -51,6 +43,18 @@ app = FastAPI(
     version="1.0.0"
 )
 
+# Log API startup in structured JSON format
+@app.on_event("startup")
+async def log_api_startup():
+    logger.info(f"API Server listening on port {settings.api_port}")
+
+# Routers
+from .routers import add_csv_output_option, audio_upload_router
+from app.routers import species_predictor, auth_router, hmi, engine, sim, two_factor, public, iot, live, sensors, payments #Websocket
+
+from app.routers import projects
+app.include_router(projects.router)
+
 app.add_exception_handler(HTTPException, http_exception_handler)
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
 app.add_exception_handler(Exception, unhandled_exception_handler)
@@ -59,12 +63,62 @@ app.add_middleware(StandardizeErrorResponseMiddleware)
 # ✅ CORS Middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins
+    allow_origins=settings.cors_origins,
 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+logger = logging.getLogger(__name__)
+
+
+async def database_unavailable_handler(request: Request, exc: Exception):
+    logger.warning(
+        "Database unavailable for %s %s (%s)",
+        request.method,
+        request.url.path,
+        exc.__class__.__name__,
+    )
+    return JSONResponse(
+        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+        content={
+            "error": "Database Unavailable",
+            "message": "The database is temporarily unavailable. Please try again later.",
+        },
+    )
+
+
+app.add_exception_handler(ConnectionFailure, database_unavailable_handler)
+app.add_exception_handler(ExecutionTimeout, database_unavailable_handler)
+
+
+######### MQTT live event handling (FR-A2)
+from app.services.mqtt_client import start_mqtt_client, get_connection_state, get_latest_events
+
+@app.on_event("startup")
+def startup_mqtt():
+    start_mqtt_client()
+
+@app.get("/mqtt/connection-state", tags=["mqtt"])
+def mqtt_connection_state():
+    return {"state": get_connection_state()}
+
+@app.get("/mqtt/latest-events", tags=["mqtt"])
+def mqtt_latest_events():
+    from app.routers.hmi import show_latest_events
+
+    events = [
+        {"eventType": "vocalization", **event}
+        for event in show_latest_events(limit=20)
+    ]
+    events += [
+        event for event in get_latest_events()
+        if event.get("eventType") != "vocalization"
+    ]
+
+    return {"events": events}
+
 
 
 # app.include_router(hmi.router, tags=['hmi'], prefix='/hmi')
@@ -97,6 +151,7 @@ print(f" database names: {client.list_database_names()}")
 app.include_router(iot.router, tags=['iot'], prefix='/iot')
 app.include_router(sensors.router, tags=['sensors'], prefix='/sensors')
 app.include_router(payments.router)
+app.include_router(live.router, tags=["live"])
 app.include_router(species_predictor.router, tags=["predict"])
 
 
@@ -150,6 +205,6 @@ def export_openapi_to_file():
     with open(output_path, "w") as f:
         json.dump(app.openapi(), f, indent=2)
 
-    print(f"✅ OpenAPI spec exported to {output_path}")
+    logger.info(f"OpenAPI spec exported to {output_path}")
 
 export_openapi_to_file()
