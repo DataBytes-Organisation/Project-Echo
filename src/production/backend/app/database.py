@@ -23,6 +23,7 @@ db = client[settings.mongo_db_name]
 # db = client['mydatabase']
 Events = db.events
 Events.create_index([("sourceType", pymongo.ASCENDING), ("timestamp", pymongo.DESCENDING)], name="idx_events_source_type_timestamp")
+Events.create_index([("species", pymongo.ASCENDING), ("sensorId", pymongo.ASCENDING), ("timestamp", pymongo.DESCENDING)], name="idx_events_species_sensor_timestamp")
 Movements = db.movements
 Species = db.species
 Microphones = db.microphones
