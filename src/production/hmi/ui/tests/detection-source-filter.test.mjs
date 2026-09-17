@@ -334,6 +334,48 @@ test("repeated filtering with unknown sources creates no duplicates or demo data
   assert.doesNotMatch(hmi.detectionSourceStatus.textContent, /demo|sample|hardcoded|fallback/i);
 });
 
+test("switching All→Simulated removes unknown-source markers without adding layers", async () => {
+  const hmiModule = await import("../public/js/HMI.js");
+  const hmi = makeHmi();
+  hmi.vocalizationEvents = [];
+  hmi.detectionSourceFilter = "all";
+  hmi.currentTime = 1750000000;
+  const layerKeysBefore = Object.keys(hmi.layers).length;
+  const basemapLayersBefore = hmi.basemap.layers.length;
+  const basemapControlsBefore = hmi.basemap.controls.length;
+  hmiModule.updateVocalizationLayerFromLiveData(hmi, [vocalizationRecord("bogus"), vocalizationRecord("simulated")]);
+  assert.equal(hmi.layers.normal_bird.getSource().getFeatures().length, 2);
+  const applied = hmiModule.setDetectionSourceFilter(hmi, "simulator");
+  for (let i = 0; i < 20; i++) await Promise.resolve();
+  assert.equal(applied.filter, "simulator");
+  assert.equal(hmi.layers.normal_bird.getSource().getFeatures().length, 0);
+  assert.equal(Object.keys(hmi.layers).length, layerKeysBefore);
+  assert.equal(hmi.basemap.layers.length, basemapLayersBefore);
+  assert.equal(hmi.basemap.controls.length, basemapControlsBefore);
+  assert.equal(hmi.vocalizationEvents.length, 2); // cache retained for switching back
+  assert.match(hmi.detectionSourceStatus.textContent, /No simulated detections/i);
+});
+
+test("Simulated keeps simulator markers and All restores the rest without duplication", async () => {
+  const hmiModule = await import("../public/js/HMI.js");
+  const hmi = makeHmi();
+  hmi.vocalizationEvents = [];
+  hmi.detectionSourceFilter = "all";
+  hmi.currentTime = 1750000000;
+  hmiModule.updateVocalizationLayerFromLiveData(hmi, [vocalizationRecord("simulator"), vocalizationRecord("bogus")]);
+  const basemapLayersBefore = hmi.basemap.layers.length;
+  hmiModule.setDetectionSourceFilter(hmi, "simulator");
+  for (let i = 0; i < 20; i++) await Promise.resolve();
+  const simFeatures = hmi.layers.normal_bird.getSource().getFeatures();
+  assert.equal(simFeatures.length, 1);
+  assert.equal(simFeatures[0].get("sourceType"), "simulator");
+  hmiModule.setDetectionSourceFilter(hmi, "all");
+  for (let i = 0; i < 20; i++) await Promise.resolve();
+  assert.equal(hmi.layers.normal_bird.getSource().getFeatures().length, 2);
+  assert.equal(hmi.basemap.layers.length, basemapLayersBefore);
+  assert.match(hmi.detectionSourceStatus.textContent, /2 detections shown/i);
+});
+
 test("movement markers keep a blank source line while detection markers state theirs", () => {
   // Q5A lock-in: only detection markers report Simulated/Real-device; movement
   // markers blank markup_source and are identified as movement elsewhere.

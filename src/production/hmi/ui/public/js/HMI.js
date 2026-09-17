@@ -44,6 +44,7 @@ import {
   DETECTION_SOURCE_FILTERS,
   applyDetectionSourceFilter,
   buildSimulatorVocalizationStyle,
+  detectionMatchesSourceFilter,
   formatDetectionSourceLabel,
   normalizeDetectionSource,
 } from "./detection-source-filter.js";
@@ -1276,12 +1277,35 @@ export function updateLayers(hmiState, filterState) {
   const sourceFilter = hmiState.detectionSourceFilter || DETECTION_SOURCE_FILTERS.ALL;
   // Single path for source + species visibility: avoids drift between the
   // checkbox handler and the All/Simulated/Real-device radios.
-  applyDetectionSourceFilter(hmiState, sourceFilter);
+  applySourceFilterWithRefresh(hmiState, sourceFilter);
+}
+
+/**
+ * Ticket 03: ingest-time filtering only reflects the filter active during the
+ * fetch, so records pulled in under All (including unknown sources) would
+ * otherwise stay rendered after switching to Simulated. Rebuilding the sim
+ * markers from the vocalizationEvents cache (no refetch, no new map, layers
+ * or listeners) keeps the visible markers matching the selection. The second
+ * apply() recomputes the status counts from the rebuilt layers.
+ */
+function refreshVocalizationFeaturesForSourceFilter(hmiState, filter) {
+  clearAllVocalizationLayers(hmiState);
+  for (const entry of hmiState.vocalizationEvents || []) {
+    if (detectionMatchesSourceFilter(entry.sourceType, filter)) {
+      _addVocalizationFeature(hmiState, entry);
+    }
+  }
+}
+
+function applySourceFilterWithRefresh(hmiState, filter) {
+  const applied = applyDetectionSourceFilter(hmiState, filter);
+  refreshVocalizationFeaturesForSourceFilter(hmiState, applied.filter);
+  return applyDetectionSourceFilter(hmiState, applied.filter);
 }
 
 /** Ticket 03: switch All / Simulated / Real-device without recreating map state. */
 export function setDetectionSourceFilter(hmiState, filter) {
-  const applied = applyDetectionSourceFilter(hmiState, filter);
+  const applied = applySourceFilterWithRefresh(hmiState, filter);
   // ponytail: rapid switches stack guarded fetches (stale responses dropped by
   // realDetectionRequest); per-switch abort if this ever shows up in profiles.
   void loadRealDetections(hmiState);
