@@ -5,9 +5,22 @@ def test_engine_event_is_persisted_in_mock_mongo(mock_mongo_api):
         "timestamp": "2026-07-28T00:00:00Z",
         "sensorId": marker,
         "species": "Koala",
-        "microphoneLLA": [-37.8136, 144.9631, 10.0],
-        "animalEstLLA": [-37.8135, 144.9632, 10.0],
-        "animalTrueLLA": [-37.8134, 144.9633, 10.0],
+        "sourceType": "simulator",
+        "microphoneLLA": {
+            "latitude": -37.8136,
+            "longitude": 144.9631,
+            "altitude": 10.0,
+        },
+        "animalEstLLA": {
+            "latitude": -37.8135,
+            "longitude": 144.9632,
+            "altitude": 10.0,
+        },
+        "animalTrueLLA": {
+            "latitude": -37.8134,
+            "longitude": 144.9633,
+            "altitude": 10.0,
+        },
         "animalLLAUncertainty": 5,
         "audioClip": "mock-only-no-real-audio",
         "confidence": 95.0,
@@ -22,6 +35,8 @@ def test_engine_event_is_persisted_in_mock_mongo(mock_mongo_api):
 
     assert stored_event is not None
     assert events.count_documents({"sensorId": marker}) == 1
-    assert str(stored_event["_id"]) == response_event["_id"]
+    # Current engine route returns {status, eventId} after persist.
+    assert response_event["status"] == "success"
+    assert str(stored_event["_id"]) == response_event["eventId"]
     assert stored_event["species"] == "Koala"
     assert stored_event["confidence"] == 95.0
