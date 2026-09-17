@@ -115,6 +115,7 @@ services:
       MQTT_BROKER_URL: "ts-mqtt-server-cont"
       MQTT_BROKER_PORT: "1883"
       MQTT_PUBLISH_URL: "projectecho/engine/2"
+      MQTT_DETECTION_TOPIC: "projectecho/backend/detections"
       ENGINE_API_KEY: ${ENGINE_API_KEY:-}
 
     stdin_open: false
