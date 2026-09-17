@@ -1,31 +1,35 @@
-from twilio.rest import Client
-from decouple import config
+import logging
 
-# Twilio credentials from environment variables
-TWILIO_ACCOUNT_SID = "AC8f3e6e91bd33bdda1dd2e453327e6d3a"
-TWILIO_AUTH_TOKEN = "ecb3f62b59de94d7158150b961e73ec9"
-TWILIO_PHONE_NUMBER = "+19035013811"
+from twilio.rest import Client
+
+from app.config import settings
+
+logger = logging.getLogger(__name__)
+
 
 def send_sms(to_number: str, message: str) -> bool:
     """
     Send SMS using Twilio
-    
+
     Args:
         to_number (str): Recipient's phone number in E.164 format (e.g., +61412345678)
         message (str): Message content
-        
+
     Returns:
         bool: True if message was sent successfully, False otherwise
     """
+    if not (settings.twilio_account_sid and settings.twilio_auth_token and settings.twilio_phone_number):
+        logger.warning("Twilio settings are not configured; skipping SMS send")
+        return False
+
     try:
-        client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
-        print(to_number)
-        message = client.messages.create(
+        client = Client(settings.twilio_account_sid, settings.twilio_auth_token)
+        client.messages.create(
             body=message,
-            from_=TWILIO_PHONE_NUMBER,
+            from_=settings.twilio_phone_number,
             to=to_number
         )
         return True
-    except Exception as e:
-        print(f"Error sending SMS: {str(e)}")
+    except Exception:
+        logger.warning("Error sending SMS", exc_info=True)
         return False
