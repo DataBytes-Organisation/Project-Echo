@@ -17,9 +17,10 @@ const VOCALIZATION_TYPES = ["mammal", "bird", "amphibian", "reptile", "insect"];
 
 export function normalizeDetectionSource(sourceType) {
   if (sourceType === "real") return DETECTION_SOURCE_FILTERS.REAL;
-  if (sourceType === "simulator" || sourceType == null || sourceType === "") {
-    return DETECTION_SOURCE_FILTERS.SIMULATOR;
-  }
+  if (sourceType === "simulator") return DETECTION_SOURCE_FILTERS.SIMULATOR;
+  // Strict contract: the backend requires sourceType on write, so a missing
+  // value is malformed, never confirmed simulator output. Unknown stays
+  // visible under All (fail-open) and out of explicit filters.
   return "unknown";
 }
 

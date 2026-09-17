@@ -236,3 +236,23 @@ test("the static map alias is session-protected before Express serves files", as
     assert.match(await authenticated.text(), /id="basemap"/);
   } finally { server.closeAllConnections(); await new Promise(resolve => server.close(resolve)); }
 });
+
+test("detection proxy forwards a validated sourceType and omits all/unknown", async () => {
+  for (const [query, expected] of [
+    [{ sourceType: "simulator" }, { limit: 100, sourceType: "simulator" }],
+    [{ sourceType: "real" }, { limit: 100, sourceType: "real" }],
+    [{ sourceType: "all" }, { limit: 100 }],
+    [{}, { limit: 100 }],
+    [{ sourceType: "simulated" }, { limit: 100 }],
+  ]) {
+    const h = harness();
+    const response = await h.request("/api/detections", "session-jwt", { query });
+    assert.equal(response.statusCode, 200);
+    assert.equal(h.calls.length, 1);
+    // Spread out of the vm realm: cross-realm objects share structure but not
+    // prototype, so strict deep-equal needs a main-realm copy.
+    assert.deepEqual({ ...h.calls[0].options.params }, expected);
+    assert.doesNotMatch(JSON.stringify(h.calls[0].options.params), /"all"/);
+    assert.equal(h.calls[0].options.headers.Authorization, "Bearer session-jwt");
+  }
+});

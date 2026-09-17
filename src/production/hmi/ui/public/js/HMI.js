@@ -1269,7 +1269,11 @@ export function updateLayers(hmiState, filterState) {
 
 /** Ticket 03: switch All / Simulated / Real-device without recreating map state. */
 export function setDetectionSourceFilter(hmiState, filter) {
-  return applyDetectionSourceFilter(hmiState, filter);
+  const applied = applyDetectionSourceFilter(hmiState, filter);
+  // ponytail: rapid switches stack guarded fetches (stale responses dropped by
+  // realDetectionRequest); per-switch abort if this ever shows up in profiles.
+  void loadRealDetections(hmiState);
+  return applied;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1965,7 +1969,7 @@ function createMapClickEvent(hmiState) {
           const sourceEl = document.getElementById("markup_source");
           if (sourceEl) sourceEl.innerText = "";
         } else {
-          setDetectionSourceDetail(values.sourceType || DETECTION_SOURCE_FILTERS.SIMULATOR);
+          setDetectionSourceDetail(values.sourceType || "unknown");
         }
         setEl("markup_loc_lon",   formatVocalizationDetailValue(values.animalLon));
         setEl("markup_loc_lat",   formatVocalizationDetailValue(values.animalLat));

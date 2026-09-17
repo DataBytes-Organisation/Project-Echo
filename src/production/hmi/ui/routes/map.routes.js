@@ -8,8 +8,13 @@ const API_BASE_URL = apiClient.API_BASE_URL;
 module.exports = function(app) {
   app.get("/api/detections", checkUserSession, async (req, res) => {
     try {
+      const { sourceType } = req.query || {};
+      const params = { limit: 100 };
+      // Forward only validated values; "all"/missing/unknown omits sourceType
+      // so the backend default (all-behaviour) applies. Never forward "all".
+      if (sourceType === "real" || sourceType === "simulator") params.sourceType = sourceType;
       const response = await axios.get(`${API_BASE_URL}/hmi/latest_events`, {
-        params: { sourceType: "real", limit: 100 },
+        params,
         headers: { Authorization: `Bearer ${req.session.token}` },
         timeout: 10000,
       });

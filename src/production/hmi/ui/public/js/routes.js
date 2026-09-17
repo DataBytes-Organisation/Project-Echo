@@ -86,8 +86,11 @@ export function retrieveIotNode(nodeId, opts = {}) {
   );
 }
 
-export function retrieveDetections() {
-  return withRetry(() => api.get("/api/detections"), RETRY_OPTS);
+export function retrieveDetections(source) {
+  // "all" (and missing/unknown) omits sourceType: the backend default is
+  // all-behaviour. Never send sourceType=all as a value.
+  const params = source === "real" || source === "simulator" ? { sourceType: source } : undefined;
+  return withRetry(() => api.get("/api/detections", params ? { params } : undefined), RETRY_OPTS);
 }
 
 /**

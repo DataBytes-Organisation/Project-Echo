@@ -107,7 +107,10 @@ function makeHmi() {
 test("source filter labels keep simulator contract and human-readable names", () => {
   assert.equal(filter.formatDetectionSourceLabel("simulator"), "Simulated");
   assert.equal(filter.formatDetectionSourceLabel("real"), "Real-device");
-  assert.equal(filter.formatDetectionSourceLabel(undefined), "Simulated");
+  for (const missing of [null, undefined, ""]) {
+    assert.equal(filter.normalizeDetectionSource(missing), "unknown");
+    assert.equal(filter.formatDetectionSourceLabel(missing), "Unknown source");
+  }
   assert.equal(filter.formatDetectionSourceLabel("bogus"), "Unknown source");
   assert.equal(filter.normalizeDetectionSource("simulated"), "unknown");
 });
@@ -121,6 +124,9 @@ test("unknown sourceType is visible under All but hidden under explicit filters"
   for (const mode of ["simulator", "real"]) {
     assert.equal(filter.detectionMatchesSourceFilter("bogus", mode), false);
     assert.equal(filter.detectionMatchesSourceFilter("simulated", mode), false);
+    for (const missing of [null, undefined, ""]) {
+      assert.equal(filter.detectionMatchesSourceFilter(missing, mode), false);
+    }
   }
   assert.equal(filter.detectionMatchesSourceFilter("simulator", "simulator"), true);
   assert.equal(filter.detectionMatchesSourceFilter("real", "real"), true);
@@ -334,5 +340,5 @@ test("movement markers keep a blank source line while detection markers state th
   const source = fs.readFileSync(new URL("../public/js/HMI.js", import.meta.url), "utf8");
   assert.match(source, /only detection markers report Simulated\/Real-device/);
   assert.match(source, /if \(values\.isAnimalMovement\) \{\s*\n\s*const sourceEl = document\.getElementById\("markup_source"\);\s*\n\s*if \(sourceEl\) sourceEl\.innerText = "";/);
-  assert.match(source, /setDetectionSourceDetail\(values\.sourceType \|\| DETECTION_SOURCE_FILTERS\.SIMULATOR\)/);
+  assert.match(source, /setDetectionSourceDetail\(values\.sourceType \|\| "unknown"\)/);
 });

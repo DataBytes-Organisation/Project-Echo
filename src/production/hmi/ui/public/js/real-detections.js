@@ -99,7 +99,7 @@ export async function loadRealDetections(hmiState) {
   );
   try {
     const response =
-      await retrieveDetections();
+      await retrieveDetections(hmiState.detectionSourceFilter || DETECTION_SOURCE_FILTERS.ALL);
 
     if (
       request !== hmiState.realDetectionRequest
@@ -123,6 +123,8 @@ export async function loadRealDetections(hmiState) {
     const ids = new Set();
 
     for (const detection of response.data) {
+      // All is a composite: sim markers render via the /events_time vocalization
+      // layers; this layer keeps real records only.
       if (normalizeDetectionSource(detection?.sourceType) !== DETECTION_SOURCE_FILTERS.REAL) continue;
       const coordinates = getMicrophoneCoordinates(detection.microphoneLLA);
       if (!coordinates) { invalid++; continue; }
