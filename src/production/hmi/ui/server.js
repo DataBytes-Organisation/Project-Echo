@@ -974,6 +974,40 @@ async function proxyToApi(req, res) {
     }
   }
 }
+async function proxyPredictionToApi(req, res) {
+  try {
+    const url = `${API_BASE_URL}${req.originalUrl}`;
+
+    const headers = {
+      'content-type': req.headers['content-type'],
+    };
+
+    if (req.headers['content-length']) {
+      headers['content-length'] = req.headers['content-length'];
+    }
+
+    const response = await axios({
+      method: req.method,
+      url,
+      headers,
+      data: req,
+      maxBodyLength: Infinity,
+      maxContentLength: Infinity,
+      validateStatus: () => true,
+    });
+
+    if (res.headersSent) return;
+
+    res.status(response.status);
+    return res.send(response.data);
+  } catch (error) {
+    console.error('Error proxying prediction to API:', error.message);
+
+    if (!res.headersSent) {
+      return res.status(502).json({ error: 'Prediction API unavailable' });
+    }
+  }
+}
 
 app.all('/sensors', proxyToApi);
 app.all('/sensors/*', proxyToApi);
