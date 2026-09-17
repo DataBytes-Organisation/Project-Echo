@@ -128,8 +128,8 @@
 
 
         <div style="display:flex; gap:8px; margin-bottom:6px;">
-    <button id="pause-resume-btn" style="background:#2c7a3f; color:white; border:none; padding:6px 14px; border-radius:4px; font-size:13px; cursor:pointer;">Pause</button>
-    <button id="manual-refresh-btn" style="background:#2c5f8a; color:white; border:none; padding:6px 14px; border-radius:4px; font-size:13px; cursor:pointer;">Refresh</button>
+    <button id="pause-resume-btn" aria-pressed="false" title="Pause live updates" style="background:#2c7a3f; color:white; border:none; padding:6px 14px; border-radius:4px; font-size:13px; cursor:pointer;">Pause</button>
+    <button id="manual-refresh-btn" title="Refresh live feed and real-device detections" style="background:#2c5f8a; color:white; border:none; padding:6px 14px; border-radius:4px; font-size:13px; cursor:pointer;">Refresh</button>
   </div>
   <div style="display:flex; gap:8px; margin-bottom:6px;">
     <select id="event-type-filter" style="background:#333; color:white; border:1px solid #555; padding:4px 8px; border-radius:4px; font-size:12px;">
@@ -144,6 +144,7 @@
     </select>
   </div>
   <div id="last-update-label" style="color:#ddd; font-size:12px;">Last update: —</div>
+  <div id="real-detection-status" role="status" aria-live="polite" style="color:#ddd; font-size:12px;">Loading real-device detections…</div>
       </div>
 
           <div id="editFormWrapper">
@@ -1569,7 +1570,7 @@
       import {
         updateLayers, initialiseHMI, showMics, hideMics,
         updateAnimalMovementLayerFromPastData, updateVocalizationLayerFromPastData,
-        resetWildlifeLayers, MapOpenNav, MapCloseNav, getAnimalToggled,
+        MapOpenNav, MapCloseNav, getAnimalToggled,
         enableMicAnimation, disableMicAnimation, getUTC,
         startAudioRecording, stopAudioRecording, cancelAudioRecording,
         playRecordingClip, testFunct, convertCSV, setDetectionSourceFilter,
@@ -1685,25 +1686,9 @@
         else { disableMicAnimation(hmiState); if (mic.checked) showMics(hmiState); }
       }
 
-      // Live mode / date range picker
-      const toggleSwitch      = document.querySelector('#liveModeToggle');
-      const pastDataContainer = document.querySelector('.past-data-container');
-
-      toggleSwitch.addEventListener('change', function () {
-        if (this.checked) {
-          resetWildlifeLayers(hmiState);
-          hmiState.currentTime    = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
-          hmiState.previousUpdate = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
-          datepickerStart = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
-          datepickerEnd   = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
-          hmiState.liveMode = true;
-          pastDataContainer.style.maxHeight = '0';
-        } else {
-          resetWildlifeLayers(hmiState);
-          hmiState.liveMode = false;
-          pastDataContainer.style.maxHeight = pastDataContainer.scrollHeight + 'px';
-        }
-      });
+      // Live mode toggle and past-data picker live in #live-map-controls wiring
+      // (setupLiveMapControls in HMI.js), which owns all live/pause behaviour.
+      // The date-range picker below only issues one-shot history queries.
 
       $(function () {
         $('#datetime-range').daterangepicker({
