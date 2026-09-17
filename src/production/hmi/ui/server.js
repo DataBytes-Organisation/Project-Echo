@@ -987,8 +987,6 @@ app.all('/mqtt/*', proxyToApi);
 // No duplicate unauthenticated proxies here: that keeps one production path
 // (authenticated HMI -> Backend API) for movement, vocalization, microphone,
 // audio, weather, and detection reads.
-// Direct calls to the authenticated detection read must also carry an HMI session.
-app.all('/hmi/detections', checkUserSession, proxyToApi);
 app.all('/hmi/*', proxyToApi);
 
 app.get('/iot/nodes', checkUserSession, async (req, res) => {

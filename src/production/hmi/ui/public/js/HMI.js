@@ -47,7 +47,6 @@ import {
   formatDetectionSourceLabel,
   normalizeDetectionSource,
 } from "./detection-source-filter.js";
-import { connectDetectionStream } from "./detection_stream_client.js";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
@@ -843,7 +842,6 @@ export function initialiseHMI(hmiState) {
       await addIoTNodesToMap(hmiState);
 
       queueSimUpdate(hmiState);
-      startDetectionStream(hmiState);
       showToast("Map data loaded successfully", "success");
     })
     .catch((error) => {
@@ -2001,35 +1999,6 @@ export function MapCloseNav() {
 // ─────────────────────────────────────────────────────────────────────────────
 // Live updates
 // ─────────────────────────────────────────────────────────────────────────────
-
-let disconnectDetectionStream = null;
-
-function startDetectionStream(hmiState) {
-  if (disconnectDetectionStream) return;
-
-  disconnectDetectionStream = connectDetectionStream({
-    onStatus: (status) => console.log("Detection stream:", status),
-    onDetection: (data) => {
-      console.log("[B1.2 WS] map handler received detection:", {
-        _id: data._id,
-        species: data.species,
-        sensorId: data.sensorId,
-        confidence: data.confidence,
-      });
-
-      const alreadySeen = hmiState.vocalizationEvents.some(
-        (event) => event.eventId === data._id
-      );
-      if (alreadySeen) {
-        console.log("[B1.2 WS] duplicate ignored:", data._id);
-        return;
-      }
-
-      updateVocalizationLayerFromLiveData(hmiState, [data]);
-      showToast(`Live detection: ${data.species}`, "success");
-    },
-  });
-}
 
 function updateTruthEvents(hmiState) {
   retrieveTruthEventsInTimeRange(hmiState.currentTime - 5, hmiState.currentTime)
