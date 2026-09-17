@@ -855,12 +855,6 @@ function setupLiveMapControls(hmiState) {
   }
 }
 
-function startMqttEventPolling(hmiState) {
-  pollMqttLatestEvents(hmiState);
-  setInterval(() => pollMqttLatestEvents(hmiState), 5000);
-}
-
-
 export function initialiseHMI(hmiState) {
 console.log("initialising");
 startMqttConnectionPolling();
