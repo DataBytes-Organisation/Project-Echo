@@ -1,0 +1,6 @@
+name: panns_cnn14
+norm_choice: freeze_bn
+params:
+  pretrained: true
+  classes_num: ${data.num_classes}
+  use_arcface: false

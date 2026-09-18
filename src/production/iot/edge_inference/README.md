@@ -38,13 +38,13 @@ Both modes are supported simultaneously on the same MQTT topic. The engine detec
 
 | File | Change |
 |---|---|
-| `src/production/engine/echo_engine_iot.py` | Added `_handle_edge_prediction()` method; `on_iot_message()` now routes on `payload["type"]` |
-| `src/production/engine/echo_engine_iot.py` | Removed duplicate `import base64` |
-| `src/production/engine/echo_engine_iot.py` | Hardcoded API URL replaced with `self.config['API_URL']` |
+| `src/production/engine/echo_engine.py` | Added `_handle_edge_prediction()` method; `on_iot_message()` now routes on `payload["type"]` |
+| `src/production/engine/echo_engine.py` | Removed duplicate `import base64` |
+| `src/production/engine/echo_engine.py` | Hardcoded API URL replaced with `self.config['API_URL']` |
 | `src/production/engine/echo_engine.json` | Added `"API_URL"` field |
-| `src/production/engine/Engine.Dockerfile` | Now copies `echo_engine_iot.py` as `echo_engine.py` so IoT engine runs in Docker |
+| `src/production/engine/Engine.Dockerfile` | Copies the canonical IoT-capable `echo_engine.py` runtime |
 | `src/production/engine/requirements.txt` | Added `scikit-learn` (was imported but missing) |
-| `src/production/engine/test_iot_integration.py` | Updated import to `from echo_engine_iot import EchoEngine` so tests run locally |
+| `src/production/engine/test_iot_integration.py` | Imports `EchoEngine` from the canonical `echo_engine` module |
 | `src/Prototypes/engine/torch_impl/light_echo_engine.json` | Fixed `MQTT_CLIENT_URL` from `"mqtt-broker"` → `"ts-mqtt-server-cont"` (was causing DNS failure) |
 | `src/Prototypes/engine/torch_impl/requirements.txt` | Added `paho-mqtt==1.6.1`, `pymongo`, `geopy`, `google-cloud-storage` |
 

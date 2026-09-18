@@ -5,7 +5,7 @@ from bson import ObjectId
 from pymongo import ReturnDocument
 from pymongo.errors import PyMongoError
 
-from app.database import Detections
+from app.database import Detections, Events
 from app.detection_rules import mutable_detection_update, validate_list_filters
 from app.exceptions import (
     DetectionNotFoundError,
@@ -64,6 +64,25 @@ def get_detection(detection_id: str) -> Detection:
     return _doc_to_detection(doc)
 
 
+def list_real_events(page_size: int = 100) -> Dict[str, Any]:
+    """Engine events for the authenticated HMI read; never served elsewhere."""
+    query: Dict[str, Any] = {"sourceType": "real"}
+
+    total = Events.count_documents(query)
+    cursor = Events.find(query).sort("timestamp", -1).limit(page_size)
+    # Raw docs: the /detections-collection Detection contract (list LLAs, no
+    # sourceType) must not coerce Engine event reads; the route serializes
+    # through eventListEntity and validates against RealDetectionRead.
+    items: List[Dict[str, Any]] = list(cursor)
+
+    return {
+        "items": items,
+        "total": total,
+        "page": 1,
+        "page_size": page_size,
+    }
+
+
 def list_detections(
     species: Optional[str] = None,
     start_time: Optional[datetime] = None,
@@ -95,8 +114,8 @@ def list_detections(
         lon_min = lon - delta_deg
         lon_max = lon + delta_deg
 
-        query["microphoneLLA.0"] = {"$gte": lat_min, "$lte": lat_max}
-        query["microphoneLLA.1"] = {"$gte": lon_min, "$lte": lon_max}
+        query["microphoneLLA.latitude"] = {"$gte": lat_min, "$lte": lat_max}
+        query["microphoneLLA.longitude"] = {"$gte": lon_min, "$lte": lon_max}
 
     if page < 1:
         page = 1

@@ -1,16 +1,19 @@
-# Builder (Compilers and heavy lifting)
-ARG BASE_IMAGE=python:3.10-slim-bullseye
+﻿# Builder (Compilers and heavy lifting)
+# bullseye (Debian 11) reached full end-of-life 2026-08-31; its apt archive
+# is being frozen/migrated, which breaks package installs unpredictably.
+# bookworm (Debian 12) is the current supported release.
+ARG BASE_IMAGE=python:3.10-slim-bookworm
 FROM ${BASE_IMAGE} AS echo_engine_builder
 
 WORKDIR /build
 
 # Install build-time dependencies only
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends --fix-missing \
 	libopenexr-dev \
 	pkg-config \
 	build-essential \
-	&& rm -rf /var/lib/apt/lists/* 
+	&& rm -rf /var/lib/apt/lists/*
 
 # Create a virtual environment to isolate packages
 RUN python -m venv /opt/venv 
@@ -25,7 +28,7 @@ RUN pip3 install --upgrade pip && \
 
 # Handle script formatting here so it doesn't create layers in the final image
 COPY ./echo_engine.sh .
-RUN apt-get update && apt-get install -y dos2unix && \
+RUN apt-get update && apt-get install -y --no-install-recommends --fix-missing dos2unix && \
 	dos2unix ./echo_engine.sh && \
 	chmod +x ./echo_engine.sh 
 
@@ -38,19 +41,27 @@ WORKDIR /app
 # We also add the gcloud CLI here in a single consolidated step
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-	libopenexr25 \
+RUN apt-get update -o Acquire::Retries=5 -o Acquire::http::Timeout=30 \
+	&& apt-get install -y --no-install-recommends --fix-missing \
+	-o Acquire::Retries=5 \
+	-o Acquire::http::Timeout=30 \
+	libopenexr-3-1-30 \
 	libgl1-mesa-glx \
 	libglib2.0-0 \
 	curl \
-	gnupg \
 	ca-certificates \
-	&& echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list \
-	&& curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg add - \
-	&& apt-get update -y \
-	&& apt-get install -y google-cloud-cli \
 	&& apt-get clean \
-	&& rm -rf /var/lib/apt/lists/* 
+	&& rm -rf /var/lib/apt/lists/*
+
+# Google Cloud CLI, installed from Google tarball instead of apt/apt-key -
+# the apt-key path needs gnupg, which is not installed above, and was
+# failing here with exit code 255.
+RUN curl -sSL -o /tmp/gcloud.tar.gz \
+		https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-linux-x86_64.tar.gz \
+	&& tar -xzf /tmp/gcloud.tar.gz -C /usr/local \
+	&& rm /tmp/gcloud.tar.gz \
+	&& /usr/local/google-cloud-sdk/install.sh --quiet --path-update false --usage-reporting false
+ENV PATH="/usr/local/google-cloud-sdk/bin:$PATH"
 
 COPY --from=echo_engine_builder /opt/venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
@@ -62,6 +73,7 @@ COPY ./echo_engine.py ./
 COPY ./echo_engine.json ./
 COPY ./echo_credentials.json ./
 COPY ./helpers ./helpers
+COPY ./inference_wrapper ./inference_wrapper
 
 # Setup GCloud config dir
 RUN mkdir -p /root/.config/gcloud/

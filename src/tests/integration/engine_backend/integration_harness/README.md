@@ -254,19 +254,18 @@ Do not state that a live test passed until the request has actually been run aga
 
 ## Current Interface Mismatches
 
-1. `echo_engine_iot.py` reads `API_URL` from `echo_engine.json`, while `echo_engine.py` hardcodes the Backend URL.
-2. The existing Engine sender does not set an explicit request timeout.
-3. The existing Engine sender prints the response body but does not explicitly check for HTTP `201`.
-4. The existing Engine sender does not catch timeout or connection errors locally.
-5. The current Backend uses three-element arrays for locations; Anand's proposed interface uses named location objects.
-6. The current Backend requires integer `animalLLAUncertainty`; the proposed interface shows a decimal value.
-7. Proposed `status` and `error` fields are not part of the current stored-event schema.
+1. The existing Engine sender does not set an explicit request timeout.
+2. The existing Engine sender prints the response body but does not explicitly check for HTTP `201`.
+3. The existing Engine sender does not catch timeout or connection errors locally.
+4. The current Backend uses three-element arrays for locations; Anand's proposed interface uses named location objects.
+5. The current Backend requires integer `animalLLAUncertainty`; the proposed interface shows a decimal value.
+6. Proposed `status` and `error` fields are not part of the current stored-event schema.
 
 ## Sprint 2 Recommendations
 
 1. Agree on one versioned Engine-Backend contract.
 2. Clarify whether the inference response and stored detection event are separate contracts.
-3. Standardise Backend URL configuration across Engine implementations.
+3. Keep the Backend URL configurable through `echo_engine.json`.
 4. Add an agreed production timeout, structured logging, and controlled error handling.
 5. Decide whether real detections require `animalTrueLLA` and the complete Base64 audio clip.
 6. Decide whether location uncertainty must support decimal values.

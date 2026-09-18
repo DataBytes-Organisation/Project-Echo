@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Project Echo | Spectrogram prototype</title>
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <header class="app-header">
+      <div>
+        <p class="product-name">Project Echo</p>
+        <h1>Audio spectrogram</h1>
+      </div>
+      <p class="session-status" data-demo-status role="status" aria-live="polite">
+        No clip selected
+      </p>
+    </header>
+
+    <main>
+      <section class="control-bar" aria-label="Audio source and state controls">
+        <div class="source-controls">
+          <button class="command-button command-button--primary" type="button" data-action="sample">
+            Generated clip
+          </button>
+          <label class="file-control">
+            <span>Local audio</span>
+            <input type="file" accept="audio/*" data-action="file">
+          </label>
+        </div>
+
+        <div class="state-preview">
+          <span class="control-label">State preview</span>
+          <div class="segmented-control" role="group" aria-label="Preview component state">
+            <button type="button" data-action="empty">Empty</button>
+            <button type="button" data-action="loading">Loading</button>
+            <button type="button" data-action="error">Decode error</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel-grid" aria-label="Spectrogram panel examples">
+        <article class="analysis-panel panel--animal">
+          <header class="panel-header">
+            <div>
+              <p class="panel-context">Animal event</p>
+              <h2>Tawny frogmouth call</h2>
+            </div>
+            <span class="panel-status">Selected clip</span>
+          </header>
+          <dl class="clip-metadata">
+            <div><dt>Event</dt><dd>EVT-2048</dd></div>
+            <div><dt>Source</dt><dd>Detection audio</dd></div>
+            <div><dt>Panel</dt><dd>Animal detail</dd></div>
+          </dl>
+          <figure class="spectrogram-component" data-spectrogram-panel="animal" data-state="empty">
+            <div class="spectrogram-viewport" data-role="viewport">
+              <canvas data-role="canvas"></canvas>
+              <div class="visual-state visual-state--empty" data-role="empty">
+                <strong>No animal audio selected</strong>
+                <span>Awaiting decoded event audio</span>
+              </div>
+              <div class="visual-state visual-state--loading" data-role="loading" hidden>
+                <span class="loading-indicator" aria-hidden="true"></span>
+                <strong>Decoding audio</strong>
+              </div>
+              <div class="visual-state visual-state--error" data-role="error" role="alert" hidden></div>
+            </div>
+            <figcaption data-role="summary"></figcaption>
+          </figure>
+        </article>
+
+        <article class="analysis-panel panel--microphone">
+          <header class="panel-header">
+            <div>
+              <p class="panel-context">Microphone</p>
+              <h2>Field node MIC-07</h2>
+            </div>
+            <span class="panel-status panel-status--field">Channel 1</span>
+          </header>
+          <dl class="clip-metadata">
+            <div><dt>Location</dt><dd>Barwon reserve</dd></div>
+            <div><dt>Source</dt><dd>Recorded clip</dd></div>
+            <div><dt>Panel</dt><dd>Microphone detail</dd></div>
+          </dl>
+          <figure class="spectrogram-component" data-spectrogram-panel="microphone" data-state="empty">
+            <div class="spectrogram-viewport" data-role="viewport">
+              <canvas data-role="canvas"></canvas>
+              <div class="visual-state visual-state--empty" data-role="empty">
+                <strong>No microphone audio selected</strong>
+                <span>Awaiting decoded recording audio</span>
+              </div>
+              <div class="visual-state visual-state--loading" data-role="loading" hidden>
+                <span class="loading-indicator" aria-hidden="true"></span>
+                <strong>Decoding audio</strong>
+              </div>
+              <div class="visual-state visual-state--error" data-role="error" role="alert" hidden></div>
+            </div>
+            <figcaption data-role="summary"></figcaption>
+          </figure>
+        </article>
+      </section>
+    </main>
+
+    <script src="./spectrogram.js"></script>
+    <script src="./demo.js"></script>
+  </body>
+</html>
