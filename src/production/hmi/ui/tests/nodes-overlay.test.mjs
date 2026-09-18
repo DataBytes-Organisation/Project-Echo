@@ -144,7 +144,7 @@ if (typeof requestAnimationFrame === "undefined") {
   globalThis.requestAnimationFrame = (cb) => setTimeout(cb, 0);
 }
 
-const mod = await import("../public/js/nodes-overlay.js");
+const mod = await import("../public/features/map/nodes-overlay.js");
 const { addIoTNodesToMap, hasValidCoordinates, addUniqueConnectionFeatures } = mod;
 
 // ── hasValidCoordinates ──────────────────────────────────────────────

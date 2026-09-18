@@ -1,47 +1,43 @@
 # Environment Setup Guide
 
-This guide explains how to configure the `.env` file for the HMI service so it works correctly both locally and on the live server.
+The HMI reads local settings from `.env` in `src/production/hmi/ui/`. Copy
+`.env.example` to `.env` when you need values that differ from the defaults.
 
-## What is `.env`?
+## Local Values
 
-The `.env` file holds environment-specific settings such as the website address (`CLIENT_URL`) and the backend API host (`API_HOST`). The same code is used everywhere — only the `.env` file changes between local and live environments.
-
-## Initial Setup
-
-1. Navigate to the HMI UI folder: `src/production/hmi/ui/`
-2. Create a new file named `.env` (copy from `.env.example` if it exists).
-3. Add the following variables:
-
-```
+```env
 API_HOST=localhost
-CLIENT_URL=http://localhost:8080
+API_PORT=9000
+CLIENT_URL=http://localhost:3000
+COOKIE_SECRET=replace-with-a-long-random-value
 ```
 
-## Variable Descriptions
+The Express HMI listens on `http://localhost:3000`. `API_HOST` and `API_PORT`
+identify the FastAPI Backend that the HMI proxies to. `CLIENT_URL` is the public
+browser-facing HMI URL used by redirects and email links.
 
-- `API_HOST` — Backend API host. Locally set to `localhost`. Automatically switches to `api-service` in Kubernetes via the ConfigMap.
-- `CLIENT_URL` — Frontend URL used for Stripe redirects and password reset emails. Locally set to `http://localhost:8080`. On the live server, this is provided by the Cloud team.
+## Runtime Notes
 
-## Updating `CLIENT_URL` for Live Server
-
-When the Cloud team provides the live server URL (e.g. `http://4.147.145.111:8080`), update the `.env` file on the live server only:
-
-```
-CLIENT_URL=http://4.147.145.111:8080
-```
-
-Then restart the server so the new value takes effect.
+- `COOKIE_SECRET` should be stable and random anywhere sessions must survive a restart.
+- Docker supplies service hostnames such as the Backend, Redis, and MongoDB hosts through the container environment.
+- The HMI Docker image installs dependencies with `npm ci --omit=dev` and starts `node server.js`.
+- Restart the HMI process after changing `.env`.
 
 ## Verification
 
-After updating, the connection status badge on the admin dashboard will display:
-- `Running in Local Mode — API connected successfully.` when running locally.
-- `Running in Live Mode — API connected successfully.` when running on the live server.
-- `Live server URL not configured yet, running in local fallback mode.` if `CLIENT_URL` is empty or misconfigured.
+From `src/production/hmi/ui/`:
+
+```powershell
+npm ci
+npm test
+node server.js
+```
+
+Then open `http://localhost:3000/login`.
 
 ## Troubleshooting
 
-- **Badge shows "Cannot connect to backend API"** → The backend API service is not running or unreachable. Check that all Docker containers are up.
-- **Badge shows "Fallback Mode"** → `CLIENT_URL` is not set correctly in the `.env` file.
-- **Donation checkout reports that the payment service is unavailable** → Confirm the Backend Razorpay configuration uses a matching Test or Live Mode key pair, then restart the Backend service.
-- **Changes to `.env` not taking effect** → Restart Docker with `docker compose down && docker compose up --build`.
+- **Cannot connect to Backend** - confirm the Backend is running and `API_HOST`/`API_PORT` point to it.
+- **Sessions reset after restart** - set a stable `COOKIE_SECRET`.
+- **Payment checkout is unavailable** - confirm the Backend payment provider environment is configured, then restart the Backend and HMI.
+- **Changes to `.env` do not appear** - restart the HMI process or rebuild/restart the container.
