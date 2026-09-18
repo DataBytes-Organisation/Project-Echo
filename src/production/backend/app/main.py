@@ -56,7 +56,7 @@ async def log_api_startup():
 
 # Routers
 from .routers import add_csv_output_option, audio_upload_router
-from app.routers import species_predictor, auth_router, hmi, engine, sim, two_factor, public, iot, live, sensors, payments #Websocket
+from app.routers import species_predictor, auth_router, detections, hmi, engine, sim, two_factor, public, iot, live, sensors, payments #Websocket
 
 from app.routers import projects
 app.include_router(projects.router)
