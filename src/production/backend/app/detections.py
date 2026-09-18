@@ -13,6 +13,7 @@ from app.exceptions import (
     DetectionStorageError,
 )
 from app.schemas import DetectionCreate, Detection
+from app.detection_rules import evaluate_detection, log_rejected_detection
 
 
 STORAGE_UNAVAILABLE_MESSAGE = "Detection storage is temporarily unavailable."
@@ -35,6 +36,11 @@ def _doc_to_detection(doc: Dict[str, Any]) -> Optional[Detection]:
 
 
 def create_detection(detection_in: DetectionCreate) -> Detection:
+    accepted, reason = evaluate_detection(detection_in)
+    if not accepted:
+        log_rejected_detection(detection_in, reason)
+        raise HTTPException(status_code=422, detail=f"Detection rejected: {reason}")
+
     payload = detection_in.dict(by_alias=True)
 
     try:

@@ -141,7 +141,6 @@ app.include_router(sim.router, tags=['sim'], prefix='/sim')
 app.include_router(two_factor.router)
 app.include_router(admin_budget.router, tags=["admin"], prefix="/api")
 app.include_router(admin_services.router, tags=["admin"], prefix="/api")
-app.include_router(projects.router)
 
 app.include_router(public.router, tags=['public'], prefix='/public')
 
