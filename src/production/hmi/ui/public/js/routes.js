@@ -86,6 +86,26 @@ export function retrieveIotNode(nodeId, opts = {}) {
   );
 }
 
+export function retrieveDetections(source) {
+  // "all" (and missing/unknown) omits sourceType: the backend default is
+  // all-behaviour. Never send sourceType=all as a value.
+  const params = source === "real" || source === "simulator" ? { sourceType: source } : undefined;
+  return withRetry(() => api.get("/api/detections", params ? { params } : undefined), RETRY_OPTS);
+}
+
+/**
+ * Fetch weather for a detection location through the authenticated HMI proxy.
+ * Same-origin only: the browser never calls the Backend host directly.
+ *
+ * @param {number|string} timestamp - Unix seconds for the detection date.
+ * @param {number|string} lat - Latitude of the detection location.
+ * @param {number|string} lon - Longitude of the detection location.
+ * @returns {Promise<AxiosResponse>}
+ */
+export function retrieveWeatherData(timestamp, lat, lon) {
+  return withRetry(() => api.get(`/api/weather?timestamp=${timestamp}&lat=${lat}&lon=${lon}`), RETRY_OPTS);
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Movement / truth events
 // ─────────────────────────────────────────────────────────────────────────────
