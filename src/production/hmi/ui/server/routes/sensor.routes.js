@@ -6,7 +6,7 @@ try {
 
 const { request: httpRequest } = require("../../public/shared/http/http-client.js");
 
-const API_BASE_URL = `http://${process.env.API_HOST || "localhost"}:9000`;
+const API_BASE_URL = `http://${process.env.API_HOST || "localhost"}:${process.env.API_PORT || "9000"}`;
 const BACKEND_TIMEOUT_MS = 3000;
 
 const DEFAULT_SETTINGS = {
@@ -183,8 +183,8 @@ function alertsFrom(items) {
   return alerts;
 }
 
-async function tryBackend(req) {
-  const url = new URL(req.originalUrl, API_BASE_URL);
+async function tryBackend(req, baseUrl = API_BASE_URL) {
+  const url = new URL(req.originalUrl, baseUrl);
   const init = {
     method: req.method,
     timeoutMs: BACKEND_TIMEOUT_MS,
@@ -204,12 +204,12 @@ function sendBackend(res, response) {
   return res.send(response.data);
 }
 
-async function loadSensorCatalog() {
+async function loadSensorCatalog(baseUrl = API_BASE_URL) {
   try {
     const response = await tryBackend({
       method: "GET",
       originalUrl: "/sensors/updates",
-    });
+    }, baseUrl);
     if (response.status < 400 && Array.isArray(response.data?.items) && response.data.items.length > 0) {
       return { items: response.data.items, source: "backend" };
     }
@@ -229,9 +229,10 @@ function asDetailPayload(sensor, source) {
   };
 }
 
-function registerSensorRoutes(app) {
+function registerSensorRoutes(app, options = {}) {
+  const baseUrl = options.apiBaseUrl || API_BASE_URL;
   app.get("/sensors/updates", async (_req, res) => {
-    const catalog = await loadSensorCatalog();
+    const catalog = await loadSensorCatalog(baseUrl);
     const items = catalog.source === "demo-fallback" ? catalog.items.map(toListItem) : catalog.items;
     return res.json({
       items,
@@ -242,7 +243,7 @@ function registerSensorRoutes(app) {
 
   app.get("/sensors/alerts", async (req, res) => {
     try {
-      const response = await tryBackend(req);
+      const response = await tryBackend(req, baseUrl);
       // An empty list is a valid answer ("no active alerts"), so only fall back
       // when the Backend is genuinely unreachable or errored.
       if (response.status < 400 && Array.isArray(response.data?.items)) {
@@ -258,7 +259,7 @@ function registerSensorRoutes(app) {
 
   app.get("/sensors/reboots/recent", async (req, res) => {
     try {
-      const response = await tryBackend(req);
+      const response = await tryBackend(req, baseUrl);
       if (response.status < 400 && Array.isArray(response.data?.items)) {
         return res.json({ ...response.data, source: "backend" });
       }
@@ -274,7 +275,7 @@ function registerSensorRoutes(app) {
   app.get("/sensors/:sensorId/settings", async (req, res) => {
     const { sensorId } = req.params;
     try {
-      const response = await tryBackend(req);
+      const response = await tryBackend(req, baseUrl);
       if (response.status < 400 && response.data?.settings) {
         return sendBackend(res, response);
       }
@@ -292,7 +293,7 @@ function registerSensorRoutes(app) {
   app.put("/sensors/:sensorId/settings", async (req, res) => {
     const { sensorId } = req.params;
     try {
-      const response = await tryBackend(req);
+      const response = await tryBackend(req, baseUrl);
       if (response.status < 400) {
         return sendBackend(res, response);
       }
@@ -317,7 +318,7 @@ function registerSensorRoutes(app) {
   app.post("/sensors/:sensorId/reboot", async (req, res) => {
     const { sensorId } = req.params;
     try {
-      const response = await tryBackend(req);
+      const response = await tryBackend(req, baseUrl);
       if (response.status < 400) {
         return sendBackend(res, response);
       }
@@ -343,7 +344,7 @@ function registerSensorRoutes(app) {
   app.get("/sensors/:sensorId/reboots", async (req, res) => {
     const { sensorId } = req.params;
     try {
-      const response = await tryBackend(req);
+      const response = await tryBackend(req, baseUrl);
       if (response.status < 400 && Array.isArray(response.data?.items)) {
         return sendBackend(res, response);
       }
@@ -359,7 +360,7 @@ function registerSensorRoutes(app) {
   app.get("/sensors/:sensorId", async (req, res) => {
     const { sensorId } = req.params;
     try {
-      const response = await tryBackend(req);
+      const response = await tryBackend(req, baseUrl);
       if (response.status < 400 && response.data && response.data.sensorId) {
         return res.json({ ...response.data, source: "backend" });
       }
@@ -367,7 +368,7 @@ function registerSensorRoutes(app) {
       console.warn("Sensor detail backend unavailable:", error.message);
     }
 
-    const catalog = await loadSensorCatalog();
+    const catalog = await loadSensorCatalog(baseUrl);
     const fromCatalog = catalog.items.find((item) => item.sensorId === sensorId);
     if (fromCatalog) {
       return res.json(asDetailPayload(fromCatalog, catalog.source));

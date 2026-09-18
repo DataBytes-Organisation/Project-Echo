@@ -4,11 +4,26 @@ const { createApp } = require("./server/app");
 const { loadEnvironment } = require("./server/config/environment");
 const { connectDatabases } = require("./server/services/database");
 const { createRedisClient } = require("./server/services/redis");
+const { MongoClient } = require("mongodb");
 
 async function start() {
   const config = loadEnvironment();
   const redisClient = createRedisClient(config);
-  const databases = await connectDatabases(config);
+  let databases;
+  try {
+    databases = await connectDatabases(config);
+  } catch (error) {
+    console.error("Donation MongoDB unavailable, continuing without it:", error.message);
+    const donationClient = new MongoClient(config.mongodbUri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    databases = {
+      donationClient,
+      echoNetDb: undefined,
+      close: () => donationClient.close(),
+    };
+  }
   await redisClient.connect();
   const app = createApp({ config, redisClient, databases });
   const server = app.listen(config.port, () => {

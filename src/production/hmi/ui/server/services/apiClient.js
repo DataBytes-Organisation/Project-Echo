@@ -1,7 +1,13 @@
 const axios = require('axios');
 
+function resolveApiBaseUrl(env = process.env) {
+  const host = env.API_HOST || 'localhost';
+  const port = env.API_PORT || '9000';
+  return `http://${host}:${port}`;
+}
+
 const API_HOST = process.env.API_HOST || 'localhost';
-const API_BASE_URL = `http://${API_HOST}:9000`;
+const API_BASE_URL = resolveApiBaseUrl();
 const DEFAULT_TIMEOUT_MS = 10000;
 
 // Throwing this for every failure case so callers can just check err.isNetworkError / err.status
@@ -63,6 +69,7 @@ function sendApiError(res, err, fallbackMessage = 'Something went wrong') {
 
 module.exports = {
   API_BASE_URL,
+  resolveApiBaseUrl,
   ApiError,
   sendApiError,
   get: (path, opts) => apiRequest('get', path, opts),

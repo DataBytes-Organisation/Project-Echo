@@ -39,12 +39,15 @@ function createApp(dependencies = {}) {
   const storeItems = dependencies.storeItems || new Map([[
     1, { priceInCents: 100, name: 'donation' }
   ]]);
+  const apiBaseUrl = dependencies.config
+    ? apiClient.resolveApiBaseUrl({ API_HOST: dependencies.config.apiHost, API_PORT: dependencies.config.apiPort })
+    : API_BASE_URL;
   const notificationStore = dependencies.notificationStore || createNotificationStore({ donationClient, dbState });
   const emailService = dependencies.emailService || createEmailService({ rootDirectory, controller });
 
   // Razorpay webhook needs raw bytes before JSON parsing.
   app.post('/api/razorpay-webhook', express.raw({ type: 'application/json' }), (req, res) => {
-    return razorpayPayment.handleWebhook(req, res, { apiBaseUrl: API_BASE_URL });
+    return razorpayPayment.handleWebhook(req, res, { apiBaseUrl });
   });
 
   app.use(express.json({ limit: '10mb' }));
@@ -153,11 +156,12 @@ function createApp(dependencies = {}) {
   legacyPaymentRoutes.registerRoutes(app, { stripe, storeItems, donationClient, dbState });
 
   razorpayPayment.registerRazorpayBrowserRoutes(app, {
-    apiBaseUrl: API_BASE_URL,
+    apiBaseUrl,
     checkUserSession,
   });
 
   app.get('/index.html', checkUserSession);
+  app.use('/pages/map', checkUserSession);
   app.use(express.static(publicDir, { index: path.join(publicDir, 'pages/auth/login.html') }));
 
   app.use(cors({ origin: ['http://localhost:8081', '*'] }));
@@ -170,7 +174,7 @@ function createApp(dependencies = {}) {
   require('./routes/user.routes')(app);
   require('./routes/map.routes')(app);
   // Sensor-specific routes must stay before the broad /sensors proxy.
-  require('./routes/sensor.routes')(app);
+  require('./routes/sensor.routes')(app, { apiBaseUrl });
 
   pagesRoutes.registerRoutes(app, {
     publicDir,
@@ -187,7 +191,7 @@ function createApp(dependencies = {}) {
   proxyRoutes.registerRoutes(app, {
     axios,
     apiClient,
-    apiBaseUrl: API_BASE_URL,
+    apiBaseUrl,
     checkUserSession,
   });
 
