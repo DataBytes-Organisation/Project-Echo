@@ -219,3 +219,45 @@ def insights_species(
     return {
         "items": list(Events.aggregate(pipeline))
     }
+
+
+@router.get("/trends")
+def insights_trends(
+    start: Annotated[Optional[str], Query(description="Inclusive start timestamp (ISO 8601)")] = None,
+    end: Annotated[Optional[str], Query(description="Inclusive end timestamp (ISO 8601)")] = None,
+    species: Annotated[Optional[str], Query(description="Filter by species name (exact match)")] = None,
+    sensorId: Annotated[Optional[str], Query(description="Filter by sensor ID (exact match)")] = None,
+):
+    """
+    Detection counts grouped by day, optionally filtered by start/end/species/sensorId.
+    Reuses the same match/normalize helpers as /insights/overview and /insights/species
+    so filter behaviour stays consistent across all insights routes.
+    """
+    start_dt = _parse_query_ts(start, "start")
+    end_dt = _parse_query_ts(end, "end")
+
+    match = _build_insights_match(
+        start=start_dt,
+        end=end_dt,
+        species=species,
+        sensor_id=sensorId,
+    )
+
+    pipeline: List[Dict[str, Any]] = [
+        _normalize_timestamp_stage(),
+        {"$match": match},
+        {
+            "$group": {
+                "_id": {
+                    "$dateToString": {"format": "%Y-%m-%d", "date": "$_normalizedTs"}
+                },
+                "count": {"$sum": 1},
+            }
+        },
+        {"$sort": {"_id": 1}},
+        {"$project": {"_id": 0, "date": "$_id", "count": 1}},
+    ]
+
+    return {
+        "items": list(Events.aggregate(pipeline))
+    }
