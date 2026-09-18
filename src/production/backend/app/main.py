@@ -51,13 +51,15 @@ app = FastAPI(
 )
 
 # Compress larger API responses for clients that advertise GZip support.
-# This is registered before BaseHTTPMiddleware so the minimum-size check sees
-# the original response rather than the streaming wrapper it creates.
+# Register GZip before the error middleware so it remains inside that
+# BaseHTTPMiddleware wrapper and can apply the minimum-size check to the
+# original response. The error middleware must not consume encoded bodies.
 app.add_middleware(
     GZipMiddleware,
     minimum_size=1000,
     compresslevel=6,
 )
+
 # Log API startup in structured JSON format
 @app.on_event("startup")
 async def log_api_startup():
