@@ -48,10 +48,12 @@ test("HMI setup docs use the reproducible install and current port", () => {
 
 test("HMI environment docs use port 3000", () => {
   const envExample = readFileSync(resolve(uiDir, ".env.example"), "utf8");
-  const envSetup = readFileSync(resolve(uiDir, "ENV_SETUP.md"), "utf8");
+  const readme = readFileSync(resolve(uiDir, "README.md"), "utf8");
 
   assert.match(envExample, /localhost:3000/);
-  assert.match(envSetup, /localhost:3000/);
+  assert.match(readme, /COOKIE_SECRET/);
+  assert.match(readme, /localhost:3000/);
   assert.doesNotMatch(envExample, /localhost:8080/);
-  assert.doesNotMatch(envSetup, /localhost:8080/);
+  assert.doesNotMatch(readme, /localhost:8080/);
+  assert.equal(existsSync(resolve(uiDir, "ENV_SETUP.md")), false, "ENV_SETUP.md was merged into README.md");
 });
