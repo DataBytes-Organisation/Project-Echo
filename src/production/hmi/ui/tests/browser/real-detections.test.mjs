@@ -41,6 +41,7 @@ const SIDEBAR_IDS = [
   "markup_date", "markup_confidence", "markup_location_metric_label",
   "animal_weather_section", "animalAudioHeader", "animalAudioControl",
   "animal-spectrogram", "request-edit-button", "animal-popup-content", "basemap",
+  "real-detection-status",
 ];
 const sidebarRegistry = {};
 function resetSidebarDOM() {
@@ -141,13 +142,14 @@ test("shared detection client uses same-origin endpoint and timeout", async () =
   assert.equal(config.timeout, 10000);
 });
 
-test("real marker uses microphone coordinates and refresh reuses its layer/control", async () => {
+test("real marker uses microphone coordinates and reuses its layer with top-panel status", async () => {
   assert.ok(detections, "real detection loader exists");
   const hmi = state(); result = { data: [record, record] };
   await detections.loadRealDetections(hmi);
   await detections.loadRealDetections(hmi);
   assert.equal(hmi.basemap.layers.length, 1);
-  assert.equal(hmi.basemap.controls.length, 1);
+  assert.equal(hmi.basemap.controls.length, 0);
+  assert.equal(hmi.realDetectionStatus, sidebarRegistry["real-detection-status"]);
   assert.equal(hmi.basemap.fits.length, 1, "first successful load brings real markers into view only once");
   const features = hmi.realDetectionLayer.getSource().getFeatures();
   assert.equal(features.length, 1);
@@ -215,17 +217,16 @@ test("simulator records never create real markers", async () => {
   assert.match(hmi.realDetectionStatus.textContent, /No real-device detections/);
 });
 
-test("repeated loads keep one layer and one status/refresh control with no extra interaction", async () => {
+test("repeated loads keep one layer and reuse the top-panel status with no map control", async () => {
   assert.ok(detections, "real detection loader exists");
   const hmi = state(); result = { data: [record] };
   await detections.loadRealDetections(hmi);
   await detections.loadRealDetections(hmi);
   assert.equal(hmi.basemap.layers.length, 1);
-  assert.equal(hmi.basemap.controls.length, 1);
+  assert.equal(hmi.basemap.controls.length, 0);
   assert.equal(hmi.basemap.interactions.length, 0);
-  const panel = hmi.basemap.controls[0].element;
-  assert.equal(panel.children.length, 2);
-  assert.equal(panel.children[1].textContent, "Refresh detections");
+  assert.equal(hmi.realDetectionStatus, sidebarRegistry["real-detection-status"]);
+  assert.match(hmi.realDetectionStatus.textContent, /1 real-device detection/);
   assert.equal(hmi.realDetectionSelect, undefined);
   assert.equal(hmi.realDetectionDetails, undefined);
 });
@@ -715,5 +716,5 @@ test("switching the source filter refetches without duplicating layers", async (
   for (let i = 0; i < 20; i++) await Promise.resolve();
   assert.deepEqual(callArgs, [["/api/detections", { params: { sourceType: "real" } }]]);
   assert.equal(hmi.basemap.layers.length, 1);
-  assert.equal(hmi.basemap.controls.length, 1);
+  assert.equal(hmi.basemap.controls.length, 0);
 });

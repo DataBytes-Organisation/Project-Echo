@@ -680,7 +680,9 @@ fetch("./js/sample_data.json")
 
 let _lastMqttState = null;
 
-async function pollMqttConnectionState() {
+async function pollMqttConnectionState(hmiState, opts = {}) {
+  const force = opts.force === true;
+  if (isLiveUpdatesFrozen(hmiState) && !force) return;
   try {
     const response = await fetch("/mqtt/connection-state");
     if (!response.ok) throw new Error("Failed to fetch connection state");
@@ -714,9 +716,9 @@ async function pollMqttConnectionState() {
   }
 }
 
-function startMqttConnectionPolling() {
-  pollMqttConnectionState();
-  const id = setInterval(pollMqttConnectionState, 5000);
+function startMqttConnectionPolling(hmiState) {
+  pollMqttConnectionState(hmiState);
+  const id = setInterval(() => pollMqttConnectionState(hmiState), 5000);
   // Background poller only: never hold a Node process (tests) open. Browsers
   // return a number here, so this is a no-op in production.
   if (id && typeof id.unref === "function") id.unref();
@@ -751,8 +753,10 @@ function updateSpeciesFilterOptions() {
   }
 }
 
-async function pollMqttLatestEvents(hmiState) {
-  if (_mqttPollingPaused) return;
+export async function pollMqttLatestEvents(hmiState, opts = {}) {
+  const force = opts.force === true;
+  if (!hmiState.liveMode) return;
+  if (_mqttPollingPaused && !force) return;
   try {
     const response = await fetch("/mqtt/latest-events");
     if (!response.ok) throw new Error("Failed to fetch latest events");
@@ -822,7 +826,57 @@ function startMqttEventPolling(hmiState) {
   if (id && typeof id.unref === "function") id.unref();
 }
 
-function setupLiveMapControls(hmiState) {
+export function isMqttPollingPaused() {
+  return _mqttPollingPaused;
+}
+
+// Unified live-state predicate: Pause freezes the auto loops, and so does
+// past-data mode. Manual Refresh force-bypasses the paused half only — never
+// the history half, so live markers stay out of the history view.
+export function isLiveUpdatesFrozen(hmiState) {
+  return _mqttPollingPaused || !hmiState.liveMode;
+}
+
+function enterLiveMode(hmiState) {
+  resetWildlifeLayers(hmiState);
+  hmiState.currentTime = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
+  hmiState.previousUpdateTime = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
+  hmiState.liveMode = true;
+  const pastDataContainer = document.querySelector(".past-data-container");
+  if (pastDataContainer) pastDataContainer.style.maxHeight = "0";
+  const liveToggle = document.getElementById("liveModeToggle");
+  if (liveToggle) liveToggle.checked = true;
+}
+
+export function setLivePaused(hmiState, paused) {
+  if (paused) {
+    _mqttPollingPaused = true;
+  } else {
+    _mqttPollingPaused = false;
+    if (!hmiState.liveMode) enterLiveMode(hmiState);
+  }
+  syncLiveControls(hmiState);
+}
+
+export function syncLiveControls(hmiState) {
+  const frozen = isLiveUpdatesFrozen(hmiState);
+  const pauseBtn = document.getElementById("pause-resume-btn");
+  if (pauseBtn) {
+    pauseBtn.textContent = frozen ? "Resume" : "Pause";
+    pauseBtn.setAttribute("aria-pressed", String(frozen));
+  }
+  // The toggle means "live is flowing", not the liveMode flag: unchecked with
+  // a closed picker is paused, unchecked with an open picker is history mode.
+  // Programmatic assignment fires no change event, so Pause never opens history.
+  const liveToggle = document.getElementById("liveModeToggle");
+  if (liveToggle) liveToggle.checked = !frozen;
+  const label = document.getElementById("last-update-label");
+  if (label) {
+    label.textContent = frozen ? "Live updates paused" : "Last update: —";
+  }
+}
+
+export function setupLiveMapControls(hmiState) {
   const pauseBtn = document.getElementById("pause-resume-btn");
   const refreshBtn = document.getElementById("manual-refresh-btn");
   const eventTypeSelect = document.getElementById("event-type-filter");
@@ -840,25 +894,45 @@ function setupLiveMapControls(hmiState) {
     });
   }
 
-  if (pauseBtn) {
+  if (pauseBtn && pauseBtn.dataset.liveControlsBound !== "true") {
+    pauseBtn.dataset.liveControlsBound = "true";
+    syncLiveControls(hmiState);
     pauseBtn.addEventListener("click", () => {
-      _mqttPollingPaused = !_mqttPollingPaused;
-      pauseBtn.textContent = _mqttPollingPaused ? "Resume" : "Pause";
+      setLivePaused(hmiState, !isLiveUpdatesFrozen(hmiState));
     });
   }
 
-  if (refreshBtn) {
+  if (refreshBtn && refreshBtn.dataset.liveControlsBound !== "true") {
+    refreshBtn.dataset.liveControlsBound = "true";
     refreshBtn.addEventListener("click", () => {
-      pollMqttLatestEvents(hmiState);
-      pollMqttConnectionState();
+      pollMqttLatestEvents(hmiState, { force: true });
+      pollMqttConnectionState(hmiState, { force: true });
+      if (hmiState.liveMode) void runLiveWindowUpdate(hmiState, { force: true });
+      void loadRealDetections(hmiState);
+    });
+  }
+
+  const liveToggle = document.getElementById("liveModeToggle");
+  if (liveToggle && liveToggle.dataset.liveControlsBound !== "true") {
+    liveToggle.dataset.liveControlsBound = "true";
+    liveToggle.addEventListener("change", () => {
+      if (liveToggle.checked) {
+        enterLiveMode(hmiState);
+        setLivePaused(hmiState, false);
+      } else {
+        resetWildlifeLayers(hmiState);
+        hmiState.liveMode = false;
+        const pastDataContainer = document.querySelector(".past-data-container");
+        if (pastDataContainer) pastDataContainer.style.maxHeight = `${pastDataContainer.scrollHeight}px`;
+        syncLiveControls(hmiState);
+      }
     });
   }
 }
 
-
 export function initialiseHMI(hmiState) {
 console.log("initialising");
-startMqttConnectionPolling();
+startMqttConnectionPolling(hmiState);
 startMqttEventPolling(hmiState);
 setupLiveMapControls(hmiState);
 
@@ -2190,20 +2264,28 @@ export function updateTimeOffset(hmiState) {
     });
 }
 
+export async function runLiveWindowUpdate(hmiState, opts = {}) {
+  const force = opts.force === true;
+  if (!hmiState.liveMode) return;
+  if (_mqttPollingPaused && !force) return;
+  await updateTimeOffset(hmiState);
+  hmiState.currentTime     = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
+  hmiState.liveEventCutoff = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay - hmiState.liveWindow) / 1000);
+
+  purgeTruthEvents(hmiState);
+  purgeVocalizationEvents(hmiState);
+  updateTruthEvents(hmiState);
+  updateVocalizationEvents(hmiState);
+  hmiState.previousUpdateTime = hmiState.currentTime;
+}
+
 function queueSimUpdate(hmiState) {
-  updateTimeOffset(hmiState).finally(() => {
-    try {
-      if (hmiState.liveMode) {
-        hmiState.currentTime     = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
-        hmiState.liveEventCutoff = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay - hmiState.liveWindow) / 1000);
-
-        purgeTruthEvents(hmiState);
-        purgeVocalizationEvents(hmiState);
-        updateTruthEvents(hmiState);
-        updateVocalizationEvents(hmiState);
-        hmiState.previousUpdateTime = hmiState.currentTime;
-      }
-
+  runLiveWindowUpdate(hmiState)
+    .catch((error) => {
+      console.error("queueSimUpdate failed:", error);
+      showToast(getApiErrorMessage(error, "Live update failed"), "error");
+    })
+    .finally(() => {
       if (simUpdateTimeout) clearTimeout(simUpdateTimeout);
 
       // Re-invalidate every live-event layer each tick so age-based fade
@@ -2224,12 +2306,7 @@ function queueSimUpdate(hmiState) {
       }
 
       simUpdateTimeout = setTimeout(simulateData, hmiState.requestInterval, hmiState);
-    } catch (error) {
-      console.error("queueSimUpdate failed:", error);
-      showToast(getApiErrorMessage(error, "Live update failed"), "error");
-      simUpdateTimeout = setTimeout(simulateData, hmiState.requestInterval, hmiState);
-    }
-  });
+    });
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

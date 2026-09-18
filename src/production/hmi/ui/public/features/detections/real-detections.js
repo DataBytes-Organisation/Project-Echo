@@ -43,46 +43,9 @@ export async function loadRealDetections(hmiState) {
     hmiState.basemap.addLayer(layer);
     hmiState.realDetectionLayer = layer;
 
-    const panel = document.createElement("div");
-    panel.className = "ol-unselectable ol-control";
-
-    Object.assign(panel.style, {
-      bottom: "12px",
-      left: "12px",
-      maxWidth: "calc(100% - 24px)",
-      padding: "8px",
-      background: "#fff",
-      color: "#222",
-      fontSize: "14px",
-    });
-
-    const status = document.createElement("span");
-    status.setAttribute("role", "status");
-    status.setAttribute("aria-live", "polite");
-
-    panel.appendChild(status);
-    hmiState.realDetectionStatus = status;
-
-    const refresh = document.createElement("button");
-    refresh.type = "button";
-    refresh.textContent = "Refresh detections";
-
-    Object.assign(refresh.style, {
-      width: "auto",
-      padding: "0 8px",
-    });
-
-    refresh.addEventListener("click", () => {
-      void loadRealDetections(hmiState);
-    });
-
-    panel.appendChild(refresh);
-
-    hmiState.basemap.addControl(
-      new ol.control.Control({
-        element: panel,
-      })
-    );
+    // Status lives in the top #live-map-controls panel
+    // (#real-detection-status), so no corner ol-control is created.
+    hmiState.realDetectionStatus = document.getElementById("real-detection-status");
   }
 
   const request =
