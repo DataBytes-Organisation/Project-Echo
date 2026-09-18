@@ -1,22 +1,18 @@
-## app.detection_rules.py
-# Configurable evaluation of incoming detections against operator-defined
-# rules, applied before persistence/streaming. Rule values come from
-# app.config.settings (see C4) rather than being hardcoded in a route, and
-# the evaluator itself is transport-agnostic so both HTTP ingestion
-# (app.detections.create_detection) and A1's future MQTT ingestion bridge
-# can call the same logic and get the same accept/reject decision.
+"""Validation and configurable evaluation rules for detections."""
+
 import logging
 from typing import List, Tuple
 
 from pydantic import BaseModel, confloat
 
 from app.config import settings
+from app.exceptions import DetectionRuleError
 
 logger = logging.getLogger(__name__)
 
 
 class DetectionRules(BaseModel):
-    """A single rule set. Empty allow-lists mean 'no restriction' for that rule."""
+    """Configurable ingestion rules; empty allow-lists impose no restriction."""
 
     min_confidence: confloat(ge=0, le=100) = 0
     allowed_species: List[str] = []
@@ -24,13 +20,7 @@ class DetectionRules(BaseModel):
 
 
 def get_active_rules() -> DetectionRules:
-    """Build the current rule set from configuration.
-
-    Re-reads app.config.settings on every call (not cached at import time)
-    so config changes take effect without restarting long-lived state, and
-    so a per-request rule override (e.g. in tests) can pass its own
-    DetectionRules instead of calling this at all.
-    """
+    """Build the current configured rule set for incoming detections."""
     return DetectionRules(
         min_confidence=settings.detection_min_confidence,
         allowed_species=settings.detection_allowed_species,
@@ -39,18 +29,7 @@ def get_active_rules() -> DetectionRules:
 
 
 def evaluate_detection(detection, rules: DetectionRules = None) -> Tuple[bool, str]:
-    """Evaluate one detection against `rules` (or the active configured rules).
-
-    `detection` needs .confidence (0-100 float), .species (str) and
-    .sensorId (str) attributes - satisfied by both DetectionCreate/Detection
-    (schemas.EventSchema) and the MQTT-side event payload A1 will parse.
-
-    Returns (accepted, reason). `reason` is a stable machine-readable code
-    ("accepted", "below_min_confidence", "species_not_allowed",
-    "sensor_not_allowed") suitable for logging and for surfacing to API
-    clients - never raises for a rule violation, so callers decide how to
-    respond (HTTP 422, MQTT drop-and-log, etc).
-    """
+    """Return whether a detection is accepted and its stable rule outcome."""
     if rules is None:
         rules = get_active_rules()
 
@@ -64,12 +43,7 @@ def evaluate_detection(detection, rules: DetectionRules = None) -> Tuple[bool, s
 
 
 def log_rejected_detection(detection, reason: str) -> None:
-    """Log a rule-rejected detection. No audioClip/binary data.
-
-    logging_config.JsonFormatter only serialises the formatted message (it
-    does not read LogRecord.extra), so the context is embedded in the
-    message itself rather than passed via `extra=`.
-    """
+    """Log a rejected detection without retaining binary audio data."""
     logger.info(
         "detection_rejected reason=%s sensorId=%s species=%s confidence=%s",
         reason,
@@ -77,3 +51,55 @@ def log_rejected_detection(detection, reason: str) -> None:
         getattr(detection, "species", None),
         getattr(detection, "confidence", None),
     )
+
+
+def validate_list_filters(
+    start_time=None,
+    end_time=None,
+    lat=None,
+    lon=None,
+    radius_km=None,
+):
+    """Validate cross-field list-query rules FastAPI cannot express alone."""
+    if start_time and end_time:
+        start_is_aware = (
+            start_time.tzinfo is not None
+            and start_time.utcoffset() is not None
+        )
+        end_is_aware = (
+            end_time.tzinfo is not None
+            and end_time.utcoffset() is not None
+        )
+
+        if start_is_aware != end_is_aware:
+            raise DetectionRuleError(
+                "start_time and end_time must both include a timezone "
+                "or both omit it."
+            )
+
+        if start_time > end_time:
+            raise DetectionRuleError(
+                "start_time must be earlier than or equal to end_time."
+            )
+
+    location_values = (lat, lon, radius_km)
+    if any(value is not None for value in location_values) and not all(
+        value is not None for value in location_values
+    ):
+        raise DetectionRuleError("lat, lon and radius_km must be provided together.")
+    if lat is not None and not -90 <= lat <= 90:
+        raise DetectionRuleError("lat must be between -90 and 90.")
+    if lon is not None and not -180 <= lon <= 180:
+        raise DetectionRuleError("lon must be between -180 and 180.")
+    if radius_km is not None and radius_km <= 0:
+        raise DetectionRuleError("radius_km must be greater than zero.")
+
+
+def mutable_detection_update(update_data):
+    """Return permitted update fields without mutating the caller's payload."""
+    safe_update = dict(update_data)
+    safe_update.pop("_id", None)
+    safe_update.pop("id", None)
+    if not safe_update:
+        raise DetectionRuleError("No mutable fields were provided for update.")
+    return safe_update
