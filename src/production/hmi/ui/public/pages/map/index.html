@@ -1,0 +1,1868 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1">
+
+    <!-- Open Layers -->
+    <link rel="stylesheet" type="text/css" href="/vendor/openlayers/ol.css" />
+    <script type="text/javascript" src="/vendor/openlayers/ol.js"></script>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <script src="https://kit.fontawesome.com/8aa980d912.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+    <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
+
+    <!-- Splash screen -->
+    <link rel="stylesheet" type="text/css" href="/assets/styles/splash_screen_style.css">
+
+    <!-- xlsx -->
+    <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+
+    <!-- jQuery / date range picker -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+
+    <!-- Payment -->
+    <script src="/features/payments/razorpay-checkout.js"></script>
+    <script>
+      window.__Razorpay__ = { locale: 'en' };
+    </script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+    <!-- Axios -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <!-- HMI styles -->
+    <link rel="stylesheet" href="/assets/styles/HMI_style.css" type="text/css">
+    <link rel="stylesheet" href="/assets/styles/HMI.css" />
+    <link rel="stylesheet" href="/assets/styles/HMI-menu.css" />
+    <link rel="stylesheet" href="/assets/styles/HMI-controls.css" />
+    <link rel="stylesheet" href="/assets/styles/HMI-audio.css" />
+    <link rel="stylesheet" href="/assets/styles/HMI-weather.css" />
+    <link rel="stylesheet" href="/assets/styles/nodes.css" />
+
+    <!--
+      HMI-utils.js is an ES module.  Loading it as a bare <script type="module">
+      here gives it its own isolated scope — the functions would NOT be available
+      to the non-module <script> blocks below.
+
+      Instead, HMI-utils is imported inside the module scripts that need it
+      (HMI.js, routes.js, audio-recorder.js).  Those module scripts expose the
+      helpers they need on window.* so the non-module blocks can reach them.
+
+      TASK 7 CHANGE: removed the standalone
+        <script type="module" src="./js/HMI-utils.js"></script>
+      tag that was here before.  It was a no-op and caused confusion.
+    -->
+    <script type="module" src="/features/map/hmi-map.js"></script>
+    <script type="text/javascript" src="/js/animation.js"></script>
+    <script type="module" src="/features/audio/audio-recorder.js"></script>
+
+    <title>Echo | Welcome</title>
+  </head>
+
+  <body>
+
+    <!-- Payment overlay -->
+    <div class="overlay1">
+      <div class="cross-container">
+        <div id="payment-response" class="hidden">
+          <div id="processing-indicator" class="hidden"></div>
+        </div>
+        <div class="crossmark hidden">
+          <div class="o-circle c-container__circle o-circle__sign--failure">
+            <div class="o-circle__sign"></div>
+          </div>
+          <div class="button-container">
+            <button class="retry-button">Retry</button>
+            <button class="cancel-button">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Splash screen -->
+    <div class="screen" id="screen" onclick="fadeAnim(); openSIMULATOR()">
+      <div class="screen-image"></div>
+      <div class="screen-overlay"></div>
+      <div class="screen-content">
+        <img src="./images/logo-splashscreen.png" style="width: 101px; height: 81px">
+        <div class="screen-user">
+          <span class="name" id="name" data-value="PROJECT ECHO" onmouseenter="{textFlex()}">PROJECT ECHO</span>
+          <span class="subtitle">Click to start</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="blur"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <div class="container" style="width:100% !important; margin-left: 0px !important; padding: 12px !important;">
+
+      <div class="hamburger-icon" onclick="toggleNav()">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+
+      <!--
+        TASK 7 CHANGE: removed the custom #notification div.
+        All user-facing feedback now goes through showToast() from HMI-utils.js,
+        which is called via window.showToast() from non-module script blocks.
+        The #notification element, generateVisualResponse(), and hideNotification()
+        have all been removed.
+      -->
+
+      <!-- Main content row -->
+      <div class="row main bg-black" style="padding: 0px !important;">
+        <div class="col-md-12 col-main" style="padding: 0px !important;">
+
+          <div id="basemap" class="map_view" tabindex="0" aria-label="Detection map"></div>
+
+          <div id="live-map-controls" style="position:absolute; z-index:1000; top:10px; left:10px; background:rgba(20,20,20,0.9); color:white; padding:10px 14px; border-radius:8px; font-size:14px; font-family:sans-serif; box-shadow:0 2px 8px rgba(0,0,0,0.5);">
+
+
+        <div style="display:flex; gap:8px; margin-bottom:6px;">
+    <button id="pause-resume-btn" aria-pressed="false" title="Pause live updates" style="background:#2c7a3f; color:white; border:none; padding:6px 14px; border-radius:4px; font-size:13px; cursor:pointer;">Pause</button>
+    <button id="manual-refresh-btn" title="Refresh live feed and real-device detections" style="background:#2c5f8a; color:white; border:none; padding:6px 14px; border-radius:4px; font-size:13px; cursor:pointer;">Refresh</button>
+  </div>
+  <div style="display:flex; gap:8px; margin-bottom:6px;">
+    <select id="event-type-filter" style="background:#333; color:white; border:1px solid #555; padding:4px 8px; border-radius:4px; font-size:12px;">
+      <option value="all">All Types</option>
+      <option value="vocalization">Vocalization</option>
+      <option value="movement">Movement</option>
+      <option value="sensor_health">Sensor Health</option>
+      <option value="iot_node">IoT Node</option>
+    </select>
+    <select id="species-filter" style="background:#333; color:white; border:1px solid #555; padding:4px 8px; border-radius:4px; font-size:12px;">
+      <option value="all">All Species</option>
+    </select>
+  </div>
+  <div id="last-update-label" style="color:#ddd; font-size:12px;">Last update: —</div>
+  <div id="real-detection-status" role="status" aria-live="polite" style="color:#ddd; font-size:12px;">Loading real-device detections…</div>
+      </div>
+
+          <div id="editFormWrapper">
+            <form id="editForm">
+              <h2 id="formSpeciesName"></h2>
+              <div id="ccs">
+                <label for="ccs">Current Conservation Status:&nbsp;&nbsp;&nbsp;</label>
+                <p id="currentConservationStatus" name="ccs"></p><br>
+              </div>
+              <div id="ncs">
+                <label for="ncs">New Conservation Status:&nbsp;&nbsp;&nbsp;</label>
+                <div id="dropdownNCS">
+                  <button id="selectNCS" name="ncs">Select New</button>
+                  <div id="dropdownContentNCS">
+                    <button>endangered</button>
+                    <button>vulnerable</button>
+                    <button>near-threatened</button>
+                    <button>least concern</button>
+                    <button>invasive</button>
+                  </div>
+                </div><br><br>
+              </div>
+              <label for="citationSneeded">Source:&nbsp;&nbsp;&nbsp;</label>
+              <input type="text" id="citationSneeded" name="citationSneeded"><br>
+              <p>Please enter a link to a reliable source that backs up your claim to make this edit.</p>
+              <label for="important" id="important">Important:&nbsp;&nbsp;&nbsp;</label>
+              <p id="importantMessage" name="important">Spamming or intentionally abusing this functionality will not be tolerated and will result in your account being either suspended or banned.</p>
+              <button id="submitEditButton">Submit</button>
+              <button id="closeFormButton">Close</button>
+            </form>
+          </div>
+
+          <div id="menu" class="menu">
+            <div class="menu-header">
+              <div class="image-container">
+                <img src="./images/tabIcons/logo-removebg.png" alt="project echo logo">
+              </div>
+            </div>
+            <button id="themeToggle" class="theme-toggle-btn" style="position: absolute; right: 10px; top: 50px; color: green; z-index: 1001;">Switch to Light Theme</button>
+            <div class="navbar">
+              <a id="filter-menu-btn"          class="tabs-button active" onclick="openTab('filter-menu')"></a>
+              <a id="SIM-menu-btn"             class="tabs-button" onclick="openTab('SIM')"></a>
+              <a id="config-settings-menu-btn" class="tabs-button" onclick="openTab('config-settings-tab')"></a>
+              <a id="popup-menu-btn"           class="tabs-button" onclick="openTab('animal-popup')"></a>
+              <a id="mic-popup-menu-btn"       class="tabs-button" onclick="openTab('mic-popup')"></a>
+              <a id="node-popup-menu-btn"      class="tabs-button" onclick="openTab('node-popup')"></a>
+              <a id="FAQ-menu-btn"             class="tabs-button" onclick="openTab('FAQ')"></a>
+              <a id="donate-menu-btn"          class="tabs-button" onclick="openTab('donate')"></a>
+              <a id="user-profile-button"      class="tabs-button" onclick="openTab('userProfile'); fetchUser()"></a>
+              <a id="notification-menu-button" class="tabs-button" onclick="openTab('animalNotifications')"></a>
+              <a id="statistics-menu-btn"      class="tabs-button" onclick="openTab('statistics')"></a>
+              <span id="pink-line" class="sudden-line"></span>
+            </div>
+            <br>
+
+            <!-- ── FAQ tab ─────────────────────────────────────────────── -->
+            <div id="FAQ">
+              <div class="wrapper">
+                <div id="FAQ-contents">
+                  <h2>About Us</h2>
+                  <div class="dropdown">
+                    <button class="btn btn-secondary btn-no-background dropdown-toggle" id="about_us_toggle" data-bs-toggle="dropdown" aria-expanded="false">Project Echo</button>
+                    <div class="dropdown-menu faq-content" id="about_us_content" aria-label="about_us_toggle">
+                      <h2>The Project</h2>
+                      <p>Project Echo, is a <strong>a bioacoustics classification tool</strong> that use AI/ML solution for understanding the density and classification of noise-producing animals in rainforests. Echo's vision is to help ecologists and environmentalists to survey the environment in a non-destructive and efficient way to track threatened animal species population numbers over time. This research input will provide conservationists the information they need to make informed conservation decisions to protect our precious native fauna.</p>
+                      <h2>Who we are?</h2>
+                      <p>We are <strong>DataBytes</strong>, a cutting-edge, data-driven company that focuses on designing and implementing custom, cloud-based data collection and analytics platforms. With a team of experienced data scientists and software engineers, we specialize in developing intelligent systems that optimize business processes and automate task management for increased efficiency across various industries. From image recognition to language translation, our AI-driven technologies aim to transform the way businesses operate and enhance their capabilities for a brighter, more prosperous future.</p>
+                      <p>Having worked with companies across the country in the retail vertical, financial services, healthcare, e-commerce, and even telecom, we're well versed in a wide variety of data needs. Our goal is to democratize AI and provide affordable, accessible solutions that enable our clients to accelerate their growth and improve their bottom line. With a passion for innovation and a commitment to excellence, we are the go-to AI partner for businesses looking to unlock the full potential of their data.</p>
+                      <p>We believe that sound analysis can revolutionize the way we monitor animal populations, and we aim to make our solution widely available to conservationists and researchers. Project Echo leverages machine learning to understand the density and classifications of animals in a survey area, using our curated sound datasets. Our team is making solid and comprehensive progress in the analysis of labeled data and its predictive ability using Artificial Intelligence and Machine Learning.</p>
+                    </div>
+                  </div>
+                  <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle btn-no-background" id="data_src_toggle" data-bs-toggle="dropdown" aria-expanded="false">Data Sourcing and Pooling</button>
+                    <div class="dropdown-menu faq-content" id="data_src_content" aria-labelledby="data_src_toggle">
+                      <h2>Audio data</h2>
+                      <p>In the early process of the project, the audio data is collected and extracted through the existing online researches. The data source can be categorized under two areas:</p>
+                      <h3>Research Paper sourced Data</h3>
+                      <p>Consistent with the systematic reviews of the literature, many papers are not following open science practices and are protecting their data. However one promising public resource of animal audio data emerged from papers produced by Phillips and Towsey (2018) and Teixeira et al (2019); Ecosounds (n.d.) is a repository of environmental audio recordings that provides publicly sourced annotations of animal sounds in Australia and other parts of the world.</p>
+                      <h3>Internet Search</h3>
+                      <p>An internet search using the Google search engine using various combinations of terms such as 'animal sound' 'database' 'repository' 'Australia' 'data set' 'dataset', yielded useful results. A non-exhaustive list of promising sources are provided in the appendix to this report.<br>The challenges for these sources is that data mining and scraping will be required to gain access to the audio files. This will be a required skill in Project Echo going forward.</p>
+                      <h2>Image and biographical data</h2>
+                      <p>The names of the species respective to the available audio data are found in the <strong>Otways from the book: Grant Palmer. Wildlife of the Otways and Shipwreck Coast. Clayton, VIC: CSIRO PUBLISHING, 2019</strong>.</p>
+                      <p>Currently, the species biographical data is generated using Generative AI in order to avoid copyrights issue. The images are generated using Dall-E, and then compare to the real visualization of the real picture to select the most similar and realistic image.<br>The summary and description of each species is generated using ChatGPT, which provide a succinct and brief information about the animal and its habitat.</p>
+                      <p>As the project is still in development, the biological information of the species can be improved further.</p>
+                    </div>
+                  </div>
+                  <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle btn-no-background" id="contact_us_toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Contact Us</button>
+                    <div class="dropdown-menu faq-content" id="contact_us_content" aria-labelledby="contact_us_toggle">
+                      <h2>Send a Message to Project Echo</h2>
+                      <p>You can submit your query or feedback using the form below:</p>
+                      <form method="POST" action="/send_email">
+                        <div class="form-group row">
+                          <div>
+                            <input type="text" class="form-control" id="email" placeholder="Enter your email" name="email" oninput="emailValidate()">
+                            <span class="label" id="email_error_label">* Please enter the correct email address</span>
+                          </div>
+                        </div>
+                        <div class="form-group row">
+                          <div>
+                            <textarea rows="5" class="form-control" id="query" name="query" placeholder="Please type your query here..." onchange="queryValidate()"></textarea>
+                            <span class="label" id="query_error_label">* Please enter a query</span>
+                          </div>
+                        </div>
+                        <div class="form-group row">
+                          <div>
+                            <button type="submit" class="btn btn-primary" id="query_submit_button">Submit</button>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ── Statistics tab ──────────────────────────────────────── -->
+            <div id="statistics"><div class="wrapper"></div></div>
+
+            <!-- ── User profile tab ───────────────────────────────────── -->
+            <div id="userProfile">
+              <div class="wrapper">
+                <form action="/api/auth/signout" method="POST">
+                  <div id="userProfile-contents">
+                    <h2>User Profile</h2>
+                    <div class="markup_form">
+                      <div class="markup_column">
+                        <div class="markup_row_left"><div>Username:</div></div>
+                        <div class="markup_row_right"><div id="display_name"><span id="username"></span></div></div>
+                      </div>
+                      <div class="markup_column">
+                        <div class="markup_row_left"><div>Email:</div></div>
+                        <div class="markup_row_right"><div id="display_mail"><span id="useremail"></span></div></div>
+                      </div>
+                    </div>
+                    <div style="text-align: center;"><button type="submit">Logout</button></div>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <!-- ── Simulator tab ──────────────────────────────────────── -->
+            <div id="SIM">
+              <div class="wrapper">
+                <div id="SIM-contents">
+                  <h2>Simulator</h2>
+                  <p><strong>The Echo Simulator</strong> - an innovative system - aims to replicate the Otway's National Forest environment by creating virtual microphone sensors strategically placed and interconnected in a mesh-like network. This advanced system effectively monitors semi-random simulated animal production events, contributing to wildlife research and conservation efforts. Upon detecting a sound, the simulator shows how our end-to-end solution is able to leverage the trigger times from the nearest microphones, employing a brute-force optimisation technique to accurately triangulate the source location of the sound. With minimal error, the audio sample and associated microphone IDs are seamlessly integrated and communicated throughout Echo-Net, a comprehensive framework comprising a bioacoustics engine, store, processing server, communications servers, and APIs. This rich data is then visually represented on our (HMI), allowing researchers and wildlife enthusiasts to analyse and better understand the complex acoustic interactions within the simulated Otway's National Forest ecosystem.</p>
+                  <h2>Select Simulator Mode</h2>
+                  <div class="toggle-switch-container">
+                    <div class="radio-group">
+                      <input type="radio" id="option1" name="options" value="option1" onclick="{simModeSwitch('Animal_Mode')}">
+                      <span for="option1">Simulate Movement</span>
+                    </div>
+                    <div class="radio-group">
+                      <input type="radio" id="option2" name="options" value="option2" onclick="{simModeSwitch('Recording_Mode')}">
+                      <span for="option2">Live Recording</span>
+                    </div>
+                    <div class="radio-group">
+                      <input type="radio" id="option3" name="options" value="option3" onclick="{simModeSwitch('Recording_Mode_V2')}">
+                      <span for="option3">Live Recording V2</span>
+                    </div>
+                    <div class="radio-group">
+                      <input type="radio" id="option4" name="options" value="option4" onclick="{simModeSwitch('Stop')}" checked>
+                      <span for="option4">Disable Simulator</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ── Animal Notifications tab ───────────────────────────── -->
+            <div id="animalNotifications" style="width: 0%; height: 0%;">
+              <div class="wrapper">
+                <form action="/api/notifications/animals" method="POST">
+                  <div id="notification-contents">
+                    <h2>Animal Notifications</h2>
+                    <div class="markup_form">
+                      <div class="markup_column">
+                        <label for="animal-search" id="animal-search-label">Search for animals:</label>
+                        <input type="text" id="animal-search" placeholder="Type animal name..." />
+                      </div>
+                      <div class="markup_column">
+                        <label for="animal-list" id="available-animal-label" style="color:white">Available Animals:</label>
+                        <ul id="animal-list"></ul>
+                      </div>
+                      <div class="markup_column">
+                        <label id="selected-animal-label">Selected Animals:</label>
+                        <ul id="selected-animals"></ul>
+                      </div>
+                      <h2>Detections</h2>
+                      <div class="markup_column" id="detections-container">
+                        <div class="detection-entry">
+                          <div class="detection-animal">animal: </div>
+                          <div class="detection-confidence">confidence level:</div>
+                          <div class="detection-location">location: </div>
+                          <div class="detection-time">time: </div>
+                        </div>
+                      </div>
+                      <h2>Nodes</h2>
+                      <div class="markup_column" id="nodes-container">
+                        <div class="node-entry">
+                          <div class="node-id">node id: </div>
+                          <div class="node-device">device:</div>
+                          <div class="node-status">status: 🟢</div>
+                        </div>
+                        <div class="node-entry">
+                          <div class="node-id">node id: </div>
+                          <div class="node-device">device:</div>
+                          <div class="node-status">status: 🔴</div>
+                        </div>
+                      </div>
+                      <h2>System Log</h2>
+                      <div class="markup_column" id="systemlog-container">
+                        <div class="systemlog-entry"><div class="systemlog-event">event:</div><div class="systemlog-time">time:</div></div>
+                        <div class="systemlog-entry"><div class="systemlog-event">event:</div><div class="systemlog-time">time:</div></div>
+                        <div class="systemlog-entry"><div class="systemlog-event">event:</div><div class="systemlog-time">time:</div></div>
+                        <div class="systemlog-entry"><div class="systemlog-event">event:</div><div class="systemlog-time">time:</div></div>
+                      </div>
+                      <center><button type="submit">Save Notifications</button></center>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <!-- ── Configuration tab ──────────────────────────────────── -->
+            <div id="config-settings-tab">
+              <div class="wrapper">
+                <div id="config-settings-contents">
+                  <h2>Configuration Settings</h2>
+                  <p class="config-description">The Configuration Settings tab is a crucial component of the Echo Simulator interface, designed to customize and control various simulation parameters. This tab allows users to tailor the simulation environment by selecting specific microphones, species, and classes, which are critical for conducting targeted environmental studies and simulations.</p>
+                  <div class="accordion" id="configAccordion">
+                    <div class="dropdown">
+                      <button class="btn btn-secondary dropdown-toggle btn-no-background" type="button" data-bs-toggle="dropdown" aria-expanded="false">Select Microphones</button>
+                      <div class="dropdown-menu">
+                        <div class="row"><div class="col">
+                          <select id="config-microphone-list" class="form-control" multiple></select>
+                        </div></div>
+                      </div>
+                    </div>
+                    <div class="dropdown">
+                      <button class="btn btn-secondary dropdown-toggle btn-no-background" type="button" data-bs-toggle="dropdown" aria-expanded="false">Select Species</button>
+                      <div class="dropdown-menu">
+                        <div class="row"><div class="col">
+                          <select id="config-species-list" class="form-control" multiple></select>
+                        </div></div>
+                      </div>
+                    </div>
+                    <div class="dropdown">
+                      <button class="btn btn-secondary dropdown-toggle btn-no-background" type="button" data-bs-toggle="dropdown" aria-expanded="false">Select Class</button>
+                      <div class="dropdown-menu">
+                        <div class="row"><div class="col">
+                          <select id="config-class-list" class="form-control" multiple></select>
+                        </div></div>
+                      </div>
+                    </div>
+                    <br>
+                    <button id="config-configure-button" class="btn btn-primary">Configure</button>
+                    <div id="config-current-configuration" class="mt-4">
+                      <h3>Current Configuration</h3>
+                      <p id="config-details">No configuration selected.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ── Donations tab ──────────────────────────────────────── -->
+            <div id="donate">
+              <div class="wrapper">
+                <div id="donate-contents">
+                  <h2>Donations</h2>
+                  <p>As our project expands, we rely on the generosity of supporters like you to ensure the continuous operation of our mission. By donating, you contribute to the preservation of our endangered species. Thank you for being a crucial part of Project Echo's journey.</p>
+                  <div class="image-row" id="image-row">
+                    <div class="image-description"><img src="./images/$1.png" alt="Amphibian Vulnerable"><p class="image-amount">1</p></div>
+                    <div class="image-description"><img src="./images/$5.png" alt="Mammal Endangered"><p class="image-amount">5</p></div>
+                    <div class="image-description"><img src="./images/$10.png" alt="Bird Endangered"><p class="image-amount">10</p></div>
+                    <div class="image-description"><img src="./images/$20.png" alt="Bird Invasive"><p class="image-amount">20</p></div>
+                    <div class="image-description"><img src="./images/$50.png" alt="Bird Vulnerable"><p class="image-amount">50</p></div>
+                  </div>
+                  <div class="lightbulb-container" style="text-align: center;">
+                    <img src="./images/Your Amount.png" alt="Light Bulb">
+                    <p class="donation-amount">Your Amount:</p>
+                  </div>
+                  <button class="donate-button" id="donation-button">DONATE NOW</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- ── Animal popup tab ───────────────────────────────────── -->
+            <div id="animal-popup">
+              <div class="wrapper">
+                <div id="animal-popup-content" role="region" aria-label="Detection details" tabindex="-1">
+                  <div class="markup_form">
+                    <div class="markup_column">
+                      <div class="markup_row_left markup_row_title" style="width: 420px !important; margin: 0px !important;"><h2 id="desc_name"></h2></div>
+                      <div class="markup_row_right markup_row_title" style="width: 100px !important; margin: 0px !important; padding: 0px !important;"><h2 id="desc_confidence"></h2></div>
+                    </div>
+                  </div>
+                  <img id="desc_img" src=""></img>
+                  <div id="desc_species" class="subtitle"></div>
+                  <h2>Animal Summary</h2>
+                  <div id="desc_summary" class="desc"></div>
+                  <div id="desc_details" class="desc"></div>
+                  <div id="animal_weather_section">
+                  <h2 style="margin-top: 20px !important;">Weather</h2>
+                  <div class="markup_form">
+                    <div class="markup_column"><div class="markup_row_left"><div>Date</div></div><div class="markup_row_right"><div id="weather_date"></div></div></div>
+                    <div class="markup_column"><div class="markup_row_left"><div>Max Temperature</div></div><div class="markup_row_right"><div id="weather_maxtemp"></div></div></div>
+                    <div class="markup_column"><div class="markup_row_left"><div>Minimum Temperature</div></div><div class="markup_row_right"><div id="weather_mintemp"></div></div></div>
+                    <div class="markup_column"><div class="markup_row_left"><div>Rainfall</div></div><div class="markup_row_right"><div id="weather_rainfall"></div></div></div>
+                    <div class="markup_column"><div class="markup_row_left"><div>Wind speed</div></div><div class="markup_row_right"><div id="weather_windspeed"></div></div></div>
+                    <div class="markup_column"><div class="markup_row_left"><div>Maximum Humiditiy</div></div><div class="markup_row_right"><div id="weather_maxhumidity"></div></div></div>
+                    <div class="markup_column"><div class="markup_row_left"><div>Minimum Humiditiy</div></div><div class="markup_row_right"><div id="weather_minhumidity"></div></div></div>
+                  </div>
+                  </div>
+                  <h2 style="margin-top: 20px !important;">Event Details</h2>
+                  <div class="markup_form">
+                    <div class="markup_column">
+                      <div class="markup_row_left" style="width: 100px !important"><img id="markup_img" src=""></img></div>
+                      <div class="markup_row_right" style="text-align: right !important; width: 400px !important"><div id="markup_details"></div></div>
+                    </div>
+                    <div class="markup_column"><div class="markup_row_left"><div>Longitude</div></div><div class="markup_row_right"><div id="markup_loc_lon"></div></div></div>
+                    <div class="markup_column"><div class="markup_row_left"><div>Latitude</div></div><div class="markup_row_right"><div id="markup_loc_lat"></div></div></div>
+                    <div class="markup_column"><div class="markup_row_left"><div>Detection source</div></div><div class="markup_row_right"><div id="markup_source"></div></div></div>
+                    <div class="markup_column"><div class="markup_row_left" style="width: 100px !important"><div>Date</div></div><div class="markup_row_right" style="text-align: right !important; width: 400px !important"><div id="markup_date"></div></div></div>
+                    <div class="markup_column"><div class="markup_row_left"><div id="markup_location_metric_label">Location Confidence</div></div><div class="markup_row_right"><div id="markup_confidence"></div></div></div>
+                  </div>
+                  <h2 id="animalAudioHeader" style="margin-top: 20px !important;">Audio</h2>
+                  <div id="animalAudioControl" class="audio_component">
+                    <span><i id="animalAudioI" class="fa fa-volume-up fa-2x" style="color:rgba(247, 186, 206, 0.6);" onclick="{toggleAudio()}"></i></span>
+                    <div class="audioContainer">
+                      <div class="box box1"></div><div class="box box2"></div><div class="box box3"></div><div class="box box4"></div><div class="box box5"></div>
+                      <div class="box box6"></div><div class="box box7"></div><div class="box box8"></div><div class="box box9"></div><div class="box box10"></div>
+                      <div class="box box1"></div><div class="box box2"></div><div class="box box3"></div><div class="box box4"></div><div class="box box5"></div>
+                      <div class="box box6"></div><div class="box box7"></div><div class="box box8"></div><div class="box box9"></div><div class="box box10"></div>
+                    </div>
+                  </div>
+
+                  <p id="animal-audio-status" class="animal-audio-status" role="status" aria-live="polite">
+                    No audio selected.
+                  </p>
+
+                  <div id="animal-spectrogram" class="spectrogram-panel" data-state="empty">
+                    <div class="spectrogram-viewport" data-role="viewport">
+                      <canvas data-role="canvas"></canvas>
+                      <p class="spectrogram-state" data-role="empty">Select a vocalisation event to view its spectrogram.</p>
+                      <p class="spectrogram-state" data-role="loading" hidden>Decoding audio...</p>
+                      <p class="spectrogram-state spectrogram-state-error" data-role="error" role="alert" hidden></p>
+                    </div>
+                    <p class="spectrogram-summary" data-role="summary" aria-live="polite"></p>
+                  </div>
+                  <p style="margin-top: 40px !important;">Is the information above inaccurate? <br>Request to make an edit.</p>
+                  <button id="request-edit-button">Request Edit</button>
+                </div>
+                <div id="animal-default-content">
+                  <h2 style="text-align: left; color: rgba(247, 186, 206, 1) !important;">Animal Bio Data</h2>
+                  <p>Please click on a map marker to view bio data.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- ── Microphone popup tab ───────────────────────────────── -->
+            <div id="mic-popup">
+              <div class="wrapper">
+                <div id="mic-popup-content">
+                  <div class="markup_form">
+                    <div class="markup_column">
+                      <div class="markup_row_left markup_row_title" style="width: 420px !important; margin: 0px !important;"><h2 id="mic_desc_name">Microphone</h2></div>
+                    </div>
+                  </div>
+                  <img id="mic_desc_img" src=""></img>
+                  <div id="mic_desc_id" class="subtitle"></div>
+                  <div id="mic_desc_details" class="desc"></div>
+                  <h2 style="margin-top: 20px !important;">Microphone Details</h2>
+                  <div class="markup_form">
+                    <div class="markup_column">
+                      <div class="markup_row_left" style="width: 100px !important"><img id="mic_markup_img" src=""></img></div>
+                      <div class="markup_row_right" style="text-align: right !important; width: 400px !important"><div id="mic_markup_details"></div></div>
+                    </div>
+                    <div class="markup_column"><div class="markup_row_left"><div>Longitude</div></div><div class="markup_row_right"><div id="mic_markup_loc_lon"></div></div></div>
+                    <div class="markup_column"><div class="markup_row_left"><div>Latitude</div></div><div class="markup_row_right"><div id="mic_markup_loc_lat"></div></div></div>
+                    <div class="markup_column"><div class="markup_row_left" style="width: 100px !important"><div>Date</div></div><div class="markup_row_right" style="text-align: right !important; width: 400px !important"><div id="mic_markup_date"></div></div></div>
+                  </div>
+                  <section id="frb2-recording-panel" class="frb2-panel">
+                    <h2>Record Live Audio</h2>
+                    <p class="frb2-help">
+                      Record from your browser mic (max 20 seconds), then use the green play button to replay.
+                    </p>
+
+                    <div class="frb2-actions">
+                      <button type="button" id="record_audio_button" class="frb2-btn frb2-btn-record" onclick="record()">Record</button>
+                      <button type="button" id="stop_recording_button" class="frb2-btn frb2-btn-stop" onclick="stopRecording()" disabled>Stop</button>
+                      <button type="button" id="cancel_recording_button" class="frb2-btn frb2-btn-cancel" onclick="cancelRecording()" disabled>Cancel</button>
+                    </div>
+
+                    <div id="frb2-live-status" class="frb2-live-status" data-state="idle">
+                      <span id="recording_indicator" class="frb2-rec-dot" aria-hidden="true"></span>
+                      <span id="recording_duration" class="frb2-timer">00:00</span>
+                      <span id="frb2-status-label" class="frb2-status-label">Ready to record</span>
+                    </div>
+
+                    <div class="frb2-playback">
+                      <h3 id="recordingPlaybackHeader">Recording Playback</h3>
+                      <p id="recording_playback_status" class="frb2-playback-status">No recording yet. Press Record, then Stop.</p>
+                      <div class="frb2-play-row">
+                        <button type="button" id="frb2-play-button" class="frb2-play-fab" onclick="playRecordingClip()" disabled title="Play last recording" aria-label="Play last recording">
+                          <span class="frb2-play-fab-icon" aria-hidden="true"></span>
+                        </button>
+                        <span id="frb2-play-label" class="frb2-play-label">Play recording</span>
+                      </div>
+                      <audio id="audioElem" class="frb2-audio frb2-audio-muted" controls preload="metadata" controlsList="nodownload"></audio>
+                    </div>
+                  </section>
+                  <section id="frb4-analysis-panel" class="frb2-panel">
+                    <h2>Audio Analysis Controls</h2>
+
+                    <p class="frb2-help">
+                      Analyse the most recent recorded audio clip using the species prediction service.
+                    </p>
+
+                    <div class="frb2-actions">
+                      <button type="button"
+                              id="start_analysis_button"
+                              class="frb2-btn frb2-btn-record"
+                              onclick="startAudioAnalysis()">
+                        Start Analysis
+                      </button>
+
+                      <button type="button"
+                              id="stop_analysis_button"
+                              class="frb2-btn frb2-btn-stop"
+                              onclick="stopAudioAnalysis()"
+                              disabled>
+                        Stop Analysis
+                      </button>
+                    </div>
+
+                    <p id="audio_analysis_status" class="frb2-playback-status">
+                      Record an audio clip before starting analysis.
+                    </p>
+
+                    <div id="audio_analysis_result"></div>
+                  </section>
+                  <!-- Keep legacy class hooks used by older helpers -->
+                  <div id="audio_recording_container" class="frb2-legacy-hidden" aria-hidden="true">
+                    <div id="recording_controls_container" class="recording_controls hide"></div>
+                    <div id="audio_playback_div"><p id="audio_playback_indicator" class="playback_indicator hide"></p></div>
+                  </div>
+                  <div id="microphone-spectrogram" class="spectrogram-panel" data-state="empty">
+                    <div class="spectrogram-viewport" data-role="viewport">
+                      <canvas data-role="canvas"></canvas>
+                      <p class="spectrogram-state" data-role="empty">Record or select an audio clip to view its spectrogram.</p>
+                      <p class="spectrogram-state" data-role="loading" hidden>Decoding audio...</p>
+                      <p class="spectrogram-state spectrogram-state-error" data-role="error" role="alert" hidden></p>
+                    </div>
+                    <p class="spectrogram-summary" data-role="summary" aria-live="polite"></p>
+                  </div>
+                  <h2 id="recordingSimulationHeader" style="margin-top: 20px !important;">Recording Simulation</h2>
+                  <div id="recording_simulation_master_container">
+                    <div id="recording_export_container" style="margin-top: 10px !important;" class="controls_item_row">
+                      <input type="file" style="display: inline-block !important; width: 250px !important" id="fileInput">
+                    </div>
+                    <div id="recording_simulation_container" style="margin-top: 10px !important;" class="controls_item_row">
+                      <i id="simulate_recording_button" style="width:120px !important" class="toggle-button btn btn-secondary btn-no-background select-all-btn" onclick="{simulateRecordingEvent()}" aria-hidden="true">Simulate</i>
+                    </div>
+                    <div id="downloadLink"></div>
+                  </div>
+                </div>
+                <div id="mic-default-content">
+                  <h2 style="text-align: left; color: rgba(247, 186, 206, 1) !important;">Microphone Bio Data</h2>
+                  <br>
+                  <p>Please click on a map marker to view microphone data.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- ── Node popup tab ─────────────────────────────────────── -->
+            <div id="node-popup">
+              <div class="wrapper">
+                <div id="node-popup-content">
+                  <h2 style="margin-top: 20px !important;">Node Details</h2>
+                  <div class="markup_form">
+                    <div class="markup_column"><div class="markup_row_left" style="width: 100px !important"><div>Name</div></div><div class="markup_row_right" style="text-align: right !important; width: 400px !important"><div id="node_markup_name"></div></div></div>
+                    <div class="markup_column"><div class="markup_row_left" style="width: 100px !important"><div>Type</div></div><div class="markup_row_right" style="text-align: right !important; width: 400px !important"><div id="node_markup_type"></div></div></div>
+                    <div class="markup_column"><div class="markup_row_left" style="width: 100px !important"><div>Model</div></div><div class="markup_row_right" style="text-align: right !important; width: 400px !important"><div id="node_markup_model"></div></div></div>
+                    <div class="markup_column"><div class="markup_row_left"><div>Longitude</div></div><div class="markup_row_right"><div id="node_markup_loc_lon"></div></div></div>
+                    <div class="markup_column"><div class="markup_row_left"><div>Latitude</div></div><div class="markup_row_right"><div id="node_markup_loc_lat"></div></div></div>
+                  </div>
+                </div>
+                <div id="node-default-content">
+                  <h2>Node Details</h2>
+                  <p>Click on a node to view its details.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- ── Filter menu tab ───────────────────────────────────── -->
+            <div id="filter-menu">
+              <div class="wrapper">
+                <div id="filter-menu-contents">
+                  <h2 style="text-align: left; color: rgba(247, 186, 206, 1) !important;">Filter Menu</h2>
+                  <div class="toggle-switch-container">
+                    <label for="toggle-switch" class="toggle-label">Live Mode:</label>
+                    <label class="toggle-switch">
+                      <input id="liveModeToggle" type="checkbox" checked>
+                      <span class="slider round"></span>
+                    </label>
+                  </div>
+                  <div class="past-data-container">
+                    <div class="past-data-header">View Past Data:</div>
+                    <div class="time-range-picker">
+                      <input type="text" id="datetime-range" name="datetime-range" style="width:100%" value="" />
+                    </div>
+                  </div>
+                  <div class="container" id="detection-source-filter">
+                    <span>Detection source</span>
+                    <div class="seg-control" role="group" aria-label="Detection source">
+                      <button type="button" class="toggle-button btn btn-secondary seg-btn" data-detection-source="all" aria-pressed="true">All</button>
+                      <button type="button" class="toggle-button btn btn-secondary seg-btn" data-detection-source="simulator" aria-pressed="false">Simulated</button>
+                      <button type="button" class="toggle-button btn btn-secondary seg-btn" data-detection-source="real" aria-pressed="false">Real-device</button>
+                    </div>
+                    <p id="detection-source-status" role="status" aria-live="polite" style="margin-top: 8px;"></p>
+                  </div>
+                  <div class="container">
+                    <input type="text" id="searchInput" placeholder="Search for an animal">
+                    <button onclick="{resetSearchFilter()}" class="toggle-button btn btn-secondary btn-no-background select-all-btn">Reset Filter</button>
+                    <ul id="animalList"></ul>
+                  </div>
+                  <div class="container">
+                    <span>Exclusive View Animal List</span>
+                    <ul id="displayOnlyAnimalList"></ul>
+                  </div>
+                  <div class="container">
+                    <span>Hidden Animal List</span>
+                    <ul id="hideAnimalList"></ul>
+                  </div>
+                  <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle btn-no-background" type="button" id="dropdownAnimalVocalizations" data-bs-toggle="dropdown" aria-expanded="false">Animal Vocalizations</button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownAnimalVocalizations">
+                      <div class="row"><div class="col">
+                        <div class="form-check"><input class="form-check-input v" type="checkbox" value="" id="_reptile" onchange="updateFilter('_reptile')" checked><label class="form-check-label" for="_reptile">Reptile</label></div>
+                        <div class="form-check"><input class="form-check-input v" type="checkbox" value="" id="_bird" onchange="updateFilter('_bird')" checked><label class="form-check-label" for="_bird">Bird</label></div>
+                        <div class="form-check"><input class="form-check-input v" type="checkbox" value="" id="_mammal" onchange="updateFilter('_mammal')" checked><label class="form-check-label" for="_mammal">Mammal</label></div>
+                        <div class="form-check"><input class="form-check-input v" type="checkbox" value="" id="_insect" onchange="updateFilter('_insect')" checked><label class="form-check-label" for="_insect">Insect</label></div>
+                        <div class="form-check"><input class="form-check-input v" type="checkbox" value="" id="_amphibian" onchange="updateFilter('_amphibian')" checked><label class="form-check-label" for="_amphibian">Amphibian</label></div>
+                        <div class="form-check"><button onclick="{selectAll('_all')}" class="toggle-button btn btn-secondary btn-no-background select-all-btn">Select All</button></div>
+                      </div>
+                      <div class="col-6">
+                        <div class="form-check"><input class="form-check-input v endangered" type="checkbox" value="" id="_endangered" onchange="updateFilter('_endangered')" checked><label class="form-check-label" for="_endangered">Endangered</label></div>
+                        <div class="form-check"><input class="form-check-input v vulnerable" type="checkbox" value="" id="_vulnerable" onchange="updateFilter('_vulnerable')" checked><label class="form-check-label" for="_vulnerable">Vunerable</label></div>
+                        <div class="form-check"><input class="form-check-input v nearthreatened" type="checkbox" value="" id="_near-threatened" onchange="updateFilter('_near-threatened')" checked><label class="form-check-label" for="_nearThreatened">Near Threatened</label></div>
+                        <div class="form-check"><input class="form-check-input v normal" type="checkbox" value="" id="_normal" onchange="updateFilter('_normal')" checked><label class="form-check-label" for="_normal">Normal</label></div>
+                        <div class="form-check"><input class="form-check-input v invasive" type="checkbox" value="" id="_invasive" onchange="updateFilter('_invasive')" checked><label class="form-check-label" for="_invasive">Invasive</label></div>
+                        <div class="form-check"><button onclick="{selectAll('_clear')}" class="toggle-button btn btn-secondary btn-no-background select-all-btn">Clear All</button></div>
+                      </div></div>
+                    </div>
+                  </div>
+                  <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle btn-no-background" type="button" id="dropdownAnimalSimulation" data-bs-toggle="dropdown" aria-expanded="false">Animal Simulation</button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownAnimalSimulation">
+                      <div class="row"><div class="col">
+                        <div class="form-check"><input class="form-check-input s" type="checkbox" value="" id="reptile" onchange="{updateFilter('reptile')}" checked><label class="form-check-label" for="reptile">Reptile</label></div>
+                        <div class="form-check"><input class="form-check-input s" type="checkbox" value="" id="bird" onchange="{updateFilter('bird')}" checked><label class="form-check-label" for="bird">Bird</label></div>
+                        <div class="form-check"><input class="form-check-input s" type="checkbox" value="" id="mammal" onchange="{updateFilter('mammal')}" checked><label class="form-check-label" for="mammal">Mammal</label></div>
+                        <div class="form-check"><input class="form-check-input s" type="checkbox" value="" id="insect" onchange="{updateFilter('insect')}" checked><label class="form-check-label" for="insect">Insect</label></div>
+                        <div class="form-check"><input class="form-check-input s" type="checkbox" value="" id="amphibian" onchange="{updateFilter('amphibian')}" checked><label class="form-check-label" for="amphibian">Amphibian</label></div>
+                        <div class="form-check"><button onclick="{selectAll('all')}" class="toggle-button btn btn-secondary btn-no-background select-all-btn">Select All</button></div>
+                      </div>
+                      <div class="col-6">
+                        <div class="form-check"><input class="form-check-input s endangered" type="checkbox" value="" id="endangered" onchange="{updateFilter('endangered')}" checked><label class="form-check-label" for="endangered">Endangered</label></div>
+                        <div class="form-check"><input class="form-check-input s vulnerable" type="checkbox" value="" id="vulnerable" onchange="{updateFilter('vulnerable')}" checked><label class="form-check-label" for="vulnerable">Vunerable</label></div>
+                        <div class="form-check"><input class="form-check-input s nearthreatened" type="checkbox" value="" id="near-threatened" onchange="{updateFilter('near-threatened')}" checked><label class="form-check-label" for="nearthreatened">Near Threatened</label></div>
+                        <div class="form-check"><input class="form-check-input s normal" type="checkbox" value="" id="normal" onchange="{updateFilter('normal')}" checked><label class="form-check-label" for="Normal">Normal</label></div>
+                        <div class="form-check"><input class="form-check-input s invasive" type="checkbox" value="" id="invasive" onchange="{updateFilter('invasive')}" checked><label class="form-check-label" for="invasive">Invasive</label></div>
+                        <div class="form-check"><button onclick="selectAll('clear')" class="toggle-button btn btn-secondary btn-no-background select-all-btn">Clear All</button></div>
+                      </div></div>
+                    </div>
+                  </div>
+                  <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle btn-no-background" type="button" id="dropdownMicrophones" data-bs-toggle="dropdown" aria-expanded="false">Microphones</button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMicrophones">
+                      <div class="row"><div class="col">
+                        <div class="form-check"><input class="form-check-input" type="checkbox" value="" id="microphones" onchange="{microphoneDisplay()}" checked><label class="form-check-label" for="microphones">Microphones</label></div>
+                        <div class="form-check"><input class="form-check-input" type="checkbox" value="" id="microphoneAnimations" onchange="{updateMicrophoneAnimation()}" checked><label class="form-check-label" for="microphones">Enable Animation</label></div>
+                      </div></div>
+                    </div>
+                  </div>
+                  <div class="export-tab">
+                    <button id="export-csv" onclick="{downloadCSV()}">EXPORT AS CSV <i class="fa-solid fa-cloud-arrow-down"></i></button>
+                    <button id="export-xlsx" onclick="{downloadXLSX()}">EXPORT AS XLSX <i class="fa-solid fa-cloud-arrow-down"></i></button>
+                  </div>
+
+                  <!--
+                    TASK 7 CHANGE: #error-msg div removed.
+                    ErrDisplay() now calls window.showToast() instead of
+                    injecting raw HTML into this element.
+                  -->
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /#menu -->
+        </div>
+      </div>
+    </div><!-- /.container -->
+
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         Script blocks
+         All non-module scripts use window.showToast() to reach the toast
+         helper that is exported from HMI-utils.js (an ES module).
+         HMI.js (type="module") is responsible for assigning
+         window.showToast = showToast after importing it.
+         ═══════════════════════════════════════════════════════════════ -->
+
+    <script>
+      // ── Animal filter / search ──────────────────────────────────────────
+
+      const iconDicts = {};
+      var displayedAnimals = new Set();
+      var hiddenAnimals = new Set();
+      var animalSpeciesToCommon = {};
+
+      // Sanitise user input to prevent XSS through the search bar
+      function sanitizeInput(str) {
+        var temp = document.createElement('div');
+        temp.textContent = str;
+        return temp.innerHTML;
+      }
+
+      const editFormElement = document.getElementById('editForm');
+      if (editFormElement) {
+        editFormElement.addEventListener('submit', function (event) {
+          event.preventDefault();
+        });
+      }
+
+      document.getElementById('searchInput').addEventListener('input', function (e) {
+        this.value = sanitizeInput(this.value);
+      });
+
+      document.addEventListener("DOMContentLoaded", function () {
+        const jsonUrl = './js/sample_data.json';
+        const animalListElement = document.getElementById('animalList');
+        const searchInput = document.getElementById('searchInput');
+        const searchForNotifications = document.getElementById('animal-search');
+        const animalNotificationListElement = document.getElementById('animal-list');
+        const selectedAnimalsElement = document.getElementById('selected-animals');
+        let animalData = [];
+        let selectedAnimals = [];
+
+        fetch(jsonUrl)
+          .then(response => response.json())
+          .then(data => { animalData = data.data; })
+          .then(() => {
+            animalData.forEach(animal => {
+              animalSpeciesToCommon[animal.species.toLowerCase()] = animal.common;
+            });
+          })
+          .catch(error => console.error('Error loading JSON:', error));
+
+        // Load saved notification preferences from the backend
+        function loadSelectedAnimalsFromBackend() {
+          const token  = localStorage.getItem('token');
+          const userId = localStorage.getItem('userId');
+
+          // FR-D1: was pointed straight at http://localhost:9000, which only ever
+          // worked on a dev machine. Shared client goes via the /hmi/* proxy instead.
+          window.retrieveUserNotifications(userId, token)
+            .then(response => {
+              selectedAnimals = response.data.notificationAnimals || [];
+              updateSelectedAnimals();
+            })
+            .catch(error => {
+              console.error('Error fetching selected animals:', error);
+              // TASK 7: replaced silent failure with a toast
+              if (window.showToast) {
+                window.showToast('Could not load notification preferences.', 'warning');
+              }
+            });
+        }
+
+        // the shared client is bridged onto window by the module block further
+        // down, and modules only run once parsing is finished - so wait for
+        // DOMContentLoaded rather than calling this straight away
+        document.addEventListener('DOMContentLoaded', loadSelectedAnimalsFromBackend);
+
+        searchForNotifications.addEventListener('keyup', function () {
+          autocompleteAnimalsForNotifications();
+        });
+
+        function autocompleteAnimalsForNotifications() {
+          const searchValue = searchForNotifications.value.toLowerCase();
+          const filteredAnimals = animalData.filter(animal =>
+            animal.common.toLowerCase().includes(searchValue)
+          );
+          displayAnimalNotificationList(filteredAnimals);
+        }
+
+        function displayAnimalNotificationList(filteredData) {
+          animalNotificationListElement.innerHTML = '';
+          filteredData.slice(0, 5).forEach(animal => {
+            const li = document.createElement('li');
+            const textSpan = document.createElement('span');
+            textSpan.textContent = animal.common;
+            li.appendChild(textSpan);
+
+            const addButton = document.createElement('button');
+            addButton.textContent = 'Add to Notifications';
+            addButton.className = 'btn btn-add';
+            addButton.style.color = 'green';
+            addButton.onclick = (event) => {
+              event.preventDefault();
+              addAnimalToNotifications(animal);
+            };
+            li.appendChild(addButton);
+            animalNotificationListElement.appendChild(li);
+          });
+        }
+
+        function addAnimalToNotifications(animal) {
+          if (!selectedAnimals.some(a => a.species === animal.species)) {
+            selectedAnimals.push(animal);
+            updateSelectedAnimals();
+            saveNotificationToBackend(animal);
+          } else {
+            // TASK 7: replaced console.log with an info toast
+            if (window.showToast) {
+              window.showToast(`${animal.common} is already in your notifications.`, 'info');
+            }
+          }
+        }
+
+        function removeAnimalFromNotifications(animal) {
+          selectedAnimals = selectedAnimals.filter(a => a.species !== animal.species);
+          updateSelectedAnimals();
+          removeNotificationFromBackend(animal);
+        }
+
+        function updateSelectedAnimals() {
+          selectedAnimalsElement.innerHTML = '';
+          selectedAnimals.forEach(animal => {
+            const li = document.createElement('li');
+            li.textContent = animal.common;
+
+            const removeButton = document.createElement('button');
+            removeButton.textContent = 'Remove';
+            removeButton.className = 'btn btn-remove';
+            removeButton.style.color = 'red';
+            removeButton.onclick = () => removeAnimalFromNotifications(animal);
+            li.appendChild(removeButton);
+            selectedAnimalsElement.appendChild(li);
+          });
+        }
+
+        function saveNotificationToBackend(animal) {
+          const token  = localStorage.getItem('token');
+          const userId = localStorage.getItem('userId');
+
+          // FR-D1: shared client via the /hmi/* proxy. axios rejects on any
+          // non-2xx, so the old !response.ok branch folds into the catch below.
+          window.addUserNotification(userId, animal, token)
+            .then(() => {
+              // TASK 7: replaced alert() with a success toast
+              if (window.showToast) {
+                window.showToast(`${animal.common} added to notifications.`, 'success');
+              }
+            })
+            .catch(error => {
+              console.error('Error adding animal to notifications:', error);
+              if (window.showToast) {
+                window.showToast('Could not add animal to notifications. Please try again.', 'error');
+              }
+            });
+        }
+
+        function removeNotificationFromBackend(animal) {
+          const token  = localStorage.getItem('token');
+          const userId = localStorage.getItem('userId');
+
+          // FR-D1: shared client via the /hmi/* proxy, same as the save above.
+          window.removeUserNotification(userId, animal.species, token)
+            .then(() => {
+              // TASK 7: replaced alert() with a success toast
+              if (window.showToast) {
+                window.showToast(`${animal.common} removed from notifications.`, 'success');
+              }
+            })
+            .catch(error => {
+              console.error('Error removing animal from notifications:', error);
+              if (window.showToast) {
+                window.showToast('Could not remove animal from notifications. Please try again.', 'error');
+              }
+            });
+        }
+
+        searchInput.addEventListener('keyup', function () {
+          const searchValue = searchInput.value.toLowerCase();
+          const filteredAnimals = animalData.filter(animal =>
+            animal.common.toLowerCase().includes(searchValue)
+          );
+          displayAnimalNotificationList(filteredAnimals);
+        });
+
+        function displayAnimalList(filteredData) {
+          animalListElement.innerHTML = '';
+          filteredData.forEach(animal => {
+            const li = document.createElement('li');
+            const textSpan = document.createElement('span');
+            textSpan.textContent = animal.common;
+            textSpan.onclick = (event) => displayPopup(animal, event);
+            li.appendChild(textSpan);
+
+            const hideButton = document.createElement('button');
+            hideButton.textContent = 'Hide';
+            hideButton.className = 'btn btn-hide';
+            hideButton.style.color = 'red';
+            hideButton.onclick = () => hideAnimal(animal.species.toLowerCase());
+            li.appendChild(hideButton);
+
+            const showOnlyButton = document.createElement('button');
+            showOnlyButton.textContent = 'Add to Exclusive View';
+            showOnlyButton.className = 'btn btn-hide';
+            showOnlyButton.style.color = 'green';
+            showOnlyButton.onclick = () => showOnly(animal);
+            li.appendChild(showOnlyButton);
+
+            animalListElement.appendChild(li);
+          });
+        }
+
+        function displayPopup(animal, event) {
+          const popup = document.createElement('div');
+          popup.className = 'popup';
+          setTimeout(() => popup.style.opacity = '1', 10);
+
+          const title = document.createElement('h4');
+          title.className = 'popup-title';
+          title.textContent = animal.common;
+
+          const summary = document.createElement('p');
+          summary.textContent = animal.summary;
+
+          const descriptionList = document.createElement('ul');
+          animal.description.forEach(desc => {
+            const description = document.createElement('li');
+            description.textContent = desc;
+            descriptionList.appendChild(description);
+          });
+
+          const closeButton = document.createElement('button');
+          closeButton.className = 'popup-close-button';
+          closeButton.textContent = 'Close';
+          closeButton.onclick = function () {
+            popup.style.opacity = '0';
+            setTimeout(() => document.body.removeChild(popup), 390);
+          };
+
+          popup.appendChild(title);
+          popup.appendChild(summary);
+          popup.appendChild(descriptionList);
+          popup.appendChild(closeButton);
+          document.body.appendChild(popup);
+
+          const rect = event.target.getBoundingClientRect();
+          popup.style.top  = `${rect.top + window.scrollY}px`;
+          popup.style.left = `${rect.left - 310}px`;
+        }
+
+        searchInput.addEventListener('keyup', function () {
+          const searchTerm = searchInput.value.toLowerCase();
+          const filteredData = animalData
+            .filter(animal => animal.common.toLowerCase().includes(searchTerm))
+            .slice(0, 3);
+          displayAnimalList(filteredData);
+        });
+      });
+
+      // ── Animal layer helpers ────────────────────────────────────────────
+
+      const visibleStyle = (url) => new ol.style.Style({
+        image: new ol.style.Icon({ src: url, anchor: [0.5, 1], scale: 0.75, className: 'true-icon' }),
+      });
+
+      function showAnimal(animal) {
+        const layers = window.hmiState.basemap.getLayers().getArray();
+        layers.forEach(layer => {
+          if (layer instanceof ol.layer.Vector) {
+            layer.getSource().getFeatures().forEach(feature => {
+              if (feature.get('animalSpecies') != undefined) {
+                const animalName = feature.get('animalSpecies').toLowerCase();
+                if (animalName.includes(animal)) {
+                  const key = feature.get('eventId') + feature.get('animalSpecies').toLowerCase();
+                  feature.setStyle(visibleStyle(iconDicts[key]));
+                }
+              }
+            });
+          }
+        });
+        hiddenAnimals.delete(animal);
+        displayedAnimals.add(animal);
+        updateDisplayedAnimalsList(displayedAnimals);
+        updateHiddenAnimalsList();
+      }
+
+      function hideAnimal(animal) {
+        const layers = window.hmiState.basemap.getLayers().getArray();
+        hiddenAnimals.add(animal);
+        layers.forEach(layer => {
+          if (layer instanceof ol.layer.Vector) {
+            layer.getSource().getFeatures().forEach(feature => {
+              if (feature.get('animalSpecies') != undefined) {
+                if (feature.get('animalSpecies').toLowerCase() === animal) {
+                  const key = feature.get('eventId') + feature.get('animalSpecies').toLowerCase();
+                  iconDicts[key] = feature.get('animalIcon');
+                  feature.setStyle(new ol.style.Style({ display: 'none' }));
+                }
+              }
+            });
+          }
+        });
+        displayedAnimals.delete(animal);
+        updateDisplayedAnimalsList(displayedAnimals);
+        updateHiddenAnimalsList();
+      }
+
+      function showOnly(animal) {
+        const layers = window.hmiState.basemap.getLayers().getArray();
+        hiddenAnimals.delete(animal.species.toLowerCase());
+        layers.forEach(layer => {
+          if (layer instanceof ol.layer.Vector) {
+            layer.getSource().getFeatures().forEach(feature => {
+              if (feature.get('animalSpecies') != undefined) {
+                const animalName = feature.get('animalSpecies').toLowerCase();
+                displayedAnimals.add(animal.species.toLowerCase());
+                if (displayedAnimals.has(animalName)) {
+                  feature.setStyle(visibleStyle(feature.get('animalIcon')));
+                  updateDisplayedAnimalsList(displayedAnimals);
+                } else {
+                  const key = feature.get('eventId') + feature.get('animalSpecies').toLowerCase();
+                  iconDicts[key] = feature.get('animalIcon');
+                  feature.setStyle(new ol.style.Style({ display: 'none' }));
+                  hiddenAnimals.add(animalName);
+                }
+              }
+            });
+          }
+        });
+        updateHiddenAnimalsList();
+      }
+
+      function updateDisplayedAnimalsList(displayedAnimals) {
+        const listContainer = document.getElementById('displayOnlyAnimalList');
+        listContainer.innerHTML = '';
+        displayedAnimals.forEach(function (animal) {
+          const listItem = document.createElement('li');
+          const textSpan = document.createElement('span');
+          textSpan.textContent = convertSpeciesToCommon(animal);
+          const hideButton = document.createElement('button');
+          hideButton.textContent = 'Hide';
+          hideButton.className = 'btn btn-hide';
+          hideButton.style.color = 'red';
+          hideButton.onclick = () => hideAnimal(animal);
+          listItem.appendChild(textSpan);
+          listItem.appendChild(hideButton);
+          listContainer.appendChild(listItem);
+        });
+      }
+
+      function updateHiddenAnimalsList() {
+        const listContainer = document.getElementById('hideAnimalList');
+        listContainer.innerHTML = '';
+        hiddenAnimals.forEach(function (animal) {
+          const listItem = document.createElement('li');
+          const textSpan = document.createElement('span');
+          textSpan.textContent = convertSpeciesToCommon(animal);
+          const showButton = document.createElement('button');
+          showButton.textContent = 'Show';
+          showButton.className = 'btn btn-hide';
+          showButton.style.color = 'green';
+          showButton.onclick = () => showAnimal(animal);
+          listItem.appendChild(textSpan);
+          listItem.appendChild(showButton);
+          listContainer.appendChild(listItem);
+        });
+      }
+
+      function resetSearchFilter() {
+        const layers = window.hmiState.basemap.getLayers().getArray();
+        layers.forEach(layer => {
+          if (layer instanceof ol.layer.Vector) {
+            layer.getSource().getFeatures().forEach(feature => {
+              if (feature.get('animalSpecies') != undefined) {
+                const animalName = feature.get('animalSpecies').toLowerCase();
+                if (!displayedAnimals.has(animalName)) {
+                  const key = feature.get('eventId') + feature.get('animalSpecies').toLowerCase();
+                  feature.setStyle(visibleStyle(iconDicts[key]));
+                }
+              }
+            });
+          }
+        });
+        hiddenAnimals.clear();
+        displayedAnimals.clear();
+        updateHiddenAnimalsList();
+        updateDisplayedAnimalsList();
+      }
+
+      function convertSpeciesToCommon(species) {
+        return animalSpeciesToCommon[species.toLowerCase()];
+      }
+    </script>
+
+    <script>
+      // ── Donations ───────────────────────────────────────────────────────
+
+      let donorAmount;
+      var donationData = [
+        { amount: 1, image: '$1.png' },
+        { amount: 5, image: '$5.png' },
+        { amount: 10, image: '$10.png' },
+        { amount: 20, image: '$20.png' },
+        { amount: 50, image: '$50.png' },
+      ];
+
+      var imageDescriptions = document.querySelectorAll('.image-description');
+      imageDescriptions.forEach(function (description, index) {
+        var image  = description.querySelector('img');
+        var amount = description.querySelector('.image-amount');
+        amount.textContent = donationData[index].amount;
+        image.src = './images/' + donationData[index].image;
+      });
+
+      imageDescriptions.forEach(function (description) {
+        var image = description.querySelector('img');
+        var amount = description.querySelector('.image-amount');
+        var yourAmountElement = document.querySelector('.donation-amount');
+        var lightbulbIcon = document.querySelector('.lightbulb-container img');
+
+        image.addEventListener('mouseenter', function () { image.style.opacity = '0.8'; });
+        image.addEventListener('mouseleave', function () { image.style.opacity = '1'; });
+
+        image.addEventListener('click', function () {
+          donorAmount = amount.textContent;
+          yourAmountElement.textContent = 'Your Amount: $' + donorAmount;
+          lightbulbIcon.src = image.src;
+          lightbulbIcon.style.transform = 'scale(1.3)';
+        });
+      });
+
+      const donationButton = document.getElementById('donation-button');
+      donationButton.addEventListener("click", async () => {
+        if (donorAmount == undefined) {
+          // TASK 7: replaced silent return with a warning toast
+          if (window.showToast) {
+            window.showToast('Please select a donation amount first.', 'warning');
+          }
+          return;
+        }
+
+        if (!username || !email) {
+          if (window.showToast) {
+            window.showToast('User details are still loading. Please try again in a moment.', 'warning');
+          }
+          return;
+        }
+
+        donationButton.disabled = true;
+        const releaseDonationButton = () => { donationButton.disabled = false; };
+
+        try {
+          const response = await fetch("/api/create-razorpay-order", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ amount: Number(donorAmount) * 100 }),
+          });
+          if (!response.ok) throw new Error('Razorpay order creation failed');
+
+          const order = await response.json();
+          const options = payment(username, order, email, releaseDonationButton);
+          const rzp1 = new Razorpay(options);
+          rzp1.on('payment.failed', function () {
+            rzp1.close();
+            releaseDonationButton();
+            if (window.showToast) {
+              window.showToast('Payment failed. Please try again.', 'error');
+            }
+          });
+          rzp1.open();
+        } catch (error) {
+          releaseDonationButton();
+          console.error('Razorpay order creation failed.');
+          if (window.showToast) {
+            window.showToast('Payment session could not be started. Please try again.', 'error');
+          }
+        }
+        });
+    </script>
+
+    <script>
+      // ── Contact form validation ─────────────────────────────────────────
+
+      let button = document.getElementById("query_submit_button");
+
+      emailValidate = function () {
+        let email_value = document.getElementById("email").value;
+        if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email_value)) {
+          $("#email_error_label").hide();
+          button.disabled = false;
+        } else {
+          $("#email_error_label").show();
+          button.disabled = true;
+        }
+      };
+
+      queryValidate = function () {
+        let query_value = document.getElementById("query").value;
+        if (query_value.replace(/\s/g, "") !== "") {
+          $("#query_error_label").hide();
+          button.disabled = false;
+        } else {
+          $("#query_error_label").show();
+          button.disabled = true;
+        }
+      };
+
+      // ── Navigation ───────────────────────────────────────────────────────
+
+      var hamburgerStatus = false;
+      var currentTab = document.getElementById('filter-menu');
+
+      document.getElementById("pink-line").style.width = "0px";
+
+      function toggleNav() {
+        document.querySelector('.hamburger-icon').classList.toggle('active');
+        if (!hamburgerStatus) openMenu();
+        else closeMenu();
+      }
+
+      function openMenu() {
+        document.getElementById("menu").style.width  = "100vw";
+        document.getElementById("menu").style.height = "100%";
+        hamburgerStatus = true;
+        openTab("filter-menu");
+        document.getElementById("pink-line").style.width = "100vw";
+      }
+
+      function closeMenu() {
+        document.getElementById("menu").style.width  = "0%";
+        document.getElementById("menu").style.height = "0%";
+        hamburgerStatus = false;
+        document.getElementById("pink-line").style.width = "0px";
+        closeTab();
+      }
+
+      function fetchUser() {
+        document.getElementById("username").innerText = `${username}`;
+        document.getElementById("useremail").innerText = `${email}`;
+      }
+
+      function openTab(tab) {
+        $(".tabs-button").removeClass("active");
+        const tabBtnMap = {
+          "filter-menu":        "filter-menu-btn",
+          "animal-popup":       "popup-menu-btn",
+          "FAQ":                "FAQ-menu-btn",
+          "SIM":                "SIM-menu-btn",
+          "donate":             "donate-menu-btn",
+          "mic-popup":          "mic-popup-menu-btn",
+          "node-popup":         "node-popup-menu-btn",
+          "userProfile":        "user-profile-button",
+          "statistics":         "statistics-menu-btn",
+          "animalNotifications":"notification-menu-button",
+          "config-settings-tab":"config-settings-menu-btn",
+        };
+        if (tabBtnMap[tab]) {
+          document.getElementById(tabBtnMap[tab]).classList.add("active");
+        }
+        if (tab === "animalNotifications") {
+          document.getElementById("animalNotifications").style.display = "block";
+        }
+        if (tab != null && currentTab !== document.getElementById(tab)) {
+          closeTab();
+        }
+        currentTab = document.getElementById(tab);
+        currentTab.style.width  = "100vw";
+        currentTab.style.height = "90%";
+      }
+
+      function closeTab() {
+        currentTab.style.width  = "0%";
+        currentTab.style.height = "0%";
+      }
+
+      var overlay = null;
+      function openSIMULATOR() {
+        if (overlay) closeOverlay(overlay);
+      }
+
+      function openNav(tab) {
+        var hamburger = document.querySelector('.hamburger-icon');
+        if (!hamburger.classList.contains('active')) toggleNav();
+        openTab(tab || 'filter-menu');
+      }
+
+      document.addEventListener('animalToggled', function () {
+        closeTab();
+        setTimeout(() => { currentTab = document.getElementById('animal-popup'); openNav("animal-popup"); document.getElementById("animal-popup-content").focus(); }, 10);
+      });
+      document.getElementById("animal-popup-content").addEventListener("keydown", function (event) {
+        if (event.key === "Escape") {
+          closeMenu();
+          document.getElementById("basemap").focus();
+        }
+      });
+      document.addEventListener('micToggled', function () {
+        closeTab();
+        setTimeout(() => { currentTab = document.getElementById('mic-popup'); openNav('mic-popup'); }, 10);
+      });
+      document.addEventListener('nodeToggled', function () {
+        closeTab();
+        setTimeout(() => { currentTab = document.getElementById('node-popup'); openNav('node-popup'); }, 10);
+      });
+
+      // ── Audio animation ─────────────────────────────────────────────────
+
+      let aud = false;
+      let recordingAud = false;
+
+      function animateAudioPlay()  { $(".boxmuted").removeClass("boxmuted"); aud = true;  document.getElementById("animalAudioI").style.opacity = ".5"; }
+      function animateAudioMute()  { $(".box").addClass("boxmuted");         aud = false; document.getElementById("animalAudioI").style.opacity = "1"; }
+
+      function toggleAudio() {
+        if (!aud) {
+          document.dispatchEvent(new CustomEvent('playAudio',  { detail: { message: "play audio" } }));
+          animateAudioPlay();
+        } else {
+          document.dispatchEvent(new CustomEvent('stopAudio',  { detail: { message: "stop audio" } }));
+          animateAudioMute();
+        }
+      }
+
+      function animateRecordedAudioPlay() {
+        recordingAud = true;
+        const icon = document.getElementById("recordingI");
+        if (icon) icon.style.opacity = ".5";
+        $(".boxmutedR").removeClass("boxmutedR");
+      }
+      function animateRecordedAudioMute() {
+        recordingAud = false;
+        const icon = document.getElementById("recordingI");
+        if (icon) icon.style.opacity = "1";
+        $(".boxR").addClass("boxmutedR");
+      }
+
+      function toggleRecordingAudio() {
+        if (!recordingAud) {
+          animateRecordedAudioPlay();
+          document.dispatchEvent(new CustomEvent('playRecordedAudio',  { detail: { message: "play audio" } }));
+        } else {
+          animateRecordedAudioMute();
+          document.dispatchEvent(new CustomEvent('stopRecordedAudio',  { detail: { message: "stop audio" } }));
+        }
+      }
+
+      function simModeSwitch(mode) {
+        document.dispatchEvent(new CustomEvent('modeSwitch', { detail: { message: mode } }));
+      }
+      function saveRecordingEvent()     { document.dispatchEvent(new CustomEvent('saveRecording',     { detail: { message: "save" } })); }
+      function loadRecordingEvent()     { document.dispatchEvent(new CustomEvent('loadRecording',     { detail: { message: "load" } })); }
+      function simulateRecordingEvent() { document.dispatchEvent(new CustomEvent('simulateRecording', { detail: { message: "simulate" } })); }
+
+      animateAudioMute();
+      animateRecordedAudioMute();
+
+      document.addEventListener('muteAnimation',          () => animateAudioMute());
+      document.addEventListener('muteRecordingAnimation', () => animateRecordedAudioMute());
+    </script>
+
+    <script>
+      // ── Edit request form ───────────────────────────────────────────────
+
+      const requestButton   = document.getElementById("request-edit-button");
+      const editForm        = document.getElementById("editForm");
+      const editFormWrapper = document.getElementById("editFormWrapper");
+      const closeFormButton = document.getElementById("closeFormButton");
+      const submit          = document.getElementById("submitEditButton");
+      const markupDetails   = document.getElementById("markup_details");
+      const newStatus       = document.getElementById("selectNCS");
+      const conservationButtons = document.getElementById("dropdownContentNCS");
+      const dropdownOptions     = document.getElementById("dropdownContentNCS");
+
+      var currentStatus;
+      var animalNewStatus;
+      var requestingToChange = "conservation status";
+      var newConservationStatus;
+      var source;
+      var animal;
+      var requestData;
+
+      requestButton.addEventListener('click', () => {
+        editFormWrapper.style.display = "";
+        const content  = markupDetails.innerHTML;
+        const items    = content.split('|');
+        currentStatus  = items.map(i => i.trim())[2];
+        document.getElementById("formSpeciesName").innerHTML          = document.getElementById("desc_species").innerHTML;
+        document.getElementById("currentConservationStatus").innerHTML = currentStatus;
+        editFormWrapper.style.zIndex = "1000";
+        editForm.style.display = "block";
+      });
+
+      conservationButtons.addEventListener("click", (event) => {
+        if (event.target.tagName === 'BUTTON') {
+          event.preventDefault();
+          newConservationStatus = event.target.innerHTML;
+          newStatus.innerHTML   = newConservationStatus;
+          dropdownOptions.style.display = "none";
+        }
+      });
+
+      newStatus.addEventListener('click', (event) => {
+        event.preventDefault();
+        dropdownOptions.style.display =
+          (dropdownOptions.style.display === "none" || dropdownOptions.style.display === "") ? "block" : "none";
+      });
+
+      function submitRequest() {
+        animal = document.getElementById("desc_species").innerHTML;
+        source = document.getElementById("citationSneeded").value;
+        const initial  = currentStatus;
+        const modified = newConservationStatus;
+
+        if (initial === modified) {
+          // TASK 7: replaced generateVisualResponse() with showToast
+          if (window.showToast) window.showToast("New conservation status can't be the same as the current status.", 'warning');
+          return;
+        }
+        if (modified === undefined) {
+          if (window.showToast) window.showToast("Please select a new conservation status.", 'warning');
+          return;
+        }
+        if (source === "") {
+          if (window.showToast) window.showToast("Please enter a source before submitting.", 'warning');
+          return;
+        }
+
+        requestData = { username, animal, requestingToChange, initial, modified, source };
+
+        // FR-D1: shared client. axios rejects on any non-2xx, so the old
+        // status !== 201 branch is now just part of the catch.
+        window.submitAnimalRequest(requestData)
+          .then(() => {
+            if (window.showToast) window.showToast("Your submission was received and is awaiting review.", 'success');
+          })
+          .catch(error => {
+            console.error('Could not submit the change request:', error);
+            if (window.showToast) window.showToast("There was an error receiving your submission. Please try again.", 'error');
+          });
+      }
+
+      function exitSubmission() {
+        currentStatus = source = animal = animalNewStatus = "";
+        editFormWrapper.style.display = "none";
+        editForm.style.display = "none";
+        dropdownOptions.style.display = "";
+      }
+
+      submit.addEventListener('click', (event) => { event.preventDefault(); submitRequest(); exitSubmission(); });
+      closeFormButton.addEventListener('click', (event) => { event.preventDefault(); exitSubmission(); });
+    </script>
+
+    <script>
+      // ── Filter checkboxes ───────────────────────────────────────────────
+
+      const myClass   = document.querySelectorAll('.form-check-input:not([name="detectionSource"])');
+      const sim       = document.querySelectorAll('.s');
+      const voc       = document.querySelectorAll('.v');
+      const checkboxIDs = [];
+      const simIds      = [];
+
+      myClass.forEach(element => checkboxIDs.push(element.id));
+      sim.forEach(element => simIds.push(element.id));
+
+      let filterState = [...checkboxIDs];
+
+      function updateFilter(checkbox) {
+        if (document.getElementById(checkbox).checked) {
+          if (!filterState.includes(checkbox)) filterState.push(checkbox);
+        } else {
+          const index = filterState.indexOf(checkbox);
+          if (index > -1) filterState.splice(index, 1);
+        }
+        if (window.hmiState) {
+          window.hmiState.speciesFilterState = [...filterState];
+          updateLayers(window.hmiState, filterState);
+        }
+      }
+
+      function microphoneDisplay() { updateMics(); }
+
+      function selectAll(filter) {
+        if (filter === 'clear') {
+          sim.forEach(id => { if (filterState.includes(id.id)) { filterState.splice(filterState.indexOf(id.id), 1); id.checked = false; } });
+        } else if (filter === '_clear') {
+          voc.forEach(id => { if (filterState.includes(id.id)) { filterState.splice(filterState.indexOf(id.id), 1); id.checked = false; } });
+        } else if (filter === 'all') {
+          sim.forEach(id => { if (!filterState.includes(id.id)) filterState.push(id.id); id.checked = true; });
+        } else if (filter === '_all') {
+          voc.forEach(id => { if (!filterState.includes(id.id)) filterState.push(id.id); id.checked = true; });
+        }
+        if (window.hmiState) {
+          window.hmiState.speciesFilterState = [...filterState];
+          updateLayers(window.hmiState, filterState);
+        }
+      }
+
+      window.getSpeciesFilterState = () => [...filterState];
+    </script>
+
+    <script type="module">
+      // ── HMI module entry point ──────────────────────────────────────────
+      import {
+        updateLayers, initialiseHMI, showMics, hideMics,
+        updateAnimalMovementLayerFromPastData, updateVocalizationLayerFromPastData,
+        MapOpenNav, MapCloseNav, getAnimalToggled,
+        enableMicAnimation, disableMicAnimation, getUTC,
+        startAudioRecording, stopAudioRecording, cancelAudioRecording,
+        playRecordingClip, testFunct, convertCSV, setDetectionSourceFilter,
+        startAudioAnalysis, stopAudioAnalysis
+      } from "/features/map/hmi-map.js";
+
+          import { retrieveTruthEventsInTimeRange, retrieveVocalizationEventsInTimeRange } from "/shared/http/routes.js";
+
+      // FR-D1: the notification, submission and profile blocks further up are
+      // plain scripts, so the shared client has to reach them through window,
+      // same as showToast already does below.
+      import {
+        retrieveUserNotifications, addUserNotification, removeUserNotification,
+        submitAnimalRequest, retrieveUserProfile
+          } from "/shared/http/routes.js";
+      window.retrieveUserNotifications = retrieveUserNotifications;
+      window.addUserNotification      = addUserNotification;
+      window.removeUserNotification   = removeUserNotification;
+      window.submitAnimalRequest      = submitAnimalRequest;
+      window.retrieveUserProfile      = retrieveUserProfile;
+
+      // TASK 7: import showToast from HMI-utils and expose it on window so
+      // the non-module <script> blocks above can call window.showToast().
+          import { showToast } from "/shared/ui/hmi-utils.js";
+      window.showToast = showToast;
+      window.playRecordingClip = playRecordingClip;
+      window.startAudioRecording = startAudioRecording;
+      window.stopAudioRecording = stopAudioRecording;
+      window.cancelAudioRecording = cancelAudioRecording;
+      window.startAudioAnalysis = startAudioAnalysis;
+      window.stopAudioAnalysis = stopAudioAnalysis;
+
+      window.updateMics              = updateMics;
+      window.downloadCSV             = downloadCSV;
+      window.downloadXLSX            = downloadXLSX;
+      window.updateMicrophoneAnimation = updateMicrophoneAnimation;
+      window.updateLayers            = updateLayers;
+      window.closeNav                = MapCloseNav;
+      window.setDetectionSourceFilter = (filter) => setDetectionSourceFilter(hmiState, filter);
+
+      let hmiState = {};
+      window.hmiState = hmiState;
+      hmiState.truthEventId = 10;
+      hmiState.detectionSourceFilter = "all";
+      hmiState.detectionSourceStatus = document.getElementById("detection-source-status");
+      if (typeof window.getSpeciesFilterState === "function") {
+        hmiState.speciesFilterState = window.getSpeciesFilterState();
+      }
+
+      document.querySelectorAll('[data-detection-source]').forEach((button) => {
+        button.addEventListener("click", () => {
+          document.querySelectorAll('[data-detection-source]').forEach((other) => {
+            other.setAttribute("aria-pressed", String(other === button));
+          });
+          setDetectionSourceFilter(hmiState, button.dataset.detectionSource);
+        });
+      });
+
+      let datepickerStart = hmiState.currentTime;
+      let datepickerEnd   = hmiState.previousUpdateTime;
+
+      hmiState.liveMode       = true;
+      hmiState.simUpdateDelay = 10000;
+
+      // Live-event window (ms): how long a live vocalization/movement marker
+      // stays on the HMI map before it is purged (see purgeVocalizationEvents /
+      // purgeTruthEvents and the fade styling in HMI.js). Default 60000 (60s),
+      // inside the 60-120s range recommended for this feature. Change ONLY
+      // this value to retune the window — everything else reads it from here.
+      hmiState.liveWindow     = 60000;
+      hmiState.simMode        = "Stop";
+
+      const utcTime = getUTC();
+      hmiState.timeOffset         = 0;
+      hmiState.simTime            = getUTC();
+      hmiState.currentTime        = Math.floor((utcTime - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
+      hmiState.previousUpdateTime = Math.floor((utcTime - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
+      hmiState.liveEventCutoff    = Math.floor((utcTime - hmiState.timeOffset - hmiState.simUpdateDelay - hmiState.liveWindow) / 1000);
+
+      hmiState.originLat      = -38.8078;
+      hmiState.originLon      = 143.54741;
+      hmiState.defaultZoom    = 10;
+      hmiState.requestInterval = 1000;
+      hmiState.layers         = {};
+      hmiState.layerPool      = 1000;
+
+      hmiState.movementEvents     = {};
+      hmiState.vocalizationEvents = [];
+      hmiState.microphoneLocations = [];
+
+      const elArea      = document.getElementById("basemap");
+      const simulatorOl = document.getElementById("screen");
+      simulatorOl.addEventListener("click", openSIMULATOR);
+
+      window.onload = function () {
+        console.log("Website loaded!");
+        initialiseHMI(hmiState);
+      };
+
+      function updateMics() {
+        const anim = document.getElementById("microphoneAnimations");
+        const mic  = document.getElementById("microphones");
+        if      ( anim.checked &&  mic.checked) enableMicAnimation(hmiState);
+        else if (!anim.checked &&  mic.checked) showMics(hmiState);
+        else if ( anim.checked && !mic.checked) disableMicAnimation(hmiState);
+        else hideMics(hmiState);
+      }
+
+      function updateMicrophoneAnimation() {
+        const anim = document.getElementById("microphoneAnimations");
+        const mic  = document.getElementById("microphones");
+        if (anim.checked && mic.checked) { enableMicAnimation(hmiState); }
+        else { disableMicAnimation(hmiState); if (mic.checked) showMics(hmiState); }
+      }
+
+      // Live mode toggle and past-data picker live in #live-map-controls wiring
+      // (setupLiveMapControls in HMI.js), which owns all live/pause behaviour.
+      // The date-range picker below only issues one-shot history queries.
+
+      $(function () {
+        $('#datetime-range').daterangepicker({
+          timePicker: true, timePicker24Hour: true, timePickerIncrement: 1,
+          locale: { format: 'YYYY-MM-DD HH:mm:ss' }
+        }, function (start, end) {
+          hmiState.startTime = start.unix();
+          hmiState.endTime   = end.unix();
+          datepickerStart    = start.unix();
+          datepickerEnd      = end.unix();
+          retrieveTruthEventsInTimeRange(hmiState.startTime, hmiState.endTime)
+            .then(res => updateAnimalMovementLayerFromPastData(hmiState, res.data));
+          retrieveVocalizationEventsInTimeRange(hmiState.startTime, hmiState.endTime)
+            .then(res => updateVocalizationLayerFromPastData(hmiState, res.data));
+        });
+      });
+
+      let active_content  = $("#animal-popup-content");
+      let default_content = $("#animal-default-content");
+      active_content.hide();
+      default_content.show();
+
+      let active_node_content  = $("#node-popup-content");
+      let default_node_content = $("#node-default-content");
+      active_node_content.hide();
+      default_node_content.show();
+
+      // ── Export helpers ─────────────────────────────────────────────────
+
+      function renameKeys(obj) {
+        const keyMappings = {
+          date: "Date", timestamp: "Time Stamp", animalId: "Animal ID",
+          detectingmicID: "Detecting Mic ID", detectingMicLat: "Detecting Mic Lat",
+          detectingMicLon: "Detecting Mic Lon", commonName: "Common Name",
+          speciesScientificName: "Species Scientific Name",
+          speciesIdentificationConfidence: "Species Identification Confidence",
+          locationLat: "Location Lat", locationLon: "Location Lon",
+          locationConfidence: "Location Confidence", animalType: "Animal Type",
+          animalStatus: "Animal Status", animalDiet: "Animal Diet",
+        };
+        const renamedObj = {};
+        for (const [oldKey, newKey] of Object.entries(keyMappings)) {
+          if (obj.hasOwnProperty(oldKey)) renamedObj[newKey] = obj[oldKey];
+        }
+        return renamedObj;
+      }
+
+      function dataCleansing(json_data) {
+        if (!json_data || json_data.length === 0) return null;
+        for (let i = 0; i < json_data.length; i++) {
+          json_data[i].date = new Date(json_data[i].timestamp * 1000).toLocaleString();
+        }
+        const headers = [
+          "date", "timestamp", "animalId", "detectingmicID", "detectingMicLat",
+          "detectingMicLon", "commonName", "speciesScientificName",
+          "speciesIdentificationConfidence", "locationLat", "locationLon",
+          "locationConfidence", "animalType", "animalStatus", "animalDiet"
+        ];
+        return JSON.parse(JSON.stringify(json_data, headers, 4)).map(renameKeys);
+      }
+
+      function downloadCSV() {
+        datepickerStart = hmiState.currentTime;
+        datepickerEnd   = hmiState.previousUpdateTime;
+        retrieveTruthEventsInTimeRange(datepickerStart, datepickerEnd).then(res => {
+          let data = dataCleansing(res.data);
+          if (!data) {
+            // Empty stays empty: never substitute sample records for live data.
+            if (window.showToast) window.showToast('No results found for the selected time range.', 'warning');
+            return;
+          }
+          const csv = convertCSV(data);
+          exportCSV("exportedCSV.csv", csv);
+        });
+      }
+
+      function downloadXLSX() {
+        datepickerStart = hmiState.currentTime;
+        datepickerEnd   = hmiState.previousUpdateTime;
+        retrieveTruthEventsInTimeRange(datepickerStart, datepickerEnd).then(res => {
+          if (!res.data || res.data.length === 0) {
+            if (window.showToast) window.showToast('No results found for the selected time range.', 'warning');
+            return;
+          }
+          const data = dataCleansing(res.data);
+          if (!data) {
+            if (window.showToast) window.showToast('No results found for the selected time range.', 'warning');
+            return;
+          }
+          const ws = XLSX.utils.json_to_sheet(data);
+          const wb = XLSX.utils.book_new();
+          ws["!autofilter"] = { ref: XLSX.utils.encode_range(XLSX.utils.decode_range(ws['!ref'])) };
+          XLSX.utils.book_append_sheet(wb, ws, "Records");
+          XLSX.writeFile(wb, "exportedExcel.xlsx", { bookType: "xlsx", header: Object.keys(data[0]) });
+        });
+      }
+
+      function exportCSV(filename, csvData) {
+        const element = document.createElement("a");
+        element.setAttribute("href", `data:text/csv;charset=utf-8,${csvData}`);
+        element.setAttribute("download", filename);
+        element.style.display = "none";
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
+      }
+
+      // ── Audio recording ─────────────────────────────────────────────────
+
+      function record()          { startAudioRecording(); }
+      function stopRecording()   { stopAudioRecording(); }
+      function cancelRecording() { cancelAudioRecording(); }
+
+      window.record            = record;
+      window.cancelRecording   = cancelRecording;
+      window.stopRecording     = stopRecording;
+    </script>
+
+    <script>
+      // ── User fetch and theme ─────────────────────────────────────────────
+
+      let username;
+      let email;
+
+      function getUser() {
+        // FR-D1: shared client, which already rejects on a non-2xx - no need to
+        // re-read the body just to turn a failure into a rejected promise.
+        window.retrieveUserProfile()
+          .then(response => {
+            const userData = response.data;
+            username = String(userData.username);
+            email    = `${userData.email}`;
+          })
+          .catch(e => {
+            console.error('Could not load user profile:', e);
+            // TASK 7: surface the failure to the user via toast
+            if (window.showToast) {
+              window.showToast('Could not load your profile. Some features may be unavailable.', 'warning');
+            }
+          });
+      }
+
+      // same as the notifications load above - the shared client only lands on
+      // window once the module block has run, which is after parsing
+      document.addEventListener('DOMContentLoaded', getUser);
+
+      // Theme toggle
+      document.addEventListener('DOMContentLoaded', () => {
+        const themeToggleButton = document.getElementById('themeToggle');
+        const filterMenuTitle   = document.querySelector('#filter-menu #filter-menu-contents h2');
+        const animalBioTitle    = document.querySelector('#animal-default-content h2');
+        const micBioTitle       = document.querySelector('#mic-default-content h2');
+
+        function setTheme(theme) {
+          document.body.classList.remove('light-theme', 'dark-theme');
+          document.body.classList.add(theme + '-theme');
+          localStorage.setItem('theme', theme);
+          const isLight = theme === 'light';
+          const colour  = isLight ? '#00a86b' : 'rgba(247, 186, 206, 1)';
+          filterMenuTitle.style.color = colour;
+          animalBioTitle.style.color  = colour;
+          micBioTitle.style.color     = colour;
+          themeToggleButton.textContent = isLight ? 'Switch to Dark Theme' : 'Switch to Light Theme';
+        }
+
+        themeToggleButton.addEventListener('click', () => {
+          setTheme(document.body.classList.contains('light-theme') ? 'dark' : 'light');
+        });
+
+        setTheme(localStorage.getItem('theme') || 'dark');
+      });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76A2z02tPqdjQnYhA4M6JbWh2nFfXnE2CkzAJ6Digw1kPxD6Z9SqnX+0Gooy2cV" crossorigin="anonymous"></script>
+
+  </body>
+</html>

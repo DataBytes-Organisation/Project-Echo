@@ -3,7 +3,7 @@
 const assert = require("node:assert/strict");
 const test = require("node:test");
 
-const { payment } = require("../public/paymentgateway");
+const { payment } = require("../public/features/payments/razorpay-checkout");
 
 const order = {
   keyId: "rzp_test_public",

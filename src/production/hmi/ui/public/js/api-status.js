@@ -4,7 +4,7 @@
 // =============================================================
 
 // using the same shared client as everywhere else now instead of our own raw fetch
-import { retrieveIotNodes } from "./routes.js";
+import { retrieveIotNodes } from "../shared/http/routes.js";
 
 /**
  * Test if the API connection is working.
