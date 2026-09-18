@@ -15,6 +15,7 @@
 
 const verifySignUp = require("./verifySignup");
 const redis = require("redis");
+const { createCheckUserSession, tokensMatch, resolveLandingPath } = require("./session");
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Redis client
@@ -45,20 +46,20 @@ async function ensureRedisConnected() {
 // Route lists
 //
 // PUBLIC_ROUTES  — accessible without a session token.
-// All other routes are treated as protected and require a valid JWT in Redis.
+// All other routes require the request's cookie-session JWT to match Redis.
 //
 // To add a new public route, add its exact path string to PUBLIC_ROUTES or
 // its prefix to PUBLIC_PREFIXES below.  Do not add it to the middleware
 // condition directly — keeping the lists here makes auditing straightforward.
 // ─────────────────────────────────────────────────────────────────────────────
 
-const PUBLIC_ROUTES = new Set(["/login", "/signup", "/map"]);
+const PUBLIC_ROUTES = new Set(["/login", "/signup"]);
 
 /**
  * Path prefixes that are always public regardless of the full path.
  * e.g. "/admin" covers "/admin", "/admin/users", "/admin/settings".
  */
-const PUBLIC_PREFIXES = ["/admin", "/public", "/static"];
+const PUBLIC_PREFIXES = ["/public", "/static"];
 
 /**
  * Return true if the given path should be accessible without a session token.
@@ -75,42 +76,58 @@ function _isPublicRoute(path) {
 // Session middleware
 // ─────────────────────────────────────────────────────────────────────────────
 
+const checkUserSession = createCheckUserSession(client, _isPublicRoute);
+
+// ─────────────────────────────────────────────────────────────────────────────
+// API session guard
+// ─────────────────────────────────────────────────────────────────────────────
+
 /**
- * Express middleware that checks for a valid JWT stored in Redis.
+ * Build a session guard for routes that answer with JSON.
  *
- * - Public routes (defined above) pass through without a token check.
- * - All other routes require a JWT to be present in Redis under the key "JWT".
- * - If no token is found, or Redis errors, the request is redirected to /login.
+ * checkUserSession above redirects to /login when there is no session, which is
+ * right for a page but wrong for an API: axios follows the redirect, gets the
+ * login page back with a 200, and the caller ends up parsing HTML as JSON. That
+ * is the same failure that had to be fixed in the sign-in route. This replies
+ * with a status the caller can actually act on instead.
  *
- * @param {import('express').Request}  req
- * @param {import('express').Response} res
- * @param {import('express').NextFunction} next
+ * The token lookup is passed in so the guard can be tested without Redis.
+ *
+ * @param {() => Promise<string|null>} getToken
+ * @returns {import('express').RequestHandler}
  */
-async function checkUserSession(req, res, next) {
-  console.log("Session check:", req.path);
+function createApiSessionGuard(getToken) {
+  return async function apiSessionGuard(req, res, next) {
+    try {
+      const token = await getToken();
 
-  // Public routes skip the token check entirely
-  if (_isPublicRoute(req.path)) {
-    return next();
-  }
+      if (!token) {
+        return res.status(401).json({
+          error: "Your session has expired. Please sign in again."
+        });
+      }
 
-  // Protected route — verify a token exists in Redis
-  try {
-    await ensureRedisConnected();
-
-    const token = await client.get("JWT");
-
-    if (!token) {
-      console.log("No stored token — redirecting to login");
-      return res.redirect("/login");
+      return next();
+    } catch (error) {
+      // Redis being unreachable is our problem rather than the caller's, so this
+      // is a 503 and not a 401. A 401 would tell them to sign in again, which
+      // would not help and would lose whatever they were doing.
+      console.error("API session check failed (Redis error):", error);
+      return res.status(503).json({
+        error: "Unable to verify your session. Please try again shortly."
+      });
     }
-
-    return next();
-  } catch (error) {
-    console.error("Session check failed (Redis error):", error);
-    return res.redirect("/login");
-  }
+  };
 }
+
+/**
+ * Session guard for JSON API routes, backed by the same Redis JWT that
+ * checkUserSession reads.
+ */
+const requireApiSession = createApiSessionGuard(async () => {
+  await ensureRedisConnected();
+  return client.get("JWT");
+});
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Session helpers
@@ -144,6 +161,10 @@ async function clearUserSession() {
 module.exports = {
   verifySignUp,
   checkUserSession,
+  createApiSessionGuard,
+  requireApiSession,
   clearUserSession,
   client,
+  tokensMatch,
+  resolveLandingPath,
 };
