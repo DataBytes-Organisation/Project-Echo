@@ -53,10 +53,34 @@ def log_rejected_detection(detection, reason: str) -> None:
     )
 
 
-def validate_list_filters(start_time=None, end_time=None, lat=None, lon=None, radius_km=None):
+def validate_list_filters(
+    start_time=None,
+    end_time=None,
+    lat=None,
+    lon=None,
+    radius_km=None,
+):
     """Validate cross-field list-query rules FastAPI cannot express alone."""
-    if start_time and end_time and start_time > end_time:
-        raise DetectionRuleError("start_time must be earlier than or equal to end_time.")
+    if start_time and end_time:
+        start_is_aware = (
+            start_time.tzinfo is not None
+            and start_time.utcoffset() is not None
+        )
+        end_is_aware = (
+            end_time.tzinfo is not None
+            and end_time.utcoffset() is not None
+        )
+
+        if start_is_aware != end_is_aware:
+            raise DetectionRuleError(
+                "start_time and end_time must both include a timezone "
+                "or both omit it."
+            )
+
+        if start_time > end_time:
+            raise DetectionRuleError(
+                "start_time must be earlier than or equal to end_time."
+            )
 
     location_values = (lat, lon, radius_km)
     if any(value is not None for value in location_values) and not all(

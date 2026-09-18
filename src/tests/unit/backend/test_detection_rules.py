@@ -1,6 +1,6 @@
 """Regression tests for cross-field detection rules (A3.2)."""
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 import pytest
 
@@ -17,6 +17,39 @@ def test_start_time_cannot_follow_end_time():
     start = datetime(2026, 1, 2)
     with pytest.raises(DetectionRuleError, match="start_time"):
         validate_list_filters(start, start - timedelta(days=1))
+
+
+@pytest.mark.parametrize(
+    "start_time,end_time",
+    [
+        (
+            datetime(2026, 9, 1),
+            datetime(2026, 9, 30, tzinfo=timezone.utc),
+        ),
+        (
+            datetime(2026, 9, 1, tzinfo=timezone.utc),
+            datetime(2026, 9, 30),
+        ),
+    ],
+)
+def test_mixed_timezone_formats_are_rejected_as_a_client_error(
+    start_time,
+    end_time,
+):
+    with pytest.raises(
+        DetectionRuleError,
+        match="both include a timezone",
+    ) as exc_info:
+        validate_list_filters(start_time, end_time)
+
+    assert exc_info.value.status_code == 400
+
+
+def test_matching_timezone_formats_are_comparable():
+    aware_start = datetime(2026, 9, 1, tzinfo=timezone.utc)
+    aware_end = datetime(2026, 9, 30, tzinfo=timezone.utc)
+
+    validate_list_filters(aware_start, aware_end)
 
 
 @pytest.mark.parametrize(
