@@ -20,6 +20,7 @@ assert.ok(pageRoutes.length > 0, "should parse at least one page route from the 
 const localAttribute = /(?:src|href)=["']([^"'#?]+)["']/g;
 const moduleImport = /(?:import|export)\s+(?:[\s\S]*?\s+from\s+)?["']([^"']+)["']/g;
 const cssUrl = /url\(["']?([^"')?#]+)["']?\)/g;
+const cssImport = /@import\s+["']([^"'#?]+)["']/g;
 
 // Already-broken references. Fails on any new missing local dependency and on
 // any entry here that starts resolving again.
@@ -30,6 +31,7 @@ const expectedMissing = new Set([
   "public/assets/styles/HMI-audio.css", // referenced by public/pages/map/index.html
   "public/assets/styles/HMI-weather.css", // referenced by public/pages/map/index.html
   "public/js/audio.js", // referenced by public/pages/auth/login.html and reset-password.html
+  "public/vendor/libs/simplebar/dist/simplebar.css", // pre-existing unresolved @import in public/vendor/admin/styles.min.css
 ]);
 
 function isIgnored(raw) {
@@ -107,7 +109,7 @@ function collectActiveGraph() {
     const isCss = absolute.endsWith(".css");
     const isJs = absolute.endsWith(".js");
     if (!isCss && !isJs) content = content.replace(/<!--[\s\S]*?-->/g, "");
-    const patterns = isCss ? [cssUrl] : isJs ? [moduleImport] : [localAttribute, moduleImport];
+    const patterns = isCss ? [cssUrl, cssImport] : isJs ? [moduleImport] : [localAttribute, moduleImport];
     for (const pattern of patterns) {
       pattern.lastIndex = 0;
       let found;
