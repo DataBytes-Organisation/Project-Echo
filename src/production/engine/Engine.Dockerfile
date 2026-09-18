@@ -75,6 +75,7 @@ COPY ./echo_engine.py ./
 COPY ./echo_engine.json ./
 COPY ./echo_credentials.json ./
 COPY ./helpers ./helpers
+COPY ./inference_wrapper ./inference_wrapper
 COPY ./models/efficientnetv2 ./models/efficientnetv2
 
 # Setup GCloud config dir
