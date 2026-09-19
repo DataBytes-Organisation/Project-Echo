@@ -274,10 +274,18 @@ test("addIoTNodesToMap: popup overlay and pointer handler are only registered on
   );
 });
 
-test("addIoTNodesToMap: API failure rejects instead of failing silently", async () => {
+test("addIoTNodesToMap: API failure rejects instead of failing silently", async (t) => {
   axiosGetError = new Error("network down");
   axiosGetResponse = { data: [] };
   const hmiState = { basemap: makeFakeBasemap() };
+
+  // Production code logs the failure, then rethrows. Mute the expected log so
+  // npm test does not look like it crashed.
+  const previousError = console.error;
+  console.error = () => {};
+  t.after(() => {
+    console.error = previousError;
+  });
 
   await assert.rejects(() => addIoTNodesToMap(hmiState), /network down/);
 });
