@@ -60,6 +60,17 @@ class Settings(BaseSettings):
     slow_operation_ms: float = 500.0
     cache_ttl_seconds: int = 60
 
+    # --- Feature flags (C12) ---
+    # Safe defaults keep current behaviour enabled unless explicitly disabled.
+    realtime_streaming_enabled: bool = Field(
+        True,
+        env="REALTIME_STREAMING_ENABLED",
+    )
+    analytics_extensions_enabled: bool = Field(
+        True,
+        env="ANALYTICS_EXTENSIONS_ENABLED",
+    )
+
     # --- Auth (required — fail fast if missing) ---
     jwt_secret: str = Field(...)
     jwt_algorithm: str = "HS256"
