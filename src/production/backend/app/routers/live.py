@@ -38,6 +38,7 @@ async def websocket_test(websocket: WebSocket):
 @router.websocket("/ws/detections")
 async def detection_stream(websocket: WebSocket):
     if not is_feature_enabled(REALTIME_STREAMING_FLAG):
+        await websocket.accept()
         await websocket.close(
             code=status.WS_1008_POLICY_VIOLATION
         )

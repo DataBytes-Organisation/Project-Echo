@@ -245,10 +245,14 @@ def test_analytics_filter_is_allowed_when_extensions_enabled(
 class FakeWebSocket:
     def __init__(self):
         self.closed_code = None
+        self.accepted = False
         self.query_params = {
             "token": "c12-test-token"
         }
         self.headers = {}
+
+    async def accept(self):
+        self.accepted = True
 
     async def close(self, code=1000):
         self.closed_code = code
@@ -272,10 +276,8 @@ def test_realtime_streaming_closes_when_disabled(
         live.detection_stream(websocket)
     )
 
-    assert (
-        websocket.closed_code
-        == status.WS_1008_POLICY_VIOLATION
-    )
+    assert websocket.accepted is True
+    assert websocket.closed_code == status.WS_1008_POLICY_VIOLATION
 
 
 def test_realtime_streaming_connects_when_enabled(
