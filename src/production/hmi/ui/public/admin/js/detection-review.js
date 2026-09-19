@@ -1,21 +1,18 @@
 // Detection Review admin page.
 //
 // Lists recent detections, and for whichever one is selected, calls the
-// similar-detection retrieval feature (GET /detections/{id}/similar) and
-// renders the results with playable audio, so an admin can verify an
-// uncertain detection against precedent instead of trusting a confidence
-// number alone. Both endpoints already exist on the Backend and are proxied
-// through this HMI server's own /detections/* route (see server.js), so
-// these are plain relative fetches, no separate backend host/CORS needed.
+// similar-detection retrieval feature and renders the results with playable
+// audio, so an admin can verify an uncertain detection against precedent
+// instead of trusting a confidence number alone.
+//
+// All reads go through the HMI's own session-protected proxy
+// (routes/detection-review.routes.js), not straight to the Backend, so they
+// are plain same-origin fetches. HTML is built only by detection-review-render.js,
+// which escapes every stored value; do not interpolate detection fields into
+// innerHTML here.
 
+const API_BASE = "/api/detection-review";
 const REQUEST_TIMEOUT = 10000;
-
-// A result can be in the top-k just because k results are always returned,
-// even when nothing in the gallery is genuinely close (small gallery, or the
-// query itself sits in an uncertain part of the embedding space). Below this
-// score, treat the row as "weak" rather than a real precedent, so the admin
-// does not read it as equally trustworthy as a strong match.
-const WEAK_MATCH_THRESHOLD = 0.6;
 
 async function fetchJson(url) {
   const controller = new AbortController();
@@ -26,7 +23,14 @@ async function fetchJson(url) {
       headers: { Accept: "application/json" },
     });
     if (!response.ok) {
-      throw new Error(`${url} returned status ${response.status}`);
+      let message = `${url} returned status ${response.status}`;
+      try {
+        const payload = await response.json();
+        if (payload && payload.error && payload.error.message) message = payload.error.message;
+      } catch (_) {
+        // Body was not JSON; keep the status-based message.
+      }
+      throw new Error(message);
     }
     return await response.json();
   } finally {
@@ -50,6 +54,8 @@ function sniffAudioMimeType(bytes) {
   return "audio/mpeg";
 }
 
+let activeObjectUrls = [];
+
 function base64ToAudioUrl(base64) {
   const binary = atob(base64);
   const bytes = new Uint8Array(binary.length);
@@ -57,87 +63,60 @@ function base64ToAudioUrl(base64) {
     bytes[i] = binary.charCodeAt(i);
   }
   const blob = new Blob([bytes], { type: sniffAudioMimeType(bytes) });
-  return URL.createObjectURL(blob);
+  const url = URL.createObjectURL(blob);
+  activeObjectUrls.push(url);
+  return url;
 }
 
-function speciesRowHtml(species, similarity, isMatchOfTop, audioUrl) {
-  const pct = Math.max(0, Math.min(1, similarity)) * 100;
-  const rowClass = isMatchOfTop ? "dr-match" : "dr-diff";
-  const isWeak = similarity < WEAK_MATCH_THRESHOLD;
-  const weakClass = isWeak ? "dr-row-weak" : "";
-  const weakLabel = isWeak ? '<span class="dr-weak-label">weak, not a strong precedent</span>' : "";
-  return `
-    <div class="d-flex align-items-center gap-3 py-2 border-bottom ${weakClass}">
-      <audio controls src="${audioUrl}" style="height:32px;width:180px;"></audio>
-      <div style="flex:1;">
-        <div class="${rowClass}">${species}${weakLabel}</div>
-        <div class="dr-similarity-bar"><div style="width:${pct}%"></div></div>
-      </div>
-      <div class="text-muted" style="width:60px;text-align:right;">${similarity.toFixed(3)}</div>
-    </div>
-  `;
+function releaseObjectUrls() {
+  activeObjectUrls.forEach((url) => URL.revokeObjectURL(url));
+  activeObjectUrls = [];
 }
+
+let renderSequence = 0;
 
 async function renderDetail(detection, pageState) {
+  const render = window.DetectionReviewRender;
   const detailEl = document.getElementById("detection-detail");
+  // If the admin clicks another detection while this one is still loading,
+  // the older response must not overwrite the newer selection.
+  const mySequence = (renderSequence += 1);
   pageState.showLoading();
   try {
-    const similar = await fetchJson(`/detections/${detection._id}/similar?k=5`);
+    const similar = await fetchJson(`${API_BASE}/detections/${encodeURIComponent(detection._id)}/similar?k=5`);
 
-    const badges = [];
-    if (similar.ambiguous) {
-      badges.push('<span class="badge bg-warning text-dark">Ambiguous: multiple species nearby</span>');
-    }
-    if (similar.novel) {
-      badges.push('<span class="badge bg-danger">Novel: nothing similar found before</span>');
-    }
-    if (!similar.ambiguous && !similar.novel) {
-      badges.push('<span class="badge bg-success">Consistent match</span>');
-    }
+    // Fetch each candidate's audio so it can be played inline for a real by-ear check.
+    const candidateDetails = await Promise.all(
+      similar.results.map((r) => fetchJson(`${API_BASE}/detections/${encodeURIComponent(r.detection_id)}`))
+    );
+    if (mySequence !== renderSequence) return;
 
+    releaseObjectUrls();
     const queryAudioUrl = base64ToAudioUrl(detection.audioClip);
+    const rows = similar.results.map((r, i) => ({
+      species: r.species,
+      similarity: r.similarity,
+      isMatchOfTop: r.species === detection.species,
+      audioUrl: base64ToAudioUrl(candidateDetails[i].audioClip),
+    }));
 
-    let rowsHtml = "";
-    if (similar.results.length === 0) {
-      rowsHtml = '<div class="dr-empty-state">No other detections with a stored embedding to compare against yet.</div>';
-    } else {
-      // Fetch each candidate's audio so it can be played inline for a real by-ear check.
-      const candidateDetails = await Promise.all(
-        similar.results.map((r) => fetchJson(`/detections/${r.detection_id}`))
-      );
-      rowsHtml = similar.results
-        .map((r, i) => {
-          const audioUrl = base64ToAudioUrl(candidateDetails[i].audioClip);
-          const isMatch = r.species === detection.species;
-          return speciesRowHtml(r.species, r.similarity, isMatch, audioUrl);
-        })
-        .join("");
-    }
-
-    detailEl.innerHTML = `
-      <h5>Reviewing: ${detection.species}</h5>
-      <div class="d-flex align-items-center gap-3 mb-2">
-        <audio controls src="${queryAudioUrl}"></audio>
-        <span class="text-muted">confidence ${Number(detection.confidence).toFixed(1)}%</span>
-      </div>
-      <div class="dr-badges mb-3">${badges.join("")}</div>
-      <h6>Most similar past detections</h6>
-      ${rowsHtml}
-    `;
+    detailEl.innerHTML = render.detailHtml({ detection, similar, queryAudioUrl, rows });
   } catch (error) {
+    if (mySequence !== renderSequence) return;
     pageState.showError(`Could not load similar detections: ${error.message}`);
   } finally {
-    pageState.hideLoading();
+    if (mySequence === renderSequence) pageState.hideLoading();
   }
 }
 
 async function init() {
+  const render = window.DetectionReviewRender;
   const pageState = window.createAdminPageState();
   const listEl = document.getElementById("detection-list");
 
   pageState.showLoading();
   try {
-    const page = await fetchJson("/detections?page=1&page_size=20");
+    const page = await fetchJson(`${API_BASE}/detections?page=1&page_size=20`);
     const items = page.items || [];
 
     if (items.length === 0) {
@@ -145,18 +124,7 @@ async function init() {
       return;
     }
 
-    listEl.innerHTML = items
-      .map(
-        (d) => `
-          <div class="card" data-id="${d._id}">
-            <div class="card-body p-2">
-              <div class="fw-semibold">${d.species}</div>
-              <div class="text-muted small">${new Date(d.timestamp).toLocaleString()} - ${Number(d.confidence).toFixed(1)}%</div>
-            </div>
-          </div>
-        `
-      )
-      .join("");
+    listEl.innerHTML = items.map(render.detectionListItemHtml).join("");
 
     listEl.querySelectorAll(".card").forEach((card) => {
       card.addEventListener("click", () => {

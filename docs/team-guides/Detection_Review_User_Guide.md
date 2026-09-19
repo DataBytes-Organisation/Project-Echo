@@ -2,7 +2,7 @@
 
 ## Open the page
 
-1. Make sure the Backend server, MongoDB/Redis, and the HMI app are running.
+1. Make sure the Backend server, MongoDB/Redis, and the HMI app are running, and that you are logged in to the HMI.
 2. Go to `http://localhost:3000/admin/detection-review.html`, or click **Detection Review** in the sidebar under **Echo**.
 
 ## Steps
@@ -29,4 +29,5 @@
 
 ## If the page does not load
 
-The Backend server is probably not running (it is started manually, separate from Docker). Start it and reload the page.
+- If it says your session has expired, log in to the HMI again and reload the page.
+- Otherwise the Backend server is probably not running (it is started manually, separate from Docker). Start it and reload the page.
