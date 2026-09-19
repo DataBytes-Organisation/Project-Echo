@@ -13,8 +13,13 @@ class BackendAdapter:
     @staticmethod
     def to_backend_payload(response):
         """
-        Convert InferenceResponse to the payload currently
-        expected by the Backend.
+        Convert InferenceResponse to the payload expected by the Backend.
+
+        LLA fields are passed through as {latitude, longitude, altitude}
+        objects. This adapter originally flattened them back into
+        [lat, lon, alt] arrays to match the older Backend contract, but the
+        agreed integration schema now uses objects end to end, so flattening
+        here silently reverted that contract.
         """
 
         return {
@@ -27,23 +32,11 @@ class BackendAdapter:
 
             "sensorId": response.sensorId,
 
-            "microphoneLLA": [
-                response.microphoneLLA["latitude"],
-                response.microphoneLLA["longitude"],
-                response.microphoneLLA["altitude"]
-            ] if response.microphoneLLA else None,
+            "microphoneLLA": response.microphoneLLA,
 
-            "animalEstLLA": [
-                response.animalEstLLA["latitude"],
-                response.animalEstLLA["longitude"],
-                response.animalEstLLA["altitude"]
-            ] if response.animalEstLLA else None,
+            "animalEstLLA": response.animalEstLLA,
 
-            "animalTrueLLA": [
-                response.animalTrueLLA["latitude"],
-                response.animalTrueLLA["longitude"],
-                response.animalTrueLLA["altitude"]
-            ] if response.animalTrueLLA else None,
+            "animalTrueLLA": response.animalTrueLLA,
 
             "animalLLAUncertainty":
                 response.animalLLAUncertainty,
