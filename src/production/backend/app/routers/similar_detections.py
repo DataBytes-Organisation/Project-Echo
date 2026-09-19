@@ -15,7 +15,7 @@ from bson import ObjectId
 from fastapi import APIRouter, HTTPException, Query
 
 from app.database import Detections
-from app.services.similarity import top_k_similar, flag_result
+from app.services.similarity import top_k_similar, flag_result, is_valid_embedding
 
 router = APIRouter(
     prefix="/detections",
@@ -51,6 +51,8 @@ def similar_detections_endpoint(detection_id: str, k: int = Query(5, ge=1, le=20
     query_embedding = query_doc.get("embedding")
     if not query_embedding:
         raise HTTPException(status_code=422, detail="This detection has no stored embedding to compare with")
+    if not is_valid_embedding(query_embedding):
+        raise HTTPException(status_code=422, detail="This detection's stored embedding is malformed")
 
     candidates = _load_candidates(exclude_id=detection_id)
     top_k = top_k_similar(query_embedding, candidates, k=k)

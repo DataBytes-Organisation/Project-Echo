@@ -42,6 +42,8 @@ SPECIES_A_ID = ObjectId()
 SPECIES_A_NEIGHBOUR_ID = ObjectId()
 SPECIES_B_ID = ObjectId()
 NO_EMBEDDING_ID = ObjectId()
+WRONG_DIMENSION_ID = ObjectId()
+MALFORMED_EMBEDDING_ID = ObjectId()
 
 
 def _make_documents():
@@ -50,6 +52,11 @@ def _make_documents():
         {"_id": SPECIES_A_NEIGHBOUR_ID, "species": "SpeciesA", "embedding": [0.99, 0.01]},
         {"_id": SPECIES_B_ID, "species": "SpeciesB", "embedding": [0.0, 1.0]},
         {"_id": NO_EMBEDDING_ID, "species": "SpeciesC", "embedding": None},
+        # Left over from a different model version, or a bad inference run.
+        # Both used to raise an uncaught ValueError out of cosine_similarity
+        # and crash the whole request for every other, valid candidate.
+        {"_id": WRONG_DIMENSION_ID, "species": "SpeciesD", "embedding": [1.0, 0.0, 0.0]},
+        {"_id": MALFORMED_EMBEDDING_ID, "species": "SpeciesE", "embedding": [float("nan"), 0.0]},
     ]
 
 
@@ -84,3 +91,24 @@ class TestSimilarDetectionsEndpoint:
         response = client.get(f"/detections/{NO_EMBEDDING_ID}/similar")
 
         assert response.status_code == 422
+
+    def test_detection_with_a_malformed_embedding_returns_422(self, monkeypatch):
+        monkeypatch.setattr(similar_detections, "Detections", FakeDetectionsCollection(_make_documents()))
+
+        response = client.get(f"/detections/{MALFORMED_EMBEDDING_ID}/similar")
+
+        assert response.status_code == 422
+
+    def test_wrong_dimension_and_malformed_candidates_are_skipped_not_crashed(self, monkeypatch):
+        # Regression test for a reviewer-reported bug: a candidate stored
+        # with a different embedding size, or containing NaN/Inf, used to
+        # raise an uncaught ValueError and fail the whole request instead of
+        # just being excluded from the results.
+        monkeypatch.setattr(similar_detections, "Detections", FakeDetectionsCollection(_make_documents()))
+
+        response = client.get(f"/detections/{SPECIES_A_ID}/similar")
+
+        assert response.status_code == 200
+        result_ids = {r["detection_id"] for r in response.json()["results"]}
+        assert str(WRONG_DIMENSION_ID) not in result_ids
+        assert str(MALFORMED_EMBEDDING_ID) not in result_ids

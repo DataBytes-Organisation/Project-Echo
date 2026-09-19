@@ -12,7 +12,14 @@ from pathlib import Path
 BACKEND_DIR = Path(__file__).resolve().parents[3] / "src" / "production" / "backend"
 sys.path.insert(0, str(BACKEND_DIR))
 
-from app.services.similarity import cosine_similarity, top_k_similar, flag_result  # noqa: E402
+import math  # noqa: E402
+
+from app.services.similarity import (  # noqa: E402
+    cosine_similarity,
+    top_k_similar,
+    flag_result,
+    is_valid_embedding,
+)
 
 
 class TestCosineSimilarity:
@@ -63,6 +70,54 @@ class TestTopKSimilar:
         ]
         results = top_k_similar([1.0, 0.0], candidates, k=5)
         assert [c["id"] for _, c in results] == ["has-embedding"]
+
+    def test_a_mixed_dimension_candidate_is_skipped_not_crashed(self):
+        # Regression test: a candidate stored with a different embedding size
+        # (e.g. left over from an earlier model version) used to raise
+        # ValueError out of cosine_similarity and crash the whole lookup,
+        # failing every other, valid candidate along with it.
+        candidates = [
+            self._candidate("wrong-dimension", "SpeciesA", [1.0, 0.0, 0.0]),
+            self._candidate("has-embedding", "SpeciesA", [1.0, 0.0]),
+        ]
+        results = top_k_similar([1.0, 0.0], candidates, k=5)
+        assert [c["id"] for _, c in results] == ["has-embedding"]
+
+    def test_a_malformed_candidate_embedding_is_skipped_not_crashed(self):
+        # Regression test: NaN/Inf values (e.g. from a bad inference run)
+        # would otherwise propagate into the cosine similarity computation
+        # and produce a NaN score, corrupting the ranking silently instead
+        # of just being excluded.
+        candidates = [
+            self._candidate("has-nan", "SpeciesA", [float("nan"), 0.0]),
+            self._candidate("has-inf", "SpeciesA", [float("inf"), 0.0]),
+            self._candidate("has-embedding", "SpeciesA", [1.0, 0.0]),
+        ]
+        results = top_k_similar([1.0, 0.0], candidates, k=5)
+        assert [c["id"] for _, c in results] == ["has-embedding"]
+
+
+class TestIsValidEmbedding:
+    def test_normal_embedding_is_valid(self):
+        assert is_valid_embedding([1.0, 0.0, -0.5]) is True
+
+    def test_empty_embedding_is_invalid(self):
+        assert is_valid_embedding([]) is False
+        assert is_valid_embedding(None) is False
+
+    def test_nan_or_inf_values_are_invalid(self):
+        assert is_valid_embedding([1.0, float("nan")]) is False
+        assert is_valid_embedding([1.0, float("inf")]) is False
+        assert is_valid_embedding([1.0, float("-inf")]) is False
+
+    def test_non_numeric_values_are_invalid(self):
+        assert is_valid_embedding([1.0, "not-a-number"]) is False
+        assert is_valid_embedding("not-a-list") is False
+
+    def test_boolean_values_are_invalid(self):
+        # bool is a subclass of int in Python, so True/False would otherwise
+        # silently pass an isinstance(x, (int, float)) check.
+        assert is_valid_embedding([1.0, True]) is False
 
 
 class TestFlagResult:
