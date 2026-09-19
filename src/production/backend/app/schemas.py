@@ -430,8 +430,8 @@ class DetectionListResponses(BaseModel):
     page: int
     page_size: int
 
-    class config:
-        allow_population_by_fiels_name = True
+    class Config:
+        allow_population_by_field_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
 
@@ -486,6 +486,26 @@ class ProjectListResponse(BaseModel):
 # Backwards/expected import name used by app.routers.detections
 class DetectionListResponse(DetectionListResponses):
     pass
+
+
+class RealDetectionRead(BaseModel):
+    """HMI real-detection read shape (no audio payload)."""
+
+    sourceType: Literal["real", "simulator"]
+    id: str = Field(..., alias="_id")
+    timestamp: datetime
+    sensorId: str
+    species: str
+    microphoneLLA: LLA
+    animalEstLLA: Optional[LLA] = None
+    animalTrueLLA: Optional[LLA] = None
+    animalLLAUncertainty: Optional[float] = None
+    confidence: float
+
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
 
 
 class RazorpayOrderRequest(BaseModel):
