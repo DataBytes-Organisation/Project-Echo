@@ -38,7 +38,6 @@ FROM ${BASE_IMAGE}
 WORKDIR /app
 
 # Install ONLY runtime libraries (not the -dev versions)
-# We also add the gcloud CLI here in a single consolidated step
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update -o Acquire::Retries=5 -o Acquire::http::Timeout=30 \
@@ -53,16 +52,6 @@ RUN apt-get update -o Acquire::Retries=5 -o Acquire::http::Timeout=30 \
 	&& apt-get clean \
 	&& rm -rf /var/lib/apt/lists/*
 
-# Google Cloud CLI, installed from Google tarball instead of apt/apt-key -
-# the apt-key path needs gnupg, which is not installed above, and was
-# failing here with exit code 255.
-RUN curl -sSL -o /tmp/gcloud.tar.gz \
-		https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-linux-x86_64.tar.gz \
-	&& tar -xzf /tmp/gcloud.tar.gz -C /usr/local \
-	&& rm /tmp/gcloud.tar.gz \
-	&& /usr/local/google-cloud-sdk/install.sh --quiet --path-update false --usage-reporting false
-ENV PATH="/usr/local/google-cloud-sdk/bin:$PATH"
-
 COPY --from=echo_engine_builder /opt/venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
@@ -74,8 +63,10 @@ COPY ./echo_engine.json ./
 COPY ./echo_credentials.json ./
 COPY ./helpers ./helpers
 COPY ./inference_wrapper ./inference_wrapper
+COPY ./models/efficientnetv2 ./models/efficientnetv2
 
-# Setup GCloud config dir
-RUN mkdir -p /root/.config/gcloud/
+# Share the same storage client as the simulator without embedding credentials.
+COPY --from=r2_storage /*.py /opt/echo-store/cloudflare_r2/
+ENV PYTHONPATH="/opt/echo-store"
 
 CMD ["/bin/bash", "/app/echo_engine.sh"]

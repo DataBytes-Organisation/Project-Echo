@@ -1,0 +1,22 @@
+# CI-only overlay: never use this file to validate a live Cloudflare bucket.
+# The deliberately invalid credentials are accepted only by the CI launcher.
+x-r2-ci-environment: &r2-ci-environment
+  ECHO_R2_CI_FIXTURE: "1"
+  R2_ACCOUNT_ID: ci-fixture
+  R2_BUCKET_NAME: echo-ci-fixture
+  R2_ACCESS_KEY_ID: ci-only-not-a-real-access-key
+  R2_SECRET_ACCESS_KEY: ci-only-not-a-real-secret
+  R2_DATASET_PREFIX: ""
+
+services:
+  echo_engine:
+    environment: *r2-ci-environment
+    volumes:
+      - ../../../.github/ci:/opt/echo-ci:ro
+    command: ["python", "-u", "/opt/echo-ci/r2_fixture.py", "engine"]
+
+  echo_simulator:
+    environment: *r2-ci-environment
+    volumes:
+      - ../../../.github/ci:/opt/echo-ci:ro
+    command: ["python", "-u", "/opt/echo-ci/r2_fixture.py", "simulator"]

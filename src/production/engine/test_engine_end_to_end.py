@@ -75,7 +75,7 @@ def load_isolated_engine():
         "tensorflow", "tensorflow.keras", "tensorflow.keras.models",
         "librosa", "librosa.feature", "pandas", "soundfile", "diskcache",
         "paho", "paho.mqtt", "paho.mqtt.client",
-        "google", "google.cloud", "google.cloud.storage", "pymongo",
+        "pymongo",
         "geopy", "geopy.distance", "sklearn", "sklearn.preprocessing",
         "helpers", "helpers.melspectrogram_to_cam",
         "yamnet_dir", "yamnet_dir.params", "yamnet_dir.yamnet",

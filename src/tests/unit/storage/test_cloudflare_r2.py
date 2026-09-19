@@ -4,7 +4,7 @@ import random
 import sys
 import unittest
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 
 STORE_DIR = Path(__file__).resolve().parents[3] / "production" / "infrastructure" / "store"
@@ -24,6 +24,9 @@ class FakeBody:
 
     def read(self):
         return self.value
+
+    def close(self):
+        pass
 
 
 class FakeR2Client:
@@ -62,7 +65,7 @@ class FakeR2Client:
 class R2PrototypeTests(unittest.TestCase):
     def setUp(self):
         self.client = FakeR2Client()
-        self.config = R2Config("account", "bucket", "key", "secret")
+        self.config = R2Config("account", "bucket", "key", "secret", "prototype")
         self.storage = R2Storage(self.config, self.client)
 
     def test_config_requires_credentials(self):
@@ -125,6 +128,94 @@ class R2PrototypeTests(unittest.TestCase):
     def test_invalid_file_key_is_rejected(self):
         with self.assertRaises(ValueError):
             self.storage.download_bytes("prototype/Species A/")
+
+
+class R2ProductionStorageTests(unittest.TestCase):
+    def setUp(self):
+        self.config = R2Config("account", "bucket", "test-key", "test-secret")
+        self.client = MagicMock()
+        self.storage = R2Storage(self.config, self.client)
+
+    def test_empty_prefix_is_preserved_from_environment(self):
+        settings = {
+            "R2_ACCOUNT_ID": "account", "R2_BUCKET_NAME": "bucket",
+            "R2_ACCESS_KEY_ID": "test-key", "R2_SECRET_ACCESS_KEY": "test-secret",
+        }
+        with patch.dict(os.environ, settings, clear=True):
+            self.assertEqual(R2Config.from_env().dataset_prefix, "")
+            os.environ["R2_DATASET_PREFIX"] = ""
+            self.assertEqual(R2Config.from_env().dataset_prefix, "")
+            os.environ["R2_DATASET_PREFIX"] = " /dataset/ "
+            self.assertEqual(R2Config.from_env().dataset_prefix, "dataset")
+
+    def test_credentials_are_not_in_config_repr(self):
+        self.assertNotIn("test-key", repr(self.config))
+        self.assertNotIn("test-secret", repr(self.config))
+
+    def test_root_layout_pagination_and_folder_markers(self):
+        self.client.list_objects_v2.side_effect = [
+            {
+                "Contents": [
+                    {"Key": "Species B/two.wav", "Size": 100},
+                    {"Key": "Species A/one.wav", "Size": 100},
+                    {"Key": "Empty/", "Size": 0},
+                    {"Key": "Empty/zero.wav", "Size": 0},
+                    {"Key": "root-file.wav", "Size": 100},
+                ],
+                "IsTruncated": True, "NextContinuationToken": "next",
+            },
+            {"Contents": [{"Key": "Species A/three.wav", "Size": 100}]},
+        ]
+        self.assertEqual(self.storage.group_objects_by_species(), {
+            "Species A": ["Species A/one.wav", "Species A/three.wav"],
+            "Species B": ["Species B/two.wav"],
+        })
+        self.assertEqual(self.client.list_objects_v2.call_args_list[0].kwargs,
+                         {"Bucket": "bucket", "Prefix": ""})
+        self.assertEqual(self.client.list_objects_v2.call_args.kwargs,
+                         {"Bucket": "bucket", "Prefix": "", "ContinuationToken": "next"})
+
+    def test_empty_bucket_returns_no_species(self):
+        self.client.list_objects_v2.return_value = {}
+        self.assertEqual(self.storage.list_species(), [])
+
+    def test_incomplete_pagination_fails_explicitly(self):
+        self.client.list_objects_v2.return_value = {"IsTruncated": True}
+        with self.assertRaisesRegex(RuntimeError, "continuation token"):
+            self.storage.list_species()
+
+    def test_download_preserves_bytes_and_closes_stream(self):
+        body = io.BytesIO(b"RIFF-unchanged-audio")
+        self.client.get_object.return_value = {"Body": body}
+        self.assertEqual(self.storage.download_bytes("Species A/one.wav"),
+                         b"RIFF-unchanged-audio")
+        self.assertTrue(body.closed)
+        self.client.get_object.assert_called_once_with(Bucket="bucket", Key="Species A/one.wav")
+
+    def test_failed_or_empty_download_closes_stream(self):
+        body = MagicMock()
+        body.read.side_effect = OSError("interrupted")
+        self.client.get_object.return_value = {"Body": body}
+        with self.assertRaisesRegex(OSError, "interrupted"):
+            self.storage.download_bytes("Species A/one.wav")
+        body.close.assert_called_once()
+        empty = io.BytesIO()
+        self.client.get_object.return_value = {"Body": empty}
+        with self.assertRaisesRegex(RuntimeError, "empty"):
+            self.storage.download_bytes("Species A/one.wav")
+        self.assertTrue(empty.closed)
+
+    def test_sdk_uses_r2_endpoint_and_explicit_credentials(self):
+        with patch("boto3.client") as create_client:
+            R2Storage(self.config)
+        args = create_client.call_args
+        self.assertEqual(args.args, ("s3",))
+        self.assertEqual(args.kwargs["endpoint_url"], "https://account.r2.cloudflarestorage.com")
+        self.assertEqual(args.kwargs["region_name"], "auto")
+        self.assertEqual(args.kwargs["aws_access_key_id"], "test-key")
+        self.assertEqual(args.kwargs["aws_secret_access_key"], "test-secret")
+        self.assertEqual(args.kwargs["config"].connect_timeout, 10)
+        self.assertEqual(args.kwargs["config"].read_timeout, 60)
 
 
 if __name__ == "__main__":

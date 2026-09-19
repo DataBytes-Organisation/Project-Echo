@@ -1,7 +1,7 @@
 """
 Unit tests for IoT MQTT integration in echo_engine.py
 
-Mocks heavy dependencies (TensorFlow, librosa, MQTT, GCP, etc.) so tests
+Mocks heavy dependencies (TensorFlow, librosa, MQTT, etc.) so tests
 run without the full Docker stack or GPU.
 
 Run from src/production/engine/:
@@ -25,7 +25,6 @@ _HEAVY_MODULES = [
     "tensorflow", "tensorflow.keras", "tensorflow.keras.models",
     "librosa", "librosa.feature",
     "paho", "paho.mqtt", "paho.mqtt.client",
-    "google.cloud", "google.cloud.storage",
     "pymongo", "diskcache", "soundfile",
     "geopy", "geopy.distance",
     # "sklearn", "sklearn.preprocessing",
@@ -58,7 +57,7 @@ _ENGINE_CONFIG = {
     "MQTT_PUBLISH_URL": "projectecho/engine/2",
     "MODEL_SERVER": "http://ts-echo-model-cont:8501/v1/models/echo_model/versions/1:predict",
     "WEATHER_SERVER": "http://localhost:8501/v1/models/weather_model:predict",
-    "GCLOUD_PROJECT": "test", "BUCKET_NAME": "test", "DB_HOSTNAME": "localhost",
+    "DB_HOSTNAME": "localhost",
     "ACTIVE_INFERENCE_MODEL": "classic",
     "IOT_MQTT_BROKER": "broker.hivemq.com",
     "IOT_MQTT_PORT": 1883,
@@ -281,7 +280,7 @@ class TestIoTStartupOrder(unittest.TestCase):
         engine = EchoEngine()
         call_order = []
 
-        engine.gcp_load_species_list = MagicMock(
+        engine.r2_load_species_list = MagicMock(
             side_effect=lambda: (call_order.append("class_names"), ["species"])[1]
         )
         engine.start_iot_mqtt_listener = MagicMock(
@@ -299,7 +298,7 @@ class TestIoTStartupOrder(unittest.TestCase):
         engine = EchoEngine()
         call_order = []
 
-        engine.gcp_load_species_list = MagicMock(
+        engine.r2_load_species_list = MagicMock(
             side_effect=lambda: (
                 call_order.append("class_names"),
                 ["species"]

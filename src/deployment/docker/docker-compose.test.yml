@@ -24,12 +24,18 @@ services:
     build:
       context: ../../production/engine
       dockerfile: Engine.test.Dockerfile
+      additional_contexts:
+        r2_storage: ../../production/infrastructure/store/cloudflare_r2
     image: ts-echo-engine
     container_name: ts-echo-engine-cont
     networks:
       - echo-net
-    volumes:
-      - credentials_volume:/root/.config/gcloud/
+    environment:
+      R2_ACCOUNT_ID: ${R2_ACCOUNT_ID:-}
+      R2_BUCKET_NAME: ${R2_BUCKET_NAME:-project-echo-simulator-prod}
+      R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID:-}
+      R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY:-}
+      R2_DATASET_PREFIX: ${R2_DATASET_PREFIX:-}
     stdin_open: true
     tty: true
 
@@ -78,13 +84,20 @@ services:
     build:
       context: ../../production/simulator
       dockerfile: Simulator.Dockerfile
+      additional_contexts:
+        r2_storage: ../../production/infrastructure/store/cloudflare_r2
     image: ts-simulator
     container_name: ts-simulator-cont
     networks:
       - echo-net
     volumes:
       - ../../production/simulator/src:/app # Mount the simulator's src directory to /app in the container
-      - credentials_volume:/root/.config/gcloud/
+    environment:
+      R2_ACCOUNT_ID: ${R2_ACCOUNT_ID:-}
+      R2_BUCKET_NAME: ${R2_BUCKET_NAME:-project-echo-simulator-prod}
+      R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID:-}
+      R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY:-}
+      R2_DATASET_PREFIX: ${R2_DATASET_PREFIX:-}
     stdin_open: false
     tty: true
 
