@@ -71,11 +71,11 @@ class TestEnginePreprocessing(unittest.TestCase):
         )
 
         # Simulate librosa loading valid audio.
-        engine_module.librosa.load.reset_mock()
-        engine_module.librosa.load.side_effect = None
-        engine_module.librosa.load.return_value = (
-            np.zeros(800, dtype=np.float32),
-            48000,
+        engine_module.librosa.load = MagicMock(
+            return_value=(
+                np.zeros(800, dtype=np.float32),
+                48000,
+            )
         )
 
         # Simulate a mel-spectrogram with sufficient time frames.
@@ -85,23 +85,13 @@ class TestEnginePreprocessing(unittest.TestCase):
             260 * 1201,
             dtype=np.float32
         ).reshape(260, 1201)
-
-        (
-            engine_module.librosa.feature
-            .melspectrogram
-            .reset_mock()
+        engine_module.librosa.feature.melspectrogram = MagicMock(
+            return_value=mel_spectrogram
         )
 
-        (
-            engine_module.librosa.feature
-            .melspectrogram
-            .return_value
-        ) = mel_spectrogram
-
-        engine_module.librosa.power_to_db.reset_mock()
-        engine_module.librosa.power_to_db.return_value = (
-            mel_spectrogram
-        )
+        engine_module.librosa.power_to_db = MagicMock(
+        return_value=mel_spectrogram
+    )
 
         # Configure mocked TensorFlow operations to use NumPy.
         engine_module.tf.expand_dims.side_effect = (

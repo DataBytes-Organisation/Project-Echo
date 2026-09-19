@@ -12,17 +12,22 @@ import asyncio
 from datetime import datetime, timedelta
 
 router = APIRouter()
-# Email configuration for sending notifications
-conf = ConnectionConfig(
-    MAIL_USERNAME=settings.mail_username,
-    MAIL_PASSWORD=settings.mail_password,
-    MAIL_FROM=settings.mail_from,
-    MAIL_PORT=settings.mail_port,
-    MAIL_SERVER=settings.mail_server,
-    MAIL_STARTTLS=settings.mail_starttls,
-    MAIL_SSL_TLS=settings.mail_use_ssl,
-    USE_CREDENTIALS=True
-)
+# Email configuration for sending notifications. Mail is optional (see
+# app.config.Settings) — ConnectionConfig itself rejects None, so only build
+# it when credentials are actually present; otherwise notifications no-op.
+if settings.mail_username and settings.mail_password and settings.mail_from:
+    conf = ConnectionConfig(
+        MAIL_USERNAME=settings.mail_username,
+        MAIL_PASSWORD=settings.mail_password,
+        MAIL_FROM=settings.mail_from,
+        MAIL_PORT=settings.mail_port,
+        MAIL_SERVER=settings.mail_server,
+        MAIL_STARTTLS=settings.mail_starttls,
+        MAIL_SSL_TLS=settings.mail_use_ssl,
+        USE_CREDENTIALS=True
+    )
+else:
+    conf = None
 
 # Function to send email notifications
 async def send_email_notification(user, species):
@@ -55,6 +60,9 @@ async def send_email_notification(user, species):
     )
 
     # Attempt to send the email
+    if conf is None:
+        print(f"Mail is not configured; skipping email to {user_email} for species {species}")
+        return
     try:
         print(f"Sending email to {user_email} for species {species}")
         fm = FastMail(conf)

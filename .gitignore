@@ -17,6 +17,7 @@
 __pycache__/
 .ipynb_checkpoints/
 .pytest_cache/
+.coverage
 *.egg-info/
 build/
 dist/
@@ -49,6 +50,16 @@ tensorboard_logs/
 
 # MLflow experiment tracking runs
 # mlruns/
+
+# Sprint 2 augmentation benchmark - raw per-run artifacts (full training
+# logs, tensorboard events). Reproducible from the archived Hydra config +
+# seed; condensed metrics are tracked instead, under
+# src/prototypes/engine/augmentation/results/. Checkpoints already covered
+# by the *.pth rule below.
+src/prototypes/engine/augmentation/experiment_results/
+src/prototypes/engine/augmentation/experiment_results_balanced/
+src/prototypes/engine/augmentation/experiment_results_ceiling20_seed0_archived/
+src/prototypes/engine/augmentation/experiment_data_subset/
 
 # -----------------------------------------------------------------------------
 # Model weights & large binaries (tracked via DVC instead of git)
@@ -104,6 +115,11 @@ src/production/iot/management_application/audioUpload
 # Environment-specific generated file
 src/production/backend/app/main.py
 
+# Generated on every `import app.main` (app/main.py's export_openapi_to_file()
+# runs unconditionally at module import time, including from tests) - not
+# something to commit.
+/backend/project-echo-openapi.json
+
 # Benchmarking self-test throwaway output
 results_selftest/
 dataset/
@@ -115,3 +131,4 @@ src/prototypes/engine/benchmarking/results_efficientnet/variants/
 
 .claude/
 CLAUDE.md
+.test-deps/
