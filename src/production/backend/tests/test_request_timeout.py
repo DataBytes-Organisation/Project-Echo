@@ -4,7 +4,6 @@ import os
 import unittest
 from unittest.mock import patch
 
-from fastapi import FastAPI
 from pydantic import ValidationError
 
 
@@ -18,6 +17,7 @@ for key, value in REQUIRED_ENV.items():
     os.environ.setdefault(key, value)
 
 from app.config import Settings, settings
+from app.main import app as project_app
 from app.middleware.request_timeout import RequestTimeoutMiddleware
 
 
@@ -69,38 +69,63 @@ async def request_app(app, method, path):
     return start["status"], headers, body
 
 
-def timeout_test_app(timeout_seconds=0.01):
-    app = FastAPI()
+async def integrated_normal_read():
+    return {"status": "ok"}
 
-    @app.get("/normal")
-    async def normal():
-        return {"status": "ok"}
 
-    @app.get("/slow")
-    async def slow():
-        await asyncio.sleep(0.05)
-        return {"status": "finished"}
+async def integrated_slow_read():
+    await asyncio.sleep(0.05)
+    return {"status": "finished"}
 
-    @app.post("/slow-write")
-    async def slow_write():
-        await asyncio.sleep(0.02)
-        return {"status": "written"}
 
-    app.add_middleware(
-        RequestTimeoutMiddleware,
+async def integrated_slow_write():
+    await asyncio.sleep(0.02)
+    return {"status": "written"}
+
+
+# These routes exist only in the test process. Wrapping the real Project Echo
+# app with a shorter timeout exercises its routers, exception handlers and
+# middleware without making the production timeout test take 15 seconds.
+project_app.add_api_route(
+    "/__tests__/timeout/normal",
+    integrated_normal_read,
+    methods=["GET"],
+    include_in_schema=False,
+)
+project_app.add_api_route(
+    "/__tests__/timeout/slow-read",
+    integrated_slow_read,
+    methods=["GET"],
+    include_in_schema=False,
+)
+project_app.add_api_route(
+    "/__tests__/timeout/slow-write",
+    integrated_slow_write,
+    methods=["POST"],
+    include_in_schema=False,
+)
+
+
+def integrated_timeout_app(timeout_seconds=0.01):
+    return RequestTimeoutMiddleware(
+        project_app,
         timeout_seconds=timeout_seconds,
     )
-    return app
 
 
 class RequestTimeoutTests(unittest.IsolatedAsyncioTestCase):
     async def test_slow_read_returns_standard_504_response(self):
-        status, _, body = await request_app(timeout_test_app(), "GET", "/slow")
+        status, _, body = await request_app(
+            integrated_timeout_app(),
+            "GET",
+            "/__tests__/timeout/slow-read",
+        )
 
         self.assertEqual(status, 504)
         self.assertEqual(
             json.loads(body),
             {
+                "status": "failed",
                 "error": {
                     "code": "GATEWAY_TIMEOUT",
                     "message": "Request timed out.",
@@ -110,16 +135,26 @@ class RequestTimeoutTests(unittest.IsolatedAsyncioTestCase):
         )
 
     async def test_normal_read_is_not_falsely_timed_out(self):
-        status, _, body = await request_app(timeout_test_app(), "GET", "/normal")
+        status, headers, body = await request_app(
+            integrated_timeout_app(),
+            "GET",
+            "/__tests__/timeout/normal",
+        )
 
         self.assertEqual(status, 200)
         self.assertEqual(json.loads(body), {"status": "ok"})
+        self.assertIn("x-correlation-id", headers)
 
     async def test_write_request_is_not_cancelled(self):
-        status, _, body = await request_app(timeout_test_app(), "POST", "/slow-write")
+        status, headers, body = await request_app(
+            integrated_timeout_app(),
+            "POST",
+            "/__tests__/timeout/slow-write",
+        )
 
         self.assertEqual(status, 200)
         self.assertEqual(json.loads(body), {"status": "written"})
+        self.assertIn("x-correlation-id", headers)
 
     def test_timeout_setting_accepts_environment_override(self):
         env = {**REQUIRED_ENV, "REQUEST_TIMEOUT_SECONDS": "2.5"}
@@ -135,15 +170,6 @@ class RequestTimeoutTests(unittest.IsolatedAsyncioTestCase):
                 Settings()
 
     def test_project_app_uses_central_timeout_setting(self):
-        # The C4 base branch currently passes optional mail settings into a
-        # dependency that requires strings. Patch harmless values only while
-        # importing the complete application so this C11 wiring test remains
-        # independent of test discovery order.
-        with patch.object(settings, "mail_username", "test@example.com"):
-            with patch.object(settings, "mail_password", "test-password"):
-                with patch.object(settings, "mail_from", "test@example.com"):
-                    from app.main import app as project_app
-
         middleware = next(
             item
             for item in project_app.user_middleware
