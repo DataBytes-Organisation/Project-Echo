@@ -31,3 +31,4 @@ fastapi_mail
 twilio==8.5.0
 python-multipart
 pytest
+prometheus-client==0.21.1
