@@ -1,5 +1,5 @@
 // This file creates one index which is a shortcut for searching fast and easily
-// on the detections collection, sorted by timestamp and species.
+// on the detections collection, sorted by timestamp and species. 
 
 const migrationDb = db.getSiblingDB("EchoNet");
 
