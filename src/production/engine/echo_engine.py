@@ -53,7 +53,11 @@ import paho.mqtt.client as paho
 import tensorflow as tf
 from tensorflow.keras.models import load_model
 
-from google.cloud import storage
+# Docker provides the shared package through PYTHONPATH; resolve local checkouts.
+_store_dir = ENGINE_DIR.parent / "infrastructure" / "store"
+if _store_dir.is_dir():
+    sys.path.insert(0, str(_store_dir))
+from cloudflare_r2 import R2Config, R2Storage
 
 # yamnet related imports
 from yamnet_dir import params as params
@@ -306,29 +310,14 @@ class EchoEngine():
 
 
     ##################################################################################################
-    # This function uses the google bucket with audio files and
-    # leverages the folder names as the official species names
-    # Note: to run this you will need to first authenticate
-    # See https://github.com/DataBytes-Organisation/Project-Echo/tree/main/src/Prototypes/data#readme
+    # Use the same R2 dataset and species folder names as the simulator.
     ##################################################################################################
-    def gcp_load_species_list(self):
-
-        species_names = set()
-
-        bucket_name = self.config['BUCKET_NAME']
-        os.environ["GCLOUD_PROJECT"] = self.config['GCLOUD_PROJECT']
-
-        storage_client = storage.Client()
-        bucket = storage_client.get_bucket(bucket_name)
-        blobs = bucket.list_blobs()  # Get list of files
-        for blob in blobs:
-            folder_name = blob.name.split('/')[0]
-            species_names.add(folder_name)
-
-        result = list(species_names)
-        result.sort()
-
-        return result
+    def r2_load_species_list(self):
+        storage = R2Storage(R2Config.from_env())
+        species_names = storage.list_species()
+        if not species_names:
+            raise RuntimeError("No species audio was found in the configured R2 prefix")
+        return species_names
 
 
     ########################################################################################
@@ -1639,8 +1628,8 @@ class EchoEngine():
         print(f'Subscribing to MQTT: {self.config["MQTT_CLIENT_URL"]} {self.config["MQTT_PUBLISH_URL"]}')
         client.subscribe(self.config['MQTT_PUBLISH_URL'])
 
-        print("Retrieving species names from GCP")
-        self.class_names = self.gcp_load_species_list()
+        print("Retrieving species names from Cloudflare R2")
+        self.class_names = self.r2_load_species_list()
 
         for cs in self.class_names:
             print(f" class name {cs}")

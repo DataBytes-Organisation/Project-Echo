@@ -1,4 +1,4 @@
-"""Isolated Cloudflare R2 prototype for Project Echo."""
+"""Cloudflare R2 storage for the engine and simulator, with prototype helpers."""
 
 from .prototype_integration import (
     R2EnginePrototype,

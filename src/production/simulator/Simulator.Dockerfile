@@ -40,4 +40,8 @@ ENV PATH="/opt/venv/bin:$PATH"
 COPY echo_credentials.json .
 COPY src/ .
 
+# Keep the storage package outside /app, which Compose bind-mounts at runtime.
+COPY --from=r2_storage /*.py /opt/echo-store/cloudflare_r2/
+ENV PYTHONPATH="/opt/echo-store"
+
 CMD ["python", "system_manager.py"]

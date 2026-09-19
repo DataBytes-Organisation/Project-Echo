@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, BinaryIO, Iterator
 
@@ -12,9 +12,9 @@ from typing import Any, BinaryIO, Iterator
 class R2Config:
     account_id: str
     bucket_name: str
-    access_key_id: str
-    secret_access_key: str
-    dataset_prefix: str = "prototype"
+    access_key_id: str = field(repr=False)
+    secret_access_key: str = field(repr=False)
+    dataset_prefix: str = ""
 
     @property
     def endpoint_url(self) -> str:
@@ -44,14 +44,13 @@ class R2Config:
             access_key_id=values["R2_ACCESS_KEY_ID"],
             secret_access_key=values["R2_SECRET_ACCESS_KEY"],
             dataset_prefix=(
-                os.environ.get("R2_DATASET_PREFIX", "prototype").strip()
-                or "prototype"
+                os.environ.get("R2_DATASET_PREFIX", "").strip().strip("/")
             ),
         )
 
 
 class R2Storage:
-    """Storage operations shared by the prototype engine and simulator."""
+    """Storage operations shared by the engine, simulator and prototype helpers."""
 
     def __init__(self, config: R2Config, client: Any | None = None) -> None:
         self.config = config
@@ -73,7 +72,11 @@ class R2Storage:
             aws_access_key_id=config.access_key_id,
             aws_secret_access_key=config.secret_access_key,
             region_name="auto",
-            config=Config(retries={"max_attempts": 3, "mode": "standard"}),
+            config=Config(
+                retries={"max_attempts": 3, "mode": "standard"},
+                connect_timeout=10,
+                read_timeout=60,
+            ),
         )
 
     def check_connection(self) -> None:
@@ -89,7 +92,7 @@ class R2Storage:
             response = self._client.list_objects_v2(**request)
             for item in response.get("Contents", []):
                 key = item.get("Key")
-                if key and not key.endswith("/"):
+                if key and not key.endswith("/") and item.get("Size") != 0:
                     yield key
 
             if not response.get("IsTruncated"):
@@ -127,7 +130,14 @@ class R2Storage:
             Bucket=self.config.bucket_name,
             Key=key,
         )
-        return response["Body"].read()
+        body = response["Body"]
+        try:
+            data = body.read()
+        finally:
+            body.close()
+        if not data:
+            raise RuntimeError(f"R2 object is empty: {key}")
+        return data
 
     def download_file(self, key: str, destination: str | Path) -> Path:
         if not key or key.endswith("/"):
