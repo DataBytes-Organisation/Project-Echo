@@ -54,7 +54,7 @@ class RMSNorm2d(nn.Module):
 
 
 class Model(nn.Module):
-	def __init__(self, cfg: DictConfig):
+	def __init__(self, cfg: DictConfig, example_input=None):
 		super().__init__()
 		model_params = cfg.model.params
 		norm_choice = cfg.model.norm_choice
@@ -106,9 +106,14 @@ class Model(nn.Module):
 
 		self.use_qat = model_params.get("use_qat", False)
 		if self.use_qat:
-			self.model.eval()
-			self.model.fuse_model()
-			self.model = prepare_qat_fx(self.model)
+				if example_input is None:
+						raise ValueError(
+								"QAT requires an example input from the training pipeline."
+						)
+
+				self.model.eval()
+				self.model.fuse_model()
+				self.model = prepare_qat_fx(self.model, example_input)
 
 	def freeze_batch_norm(self):
 		"""
@@ -159,14 +164,24 @@ class Model(nn.Module):
 	def state_dict(self, *args, **kwargs):
 		return self.model.state_dict(*args, **kwargs)
 
-	def quantise(self):
-		if not self.use_qat:
-			print("Warning: quantise() called, but model was not trained with QAT. Only fusing modules.")
-			self.model.eval()
-			self.model.fuse_model()
-			return
+	def quantise(self, calib_dl=None):
+			if self.use_qat:
+					print("Converting QAT-prepared model to quantised model.")
+					self.model.eval()
+					self.model = self.model.cpu()
+					self.model = convert_fx(self.model)
+					return
 
-		self.model = convert_fx(self.model)
+			if calib_dl is None:
+					raise ValueError(
+							"A calibration DataLoader is required for static quantisation."
+					)
+
+			print("Preparing model for post-training static quantisation.")
+
+			self.model = prepare_post_static_quantize_fx(self.model, calib_dl)
+			print("Converting calibrated model to quantised model.")
+			self.model = convert_fx(self.model)
 
 	def summary(self):
 		"""

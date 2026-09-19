@@ -28,6 +28,8 @@ services:
     container_name: ts-echo-engine-cont
     networks:
       - echo-net
+    environment:
+      ENGINE_API_KEY: ${ENGINE_API_KEY:-}
     volumes:
       - credentials_volume:/root/.config/gcloud/
     stdin_open: true
@@ -109,6 +111,8 @@ services:
       - ../../production/backend:/app # Mount the api's src directory to /app in the container
       - credentials_volume:/root/.config/gcloud/
       - weather_data:/app/weather_data  # Add a volume for weather data
+    env_file:
+      - .env
     environment:
       MAIL_STARTTLS: "true"
       MAIL_SSL_TLS: "false"
@@ -117,6 +121,22 @@ services:
     tty: true
     command: uvicorn app.main:app --host 0.0.0.0 --port 9000 --workers ${WEB_CONCURRENCY:-1}
 
+      MQTT_BROKER_URL: "ts-mqtt-server-cont"
+      MQTT_BROKER_PORT: "1883"
+      MQTT_PUBLISH_URL: "projectecho/engine/2"
+      ENGINE_API_KEY: ${ENGINE_API_KEY:-}
+
+    stdin_open: false
+    tty: true
+    # --no-server-header suppresses uvicorn's "server: uvicorn" response
+    # header. It must be set here as well as in API.Dockerfile, because this
+    # command overrides the image's CMD.
+    command: uvicorn app.main:app --host 0.0.0.0 --port 9000 --reload --no-server-header
+    restart: on-failure
+    depends_on:
+      echo_store:
+        condition: service_healthy
+        
   mongo-express:
     image: mongo-express
     container_name: mongo-express
@@ -150,6 +170,25 @@ services:
       - "27017:27017"
     volumes:
       - db-data:/data/db
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mongo",
+          "--quiet",
+          "-u",
+          "root",
+          "-p",
+          "root_password",
+          "--authenticationDatabase",
+          "admin",
+          "--eval",
+          "db.adminCommand('ping').ok"
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 40s
 
   echo-redis:
     image: redis:latest
