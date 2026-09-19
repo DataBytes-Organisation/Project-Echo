@@ -15,7 +15,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import notificationFeed from "../services/notifications.js";
+import notificationFeed from "../server/services/notifications.js";
 
 const { buildFeed, applyState } = notificationFeed;
 
