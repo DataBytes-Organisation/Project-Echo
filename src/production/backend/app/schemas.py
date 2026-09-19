@@ -441,6 +441,8 @@ class DetectionListResponses(BaseModel):
         # Never caught before because prior tests mocked the service layer
         # directly and never exercised this response model against a real
         # database round-trip - see test_detections_list_serialization.py.
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
 
 class BudgetRule(BaseModel):
@@ -494,6 +496,26 @@ class ProjectListResponse(BaseModel):
 # Backwards/expected import name used by app.routers.detections
 class DetectionListResponse(DetectionListResponses):
     pass
+
+
+class RealDetectionRead(BaseModel):
+    """HMI real-detection read shape (no audio payload)."""
+
+    sourceType: Literal["real", "simulator"]
+    id: str = Field(..., alias="_id")
+    timestamp: datetime
+    sensorId: str
+    species: str
+    microphoneLLA: LLA
+    animalEstLLA: Optional[LLA] = None
+    animalTrueLLA: Optional[LLA] = None
+    animalLLAUncertainty: Optional[float] = None
+    confidence: float
+
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
 
 
 class RazorpayOrderRequest(BaseModel):

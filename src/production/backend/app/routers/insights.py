@@ -1,8 +1,6 @@
 from datetime import datetime, timezone
 from typing import Annotated, Any, Dict, List, Optional
-
 from fastapi import APIRouter, HTTPException, Query
-
 from app.database import Events, Microphones, Nodes
 
 router = APIRouter(prefix="/insights", tags=["insights"])

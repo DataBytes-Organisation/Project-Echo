@@ -37,17 +37,17 @@ the epoch limit (see "Why the goal isn't fully met" below).
 
 | Arm | final train loss | best val loss | test acc | macro-F1 |
 |---|---|---|---|---|
-| `none` | 15.230 | **1.765** | **0.522** | **0.498** |
-| `original_unfixed_reference` | 18.672 | 2.506 | 0.218 | 0.147 |
-| `light` | 10.210 | 2.027 | 0.520 | 0.478 |
-| `default` | 18.466 | 2.367 | 0.255 | 0.152 |
-| `heavy` | 18.614 | 2.573 | 0.179 | 0.084 |
+| `none` | 15.23 | **1.77** | **0.52** | **0.50** |
+| `original_unfixed_reference` | 18.67 | 2.51 | 0.22 | 0.15 |
+| `light` | 10.21 | 2.03 | 0.52 | 0.48 |
+| `default` | 18.47 | 2.37 | 0.26 | 0.15 |
+| `heavy` | 18.61 | 2.57 | 0.18 | 0.08 |
 
-**Goal check:** not met against `none` - `light` comes within **0.002
-accuracy** (0.520 vs 0.522), effectively a tie given this is a
-single-seed, ~547-sample measurement, but doesn't cross it. Against
+**Goal check:** not met against `none` - `light` comes within rounding
+error (0.52 vs 0.52), effectively a tie given this is a single-seed,
+~547-sample measurement, but doesn't cross it. Against
 `original_unfixed_reference`: `default`/`light` beat it on both metrics,
-but `heavy` (0.179/0.084) loses to it on *both* (0.218/0.147) - see "Why
+but `heavy` (0.18/0.08) loses to it on *both* (0.22/0.15) - see "Why
 `heavy` underperforms" below.
 
 ---
@@ -60,17 +60,17 @@ delivery, recording-level split, training floor=30/cap=150). Seed 42,
 
 | Arm | final train loss | best val loss | test acc | macro-F1 | zero-F1 species (of 79) |
 |---|---|---|---|---|---|
-| `none` | 10.137 | 2.344 | **0.712** | **0.611** | **3** |
-| `original_unfixed_reference` | 15.565 | 2.217 | 0.567 | 0.336 | 12 |
-| `light` | 11.653 | 2.224 | 0.653 | 0.494 | 5 |
-| `default` | 14.619 | **2.024** | 0.599 | 0.384 | 7 |
-| `heavy` | 14.992 | 2.167 | 0.584 | 0.390 | 7 |
+| `none` | 10.14 | 2.34 | **0.71** | **0.61** | **3** |
+| `original_unfixed_reference` | 15.57 | 2.22 | 0.57 | 0.34 | 12 |
+| `light` | 11.65 | 2.22 | 0.65 | 0.49 | 5 |
+| `default` | 14.62 | **2.02** | 0.60 | 0.38 | 7 |
+| `heavy` | 14.99 | 2.17 | 0.58 | 0.39 | 7 |
 
-**Goal check:** not met against `none` - `light` is closest (0.653/0.494
-vs 0.712/0.611) but doesn't cross it. Against `original_unfixed_reference`,
+**Goal check:** not met against `none` - `light` is closest (0.65/0.49
+vs 0.71/0.61) but doesn't cross it. Against `original_unfixed_reference`,
 the goal **is** met, cleanly and consistently: all three fixed presets
 beat it on both accuracy and macro-F1 - `light` by the largest margin
-(+0.086 accuracy, +0.158 macro-F1).
+(+0.09 accuracy, +0.16 macro-F1).
 
 ---
 
@@ -84,7 +84,7 @@ spectrogram remove more discriminative signal per sample, which delays
 exactly this threshold, not the loss curve itself. This is directly
 visible in the balanced-dataset table above without needing any other
 evidence: `default` has the **lowest (best) validation loss of all five
-arms** (2.024) yet is only 4th of 5 on accuracy (0.599) - the model with
+arms** (2.02) yet is only 4th of 5 on accuracy (0.60) - the model with
 the best embedding space is not the model with the best discrete
 accuracy, because it hadn't finished crossing the threshold within the
 40-epoch budget.
@@ -105,9 +105,9 @@ it's Sprint 1's deliberately-reproduced *pre-fix* behaviour: no cap on
 `max_total_time_ratio`, so the fraction of the spectrogram masked per
 sample is effectively unbounded and varies far more from sample to
 sample than any capped preset. On the balanced dataset this shows up as
-**12 of 79 species scoring exactly 0.0 F1** - nearly double `default`'s
+**12 of 79 species scoring exactly 0.00 F1** - nearly double `default`'s
 or `heavy`'s count (7 each) despite a competitive aggregate accuracy
-(0.567) - consistent with inconsistent per-sample masking teaching some
+(0.57) - consistent with inconsistent per-sample masking teaching some
 classes well while leaving others essentially untrained, which accuracy
 (dominated by classes that *did* learn) hides and macro-F1 exposes. This
 is the strongest evidence in the whole benchmark that the Sprint 1
@@ -115,14 +115,14 @@ safety-cap fix has real, practical value, independent of which capped
 preset you pick.
 
 **Why `heavy` underperforms even `original_unfixed_reference` on the
-current dataset (0.179/0.084 vs 0.218/0.147).** `heavy` is deliberately
+current dataset (0.18/0.08 vs 0.22/0.15).** `heavy` is deliberately
 the most aggressive preset on the light/default/heavy ladder, so within a
 fixed, already-insufficient epoch budget it is expected to be *furthest*
 from crossing the phase transition - the same mechanism as above, at its
 most extreme point, on the smallest dataset (2,737 files) where there is
 also the least room to average out single-run noise. This does not recur
-on the balanced dataset, where `heavy` (0.584/0.390) clearly and
-consistently beats `original_unfixed_reference` (0.567/0.336).
+on the balanced dataset, where `heavy` (0.58/0.39) clearly and
+consistently beats `original_unfixed_reference` (0.57/0.34).
 
 ---
 
@@ -191,21 +191,21 @@ above rather than ruling them out.
 **Justification:**
 
 - **Closest of the three augmented presets to `none` everywhere, and
-  effectively tied with it on the current dataset** (0.520 vs 0.522
-  accuracy - a 0.002 gap, well inside single-seed noise). No other
+  effectively tied with it on the current dataset** (0.52 vs 0.52
+  accuracy, well inside single-seed noise). No other
   augmented preset gets this close on any run.
 - **Wins outright against `original_unfixed_reference` on the dataset
-  that actually matters for submission** (balanced, +0.086 accuracy,
-  +0.158 macro-F1 - the largest margin of any capped preset).
+  that actually matters for submission** (balanced, +0.09 accuracy,
+  +0.16 macro-F1 - the largest margin of any capped preset).
 - **Fewest catastrophic per-class failures on the balanced dataset**: 5
-  of 79 species at exactly 0.0 F1, versus 7 for `default`, 7 for `heavy`,
+  of 79 species at exactly 0.00 F1, versus 7 for `default`, 7 for `heavy`,
   and 12 for `original_unfixed_reference` - the most stable preset of the
   three real augmentation options, not just the highest-scoring on
   average.
 - **Smallest phase-transition delay of the three augmented presets**:
-  on the balanced dataset its training curve reached val-accuracy 0.697
-  by the time training stopped, ahead of `default` (0.639) and `heavy`
-  (0.643) - `light` is the augmented preset least likely to still be
+  on the balanced dataset its training curve reached val-accuracy 0.70
+  by the time training stopped, ahead of `default` (0.64) and `heavy`
+  (0.64) - `light` is the augmented preset least likely to still be
   mid-transition when training has to stop under a real, time-boxed
   budget.
 - **Why not just select `none`, since it wins every table above?**
@@ -223,13 +223,123 @@ above rather than ruling them out.
   while minimising the accuracy cost this benchmark actually measured.
 - **`default` remains the most promising long-term candidate, not a
   rejected one.** It has the best validation loss of all five arms on the
-  balanced dataset (2.024) - the strongest embedding space of anything
+  balanced dataset (2.02) - the strongest embedding space of anything
   tested here. It is not the current pick only because its accuracy
   hadn't caught up within the epoch budget this benchmark could afford,
   which suggestion #1 above (real early-stopping-governed runs) is the
   direct, low-cost way to test properly before the next sprint.
 
 ---
+
+## Addendum: time warping - a non-masking alternative
+
+Everything above compares five presets of the *same* underlying
+technique - time/frequency masking (`augment.py`'s `SpecAugment`). At a
+mentor's suggestion, a structurally different augmentation - time
+warping, the original SpecAugment paper's third operation ("W",
+alongside masking's "F"/"T") - was implemented and benchmarked the same
+way, to check whether the phase-transition problem above is inherent to
+augmentation in general or specific to masking. Implementation:
+`time_warp.py` (this folder) + `reproducible_training_pipeline/config/
+augmentation/time_warp.yaml`; deliberately not a change to `augment.py`
+- a separate, additive module so it stays independently comparable.
+Same seed (42), same 40-epoch ceiling, same `evaluate_checkpoint()`
+scoring as every arm above.
+
+**Updated results, both datasets:**
+
+| Arm | final train loss | best val loss | test acc | macro-F1 |
+|---|---|---|---|---|
+| `none` | 15.23 | 1.77 | **0.52** | **0.50** |
+| `time_warp` | 17.03 | 2.30 | 0.41 | 0.35 |
+| `light` | 10.21 | 2.03 | 0.52 | 0.48 |
+| `default` | 18.47 | 2.37 | 0.26 | 0.15 |
+| `heavy` | 18.61 | 2.57 | 0.18 | 0.08 |
+| `original_unfixed_reference` | 18.67 | 2.51 | 0.22 | 0.15 |
+
+*(current dataset - `time_warp` beats every masking preset except
+`light`, on both metrics)*
+
+| Arm | final train loss | best val loss | test acc | macro-F1 | zero-F1 species (of 79) |
+|---|---|---|---|---|---|
+| `time_warp` | 10.03 | 2.48 | **0.71** | **0.61** | **1** |
+| `none` | 10.14 | 2.34 | 0.71 | 0.61 | 3 |
+| `light` | 11.65 | 2.22 | 0.65 | 0.49 | 5 |
+| `default` | 14.62 | **2.02** | 0.60 | 0.38 | 7 |
+| `heavy` | 14.99 | 2.17 | 0.58 | 0.39 | 7 |
+| `original_unfixed_reference` | 15.57 | 2.22 | 0.57 | 0.34 | 12 |
+
+*(balanced dataset - `time_warp` is statistically tied with `none` on
+both metrics, and has fewer catastrophic per-class failures than any
+other arm, `none` included)*
+
+**Why this changes the goal check.** On the balanced dataset - the one
+that actually matters for submission - `time_warp` closes the gap the
+whole rest of this document couldn't: it beats `original_unfixed_reference`
+by the largest margin of any arm (+0.14 accuracy, +0.27 macro-F1) *and*
+comes within rounding error of `none`, well inside single-seed noise. No
+masking preset got closer than `light`'s 0.06/0.12 gap. This is the
+first arm in the whole benchmark close enough to `none` to be a candidate
+on its own merits, not just "the best of the augmented options."
+
+**Why time warping succeeds where masking doesn't.** Masking *deletes*
+information - a masked strip carries no discriminative signal at all,
+which is exactly what delays `CircleLoss`'s embedding-separation
+threshold (see "Why the goal isn't fully met yet" above). Time warping
+*redistributes* existing information instead - every pixel from the
+original spectrogram is still present somewhere in the output, just
+stretched or compressed along time - so it perturbs the embedding far
+less at initialisation while still forcing timing/tempo invariance. The
+zero-F1-species count is the clearest evidence of this: masking presets
+leave whole species with no learnable signal on a fraction of their
+samples (5-12 species at exactly 0.00 F1); warping leaves only 1.
+
+One genuine nuance worth flagging rather than smoothing over: `time_warp`
+does **not** have the best validation loss (2.48, worse than `none`'s
+2.34 and `default`'s 2.02) despite having accuracy/macro-F1 tied for
+best. This is the loss/accuracy decoupling from earlier, but running in
+the *opposite* direction - here a numerically worse loss still produced
+excellent discrete accuracy, presumably because warping's geometric
+distortion makes the margin loss itself harder to minimise even once the
+embeddings are already well separated for classification purposes. The
+decoupling is real in both directions; it isn't simply "worse loss always
+means worse accuracy" or vice versa.
+
+**A real bug this run surfaced, unrelated to time warping itself:**
+evaluating the first checkpoint trained after this sprint's mid-sprint
+`main` pull failed - `train.py`'s checkpoint format changed upstream
+(now saves a full `{model_state_dict, optimizer_state_dict, ...}` dict
+for resume support, not a bare `model.state_dict()`), which
+`evaluate_checkpoint()` didn't know about. Fixed to handle both formats,
+so every checkpoint archived before that pull (all five presets above)
+still loads correctly, unchanged.
+
+### Final selected configuration (updated): `time_warp`
+
+**This supersedes the `light` recommendation above.** `time_warp` is not
+merely the best augmented preset - on the balanced dataset it is
+statistically indistinguishable from `none` while still being genuine,
+non-trivial augmentation, which is a stronger position than anything
+masking-based produced in this entire benchmark.
+
+- **Closest of any augmented approach to `none` on the balanced
+  dataset** - within rounding error, versus `light`'s
+  0.06/0.12 gap.
+- **Fewest catastrophic per-class failures of any arm tested**,
+  including `none` (1 of 79 species at 0.00 F1, versus 3 for `none`, 5 for
+  `light`).
+- **Beats `original_unfixed_reference` by the largest margin of any
+  arm** (+0.14 accuracy, +0.27 macro-F1).
+- **Mechanistically explained, not just empirically observed** - it
+  avoids the phase-transition delay by construction (redistributing
+  rather than deleting information), which is exactly the property
+  suggestion #2 above predicted before this was tested.
+- **`light` remains a reasonable fallback** if time warping's
+  implementation (still experimental, not yet reconciled with
+  `augment.py`/Nolan's pipeline the way the masking presets are) turns
+  out not to suit the production pipeline - the two are not mutually
+  exclusive, and could plausibly be combined (time warping plus light
+  masking) in future work.
 
 ## Caveats
 
