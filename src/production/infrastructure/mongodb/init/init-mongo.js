@@ -107,6 +107,29 @@ userdb.guests.insertMany([
 
 
 // ----------------------------------------------
+// DEFAULT SERVICE BUDGETS
+// ----------------------------------------------
+// The HMI detection read is budget-guarded and fails closed with 403 when no
+// rule exists, so seed a default detections rule. Idempotent: only adds the
+// service when missing, never overwrites configured limits or usage counters.
+// Runs on first DB init only; existing volumes need the one-off backfill:
+// POST /api/admin/budget/limits [{"service": "detections", "monthly_limit": N}]
+if (!apidb.getCollectionNames().includes("admin_budgets")) {
+  apidb.createCollection("admin_budgets");
+}
+
+if (!apidb.admin_budgets.findOne({ _type: "config", "rules.service": "detections" })) {
+  apidb.admin_budgets.updateOne(
+    { _type: "config" },
+    {
+      $setOnInsert: { _type: "config", updated_at: new Date() },
+      $push: { rules: { service: "detections", monthly_limit: 100000 } },
+    },
+    { upsert: true }
+  );
+}
+
+// ----------------------------------------------
 // INITIALIZE DONATIONS COLLECTION
 // ----------------------------------------------
 const donations = [

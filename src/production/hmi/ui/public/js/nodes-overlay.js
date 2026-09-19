@@ -17,6 +17,7 @@
  */
 
 import { retrieveIotNodes } from "./routes.js";
+import { showToast, getApiErrorMessage } from "./HMI-utils.js";
 
 const IOT_LAYER_NAME = "iot_nodes";
 
@@ -282,6 +283,10 @@ async function addIoTNodesToMap(hmiState) {
     initialiseNodePopup(hmiState);
   } catch (error) {
     console.error("Error loading IoT nodes:", error);
+    // this was just a silent console.error before FR-D1 touched it - now it
+    // actually tells the user something failed instead of leaving them staring
+    // at a map with no nodes on it and no idea why
+    showToast(getApiErrorMessage(error, "Could not load IoT nodes."), "error");
     throw error;
   }
 }
