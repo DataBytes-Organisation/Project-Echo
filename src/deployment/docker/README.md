@@ -280,3 +280,20 @@ If `python` is not on PATH, substitute your installed Python executable. These
 tests use fake credentials and mocked storage/messaging; they do not upload
 data or run the simulation. Engine regression tests additionally require the
 existing engine test dependencies and fixtures.
+
+## GitHub CI storage fixture
+
+The Docker Image CI workflow adds `docker-compose.ci.yml` to the test Compose
+configuration. This explicit CI-only overlay mounts `.github/ci/r2_fixture.py`
+and supplies synthetic credentials. The launcher validates SDK responses for a
+generated WAV file, then runs the real engine/simulator entrypoint with only the
+storage client stubbed. No live R2 request or repository secret is required,
+including on fork pull requests. All nine application services must still run;
+application errors are not suppressed.
+
+The workflow also runs the fixture's offline regression tests before starting
+the services. This is a container-startup/storage-contract check, **not a live
+Cloudflare integration test**. It does not replace the real-bucket checks above.
+Do not add the CI overlay to normal local or production commands: those keep
+using `docker-compose.yml` or `docker-compose.test.yml` with your private `.env`
+and the real R2 client. The fixture is not included in production images.

@@ -6,10 +6,13 @@ on:
     paths:
       - 'src/**/*'
       - '.github/workflows/**/*'
+      - '.github/ci/**'
   pull_request:
     branches: [ "main" ]
     paths:
       - 'src/**/*'
+      - '.github/workflows/docker-image.yml'
+      - '.github/ci/**'
 
 jobs:
   build:
@@ -46,7 +49,7 @@ jobs:
       run: |
         cd src/deployment/docker
         for i in 1 2 3; do
-          docker compose -f docker-compose.test.yml build --no-cache --force-rm && break
+          docker compose -f docker-compose.test.yml -f docker-compose.ci.yml build --no-cache --force-rm && break
           echo "Build attempt $i failed -- retrying in 20s..."
           sleep 20
           if [ "$i" -eq 3 ]; then
@@ -54,10 +57,15 @@ jobs:
             exit 1
           fi
         done
+    - name: Verify isolated R2 CI fixture
+      working-directory: src/deployment/docker
+      run: |
+        docker compose -f docker-compose.test.yml -f docker-compose.ci.yml run --rm --no-deps --entrypoint python echo_engine -B -m unittest discover -s /opt/echo-ci -p 'test_r2_fixture.py' -v
+
     - name: Start containers
       run: |
         cd src/deployment/docker
-        docker compose -f docker-compose.test.yml up -d
+        docker compose -f docker-compose.test.yml -f docker-compose.ci.yml up -d
     
     - name: Wait for containers to be ready
       run: sleep 180
@@ -65,18 +73,18 @@ jobs:
     - name: Check running containers
       run: |
         cd src/deployment/docker
-        RUNNING_CONTAINERS=$(docker compose -f docker-compose.test.yml ps | grep -c 'Up')
+        RUNNING_CONTAINERS=$(docker compose -f docker-compose.test.yml -f docker-compose.ci.yml ps | grep -c 'Up')
         if [ "$RUNNING_CONTAINERS" -eq 9 ]; then
           echo "All containers are up and running."
         else
           echo "Expected 9 running containers, but found $RUNNING_CONTAINERS. Failing."
           echo "===================== DIAGNOSTICS ====================="
           echo "----- docker compose ps -a (all container states) -----"
-          docker compose -f docker-compose.test.yml ps -a || docker-compose ps
+          docker compose -f docker-compose.test.yml -f docker-compose.ci.yml ps -a
           echo "----- disk usage (df -h) -----"
           df -h
           echo "----- per-container logs (tail 60) -----"
-          docker compose -f docker-compose.test.yml logs --tail 60 || docker-compose logs --tail 60
+          docker compose -f docker-compose.test.yml -f docker-compose.ci.yml logs --tail 60
           echo "======================================================="
           exit 1
         fi
@@ -85,4 +93,4 @@ jobs:
       if: always()
       run: |
         cd src/deployment/docker
-        docker compose -f docker-compose.test.yml down --remove-orphans
+        docker compose -f docker-compose.test.yml -f docker-compose.ci.yml down --remove-orphans
