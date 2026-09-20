@@ -13,6 +13,13 @@ REQUIRED_ENV = {
     "JWT_SECRET": "test-secret",
 }
 
+# Use a generous test-only deadline so a normal request through the complete
+# Project Echo middleware stack cannot fail because of cold-start or scheduler
+# overhead. The deliberately slow operations remain longer than this deadline.
+TEST_TIMEOUT_SECONDS = 0.5
+SLOW_READ_SECONDS = 1.0
+SLOW_WRITE_SECONDS = 0.75
+
 for key, value in REQUIRED_ENV.items():
     os.environ.setdefault(key, value)
 
@@ -74,12 +81,12 @@ async def integrated_normal_read():
 
 
 async def integrated_slow_read():
-    await asyncio.sleep(0.05)
+    await asyncio.sleep(SLOW_READ_SECONDS)
     return {"status": "finished"}
 
 
 async def integrated_slow_write():
-    await asyncio.sleep(0.02)
+    await asyncio.sleep(SLOW_WRITE_SECONDS)
     return {"status": "written"}
 
 
@@ -106,7 +113,7 @@ project_app.add_api_route(
 )
 
 
-def integrated_timeout_app(timeout_seconds=0.01):
+def integrated_timeout_app(timeout_seconds=TEST_TIMEOUT_SECONDS):
     return RequestTimeoutMiddleware(
         project_app,
         timeout_seconds=timeout_seconds,

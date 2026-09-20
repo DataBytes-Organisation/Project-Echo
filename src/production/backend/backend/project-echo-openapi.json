@@ -3494,21 +3494,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Detection returned with ETag and Cache-Control headers.",
-            "headers": {
-              "ETag": {
-                "description": "Strong validator for this detection representation.",
-                "schema": {
-                  "type": "string"
-                }
-              },
-              "Cache-Control": {
-                "description": "Requires private caches to revalidate before reuse.",
-                "schema": {
-                  "type": "string"
-                }
-              }
-            },
+            "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {
@@ -3516,26 +3502,6 @@
                 }
               }
             }
-          },
-          "304": {
-            "description": "The supplied If-None-Match validator is still current.",
-            "headers": {
-              "ETag": {
-                "description": "Validator for the cached representation.",
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "The detection id is invalid."
-          },
-          "404": {
-            "description": "The detection does not exist."
-          },
-          "503": {
-            "description": "Detection storage is temporarily unavailable."
           },
           "422": {
             "description": "Validation Error",
