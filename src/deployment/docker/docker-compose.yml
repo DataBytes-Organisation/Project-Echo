@@ -109,6 +109,8 @@ services:
       - ../../production/backend:/app # Mount the api's src directory to /app in the container
       - credentials_volume:/root/.config/gcloud/
       - weather_data:/app/weather_data  # Add a volume for weather data
+    env_file:
+      - .env
     environment:
       MAIL_STARTTLS: "true"
       MAIL_SSL_TLS: "false"
@@ -143,13 +145,20 @@ services:
     volumes:
       - ../../production/backend:/app
       - credentials_volume:/root/.config/gcloud/
+    # Same C4 settings as echo_api: importing app.jobs.detection_webhook
+    # loads app.database -> app.config.Settings (MONGODB_URI,
+    # USER_MONGODB_URI, JWT_SECRET). Delayed Retry intervals only fire when
+    # the worker process runs RQ's scheduler.
+    env_file:
+      - .env
     environment:
       PYTHONUNBUFFERED: "1"
       PYTHONPATH: /app
       REDIS_URL: redis://echo-redis:6379/1
       MONGODB_URI: mongodb://root:root_password@ts-mongodb-cont:27017/EchoNet?authSource=admin
+      USER_MONGODB_URI: mongodb://root:root_password@ts-mongodb-cont:27017/EchoNet?authSource=admin
       DETECTION_WEBHOOK_URL: ${DETECTION_WEBHOOK_URL:-}
-    command: rq worker echo-backend --url redis://echo-redis:6379/1
+    command: rq worker echo-backend --with-scheduler --url redis://echo-redis:6379/1
     restart: on-failure
     depends_on:
       echo_store:
