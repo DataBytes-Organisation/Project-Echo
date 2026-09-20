@@ -1,21 +1,28 @@
 ## app.database.py
-import pymongo
 import os
+import pymongo
 import datetime
 import time
 # import mongoose
 
+from app.config import settings
+
+MONGODB_TIMEOUT_MS = int(os.getenv("MONGODB_TIMEOUT_MS", "3000"))
+MONGODB_CLIENT_OPTIONS = {
+    "serverSelectionTimeoutMS": MONGODB_TIMEOUT_MS,
+    "connectTimeoutMS": MONGODB_TIMEOUT_MS,
+    "socketTimeoutMS": MONGODB_TIMEOUT_MS,
+}
+
 # prefer environment variable inside containers; fallback to service hostname (EchoNet DB)
 # legacy (kept for reference):
 # connection_string = "mongodb://modelUser:EchoNetAccess2023@ts-mongodb-cont:27017/EchoNet"
-connection_string = os.getenv(
-    "MONGODB_URI",
-    "mongodb://modelUser:EchoNetAccess2023@ts-mongodb-cont:27017/EchoNet",
-)
-client = pymongo.MongoClient(connection_string)
-db = client["EchoNet"]
+
+client = pymongo.MongoClient(settings.mongodb_uri, **MONGODB_CLIENT_OPTIONS)
+db = client[settings.mongo_db_name]
 # db = client['mydatabase']
 Events = db.events
+Events.create_index([("sourceType", pymongo.ASCENDING), ("timestamp", pymongo.DESCENDING)], name="idx_events_source_type_timestamp")
 Movements = db.movements
 Species = db.species
 Microphones = db.microphones
@@ -39,11 +46,9 @@ SensorReboots.create_index(
 # User DB connection (env first, then service hostname)
 # legacy (kept for reference):
 # User_connection_string = "mongodb://root:root_password@ts-mongodb-cont/UserSample?authSource=admin"
-User_connection_string = os.getenv(
-    "USER_MONGODB_URI",
-    "mongodb://root:root_password@ts-mongodb-cont/UserSample?authSource=admin",
-)
-Userclient = pymongo.MongoClient(User_connection_string)
+
+# User DB connection
+Userclient = pymongo.MongoClient(settings.user_mongodb_uri, **MONGODB_CLIENT_OPTIONS)
 Userdb = Userclient['UserSample']
 User = Userdb.users
 Role = Userdb.roles
@@ -86,9 +91,13 @@ Detections.create_index(
     [("species", pymongo.ASCENDING), ("timestamp", pymongo.DESCENDING)],
     name="idx_species_timestamp_desc"
 )
+try:
+    Detections.drop_index("idx_microphone_lat_lon")
+except Exception:
+    pass
 Detections.create_index(
-    [("microphoneLLA.0", pymongo.ASCENDING), ("microphoneLLA.1", pymongo.ASCENDING)],
-    name="idx_microphone_lat_lon"
+    [("microphoneLLA.latitude", pymongo.ASCENDING), ("microphoneLLA.longitude", pymongo.ASCENDING)],
+    name="idx_microphone_lla_obj"
 )
 
 AdminBudgets = db.admin_budgets
