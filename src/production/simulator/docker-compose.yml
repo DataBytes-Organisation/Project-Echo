@@ -1,7 +1,17 @@
 version: '3'
 services:
   app:
-    build: .
+    build:
+      context: .
+      dockerfile: Simulator.Dockerfile
+      additional_contexts:
+        r2_storage: ../infrastructure/store/cloudflare_r2
+    environment:
+      R2_ACCOUNT_ID: ${R2_ACCOUNT_ID:-}
+      R2_BUCKET_NAME: ${R2_BUCKET_NAME:-project-echo-simulator-prod}
+      R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID:-}
+      R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY:-}
+      R2_DATASET_PREFIX: ${R2_DATASET_PREFIX:-}
     volumes:
       - ./src:/app/src
     command: python src/system_manager.py
