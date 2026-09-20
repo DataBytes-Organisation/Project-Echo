@@ -50,7 +50,7 @@ from pymongo.collection import Collection
 from pymongo.errors import PyMongoError
 
 from app.database import client as project_mongo_client
-from app.schemas import DetectionCreate
+from app.schemas import DetectionCreate, EventSchema
 
 
 GENERATOR_NAME = "c13_seed_detections"
@@ -213,6 +213,25 @@ def validate_detection(payload: Dict[str, Any]) -> Dict[str, Any]:
     validated = DetectionCreate(**payload)
     return validated.dict(by_alias=True)
 
+def _event_lla(value: Any) -> Any:
+    """Convert DetectionCreate LLA arrays to EventSchema location objects."""
+    if value is None:
+        return None
+
+    if isinstance(value, dict):
+        return value
+
+    return {
+        "latitude": value[0],
+        "longitude": value[1],
+        "altitude": value[2],
+    }
+
+
+def validate_event(payload: Dict[str, Any]) -> Dict[str, Any]:
+    """Validate fixture data through Project Echo's EventSchema."""
+    validated = EventSchema(**payload)
+    return validated.dict(by_alias=True)
 
 def generate_detection_payload(
     *,
@@ -279,6 +298,53 @@ def generate_detection_payload(
 
     return validate_detection(raw_payload)
 
+def generate_event_payload(
+    *,
+    index: int,
+    count: int,
+    start: datetime,
+    end: datetime,
+    species_values: Sequence[str],
+    sensor_ids: Sequence[str],
+    rng: random.Random,
+    run_id: str,
+) -> Dict[str, Any]:
+    """
+    Generate one deterministic EventSchema-compatible fixture.
+
+    Event fixtures alternate deterministically between real and simulator
+    so both sourceType-filtered read paths can be exercised.
+    """
+    detection = generate_detection_payload(
+        index=index,
+        count=count,
+        start=start,
+        end=end,
+        species_values=species_values,
+        sensor_ids=sensor_ids,
+        rng=rng,
+        run_id=run_id,
+    )
+
+    event_payload = dict(detection)
+
+    event_payload["sourceType"] = (
+        "real"
+        if index % 2 == 0
+        else "simulator"
+    )
+
+    event_payload["microphoneLLA"] = _event_lla(
+        event_payload.get("microphoneLLA")
+    )
+    event_payload["animalEstLLA"] = _event_lla(
+        event_payload.get("animalEstLLA")
+    )
+    event_payload["animalTrueLLA"] = _event_lla(
+        event_payload.get("animalTrueLLA")
+    )
+
+    return validate_event(event_payload)
 
 def attach_fixture_metadata(
     detection: Dict[str, Any],
@@ -317,6 +383,7 @@ def generate_fixtures(
     seed: int,
     run_id: str,
     environment: str,
+    collection_name: str,
 ) -> List[Dict[str, Any]]:
     """Generate a deterministic list of validated fixture documents."""
     if count < 1:
@@ -333,16 +400,28 @@ def generate_fixtures(
     fixtures: List[Dict[str, Any]] = []
 
     for index in range(count):
-        validated = generate_detection_payload(
-            index=index,
-            count=count,
-            start=start,
-            end=end,
-            species_values=species_values,
-            sensor_ids=sensor_ids,
-            rng=rng,
-            run_id=run_id,
-        )
+        if collection_name == "events":
+            validated = generate_event_payload(
+                index=index,
+                count=count,
+                start=start,
+                end=end,
+                species_values=species_values,
+                sensor_ids=sensor_ids,
+                rng=rng,
+                run_id=run_id,
+            )
+        else:
+            validated = generate_detection_payload(
+                index=index,
+                count=count,
+                start=start,
+                end=end,
+                species_values=species_values,
+                sensor_ids=sensor_ids,
+                rng=rng,
+                run_id=run_id,
+            )
 
         fixtures.append(
             attach_fixture_metadata(
@@ -774,6 +853,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             seed=args.seed,
             run_id=run_id,
             environment=args.environment,
+            collection_name=args.collection,
         )
 
         print_generation_summary(
