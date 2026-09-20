@@ -31,6 +31,7 @@ from app.routers import hmi, engine, sim, two_factor
 from app.routers import public
 from app.logging_config import configure_logging
 from app.config import settings
+from app.metrics import PrometheusMiddleware, metrics_router
 
 configure_logging() #
 logger = logging.getLogger(__name__)
@@ -76,6 +77,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.add_middleware(PrometheusMiddleware)
 logger = logging.getLogger(__name__)
 
 
@@ -159,6 +161,7 @@ app.include_router(sensors.router, tags=['sensors'], prefix='/sensors')
 app.include_router(payments.router)
 app.include_router(live.router, tags=["live"])
 app.include_router(species_predictor.router, tags=["predict"])
+app.include_router(metrics_router)
 
 
 
