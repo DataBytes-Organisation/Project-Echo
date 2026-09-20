@@ -5,6 +5,10 @@ Objective:
 Detect orphaned/inconsistent references in Project Echo data, focusing on
 detection-to-audio relationships (Detection.audioClip -> AudioUploads._id).
 
+Scanning is delegated to the shared checker in app/services/consistency_checker.py
+(introduced in PR #1033) so there is a single source of truth for what counts as
+a broken link. This tool adds the optional, conservative repair step on top.
+
 Usage:
     python -m tools.db_consistency_check --report-only
     python -m tools.db_consistency_check --safe-fix --confirm
@@ -17,54 +21,21 @@ import argparse
 import sys
 
 from bson import ObjectId
-from bson.errors import InvalidId
 
-from app.database import AudioUploads, Detections, Events
+from app.database import Detections, Events
+from app.services.consistency_checker import run_consistency_checks
 
+# audioClip is a required string in the app's models, so None is not valid.
+# The app already uses an empty string to mean "no audio clip" (serializers.py).
+NO_AUDIO_CLIP = ""
 
-def looks_like_upload_id(value):
-    """Return True if value looks like a Mongo ObjectId string (24 hex chars)."""
-    if not isinstance(value, str):
-        return False
-    try:
-        ObjectId(value)
-        return True
-    except (InvalidId, TypeError):
-        return False
+COLLECTIONS = {"detections": Detections, "events": Events}
 
 
 def find_broken_audio_links():
-    """
-    Scan detections and events for audioClip values that look like an
-    upload reference but do not match any real AudioUploads record.
-    Returns a list of plain-dict issues, report-only (no writes).
-    """
-    known_upload_ids = set()
-    for doc in AudioUploads.find({}, {"_id": 1}):
-        known_upload_ids.add(str(doc["_id"]))
-
-    issues = []
-    for label, collection in (("detections", Detections), ("events", Events)):
-        cursor = collection.find({}, {"_id": 1, "audioClip": 1, "sensorId": 1})
-        for doc in cursor:
-            audio_clip = doc.get("audioClip")
-
-            if not looks_like_upload_id(audio_clip):
-                # Not a reference-shaped value (e.g. empty, a URL, etc.) - skip.
-                continue
-
-            if audio_clip in known_upload_ids:
-                continue
-
-            issues.append({
-                "collection": label,
-                "record_id": str(doc["_id"]),
-                "sensorId": doc.get("sensorId"),
-                "audioClip": audio_clip,
-                "reason": "audioClip does not match any AudioUploads record",
-            })
-
-    return issues
+    """Report-only (no writes). Uses the shared #1033 scan and keeps only broken
+    detection/event -> audio upload links."""
+    return [i for i in run_consistency_checks() if i.get("check") == "missing_audio_upload"]
 
 
 def print_report(issues):
@@ -82,20 +53,41 @@ def print_report(issues):
 
 def apply_conservative_fix(issues):
     """
-    Conservative fix: clear the broken audioClip reference so the record no
-    longer points at a non-existent upload. Does not delete the detection or
-    event itself, and does not guess a replacement value.
+    Conservative fix: replace a broken audioClip reference with an empty string,
+    the app's own "no audio clip" value, so the record stays valid against the
+    existing string-field models. Does not delete the detection or event.
+
+    Each update also matches the audioClip value seen at scan time, so a record
+    whose link was changed (for example fixed by someone else) after the scan
+    is skipped, not overwritten.
     """
-    fixed_count = 0
+    fixed, skipped = [], []
     for issue in issues:
-        collection = Detections if issue["collection"] == "detections" else Events
+        collection = COLLECTIONS[issue["collection"]]
         result = collection.update_one(
-            {"_id": ObjectId(issue["record_id"])},
-            {"$set": {"audioClip": None}},
+            {"_id": ObjectId(issue["record_id"]), "audioClip": issue["audioClip"]},
+            {"$set": {"audioClip": NO_AUDIO_CLIP}},
         )
         if result.modified_count:
-            fixed_count += 1
-    return fixed_count
+            fixed.append(issue)
+        else:
+            skipped.append(issue)
+    return fixed, skipped
+
+
+def verify_repairs(fixed):
+    """Read each repaired record back and re-run the shared scan."""
+    bad_value = 0
+    for issue in fixed:
+        doc = COLLECTIONS[issue["collection"]].find_one(
+            {"_id": ObjectId(issue["record_id"])}, {"audioClip": 1}
+        )
+        if doc is None or doc.get("audioClip") != NO_AUDIO_CLIP:
+            bad_value += 1
+
+    flagged_again = {i["record_id"] for i in find_broken_audio_links()}
+    reflagged = sum(1 for i in fixed if i["record_id"] in flagged_again)
+    return bad_value, reflagged
 
 
 def main():
@@ -103,7 +95,7 @@ def main():
     parser.add_argument("--report-only", action="store_true", default=True,
                          help="Report issues without changing any data (default).")
     parser.add_argument("--safe-fix", action="store_true",
-                         help="Clear broken audioClip references. Requires --confirm.")
+                         help="Replace broken audioClip references with an empty string. Requires --confirm.")
     parser.add_argument("--confirm", action="store_true",
                          help="Required alongside --safe-fix to actually apply changes.")
     args = parser.parse_args()
@@ -115,8 +107,13 @@ def main():
         if not args.confirm:
             print("\n--safe-fix was passed without --confirm. No changes made.")
             sys.exit(0)
-        fixed = apply_conservative_fix(issues)
-        print(f"\nSafe-fix applied: cleared audioClip on {fixed} record(s).")
+        fixed, skipped = apply_conservative_fix(issues)
+        print(f"\nSafe-fix applied: reset audioClip to an empty string on {len(fixed)} record(s).")
+        if skipped:
+            print(f"Skipped {len(skipped)} record(s) whose audioClip changed since the scan.")
+        bad_value, reflagged = verify_repairs(fixed)
+        print(f"Verification: {bad_value} record(s) with an unexpected value, "
+              f"{reflagged} record(s) still flagged by the checker.")
 
 
 if __name__ == "__main__":
