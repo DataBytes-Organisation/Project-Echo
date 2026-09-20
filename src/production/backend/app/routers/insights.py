@@ -138,6 +138,11 @@ def insights_overview(
     start_dt = _parse_query_ts(start, "start")
     end_dt = _parse_query_ts(end, "end")
 
+    cache_key = insights_overview_key(start, end, species, sensorId)
+    cached = get_json(cache_key)
+    if cached is not None:
+        return cached
+
     microphones = Microphones.count_documents({})
     nodes = Nodes.count_documents({})
 
@@ -165,7 +170,7 @@ def insights_overview(
 
     summary = list(Events.aggregate(pipeline))
     if not summary:
-        return {
+        payload = {
             "timeRange": {"start": None, "end": None},
             "counts": {
                 "detections": 0,
@@ -174,6 +179,8 @@ def insights_overview(
                 "microphones": microphones or nodes,
             },
         }
+        set_json(cache_key, payload)
+        return payload
 
     row = summary[0]
     species_values = [value for value in row.get("species", []) if value]
@@ -214,6 +221,11 @@ def insights_species(
     start_dt = _parse_query_ts(start, "start")
     end_dt = _parse_query_ts(end, "end")
 
+    cache_key = insights_species_key(limit, start, end, species, sensorId)
+    cached = get_json(cache_key)
+    if cached is not None:
+        return cached
+
     match = _build_insights_match(
         start=start_dt,
         end=end_dt,
@@ -241,6 +253,8 @@ def insights_species(
         {"$project": {"_id": 0, "species": "$_id", "count": 1, "avg_confidence": 1}},
     ]
 
-    return {
+    payload = {
         "items": list(Events.aggregate(pipeline))
     }
+    set_json(cache_key, payload)
+    return payload
