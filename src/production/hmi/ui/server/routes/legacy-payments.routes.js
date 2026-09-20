@@ -1,5 +1,6 @@
 function registerRoutes(app, dependencies) {
   const { stripe, storeItems, donationClient, dbState } = dependencies;
+  const clientUrl = dependencies.clientUrl || process.env.CLIENT_URL || 'http://localhost:3000';
 
   app.post('/api/create-checkout-session', async (req, res) => {
     try {
@@ -25,13 +26,14 @@ function registerRoutes(app, dependencies) {
         metadata: {
           type: 'One-Time'
         },
-        success_url: 'http://localhost:9000/donation-success?session_id={CHECKOUT_SESSION_ID}',
-        cancel_url: 'http://localhost:9000'
+        success_url: `${clientUrl}/donation-success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: clientUrl
       });
       console.log('two');
       res.json({ url: session.url });
     } catch (e) {
-      res.status(500).json({ error: e.message });
+      console.error('Error creating Stripe checkout session:', e);
+      res.status(500).json({ error: 'Internal server error' });
     }
   });
 

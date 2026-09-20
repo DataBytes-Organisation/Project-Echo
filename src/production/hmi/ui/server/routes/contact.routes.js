@@ -99,7 +99,8 @@ function registerRoutes(app, dependencies) {
       }, 200);
 
     } catch (error) {
-      res.status(500).send({ message: 'An error occurred while sending the request access: ' + error });
+      console.error('Error processing request_access:', error);
+      res.status(500).send({ message: 'An error occurred while sending the request access.' });
     }
   });
 }

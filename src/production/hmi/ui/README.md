@@ -68,6 +68,9 @@ ui/
 |  |- pages/                  HTML pages served by legacy-compatible routes
 |  |- features/               Feature-owned browser modules and styles
 |  |- shared/                 Shared browser HTTP, UI, and admin shell modules
+|  |- js/                     Page scripts still loaded directly by active
+|  |                           pages (e.g. `/js/api-status.js`); new browser
+|  |                           code belongs in `features/` or `shared/`
 |  |- assets/                 Static fonts, images, and styles
 |  `- vendor/                 Vendored browser libraries
 `- tests/
@@ -132,6 +135,9 @@ Express seam.
 - `public/shared/` - shared browser code: `http/` (API client, fetch
   helper), `ui/` (errors, toasts, DOM helpers), `admin/` (layout loader,
   page-state helper, header/sidebar/footer fragments).
+- `public/js/` - page scripts loaded directly by active pages (for example,
+  the admin dashboard loads `/js/api-status.js`). Do not add new files
+  here; put new browser code in `public/features/` or `public/shared/`.
 - `public/assets/` - images, fonts, global styles used at runtime.
 - `public/vendor/` - third-party bundles stored in the repo (OpenLayers,
   admin theme). Tabler CSS and its `fonts/` directory move as one group.

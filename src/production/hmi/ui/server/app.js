@@ -153,7 +153,7 @@ function createApp(dependencies = {}) {
     })
   );
 
-  legacyPaymentRoutes.registerRoutes(app, { stripe, storeItems, donationClient, dbState });
+  legacyPaymentRoutes.registerRoutes(app, { stripe, storeItems, donationClient, dbState, clientUrl: dependencies.config?.clientUrl || process.env.CLIENT_URL || 'http://localhost:3000' });
 
   razorpayPayment.registerRazorpayBrowserRoutes(app, {
     apiBaseUrl,
@@ -162,6 +162,7 @@ function createApp(dependencies = {}) {
 
   app.get('/index.html', checkUserSession);
   app.use('/pages/map', checkUserSession);
+  app.use('/pages/admin', checkUserSession);
   app.use(express.static(publicDir, { index: path.join(publicDir, 'pages/auth/login.html') }));
 
   app.use(cors({ origin: ['http://localhost:8081', '*'] }));

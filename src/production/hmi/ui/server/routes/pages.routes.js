@@ -14,7 +14,7 @@ function registerRoutes(app, dependencies) {
     ['/resetPassword.html', 'pages/auth/reset-password.html'],
   ];
 
-  const unprotectedAdminPages = [
+  const adminPages = [
     ['/admin/dashboard.html', 'pages/admin/dashboard.html'],
     ['/admin/admin-nodes.html', 'pages/admin/admin-nodes.html'],
     ['/admin/admin-nodes-temp.html', 'pages/admin/admin-nodes-temp.html'],
@@ -26,6 +26,7 @@ function registerRoutes(app, dependencies) {
     ['/admin/donations.html', 'pages/admin/donations.html'],
     ['/admin/admin-request.html', 'pages/admin/admin-request.html'],
     ['/admin/notifications.html', 'pages/admin/notifications.html'],
+    ['/admin/detection-review.html', 'pages/admin/detection-review.html'],
     ['/admin/sensor-health.html', 'pages/admin/sensor-health.html'],
     ['/admin/feedback.html', 'pages/admin/feedback.html'],
     ['/admin/hmi-data-insights.html', 'pages/admin/hmi-data-insights.html'],
@@ -36,8 +37,12 @@ function registerRoutes(app, dependencies) {
     ['/admin/sensor_health/device-detail.html', 'pages/admin/sensor_health/device-detail.html'],
   ];
 
-  for (const [route, file] of [...publicPages, ...unprotectedAdminPages]) {
+  for (const [route, file] of publicPages) {
     app.get(route, (req, res) => sendPage(res, file));
+  }
+
+  for (const [route, file] of adminPages) {
+    app.get(route, checkUserSession, (req, res) => sendPage(res, file));
   }
 
   app.get(
