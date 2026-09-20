@@ -175,3 +175,28 @@ real audio needed) - see `src/tests/pipeline/engine_training/smoke_test/README.m
   - A full training run against the real local dataset
     (`src/prototypes/data_files/`, ~900MB, 128 species) to convergence -
     only a 2-epoch synthetic-data smoke run was done this sprint.
+
+### Sprint 2 Update: Checkpoint and Quantisation Pipeline
+
+The checkpoint and quantisation items that were previously deferred to
+Sprint 2 have now been implemented on the active training pipeline.
+
+- **Checkpoint handling:** Checkpoint save and resume are now wired into the
+  training flow. Full checkpoints preserve the model, optimizer, scheduler,
+  epoch, best metric, and related training state. Save and resume behaviour
+  was functionally smoke-tested. The `run.test=true` checkpoint-loading path
+  now supports both full checkpoints and legacy weight-only checkpoints;
+  this loading path has been syntax-checked but has not been separately
+  functionally smoke-tested.
+
+- **Quantisation:** QAT preparation now uses an example tensor obtained from
+  the real training DataLoader instead of the previous generic image-shaped
+  example input. QAT prepare/convert/inference and post-training static
+  prepare/calibrate/convert/inference were both functionally smoke-tested
+  successfully on CPU.
+
+- **Validation scope:** These checks were controlled smoke-test scenarios
+  using a small synthetic dataset. They verify that the checkpoint and
+  quantisation pipeline paths execute correctly, but they are not intended
+  to demonstrate final model accuracy, inference-speed improvement, or
+  production-level performance.

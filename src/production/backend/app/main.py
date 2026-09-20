@@ -1,56 +1,91 @@
+import json
+import logging
 import os
-# from Components.API.app.routers import add_csv_output_option, audio_upload_router
-from .routers import add_csv_output_option, audio_upload_router
-
-from fastapi import FastAPI, Body, HTTPException, status, APIRouter
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.exceptions import RequestValidationError
-from app.errors import StandardizeErrorResponseMiddleware, http_exception_handler, unhandled_exception_handler, validation_exception_handler
-from app.routers import species_predictor
-from app.routers import auth_router
-from app.routers import admin_budget, admin_services
-from fastapi.responses import Response, JSONResponse
-from fastapi.encoders import jsonable_encoder
-from pydantic import BaseModel, Field, EmailStr
-from bson import ObjectId
-from typing import Optional, List
-from app.routers import insights
-import datetime
-import pymongo
-import json 
-
-from app.routers import hmi, engine, sim, two_factor
-from app.routers import public
-app = FastAPI()
-
-# Add the CORS middleware
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:8080"],  # 可根据实际需求配置
-)
-# Routers
-from .routers import add_csv_output_option, audio_upload_router
-from app.routers import species_predictor, auth_router, hmi, engine, sim, two_factor, public, iot, live, sensors #Websocket
-
-from app.routers import projects, health
-from app.routers import hmi, engine, sim, iot
-
 from contextlib import asynccontextmanager
-from app.database import client
+from typing import List, Optional
+
+from fastapi import Body, FastAPI, HTTPException, Request, status
+from fastapi.encoders import jsonable_encoder
+from fastapi.exceptions import RequestValidationError
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse, Response
+from pymongo.errors import ConnectionFailure, ExecutionTimeout
+
+from app.config import settings
+from app.database import client, Userclient
+from app.errors import (
+    StandardizeErrorResponseMiddleware,
+    http_exception_handler,
+    unhandled_exception_handler,
+    validation_exception_handler,
+)
+from app.logging_config import configure_logging
 from app.queue import redis_conn
-import os
+from app.routers import (
+    add_csv_output_option,
+    admin_budget,
+    admin_services,
+    audio_upload_router,
+    auth_router,
+    detections,
+    engine,
+    health,
+    hmi,
+    insights,
+    iot,
+    live,
+    payments,
+    projects,
+    public,
+    sensors,
+    sim,
+    species_predictor,
+    two_factor,
+)
+from app.services.mqtt_client import (
+    get_connection_state,
+    get_latest_events,
+    start_mqtt_client,
+)
+
+configure_logging()
+logger = logging.getLogger(__name__)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup actions
-    print("Backend starting up... Connections initialized.")
+    logger.info("Backend starting up... Initializing application resources.")
+    try:
+        start_mqtt_client()
+    except Exception as e:
+        logger.warning("Could not automatically start MQTT client: %s", e)
     yield
     # Shutdown actions
-    print("Backend shutting down... Closing database connections cleanly.")
-    client.close()
-    redis_conn.close()
+    logger.info("Backend shutting down... Gracefully closing all owned client connections.")
+    
+    # 1. Close Primary EchoNet MongoDB Client
+    try:
+        client.close()
+        logger.info("Primary MongoDB client closed cleanly.")
+    except Exception as e:
+        logger.error("Error closing primary MongoDB client: %s", e)
 
-# ✅ Add metadata here
+    # 2. Close User MongoDB Client
+    try:
+        Userclient.close()
+        logger.info("User MongoDB client closed cleanly.")
+    except Exception as e:
+        logger.error("Error closing user MongoDB client: %s", e)
+
+    # 3. Close Redis Connection
+    try:
+        redis_conn.close()
+        logger.info("Redis queue connection closed cleanly.")
+    except Exception as e:
+        logger.error("Error closing Redis connection: %s", e)
+
+
 app = FastAPI(
     lifespan=lifespan,
     title="Project Echo API",
@@ -62,110 +97,122 @@ app = FastAPI(
     - Simulate audio responses
     - Interface with HMI and audio engine modules
     """,
-    version="1.0.0"
+    version="1.0.0",
 )
 
+
+# Exception Handlers
+async def database_unavailable_handler(request: Request, exc: Exception):
+    logger.warning(
+        "Database unavailable for %s %s (%s)",
+        request.method,
+        request.url.path,
+        exc.__class__.__name__,
+    )
+    return JSONResponse(
+        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+        content={
+            "error": "Database Unavailable",
+            "message": "The database is temporarily unavailable. Please try again later.",
+        },
+    )
+
+
+app.add_exception_handler(ConnectionFailure, database_unavailable_handler)
+app.add_exception_handler(ExecutionTimeout, database_unavailable_handler)
 app.add_exception_handler(HTTPException, http_exception_handler)
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
 app.add_exception_handler(Exception, unhandled_exception_handler)
+
+# Middlewares
 app.add_middleware(StandardizeErrorResponseMiddleware)
-
-app.include_router(projects.router)
-app.include_router(health.router)
-
-# ✅ CORS Middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins
-
+    allow_origins=settings.cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 
-# app.include_router(hmi.router, tags=['hmi'], prefix='/hmi')
-# app.include_router(engine.router, tags=['engine'], prefix='/engine')
-# app.include_router(sim.router, tags=['sim'], prefix='/sim')
-# app.include_router(add_csv_output_option.router, tags=['csv'], prefix='/api')
-app.include_router(audio_upload_router.router, tags=['audio'], prefix='/api')
-
-
-# ✅ Include routers
-app.include_router(hmi.router, tags=['hmi'], prefix='/hmi')
-app.include_router(engine.router, tags=['engine'], prefix='/engine')
-app.include_router(sim.router, tags=['sim'], prefix='/sim')
+# Routers
+app.include_router(health.router)
+app.include_router(projects.router)
+app.include_router(audio_upload_router.router, tags=["audio"], prefix="/api")
+app.include_router(hmi.router, tags=["hmi"], prefix="/hmi")
+app.include_router(engine.router, tags=["engine"], prefix="/engine")
+app.include_router(sim.router, tags=["sim"], prefix="/sim")
 app.include_router(two_factor.router)
 app.include_router(admin_budget.router, tags=["admin"], prefix="/api")
 app.include_router(admin_services.router, tags=["admin"], prefix="/api")
-
-app.include_router(public.router, tags=['public'], prefix='/public')
-
-'''try:
-    file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'echo_config.json')
-    with open(file_path, 'r') as f:
-        echo_config = json.load(f)
-    print(f"Echo API echo_config successfully loaded", flush=True)
-except:
-    print(f"Could not API echo_config : {file_path}") 
-print(f" database names: {client.list_database_names()}")
-'''
-
-app.include_router(iot.router, tags=['iot'], prefix='/iot')
-app.include_router(sensors.router, tags=['sensors'], prefix='/sensors')
+app.include_router(public.router, tags=["public"], prefix="/public")
+app.include_router(iot.router, tags=["iot"], prefix="/iot")
+app.include_router(sensors.router, tags=["sensors"], prefix="/sensors")
 app.include_router(species_predictor.router, tags=["predict"])
-
-
-
-# ✅ Root endpoint
 app.include_router(insights.router, tags=["insights"])
+app.include_router(auth_router.router, tags=["auth"], prefix="/api")
+app.include_router(detections.router)
+try:
+    app.include_router(payments.router)
+except Exception:
+    pass
 
-# --- Root Endpoint ---
+
+# Root Endpoint
 @app.get("/", response_description="API Root")
 def show_home():
-    return 'Welcome to echo api, move to /docs for more'
-    return 'Welcome to Project Echo API. Visit /docs for interactive documentation.'
+    return "Welcome to Project Echo API. Visit /docs for interactive documentation."
 
-app.include_router(auth_router.router, tags=["auth"], prefix="/api")
-from app.routers import detections
-app.include_router(detections.router)
 
-# ✅ /openapi-export - fetch live OpenAPI spec
+# MQTT Endpoints
+@app.get("/mqtt/connection-state", tags=["mqtt"])
+def mqtt_connection_state():
+    return {"state": get_connection_state()}
+
+
+@app.get("/mqtt/latest-events", tags=["mqtt"])
+def mqtt_latest_events():
+    from app.routers.hmi import show_latest_events
+
+    events = [
+        {"eventType": "vocalization", **event}
+        for event in show_latest_events(limit=20)
+    ]
+    events += [
+        event
+        for event in get_latest_events()
+        if event.get("eventType") != "vocalization"
+    ]
+    return {"events": events}
+
+
+# OpenAPI Exporters
 @app.get("/openapi-export", include_in_schema=False)
 async def get_openapi_spec():
-    """
-    Returns the current OpenAPI spec generated by FastAPI.
-    Used for downloading and converting to YAML.
-    """
     return app.openapi()
 
-# ✅ /spec/summary - for OpenAPI spec verification/debug
+
 @app.get("/spec/summary", tags=["debug"], include_in_schema=False)
 async def get_spec_summary():
-    """
-    Returns a summary of the OpenAPI spec for deployment verification.
-    """
     spec = app.openapi()
     return {
         "title": spec.get("info", {}).get("title"),
         "version": spec.get("info", {}).get("version"),
         "number_of_paths": len(spec.get("paths", {})),
-        "tags": [tag.get("name") for tag in spec.get("tags", []) if "name" in tag]
+        "tags": [tag.get("name") for tag in spec.get("tags", []) if "name" in tag],
     }
 
-# ✅ Save OpenAPI spec to file when app starts
+
 def export_openapi_to_file():
-    """
-    Saves the OpenAPI spec to a file on startup.
-    Creates the 'backend' folder if it doesn't exist.
-    """
     output_dir = "backend"
-    os.makedirs(output_dir, exist_ok=True)  # creates the folder if it doesn't exist
+    os.makedirs(output_dir, exist_ok=True)
     output_path = os.path.join(output_dir, "project-echo-openapi.json")
+    try:
+        with open(output_path, "w") as f:
+            json.dump(app.openapi(), f, indent=2)
+        logger.info(f"OpenAPI spec exported to {output_path}")
+    except Exception as e:
+        logger.warning(f"Failed to export OpenAPI spec: {e}")
 
-    with open(output_path, "w") as f:
-        json.dump(app.openapi(), f, indent=2)
-
-    print(f"✅ OpenAPI spec exported to {output_path}")
 
 export_openapi_to_file()

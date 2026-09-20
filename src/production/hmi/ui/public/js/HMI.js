@@ -12,7 +12,8 @@
  *              No changes to map logic, layer management, or audio handling.
  */
 
-import { showToast, getApiErrorMessage, withRetry } from "./HMI-utils.js";
+import { showToast, getApiErrorMessage, withRetry, showPageBanner, hidePageBanner } from "./HMI-utils.js";
+// TEMP: audio_recorder.js has a pre-existing syntax error, commented out to test FR-A4 locally
 import { getAudioRecorder } from "./audio_recorder.js";
 import {
   AudioDecoder,
@@ -29,14 +30,26 @@ import {
   retrieveVocalizationEventsInTimeRange,
   retrieveMicrophones,
   retrieveAudio,
+  analyseAudio,
   retrieveSimTime,
+  retrieveWeatherData,
   postRecording,
   setSimModeAnimal,
   setSimModeRecording,
   setSimModeRecordingV2,
   stopSimulator,
+  retrieveWeather,
 } from "./routes.js";
 import { addIoTNodesToMap } from "./nodes-overlay.js";
+import { loadRealDetections } from "./real-detections.js";
+import {
+  DETECTION_SOURCE_FILTERS,
+  applyDetectionSourceFilter,
+  buildSimulatorVocalizationStyle,
+  detectionMatchesSourceFilter,
+  formatDetectionSourceLabel,
+  normalizeDetectionSource,
+} from "./detection-source-filter.js";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
@@ -49,9 +62,55 @@ const DEG_TO_RAD           = Math.PI / 180;
 const RAD_TO_DEG           = 180 / Math.PI;
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Live-event visualisation (location confidence + event age)
+//
+// HMI Planner (Sprint 2, Project Echo) — "The HMI map shall visually
+// represent live detections with location, confidence, event type, and
+// event age."
+//
+// Confidence -> ring radius (vocalization events only):
+//   CONFIRMED against src/production/iot/edge_inference/README.md
+//   ("GPS accuracy estimate in metres") and echo_engine.py / comms_manager.py:
+//   `animalLLAUncertainty` is a real distance in METRES (default 10.0),
+//   not a 0-100 score. It is carried through onto the event as
+//   `locationUncertaintyM` and used directly below for the ring radius.
+//   (`locationConfidence` = `100 - animalLLAUncertainty`, computed in
+//   convertJSONtoAnimalVocalizationEvent, is kept only for the existing
+//   popup's "Location Confidence %" label — a pre-existing approximation
+//   that reads oddly once uncertainty exceeds ~100m; not changed here since
+//   fixing that display is outside this feature's scope.)
+//   Movement/truth events are ground truth (uncertainty is always 0),
+//   so they get no ring — only vocalization detections carry real
+//   location uncertainty.
+//
+// Event age -> fade -> expiry:
+//   hmiState.liveWindow (ms, set once in index.html) is the single source
+//   of truth for how long a live event stays on the map. Default is
+//   60000 ms (60s), inside the 60-120s range suggested for this feature.
+//   To change the window, edit hmiState.liveWindow in index.html — nothing
+//   else needs to change. purgeVocalizationEvents/purgeTruthEvents (below)
+//   remove a feature once its age passes that window; the constants here
+//   only control when a *visible* marker starts fading before that happens,
+//   so fade and removal always agree (a marker reaches MIN_LIVE_EVENT_OPACITY
+//   right as it is purged).
+// ─────────────────────────────────────────────────────────────────────────────
+
+const CONFIDENCE_RING_BASE_RADIUS_M = 15;  // minimum ring radius (m), so a very precise fix is still visible
+const CONFIDENCE_RING_MAX_RADIUS_M  = 300; // cap on displayed radius (m), so one outlier reading can't dominate the map
+const LIVE_EVENT_FADE_START_RATIO        = 0.5;  // start fading at 50% of hmiState.liveWindow elapsed
+const MIN_LIVE_EVENT_OPACITY             = 0.15; // opacity immediately before purge removes the marker
+
+// Vocalization (detected) vs movement/truth markers are told apart by BOTH
+// color and shape (circle+amber vs diamond+teal), not color alone, so the
+// distinction still reads for colour-blind users and in greyscale printouts.
+const VOCALIZATION_MARKER_COLOR = "255, 167, 38"; // amber
+const TRUTH_MARKER_COLOR        = "0, 172, 193";  // teal
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Module-level state
 // ─────────────────────────────────────────────────────────────────────────────
 
+//var audioRecorder = {}; //TEMP: stub, see note above
 var audioRecorder = getAudioRecorder();
 
 var statuses    = ["endangered", "vulnerable", "near-threatened", "normal", "invasive"];
@@ -91,8 +150,15 @@ var current_mic_id   = "";
 
 var activeAudioNode     = null;
 var activeAudioContext  = null;
+var activeAudioEventId  = null;
 var audioAnimTimeout    = null;
 var playNextTrack       = false;
+
+const ANIMAL_AUDIO_READY =
+  "Audio ready. Press the audio button to play.";
+
+const ANIMAL_AUDIO_UNAVAILABLE =
+  "Audio unavailable for this detection.";
 
 var micAnimFrameIndex = 1;
 var animTimeout       = null;
@@ -110,6 +176,7 @@ var lastBrowserRecordingUrl       = null;
 var lastRecordingDurationLabel    = null;
 var lastRecordingSamples          = null;
 var lastRecordingSampleRate       = 44100;
+let audioAnalysisController       = null;
 var playbackSourceNode            = null;
 var playbackAudioContext          = null;
 
@@ -144,6 +211,24 @@ function getStatusLabel()       { return document.getElementById("frb2-status-la
 function getFileInput()         { return document.getElementById("fileInput"); }
 function getAudioElemForRecordedPlayback() { return document.getElementById("audioElem"); }
 function getRecordingPlaybackStatus() { return document.getElementById("recording_playback_status"); }
+
+function getAnimalAudioStatus() {
+  return document.getElementById("animal-audio-status");
+}
+
+function setAnimalAudioStatus(message) {
+  const status = getAnimalAudioStatus();
+  if (status) status.textContent = message;
+}
+
+function markAnimalAudioReady(eventId) {
+  if (
+    eventId !== null &&
+    selectedVocalizationEventId === eventId
+  ) {
+    setAnimalAudioStatus(ANIMAL_AUDIO_READY);
+  }
+}
 
 function setRecordingPlaybackStatus(message) {
   const status = getRecordingPlaybackStatus();
@@ -589,11 +674,203 @@ fetch("./js/sample_data.json")
  * Task 7: error message now routed through getApiErrorMessage so the wording
  * is consistent with every other error surface in the application.
  */
-export function initialiseHMI(hmiState) {
-  console.log("initialising");
+// ─────────────────────────────────────────────────────────────────────────────
+// MQTT connection state polling (FR-A2)
+// ─────────────────────────────────────────────────────────────────────────────
 
-  showMapSpinner("Loading map data…");
-  hideMapError();
+let _lastMqttState = null;
+
+async function pollMqttConnectionState() {
+  try {
+    const response = await fetch("/mqtt/connection-state");
+    if (!response.ok) throw new Error("Failed to fetch connection state");
+    const data = await response.json();
+    const state = data.state;
+
+    if (state !== _lastMqttState) {
+      if (state === "connected") {
+        hidePageBanner("warning");
+        hidePageBanner("error");
+        if (_lastMqttState !== null) {
+          showToast("Live data connection restored", "success");
+        }
+      } else if (state === "reconnecting") {
+        showPageBanner("Live data connection lost — reconnecting…", "warning", false);
+        showToast("Live data connection lost, reconnecting…", "warning");
+      } else if (state === "disconnected") {
+        showPageBanner("Live data unavailable", "error", false);
+      }
+      _lastMqttState = state;
+    }
+  } catch (err) {
+    console.error("Error polling MQTT connection state:", err);
+
+    // The status check itself failed (backend unreachable) — treat this
+    // as unavailable rather than silently keeping the last-known state.
+    if (_lastMqttState !== "unavailable") {
+      showPageBanner("Live data unavailable — unable to check connection status", "error", false);
+      _lastMqttState = "unavailable";
+    }
+  }
+}
+
+function startMqttConnectionPolling() {
+  pollMqttConnectionState();
+  const id = setInterval(pollMqttConnectionState, 5000);
+  // Background poller only: never hold a Node process (tests) open. Browsers
+  // return a number here, so this is a no-op in production.
+  if (id && typeof id.unref === "function") id.unref();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Live MQTT events → map layers (FR-A2)
+// ─────────────────────────────────────────────────────────────────────────────
+
+const _seenMqttEventIds = new Set();
+let _mqttPollingPaused = false;
+let _eventTypeFilter = "all";
+let _speciesFilter = "all";
+const _knownSpecies = new Set();
+
+function passesFilters(event) {
+  if (_eventTypeFilter !== "all" && event.eventType !== _eventTypeFilter) return false;
+  if (_speciesFilter !== "all" && event.species !== _speciesFilter) return false;
+  return true;
+}
+
+function updateSpeciesFilterOptions() {
+  const select = document.getElementById("species-filter");
+  if (!select) return;
+  for (const species of _knownSpecies) {
+    if (![...select.options].some((opt) => opt.value === species)) {
+      const opt = document.createElement("option");
+      opt.value = species;
+      opt.textContent = species;
+      select.appendChild(opt);
+    }
+  }
+}
+
+async function pollMqttLatestEvents(hmiState) {
+  if (_mqttPollingPaused) return;
+  try {
+    const response = await fetch("/mqtt/latest-events");
+    if (!response.ok) throw new Error("Failed to fetch latest events");
+    const data = await response.json();
+    const events = data.events || [];
+
+    // Update last-updated timestamp label
+    const label = document.getElementById("last-update-label");
+    if (label) {
+      label.textContent = "Last update: " + new Date().toLocaleTimeString();
+    }
+
+
+    const newVocalizationEvents = [];
+    const newMovementEvents = [];
+
+    for (const event of events) {
+      if (_seenMqttEventIds.has(event._id)) continue;
+      _seenMqttEventIds.add(event._id);
+
+      // Real species data only exists for movement events today — vocalization
+      // events are hardcoded to "unclassified" until DB enrichment lands (see
+      // normalize_payload in mqtt_client.py), so we don't add those as filter options.
+      if (event.species && event.species !== "unclassified" && !_knownSpecies.has(event.species)) {
+        _knownSpecies.add(event.species);
+        updateSpeciesFilterOptions();
+      }
+
+      if (!passesFilters(event)) continue;
+
+      switch (event.eventType) {
+      case "vocalization":
+        newVocalizationEvents.push(event);
+        break;
+      case "movement":
+        newMovementEvents.push(event);
+        break;
+      case "sensor_health":
+      case "iot_node":
+        document.dispatchEvent(
+          new CustomEvent(`mqtt:${event.eventType}`, { detail: event })
+        );
+        break;
+      }
+
+      
+    }
+
+    if (newVocalizationEvents.length > 0) {
+      updateVocalizationLayerFromLiveData(hmiState, newVocalizationEvents);
+    }
+    if (newMovementEvents.length > 0) {
+      updateAnimalMovementLayerFromLiveData(hmiState, newMovementEvents);
+    }
+
+
+  } catch (err) {
+    console.error("Error polling MQTT latest events:", err);
+  }
+}
+
+function startMqttEventPolling(hmiState) {
+  pollMqttLatestEvents(hmiState);
+  const id = setInterval(() => pollMqttLatestEvents(hmiState), 5000);
+  // Background poller only: never hold a Node process (tests) open. Browsers
+  // return a number here, so this is a no-op in production.
+  if (id && typeof id.unref === "function") id.unref();
+}
+
+function setupLiveMapControls(hmiState) {
+  const pauseBtn = document.getElementById("pause-resume-btn");
+  const refreshBtn = document.getElementById("manual-refresh-btn");
+  const eventTypeSelect = document.getElementById("event-type-filter");
+  const speciesSelect = document.getElementById("species-filter");
+
+  if (eventTypeSelect) {
+    eventTypeSelect.addEventListener("change", () => {
+      _eventTypeFilter = eventTypeSelect.value;
+    });
+  }
+
+  if (speciesSelect) {
+    speciesSelect.addEventListener("change", () => {
+      _speciesFilter = speciesSelect.value;
+    });
+  }
+
+  if (pauseBtn) {
+    pauseBtn.addEventListener("click", () => {
+      _mqttPollingPaused = !_mqttPollingPaused;
+      pauseBtn.textContent = _mqttPollingPaused ? "Resume" : "Pause";
+    });
+  }
+
+  if (refreshBtn) {
+    refreshBtn.addEventListener("click", () => {
+      pollMqttLatestEvents(hmiState);
+      pollMqttConnectionState();
+    });
+  }
+}
+
+function startMqttEventPolling(hmiState) {
+  pollMqttLatestEvents(hmiState);
+  setInterval(() => pollMqttLatestEvents(hmiState), 5000);
+}
+
+
+export function initialiseHMI(hmiState) {
+console.log("initialising");
+startMqttConnectionPolling();
+startMqttEventPolling(hmiState);
+setupLiveMapControls(hmiState);
+
+showMapSpinner("Loading map data…");
+hideMapError();
+
+
 
   // FR-A1: initialiseHMI() is re-entered by the map-error retry button
   // (see showMapError(userMsg, () => initialiseHMI(hmiState)) below), on
@@ -607,6 +884,8 @@ export function initialiseHMI(hmiState) {
   const isFirstInit = !hmiState.basemap;
 
   createBasemap(hmiState);
+
+  const detectionLoad = loadRealDetections(hmiState);
 
   if (isFirstInit) {
     addVocalisationLayers(hmiState);
@@ -659,6 +938,7 @@ export function initialiseHMI(hmiState) {
       showMapError(userMsg, () => initialiseHMI(hmiState));
       showToast(userMsg, "error");
     });
+  return detectionLoad;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -726,6 +1006,20 @@ export function clearMicrophoneLayer(hmiState) {
 // Data converters
 // ─────────────────────────────────────────────────────────────────────────────
 
+// Tolerant LLA reader: {latitude, longitude} objects, legacy [lat, lon, alt]
+// lists, or null when the animal location is unknown (real ESP32).
+function llaLat(lla) {
+  if (Array.isArray(lla)) return Number.isFinite(lla[0]) ? lla[0] : null;
+  if (lla && typeof lla === "object") return Number.isFinite(lla.latitude) ? lla.latitude : null;
+  return null;
+}
+
+function llaLon(lla) {
+  if (Array.isArray(lla)) return Number.isFinite(lla[1]) ? lla[1] : null;
+  if (lla && typeof lla === "object") return Number.isFinite(lla.longitude) ? lla.longitude : null;
+  return null;
+}
+
 export function convertJSONtoAnimalMovementEvent(hmiState, data) {
   return {
     animalId:                      data.animalId,
@@ -744,25 +1038,66 @@ export function convertJSONtoAnimalMovementEvent(hmiState, data) {
 }
 
 export function convertJSONtoAnimalVocalizationEvent(hmiState, data) {
+  const sensorLat = llaLat(data.microphoneLLA);
+  const sensorLon = llaLon(data.microphoneLLA);
   return {
     timestamp:                      hmiState.currentTime,
     eventTimestamp:                 data.timestamp,
     eventId:                        data._id,
     speciesIdentificationConfidence:data.confidence,
-    speciesScientificName:          data.species.toLowerCase(),
-    commonName:                     data.commonName.toLowerCase(),
-    animalType:                     data.type.toLowerCase(),
-    animalStatus:                   matchStatus(data.status.toLowerCase()),
-    animalDiet:                     data.diet.toLowerCase(),
-    locationConfidence:             100 - data.animalLLAUncertainty,
-    estLat:                         data.animalEstLLA[0],
-    estLon:                         data.animalEstLLA[1],
-    locationLat:                    data.animalTrueLLA[0],
-    locationLon:                    data.animalTrueLLA[1],
+    speciesScientificName:          (data.species || "unknown").toLowerCase(),
+    commonName:                     (data.commonName || data.species || "unknown").toLowerCase(),
+    animalType:                     (data.type || "mammal").toLowerCase(),
+    animalStatus:                   matchStatus((data.status || "least concern").toLowerCase()),
+    animalDiet:                     (data.diet || "herbivore").toLowerCase(),
+    locationConfidence:             data.animalLLAUncertainty == null ? null : 100 - data.animalLLAUncertainty,
+    locationUncertaintyM:           data.animalLLAUncertainty,
+    estLat:                         llaLat(data.animalEstLLA),
+    estLon:                         llaLon(data.animalEstLLA),
+    locationLat:                    llaLat(data.animalTrueLLA),
+    locationLon:                    llaLon(data.animalTrueLLA),
     sensorId:                       data.sensorId,
-    sensorLat:                      data.microphoneLLA[0],
-    sensorLon:                      data.microphoneLLA[1],
+    sensorLat:                      sensorLat,
+    sensorLon:                      sensorLon,
+    // Preserve Backend/Engine contract ("simulator" | "real"); unknown values
+    // stay unknown so explicit Simulated/Real filters exclude them (All shows them).
+    sourceType:                     normalizeDetectionSource(data.sourceType) === "unknown"
+      ? String(data.sourceType)
+      : normalizeDetectionSource(data.sourceType),
   };
+}
+
+// Plot location keeps a null animal location null in the event model; the
+// microphone fallback happens here at render time so AC5 markers still sit at
+// microphoneLLA while Ticket 02 details can report the animal as unavailable.
+export function resolveVocalizationPlotLocation(entry) {
+  if (Number.isFinite(entry.locationLat) && Number.isFinite(entry.locationLon)) {
+    return { lat: entry.locationLat, lon: entry.locationLon, isFallback: false };
+  }
+  if (Number.isFinite(entry.sensorLat) && Number.isFinite(entry.sensorLon)) {
+    return { lat: entry.sensorLat, lon: entry.sensorLon, isFallback: true };
+  }
+  return null;
+}
+
+export function formatVocalizationDetailValue(value, suffix = "") {
+  if (value === null || value === undefined || value === "") return "unavailable";
+  if (typeof value === "number" && !Number.isFinite(value)) return "unavailable";
+  return `${value}${suffix}`;
+}
+
+export function formatDetectionTimestamp(value) {
+  if (value === null || value === undefined || value === "") return "unavailable";
+  const parsed = new Date(value);
+  return Number.isFinite(parsed.getTime()) ? parsed.toUTCString() : "unavailable";
+}
+
+function toWeatherTimestamp(value) {
+  if (value === null || value === undefined || value === "") return null;
+  const numeric = Number(value);
+  if (Number.isFinite(numeric)) return Math.abs(numeric) >= 1e12 ? Math.floor(numeric / 1000) : Math.floor(numeric);
+  const parsed = new Date(value);
+  return Number.isFinite(parsed.getTime()) ? Math.floor(parsed.getTime() / 1000) : null;
 }
 
 export function convertJSONtoMicrophone(hmiState, data) {
@@ -808,11 +1143,22 @@ export function updateVocalizationLayerFromPastData(hmiState, results) {
   clearAllVocalizationLayers(hmiState);
   hmiState.vocalizationEvents = [];
 
+  // Unknown sourceType values render under All (fail-open) but stay out of
+  // explicit Simulated/Real views; canonical contract remains "simulator".
+  const allowUnknownSource =
+    (hmiState.detectionSourceFilter || DETECTION_SOURCE_FILTERS.ALL) === DETECTION_SOURCE_FILTERS.ALL;
+
   for (let data of results) {
+    if (data.sourceType === "real") continue;
+    if (!allowUnknownSource && normalizeDetectionSource(data.sourceType) === "unknown") continue;
     hmiState.vocalizationEvents.push(convertJSONtoAnimalVocalizationEvent(hmiState, data));
   }
 
   addAllVocalizationFeatures(hmiState);
+  applyDetectionSourceFilter(
+    hmiState,
+    hmiState.detectionSourceFilter || DETECTION_SOURCE_FILTERS.ALL,
+  );
 }
 
 export function updateMicrophoneLayer(hmiState, results) {
@@ -866,12 +1212,22 @@ export function updateAnimalMovementLayerFromLiveData(hmiState, results) {
 
 export function updateVocalizationLayerFromLiveData(hmiState, results) {
   const newEvents = [];
+  // Unknown sourceType values render under All (fail-open) but stay out of
+  // explicit Simulated/Real views; canonical contract remains "simulator".
+  const allowUnknownSource =
+    (hmiState.detectionSourceFilter || DETECTION_SOURCE_FILTERS.ALL) === DETECTION_SOURCE_FILTERS.ALL;
   for (let data of results) {
+    if (data.sourceType === "real") continue;
+    if (!allowUnknownSource && normalizeDetectionSource(data.sourceType) === "unknown") continue;
     const event = convertJSONtoAnimalVocalizationEvent(hmiState, data);
     hmiState.vocalizationEvents.push(event);
     newEvents.push(event);
   }
   addNewVocalizationFeatures(hmiState, newEvents);
+  applyDetectionSourceFilter(
+    hmiState,
+    hmiState.detectionSourceFilter || DETECTION_SOURCE_FILTERS.ALL,
+  );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -887,11 +1243,12 @@ export function muteRecordingPlaybackAnimation() {
 }
 
 export function stopAudioPlayback(updateAnimation = true) {
+  const stoppedEventId = activeAudioEventId;
   if (updateAnimation) muteAudioAnimation();
   if (audioAnimTimeout) clearTimeout(audioAnimTimeout);
   audioAnimTimeout = null;
   if (activeAudioNode !== null) {
-    try { activeAudioNode.stop(); } catch (_error) { /* Source may already have ended. */ }
+    try {activeAudioNode.stop(); } catch (_error) { /* Source may already have ended. */ }
     activeAudioNode.disconnect();
   }
   activeAudioNode = null;
@@ -899,9 +1256,12 @@ export function stopAudioPlayback(updateAnimation = true) {
     void activeAudioContext.close().catch(() => {});
   }
   activeAudioContext = null;
+  activeAudioEventId = null;
+
+  markAnimalAudioReady(stoppedEventId);
 }
 
-function playDecodedAudio(decodedAudio) {
+function playDecodedAudio(decodedAudio, eventId) {
   if (!decodedAudio || !playNextTrack) return;
   stopAudioPlayback(false);
   playNextTrack = true;
@@ -923,13 +1283,18 @@ function playDecodedAudio(decodedAudio) {
     audioAnimTimeout = null;
     activeAudioNode = null;
     activeAudioContext = null;
+    activeAudioEventId = null;
     source.disconnect();
     void context.close().catch(() => {});
     muteAudioAnimation();
+
+    markAnimalAudioReady(eventId);
   };
   activeAudioContext = context;
   activeAudioNode = source;
+  activeAudioEventId = eventId;
   source.start();
+  setAnimalAudioStatus("Playing audio...");
   audioAnimTimeout = setTimeout(muteAudioAnimation, audioBuffer.duration * 1000);
 }
 
@@ -939,13 +1304,35 @@ document.addEventListener("playAudio", function () {
     muteAudioAnimation();
     return;
   }
+
+  const eventId = selectedVocalizationEventId;
+
   animalSpectrogramWorkflow.getSelectedAudio().then((decodedAudio) => {
-    if (!decodedAudio || !playNextTrack) {
+      if (!playNextTrack) {
+        muteAudioAnimation();
+        return;
+      }
+
+      // Ignore audio returned for an event that is no longer selected.
+      if (selectedVocalizationEventId !== eventId) {
+        muteAudioAnimation();
+        return;
+      }
+
+      if (!decodedAudio) {
+        muteAudioAnimation();
+        setAnimalAudioStatus(ANIMAL_AUDIO_UNAVAILABLE);
+        return;
+      }
+
+      playDecodedAudio(decodedAudio, eventId);
+    })
+    .catch(() => {
+      if (selectedVocalizationEventId !== eventId) return;
+
       muteAudioAnimation();
-      return;
-    }
-    playDecodedAudio(decodedAudio);
-  });
+      setAnimalAudioStatus(ANIMAL_AUDIO_UNAVAILABLE);
+    });
 });
 
 document.addEventListener("stopAudio", function () {
@@ -957,6 +1344,7 @@ function clearAnimalAudioSelection() {
   selectedVocalizationEventId = null;
   animalSpectrogramWorkflow?.clear();
   stopAudioPlayback();
+  setAnimalAudioStatus("No audio selected.");
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -964,43 +1352,161 @@ function clearAnimalAudioSelection() {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function updateLayers(hmiState, filterState) {
-  for (let stat of statuses) {
-    for (let animalType of animalTypes) {
-      const layer = findMapLayerWithName(hmiState, deriveLayerName(stat, animalType));
-      if (layer) {
-        layer.setVisible(
-          filterState.includes("_" + stat) && filterState.includes("_" + animalType)
-        );
-      }
-    }
-  }
+  hmiState.speciesFilterState = Array.isArray(filterState) ? [...filterState] : filterState;
 
-  for (let stat of statuses) {
-    for (let animalType of animalTypes) {
-      const layer = findMapLayerWithName(hmiState, deriveTruthLayerName(stat, animalType));
-      if (layer) {
-        layer.setVisible(
-          filterState.includes(stat) && filterState.includes(animalType)
-        );
-      }
+  const sourceFilter = hmiState.detectionSourceFilter || DETECTION_SOURCE_FILTERS.ALL;
+  // Single path for source + species visibility: avoids drift between the
+  // checkbox handler and the All/Simulated/Real-device radios.
+  applySourceFilterWithRefresh(hmiState, sourceFilter);
+}
+
+/**
+ * Ticket 03: ingest-time filtering only reflects the filter active during the
+ * fetch, so records pulled in under All (including unknown sources) would
+ * otherwise stay rendered after switching to Simulated. Rebuilding the sim
+ * markers from the vocalizationEvents cache (no refetch, no new map, layers
+ * or listeners) keeps the visible markers matching the selection. The second
+ * apply() recomputes the status counts from the rebuilt layers.
+ */
+function refreshVocalizationFeaturesForSourceFilter(hmiState, filter) {
+  clearAllVocalizationLayers(hmiState);
+  for (const entry of hmiState.vocalizationEvents || []) {
+    if (detectionMatchesSourceFilter(entry.sourceType, filter)) {
+      _addVocalizationFeature(hmiState, entry);
     }
   }
+}
+
+function applySourceFilterWithRefresh(hmiState, filter) {
+  const applied = applyDetectionSourceFilter(hmiState, filter);
+  refreshVocalizationFeaturesForSourceFilter(hmiState, applied.filter);
+  return applyDetectionSourceFilter(hmiState, applied.filter);
+}
+
+/** Ticket 03: switch All / Simulated / Real-device without recreating map state. */
+export function setDetectionSourceFilter(hmiState, filter) {
+  const applied = applySourceFilterWithRefresh(hmiState, filter);
+  // ponytail: rapid switches stack guarded fetches (stale responses dropped by
+  // realDetectionRequest); per-switch abort if this ever shows up in profiles.
+  void loadRealDetections(hmiState);
+  return applied;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Map features
 // ─────────────────────────────────────────────────────────────────────────────
 
-function _makeAnimalIcon(iconPath) {
-  return new ol.style.Style({
-    image: new ol.style.Icon({ src: iconPath, anchor: [0.5, 1], scale: 0.75, className: "true-icon" }),
-  });
+/**
+ * Fraction of hmiState.liveWindow elapsed for a live event, measured from
+ * the same `timestamp` field purgeTruthEvents/purgeVocalizationEvents use
+ * to expire it (stored on the feature as animalRecordDate), so fade and
+ * expiry always agree.
+ */
+function _liveEventAgeRatio(hmiState, recordTimestampSeconds) {
+  const windowSeconds = hmiState.liveWindow / 1000;
+  if (!windowSeconds || !hmiState.currentTime) return 0;
+  const ageSeconds = hmiState.currentTime - recordTimestampSeconds;
+  return ageSeconds / windowSeconds;
 }
 
 function _makeVocalizationIcon(iconPath) {
-  return new ol.style.Style({
-    image: new ol.style.Icon({ src: iconPath, anchor: [0.5, 1], scale: 0.75, className: "vocalization-icon" }),
-  });
+  // Icon shape plus SIM text label — distinguishable from real circles by more than colour.
+  return buildSimulatorVocalizationStyle(iconPath);
+}
+
+/** Opacity (1 = fresh, MIN_LIVE_EVENT_OPACITY = about to be purged) for a live event's age. */
+function _computeFadeOpacity(hmiState, recordTimestampSeconds) {
+  const ratio = _liveEventAgeRatio(hmiState, recordTimestampSeconds);
+  if (ratio <= LIVE_EVENT_FADE_START_RATIO) return 1;
+  if (ratio >= 1) return MIN_LIVE_EVENT_OPACITY;
+
+  const fadeRatio = (ratio - LIVE_EVENT_FADE_START_RATIO) / (1 - LIVE_EVENT_FADE_START_RATIO);
+  return 1 - fadeRatio * (1 - MIN_LIVE_EVENT_OPACITY);
+}
+
+/**
+ * Maps a location-uncertainty reading in metres (animalLLAUncertainty /
+ * locationUncertaintyM — see the "Confidence -> ring radius" note above) to
+ * an on-map ring radius in metres. Missing/invalid uncertainty is treated as
+ * CONFIDENCE_RING_MAX_RADIUS_M (worst case) rather than 0, so a data gap
+ * shows as "we don't know", never as false confidence.
+ */
+function _uncertaintyToRingRadiusMeters(uncertaintyMeters) {
+  const safeUncertainty = Number.isFinite(uncertaintyMeters) && uncertaintyMeters >= 0
+    ? uncertaintyMeters
+    : CONFIDENCE_RING_MAX_RADIUS_M;
+  return Math.min(CONFIDENCE_RING_BASE_RADIUS_M + safeUncertainty, CONFIDENCE_RING_MAX_RADIUS_M);
+}
+
+/**
+ * Style FUNCTION (not a static Style) for movement/truth markers.
+ * OpenLayers calls this at render time only for features actually on
+ * screen, so age-based fade updates automatically as hmiState.currentTime
+ * advances — nothing here loops over features or rebuilds styles itself
+ * (see the per-tick source.changed() calls in queueSimUpdate, which just
+ * mark each layer dirty so OpenLayers repaints it on its next frame).
+ * Ground-truth locations have no location uncertainty, so there is no
+ * confidence ring — only the diamond/teal shape+colour marker (AC2) drawn
+ * underneath the existing per-species icon.
+ */
+function _makeTruthStyleFn(hmiState, iconPath) {
+  return function truthStyle(feature) {
+    const opacity = _computeFadeOpacity(hmiState, feature.get("animalRecordDate"));
+
+    return [
+      new ol.style.Style({
+        image: new ol.style.RegularShape({
+          points: 4,
+          radius: 9,
+          angle: Math.PI / 4, // rotate square -> diamond
+          fill:   new ol.style.Fill({ color: `rgba(${TRUTH_MARKER_COLOR}, ${opacity})` }),
+          stroke: new ol.style.Stroke({ color: `rgba(255, 255, 255, ${opacity})`, width: 1.5 }),
+        }),
+      }),
+      new ol.style.Style({
+        image: new ol.style.Icon({
+          src: iconPath, anchor: [0.5, 1], scale: 0.75, opacity, className: "true-icon",
+        }),
+      }),
+    ];
+  };
+}
+
+/**
+ * Style FUNCTION for vocalization (detected) markers. Same fade behaviour
+ * as _makeTruthStyleFn, plus a translucent confidence ring (AC3) drawn as a
+ * real ol.geom.Circle in map units (metres) centred on the marker, so it
+ * scales correctly with zoom and with the event's own reported location
+ * uncertainty (in metres) — see _uncertaintyToRingRadiusMeters. The ring
+ * uses a fixed low alpha (not the
+ * age-fade opacity) so overlapping detections stay legible instead of a
+ * cluster of fading rings compounding into an unreadable smear.
+ */
+function _makeVocalizationStyleFn(hmiState, iconPath) {
+  return function vocalizationStyle(feature) {
+    const opacity = _computeFadeOpacity(hmiState, feature.get("animalRecordDate"));
+    const radiusM = _uncertaintyToRingRadiusMeters(feature.get("animalLocUncertaintyM"));
+
+    return [
+      new ol.style.Style({
+        geometry: (feat) => new ol.geom.Circle(feat.getGeometry().getCoordinates(), radiusM),
+        fill:   new ol.style.Fill({ color: `rgba(${VOCALIZATION_MARKER_COLOR}, 0.18)` }),
+        stroke: new ol.style.Stroke({ color: `rgba(${VOCALIZATION_MARKER_COLOR}, 0.6)`, width: 1 }),
+      }),
+      new ol.style.Style({
+        image: new ol.style.Circle({
+          radius: 9,
+          fill:   new ol.style.Fill({ color: `rgba(${VOCALIZATION_MARKER_COLOR}, ${opacity})` }),
+          stroke: new ol.style.Stroke({ color: `rgba(255, 255, 255, ${opacity})`, width: 1.5 }),
+        }),
+      }),
+      new ol.style.Style({
+        image: new ol.style.Icon({
+          src: iconPath, anchor: [0.5, 1], scale: 0.75, opacity, className: "vocalization-icon",
+        }),
+      }),
+    ];
+  };
 }
 
 function _resolveSimIconPath(entry) {
@@ -1034,7 +1540,7 @@ function _addTruthFeature(hmiState, entry) {
     isAnimalMovement:  1,
   });
 
-  feature.setStyle(_makeAnimalIcon(iconPath));
+  feature.setStyle(_makeTruthStyleFn(hmiState, iconPath));
   feature.setId(entry.animalId);
 
   const layer = findMapLayerWithName(hmiState, deriveTruthLayerName(entry.animalStatus, entry.animalType));
@@ -1043,25 +1549,36 @@ function _addTruthFeature(hmiState, entry) {
 
 function _addVocalizationFeature(hmiState, entry) {
   const iconPath = _resolveVocalizationIconPath(entry);
+  const plot = resolveVocalizationPlotLocation(entry);
+  if (!plot) return;
 
   const feature = new ol.Feature({
-    geometry:          new ol.geom.Point(ol.proj.fromLonLat([entry.locationLon, entry.locationLat])),
+    geometry:          new ol.geom.Point(ol.proj.fromLonLat([plot.lon, plot.lat])),
     name:              "vocalisation_" + entry.speciesScientificName,
     animalType:        entry.animalType,
     animalStatus:      entry.animalStatus,
     animalSpecies:     entry.speciesScientificName,
     animalLon:         entry.locationLon,
     animalLat:         entry.locationLat,
+    animalTrueLon:     entry.locationLon,
+    animalTrueLat:     entry.locationLat,
     animalConfidence:  entry.speciesIdentificationConfidence,
     animalLocConfidence: entry.locationConfidence,
+    animalLocUncertaintyM: entry.locationUncertaintyM,
     animalDiet:        entry.animalDiet,
     animalIcon:        iconPath,
     animalRecordDate:  entry.timestamp,
+    eventTimestamp:    entry.eventTimestamp,
     eventId:           entry.eventId,
     isAnimalMovement:  0,
+    isFallbackLocation: plot.isFallback,
+    sourceType:        normalizeDetectionSource(entry.sourceType) === "unknown"
+      ? entry.sourceType
+      : normalizeDetectionSource(entry.sourceType),
+    sensorId:          entry.sensorId,
   });
 
-  feature.setStyle(_makeVocalizationIcon(iconPath));
+  feature.setStyle(_makeVocalizationStyleFn(hmiState, iconPath));
   feature.setId(entry.eventId);
 
   const layer = findMapLayerWithName(hmiState, deriveLayerName(entry.animalStatus, entry.animalType));
@@ -1276,18 +1793,76 @@ function createBasemap(hmiState) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 async function fetchWeatherData(timestamp, lat, lon) {
-  const response = await fetch(
-    `http://localhost:9000/hmi/weather?timestamp=${timestamp}&lat=${lat}&lon=${lon}`
-  );
-  if (!response.ok) throw new Error("Failed to fetch weather data");
-  return response.json();
+  const response = await retrieveWeatherData(timestamp, lat, lon);
+  return response.data;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Map click handler
 // ─────────────────────────────────────────────────────────────────────────────
 
-function createMapClickEvent(hmiState) {
+function setDetectionSourceDetail(sourceType) {
+  const el = document.getElementById("markup_source");
+  if (el) el.innerText = formatDetectionSourceLabel(sourceType);
+}
+
+export function setRealDetectionSidebarMode(isReal) {
+  const setDisplay = (id, value) => { const el = document.getElementById(id); if (el) el.style.display = value; };
+  const label = document.getElementById("markup_location_metric_label");
+  if (isReal) {
+    setDisplay("animal_weather_section", "none");
+    setDisplay("desc_img", "none");
+    setDisplay("request-edit-button", "none");
+    setDisplay("animalAudioHeader", "none");
+    setDisplay("animalAudioControl", "none");
+    setDisplay("animal-spectrogram", "none");
+    if (label) label.textContent = "Location uncertainty";
+  } else {
+    setDisplay("animal_weather_section", "");
+    setDisplay("desc_img", "");
+    setDisplay("request-edit-button", "");
+    if (label) label.textContent = "Location Confidence";
+  }
+}
+
+export function showRealDetectionDetails(values) {
+  const setText = (id, text) => { const el = document.getElementById(id); if (el) el.textContent = text; };
+  const record = values || {};
+  const species = typeof record.species === "string" && record.species.trim() !== ""
+    ? record.species
+    : "unavailable";
+  setText("desc_name", species);
+  setText("desc_species", species);
+  setText("desc_confidence", record.confidence === "" ? "unavailable" : formatVocalizationDetailValue(record.confidence, "%"));
+  setText("desc_summary", "Real-device detection details.");
+  const sensorText = record.sensorId != null && String(record.sensorId).trim() !== ""
+    ? `Sensor ${record.sensorId}`
+    : "unavailable";
+  setText("markup_details", sensorText);
+  setText("markup_source", formatDetectionSourceLabel(record.sourceType));
+  let dateText = "unavailable";
+  if (record.timestamp != null && record.timestamp !== "") {
+    const parsed = new Date(record.timestamp);
+    if (Number.isFinite(parsed.getTime())) dateText = parsed.toUTCString();
+  }
+  setText("markup_date", dateText);
+  setText("markup_loc_lat", formatVocalizationDetailValue(llaLat(record.microphoneLLA)));
+  setText("markup_loc_lon", formatVocalizationDetailValue(llaLon(record.microphoneLLA)));
+  const details = document.getElementById("desc_details");
+  if (details) {
+    details.replaceChildren();
+    const estLat = llaLat(record.animalEstLLA);
+    const estLon = llaLon(record.animalEstLLA);
+    const row = document.createElement("p");
+    row.textContent = Number.isFinite(estLat) && Number.isFinite(estLon)
+      ? `Estimated animal location: ${estLat}, ${estLon}`
+      : "Estimated animal location: unavailable";
+    details.appendChild(row);
+  }
+  setText("markup_confidence", record.animalLLAUncertainty === "" ? "unavailable" : formatVocalizationDetailValue(record.animalLLAUncertainty));
+}
+
+export function createMapClickEvent(hmiState) {
   hmiState.basemap.on("click", function (evt) {
     const feature = hmiState.basemap.forEachFeatureAtPixel(evt.pixel, (f) => f);
 
@@ -1318,7 +1893,10 @@ function createMapClickEvent(hmiState) {
     const values = feature.getProperties();
 
     if (values.hasOwnProperty("animalRecordDate")) {
-      fetchWeatherData(values.animalRecordDate, values.animalLat, values.animalLon)
+      const weatherTimestamp = values.isAnimalMovement
+        ? values.animalRecordDate
+        : toWeatherTimestamp(values.eventTimestamp);
+      if (weatherTimestamp !== null) fetchWeatherData(weatherTimestamp, values.animalLat, values.animalLon)
         .then((weatherData) => {
           const key = Object.keys(weatherData.Date)[0];
           const fields = {
@@ -1388,7 +1966,22 @@ function createMapClickEvent(hmiState) {
       animal_toggled = true;
       document.dispatchEvent(new CustomEvent("nodeToggled", { detail: { message: "Node toggled:" } }));
 
+    } else if (normalizeDetectionSource(values.sourceType) === DETECTION_SOURCE_FILTERS.REAL
+      && !values.animalSpecies) {
+      setRealDetectionSidebarMode(true);
+      stopAudioPlayback();
+      clearAnimalAudioSelection();
+      active_content.show();       default_content.hide();
+      active_mic_content.hide();   default_mic_content.show();
+      active_node_content.hide();  default_node_content.show();
+
+      showRealDetectionDetails(values);
+
+      animal_toggled = true;
+      document.dispatchEvent(new CustomEvent("animalToggled", { detail: { message: "Animal toggled:" } }));
+
     } else {
+      setRealDetectionSidebarMode(false);
       stopAudioPlayback();
 
       active_content.show();       default_content.hide();
@@ -1408,11 +2001,37 @@ function createMapClickEvent(hmiState) {
         if (audioControl) audioControl.style.display = "flex";
         if (spectrogram)  spectrogram.style.display  = "block";
         selectedVocalizationEventId = values.eventId || null;
+
         if (selectedVocalizationEventId !== null) {
-          void animalSpectrogramWorkflow?.select(selectedVocalizationEventId);
+          const eventId = selectedVocalizationEventId;
+
+          setAnimalAudioStatus("Loading audio...");
+
+          if (!animalSpectrogramWorkflow) {
+            setAnimalAudioStatus(ANIMAL_AUDIO_UNAVAILABLE);
+          } else {
+            void animalSpectrogramWorkflow
+              .select(eventId)
+              .then((decodedAudio) => {
+                if (selectedVocalizationEventId !== eventId) return;
+
+                if (decodedAudio) {
+                  markAnimalAudioReady(eventId);
+                } else {
+                  setAnimalAudioStatus(ANIMAL_AUDIO_UNAVAILABLE);
+                }
+              })
+              .catch(() => {
+                if (selectedVocalizationEventId !== eventId) return;
+
+                setAnimalAudioStatus(ANIMAL_AUDIO_UNAVAILABLE);
+              });
+          }
         } else {
           animalSpectrogramWorkflow?.clear();
+          setAnimalAudioStatus("No audio selected.");
         }
+
       }
 
       if (values.animalSpecies) {
@@ -1432,7 +2051,7 @@ function createMapClickEvent(hmiState) {
 
           const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; };
           setEl("desc_name",       result.common);
-          setEl("desc_confidence", values.animalConfidence + "%");
+          setEl("desc_confidence", formatVocalizationDetailValue(values.animalConfidence, "%"));
           setEl("desc_species",    result.species);
           setEl("desc_summary",    result.summary);
 
@@ -1453,22 +2072,31 @@ function createMapClickEvent(hmiState) {
           if (descImg) descImg.src = "../../images/bio/not_available_" + dice + "-bio.png";
           const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; };
           setEl("desc_name",       values.animalSpecies);
-          setEl("desc_confidence", values.animalConfidence + "%");
+          setEl("desc_confidence", formatVocalizationDetailValue(values.animalConfidence, "%"));
           setEl("desc_species",    values.animalSpecies);
           setEl("desc_summary",    "Bio data coming soon.");
           const summary = document.getElementById("desc_details");
           if (summary) summary.innerHTML = "";
         }
 
-        const dateFormat = new Date(values.animalRecordDate);
         const markupImg  = document.getElementById("markup_img");
         if (markupImg) markupImg.src = values.animalIcon;
-        const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.innerHTML = val; };
+        const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; };
         setEl("markup_details",   values.animalType + " | " + values.animalDiet + " | " + statusPrintLookup[values.animalStatus]);
-        setEl("markup_loc_lon",   values.animalLon);
-        setEl("markup_loc_lat",   values.animalLat);
-        setEl("markup_confidence",values.animalLocConfidence + "%");
-        setEl("markup_date",      dateFormat.toUTCString());
+        // Ticket 03: only detection markers report Simulated/Real-device.
+        if (values.isAnimalMovement) {
+          const sourceEl = document.getElementById("markup_source");
+          if (sourceEl) sourceEl.innerText = "";
+        } else {
+          setDetectionSourceDetail(values.sourceType || "unknown");
+        }
+        setEl("markup_loc_lon",   formatVocalizationDetailValue(values.animalLon));
+        setEl("markup_loc_lat",   formatVocalizationDetailValue(values.animalLat));
+        setEl("markup_confidence",formatVocalizationDetailValue(values.animalLocConfidence, "%"));
+        const detailTimestamp = values.isAnimalMovement
+          ? values.animalRecordDate
+          : values.eventTimestamp;
+        setEl("markup_date",      formatDetectionTimestamp(detailTimestamp));
 
         animal_toggled = true;
         document.dispatchEvent(new CustomEvent("animalToggled", { detail: { message: "Animal toggled:" } }));
@@ -1583,10 +2211,20 @@ function queueSimUpdate(hmiState) {
 
       if (simUpdateTimeout) clearTimeout(simUpdateTimeout);
 
+      // Re-invalidate every live-event layer each tick so age-based fade
+      // (computed inside the style functions in the "Live-event
+      // visualisation" section above) repaints smoothly. This does NOT
+      // rebuild features or re-render the whole map — it only marks each
+      // vector layer's own canvas dirty, so OpenLayers repaints just that
+      // layer's on-screen features on its next frame, same as the
+      // pre-existing truth-layer refresh this replaces.
       for (let stat of statuses) {
         for (let animalType of animalTypes) {
-          const layer = findMapLayerWithName(hmiState, deriveTruthLayerName(stat, animalType));
-          if (layer) { layer.changed(); layer.getSource().changed(); }
+          const truthLayer = findMapLayerWithName(hmiState, deriveTruthLayerName(stat, animalType));
+          if (truthLayer) { truthLayer.changed(); truthLayer.getSource().changed(); }
+
+          const vocalizationLayer = findMapLayerWithName(hmiState, deriveLayerName(stat, animalType));
+          if (vocalizationLayer) { vocalizationLayer.changed(); vocalizationLayer.getSource().changed(); }
         }
       }
 
@@ -1668,6 +2306,8 @@ export function startAudioRecording() {
         audioRecorder.cancel();
         return;
       }
+
+      clearBrowserRecordingPlayback();
       fileContent = null;
       decodedAudioStore = null;
       microphoneSpectrogramWorkflow?.clear();
@@ -1722,7 +2362,9 @@ export function stopAudioRecording() {
       if (!(audioBlob instanceof Blob) || audioBlob.size === 0) {
         throw new TypeError("Recorder did not return a valid audio Blob");
       }
-
+      prepareBrowserRecordingPlayback(recordingResult);
+      const analysisStatus = document.getElementById("audio_analysis_status");
+      if (analysisStatus) analysisStatus.textContent = "Audio ready for analysis.";
       fileContent = null;
 
       const decodedAudio =
@@ -1793,7 +2435,65 @@ export function playRecordingClip() {
       showToast("Unable to play recording: " + (err.message || "unknown error"), "error");
     });
 }
+export async function startAudioAnalysis() {
+  const statusElement = document.getElementById("audio_analysis_status");
+  const resultElement = document.getElementById("audio_analysis_result");
+  const startButton = document.getElementById("start_analysis_button");
+  const stopButton = document.getElementById("stop_analysis_button");
 
+  if (!(lastBrowserRecordingBlob instanceof Blob) || lastBrowserRecordingBlob.size === 0) {
+    showToast("Record an audio clip before starting analysis.", "error");
+    if (statusElement) statusElement.textContent = "No recorded audio available.";
+    return;
+  }
+
+  audioAnalysisController = new AbortController();
+
+  if (startButton) startButton.disabled = true;
+  if (stopButton) stopButton.disabled = false;
+  if (statusElement) statusElement.textContent = "Analysing audio...";
+  if (resultElement) resultElement.textContent = "";
+
+  try {
+    const response = await analyseAudio(
+      lastBrowserRecordingBlob,
+      "recording.wav",
+      audioAnalysisController.signal
+    );
+
+    const prediction = response?.data || response;
+
+    if (statusElement) statusElement.textContent = "Analysis complete.";
+
+    if (resultElement) {
+      const species = prediction?.species || "Unknown";
+      const confidence = prediction?.confidence;
+
+      resultElement.textContent =
+        confidence !== undefined
+          ? `Predicted species: ${species} | Confidence: ${confidence}`
+          : `Predicted species: ${species}`;
+    }
+  } catch (error) {
+    if (error?.name === "CanceledError" || error?.code === "ERR_CANCELED") {
+      if (statusElement) statusElement.textContent = "Analysis stopped.";
+    } else {
+      console.error("Audio analysis error:", error);
+      if (statusElement) statusElement.textContent = "Audio analysis failed.";
+      showToast("Unable to analyse audio.", "error");
+    }
+  } finally {
+    audioAnalysisController = null;
+    if (startButton) startButton.disabled = false;
+    if (stopButton) stopButton.disabled = true;
+  }
+}
+
+export function stopAudioAnalysis() {
+  if (audioAnalysisController) {
+    audioAnalysisController.abort();
+  }
+}
 document.addEventListener("saveRecording",     function () { save(); });
 document.addEventListener("simulateRecording", function () { simulateRecording(window.hmiState); });
 
