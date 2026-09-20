@@ -2,7 +2,9 @@ from datetime import datetime, timezone
 
 import pytest
 
-from app.schemas import DetectionCreate
+from app import detections as detection_service
+from app.routers import hmi
+from app.schemas import DetectionCreate, EventSchema
 from tools import seed_detections as seed
 
 
@@ -13,7 +15,11 @@ def make_range():
     )
 
 
-def generate(count=8, seed_value=374):
+def generate(
+    count=8,
+    seed_value=374,
+    collection_name="detections",
+):
     start, end = make_range()
 
     return seed.generate_fixtures(
@@ -25,6 +31,7 @@ def generate(count=8, seed_value=374):
         seed=seed_value,
         run_id="test-run",
         environment="test",
+        collection_name=collection_name,
     )
 
 
@@ -34,6 +41,50 @@ def detection_only(document):
     result.pop("_fixture", None)
     return result
 
+class FixtureCursor(list):
+    """Minimal cursor implementing the operations used by list_real_events."""
+
+    def sort(self, key, direction):
+        return FixtureCursor(
+            sorted(
+                self,
+                key=lambda document: document[key],
+                reverse=direction == -1,
+            )
+        )
+
+    def limit(self, size):
+        return FixtureCursor(self[:size])
+
+
+class FixtureEventsCollection:
+    """Small in-memory Events collection for C13 filtered-read tests."""
+
+    def __init__(self, documents):
+        self.documents = list(documents)
+
+    @staticmethod
+    def _matches(document, query):
+        return all(
+            document.get(key) == value
+            for key, value in query.items()
+        )
+
+    def count_documents(self, query):
+        return sum(
+            1
+            for document in self.documents
+            if self._matches(document, query)
+        )
+
+    def find(self, query):
+        return FixtureCursor(
+            [
+                document
+                for document in self.documents
+                if self._matches(document, query)
+            ]
+        )
 
 def test_requested_fixture_count_is_generated():
     fixtures = generate(count=8)
@@ -226,3 +277,107 @@ def test_dry_run_never_attempts_database_insert(monkeypatch):
     )
 
     assert result == 0
+
+
+def test_event_fixtures_match_event_schema():
+    fixtures = generate(
+        count=4,
+        seed_value=374,
+        collection_name="events",
+    )
+
+    assert len(fixtures) == 4
+
+    for fixture in fixtures:
+        event = dict(fixture)
+        event.pop("_fixture", None)
+
+        validated = EventSchema(**event)
+
+        assert validated.sourceType in ("real", "simulator")
+        assert isinstance(fixture["microphoneLLA"], dict)
+        assert isinstance(fixture["animalEstLLA"], dict)
+        assert isinstance(fixture["animalTrueLLA"], dict)
+
+        assert set(fixture["microphoneLLA"]) >= {
+            "latitude",
+            "longitude",
+            "altitude",
+        }
+
+
+def test_event_fixtures_cover_real_and_simulator_sources():
+    fixtures = generate(
+        count=4,
+        seed_value=374,
+        collection_name="events",
+    )
+
+    source_types = [fixture["sourceType"] for fixture in fixtures]
+
+    assert source_types == [
+        "real",
+        "simulator",
+        "real",
+        "simulator",
+    ]
+
+def test_event_fixtures_appear_through_real_event_read(monkeypatch):
+    fixtures = generate(
+        count=4,
+        seed_value=374,
+        collection_name="events",
+    )
+
+    events = FixtureEventsCollection(fixtures)
+
+    monkeypatch.setattr(
+        detection_service,
+        "Events",
+        events,
+    )
+
+    result = detection_service.list_real_events(page_size=10)
+
+    assert result["total"] == 2
+    assert len(result["items"]) == 2
+
+    assert {
+        item["sourceType"]
+        for item in result["items"]
+    } == {"real"}
+
+
+def test_event_fixtures_match_hmi_source_type_read_filters():
+    fixtures = generate(
+        count=4,
+        seed_value=374,
+        collection_name="events",
+    )
+
+    for source_type in ("real", "simulator"):
+        stage = hmi._source_type_match_stage(source_type)
+
+        assert stage == {
+            "$match": {
+                "sourceType": source_type,
+            }
+        }
+
+        query = stage["$match"]
+
+        matching_fixtures = [
+            fixture
+            for fixture in fixtures
+            if all(
+                fixture.get(key) == value
+                for key, value in query.items()
+            )
+        ]
+
+        assert len(matching_fixtures) == 2
+
+        assert all(
+            fixture["sourceType"] == source_type
+            for fixture in matching_fixtures
+        )
