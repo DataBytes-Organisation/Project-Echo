@@ -1,20 +1,52 @@
 # Sprint 2 Resilience & Scalability Architecture Log
 
-**Prepared by:** Mack Turley (Backend Leader)
-**Scope:** Group C Tasks (C1, C3, C6)
+**Prepared by:** Mack Turley (Backend Leader)  
+**Scope:** Group C Resilience & Infrastructure Tasks (C1.1, C3, C6, C18)  
+**Cross-PR Coordination:** Aligned with PR #1048 (Jamie Zhi – C1.2 Asynchronous Worker Implementation)
 
-## 1. Redis Namespacing Strategy
-To ensure that background asynchronous queue operations do not interfere with the HMI session management or caching layers, we have implemented strict Redis namespacing via logical databases:
-- **`db=0`**: Reserved for default operations, legacy caching, and HMI JWT/session handling (handled by HMI module).
-- **`db=1`**: Exclusively allocated to the newly introduced `rq` background job queue (`queue.py`).
-- **`db=2`**: Allocated for future high-frequency read caches (Task C2 implementation).
+---
 
-## 2. Graceful Shutdown Behavior
-Instead of abruptly killing background operations when a SIGTERM is received (e.g. `docker compose stop echo_api`), the FastAPI backend now relies on the `@asynccontextmanager def lifespan(app)` context block.
-- **Startup:** Establishes necessary connection pools.
-- **Shutdown:** Explicitly triggers `.close()` on the global `pymongo.MongoClient` and the backend's `redis_conn`. This prevents zombie connections from leaking memory inside the backend Docker container across rapid iterative deployments.
+## 1. Unified Asynchronous Queue Architecture (C1.1 & C1.2 Coordination)
 
-## 3. Dependency Aggregation (/health/dependencies)
-A new endpoint was introduced to aggregate the health of `MongoDB`, `Redis`, and `HiveMQ`.
-- **Constraint:** Rather than importing heavy client objects exclusively for health checks, we use non-blocking `ping` commands and simple `socket.create_connection()` probes.
-- **Constraint:** Connection strings and server internals are purposely excluded from the response payload to maintain internal boundary security.
+To establish a single supported queue approach across Project Echo, the backend API (`EB/MT/Sprint2-Resilience`) and worker implementation (`#1048`) adhere to the following shared contract:
+
+* **Queue Framework:** `rq` (Redis Queue)
+* **Redis Logical Database Allocation:**
+  * `db=0`: Reserved for HMI session management, token storage, and legacy caching.
+  * `db=1`: Exclusively dedicated to the backend task queue (`echo-backend`).
+  * `db=2`: Allocated for high-frequency read caching (Task C2).
+* **Queue Name:** `echo-backend`
+* **Canonical Application Workflow:** `app.queue.process_audio_ingest_job`
+  * **Trigger:** Invoked asynchronously whenever audio files are uploaded via `POST /api/audio/upload`.
+  * **Input Parameters:** `upload_id: str` (MongoDB ObjectId), `file_path: Optional[str]`, `filename: Optional[str]`.
+  * **State Transitions:** Updates MongoDB `AudioUploads` record through lifecycle states: `pending` -> `processing` -> `completed` (or `failed`).
+  * **Output Contract:** JSON-serializable dictionary containing `{"status": "completed", "upload_id": "...", "filename": "...", "duration_seconds": float, "completed_at": "ISO-8601"}`.
+  * **Timeout & Retry Policy:** `job_timeout = 180s`, `Retry(max=3, interval=10s)`.
+  * **Failure Handling:** Catches all exceptions, persists error details in MongoDB with `processing_status: "failed"`, logs structured traceback, and triggers RQ retry policy.
+
+---
+
+## 2. Bounded Dependency Health Probes (`/health/dependencies`)
+
+The health aggregation endpoint ensures all subsystem probes are non-blocking and strictly bounded to prevent cascading gateway timeouts during downstream outages:
+
+* **MongoDB (Primary & User Databases):**
+  * Probes both `EchoNet` (`client`) and `UserSample` (`Userclient`) using `admin.command('ping', maxTimeMS=settings.mongo_timeout_ms)` with a default 2000ms ceiling.
+* **Redis Job Queue:**
+  * Uses dedicated connection parameters: `socket_connect_timeout=2.0s` and `socket_timeout=2.0s`.
+* **HiveMQ / MQTT Broker:**
+  * Probed via non-blocking TCP socket connection with a 2.0s timeout limit.
+* **Payload Structure:**
+  * Returns round-trip latency (`latency_ms`) per component, error details on failure, and an aggregate system status (`UP`, `DEGRADED`, or `DOWN`).
+
+---
+
+## 3. Comprehensive Graceful Shutdown & Resource Cleanup
+
+To prevent connection leaks, zombie sockets, and incomplete operations upon container restarts or SIGTERM signals, the FastAPI application lifecycle is managed via `@asynccontextmanager def lifespan(app: FastAPI)`:
+
+* **Teardown Sequence:**
+  1. **Primary MongoDB Client (`client.close()`):** Closes all active connection pools to the `EchoNet` database.
+  2. **User MongoDB Client (`Userclient.close()`):** Closes connection pools to `UserSample`.
+  3. **Redis Queue Connection (`redis_conn.close()`):** Closes the connection pool to `echo-redis` (db=1).
+* **Error Isolation:** Each cleanup step is wrapped in isolated `try/except` blocks to guarantee that a failure in one client teardown does not abort the remaining resource cleanups.

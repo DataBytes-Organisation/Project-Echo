@@ -39,9 +39,18 @@ class Settings(BaseSettings):
     user_mongodb_uri: str = Field(...)
     mongo_db_name: str = Field("EchoNet", env="MONGO_DB")
 
-    # --- Redis (for C1/C2, not yet used by this backend) ---
+    # --- Redis & Job Queue (Resilience Tasks C1/C2/C3) ---
     redis_host: str = "echo-redis"
     redis_port: int = 6379
+    redis_db: int = 1
+    redis_connect_timeout: float = 2.0
+    redis_socket_timeout: float = 2.0
+    job_timeout_seconds: int = 180
+    job_max_retries: int = 3
+    job_retry_delay_seconds: int = 10
+
+    # --- Database Settings & Timeouts ---
+    mongo_timeout_ms: int = 2000
 
     # --- MQTT / HiveMQ ---
     mqtt_host: str = "ts-mqtt-server-cont"

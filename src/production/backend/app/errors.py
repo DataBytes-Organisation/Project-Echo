@@ -14,10 +14,9 @@ STATUS_CODES = {400: "BAD_REQUEST", 401: "UNAUTHENTICATED", 403: "FORBIDDEN", 40
 
 
 def error_body(status_code: int, message: str, details: Optional[Any] = None) -> dict:
-    error = {"code": STATUS_CODES.get(status_code, "REQUEST_FAILED"), "message": message}
-    if details is not None:
-        error["details"] = details
+    error = {"code": STATUS_CODES.get(status_code, "REQUEST_FAILED"), "message": message, "details": details}
     return {"status": "failed", "error": error}
+
 
 
 def error_response(status_code: int, message: str, details: Optional[Any] = None, headers: Optional[dict] = None) -> JSONResponse:
