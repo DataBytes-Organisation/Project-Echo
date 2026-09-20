@@ -57,14 +57,22 @@ const { User } = require('./model/user.model'); // Add this line
 
 // Middleware to check if the user is an admin
 function isAdmin(req, res, next) {
-  const token = req.headers.authorization.split(' ')[1];
-  const decoded = jwt.verify(token, process.env.JWT_SECRET);
-  
-  if (decoded.role !== 'admin') {
-    return res.status(403).json({ message: 'Access denied: Admins only' });
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      return res.status(401).json({ message: 'Access denied: No token provided' });
+    }
+    const token = authHeader.split(' ')[1];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    if (decoded.role !== 'admin') {
+      return res.status(403).json({ message: 'Access denied: Admins only' });
+    }
+
+    next();
+  } catch (err) {
+    return res.status(401).json({ message: 'Access denied: Invalid or missing token' });
   }
-  
-  next();
 }
 
 // API to suspend a user
@@ -315,7 +323,7 @@ app.get('/donation-success', async (req, res) => {
 
 
 
-app.get('/donations', async (req, res) => {
+app.get('/donations', isAdmin, async (req, res) => {
   try {
     // Ensure MongoDB is connected
     if (!connectedDB) {
@@ -328,6 +336,29 @@ app.get('/donations', async (req, res) => {
     res.json({ charges: { data: donations } });
   } catch (error) {
     console.error("❌ Error fetching donations from MongoDB:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+
+app.get('/donations/summary', async (req, res) => {
+  try {
+    if (!connectedDB) {
+      await donationClient.connect();
+      connectedDB = donationClient.db("EchoNet");
+    }
+
+    const donations = await connectedDB
+      .collection("donations")
+      .find({ status: "succeeded" })
+      .toArray();
+
+    const totalAmount = donations.reduce((sum, donation) => sum + (donation.amount || 0), 0);
+    const goalAmount = parseFloat(process.env.DONATION_GOAL_AMOUNT || "10000");
+
+    res.json({ totalRaised: totalAmount.toFixed(2), goal: goalAmount });
+  } catch (error) {
+    console.error("❌ Error calculating donation summary:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
