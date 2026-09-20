@@ -11,6 +11,7 @@ import logging
 from app import serializers
 from app import schemas
 from app.database import Events, Species
+from app.cache import invalidate_insights
 import datetime
 from fastapi.responses import StreamingResponse
 import pandas as pd
@@ -59,6 +60,7 @@ def _build_stream_payload(inserted_id):
 async def create_event(event: schemas.EventSchema):
     # Keep Mongo work off the event loop so open WebSocket clients stay responsive.
     result = await asyncio.to_thread(Events.insert_one, event.dict())
+    await asyncio.to_thread(invalidate_insights)
     # Persistence already succeeded. Broadcast failures must not turn this into a 500.
     try:
         stream_payload = await asyncio.to_thread(

@@ -15,6 +15,7 @@ from app.exceptions import (
 )
 from app.schemas import DetectionCreate, Detection
 from app.detection_rules import evaluate_detection, log_rejected_detection
+from app.cache import invalidate_insights
 
 
 STORAGE_UNAVAILABLE_MESSAGE = "Detection storage is temporarily unavailable."
@@ -55,6 +56,7 @@ def create_detection(detection_in: DetectionCreate) -> Detection:
             "The detection was not available after it was created."
         )
 
+    invalidate_insights()
     return _doc_to_detection(created)
 
 
@@ -161,6 +163,8 @@ def delete_detection(detection_id: str) -> bool:
 
     if result.deleted_count != 1:
         raise DetectionNotFoundError("Detection not found.")
+
+    invalidate_insights()
     return True
 
 
@@ -184,4 +188,5 @@ def update_detection(
     if not doc:
         raise DetectionNotFoundError("Detection not found.")
 
+    invalidate_insights()
     return _doc_to_detection(doc)

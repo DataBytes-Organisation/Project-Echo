@@ -77,7 +77,7 @@ def test_create_event_broadcasts_only_after_persistence(monkeypatch):
 
     response = asyncio.run(engine.create_event(EventSchema(**valid_payload())))
 
-    assert response["_id"] == "fake-event-id"
+    assert response == {"status": "success", "eventId": "fake-event-id"}
     assert len(broadcast_payloads) == 1
     assert broadcast_payloads[0]["sensorId"] == "unit-test-sensor"
     assert broadcast_payloads[0]["species"] == "Uperoleia mimula"
@@ -96,7 +96,7 @@ def test_broadcast_failure_does_not_undo_persisted_event(monkeypatch):
     response = asyncio.run(engine.create_event(EventSchema(**valid_payload())))
 
     assert fake_events.inserted_document is not None
-    assert response["_id"] == "fake-event-id"
+    assert response == {"status": "success", "eventId": "fake-event-id"}
 
 
 def test_empty_species_is_rejected():
