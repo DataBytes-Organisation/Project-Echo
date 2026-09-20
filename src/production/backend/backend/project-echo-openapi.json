@@ -3004,6 +3004,22 @@
         }
       }
     },
+    "/metrics": {
+      "get": {
+        "summary": "Metrics",
+        "operationId": "metrics_metrics_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
     "/insights/overview": {
       "get": {
         "tags": [
@@ -3494,7 +3510,21 @@
         ],
         "responses": {
           "200": {
-            "description": "Successful Response",
+            "description": "Detection returned with ETag and Cache-Control headers.",
+            "headers": {
+              "ETag": {
+                "description": "Strong validator for this detection representation.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Cache-Control": {
+                "description": "Requires private caches to revalidate before reuse.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -3502,6 +3532,26 @@
                 }
               }
             }
+          },
+          "304": {
+            "description": "The supplied If-None-Match validator is still current.",
+            "headers": {
+              "ETag": {
+                "description": "Validator for the cached representation.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The detection id is invalid."
+          },
+          "404": {
+            "description": "The detection does not exist."
+          },
+          "503": {
+            "description": "Detection storage is temporarily unavailable."
           },
           "422": {
             "description": "Validation Error",
@@ -3634,6 +3684,61 @@
             "content": {
               "application/json": {
                 "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/detections/{detection_id}/similar": {
+      "get": {
+        "tags": [
+          "detections"
+        ],
+        "summary": "Find past detections with the closest model embedding",
+        "operationId": "similar_detections_endpoint_detections__detection_id__similar_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Detection Id"
+            },
+            "name": "detection_id",
+            "in": "path"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 20.0,
+              "minimum": 1.0,
+              "title": "K",
+              "default": 5
+            },
+            "name": "k",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "Response Similar Detections Endpoint Detections  Detection Id  Similar Get"
+                }
               }
             }
           },
@@ -3799,6 +3904,13 @@
             "type": "integer",
             "title": "Samplerate"
           },
+          "embedding": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Embedding"
+          },
           "_id": {
             "type": "string",
             "title": " Id"
@@ -3905,6 +4017,13 @@
           "sampleRate": {
             "type": "integer",
             "title": "Samplerate"
+          },
+          "embedding": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Embedding"
           }
         },
         "type": "object",

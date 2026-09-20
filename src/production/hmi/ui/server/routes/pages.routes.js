@@ -14,7 +14,7 @@ function registerRoutes(app, dependencies) {
     ['/resetPassword.html', 'pages/auth/reset-password.html'],
   ];
 
-  const unprotectedAdminPages = [
+  const adminPages = [
     ['/admin/dashboard.html', 'pages/admin/dashboard.html'],
     ['/admin/admin-nodes.html', 'pages/admin/admin-nodes.html'],
     ['/admin/admin-nodes-temp.html', 'pages/admin/admin-nodes-temp.html'],
@@ -37,8 +37,12 @@ function registerRoutes(app, dependencies) {
     ['/admin/sensor_health/device-detail.html', 'pages/admin/sensor_health/device-detail.html'],
   ];
 
-  for (const [route, file] of [...publicPages, ...unprotectedAdminPages]) {
+  for (const [route, file] of publicPages) {
     app.get(route, (req, res) => sendPage(res, file));
+  }
+
+  for (const [route, file] of adminPages) {
+    app.get(route, checkUserSession, (req, res) => sendPage(res, file));
   }
 
   app.get(
