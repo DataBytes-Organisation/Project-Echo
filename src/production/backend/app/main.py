@@ -3,6 +3,7 @@ import os
 
 from fastapi import FastAPI, Body, HTTPException, status, APIRouter, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.exceptions import RequestValidationError
 from app.errors import (
     StandardizeErrorResponseMiddleware,
@@ -48,6 +49,16 @@ app = FastAPI(
     - Interface with HMI and audio engine modules
     """,
     version="1.0.0"
+)
+
+# Compress larger API responses for clients that advertise GZip support.
+# Register GZip before the error middleware so it remains inside that
+# BaseHTTPMiddleware wrapper and can apply the minimum-size check to the
+# original response. The error middleware must not consume encoded bodies.
+app.add_middleware(
+    GZipMiddleware,
+    minimum_size=1000,
+    compresslevel=6,
 )
 
 # Log API startup in structured JSON format

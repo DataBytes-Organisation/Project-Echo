@@ -97,6 +97,10 @@ class StandardizeErrorResponseMiddleware(BaseHTTPMiddleware):
         response = await call_next(request)
         if response.status_code < 400 or "application/json" not in response.headers.get("content-type", ""):
             return response
+        # Encoded response bodies are no longer JSON bytes. Leave them untouched
+        # so an outer middleware cannot consume and accidentally empty the body.
+        if response.headers.get("content-encoding"):
+            return response
         body = b"".join([chunk async for chunk in response.body_iterator])
         try:
             payload = json.loads(body)
