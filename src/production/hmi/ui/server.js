@@ -1049,9 +1049,10 @@ app.all('/predict', proxyPredictionToApi);
 app.all('/sim_control/*', proxyToApi);
 app.all('/hmi/*', proxyToApi);
 
+const iotAuth=(req)=>({ headers: { Authorization: `Bearer ${req.session && req.session.token}` } });
 app.get('/iot/nodes', async (req, res) => {
   try {
-    const data = await apiClient.get('/iot/nodes');
+    const data = await apiClient.get('/iot/nodes', iotAuth(req));
     res.json(data);
   } catch (error) {
     apiClient.sendApiError(res, error, 'Error fetching IoT nodes');
@@ -1064,7 +1065,7 @@ app.get('/iot/nodes', async (req, res) => {
 // the page can go through the shared client like everything else.
 app.get('/iot/nodes/:nodeId', async (req, res) => {
   try {
-    const data = await apiClient.get(`/iot/nodes/${encodeURIComponent(req.params.nodeId)}`);
+    const data = await apiClient.get(`/iot/nodes/${encodeURIComponent(req.params.nodeId)}`, iotAuth(req));
     res.json(data);
   } catch (error) {
     apiClient.sendApiError(res, error, 'Error fetching IoT node details');
