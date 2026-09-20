@@ -73,6 +73,7 @@ COPY ./echo_engine.py ./
 COPY ./echo_engine.json ./
 COPY ./echo_credentials.json ./
 COPY ./helpers ./helpers
+COPY ./inference_wrapper ./inference_wrapper
 
 # Setup GCloud config dir
 RUN mkdir -p /root/.config/gcloud/
