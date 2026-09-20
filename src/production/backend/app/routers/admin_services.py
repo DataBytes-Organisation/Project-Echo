@@ -1,3 +1,4 @@
+from app.middleware.admin_auth import require_admin
 from fastapi import APIRouter, Depends
 from app.schemas import ServicePauseIn, ServicePauseOut
 from app.services.service_state import get_service_state, set_service_state
@@ -13,7 +14,7 @@ def get_pause_status(service: str):
     # if no doc exists, we still return a valid status
     return ServicePauseOut(service=service, paused=paused, updated_at=datetime.utcnow())
 
-@router.post("/admin/services/pause", dependencies=[Depends(jwtBearer)], response_model=ServicePauseOut)
+@router.post("/admin/services/pause", dependencies=[Depends(jwtBearer), Depends(require_admin)], response_model=ServicePauseOut)
 def pause_or_resume_service(payload: ServicePauseIn):
     result = set_service_state(payload.service, payload.paused)
     return ServicePauseOut(**result)
