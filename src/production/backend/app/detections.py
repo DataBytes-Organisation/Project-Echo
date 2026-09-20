@@ -1,4 +1,7 @@
-from typing import List, Optional, Dict, Any
+import base64
+import binascii
+import json
+from typing import List, Optional, Dict, Any, Tuple
 from datetime import datetime
 
 from bson import ObjectId
@@ -34,6 +37,71 @@ def _doc_to_detection(doc: Dict[str, Any]) -> Optional[Detection]:
     if not doc:
         return None
     return Detection(**doc)
+
+
+def _build_detection_query(
+    species: Optional[str] = None,
+    start_time: Optional[datetime] = None,
+    end_time: Optional[datetime] = None,
+    lat: Optional[float] = None,
+    lon: Optional[float] = None,
+    radius_km: Optional[float] = None,
+) -> Dict[str, Any]:
+    """Build the shared filter used by both offset and cursor pagination."""
+    query: Dict[str, Any] = {}
+
+    if species:
+        query["species"] = species
+
+    if start_time or end_time:
+        timestamp_filter: Dict[str, Any] = {}
+        if start_time:
+            timestamp_filter["$gte"] = start_time
+        if end_time:
+            timestamp_filter["$lte"] = end_time
+        query["timestamp"] = timestamp_filter
+
+    if lat is not None and lon is not None and radius_km is not None:
+        delta_deg = radius_km / 111.0
+        query["microphoneLLA.latitude"] = {
+            "$gte": lat - delta_deg,
+            "$lte": lat + delta_deg,
+        }
+        query["microphoneLLA.longitude"] = {
+            "$gte": lon - delta_deg,
+            "$lte": lon + delta_deg,
+        }
+
+    return query
+
+
+def _encode_cursor(timestamp: datetime, detection_id: ObjectId) -> str:
+    """Create an opaque keyset cursor from the final item in a page."""
+    payload = json.dumps(
+        {"timestamp": timestamp.isoformat(), "id": str(detection_id)},
+        separators=(",", ":"),
+    ).encode("utf-8")
+    return base64.urlsafe_b64encode(payload).decode("ascii").rstrip("=")
+
+
+def _decode_cursor(cursor: str) -> Tuple[datetime, ObjectId]:
+    """Decode and validate an opaque keyset cursor supplied by a client."""
+    try:
+        padded = cursor + "=" * (-len(cursor) % 4)
+        payload = json.loads(base64.urlsafe_b64decode(padded).decode("utf-8"))
+        timestamp = datetime.fromisoformat(payload["timestamp"])
+        detection_id = ObjectId(payload["id"])
+    except (
+        KeyError,
+        TypeError,
+        ValueError,
+        UnicodeDecodeError,
+        binascii.Error,
+        json.JSONDecodeError,
+    ) as exc:
+        raise ValueError("Invalid cursor") from exc
+
+    return timestamp, detection_id
 
 
 def create_detection(detection_in: DetectionCreate) -> Detection:
@@ -100,29 +168,10 @@ def list_detections(
     page: int = 1,
     page_size: int = 20,
 ) -> Dict[str, Any]:
-    query: Dict[str, Any] = {}
     validate_list_filters(start_time, end_time, lat, lon, radius_km)
-
-    if species:
-        query["species"] = species
-
-    if start_time or end_time:
-        ts_filter: Dict[str, Any] = {}
-        if start_time:
-            ts_filter["$gte"] = start_time
-        if end_time:
-            ts_filter["$lte"] = end_time
-        query["timestamp"] = ts_filter
-
-    if lat is not None and lon is not None and radius_km is not None:
-        delta_deg = radius_km / 111.0
-        lat_min = lat - delta_deg
-        lat_max = lat + delta_deg
-        lon_min = lon - delta_deg
-        lon_max = lon + delta_deg
-
-        query["microphoneLLA.latitude"] = {"$gte": lat_min, "$lte": lat_max}
-        query["microphoneLLA.longitude"] = {"$gte": lon_min, "$lte": lon_max}
+    query = _build_detection_query(
+        species, start_time, end_time, lat, lon, radius_km
+    )
 
     if page < 1:
         page = 1
@@ -148,6 +197,54 @@ def list_detections(
         "total": total,
         "page": page,
         "page_size": page_size,
+    }
+
+
+def list_detections_cursor(
+    species: Optional[str] = None,
+    start_time: Optional[datetime] = None,
+    end_time: Optional[datetime] = None,
+    lat: Optional[float] = None,
+    lon: Optional[float] = None,
+    radius_km: Optional[float] = None,
+    limit: int = 20,
+    cursor: Optional[str] = None,
+) -> Dict[str, Any]:
+    """Return detections using a stable timestamp-and-ID keyset cursor."""
+    validate_list_filters(start_time, end_time, lat, lon, radius_km)
+    query = _build_detection_query(
+        species, start_time, end_time, lat, lon, radius_km
+    )
+
+    if cursor:
+        cursor_timestamp, cursor_id = _decode_cursor(cursor)
+        after_cursor = {
+            "$or": [
+                {"timestamp": {"$lt": cursor_timestamp}},
+                {"timestamp": cursor_timestamp, "_id": {"$lt": cursor_id}},
+            ]
+        }
+        query = {"$and": [query, after_cursor]} if query else after_cursor
+
+    try:
+        documents = list(
+            Detections.find(query)
+            .sort([("timestamp", -1), ("_id", -1)])
+            .limit(limit + 1)
+        )
+    except PyMongoError as exc:
+        _raise_storage_error(exc)
+
+    next_cursor = None
+    if len(documents) > limit:
+        last_item = documents[limit - 1]
+        next_cursor = _encode_cursor(last_item["timestamp"], last_item["_id"])
+        documents = documents[:limit]
+
+    return {
+        "items": [_doc_to_detection(document) for document in documents],
+        "limit": limit,
+        "next_cursor": next_cursor,
     }
 
 
