@@ -60,6 +60,17 @@ class Settings(BaseSettings):
     slow_operation_ms: float = 500.0
     cache_ttl_seconds: int = 60
 
+    # --- Feature flags (C12) ---
+    # Safe defaults keep current behaviour enabled unless explicitly disabled.
+    realtime_streaming_enabled: bool = Field(
+        True,
+        env="REALTIME_STREAMING_ENABLED",
+    )
+    analytics_extensions_enabled: bool = Field(
+        True,
+        env="ANALYTICS_EXTENSIONS_ENABLED",
+    )
+
     # --- Auth (required — fail fast if missing) ---
     jwt_secret: str = Field(...)
     jwt_algorithm: str = "HS256"
@@ -69,6 +80,14 @@ class Settings(BaseSettings):
     # --- Logging / CORS ---
     log_level: str = "INFO"
     cors_origins: List[str] = ["*"]
+
+    # --- Detection rule engine (A3) ---
+    # Evaluated by app.detection_rules.evaluate_detection for every incoming
+    # detection, shared by HTTP ingestion and (once wired) A1's MQTT bridge.
+    # Empty allow-lists mean "no restriction" for that rule.
+    detection_min_confidence: float = Field(0, ge=0, le=100)
+    detection_allowed_species: List[str] = []
+    detection_allowed_sensor_ids: List[str] = []
 
     # --- Twilio (optional — SMS/2FA degrades gracefully if unset) ---
     twilio_account_sid: Optional[str] = None
@@ -87,6 +106,16 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         case_sensitive = False
+
+        @classmethod
+        def parse_env_var(cls, field_name: str, raw_val: str):
+            # Comma-separated lists (DETECTION_ALLOWED_SPECIES=Koala,Sus Scrofa)
+            # instead of JSON-array syntax, for these specific fields. Pydantic's
+            # default parse_env_var (cls.json_loads) still applies to every
+            # other complex-typed field (e.g. cors_origins).
+            if field_name in {"detection_allowed_species", "detection_allowed_sensor_ids"}:
+                return [item.strip() for item in raw_val.split(",") if item.strip()]
+            return cls.json_loads(raw_val)
 
         @classmethod
         def customise_sources(cls, init_settings, env_settings, file_secret_settings):

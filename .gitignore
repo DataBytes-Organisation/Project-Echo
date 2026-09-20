@@ -113,7 +113,7 @@ src/production/iot/management_application/audioLocal
 src/production/iot/management_application/audioUpload
 
 # Environment-specific generated file
-src/production/backend/app/main.py
+# src/production/backend/app/main.py
 
 # Generated on every `import app.main` (app/main.py's export_openapi_to_file()
 # runs unconditionally at module import time, including from tests) - not
