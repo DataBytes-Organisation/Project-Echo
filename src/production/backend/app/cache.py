@@ -50,12 +50,38 @@ def _normalize_bound(value: Optional[str]) -> str:
         return text
 
 
-def insights_overview_key(start: Optional[str] = None, end: Optional[str] = None) -> str:
-    return f"{INSIGHTS_PREFIX}overview:{_normalize_bound(start)}:{_normalize_bound(end)}"
+def _normalize_token(value: Optional[str]) -> str:
+    if not value:
+        return "all"
+    text = value.strip()
+    return text if text else "all"
 
 
-def insights_species_key(limit: int) -> str:
-    return f"{INSIGHTS_PREFIX}species:{limit}"
+def insights_overview_key(
+    start: Optional[str] = None,
+    end: Optional[str] = None,
+    species: Optional[str] = None,
+    sensor_id: Optional[str] = None,
+) -> str:
+    return (
+        f"{INSIGHTS_PREFIX}overview:"
+        f"{_normalize_bound(start)}:{_normalize_bound(end)}:"
+        f"{_normalize_token(species)}:{_normalize_token(sensor_id)}"
+    )
+
+
+def insights_species_key(
+    limit: int,
+    start: Optional[str] = None,
+    end: Optional[str] = None,
+    species: Optional[str] = None,
+    sensor_id: Optional[str] = None,
+) -> str:
+    return (
+        f"{INSIGHTS_PREFIX}species:{limit}:"
+        f"{_normalize_bound(start)}:{_normalize_bound(end)}:"
+        f"{_normalize_token(species)}:{_normalize_token(sensor_id)}"
+    )
 
 
 def get_json(key: str) -> Optional[Any]:
