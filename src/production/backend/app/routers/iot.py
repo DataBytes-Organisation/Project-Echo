@@ -16,7 +16,7 @@ def get_nodes():
     except Exception as error:
         raise HTTPException(status_code=500, detail=f"Error retrieving nodes: {str(error)}")
 
-@router.get("/nodes/{node_id}", response_description="Get a single node by ID")
+@router.get("/nodes/{node_id}", dependencies=[Depends(jwtBearer)], response_description="Get a single node by ID")
 def get_node(node_id: str):
     try:
         node = Nodes.find_one({"_id": node_id})
@@ -66,7 +66,7 @@ def get_node_connections(node_id: str):
     except Exception as error:
         raise HTTPException(status_code=500, detail=f"Error retrieving node connections: {str(error)}")
 
-@router.put("/nodes/{node_id}/register", response_description="Register a node")
+@router.put("/nodes/{node_id}/register", dependencies=[Depends(jwtBearer)], response_description="Register a node")
 def register_node(node_id: str):
     try:
         result = Nodes.update_one(
