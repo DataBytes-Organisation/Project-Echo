@@ -175,6 +175,7 @@ function createApp(dependencies = {}) {
   require('./routes/map.routes')(app);
   // Sensor-specific routes must stay before the broad /sensors proxy.
   require('./routes/sensor.routes')(app, { apiBaseUrl });
+  require('./routes/detection-review.routes')(app);
 
   pagesRoutes.registerRoutes(app, {
     publicDir,

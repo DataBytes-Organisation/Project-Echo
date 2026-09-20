@@ -26,6 +26,7 @@ function registerRoutes(app, dependencies) {
     ['/admin/donations.html', 'pages/admin/donations.html'],
     ['/admin/admin-request.html', 'pages/admin/admin-request.html'],
     ['/admin/notifications.html', 'pages/admin/notifications.html'],
+    ['/admin/detection-review.html', 'pages/admin/detection-review.html'],
     ['/admin/sensor-health.html', 'pages/admin/sensor-health.html'],
     ['/admin/feedback.html', 'pages/admin/feedback.html'],
     ['/admin/hmi-data-insights.html', 'pages/admin/hmi-data-insights.html'],

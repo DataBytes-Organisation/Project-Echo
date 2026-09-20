@@ -36,6 +36,7 @@ export const pageRoutes = [
   ["/admin/donations.html", "public/pages/admin/donations.html", false],
   ["/admin/admin-request.html", "public/pages/admin/admin-request.html", false],
   ["/admin/notifications.html", "public/pages/admin/notifications.html", false],
+  ["/admin/detection-review.html", "public/pages/admin/detection-review.html", false],
   ["/admin/sensor-health.html", "public/pages/admin/sensor-health.html", false],
   ["/admin/feedback.html", "public/pages/admin/feedback.html", false],
   ["/admin/hmi-data-insights.html", "public/pages/admin/hmi-data-insights.html", false],
