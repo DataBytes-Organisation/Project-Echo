@@ -41,6 +41,46 @@ MODEL_PATH        = _DIR / "models" / "efficientnetv2_project_echo.tflite"
 CLASS_MAPPING_PATH = _DIR / "models" / "class_mapping.json"
 PREPROCESS_CFG_PATH = _DIR / "models" / "preprocess_config.json"
 
+# Local offline message storage
+QUEUE_PATH = _DIR / "offline_message_queue.json"
+QUEUE_LOCK = threading.Lock()
+
+def load_offline_queue():
+    with QUEUE_LOCK:
+        if not QUEUE_PATH.exists():
+            return []
+
+        try:
+            with open(QUEUE_PATH, "r") as f:
+                data = json.load(f)
+
+            return data if isinstance(data, list) else []
+
+        except (json.JSONDecodeError, OSError):
+            return []
+
+
+def save_offline_queue(queue):
+    temp_path = QUEUE_PATH.with_suffix(".tmp")
+
+    with QUEUE_LOCK:
+        with open(temp_path, "w") as f:
+            json.dump(queue, f, indent=2)
+
+        temp_path.replace(QUEUE_PATH)
+
+
+def queue_message(payload):
+    queue = load_offline_queue()
+    queue.append(payload)
+    save_offline_queue(queue)
+
+    print(
+        f"MQTT offline. Message stored locally. "
+        f"Queue size: {len(queue)}",
+        flush=True,
+    )
+
 # ---------------------------------------------------------------------------
 # Audio Enhancement Pipeline & Edge Event Detection
 # ---------------------------------------------------------------------------
@@ -195,7 +235,16 @@ def connect_mqtt(broker: str, port: int) -> mqtt.Client:
         else:
             print(f"MQTT connection failed (rc={rc})", flush=True)
 
+    def on_disconnect(c, userdata, rc):
+
+        if rc != 0:
+            print(
+                "MQTT connection lost. "
+                "Messages will be stored locally.",
+                flush=True,
+            )
     client.on_connect = on_connect
+    client.on_disconnect = on_disconnect
     client.connect(broker, port, keepalive=60)
     client.loop_start()
 
@@ -203,6 +252,103 @@ def connect_mqtt(broker: str, port: int) -> mqtt.Client:
         raise RuntimeError(f"Could not connect to MQTT broker {broker}:{port}")
     return client
 
+
+# ---------------------------------------------------------------------------
+# Offline queue handling
+# ---------------------------------------------------------------------------
+
+def publish_queued_messages(
+    client: mqtt.Client,
+    topic: str,
+):
+    queue = load_offline_queue()
+
+    if not queue or not client.is_connected():
+        return
+
+    print(
+        f"MQTT reconnected. Sending {len(queue)} stored message(s)...",
+        flush=True,
+    )
+
+    remaining = []
+
+    for idx, payload in enumerate(queue):
+        # Stop trying to send if connection drops mid-queue
+        if not client.is_connected():
+            remaining = queue[idx:]
+            break
+
+        try:
+            message = client.publish(
+                topic,
+                json.dumps(payload),
+                qos=1,
+            )
+            message.wait_for_publish(timeout=5)
+
+            if message.rc == mqtt.MQTT_ERR_SUCCESS:
+                print(
+                    "Stored message published successfully.",
+                    flush=True,
+                )
+            else:
+                remaining = queue[idx:]
+                break
+        except Exception:
+            remaining = queue[idx:]
+            break
+
+    save_offline_queue(remaining)
+
+    if remaining:
+        print(
+            f"{len(remaining)} message(s) remain in local storage.",
+            flush=True,
+        )
+    else:
+        print(
+            "Offline message queue cleared.",
+            flush=True,
+        )
+
+def publish_or_store(
+    client: mqtt.Client,
+    topic: str,
+    payload: dict,
+):
+
+    if not client.is_connected():
+
+        queue_message(payload)
+        return False
+
+    try:
+
+        message = client.publish(
+            topic,
+            json.dumps(payload),
+            qos=1,
+        )
+
+        message.wait_for_publish()
+
+        if message.rc == mqtt.MQTT_ERR_SUCCESS:
+
+            print(
+                f"Published to {topic}",
+                flush=True,
+            )
+
+            return True
+
+        queue_message(payload)
+        return False
+
+    except Exception:
+
+        queue_message(payload)
+        return False
 
 # ---------------------------------------------------------------------------
 # Payload
@@ -221,6 +367,9 @@ def build_payload(
         "gps_data":        gps,
         "gps_uncertainty": gps_uncertainty,
     }
+
+
+
 
 
 # ---------------------------------------------------------------------------
@@ -249,6 +398,9 @@ def main():
     print("Edge inference client running. Ctrl+C to stop.", flush=True)
     try:
         while True:
+
+            publish_queued_messages(client,args.topic,)
+
             gps = get_gps(args.lat, args.lon) if args.use_gps else {"lat": args.lat, "lon": args.lon}
 
             raw_audio = record_audio(cfg["duration_s"], cfg["target_sr"])
@@ -272,8 +424,7 @@ def main():
                 species, confidence, top5,
                 args.sensor_id, gps, args.gps_uncertainty,
             )
-            client.publish(args.topic, json.dumps(payload), qos=1)
-            print(f"Published to {args.topic}", flush=True)
+            publish_or_store(client, args.topic, payload)
 
             time.sleep(args.interval)
 
