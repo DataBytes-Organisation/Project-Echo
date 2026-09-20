@@ -6,6 +6,7 @@ const cookieSession = require('cookie-session');
 const helmet = require('helmet');
 const jwt = require('jsonwebtoken');
 const { client, checkUserSession, requireApiSession } = require('./middleware');
+const { verifyToken, isAdmin: isSessionAdmin }=require('./middleware/authJwt');
 const controller = require('./controller/auth.controller');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
@@ -323,7 +324,7 @@ app.get('/donation-success', async (req, res) => {
 
 
 
-app.get('/donations', isAdmin, async (req, res) => {
+app.get('/donations', verifyToken, isSessionAdmin, async (req, res) => {
   try {
     // Ensure MongoDB is connected
     if (!connectedDB) {
