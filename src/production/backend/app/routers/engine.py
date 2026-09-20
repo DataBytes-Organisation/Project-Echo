@@ -7,6 +7,7 @@ import datetime
 from app import serializers
 from app import schemas
 from app.database import Events, Species
+from app.cache import invalidate_insights
 import datetime
 from fastapi.responses import StreamingResponse
 import pandas as pd
@@ -18,6 +19,7 @@ router = APIRouter()
 def create_event(event: schemas.EventSchema):
 
     result = Events.insert_one(event.dict())
+    invalidate_insights()
     pipeline = [
             {'$match': {'_id': result.inserted_id}},
         ]

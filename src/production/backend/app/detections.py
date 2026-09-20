@@ -7,6 +7,7 @@ from pymongo import ReturnDocument
 
 from app.database import Detections
 from app.schemas import DetectionCreate, Detection
+from app.cache import invalidate_insights
 
 def _doc_to_detection(doc: Dict[str, Any]) -> Optional[Detection]:
     if not doc:
@@ -19,6 +20,7 @@ def create_detection(detection_in: DetectionCreate) -> Detection:
 
     result = Detections.insert_one(payload)
     created = Detections.find_one({"_id": result.inserted_id})
+    invalidate_insights()
 
     return _doc_to_detection(created)
 
@@ -102,6 +104,8 @@ def delete_detection(detection_id: str) -> bool:
         return False
 
     result = Detections.delete_one({"_id": oid})
+    if result.deleted_count == 1:
+        invalidate_insights()
     return result.deleted_count == 1
 
 
@@ -126,4 +130,5 @@ def update_detection(
     if not doc:
         return None
 
+    invalidate_insights()
     return _doc_to_detection(doc)
