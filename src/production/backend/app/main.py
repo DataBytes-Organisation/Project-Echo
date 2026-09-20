@@ -56,7 +56,7 @@ async def log_api_startup():
     logger.info(f"API Server listening on port {settings.api_port}")
 
 # Routers
-from .routers import add_csv_output_option, audio_upload_router
+from .routers import add_csv_output_option, audio_upload_router, audio_jobs
 from app.routers import species_predictor, auth_router, detections, hmi, engine, sim, two_factor, public, iot, live, sensors, payments #Websocket
 
 from app.routers import projects
@@ -134,6 +134,7 @@ def mqtt_latest_events():
 add_correlation_id(app)
 
 app.include_router(audio_upload_router.router, tags=['audio'], prefix='/api')
+app.include_router(audio_jobs.router, prefix='/api')
 
 
 # ✅ Include routers
