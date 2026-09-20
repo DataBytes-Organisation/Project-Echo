@@ -3,6 +3,11 @@ from typing import Annotated, Any, Dict, List, Optional
 from fastapi import APIRouter, HTTPException, Query
 from app.database import Events, Microphones, Nodes
 
+from app.feature_flags import (
+    ANALYTICS_EXTENSIONS_FLAG,
+    require_feature,
+)
+
 router = APIRouter(prefix="/insights", tags=["insights"])
 
 
@@ -120,6 +125,14 @@ def insights_overview(
     species: Annotated[Optional[str], Query(description="Filter by species name (exact match)")] = None,
     sensorId: Annotated[Optional[str], Query(description="Filter by sensor ID (exact match)")] = None,
 ):
+    if any(
+        value not in (None, "")
+        for value in (start, end, species, sensorId)
+    ):
+        require_feature(
+            ANALYTICS_EXTENSIONS_FLAG,
+            "analytics extensions",
+        )
     start_dt = _parse_query_ts(start, "start")
     end_dt = _parse_query_ts(end, "end")
 
@@ -186,6 +199,14 @@ def insights_species(
     sensorId: Annotated[Optional[str], Query(description="Filter by sensor ID (exact match)")] = None,
     limit: Annotated[int, Query(ge=1, le=50)] = 10,
 ):
+    if any(
+        value not in (None, "")
+        for value in (start, end, species, sensorId)
+    ):
+        require_feature(
+            ANALYTICS_EXTENSIONS_FLAG,
+            "analytics extensions",
+        )
     start_dt = _parse_query_ts(start, "start")
     end_dt = _parse_query_ts(end, "end")
 
