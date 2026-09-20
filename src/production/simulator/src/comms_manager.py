@@ -162,6 +162,11 @@ class CommsManager():
             "animalTrueLLA": list(animal.getLLA())    
         }
 
+        self.mqtt_client.publish(
+            os.environ.get("MQTT_MOVEMENT_TOPIC", "projectecho/movement"),
+            json.dumps(movement_event),
+        )
+
         url = 'http://ts-api-cont:9000/sim/movement'
 
         x = requests.post(url, json = movement_event)

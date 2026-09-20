@@ -1,80 +1,260 @@
-import os
-from fastapi import APIRouter, Query
-from datetime import datetime
-from typing import Optional
-import pymongo
+from datetime import datetime, timezone
+from typing import Annotated, Any, Dict, List, Optional
+from fastapi import APIRouter, HTTPException, Query
+from app.database import Events, Microphones, Nodes
+
+from app.feature_flags import (
+    ANALYTICS_EXTENSIONS_FLAG,
+    require_feature,
+)
+
+from app.cache import get_json, insights_overview_key, insights_species_key, set_json
 
 router = APIRouter(prefix="/insights", tags=["insights"])
 
-MONGO_URI = os.getenv("MONGO_URI")
-MONGO_DB = os.getenv("MONGO_DB", "EchoNet")
 
-client = pymongo.MongoClient(MONGO_URI)
-db = client[MONGO_DB]
-
-
-def parse_ts(value):
+def _parse_ts(value: Any) -> Optional[datetime]:
+    """Parse Mongo datetime or common ISO string timestamps."""
     if isinstance(value, datetime):
         return value
     if isinstance(value, str):
+        text = value.strip()
+        if not text:
+            return None
         try:
-            return datetime.fromisoformat(value.replace("Z", "+00:00"))
-        except Exception:
+            return datetime.fromisoformat(text.replace("Z", "+00:00"))
+        except ValueError:
             return None
     return None
 
 
-@router.get("/overview")
-def insights_overview(
-    start: Optional[str] = Query(None),
-    end: Optional[str] = Query(None),
-):
-    events = list(db["events"].find())
-    microphones = db["microphones"].count_documents({})
-    nodes = db["nodes"].count_documents({})
+def _to_iso_string(value: Any) -> Optional[str]:
+    """
+    Format a timestamp for JSON responses without crashing.
 
-    start_dt = parse_ts(start)
-    end_dt = parse_ts(end)
+    Supports datetime values and ISO / Zulu strings already stored in Mongo.
+    Unsupported values return None instead of raising AttributeError.
+    """
+    if value is None:
+        return None
 
-    filtered = []
-    for e in events:
-        ts = parse_ts(e.get("timestamp"))
-        if not ts:
-            continue
-        if start_dt and ts < start_dt:
-            continue
-        if end_dt and ts > end_dt:
-            continue
-        filtered.append(e)
+    parsed = _parse_ts(value)
+    if parsed is not None:
+        if parsed.tzinfo is not None:
+            return parsed.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
+        return parsed.isoformat()
 
-    timestamps = [parse_ts(e["timestamp"]) for e in filtered if parse_ts(e.get("timestamp"))]
+    if isinstance(value, str) and value.strip():
+        return value.strip()
 
+    return None
+
+
+def _parse_query_ts(value: Optional[str], field_name: str) -> Optional[datetime]:
+    if value is None:
+        return None
+
+    parsed = _parse_ts(value)
+    if parsed is None:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid {field_name} datetime format",
+        )
+    return parsed
+
+
+def _normalize_timestamp_stage() -> Dict[str, Any]:
+    """Convert mixed Mongo timestamp storage (Date or string) into a Date field."""
     return {
-        "timeRange": {
-            "start": min(timestamps).isoformat() if timestamps else None,
-            "end": max(timestamps).isoformat() if timestamps else None,
-        },
-        "counts": {
-            "detections": len(filtered),
-            "uniqueSpecies": len(set(e.get("species") for e in filtered if e.get("species"))),
-            "sensorsWithDetections": len(set(e.get("sensorId") for e in filtered if e.get("sensorId"))),
-            "microphones": microphones or nodes,
+        "$addFields": {
+            "_normalizedTs": {
+                "$switch": {
+                    "branches": [
+                        {
+                            "case": {"$eq": [{"$type": "$timestamp"}, "date"]},
+                            "then": "$timestamp",
+                        },
+                        {
+                            "case": {"$eq": [{"$type": "$timestamp"}, "string"]},
+                            "then": {
+                                "$dateFromString": {
+                                    "dateString": "$timestamp",
+                                    "onError": None,
+                                    "onNull": None,
+                                }
+                            },
+                        },
+                    ],
+                    "default": None,
+                }
+            }
         }
     }
 
 
-@router.get("/species")
-def insights_species(
-    limit: int = Query(10, ge=1, le=50),
+def _build_insights_match(
+    start: Optional[datetime] = None,
+    end: Optional[datetime] = None,
+    species: Optional[str] = None,
+    sensor_id: Optional[str] = None,
+) -> Dict[str, Any]:
+    match: Dict[str, Any] = {
+        # Skip records whose timestamp could not be normalized.
+        "_normalizedTs": {"$ne": None},
+    }
+
+    if start is not None or end is not None:
+        ts_filter: Dict[str, Any] = {"$ne": None}
+        if start is not None:
+            ts_filter["$gte"] = start
+        if end is not None:
+            ts_filter["$lte"] = end
+        match["_normalizedTs"] = ts_filter
+
+    if species:
+        match["species"] = species
+
+    if sensor_id:
+        match["sensorId"] = sensor_id
+
+    return match
+
+
+@router.get("/overview")
+def insights_overview(
+    start: Annotated[Optional[str], Query(description="Inclusive start timestamp (ISO 8601)")] = None,
+    end: Annotated[Optional[str], Query(description="Inclusive end timestamp (ISO 8601)")] = None,
+    species: Annotated[Optional[str], Query(description="Filter by species name (exact match)")] = None,
+    sensorId: Annotated[Optional[str], Query(description="Filter by sensor ID (exact match)")] = None,
 ):
-    pipeline = [
-        {"$match": {"species": {"$exists": True, "$ne": ""}}},
-        {"$group": {"_id": "$species", "count": {"$sum": 1}}},
-        {"$sort": {"count": -1}},
-        {"$limit": limit},
-        {"$project": {"_id": 0, "species": "$_id", "count": 1}},
+    if any(
+        value not in (None, "")
+        for value in (start, end, species, sensorId)
+    ):
+        require_feature(
+            ANALYTICS_EXTENSIONS_FLAG,
+            "analytics extensions",
+        )
+    start_dt = _parse_query_ts(start, "start")
+    end_dt = _parse_query_ts(end, "end")
+
+    cache_key = insights_overview_key(start, end, species, sensorId)
+    cached = get_json(cache_key)
+    if cached is not None:
+        return cached
+
+    microphones = Microphones.count_documents({})
+    nodes = Nodes.count_documents({})
+
+    match = _build_insights_match(
+        start=start_dt,
+        end=end_dt,
+        species=species,
+        sensor_id=sensorId,
+    )
+
+    pipeline: List[Dict[str, Any]] = [
+        _normalize_timestamp_stage(),
+        {"$match": match},
+        {
+            "$group": {
+                "_id": None,
+                "detections": {"$sum": 1},
+                "species": {"$addToSet": "$species"},
+                "sensors": {"$addToSet": "$sensorId"},
+                "minTs": {"$min": "$_normalizedTs"},
+                "maxTs": {"$max": "$_normalizedTs"},
+            }
+        },
     ]
 
-    return {
-        "items": list(db["events"].aggregate(pipeline))
+    summary = list(Events.aggregate(pipeline))
+    if not summary:
+        payload = {
+            "timeRange": {"start": None, "end": None},
+            "counts": {
+                "detections": 0,
+                "uniqueSpecies": 0,
+                "sensorsWithDetections": 0,
+                "microphones": microphones or nodes,
+            },
+        }
+        set_json(cache_key, payload)
+        return payload
+
+    row = summary[0]
+    species_values = [value for value in row.get("species", []) if value]
+    sensor_values = [value for value in row.get("sensors", []) if value]
+
+    payload = {
+        "timeRange": {
+            "start": _to_iso_string(row.get("minTs")),
+            "end": _to_iso_string(row.get("maxTs")),
+        },
+        "counts": {
+            "detections": int(row.get("detections", 0)),
+            "uniqueSpecies": len(species_values),
+            "sensorsWithDetections": len(sensor_values),
+            "microphones": microphones or nodes,
+        },
     }
+    set_json(cache_key, payload)
+    return payload
+
+
+@router.get("/species")
+def insights_species(
+    start: Annotated[Optional[str], Query(description="Inclusive start timestamp (ISO 8601)")] = None,
+    end: Annotated[Optional[str], Query(description="Inclusive end timestamp (ISO 8601)")] = None,
+    species: Annotated[Optional[str], Query(description="Filter by species name (exact match)")] = None,
+    sensorId: Annotated[Optional[str], Query(description="Filter by sensor ID (exact match)")] = None,
+    limit: Annotated[int, Query(ge=1, le=50)] = 10,
+):
+    if any(
+        value not in (None, "")
+        for value in (start, end, species, sensorId)
+    ):
+        require_feature(
+            ANALYTICS_EXTENSIONS_FLAG,
+            "analytics extensions",
+        )
+    start_dt = _parse_query_ts(start, "start")
+    end_dt = _parse_query_ts(end, "end")
+
+    cache_key = insights_species_key(limit, start, end, species, sensorId)
+    cached = get_json(cache_key)
+    if cached is not None:
+        return cached
+
+    match = _build_insights_match(
+        start=start_dt,
+        end=end_dt,
+        species=species,
+        sensor_id=sensorId,
+    )
+
+    if species:
+        match["species"] = species
+    else:
+        match["species"] = {"$exists": True, "$ne": ""}
+
+    pipeline = [
+        _normalize_timestamp_stage(),
+        {"$match": match},
+        {
+            "$group": {
+                "_id": "$species",
+                "count": {"$sum": 1},
+                "avg_confidence": {"$avg": "$confidence"},
+            }
+        },
+        {"$sort": {"count": -1}},
+        {"$limit": limit},
+        {"$project": {"_id": 0, "species": "$_id", "count": 1, "avg_confidence": 1}},
+    ]
+
+    payload = {
+        "items": list(Events.aggregate(pipeline))
+    }
+    set_json(cache_key, payload)
+    return payload
