@@ -10,7 +10,7 @@ const hmiPath = path.join(here, "..", "public", "features", "map", "hmi-map.js")
 
 function extractHmiImport(source) {
   const match = source.match(/import\s*\{([\s\S]*?)\}\s*from\s*["']\/features\/map\/hmi-map\.js["']\s*;/);
-  assert.ok(match, 'map entry must import its HMI module from /features/map/hmi-map.js');
+  assert.ok(match, 'index.html must contain an import {...} from "/features/map/hmi-map.js" block');
   return match[1];
 }
 
@@ -35,7 +35,7 @@ test("map entry import block parses: each entry is one identifier (no missing co
     if (seen.has(name)) dupes.add(name);
     seen.add(name);
   }
-  assert.deepEqual([...dupes], [], `duplicate HMI.js imports: ${[...dupes].join(", ")}`);
+  assert.deepEqual([...dupes], [], `duplicate hmi-map.js imports: ${[...dupes].join(", ")}`);
 });
 
 test("map entry imports all resolve to HMI.js exports", async () => {
@@ -48,6 +48,6 @@ test("map entry imports all resolve to HMI.js exports", async () => {
     )
   );
   for (const name of names) {
-    assert.ok(exported.has(name), `${name} is imported by index.html but not exported from HMI.js`);
+    assert.ok(exported.has(name), `${name} is imported by index.html but not exported from hmi-map.js`);
   }
 });
