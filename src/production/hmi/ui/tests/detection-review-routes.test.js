@@ -3,7 +3,7 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
-const { createCheckUserSession } = require("../middleware/session");
+const { createCheckUserSession } = require("../server/middleware/session");
 
 // Objects built inside the vm sandbox have a different Object.prototype, which
 // makes deepStrictEqual fail on identical content; normalise before comparing.
@@ -27,7 +27,7 @@ function load(relative, dependencies) {
 function harness() {
   // Real session middleware, with only Redis replaced.
   const redis = { isOpen: true, on() {}, async get() { return "session-jwt"; } };
-  const middleware = load("../middleware/index.js", {
+  const middleware = load("../server/middleware/index.js", {
     "./verifySignup": {}, redis: { createClient: () => redis },
     "./session": { createCheckUserSession },
   });
@@ -41,7 +41,7 @@ function harness() {
       return state.response;
     },
   };
-  const register = load("../routes/detection-review.routes.js", {
+  const register = load("../server/routes/detection-review.routes.js", {
     axios,
     "../middleware": middleware,
     "../services/apiClient": { API_BASE_URL: BACKEND },

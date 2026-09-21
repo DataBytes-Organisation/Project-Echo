@@ -106,8 +106,8 @@ globalThis.ol = {
   control: { Control: class { constructor(options) { this.element = options.element; } } },
 };
 
-const hmi = await import("../public/js/HMI.js");
-const detections = await import("../public/js/real-detections.js");
+const hmi = await import("../public/features/map/hmi-map.js");
+const detections = await import("../public/features/detections/real-detections.js");
 
 // One shared state: setupLiveMapControls binds once (as in production),
 // so every button-driven test acts on this object.

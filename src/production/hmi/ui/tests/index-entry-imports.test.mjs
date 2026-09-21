@@ -5,12 +5,12 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const indexPath = path.join(here, "..", "public", "index.html");
-const hmiPath = path.join(here, "..", "public", "js", "HMI.js");
+const indexPath = path.join(here, "..", "public", "pages", "map", "index.html");
+const hmiPath = path.join(here, "..", "public", "features", "map", "hmi-map.js");
 
 function extractHmiImport(source) {
-  const match = source.match(/import\s*\{([\s\S]*?)\}\s*from\s*["']\.\/js\/HMI\.js["']\s*;/);
-  assert.ok(match, 'index.html must contain an import {...} from "./js/HMI.js" block');
+  const match = source.match(/import\s*\{([\s\S]*?)\}\s*from\s*["']\/features\/map\/hmi-map\.js["']\s*;/);
+  assert.ok(match, 'map entry must import its HMI module from /features/map/hmi-map.js');
   return match[1];
 }
 
