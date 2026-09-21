@@ -167,7 +167,7 @@ python -m pytest -q \
 
 Result:
 
-10 passed, 1 warning
+12 passed, 1 warning
 
 The warning is the existing python_multipart deprecation warning and is unrelated to B1.3.
 
@@ -322,7 +322,56 @@ No JWT, password, .env file, MongoDB credential, or other local secret is includ
 tests/test_detection_stream_multiclient.py
 tools/detection_stream_test_client.html
 docs/backend/B1_3_multi_client_streaming.md
-12. Conclusion
+
+12. API Upload-to-Detection Linking Verification
+
+During integration validation, two separate budget-related failures were observed.
+
+### Separate budget issues
+
+The `/api/admin/budget/usage` failure and the `/detections` creation failure are
+independent issues and follow separate code paths.
+
+The usage endpoint returned an unexpected-argument error because the router passes
+`month_key` to the current budget service interface. This issue is separate from
+detection creation and was not modified as part of B1.3.
+
+The detection-create `403` was independently caused by the `detections` budget not
+being configured. The local budget configuration initially contained no rules, so
+the detection budget resolved to zero.
+
+For API-level verification, a temporary positive local test budget was configured
+for the `detections` service.
+
+12.1. Upload-to-detection API flow
+
+The linking workflow was then rerun entirely through the Backend API:
+
+1. An audio test file was submitted to `POST /api/audio/upload`.
+2. The upload completed successfully and returned an `upload_id`.
+3. A detection was created through `POST /detections` with that `upload_id` supplied
+   as its `audioClip`.
+4. The created detection was retrieved again through the detection API.
+5. The returned `audioClip` matched the original upload ID.
+
+Observed result:
+
+Upload API: successful
+Detection creation API: successful
+Detection readback API: successful
+Stored audioClip matched upload_id: True
+
+This provides API-level evidence that an uploaded audio record can be linked to a
+detection when an appropriate detection budget is configured.
+
+Any earlier direct/manual database linking should be treated only as partial
+verification and not as completion of the upload-to-detection API workflow.
+
+The temporary test detection, upload metadata, uploaded file, usage record, and test
+budget configuration were removed after verification. The original local budget state
+(`rules: []`, `updated_at: null`) was restored.
+
+13. Conclusion
 
 B1.3 confirms that Project Echo's live detection stream supports multiple simultaneous WebSocket consumers.
 
