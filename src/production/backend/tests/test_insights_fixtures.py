@@ -100,6 +100,7 @@ def build_b2_fixtures():
         seed=FIXTURE_SEED,
         run_id=FIXTURE_RUN_ID,
         environment="test",
+        collection_name="events",
     )
 
 
