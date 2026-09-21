@@ -22,7 +22,12 @@ def dynamic_route(item_id: str):
     return {"item_id": item_id}
 
 
-client = TestClient(app)
+@app.get("/test-error")
+def error_route():
+    raise RuntimeError("intentional test failure")
+
+
+client = TestClient(app, raise_server_exceptions=False)
 
 
 def sample_value(name, labels):
@@ -113,3 +118,83 @@ def test_metrics_endpoint_is_not_self_instrumented():
             "status": "200",
         },
     ) is None
+
+
+def test_server_error_increments_500_counter_and_latency():
+    request_labels = {
+        "method": "GET",
+        "route": "/test-error",
+        "status": "500",
+    }
+
+    latency_labels = {
+        "route": "/test-error",
+    }
+
+    before_requests = sample_value(
+        "echo_http_requests_total",
+        request_labels,
+    ) or 0
+
+    before_latency_count = sample_value(
+        "echo_http_request_seconds_count",
+        latency_labels,
+    ) or 0
+
+    response = client.get("/test-error")
+
+    assert response.status_code == 500
+
+    after_requests = sample_value(
+        "echo_http_requests_total",
+        request_labels,
+    )
+
+    after_latency_count = sample_value(
+        "echo_http_request_seconds_count",
+        latency_labels,
+    )
+
+    assert after_requests == before_requests + 1
+    assert after_latency_count == before_latency_count + 1
+
+
+def test_repeated_requests_increment_metrics_under_load():
+    request_labels = {
+        "method": "GET",
+        "route": "/test-success",
+        "status": "200",
+    }
+
+    latency_labels = {
+        "route": "/test-success",
+    }
+
+    before_requests = sample_value(
+        "echo_http_requests_total",
+        request_labels,
+    ) or 0
+
+    before_latency_count = sample_value(
+        "echo_http_request_seconds_count",
+        latency_labels,
+    ) or 0
+
+    request_count = 50
+
+    for _ in range(request_count):
+        response = client.get("/test-success")
+        assert response.status_code == 200
+
+    after_requests = sample_value(
+        "echo_http_requests_total",
+        request_labels,
+    )
+
+    after_latency_count = sample_value(
+        "echo_http_request_seconds_count",
+        latency_labels,
+    )
+
+    assert after_requests == before_requests + request_count
+    assert after_latency_count == before_latency_count + request_count
