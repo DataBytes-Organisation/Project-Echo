@@ -2,6 +2,7 @@
 Automated tests for the Engine prediction output contract.
 """
 
+import os
 import unittest
 from unittest.mock import MagicMock, patch
 
@@ -13,6 +14,10 @@ import echo_engine as engine_module
 class TestEnginePredictionOutput(unittest.TestCase):
 
     def setUp(self):
+        env_patcher = patch.dict(os.environ, {"ENGINE_API_KEY": ""})
+        env_patcher.start()
+        self.addCleanup(env_patcher.stop)
+
         self.engine = EchoEngine()
         self.engine.config["API_URL"] = (
             "http://mock-backend/engine/event"
@@ -91,6 +96,7 @@ class TestEnginePredictionOutput(unittest.TestCase):
             "http://mock-backend/engine/event",
             json=expected_payload,
             timeout=5,
+            headers=None,
         )
 
     def test_mqtt_sample_rate_used_when_provided(self):

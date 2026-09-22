@@ -116,22 +116,21 @@ services:
     environment:
       MAIL_STARTTLS: "true"
       MAIL_SSL_TLS: "false"
-      WEB_CONCURRENCY: "${WEB_CONCURRENCY:-1}"
-    stdin_open: false
-    tty: true
-    command: uvicorn app.main:app --host 0.0.0.0 --port 9000 --workers ${WEB_CONCURRENCY:-1}
-
+      REDIS_HOST: echo-redis
+      REDIS_PORT: "6379"
+      REDIS_CACHE_DB: "2"
+      CACHE_TTL_SECONDS: "300"    
       MQTT_BROKER_URL: "ts-mqtt-server-cont"
       MQTT_BROKER_PORT: "1883"
       MQTT_PUBLISH_URL: "projectecho/engine/2"
       ENGINE_API_KEY: ${ENGINE_API_KEY:-}
-
+      WEB_CONCURRENCY: "${WEB_CONCURRENCY:-1}"
     stdin_open: false
     tty: true
+    command: uvicorn app.main:app --host 0.0.0.0 --port 9000 --workers ${WEB_CONCURRENCY:-1}
     # --no-server-header suppresses uvicorn's "server: uvicorn" response
     # header. It must be set here as well as in API.Dockerfile, because this
     # command overrides the image's CMD.
-    command: uvicorn app.main:app --host 0.0.0.0 --port 9000 --reload --no-server-header
     restart: on-failure
     depends_on:
       echo_store:
