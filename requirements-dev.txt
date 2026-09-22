@@ -1,0 +1,7 @@
+# Dev/test-only dependencies - not needed to run the application itself.
+# Install with: pip install -r requirements-dev.txt
+# See docs/team-guides/TDD_Guide.md for how these are used.
+
+pytest>=7.4.0
+pytest-cov>=4.1.0
+locust>=2.20.0

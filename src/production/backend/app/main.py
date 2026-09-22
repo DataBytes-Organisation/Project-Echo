@@ -1,41 +1,46 @@
+import logging
 import os
-# from Components.API.app.routers import add_csv_output_option, audio_upload_router
-from .routers import add_csv_output_option, audio_upload_router
+import datetime
+import pymongo
+import json
 
-from fastapi import FastAPI, Body, HTTPException, status, APIRouter
+from bson import ObjectId
+from typing import Optional, List
+from pymongo.errors import ConnectionFailure, ExecutionTimeout
+
+from fastapi import FastAPI, Body, HTTPException, status, APIRouter, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import Response, JSONResponse
+from fastapi.encoders import jsonable_encoder
+
+from pydantic import BaseModel, Field, EmailStr
+
+from app.errors import (
+    StandardizeErrorResponseMiddleware,
+    detection_exception_handler,
+    http_exception_handler,
+    unhandled_exception_handler,
+    validation_exception_handler,
+)
+from app.exceptions import DetectionError
+from app.middleware.correlation_id import add_correlation_id
+from app.metrics import PrometheusMiddleware, metrics_router
+from app.logging_config import configure_logging
+from app.config import settings
+
 from app.routers import species_predictor
 from app.routers import auth_router
 from app.routers import admin_budget, admin_services
-from fastapi.responses import Response, JSONResponse
-from fastapi.encoders import jsonable_encoder
-from pydantic import BaseModel, Field, EmailStr
-from bson import ObjectId
-from typing import Optional, List
 from app.routers import insights
-import datetime
-import pymongo
-import json 
-
 from app.routers import hmi, engine, sim, two_factor
 from app.routers import public
-app = FastAPI()
 
-# Add the CORS middleware
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:8080"],  # 可根据实际需求配置
-)
-# Routers
-from .routers import add_csv_output_option, audio_upload_router
-from app.routers import species_predictor, auth_router, hmi, engine, sim, two_factor, public, iot, live, sensors #Websocket
 
-from app.routers import projects
-app.include_router(projects.router)
+configure_logging()
+logger = logging.getLogger(__name__)
 
-from app.routers import hmi, engine, sim, iot
-
-# ✅ Add metadata here
+# Add metadata here
 app = FastAPI(
     title="Project Echo API",
     description="""
@@ -46,36 +51,127 @@ app = FastAPI(
     - Simulate audio responses
     - Interface with HMI and audio engine modules
     """,
-    version="1.0.0"
+    version="1.0.0",
 )
 
-# ✅ CORS Middleware
+
+# Log API startup in structured JSON format
+@app.on_event("startup")
+async def log_api_startup():
+    logger.info(f"API Server listening on port {settings.api_port}")
+
+
+# Routers
+from .routers import add_csv_output_option, audio_upload_router
+from app.routers import (
+    species_predictor,
+    auth_router,
+    detections,
+    hmi,
+    engine,
+    sim,
+    two_factor,
+    public,
+    iot,
+    live,
+    sensors,
+    payments,
+)
+from app.routers import projects
+
+app.include_router(projects.router)
+
+app.add_exception_handler(HTTPException, http_exception_handler)
+app.add_exception_handler(RequestValidationError, validation_exception_handler)
+app.add_exception_handler(DetectionError, detection_exception_handler)
+app.add_exception_handler(Exception, unhandled_exception_handler)
+app.add_middleware(StandardizeErrorResponseMiddleware)
+
+# CORS Middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins
-
+    allow_origins=settings.cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-
-# app.include_router(hmi.router, tags=['hmi'], prefix='/hmi')
-# app.include_router(engine.router, tags=['engine'], prefix='/engine')
-# app.include_router(sim.router, tags=['sim'], prefix='/sim')
-# app.include_router(add_csv_output_option.router, tags=['csv'], prefix='/api')
-app.include_router(audio_upload_router.router, tags=['audio'], prefix='/api')
+# Prometheus HTTP request metrics middleware
+app.add_middleware(PrometheusMiddleware)
 
 
-# ✅ Include routers
-app.include_router(hmi.router, tags=['hmi'], prefix='/hmi')
-app.include_router(engine.router, tags=['engine'], prefix='/engine')
-app.include_router(sim.router, tags=['sim'], prefix='/sim')
+async def database_unavailable_handler(request: Request, exc: Exception):
+    logger.warning(
+        "Database unavailable for %s %s (%s)",
+        request.method,
+        request.url.path,
+        exc.__class__.__name__,
+    )
+    return JSONResponse(
+        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+        content={
+            "error": "Database Unavailable",
+            "message": "The database is temporarily unavailable. Please try again later.",
+        },
+    )
+
+
+app.add_exception_handler(ConnectionFailure, database_unavailable_handler)
+app.add_exception_handler(ExecutionTimeout, database_unavailable_handler)
+
+
+######### MQTT live event handling (FR-A2)
+from app.services.mqtt_client import (
+    start_mqtt_client,
+    get_connection_state,
+    get_latest_events,
+)
+
+
+@app.on_event("startup")
+def startup_mqtt():
+    start_mqtt_client()
+
+
+@app.get("/mqtt/connection-state", tags=["mqtt"])
+def mqtt_connection_state():
+    return {"state": get_connection_state()}
+
+
+@app.get("/mqtt/latest-events", tags=["mqtt"])
+def mqtt_latest_events():
+    from app.routers.hmi import show_latest_events
+
+    events = [
+        {"eventType": "vocalization", **event}
+        for event in show_latest_events(limit=20)
+    ]
+
+    events += [
+        event
+        for event in get_latest_events()
+        if event.get("eventType") != "vocalization"
+    ]
+
+    return {"events": events}
+
+
+# Correlate every response and application log entry (C9.2). This middleware
+# is registered last so it is the outermost user middleware and can observe
+# responses generated by the other middleware.
+add_correlation_id(app)
+
+app.include_router(audio_upload_router.router, tags=["audio"], prefix="/api")
+
+
+# Include routers
+app.include_router(hmi.router, tags=["hmi"], prefix="/hmi")
+app.include_router(engine.router, tags=["engine"], prefix="/engine")
+app.include_router(sim.router, tags=["sim"], prefix="/sim")
 app.include_router(two_factor.router)
 app.include_router(admin_budget.router, tags=["admin"], prefix="/api")
 app.include_router(admin_services.router, tags=["admin"], prefix="/api")
-
-app.include_router(public.router, tags=['public'], prefix='/public')
+app.include_router(public.router, tags=["public"], prefix="/public")
 
 '''try:
     file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'echo_config.json')
@@ -87,26 +183,34 @@ except:
 print(f" database names: {client.list_database_names()}")
 '''
 
-app.include_router(iot.router, tags=['iot'], prefix='/iot')
-app.include_router(sensors.router, tags=['sensors'], prefix='/sensors')
+app.include_router(iot.router, tags=["iot"], prefix="/iot")
+app.include_router(sensors.router, tags=["sensors"], prefix="/sensors")
+app.include_router(payments.router)
+app.include_router(live.router, tags=["live"])
 app.include_router(species_predictor.router, tags=["predict"])
 
+# Prometheus /metrics endpoint
+app.include_router(metrics_router)
 
 
-# ✅ Root endpoint
+# Root endpoint
 app.include_router(insights.router, tags=["insights"])
 
-# --- Root Endpoint ---
+
 @app.get("/", response_description="API Root")
 def show_home():
-    return 'Welcome to echo api, move to /docs for more'
-    return 'Welcome to Project Echo API. Visit /docs for interactive documentation.'
+    return "Welcome to Project Echo API. Visit /docs for interactive documentation."
+
 
 app.include_router(auth_router.router, tags=["auth"], prefix="/api")
-from app.routers import detections
 app.include_router(detections.router)
 
-# ✅ /openapi-export - fetch live OpenAPI spec
+from app.routers import similar_detections
+
+app.include_router(similar_detections.router)
+
+
+# /openapi-export - fetch live OpenAPI spec
 @app.get("/openapi-export", include_in_schema=False)
 async def get_openapi_spec():
     """
@@ -115,33 +219,45 @@ async def get_openapi_spec():
     """
     return app.openapi()
 
-# ✅ /spec/summary - for OpenAPI spec verification/debug
+
+# /spec/summary - for OpenAPI spec verification/debug
 @app.get("/spec/summary", tags=["debug"], include_in_schema=False)
 async def get_spec_summary():
     """
     Returns a summary of the OpenAPI spec for deployment verification.
     """
     spec = app.openapi()
+
     return {
         "title": spec.get("info", {}).get("title"),
         "version": spec.get("info", {}).get("version"),
         "number_of_paths": len(spec.get("paths", {})),
-        "tags": [tag.get("name") for tag in spec.get("tags", []) if "name" in tag]
+        "tags": [
+            tag.get("name")
+            for tag in spec.get("tags", [])
+            if "name" in tag
+        ],
     }
 
-# ✅ Save OpenAPI spec to file when app starts
+
+# Save OpenAPI spec to file when app starts
 def export_openapi_to_file():
     """
     Saves the OpenAPI spec to a file on startup.
     Creates the 'backend' folder if it doesn't exist.
     """
     output_dir = "backend"
-    os.makedirs(output_dir, exist_ok=True)  # creates the folder if it doesn't exist
-    output_path = os.path.join(output_dir, "project-echo-openapi.json")
+    os.makedirs(output_dir, exist_ok=True)
+
+    output_path = os.path.join(
+        output_dir,
+        "project-echo-openapi.json",
+    )
 
     with open(output_path, "w") as f:
         json.dump(app.openapi(), f, indent=2)
 
-    print(f"✅ OpenAPI spec exported to {output_path}")
+    logger.info(f"OpenAPI spec exported to {output_path}")
+
 
 export_openapi_to_file()
