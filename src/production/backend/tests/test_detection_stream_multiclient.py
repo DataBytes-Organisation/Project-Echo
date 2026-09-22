@@ -104,6 +104,11 @@ def test_two_clients_receive_same_persisted_detection(
         )
         monkeypatch.setattr(
             engine,
+            "invalidate_insights",
+            lambda: None,
+        )
+        monkeypatch.setattr(
+            engine,
             "detection_stream_manager",
             manager,
         )
