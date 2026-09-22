@@ -121,10 +121,14 @@ services:
       MQTT_BROKER_URL: "ts-mqtt-server-cont"
       MQTT_BROKER_PORT: "1883"
       MQTT_PUBLISH_URL: "projectecho/engine/2"
-      ENGINE_API_KEY: ${ENGINE_API_KEY:-}
-
+      ENGINE_API_KEY: ${ENGINE_API_KEY:-}      
     stdin_open: false
     tty: true
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 512M
     # --no-server-header suppresses uvicorn's "server: uvicorn" response
     # header. It must be set here as well as in API.Dockerfile, because this
     # command overrides the image's CMD.
@@ -149,6 +153,11 @@ services:
       - echo_store
     networks:
       - echo-net
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 256M
 
   echo_store:
     build:
@@ -167,6 +176,11 @@ services:
       - "27017:27017"
     volumes:
       - db-data:/data/db
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 512M
     healthcheck:
       test:
         [
