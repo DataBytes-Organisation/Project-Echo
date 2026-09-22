@@ -391,49 +391,72 @@ themselves, so an empty _b2_4_test_* collection may remain present after a test 
 The important isolation guarantee is that B2.4 fixture documents are removed and the
 normal Project Echo collections are not modified.
 
-### MongoDB integration test environment
+### MongoDB and Redis test isolation
 
 The shared:
 
-tests/conftest.py
+`tests/conftest.py`
 
-patches:
+patches `pymongo.MongoClient` to `mongomock.MongoClient` for the normal Backend
+test suite.
 
-pymongo.MongoClient
+The current analytics aggregation pipeline uses MongoDB expressions including
+`$type` during timestamp normalisation. The installed mongomock implementation
+does not support this expression.
 
-to:
+B2.4 therefore explicitly separates the two test modes:
 
-mongomock.MongoClient
+1. **Normal mocked Backend suite**
 
-for the general tests/ package.
+   When the shared mongomock configuration is active, the three deterministic
+   fixture-generation tests run normally, while the eight analytics integration
+   tests are explicitly skipped.
 
-The current analytics aggregation pipeline uses MongoDB expressions including:
+   Expected result:
 
-$type
+   `3 passed, 8 skipped`
 
-inside timestamp normalisation.
+   This prevents real-MongoDB analytics tests from entering the normal mocked
+   Backend suite and failing because of unsupported aggregation expressions.
 
-The installed mongomock implementation does not support this aggregation expression
-and raises:
+2. **Real MongoDB integration suite**
 
-OperationFailure: Unrecognized expression '$type'
+   The full B2.4 analytics suite is run with `--noconftest`, which bypasses the
+   shared mongomock patch and uses the local Project Echo MongoDB instance.
 
-This is a test-environment limitation rather than an analytics failure.
+   The tests continue to use the isolated `_b2_4_test_*` collections, so normal
+   Project Echo data is not read, modified or removed.
 
-For this reason, the B2.4 analytics integration suite is run against the local Project
-Echo MongoDB container using:
+The B2.4 integration fixture also bypasses the normal Redis insights cache by
+patching the cache functions imported by `app.routers.insights`:
 
---noconftest
+- `get_json` always returns `None`
+- `set_json` is a no-op
 
-This bypasses the shared mongomock patch and allows the tests to exercise the real
-MongoDB aggregation behaviour while still using the isolated _b2_4_test_*
-collections.
+This ensures analytics results always come from the deterministic B2.4 fixture
+collections and cannot be overridden by existing application cache entries.
 
-### B2.4 analytics fixture tests
+### Normal mocked Backend collection
 
 Run:
 
-docker exec -it ts-api-cont python -m pytest `
+docker exec -e PYTHONPATH=/app -w /app ts-api-cont `
+    python -m pytest -q tests/test_insights_fixtures.py
+
+Observed result:
+
+3 passed, 8 skipped, 1 warning
+
+The three fixture-only tests run under the normal mongomock configuration.
+The eight analytics integration tests are intentionally skipped because they
+require real MongoDB aggregation support.
+
+### B2.4 real-MongoDB analytics fixture tests
+
+Run:
+
+docker exec -e PYTHONPATH=/app -w /app ts-api-cont `
+    python -m pytest `
     --noconftest `
     -q tests/test_insights_fixtures.py
 
@@ -448,7 +471,8 @@ and is unrelated to B2.4.
 
 Run:
 
-docker exec -it ts-api-cont python -m pytest `
+docker exec -e PYTHONPATH=/app -w /app ts-api-cont `
+    python -m pytest `
     --noconftest `
     -q tests/test_seed_detections.py `
        tests/test_insights_fixtures.py
@@ -515,10 +539,14 @@ sensor filtering verified
 date-range filtering verified
 combined species + sensor filtering verified
 isolated _b2_4_test_* MongoDB collections used
-B2.4-only suite = 11 passed
+normal mocked B2.4 collection = 3 passed, 8 skipped
+Redis insights cache bypassed during B2.4 integration tests
+B2.4 real-MongoDB suite = 11 passed
 combined C13 + B2.4 suite = 30 passed
 
-The B2.4 integration suite is executed against the local MongoDB instance using
---noconftest because the shared mongomock test environment does not support the
-$type aggregation expression used by the current analytics timestamp-normalisation
-pipeline.
+The real-MongoDB B2.4 integration suite is explicitly gated out of the normal
+mongomock-backed Backend collection and is executed using `--noconftest`.
+This is required because mongomock does not support the `$type` aggregation
+expression used by the current analytics timestamp-normalisation pipeline.
+The integration fixture also bypasses the shared Redis insights cache so existing
+application cache entries cannot override deterministic B2.4 fixture results.

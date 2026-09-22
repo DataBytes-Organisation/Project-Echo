@@ -132,6 +132,33 @@ def isolated_insights_database(monkeypatch):
     directly from app.database, so those module globals are
     patched rather than patching an old `db` object.
     """
+    # These analytics integration tests exercise MongoDB aggregation
+    # expressions such as $type that mongomock does not support.
+    #
+    # The normal Backend test suite intentionally patches MongoClient with
+    # mongomock, so explicitly skip only the real-MongoDB integration tests
+    # in that environment. Run this file with --noconftest to exercise the
+    # real local MongoDB instance.
+    if project_mongo_client.__class__.__module__.startswith("mongomock"):
+        pytest.skip(
+            "B2.4 analytics integration requires real MongoDB; "
+            "run with --noconftest."
+        )
+
+    # B2.4 must exercise its deterministic fixture data rather than normal
+    # application Redis entries. Do not read or write the shared insights
+    # cache during these integration tests.
+    monkeypatch.setattr(
+        insights,
+        "get_json",
+        lambda _key: None,
+    )
+    monkeypatch.setattr(
+        insights,
+        "set_json",
+        lambda _key, _payload: None,
+    )
+
     try:
         project_mongo_client.admin.command("ping")
     except PyMongoError:
