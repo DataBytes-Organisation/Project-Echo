@@ -4,73 +4,51 @@ import datetime
 
 client = TestClient(app)
 
-def test_valid_payload_normalisation():
-    """Verify that a valid engine payload is processed successfully."""
+
+def _valid_payload(**overrides):
     payload = {
         "timestamp": datetime.datetime.utcnow().isoformat() + "Z",
         "sensorId": "S123",
         "species": "Koala",
-        "microphoneLLA": [-33.0, 150.0, 20.0],
-        "animalEstLLA": [-33.01, 150.01, 20.0],
-        "animalTrueLLA": [-33.02, 150.02, 20.0],
+        "sourceType": "real",
+        "microphoneLLA": {"latitude": -33.0, "longitude": 150.0, "altitude": 20.0},
+        "animalEstLLA": {"latitude": -33.01, "longitude": 150.01, "altitude": 20.0},
+        "animalTrueLLA": {"latitude": -33.02, "longitude": 150.02, "altitude": 20.0},
         "animalLLAUncertainty": 5,
         "audioClip": "base64encodedaudio==",
         "confidence": 95.5,
-        "sampleRate": 48000
+        "sampleRate": 48000,
     }
-    
-    # We expect 422 if the schema is invalid, so if it returns something else 
-    # (like 500 because the DB is down, or 201 Created), it means it passed validation.
-    response = client.post("/engine/event", json=payload)
+    payload.update(overrides)
+    return payload
+
+
+def test_valid_payload_normalisation():
+    """Verify that a valid engine payload is processed successfully."""
+    response = client.post("/engine/event", json=_valid_payload())
+    # Passed validation if not 422 (201 created, or another non-validation status).
     assert response.status_code != 422
+    assert response.status_code == 201
+
 
 def test_missing_required_field():
     """Verify that a payload missing a required field (species) is rejected."""
-    payload = {
-        "timestamp": datetime.datetime.utcnow().isoformat() + "Z",
-        "sensorId": "S123",
-        # "species" is missing
-        "microphoneLLA": [-33.0, 150.0, 20.0],
-        "animalEstLLA": [-33.01, 150.01, 20.0],
-        "animalTrueLLA": [-33.02, 150.02, 20.0],
-        "animalLLAUncertainty": 5,
-        "audioClip": "base64encodedaudio==",
-        "confidence": 95.5,
-        "sampleRate": 48000
-    }
+    payload = _valid_payload()
+    del payload["species"]
     response = client.post("/engine/event", json=payload)
     assert response.status_code == 422
+
 
 def test_out_of_bounds_confidence():
     """Verify that a payload with confidence > 100 is rejected."""
-    payload = {
-        "timestamp": datetime.datetime.utcnow().isoformat() + "Z",
-        "sensorId": "S123",
-        "species": "Koala",
-        "microphoneLLA": [-33.0, 150.0, 20.0],
-        "animalEstLLA": [-33.01, 150.01, 20.0],
-        "animalTrueLLA": [-33.02, 150.02, 20.0],
-        "animalLLAUncertainty": 5,
-        "audioClip": "base64encodedaudio==",
-        "confidence": 150.0, # Invalid, max is 100
-        "sampleRate": 48000
-    }
-    response = client.post("/engine/event", json=payload)
+    response = client.post("/engine/event", json=_valid_payload(confidence=150.0))
     assert response.status_code == 422
+
 
 def test_invalid_data_type():
     """Verify that a payload with an incorrect data type is rejected."""
-    payload = {
-        "timestamp": datetime.datetime.utcnow().isoformat() + "Z",
-        "sensorId": "S123",
-        "species": "Koala",
-        "microphoneLLA": [-33.0, 150.0, 20.0],
-        "animalEstLLA": [-33.01, 150.01, 20.0],
-        "animalTrueLLA": [-33.02, 150.02, 20.0],
-        "animalLLAUncertainty": 5,
-        "audioClip": "base64encodedaudio==",
-        "confidence": 95.5,
-        "sampleRate": "forty-eight thousand" # Invalid string instead of int
-    }
-    response = client.post("/engine/event", json=payload)
+    response = client.post(
+        "/engine/event",
+        json=_valid_payload(sampleRate="forty-eight thousand"),
+    )
     assert response.status_code == 422
