@@ -109,12 +109,40 @@ services:
       MONGODB_URI: mongodb://root:root_password@ts-mongodb-cont:27017/EchoNet?authSource=admin
       USER_MONGODB_URI: mongodb://root:root_password@ts-mongodb-cont:27017/EchoNet?authSource=admin
       JWT_SECRET: ci-test-secret-not-for-production
+      REDIS_URL: redis://echo-redis:6379/1
     depends_on:
       - echo_store
+      - echo-redis
 
     stdin_open: false
     tty: true
     command: uvicorn app.main:app --host 0.0.0.0 --port 9000 --reload
+
+  echo_rq_worker:
+    build:
+      context: ../../production/backend
+      dockerfile: API.Dockerfile
+    image: ts-api
+    container_name: ts-rq-worker-cont
+    networks:
+      - echo-net
+    volumes:
+      - ../../production/backend:/app
+    environment:
+      PYTHONUNBUFFERED: "1"
+      PYTHONPATH: /app
+      MONGODB_URI: mongodb://root:root_password@ts-mongodb-cont:27017/EchoNet?authSource=admin
+      USER_MONGODB_URI: mongodb://root:root_password@ts-mongodb-cont:27017/EchoNet?authSource=admin
+      JWT_SECRET: ci-test-secret-not-for-production
+      REDIS_URL: redis://echo-redis:6379/1
+      JOB_TIMEOUT_SECONDS: "180"
+      JOB_MAX_RETRIES: "3"
+      JOB_RETRY_DELAY_SECONDS: "10"
+      DETECTION_WEBHOOK_URL: ${DETECTION_WEBHOOK_URL:-}
+    command: rq worker echo-backend --with-scheduler --url redis://echo-redis:6379/1
+    depends_on:
+      - echo_store
+      - echo-redis
 
   mongo-express:
     image: mongo-express
