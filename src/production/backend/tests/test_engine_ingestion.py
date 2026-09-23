@@ -1,3 +1,4 @@
+import asyncio
 from types import SimpleNamespace
 import asyncio
 
@@ -90,6 +91,93 @@ def test_create_event_uses_shared_persistence(monkeypatch):
 
     assert captured["broadcast"]["_id"] == "fake-event-id"
 
+    assert response == {
+        "status": "success",
+        "eventId": "fake-event-id",
+    }
+
+
+def test_create_event_broadcasts_only_after_persistence(monkeypatch):
+    persisted = {"done": False}
+    broadcast_payloads = []
+
+    def fake_persist(event):
+        persisted["done"] = True
+        return "fake-event-id"
+
+    def fake_build_stream_payload(inserted_id):
+        assert persisted["done"] is True
+        return {
+            "_id": inserted_id,
+            "sensorId": "unit-test-sensor",
+            "species": "Uperoleia mimula",
+        }
+
+    class RecordingStream:
+        async def broadcast(self, payload):
+            assert persisted["done"] is True
+            broadcast_payloads.append(payload)
+
+    monkeypatch.setattr(engine, "persist_event", fake_persist)
+    monkeypatch.setattr(
+        engine,
+        "_build_stream_payload",
+        fake_build_stream_payload,
+    )
+    monkeypatch.setattr(
+        engine,
+        "detection_stream_manager",
+        RecordingStream(),
+    )
+
+    response = asyncio.run(
+        engine.create_event(EventSchema(**valid_payload()))
+    )
+
+    assert persisted["done"] is True
+    assert response == {
+        "status": "success",
+        "eventId": "fake-event-id",
+    }
+    assert len(broadcast_payloads) == 1
+    assert broadcast_payloads[0]["sensorId"] == "unit-test-sensor"
+
+
+def test_broadcast_failure_does_not_undo_persisted_event(monkeypatch):
+    persisted = {"done": False}
+
+    def fake_persist(event):
+        persisted["done"] = True
+        return "fake-event-id"
+
+    def fake_build_stream_payload(inserted_id):
+        return {
+            "_id": inserted_id,
+            "sensorId": "unit-test-sensor",
+            "species": "Uperoleia mimula",
+        }
+
+    class FailingStream:
+        async def broadcast(self, payload):
+            raise RuntimeError("client connection failed")
+
+    monkeypatch.setattr(engine, "persist_event", fake_persist)
+    monkeypatch.setattr(
+        engine,
+        "_build_stream_payload",
+        fake_build_stream_payload,
+    )
+    monkeypatch.setattr(
+        engine,
+        "detection_stream_manager",
+        FailingStream(),
+    )
+
+    response = asyncio.run(
+        engine.create_event(EventSchema(**valid_payload()))
+    )
+
+    assert persisted["done"] is True
     assert response == {
         "status": "success",
         "eventId": "fake-event-id",

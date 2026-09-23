@@ -109,9 +109,15 @@ services:
       - ../../production/backend:/app # Mount the api's src directory to /app in the container
       - credentials_volume:/root/.config/gcloud/
       - weather_data:/app/weather_data  # Add a volume for weather data
+    env_file:
+      - .env
     environment:
       MAIL_STARTTLS: "true"
       MAIL_SSL_TLS: "false"
+      REDIS_HOST: echo-redis
+      REDIS_PORT: "6379"
+      REDIS_CACHE_DB: "2"
+      CACHE_TTL_SECONDS: "300"
       MQTT_BROKER_URL: "ts-mqtt-server-cont"
       MQTT_BROKER_PORT: "1883"
       MQTT_PUBLISH_URL: "projectecho/engine/2"

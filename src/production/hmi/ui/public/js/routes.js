@@ -86,6 +86,26 @@ export function retrieveIotNode(nodeId, opts = {}) {
   );
 }
 
+export function retrieveDetections(source) {
+  // "all" (and missing/unknown) omits sourceType: the backend default is
+  // all-behaviour. Never send sourceType=all as a value.
+  const params = source === "real" || source === "simulator" ? { sourceType: source } : undefined;
+  return withRetry(() => api.get("/api/detections", params ? { params } : undefined), RETRY_OPTS);
+}
+
+/**
+ * Fetch weather for a detection location through the authenticated HMI proxy.
+ * Same-origin only: the browser never calls the Backend host directly.
+ *
+ * @param {number|string} timestamp - Unix seconds for the detection date.
+ * @param {number|string} lat - Latitude of the detection location.
+ * @param {number|string} lon - Longitude of the detection location.
+ * @returns {Promise<AxiosResponse>}
+ */
+export function retrieveWeatherData(timestamp, lat, lon) {
+  return withRetry(() => api.get(`/api/weather?timestamp=${timestamp}&lat=${lat}&lon=${lon}`), RETRY_OPTS);
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Movement / truth events
 // ─────────────────────────────────────────────────────────────────────────────
@@ -125,6 +145,22 @@ export function retrieveMicrophones() {
 export function retrieveAudio(id) {
   return withRetry(() => api.get(`/audio/${id}`), RETRY_OPTS);
 }
+/**
+ * Submit an audio file for species analysis.
+ * POST is not retried because prediction requests should not be duplicated.
+ *
+ * @param {Blob|File} audioBlob
+ * @param {string} [filename="recording.wav"]
+ * @param {AbortSignal} [signal]
+ * @returns {Promise<AxiosResponse>}
+ */
+export function analyseAudio(audioBlob, filename = "recording.wav", signal) {
+  const formData = new FormData();
+  formData.append("audio", audioBlob, filename);
+
+  return api.post("/predict", formData, { signal });
+}
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Recordings  (POST — not retried: could create duplicate records)

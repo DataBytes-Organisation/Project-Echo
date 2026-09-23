@@ -3,15 +3,16 @@ from fastapi import status, APIRouter, Depends
 from app import serializers
 from app import schemas
 from app.database import Events
+from app.services.detection_stream import detection_stream_manager
 from app.services.event_ingestion import persist_event
 from app.middleware.engine_auth import verify_engine_api_key
-from app.services.detection_stream import detection_stream_manager
 import asyncio
 import datetime
 import logging
 from app import serializers
 from app import schemas
 from app.database import Events, Species
+from app.cache import invalidate_insights
 import datetime
 from fastapi.responses import StreamingResponse
 import pandas as pd
@@ -60,6 +61,7 @@ def _build_stream_payload(inserted_id):
 async def create_event(event: schemas.EventSchema):
     # Keep Mongo work off the event loop so open WebSocket clients stay responsive.
     inserted_id = await asyncio.to_thread(persist_event, event)
+    await asyncio.to_thread(invalidate_insights)
     # Persistence already succeeded. Broadcast failures must not turn this into a 500.
     try:
         stream_payload = await asyncio.to_thread(
@@ -120,11 +122,11 @@ def list_species_data(species: str = "", event_start: str = "", event_end: str =
         pipeline.append(
             {'$match': {'timestamp': {'$gte': datetime_start, '$lt': datetime_end}}})
     if (microphoneLLA_0):
-        pipeline.append({'$match': {'microphoneLLA.0': microphoneLLA_0}})
+        pipeline.append({'$match': {'microphoneLLA.latitude': microphoneLLA_0}})
     if (microphoneLLA_1):
-        pipeline.append({'$match': {'microphoneLLA.1': microphoneLLA_1}})
+        pipeline.append({'$match': {'microphoneLLA.longitude': microphoneLLA_1}})
     if (microphoneLLA_2):
-        pipeline.append({'$match': {'microphoneLLA.2': microphoneLLA_2}})
+        pipeline.append({'$match': {'microphoneLLA.altitude': microphoneLLA_2}})
 
     # Convering to csv format
     df = pd.DataFrame(serializers.animalListEntity(
