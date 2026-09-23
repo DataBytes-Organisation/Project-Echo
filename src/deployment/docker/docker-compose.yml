@@ -6,8 +6,8 @@ services:
       context: ../../production/engine
       dockerfile: Model.Dockerfile
       args:
-       BASE_IMAGE: tensorflow/serving:latest
-       # BASE_IMAGE: emacski/tensorflow-serving # Uncomment if on macos and comment above line
+        BASE_IMAGE: tensorflow/serving:latest
+        # BASE_IMAGE: emacski/tensorflow-serving # Uncomment if on macos and comment above line
     image: ts-echo-model
     container_name: ts-echo-model-cont
     command: --model_config_file=/models/models.config
@@ -41,12 +41,10 @@ services:
       dockerfile: HMI.Dockerfile
     image: ts-echo-hmi
     container_name: ts-echo-hmi-cont
-    # env_file:
-    #   - .env
     networks:
       - echo-net
     volumes:
-      - ../../production/hmi/ui:/usr/src/app/ui # Mount the hmi/ui directory to /usr/src/app/ui in the container
+      - ../../production/hmi/ui:/usr/src/app/ui
       - /usr/src/app/ui/node_modules
       - credentials_volume:/root/.config/gcloud/
     ports:
@@ -63,7 +61,6 @@ services:
       - DB_HOST=ts-mongodb-cont
       - MONGODB_URI=mongodb://root:root_password@ts-mongodb-cont:27017/EchoNet?authSource=admin
       - MONGO_URI=mongodb://root:root_password@ts-mongodb-cont:27017/EchoNet?authSource=admin
-
 
   echo_mqtt:
     build:
@@ -89,11 +86,10 @@ services:
     networks:
       - echo-net
     volumes:
-      - ../../production/simulator/src:/app # Mount the simulator's src directory to /app in the container
+      - ../../production/simulator/src:/app
       - credentials_volume:/root/.config/gcloud/
     stdin_open: false
     tty: true
-
 
   echo_api:
     build:
@@ -106,9 +102,9 @@ services:
     ports:
       - "9000:9000"
     volumes:
-      - ../../production/backend:/app # Mount the api's src directory to /app in the container
+      - ../../production/backend:/app
       - credentials_volume:/root/.config/gcloud/
-      - weather_data:/app/weather_data  # Add a volume for weather data
+      - weather_data:/app/weather_data
     env_file:
       - .env
     environment:
@@ -122,24 +118,20 @@ services:
       MQTT_BROKER_PORT: "1883"
       MQTT_PUBLISH_URL: "projectecho/engine/2"
       ENGINE_API_KEY: ${ENGINE_API_KEY:-}
-
     stdin_open: false
     tty: true
-    # --no-server-header suppresses uvicorn's "server: uvicorn" response
-    # header. It must be set here as well as in API.Dockerfile, because this
-    # command overrides the image's CMD.
     command: uvicorn app.main:app --host 0.0.0.0 --port 9000 --reload --no-server-header
     restart: on-failure
     depends_on:
       echo_store:
         condition: service_healthy
-        
+
   mongo-express:
     image: mongo-express
     container_name: mongo-express
     restart: always
     ports:
-      - 8888:8081
+      - "8888:8081"
     environment:
       ME_CONFIG_MONGODB_SERVER: ts-mongodb-cont
       ME_CONFIG_MONGODB_ENABLE_ADMIN: "true"
@@ -215,6 +207,53 @@ services:
     stdin_open: false
     tty: true
 
+  # -------------------------------------------------
+  # D1.4 - Monitoring Stack
+  # -------------------------------------------------
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    networks:
+      - echo-net
+    depends_on:
+      - echo_api
+      - cadvisor
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3001:3000"
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards
+      - grafana-data:/var/lib/grafana
+    networks:
+      - echo-net
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    ports:
+      - "8080:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+    networks:
+      - echo-net
+    restart: unless-stopped
+
 networks:
   echo-net:
     driver: bridge
@@ -223,3 +262,4 @@ volumes:
   credentials_volume:
   db-data:
   weather_data:
+  grafana-data:
