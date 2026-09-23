@@ -5,7 +5,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const hmiPath = path.join(here, "..", "public", "js", "HMI.js");
+const hmiPath = path.join(here, "..", "public", "features", "map", "hmi-map.js");
 
 // The browser loads HMI.js as an ES module, where a duplicate top-level
 // function/lexical declaration is a SyntaxError that kills the whole module:

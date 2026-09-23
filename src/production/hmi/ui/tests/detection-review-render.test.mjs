@@ -3,7 +3,7 @@ import { createRequire } from "node:module";
 import test from "node:test";
 
 const require = createRequire(import.meta.url);
-const render = require("../public/admin/js/detection-review-render.js");
+const render = require("../public/pages/admin/js/detection-review-render.js");
 
 // The Backend accepts and returns markup in a detection's species field, so
 // stored values must be rendered as text, never as HTML.

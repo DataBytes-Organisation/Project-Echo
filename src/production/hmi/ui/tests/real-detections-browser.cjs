@@ -4,7 +4,7 @@ const express = require("express");
 const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
-const { createCheckUserSession } = require("../middleware/session");
+const { createCheckUserSession } = require("../server/middleware/session");
 const app = express();
 let mode = "success";
 const fixture = { _id: "esp32-fixture", sourceType: "real", sensorId: "esp32-001",
@@ -12,7 +12,7 @@ const fixture = { _id: "esp32-fixture", sourceType: "real", sensorId: "esp32-001
   microphoneLLA: [-37.8136, 144.9631, 0], animalTrueLLA: [10, 20, 0] };
 app.use((req, _res, next) => { req.session = { token: "fixture-session" }; next(); });
 const routeModule = { exports: {} };
-vm.runInNewContext(fs.readFileSync(path.join(__dirname, "../routes/map.routes.js"), "utf8"), {
+vm.runInNewContext(fs.readFileSync(path.join(__dirname, "../server/routes/map.routes.js"), "utf8"), {
   module: routeModule, process: { env: { API_HOST: "fixture.invalid" } }, console,
   require(name) {
     if (name === "dotenv") return { config() {} };
@@ -36,16 +36,16 @@ app.get("/scenario/:mode", (req, res) => {
 });
 app.get("/", (_req, res) => res.send(`<!doctype html><html lang="en"><head>
 <meta name="viewport" content="width=device-width,initial-scale=1"><title>ESP32 map verification</title>
-<link rel="stylesheet" href="/css/ol.css"><style>
+<link rel="stylesheet" href="/vendor/openlayers/ol.css"><style>
 body{margin:0;font:16px system-ui;color:#222}header{padding:16px}nav{display:flex;flex-wrap:wrap;gap:18px}
 #basemap{height:calc(100vh - 140px);min-height:300px;background:#e6ece8}output{display:block;padding:8px}
-</style><script src="/js/ol.js"></script><script src="/axios.js"></script></head><body>
+</style><script src="/vendor/openlayers/ol.js"></script><script src="/axios.js"></script></head><body>
 <header><strong>ESP32 map verification — deterministic fixture, no live services</strong>
 <p>Production detection control and rendering. Scenario: ${mode}.</p><nav>
 ${["success", "empty", "error", "invalid", "loading"].map(value => `<a href="/scenario/${value}">${value}</a>`).join("")}
 </nav></header><div id="basemap"></div><output id="counts"></output>
 <script type="module">
-import { loadRealDetections } from '/js/real-detections.js';
+import { loadRealDetections } from '/features/detections/real-detections.js';
 const state = { basemap: new ol.Map({ target: 'basemap', layers: [],
   view: new ol.View({ center: ol.proj.fromLonLat([144.9631,-37.8136]), zoom: 10 }) }) };
 await loadRealDetections(state);

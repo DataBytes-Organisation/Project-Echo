@@ -1,7 +1,7 @@
-const {client} = require("../middleware")
+const {client} = require("../server/middleware")
 const axios = require('axios');
 require('dotenv').config();
-const API_BASE_URL = `http://${process.env.API_HOST || 'localhost'}:9000`;
+const API_BASE_URL = `http://${process.env.API_HOST || 'localhost'}:${process.env.API_PORT || '9000'}`;
 
 
 const nodemailer = require("nodemailer");
