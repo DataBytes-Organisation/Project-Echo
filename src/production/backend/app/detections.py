@@ -1,12 +1,35 @@
 from typing import List, Optional, Dict, Any
 from datetime import datetime
-from fastapi import HTTPException
 
 from bson import ObjectId
+from fastapi import HTTPException
 from pymongo import ReturnDocument
+from pymongo.errors import PyMongoError
 
 from app.database import Detections, Events
+from app.detection_rules import mutable_detection_update, validate_list_filters
+from app.exceptions import (
+    DetectionNotFoundError,
+    DetectionRuleError,
+    DetectionStorageError,
+)
 from app.schemas import DetectionCreate, Detection
+from app.detection_rules import evaluate_detection, log_rejected_detection
+from app.cache import invalidate_insights
+
+
+STORAGE_UNAVAILABLE_MESSAGE = "Detection storage is temporarily unavailable."
+
+
+def _object_id(detection_id: str) -> ObjectId:
+    """Parse a detection id or report a client-facing rule violation."""
+    if not ObjectId.is_valid(detection_id):
+        raise DetectionRuleError("detection_id must be a valid MongoDB ObjectId.")
+    return ObjectId(detection_id)
+
+
+def _raise_storage_error(exc: Exception):
+    raise DetectionStorageError(STORAGE_UNAVAILABLE_MESSAGE) from exc
 
 def _doc_to_detection(doc: Dict[str, Any]) -> Optional[Detection]:
     if not doc:
@@ -15,23 +38,37 @@ def _doc_to_detection(doc: Dict[str, Any]) -> Optional[Detection]:
 
 
 def create_detection(detection_in: DetectionCreate) -> Detection:
+    accepted, reason = evaluate_detection(detection_in)
+    if not accepted:
+        log_rejected_detection(detection_in, reason)
+        raise HTTPException(status_code=422, detail=f"Detection rejected: {reason}")
+
     payload = detection_in.dict(by_alias=True)
 
-    result = Detections.insert_one(payload)
-    created = Detections.find_one({"_id": result.inserted_id})
+    try:
+        result = Detections.insert_one(payload)
+        created = Detections.find_one({"_id": result.inserted_id})
+    except PyMongoError as exc:
+        _raise_storage_error(exc)
 
+    if not created:
+        raise DetectionStorageError(
+            "The detection was not available after it was created."
+        )
+
+    invalidate_insights()
     return _doc_to_detection(created)
 
 
-def get_detection(detection_id: str) -> Optional[Detection]:
+def get_detection(detection_id: str) -> Detection:
+    oid = _object_id(detection_id)
     try:
-        oid = ObjectId(detection_id)
-    except Exception:
-        return None
+        doc = Detections.find_one({"_id": oid})
+    except PyMongoError as exc:
+        _raise_storage_error(exc)
 
-    doc = Detections.find_one({"_id": oid})
     if not doc:
-        return None
+        raise DetectionNotFoundError("Detection not found.")
 
     return _doc_to_detection(doc)
 
@@ -66,6 +103,7 @@ def list_detections(
     page_size: int = 20,
 ) -> Dict[str, Any]:
     query: Dict[str, Any] = {}
+    validate_list_filters(start_time, end_time, lat, lon, radius_km)
 
     if species:
         query["species"] = species
@@ -95,14 +133,17 @@ def list_detections(
 
     skip = (page - 1) * page_size
 
-    total = Detections.count_documents(query)
-    cursor = (
-        Detections.find(query)
-        .sort("timestamp", -1)
-        .skip(skip)
-        .limit(page_size)
-    )
-    items: List[Detection] = [Detection(**doc) for doc in cursor]
+    try:
+        total = Detections.count_documents(query)
+        cursor = (
+            Detections.find(query)
+            .sort("timestamp", -1)
+            .skip(skip)
+            .limit(page_size)
+        )
+        items: List[Detection] = [Detection(**doc) for doc in cursor]
+    except PyMongoError as exc:
+        _raise_storage_error(exc)
 
     return {
         "items": items,
@@ -114,34 +155,38 @@ def list_detections(
 
 
 def delete_detection(detection_id: str) -> bool:
+    oid = _object_id(detection_id)
     try:
-        oid = ObjectId(detection_id)
-    except Exception:
-        return False
+        result = Detections.delete_one({"_id": oid})
+    except PyMongoError as exc:
+        _raise_storage_error(exc)
 
-    result = Detections.delete_one({"_id": oid})
-    return result.deleted_count == 1
+    if result.deleted_count != 1:
+        raise DetectionNotFoundError("Detection not found.")
+
+    invalidate_insights()
+    return True
 
 
 def update_detection(
     detection_id: str,
     update_data: Dict[str, Any],
-) -> Optional[Detection]:
+) -> Detection:
+    oid = _object_id(detection_id)
+
+    safe_update = mutable_detection_update(update_data)
+
     try:
-        oid = ObjectId(detection_id)
-    except Exception:
-        return None
-
-    update_data.pop("_id", None)
-    update_data.pop("id", None)
-
-    doc = Detections.find_one_and_update(
-        {"_id": oid},
-        {"$set": update_data},
-        return_document=ReturnDocument.AFTER,
-    )
+        doc = Detections.find_one_and_update(
+            {"_id": oid},
+            {"$set": safe_update},
+            return_document=ReturnDocument.AFTER,
+        )
+    except PyMongoError as exc:
+        _raise_storage_error(exc)
 
     if not doc:
-        return None
+        raise DetectionNotFoundError("Detection not found.")
 
+    invalidate_insights()
     return _doc_to_detection(doc)

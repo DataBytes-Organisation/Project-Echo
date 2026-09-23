@@ -1238,6 +1238,11 @@ class EchoEngine():
         retry_count = config.get("API_RETRY_COUNT", 2)
         max_attempts = retry_count + 1
 
+        headers = {}
+        engine_api_key = os.getenv("ENGINE_API_KEY")
+        if engine_api_key:
+            headers["X-Engine-Api-Key"] = engine_api_key
+
         last_error_message = None
 
         for attempt in range(1, max_attempts + 1):
@@ -1245,7 +1250,8 @@ class EchoEngine():
                 backend_response = requests.post(
                     url,
                     json=backend_payload,
-                    timeout=timeout_seconds
+                    timeout=timeout_seconds,
+                    headers=headers or None,
                 )
 
             except requests.exceptions.Timeout as error:

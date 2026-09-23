@@ -380,6 +380,7 @@ class DetectionCreate(BaseModel):
     audioClip: str  # Audio clip data
     confidence: float = Field(gt=0, lt=100)  # Confidence value between 0 and 100
     sampleRate: int  # Audio sample rate
+    embedding: Optional[List[float]] = None  # Model embedding vector, used for similar-detection retrieval
 
     class Config:
         allow_population_by_field_name = True
@@ -430,8 +431,17 @@ class DetectionListResponses(BaseModel):
     page: int
     page_size: int
 
-    class config:
-        allow_population_by_fiels_name = True
+    class Config:
+        # A previous attempt at this same fix exists in git history as
+        # "class config" (lowercase), which Pydantic silently ignores since
+        # it requires the exact name "Config" - so it never took effect.
+        # Without a correctly-named Config here, jsonable_encoder fails on
+        # real Mongo-backed Detection items, because ObjectId inside a
+        # nested list isn't handled by the outer model's default encoder.
+        # Never caught before because prior tests mocked the service layer
+        # directly and never exercised this response model against a real
+        # database round-trip - see test_detections_list_serialization.py.
+        allow_population_by_field_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
 
