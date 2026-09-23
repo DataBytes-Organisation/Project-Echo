@@ -1,10 +1,9 @@
 import io
-import os
 import random
 import sys
 import unittest
 from pathlib import Path
-from unittest.mock import patch
+from types import SimpleNamespace
 
 
 STORE_DIR = Path(__file__).resolve().parents[3] / "production" / "infrastructure" / "store"
@@ -62,13 +61,49 @@ class FakeR2Client:
 class R2PrototypeTests(unittest.TestCase):
     def setUp(self):
         self.client = FakeR2Client()
-        self.config = R2Config("account", "bucket", "key", "secret")
+        self.config = R2Config(
+            account_id="account",
+            bucket_name="bucket",
+            access_key_id="key",
+            secret_access_key="secret",
+            endpoint_url="https://account.r2.cloudflarestorage.com",
+        )
         self.storage = R2Storage(self.config, self.client)
 
     def test_config_requires_credentials(self):
-        with patch.dict(os.environ, {}, clear=True):
-            with self.assertRaisesRegex(ValueError, "R2_ACCOUNT_ID"):
-                R2Config.from_env()
+        app_settings = SimpleNamespace(
+            r2_account_id=None,
+            r2_bucket_name=None,
+            r2_access_key_id=None,
+            r2_secret_access_key=None,
+            r2_endpoint_url=None,
+            r2_dataset_prefix="prototype",
+        )
+
+        with self.assertRaisesRegex(ValueError, "R2_ACCOUNT_ID"):
+            R2Config.from_settings(app_settings)
+
+    def test_config_reads_validated_backend_settings(self):
+        app_settings = SimpleNamespace(
+            r2_account_id="account-123",
+            r2_bucket_name="echo-bucket",
+            r2_access_key_id="access-key",
+            r2_secret_access_key="secret-key",
+            r2_endpoint_url="https://account-123.r2.cloudflarestorage.com",
+            r2_dataset_prefix="dataset",
+        )
+
+        config = R2Config.from_settings(app_settings)
+
+        self.assertEqual(config.account_id, "account-123")
+        self.assertEqual(config.bucket_name, "echo-bucket")
+        self.assertEqual(config.access_key_id, "access-key")
+        self.assertEqual(config.secret_access_key, "secret-key")
+        self.assertEqual(
+            config.endpoint_url,
+            "https://account-123.r2.cloudflarestorage.com",
+        )
+        self.assertEqual(config.dataset_prefix, "dataset")
 
     def test_connection_uses_configured_bucket(self):
         self.storage.check_connection()

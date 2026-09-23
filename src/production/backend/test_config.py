@@ -89,6 +89,41 @@ class TestSettingsDefaults(unittest.TestCase):
         self.assertEqual(settings.jwt_algorithm, "HS256")
         self.assertEqual(settings.mongo_db_name, "EchoNet")
 
+    def test_r2_settings_default_to_optional_values(self):
+        with patch.dict("os.environ", REQUIRED_ENV, clear=True):
+            settings = Settings()
+
+        self.assertIsNone(settings.r2_account_id)
+        self.assertIsNone(settings.r2_access_key_id)
+        self.assertIsNone(settings.r2_secret_access_key)
+        self.assertIsNone(settings.r2_bucket_name)
+        self.assertIsNone(settings.r2_endpoint_url)
+        self.assertEqual(settings.r2_dataset_prefix, "prototype")
+
+    def test_r2_settings_are_loaded_from_environment(self):
+        env = {
+            **REQUIRED_ENV,
+            "R2_ACCOUNT_ID": "account-123",
+            "R2_ACCESS_KEY_ID": "access-key",
+            "R2_SECRET_ACCESS_KEY": "secret-key",
+            "R2_BUCKET_NAME": "echo-test",
+            "R2_ENDPOINT_URL": "https://account-123.r2.cloudflarestorage.com",
+            "R2_DATASET_PREFIX": "dataset",
+        }
+
+        with patch.dict("os.environ", env, clear=True):
+            settings = Settings()
+
+        self.assertEqual(settings.r2_account_id, "account-123")
+        self.assertEqual(settings.r2_access_key_id, "access-key")
+        self.assertEqual(settings.r2_secret_access_key, "secret-key")
+        self.assertEqual(settings.r2_bucket_name, "echo-test")
+        self.assertEqual(
+            settings.r2_endpoint_url,
+            "https://account-123.r2.cloudflarestorage.com",
+        )
+        self.assertEqual(settings.r2_dataset_prefix, "dataset")
+
 
 class TestSettingsSecretFile(unittest.TestCase):
     def setUp(self):
@@ -145,6 +180,26 @@ class TestSettingsSecretFile(unittest.TestCase):
             with self.assertRaises(ValidationError) as ctx:
                 Settings()
         self.assertNotIn("super-secret-value", str(ctx.exception))
+
+    def test_r2_secret_access_key_supports_secret_file(self):
+        secret_path = self._write_secret(
+            "r2_secret_access_key",
+            "r2-secret-from-file",
+        )
+
+        env = {
+            **REQUIRED_ENV,
+            "R2_SECRET_ACCESS_KEY": "r2-secret-from-env",
+            "R2_SECRET_ACCESS_KEY_FILE": secret_path,
+        }
+
+        with patch.dict("os.environ", env, clear=True):
+            settings = Settings()
+
+        self.assertEqual(
+            settings.r2_secret_access_key,
+            "r2-secret-from-file",
+        )
 
 
 if __name__ == "__main__":
