@@ -128,6 +128,33 @@ def create_detection(detection_in: DetectionCreate) -> Detection:
     return _doc_to_detection(created)
 
 
+def create_detections_bulk(
+    detections_in: List[DetectionCreate],
+) -> List[str]:
+    """
+    Insert multiple validated detections in one MongoDB operation.
+    """
+    if not detections_in:
+        return []
+
+    documents = [
+        detection.dict(by_alias=True)
+        for detection in detections_in
+    ]
+
+    try:
+        result = Detections.insert_many(documents)
+    except PyMongoError as exc:
+        _raise_storage_error(exc)
+
+    invalidate_insights()
+
+    return [
+        str(inserted_id)
+        for inserted_id in result.inserted_ids
+    ]
+
+
 def get_detection(detection_id: str) -> Detection:
     oid = _object_id(detection_id)
     try:
