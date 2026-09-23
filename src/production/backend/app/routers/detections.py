@@ -1,5 +1,9 @@
 from datetime import datetime, timedelta, timezone
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
+
+from pydantic import ValidationError
+
+from pydantic import ValidationError
 
 from fastapi import (
     APIRouter,
@@ -242,6 +246,66 @@ def dashboard_summary_endpoint(
         "start_time": start_day.isoformat(),
         "end_time": end_time.isoformat(),
     }
+@router.post(
+    "/bulk",
+    status_code=201,
+    summary="Create multiple detections in one request",
+    dependencies=[Depends(pause_guard("detections"))],
+)
+def create_detections_bulk_endpoint(
+    payload: List[Dict[str, Any]] = Body(...),
+):
+    if not payload:
+        raise HTTPException(
+            status_code=400,
+            detail="Bulk detection payload cannot be empty",
+        )
+
+    if len(payload) > 100:
+        raise HTTPException(
+            status_code=413,
+            detail="Bulk detection limit is 100 records",
+        )
+
+    valid_detections = []
+    errors = []
+
+    for index, item in enumerate(payload):
+        try:
+            valid_detections.append(
+                DetectionCreate(**item)
+            )
+        except ValidationError as exc:
+            errors.append(
+                {
+                    "index": index,
+                    "errors": exc.errors(),
+                }
+            )
+
+    inserted_ids = []
+
+    if valid_detections:
+        enforce_and_consume(
+            "detections",
+            cost=len(valid_detections),
+        )
+
+        inserted_ids = (
+            detections_service.create_detections_bulk(
+                valid_detections
+            )
+        )
+
+    return {
+        "received": len(payload),
+        "inserted": len(inserted_ids),
+        "rejected": len(errors),
+        "inserted_ids": inserted_ids,
+        "errors": errors,
+    }
+
+
 @router.get(
     "/{detection_id}",
     response_model=Detection,
