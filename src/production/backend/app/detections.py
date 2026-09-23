@@ -15,7 +15,6 @@ from app.exceptions import (
 )
 from app.schemas import DetectionCreate, Detection
 from app.jobs.queue import enqueue_detection_webhook
-
 from app.detection_rules import evaluate_detection, log_rejected_detection
 
 
@@ -57,7 +56,6 @@ def create_detection(detection_in: DetectionCreate) -> Detection:
         raise DetectionStorageError(
             "The detection was not available after it was created."
         )
-
 
     return _doc_to_detection(created)
 

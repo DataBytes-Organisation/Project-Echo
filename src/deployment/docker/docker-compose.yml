@@ -145,16 +145,19 @@ services:
     volumes:
       - ../../production/backend:/app
       - credentials_volume:/root/.config/gcloud/
-    # Same C4 settings as echo_api: importing app.jobs.detection_webhook
-    # loads app.database -> app.config.Settings (MONGODB_URI,
-    # USER_MONGODB_URI, JWT_SECRET). Delayed Retry intervals only fire when
-    # the worker process runs RQ's scheduler.
+    # Shared C1 queue with PR #1009: name echo-backend, Redis DB 1.
+    # --with-scheduler is required for Retry interval=10s.
     env_file:
       - .env
     environment:
       PYTHONUNBUFFERED: "1"
       PYTHONPATH: /app
       REDIS_URL: redis://echo-redis:6379/1
+      REDIS_HOST: echo-redis
+      REDIS_PORT: "6379"
+      JOB_TIMEOUT_SECONDS: "180"
+      JOB_MAX_RETRIES: "3"
+      JOB_RETRY_DELAY_SECONDS: "10"
       MONGODB_URI: mongodb://root:root_password@ts-mongodb-cont:27017/EchoNet?authSource=admin
       USER_MONGODB_URI: mongodb://root:root_password@ts-mongodb-cont:27017/EchoNet?authSource=admin
       DETECTION_WEBHOOK_URL: ${DETECTION_WEBHOOK_URL:-}
