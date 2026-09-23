@@ -22,6 +22,12 @@ class R2StorageUnavailable(RuntimeError):
 class R2UploadFailed(RuntimeError):
     """Raised when R2 rejects or fails an upload operation."""
 
+class R2DownloadFailed(RuntimeError):
+    """Raised when R2 rejects or fails a download operation."""
+
+
+class R2ObjectNotFound(RuntimeError):
+    """Raised when the requested R2 object does not exist."""
 
 @lru_cache(maxsize=1)
 def get_r2_storage() -> Any:
@@ -71,6 +77,50 @@ def upload_to_r2(
             "Cloudflare R2 upload failed"
         ) from exc
 
+def download_from_r2(
+    storage: Any,
+    key: str,
+) -> bytes:
+    try:
+        return storage.download_bytes(key)
+
+    except (
+        EndpointConnectionError,
+        ConnectionClosedError,
+        ConnectTimeoutError,
+        ReadTimeoutError,
+    ) as exc:
+        raise R2StorageUnavailable(
+            "Cloudflare R2 is temporarily unavailable"
+        ) from exc
+
+    except ClientError as exc:
+        error_code = str(
+            exc.response.get("Error", {}).get("Code", "")
+        )
+
+        if error_code in {
+            "NoSuchKey",
+            "NotFound",
+            "404",
+        }:
+            raise R2ObjectNotFound(
+                "Cloudflare R2 object was not found"
+            ) from exc
+
+        raise R2DownloadFailed(
+            "Cloudflare R2 download failed"
+        ) from exc
+
+    except BotoCoreError as exc:
+        raise R2DownloadFailed(
+            "Cloudflare R2 download failed"
+        ) from exc
+
+    except Exception as exc:
+        raise R2DownloadFailed(
+            "Cloudflare R2 download failed"
+        ) from exc
 
 def delete_from_r2_best_effort(storage: Any, key: str) -> bool:
     try:

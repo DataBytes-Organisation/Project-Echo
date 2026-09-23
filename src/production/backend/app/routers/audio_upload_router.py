@@ -4,14 +4,20 @@ import re
 from typing import Optional
 from uuid import uuid4
 
+from bson import ObjectId
+from fastapi.responses import Response
+
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 from starlette.concurrency import run_in_threadpool
 
 from app.database import AudioUploads
 from app.services.r2_storage_service import (
+    R2DownloadFailed,
+    R2ObjectNotFound,
     R2StorageUnavailable,
     R2UploadFailed,
     delete_from_r2_best_effort,
+    download_from_r2,
     get_r2_storage,
     upload_to_r2,
 )
@@ -163,3 +169,81 @@ async def upload_audio(
         "upload_id": upload_id,
         "storage_key": storage_key,
     }
+
+@router.get("/audio/{upload_id}")
+async def get_audio(upload_id: str):
+    if not ObjectId.is_valid(upload_id):
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid audio upload ID",
+        )
+
+    meta = await run_in_threadpool(
+        AudioUploads.find_one,
+        {"_id": ObjectId(upload_id)},
+    )
+
+    if not meta:
+        raise HTTPException(
+            status_code=404,
+            detail="Audio upload not found",
+        )
+
+    storage_key = meta.get("storage_key")
+
+    if not storage_key:
+        raise HTTPException(
+            status_code=404,
+            detail="Audio file metadata is incomplete",
+        )
+
+    try:
+        storage = get_r2_storage()
+    except R2StorageUnavailable:
+        raise HTTPException(
+            status_code=503,
+            detail="Audio storage is temporarily unavailable",
+        )
+
+    try:
+        content = await run_in_threadpool(
+            download_from_r2,
+            storage,
+            storage_key,
+        )
+    except R2StorageUnavailable:
+        raise HTTPException(
+            status_code=503,
+            detail="Audio storage is temporarily unavailable",
+        )
+    except R2ObjectNotFound:
+        raise HTTPException(
+            status_code=404,
+            detail="Audio file not found on storage",
+        )
+    except R2DownloadFailed:
+        raise HTTPException(
+            status_code=502,
+            detail="Failed to retrieve audio from object storage",
+        )
+
+    content_type = (
+        meta.get("content_type")
+        or "application/octet-stream"
+    )
+
+    filename = _safe_filename(
+        meta.get("original_filename")
+        or meta.get("filename")
+        or "audio"
+    )
+
+    return Response(
+        content=content,
+        media_type=content_type,
+        headers={
+            "Content-Disposition": (
+                f'inline; filename="{filename}"'
+            )
+        },
+    )

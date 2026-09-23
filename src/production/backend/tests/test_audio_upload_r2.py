@@ -2,6 +2,7 @@ from types import SimpleNamespace
 
 from app.routers import audio_upload_router as audio
 
+from bson import ObjectId
 
 class FakeStorage:
     pass
@@ -21,6 +22,14 @@ class RecordingUploads:
             inserted_id="64b64c1234567890abcdef12"
         )
 
+class LookupUploads:
+    def __init__(self, document=None):
+        self.document = document
+        self.query = None
+
+    def find_one(self, query):
+        self.query = query
+        return self.document
 
 def post_audio(
     client,
@@ -38,6 +47,14 @@ def post_audio(
             )
         },
         data={"user_id": "test-user"},
+    )
+
+VALID_UPLOAD_ID = "64b64c1234567890abcdef12"
+
+
+def get_audio(client, upload_id=VALID_UPLOAD_ID):
+    return client.get(
+        f"/api/audio/{upload_id}"
     )
 
 def assert_error_response(
@@ -331,4 +348,263 @@ def test_oversized_audio_is_rejected_before_r2(
         413,
         "PAYLOAD_TOO_LARGE",
         "File too large (max 30MB)",
+    )
+
+def test_audio_retrieval_reads_object_from_r2(
+    mock_mongo_api,
+    monkeypatch,
+):
+    client, _ = mock_mongo_api
+
+    storage = FakeStorage()
+
+    uploads = LookupUploads(
+        {
+            "_id": ObjectId(VALID_UPLOAD_ID),
+            "original_filename": "sample.wav",
+            "filename": "stored-sample.wav",
+            "storage_key": (
+                "audio_uploads/2026/09/23/"
+                "stored-sample.wav"
+            ),
+            "content_type": "audio/wav",
+        }
+    )
+
+    monkeypatch.setattr(
+        audio,
+        "AudioUploads",
+        uploads,
+    )
+
+    monkeypatch.setattr(
+        audio,
+        "get_r2_storage",
+        lambda: storage,
+    )
+
+    download_call = {}
+
+    def fake_download(storage_arg, key):
+        download_call["storage"] = storage_arg
+        download_call["key"] = key
+        return b"RIFF-audio-from-r2"
+
+    monkeypatch.setattr(
+        audio,
+        "download_from_r2",
+        fake_download,
+    )
+
+    response = get_audio(client)
+
+    assert response.status_code == 200
+    assert response.content == b"RIFF-audio-from-r2"
+    assert response.headers["content-type"].startswith(
+        "audio/wav"
+    )
+
+    assert download_call["storage"] is storage
+    assert (
+        download_call["key"]
+        == "audio_uploads/2026/09/23/"
+        "stored-sample.wav"
+    )
+
+    assert uploads.query == {
+        "_id": ObjectId(VALID_UPLOAD_ID)
+    }
+
+def test_audio_retrieval_rejects_invalid_upload_id(
+    mock_mongo_api,
+):
+    client, _ = mock_mongo_api
+
+    response = get_audio(
+        client,
+        "not-a-valid-object-id",
+    )
+
+    assert_error_response(
+        response,
+        400,
+        "BAD_REQUEST",
+        "Invalid audio upload ID",
+    )
+
+def test_audio_retrieval_returns_404_when_metadata_missing(
+    mock_mongo_api,
+    monkeypatch,
+):
+    client, _ = mock_mongo_api
+
+    monkeypatch.setattr(
+        audio,
+        "AudioUploads",
+        LookupUploads(None),
+    )
+
+    response = get_audio(client)
+
+    assert_error_response(
+        response,
+        404,
+        "RESOURCE_NOT_FOUND",
+        "Audio upload not found",
+    )
+
+def test_audio_retrieval_rejects_missing_storage_key(
+    mock_mongo_api,
+    monkeypatch,
+):
+    client, _ = mock_mongo_api
+
+    monkeypatch.setattr(
+        audio,
+        "AudioUploads",
+        LookupUploads(
+            {
+                "_id": ObjectId(VALID_UPLOAD_ID),
+                "original_filename": "sample.wav",
+            }
+        ),
+    )
+
+    response = get_audio(client)
+
+    assert_error_response(
+        response,
+        404,
+        "RESOURCE_NOT_FOUND",
+        "Audio file metadata is incomplete",
+    )
+
+def test_audio_retrieval_r2_unavailable_returns_503(
+    mock_mongo_api,
+    monkeypatch,
+):
+    client, _ = mock_mongo_api
+
+    monkeypatch.setattr(
+        audio,
+        "AudioUploads",
+        LookupUploads(
+            {
+                "_id": ObjectId(VALID_UPLOAD_ID),
+                "storage_key": "audio_uploads/sample.wav",
+                "content_type": "audio/wav",
+            }
+        ),
+    )
+
+    def unavailable():
+        raise audio.R2StorageUnavailable(
+            "storage unavailable"
+        )
+
+    monkeypatch.setattr(
+        audio,
+        "get_r2_storage",
+        unavailable,
+    )
+
+    response = get_audio(client)
+
+    assert_error_response(
+        response,
+        503,
+        "SERVICE_UNAVAILABLE",
+        "Audio storage is temporarily unavailable",
+    )
+
+def test_audio_retrieval_missing_r2_object_returns_404(
+    mock_mongo_api,
+    monkeypatch,
+):
+    client, _ = mock_mongo_api
+
+    storage = FakeStorage()
+
+    monkeypatch.setattr(
+        audio,
+        "AudioUploads",
+        LookupUploads(
+            {
+                "_id": ObjectId(VALID_UPLOAD_ID),
+                "storage_key": "audio_uploads/missing.wav",
+                "content_type": "audio/wav",
+            }
+        ),
+    )
+
+    monkeypatch.setattr(
+        audio,
+        "get_r2_storage",
+        lambda: storage,
+    )
+
+    def missing(*args, **kwargs):
+        raise audio.R2ObjectNotFound(
+            "missing"
+        )
+
+    monkeypatch.setattr(
+        audio,
+        "download_from_r2",
+        missing,
+    )
+
+    response = get_audio(client)
+
+    assert_error_response(
+        response,
+        404,
+        "RESOURCE_NOT_FOUND",
+        "Audio file not found on storage",
+    )
+
+def test_audio_retrieval_failure_returns_502(
+    mock_mongo_api,
+    monkeypatch,
+):
+    client, _ = mock_mongo_api
+
+    storage = FakeStorage()
+
+    monkeypatch.setattr(
+        audio,
+        "AudioUploads",
+        LookupUploads(
+            {
+                "_id": ObjectId(VALID_UPLOAD_ID),
+                "storage_key": "audio_uploads/sample.wav",
+                "content_type": "audio/wav",
+            }
+        ),
+    )
+
+    monkeypatch.setattr(
+        audio,
+        "get_r2_storage",
+        lambda: storage,
+    )
+
+    def fail_download(*args, **kwargs):
+        raise audio.R2DownloadFailed(
+            "download failed"
+        )
+
+    monkeypatch.setattr(
+        audio,
+        "download_from_r2",
+        fail_download,
+    )
+
+    response = get_audio(client)
+
+    assert_error_response(
+        response,
+        502,
+        "UPSTREAM_ERROR",
+        "Failed to retrieve audio from object storage",
     )
