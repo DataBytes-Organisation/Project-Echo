@@ -91,8 +91,8 @@ services:
 
   echo_api:
     build:
-      context: ../../production/backend
-      dockerfile: API.Dockerfile
+      context: ../../production
+      dockerfile: backend/API.Dockerfile
     image: ts-api
     container_name: ts-api-cont
     networks:

@@ -1,0 +1,16 @@
+*
+!backend/
+!backend/**
+!infrastructure/
+!infrastructure/store/
+!infrastructure/store/cloudflare_r2/
+!infrastructure/store/cloudflare_r2/**
+
+backend/.env
+backend/.env.*
+!backend/.env.example
+
+**/__pycache__/
+**/*.pyc
+**/.pytest_cache/
+backend/weather_data/

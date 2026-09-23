@@ -150,6 +150,15 @@ class R2Storage:
         )
         return destination_path
 
+    def delete_object(self, key: str) -> None:
+        if not key or key.endswith("/"):
+            raise ValueError("R2 object key must identify a file")
+
+        self._client.delete_object(
+            Bucket=self.config.bucket_name,
+            Key=key,
+        )
+
     def upload_file(
         self,
         source: str | Path | BinaryIO,
