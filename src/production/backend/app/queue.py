@@ -4,17 +4,16 @@ from datetime import datetime
 from typing import Any, Dict, Optional
 from bson import ObjectId
 from redis import Redis
-from rq import Queue, Retry
+from rq import Queue, Retry, get_current_job
 
 from app.config import settings
 
 logger = logging.getLogger(__name__)
 
-# Initialize bounded Redis connection using db=1 for the job queue to avoid conflicts with HMI sessions
-redis_conn = Redis(
-    host=settings.redis_host,
-    port=settings.redis_port,
-    db=settings.redis_db,
+# Bounded Redis connection on the job-queue DB (REDIS_URL, DB 1) agreed with the
+# C1.2 worker (#1048), so jobs never collide with HMI sessions on DB 0.
+redis_conn = Redis.from_url(
+    settings.redis_url,
     decode_responses=False,
     socket_connect_timeout=settings.redis_connect_timeout,
     socket_timeout=settings.redis_socket_timeout,
@@ -24,23 +23,51 @@ redis_conn = Redis(
 QUEUE_NAME = "echo-backend"
 job_queue = Queue(QUEUE_NAME, connection=redis_conn)
 
+# Upload records store `path` relative to the upload router's directory.
+_UPLOAD_PATH_BASE = os.path.join(os.path.dirname(__file__), "routers")
+
+
+class AudioFileMissingError(FileNotFoundError):
+    """The uploaded audio is not on storage; retrying cannot fix this."""
+
+
+def _resolve_audio_path(file_path: Optional[str], upload_doc: Optional[Dict[str, Any]]) -> Optional[str]:
+    path = file_path or (upload_doc or {}).get("path")
+    if path and not os.path.isabs(path):
+        path = os.path.join(_UPLOAD_PATH_BASE, path)
+    return path
+
+
+def _stop_retries() -> None:
+    # RQ checks retries_left on this same Job object when handling the failure.
+    job = get_current_job()
+    if job is not None:
+        job.retries_left = 0
+
+
+def _will_retry() -> bool:
+    job = get_current_job()
+    return bool(job is not None and job.retries_left)
+
 
 def process_audio_ingest_job(upload_id: str, file_path: Optional[str] = None, filename: Optional[str] = None) -> Dict[str, Any]:
     """
     Core application workflow for background audio processing:
     1. Validates upload record in MongoDB
     2. Updates processing state
-    3. Performs metadata validation and prepares audio for engine inference
+    3. Verifies the audio file exists on storage and prepares it for engine inference
     4. Records job completion timestamp and status
+
+    A missing or empty audio file fails the job permanently (no retries); any
+    other error is re-raised so RQ retries it on the configured schedule.
     """
     logger.info("Starting audio ingest background processing for upload_id=%s, file=%s", upload_id, filename)
     from app.database import AudioUploads
 
     started_at = datetime.utcnow()
-    
+    query = {"_id": ObjectId(upload_id)} if ObjectId.is_valid(upload_id) else {"filename": filename}
+
     try:
-        # Find upload record
-        query = {"_id": ObjectId(upload_id)} if ObjectId.is_valid(upload_id) else {"filename": filename}
         upload_doc = AudioUploads.find_one(query)
 
         if not upload_doc:
@@ -57,13 +84,23 @@ def process_audio_ingest_job(upload_id: str, file_path: Optional[str] = None, fi
                 "processing_started_at": started_at,
             }
 
-        AudioUploads.update_one(query, {"$set": update_data}, upsert=True)
+        AudioUploads.update_one(
+            query,
+            {
+                "$set": update_data,
+                "$inc": {"processing_attempts": 1},
+                "$unset": {"pipeline_status": "", "error_message": ""},
+            },
+            upsert=True,
+        )
 
-        # File validation and metadata check
-        file_size = 0
-        resolved_path = file_path or (upload_doc.get("path") if upload_doc else None)
-        if resolved_path and os.path.exists(resolved_path):
-            file_size = os.path.getsize(resolved_path)
+        # File validation: never hand a missing file to inference.
+        resolved_path = _resolve_audio_path(file_path, upload_doc)
+        if not resolved_path or not os.path.isfile(resolved_path):
+            raise AudioFileMissingError(f"Audio file not found on storage: {resolved_path or '<no path recorded>'}")
+        file_size = os.path.getsize(resolved_path)
+        if file_size == 0:
+            raise AudioFileMissingError(f"Audio file is empty on storage: {resolved_path}")
 
         completed_at = datetime.utcnow()
         elapsed_seconds = (completed_at - started_at).total_seconds()
@@ -88,14 +125,22 @@ def process_audio_ingest_job(upload_id: str, file_path: Optional[str] = None, fi
         }
 
     except Exception as exc:
-        logger.error("Failed audio ingest background processing for upload_id=%s: %s", upload_id, exc, exc_info=True)
+        if isinstance(exc, AudioFileMissingError):
+            _stop_retries()
+        retrying = _will_retry()
+        logger.error(
+            "Failed audio ingest background processing for upload_id=%s (%s): %s",
+            upload_id,
+            "retry scheduled" if retrying else "giving up",
+            exc,
+            exc_info=True,
+        )
         try:
-            query = {"_id": ObjectId(upload_id)} if ObjectId.is_valid(upload_id) else {"filename": filename}
             AudioUploads.update_one(
                 query,
                 {
                     "$set": {
-                        "processing_status": "failed",
+                        "processing_status": "retry_scheduled" if retrying else "failed",
                         "error_message": str(exc),
                         "failed_at": datetime.utcnow(),
                     }
@@ -103,7 +148,7 @@ def process_audio_ingest_job(upload_id: str, file_path: Optional[str] = None, fi
             )
         except Exception as db_err:
             logger.error("Could not write failure status to DB: %s", db_err)
-        raise exc
+        raise
 
 
 def enqueue_audio_ingest(upload_id: str, file_path: Optional[str] = None, filename: Optional[str] = None):
@@ -112,8 +157,8 @@ def enqueue_audio_ingest(upload_id: str, file_path: Optional[str] = None, filena
     """
     try:
         retry_policy = Retry(
-            max=settings.job_max_retries,
-            interval=[settings.job_retry_delay_seconds] * settings.job_max_retries,
+            max=len(settings.job_retry_intervals),
+            interval=settings.job_retry_intervals,
         )
         job = job_queue.enqueue(
             process_audio_ingest_job,

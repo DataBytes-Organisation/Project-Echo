@@ -2,27 +2,29 @@ import json
 import logging
 import os
 from contextlib import asynccontextmanager
-from typing import List, Optional
 
-from fastapi import Body, FastAPI, HTTPException, Request, status
-from fastapi.encoders import jsonable_encoder
+from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, Response
+from fastapi.responses import JSONResponse
 from pymongo.errors import ConnectionFailure, ExecutionTimeout
 
+from app.cache import close_client as close_cache_client
 from app.config import settings
 from app.database import client, Userclient
 from app.errors import (
     StandardizeErrorResponseMiddleware,
+    detection_exception_handler,
     http_exception_handler,
     unhandled_exception_handler,
     validation_exception_handler,
 )
+from app.exceptions import DetectionError
 from app.logging_config import configure_logging
+from app.metrics import PrometheusMiddleware, metrics_router
+from app.middleware.correlation_id import add_correlation_id
 from app.queue import redis_conn
 from app.routers import (
-    add_csv_output_option,
     admin_budget,
     admin_services,
     audio_upload_router,
@@ -39,6 +41,7 @@ from app.routers import (
     public,
     sensors,
     sim,
+    similar_detections,
     species_predictor,
     two_factor,
 )
@@ -46,6 +49,7 @@ from app.services.mqtt_client import (
     get_connection_state,
     get_latest_events,
     start_mqtt_client,
+    stop_mqtt_client,
 )
 
 configure_logging()
@@ -55,7 +59,7 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup actions
-    logger.info("Backend starting up... Initializing application resources.")
+    logger.info(f"API Server listening on port {settings.api_port}")
     try:
         start_mqtt_client()
     except Exception as e:
@@ -63,27 +67,40 @@ async def lifespan(app: FastAPI):
     yield
     # Shutdown actions
     logger.info("Backend shutting down... Gracefully closing all owned client connections.")
-    
-    # 1. Close Primary EchoNet MongoDB Client
+
+    # 1. Stop the MQTT client: disconnect from the broker and join its loop thread
+    try:
+        stop_mqtt_client()
+    except Exception as e:
+        logger.error("Error stopping MQTT client: %s", e)
+
+    # 2. Close Primary EchoNet MongoDB Client
     try:
         client.close()
         logger.info("Primary MongoDB client closed cleanly.")
     except Exception as e:
         logger.error("Error closing primary MongoDB client: %s", e)
 
-    # 2. Close User MongoDB Client
+    # 3. Close User MongoDB Client
     try:
         Userclient.close()
         logger.info("User MongoDB client closed cleanly.")
     except Exception as e:
         logger.error("Error closing user MongoDB client: %s", e)
 
-    # 3. Close Redis Connection
+    # 4. Close Redis Connection
     try:
         redis_conn.close()
         logger.info("Redis queue connection closed cleanly.")
     except Exception as e:
         logger.error("Error closing Redis connection: %s", e)
+
+    # 5. Close the insights Redis cache connection (DB 2)
+    try:
+        close_cache_client()
+        logger.info("Redis cache connection closed cleanly.")
+    except Exception as e:
+        logger.error("Error closing Redis cache connection: %s", e)
 
 
 app = FastAPI(
@@ -122,6 +139,7 @@ app.add_exception_handler(ConnectionFailure, database_unavailable_handler)
 app.add_exception_handler(ExecutionTimeout, database_unavailable_handler)
 app.add_exception_handler(HTTPException, http_exception_handler)
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
+app.add_exception_handler(DetectionError, detection_exception_handler)
 app.add_exception_handler(Exception, unhandled_exception_handler)
 
 # Middlewares
@@ -133,6 +151,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Prometheus HTTP request metrics middleware
+app.add_middleware(PrometheusMiddleware)
 
 
 # Routers
@@ -148,14 +169,16 @@ app.include_router(admin_services.router, tags=["admin"], prefix="/api")
 app.include_router(public.router, tags=["public"], prefix="/public")
 app.include_router(iot.router, tags=["iot"], prefix="/iot")
 app.include_router(sensors.router, tags=["sensors"], prefix="/sensors")
+app.include_router(payments.router)
+app.include_router(live.router, tags=["live"])
 app.include_router(species_predictor.router, tags=["predict"])
 app.include_router(insights.router, tags=["insights"])
 app.include_router(auth_router.router, tags=["auth"], prefix="/api")
 app.include_router(detections.router)
-try:
-    app.include_router(payments.router)
-except Exception:
-    pass
+app.include_router(similar_detections.router)
+
+# Prometheus /metrics endpoint
+app.include_router(metrics_router)
 
 
 # Root Endpoint
@@ -164,7 +187,7 @@ def show_home():
     return "Welcome to Project Echo API. Visit /docs for interactive documentation."
 
 
-# MQTT Endpoints
+# MQTT Endpoints (FR-A2)
 @app.get("/mqtt/connection-state", tags=["mqtt"])
 def mqtt_connection_state():
     return {"state": get_connection_state()}
@@ -184,6 +207,12 @@ def mqtt_latest_events():
         if event.get("eventType") != "vocalization"
     ]
     return {"events": events}
+
+
+# Correlate every response and application log entry (C9.2). This middleware
+# is registered last so it is the outermost user middleware and can observe
+# responses generated by the other middleware.
+add_correlation_id(app)
 
 
 # OpenAPI Exporters

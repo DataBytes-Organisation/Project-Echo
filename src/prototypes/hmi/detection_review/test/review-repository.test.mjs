@@ -1,0 +1,149 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+
+import {
+  createReviewCase,
+  submitIndependentReview,
+} from "../src/review-domain.mjs";
+import {
+  FixtureReviewWorkflowRepository,
+  ReviewWorkflowRepository,
+  StaleReviewVersionError,
+} from "../src/review-repository.mjs";
+
+test("review workflow repository declares load, save, adjudication list, and reset operations", async () => {
+  const repository = new ReviewWorkflowRepository();
+
+  await assert.rejects(() => repository.loadCase("det-echo-001"), /must be implemented/);
+  await assert.rejects(() => repository.saveCase(createReviewCase("det-echo-001")), /must be implemented/);
+  await assert.rejects(() => repository.listAdjudication(), /must be implemented/);
+  await assert.rejects(() => repository.reset(), /must be implemented/);
+});
+
+test("fixture repository loads and saves deterministic immutable review cases", async () => {
+  const initial = createReviewCase("det-echo-001");
+  const repository = new FixtureReviewWorkflowRepository([initial]);
+  const afterFirst = submitIndependentReview(initial, {
+    actor: "reviewer-1",
+    decision: "confirmed",
+  }, "2026-08-16T01:00:00.000Z");
+
+  assert.notEqual(await repository.loadCase("det-echo-001"), initial);
+  const saved = await repository.saveCase(afterFirst, 1);
+
+  assert.notEqual(await repository.loadCase("det-echo-001"), afterFirst);
+  assert.equal(saved.version, 2);
+  assert.equal(Object.isFrozen((await repository.loadCase("det-echo-001")).submissions), true);
+});
+
+test("fixture repository isolates stored cases from caller-owned mutation", async () => {
+  const callerOwned = structuredClone(createReviewCase("det-echo-001"));
+  const repository = new FixtureReviewWorkflowRepository([callerOwned]);
+  callerOwned.status = "tampered";
+
+  const loaded = await repository.loadCase("det-echo-001");
+  assert.equal(loaded.status, "awaiting_first_review");
+  assert.equal(Object.isFrozen(loaded), true);
+  assert.throws(() => {
+    loaded.status = "tampered";
+  }, TypeError);
+});
+
+test("fixture repository isolates saved cases from later caller mutation", async () => {
+  const repository = new FixtureReviewWorkflowRepository([
+    createReviewCase("det-echo-001"),
+  ]);
+  const callerOwned = structuredClone(submitIndependentReview(
+    createReviewCase("det-echo-001"),
+    { actor: "reviewer-1", decision: "confirmed" },
+    "2026-08-16T01:00:00.000Z",
+  ));
+
+  await repository.saveCase(callerOwned, 1);
+  callerOwned.status = "tampered";
+
+  assert.equal((await repository.loadCase("det-echo-001")).status, "awaiting_second_review");
+});
+
+test("rejects a stale expected version and returns the latest immutable case", async () => {
+  const initial = createReviewCase("det-echo-001");
+  const repository = new FixtureReviewWorkflowRepository([initial]);
+  const firstWrite = submitIndependentReview(initial, {
+    actor: "reviewer-1",
+    decision: "confirmed",
+  }, "2026-08-16T01:00:00.000Z");
+  await repository.saveCase(firstWrite, 1);
+
+  await assert.rejects(
+    () => repository.saveCase(firstWrite, 1),
+    error => error instanceof StaleReviewVersionError
+      && error.expectedVersion === 1
+      && error.actualVersion === 2
+      && error.latestCase.version === 2
+      && Object.isFrozen(error.latestCase),
+  );
+});
+
+test("deterministic conflict simulation advances history then rejects one save", async () => {
+  const initial = createReviewCase("det-echo-001");
+  const repository = new FixtureReviewWorkflowRepository([initial], {
+    conflictOnNextSave: true,
+    now: () => "2026-08-17T02:00:00.000Z",
+  });
+  const firstWrite = submitIndependentReview(initial, {
+    actor: "reviewer-1",
+    decision: "confirmed",
+  }, "2026-08-17T01:00:00.000Z");
+
+  await assert.rejects(
+    () => repository.saveCase(firstWrite, 1),
+    error => error instanceof StaleReviewVersionError
+      && error.latestCase.history.at(-1).action === "stale_write_conflict",
+  );
+  assert.equal((await repository.loadCase("det-echo-001")).version, 2);
+});
+
+test("fixture repository lists only cases awaiting adjudication", async () => {
+  const untouched = createReviewCase("det-echo-001");
+  const first = submitIndependentReview(createReviewCase("det-echo-002"), {
+    actor: "reviewer-1",
+    decision: "confirmed",
+  }, "2026-08-16T01:00:00.000Z");
+  const disagreement = submitIndependentReview(first, {
+    actor: "reviewer-2",
+    decision: "rejected",
+    reason: "The evidence contradicts the prediction.",
+  }, "2026-08-16T02:00:00.000Z");
+  const repository = new FixtureReviewWorkflowRepository([untouched, disagreement]);
+
+  const queued = await repository.listAdjudication();
+
+  assert.deepEqual(queued.map(reviewCase => reviewCase.detectionId), ["det-echo-002"]);
+});
+
+test("fixture repository reset restores constructor seeds and its one-shot conflict simulation", async () => {
+  const initial = createReviewCase("det-echo-001");
+  const repository = new FixtureReviewWorkflowRepository([initial], {
+    conflictOnNextSave: true,
+    now: () => "2026-08-17T02:00:00.000Z",
+  });
+  const firstWrite = submitIndependentReview(initial, {
+    actor: "reviewer-1",
+    decision: "confirmed",
+  }, "2026-08-17T01:00:00.000Z");
+
+  await assert.rejects(
+    () => repository.saveCase(firstWrite, 1),
+    StaleReviewVersionError,
+  );
+  await repository.reset();
+
+  await assert.rejects(
+    () => repository.saveCase(firstWrite, 1),
+    error => error instanceof StaleReviewVersionError
+      && error.latestCase.history.at(-1).action === "stale_write_conflict",
+  );
+  const restored = await repository.loadCase("det-echo-001");
+  assert.equal(restored.status, "awaiting_first_review");
+  assert.equal(restored.version, 2);
+});

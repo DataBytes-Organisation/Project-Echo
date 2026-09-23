@@ -1,4 +1,6 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException, Form
+from fastapi.responses import FileResponse
+from bson import ObjectId
 from datetime import datetime
 import os
 from typing import Optional
@@ -80,3 +82,55 @@ async def upload_audio(
         "upload_id": upload_id,
         "job_id": job_id,
     }
+
+
+@router.get("/audio/{upload_id}")
+def get_audio(upload_id: str):
+    if not ObjectId.is_valid(upload_id):
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid audio upload ID",
+        )
+
+    meta = AudioUploads.find_one(
+        {"_id": ObjectId(upload_id)}
+    )
+
+    if not meta:
+        raise HTTPException(
+            status_code=404,
+            detail="Audio upload not found",
+        )
+
+    filename = meta.get("filename")
+
+    if not filename:
+        raise HTTPException(
+            status_code=404,
+            detail="Audio file metadata is incomplete",
+        )
+
+    filename = os.path.basename(filename)
+
+    file_path = os.path.join(
+        UPLOAD_DIR,
+        filename,
+    )
+
+    if not os.path.isfile(file_path):
+        raise HTTPException(
+            status_code=404,
+            detail="Audio file not found on storage",
+        )
+
+    return FileResponse(
+        path=file_path,
+        media_type=meta.get(
+            "content_type",
+            "application/octet-stream",
+        ),
+        filename=meta.get(
+            "original_filename",
+            filename,
+        ),
+    )

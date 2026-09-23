@@ -20,6 +20,8 @@ _SECRET_FILE_ENV_VARS = (
     "TWILIO_ACCOUNT_SID",
     "TWILIO_AUTH_TOKEN",
     "MAIL_PASSWORD",
+    "R2_ACCESS_KEY_ID",
+    "R2_SECRET_ACCESS_KEY",
 )
 
 
@@ -40,14 +42,14 @@ class Settings(BaseSettings):
     mongo_db_name: str = Field("EchoNet", env="MONGO_DB")
 
     # --- Redis & Job Queue (Resilience Tasks C1/C2/C3) ---
-    redis_host: str = "echo-redis"
-    redis_port: int = 6379
-    redis_db: int = 1
+    # Shared with the C1.2 worker (#1048): queue "echo-backend" on Redis DB 1
+    # (HMI JWT stays on DB 0, insights cache on DB 2). Retry intervals are
+    # delayed, so the worker must run `rq worker --with-scheduler`.
+    redis_url: str = "redis://echo-redis:6379/1"
     redis_connect_timeout: float = 2.0
     redis_socket_timeout: float = 2.0
     job_timeout_seconds: int = 180
-    job_max_retries: int = 3
-    job_retry_delay_seconds: int = 10
+    job_retry_intervals: List[int] = [10, 30, 60]
 
     # --- Database Settings & Timeouts ---
     mongo_timeout_ms: int = 2000
@@ -64,10 +66,30 @@ class Settings(BaseSettings):
     internal_api_base_url: str = "http://ts-api-cont:9000"
     api_port: int = 9000
 
+    # --- Cloudflare R2 object storage ---
+    # Optional at Backend startup; validated as required when R2 storage is used.
+    r2_account_id: Optional[str] = Field(None, env="R2_ACCOUNT_ID")
+    r2_access_key_id: Optional[str] = Field(None, env="R2_ACCESS_KEY_ID")
+    r2_secret_access_key: Optional[str] = Field(None, env="R2_SECRET_ACCESS_KEY")
+    r2_bucket_name: Optional[str] = Field(None, env="R2_BUCKET_NAME")
+    r2_endpoint_url: Optional[str] = Field(None, env="R2_ENDPOINT_URL")
+    r2_dataset_prefix: str = Field("prototype", env="R2_DATASET_PREFIX")
+
     # --- Timeouts / thresholds (consumed by C10/C11 later) ---
     request_timeout_seconds: float = 15.0
     slow_operation_ms: float = 500.0
     cache_ttl_seconds: int = 60
+
+    # --- Feature flags (C12) ---
+    # Safe defaults keep current behaviour enabled unless explicitly disabled.
+    realtime_streaming_enabled: bool = Field(
+        True,
+        env="REALTIME_STREAMING_ENABLED",
+    )
+    analytics_extensions_enabled: bool = Field(
+        True,
+        env="ANALYTICS_EXTENSIONS_ENABLED",
+    )
 
     # --- Auth (required — fail fast if missing) ---
     jwt_secret: str = Field(...)
@@ -78,6 +100,14 @@ class Settings(BaseSettings):
     # --- Logging / CORS ---
     log_level: str = "INFO"
     cors_origins: List[str] = ["*"]
+
+    # --- Detection rule engine (A3) ---
+    # Evaluated by app.detection_rules.evaluate_detection for every incoming
+    # detection, shared by HTTP ingestion and (once wired) A1's MQTT bridge.
+    # Empty allow-lists mean "no restriction" for that rule.
+    detection_min_confidence: float = Field(0, ge=0, le=100)
+    detection_allowed_species: List[str] = []
+    detection_allowed_sensor_ids: List[str] = []
 
     # --- Twilio (optional — SMS/2FA degrades gracefully if unset) ---
     twilio_account_sid: Optional[str] = None
@@ -96,6 +126,16 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         case_sensitive = False
+
+        @classmethod
+        def parse_env_var(cls, field_name: str, raw_val: str):
+            # Comma-separated lists (DETECTION_ALLOWED_SPECIES=Koala,Sus Scrofa)
+            # instead of JSON-array syntax, for these specific fields. Pydantic's
+            # default parse_env_var (cls.json_loads) still applies to every
+            # other complex-typed field (e.g. cors_origins).
+            if field_name in {"detection_allowed_species", "detection_allowed_sensor_ids"}:
+                return [item.strip() for item in raw_val.split(",") if item.strip()]
+            return cls.json_loads(raw_val)
 
         @classmethod
         def customise_sources(cls, init_settings, env_settings, file_secret_settings):
