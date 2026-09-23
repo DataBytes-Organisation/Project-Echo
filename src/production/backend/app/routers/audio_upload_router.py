@@ -62,6 +62,11 @@ async def upload_audio(
         }
         result = AudioUploads.insert_one(meta)
         upload_id = str(result.inserted_id)
+
+        # Enqueue background processing job via RQ
+        from app.queue import enqueue_audio_ingest
+        job_id = enqueue_audio_ingest(upload_id=upload_id, file_path=file_path, filename=filename)
+
     except Exception as e:
         # Best-effort cleanup if DB insert fails
         try:
@@ -71,7 +76,12 @@ async def upload_audio(
             pass
         raise HTTPException(status_code=500, detail=f"Failed to save upload: {e}")
 
-    return {"message": "Upload successful", "filename": filename, "upload_id": upload_id}
+    return {
+        "message": "Upload successful",
+        "filename": filename,
+        "upload_id": upload_id,
+        "job_id": job_id,
+    }
 
 
 @router.get("/audio/{upload_id}")

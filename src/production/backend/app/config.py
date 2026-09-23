@@ -41,9 +41,18 @@ class Settings(BaseSettings):
     user_mongodb_uri: str = Field(...)
     mongo_db_name: str = Field("EchoNet", env="MONGO_DB")
 
-    # --- Redis (for C1/C2, not yet used by this backend) ---
-    redis_host: str = "echo-redis"
-    redis_port: int = 6379
+    # --- Redis & Job Queue (Resilience Tasks C1/C2/C3) ---
+    # Shared with the C1.2 worker (#1048): queue "echo-backend" on Redis DB 1
+    # (HMI JWT stays on DB 0, insights cache on DB 2). Retry intervals are
+    # delayed, so the worker must run `rq worker --with-scheduler`.
+    redis_url: str = "redis://echo-redis:6379/1"
+    redis_connect_timeout: float = 2.0
+    redis_socket_timeout: float = 2.0
+    job_timeout_seconds: int = 180
+    job_retry_intervals: List[int] = [10, 30, 60]
+
+    # --- Database Settings & Timeouts ---
+    mongo_timeout_ms: int = 2000
 
     # --- MQTT / HiveMQ ---
     mqtt_host: str = "ts-mqtt-server-cont"

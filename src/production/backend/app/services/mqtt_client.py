@@ -14,6 +14,10 @@ logger = logging.getLogger(__name__)
 connection_state = "disconnected"  # disconnected | connecting | connected | reconnecting
 latest_events = {}
 
+# The single paho client (and its network-loop thread) owned by this process.
+# Set by start_mqtt_client() and released by stop_mqtt_client() on shutdown.
+_client = None
+
 MQTT_BROKER_URL = os.environ.get("MQTT_BROKER_URL", "ts-mqtt-server-cont")
 MQTT_BROKER_PORT = int(os.environ.get("MQTT_BROKER_PORT", 1883))
 MQTT_TOPICS = os.environ.get(
@@ -45,6 +49,11 @@ def on_connect(client, userdata, flags, rc):
 
 def on_disconnect(client, userdata, rc):
     global connection_state
+    if rc == mqtt.MQTT_ERR_SUCCESS:
+        # rc 0 means we asked to disconnect (stop_mqtt_client); paho will not reconnect.
+        connection_state = "disconnected"
+        logger.info("MQTT client disconnected cleanly")
+        return
     connection_state = "reconnecting"
     logger.warning("MQTT client disconnected, rc=%s; attempting reconnect", rc)
 
@@ -182,7 +191,9 @@ def normalize_payload(raw_payload, topic):
     return {"eventType": "unknown", "raw": data}
 
 def start_mqtt_client():
-    global connection_state
+    global connection_state, _client
+    if _client is not None:
+        return _client
     connection_state = "connecting"
     client = mqtt.Client()
     client.on_connect = on_connect
@@ -197,7 +208,28 @@ def start_mqtt_client():
             "MQTT initial connection failed; will keep retrying in background"
         )
     client.loop_start()
+    _client = client
     return client
+
+def stop_mqtt_client():
+    """
+    Disconnect the owned MQTT client and join its network-loop thread.
+    Safe to call when the client was never started or is already stopped.
+    """
+    global connection_state, _client
+    client, _client = _client, None
+    if client is None:
+        return
+    try:
+        # Sends DISCONNECT when connected; when still retrying it just tells
+        # the loop thread to stop reconnecting.
+        client.disconnect()
+    except Exception:
+        logger.warning("MQTT disconnect failed during shutdown", exc_info=True)
+    finally:
+        client.loop_stop()
+        connection_state = "disconnected"
+        logger.info("MQTT client stopped and network loop joined")
 
 def get_connection_state():
     return connection_state

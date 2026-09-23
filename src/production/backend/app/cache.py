@@ -37,6 +37,14 @@ def get_client() -> Optional[Redis]:
     return _client
 
 
+def close_client() -> None:
+    """Close the cache connection pool on shutdown; a later get_client() reopens it."""
+    global _client
+    client, _client = _client, None
+    if client is not None:
+        client.close()
+
+
 def _normalize_bound(value: Optional[str]) -> str:
     if not value:
         return "all"

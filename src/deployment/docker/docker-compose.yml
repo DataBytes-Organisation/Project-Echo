@@ -123,6 +123,7 @@ services:
       MQTT_PUBLISH_URL: "projectecho/engine/2"
       MQTT_DETECTION_TOPIC: "projectecho/backend/detections"
       ENGINE_API_KEY: ${ENGINE_API_KEY:-}
+      REDIS_URL: redis://echo-redis:6379/1
 
     stdin_open: false
     tty: true
@@ -134,7 +135,41 @@ services:
     depends_on:
       echo_store:
         condition: service_healthy
-        
+      echo-redis:
+        condition: service_started
+
+  # Shared RQ worker for the "echo-backend" queue, matching the C1.2 setup in
+  # #1048 (audio ingest + detection webhook jobs). Jobs are enqueued with
+  # delayed Retry intervals, which only fire when the worker runs RQ's
+  # scheduler, hence --with-scheduler.
+  echo_rq_worker:
+    build:
+      context: ../../production/backend
+      dockerfile: API.Dockerfile
+    image: ts-api
+    container_name: ts-rq-worker-cont
+    networks:
+      - echo-net
+    volumes:
+      - ../../production/backend:/app
+      - credentials_volume:/root/.config/gcloud/
+    env_file:
+      - .env
+    environment:
+      PYTHONUNBUFFERED: "1"
+      PYTHONPATH: /app
+      REDIS_URL: redis://echo-redis:6379/1
+      MONGODB_URI: mongodb://root:root_password@ts-mongodb-cont:27017/EchoNet?authSource=admin
+      USER_MONGODB_URI: mongodb://root:root_password@ts-mongodb-cont:27017/EchoNet?authSource=admin
+      DETECTION_WEBHOOK_URL: ${DETECTION_WEBHOOK_URL:-}
+    command: rq worker echo-backend --with-scheduler --url redis://echo-redis:6379/1
+    restart: on-failure
+    depends_on:
+      echo_store:
+        condition: service_healthy
+      echo-redis:
+        condition: service_started
+
   mongo-express:
     image: mongo-express
     container_name: mongo-express

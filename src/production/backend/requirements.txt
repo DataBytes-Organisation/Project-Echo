@@ -31,5 +31,6 @@ fastapi_mail
 twilio==8.5.0
 python-multipart
 redis==5.2.1
+rq==1.16.2
 prometheus-client==0.21.1
 pytest
