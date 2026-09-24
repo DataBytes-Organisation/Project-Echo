@@ -48,55 +48,140 @@ def test_valid_engine_event_schema():
     assert event.sampleRate == 32000
 
 
-def test_create_event_inserts_into_events_collection(monkeypatch):
-    fake_events = FakeEventsCollection()
-    monkeypatch.setattr(engine, "Events", fake_events)
+def test_create_event_uses_shared_persistence(monkeypatch):
+    captured = {}
+
+    def fake_persist(event):
+        captured["event"] = event
+        return "fake-event-id"
+
+    def fake_build_stream_payload(inserted_id):
+        return {
+            "_id": inserted_id,
+            "sensorId": "unit-test-sensor",
+        }
+
+    async def fake_broadcast(payload):
+        captured["broadcast"] = payload
+
+    monkeypatch.setattr(
+        engine,
+        "persist_event",
+        fake_persist,
+    )
+
+    monkeypatch.setattr(
+        engine,
+        "_build_stream_payload",
+        fake_build_stream_payload,
+    )
+
+    monkeypatch.setattr(
+        engine.detection_stream_manager,
+        "broadcast",
+        fake_broadcast,
+    )
 
     event = EventSchema(**valid_payload())
     response = asyncio.run(engine.create_event(event))
 
-    assert fake_events.inserted_document is not None
-    assert fake_events.inserted_document["sensorId"] == "unit-test-sensor"
-    assert fake_events.inserted_document["species"] == "Uperoleia mimula"
-    assert fake_events.inserted_document["confidence"] == 99.36
+    assert captured["event"].sensorId == "unit-test-sensor"
+    assert captured["event"].species == "Uperoleia mimula"
+    assert captured["event"].confidence == 99.36
 
-    assert response == {"status": "success", "eventId": "fake-event-id"}
+    assert captured["broadcast"]["_id"] == "fake-event-id"
+
+    assert response == {
+        "status": "success",
+        "eventId": "fake-event-id",
+    }
 
 
 def test_create_event_broadcasts_only_after_persistence(monkeypatch):
-    fake_events = FakeEventsCollection()
+    persisted = {"done": False}
     broadcast_payloads = []
+
+    def fake_persist(event):
+        persisted["done"] = True
+        return "fake-event-id"
+
+    def fake_build_stream_payload(inserted_id):
+        assert persisted["done"] is True
+        return {
+            "_id": inserted_id,
+            "sensorId": "unit-test-sensor",
+            "species": "Uperoleia mimula",
+        }
 
     class RecordingStream:
         async def broadcast(self, payload):
-            assert fake_events.inserted_document is not None
+            assert persisted["done"] is True
             broadcast_payloads.append(payload)
 
-    monkeypatch.setattr(engine, "Events", fake_events)
-    monkeypatch.setattr(engine, "detection_stream_manager", RecordingStream())
+    monkeypatch.setattr(engine, "persist_event", fake_persist)
+    monkeypatch.setattr(
+        engine,
+        "_build_stream_payload",
+        fake_build_stream_payload,
+    )
+    monkeypatch.setattr(
+        engine,
+        "detection_stream_manager",
+        RecordingStream(),
+    )
 
-    response = asyncio.run(engine.create_event(EventSchema(**valid_payload())))
+    response = asyncio.run(
+        engine.create_event(EventSchema(**valid_payload()))
+    )
 
-    assert response["_id"] == "fake-event-id"
+    assert persisted["done"] is True
+    assert response == {
+        "status": "success",
+        "eventId": "fake-event-id",
+    }
     assert len(broadcast_payloads) == 1
     assert broadcast_payloads[0]["sensorId"] == "unit-test-sensor"
-    assert broadcast_payloads[0]["species"] == "Uperoleia mimula"
 
 
 def test_broadcast_failure_does_not_undo_persisted_event(monkeypatch):
-    fake_events = FakeEventsCollection()
+    persisted = {"done": False}
+
+    def fake_persist(event):
+        persisted["done"] = True
+        return "fake-event-id"
+
+    def fake_build_stream_payload(inserted_id):
+        return {
+            "_id": inserted_id,
+            "sensorId": "unit-test-sensor",
+            "species": "Uperoleia mimula",
+        }
 
     class FailingStream:
         async def broadcast(self, payload):
             raise RuntimeError("client connection failed")
 
-    monkeypatch.setattr(engine, "Events", fake_events)
-    monkeypatch.setattr(engine, "detection_stream_manager", FailingStream())
+    monkeypatch.setattr(engine, "persist_event", fake_persist)
+    monkeypatch.setattr(
+        engine,
+        "_build_stream_payload",
+        fake_build_stream_payload,
+    )
+    monkeypatch.setattr(
+        engine,
+        "detection_stream_manager",
+        FailingStream(),
+    )
 
-    response = asyncio.run(engine.create_event(EventSchema(**valid_payload())))
+    response = asyncio.run(
+        engine.create_event(EventSchema(**valid_payload()))
+    )
 
-    assert fake_events.inserted_document is not None
-    assert response["_id"] == "fake-event-id"
+    assert persisted["done"] is True
+    assert response == {
+        "status": "success",
+        "eventId": "fake-event-id",
+    }
 
 
 def test_empty_species_is_rejected():

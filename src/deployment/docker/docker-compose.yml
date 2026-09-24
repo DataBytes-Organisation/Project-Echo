@@ -114,9 +114,14 @@ services:
     environment:
       MAIL_STARTTLS: "true"
       MAIL_SSL_TLS: "false"
+      REDIS_HOST: echo-redis
+      REDIS_PORT: "6379"
+      REDIS_CACHE_DB: "2"
+      CACHE_TTL_SECONDS: "300"
       MQTT_BROKER_URL: "ts-mqtt-server-cont"
       MQTT_BROKER_PORT: "1883"
       MQTT_PUBLISH_URL: "projectecho/engine/2"
+      MQTT_DETECTION_TOPIC: "projectecho/backend/detections"
       ENGINE_API_KEY: ${ENGINE_API_KEY:-}
 
     stdin_open: false
