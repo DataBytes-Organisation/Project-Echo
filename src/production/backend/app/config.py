@@ -20,6 +20,8 @@ _SECRET_FILE_ENV_VARS = (
     "TWILIO_ACCOUNT_SID",
     "TWILIO_AUTH_TOKEN",
     "MAIL_PASSWORD",
+    "R2_ACCESS_KEY_ID",
+    "R2_SECRET_ACCESS_KEY",
 )
 
 
@@ -61,6 +63,15 @@ class Settings(BaseSettings):
     # --- API self-reference ---
     internal_api_base_url: str = "http://ts-api-cont:9000"
     api_port: int = 9000
+
+    # --- Cloudflare R2 object storage ---
+    # Optional at Backend startup; validated as required when R2 storage is used.
+    r2_account_id: Optional[str] = Field(None, env="R2_ACCOUNT_ID")
+    r2_access_key_id: Optional[str] = Field(None, env="R2_ACCESS_KEY_ID")
+    r2_secret_access_key: Optional[str] = Field(None, env="R2_SECRET_ACCESS_KEY")
+    r2_bucket_name: Optional[str] = Field(None, env="R2_BUCKET_NAME")
+    r2_endpoint_url: Optional[str] = Field(None, env="R2_ENDPOINT_URL")
+    r2_dataset_prefix: str = Field("prototype", env="R2_DATASET_PREFIX")
 
     # --- Timeouts / thresholds (consumed by C10/C11 later) ---
     request_timeout_seconds: float = 15.0
