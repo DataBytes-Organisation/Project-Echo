@@ -1,0 +1,15 @@
+# Augmentation preset: LIGHT (gentle masking).
+# Selected via: python main.py augmentation=light
+
+_target_: torchvision.transforms.Compose
+transforms:
+  # `augment.SpecAugment` resolves as a plain Python import, which
+  # depends on augment.py sitting in the same folder as main.py
+  - _target_: augment.SpecAugment
+    p: 0.3 # only mask 30% of spectrograms seen during training
+    n_freq_mask: 1 # one frequency-strip covered
+    n_time_mask: 1 # one time-strip covered
+    freq_mask_ratio: 0.10           
+    time_mask_ratio: 0.05          
+    max_total_time_ratio: 0.2 # safety cap: never more than 20% of the clip's total timeframes
+    mask_value: "zero" # fill masked strips with 0

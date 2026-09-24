@@ -28,9 +28,10 @@ _HEAVY_MODULES = [
     "google.cloud", "google.cloud.storage",
     "pymongo", "diskcache", "soundfile",
     "geopy", "geopy.distance",
-    "sklearn", "sklearn.preprocessing",
+    # "sklearn", "sklearn.preprocessing",
     "helpers", "helpers.melspectrogram_to_cam",
-    "yamnet_dir", "yamnet_dir.params", "yamnet_dir.yamnet",
+    "yamnet_dir.params", "yamnet_dir.yamnet",
+
 ]
 
 for mod in _HEAVY_MODULES:
@@ -55,9 +56,10 @@ _ENGINE_CONFIG = {
     "MODEL_INPUT_IMAGE_CHANNELS": 3,
     "MQTT_CLIENT_URL": "localhost", "MQTT_CLIENT_PORT": 1883,
     "MQTT_PUBLISH_URL": "projectecho/engine/2",
-    "MODEL_SERVER": "http://localhost:8501/v1/models/echo_model:predict",
+    "MODEL_SERVER": "http://ts-echo-model-cont:8501/v1/models/echo_model/versions/1:predict",
     "WEATHER_SERVER": "http://localhost:8501/v1/models/weather_model:predict",
     "GCLOUD_PROJECT": "test", "BUCKET_NAME": "test", "DB_HOSTNAME": "localhost",
+    "ACTIVE_INFERENCE_MODEL": "classic",
     "IOT_MQTT_BROKER": "broker.hivemq.com",
     "IOT_MQTT_PORT": 1883,
     "IOT_MQTT_TOPIC": "iot/data/test",
@@ -77,9 +79,29 @@ def _patched_open(path, *args, **kwargs):
     return _real_open(path, *args, **kwargs)
 
 
+# Keep the patched open installed so EchoEngine() construction in each test's
+# setUp also reads the mocked _ENGINE_CONFIG (which selects the classic model,
+# not efficientnetv2_tflite, so __init__ skips the TFLite interpreter setup).
+# Real file access still falls through to _real_open inside _patched_open.
 builtins.open = _patched_open
-from echo_engine_iot import EchoEngine  # noqa: E402
-builtins.open = _real_open
+from echo_engine import EchoEngine  # noqa: E402
+
+# sklearn (unlike tensorflow/librosa/etc.) isn't referenced again anywhere in
+# this file after the import above, and echo_engine.py only needs it mocked
+# at *its own* import time (`from sklearn.preprocessing import LabelEncoder`,
+# already bound into echo_engine's namespace by now). Left mocked, it stays a
+# MagicMock in sys.modules for the rest of the pytest process once this file
+# is collected - pytest imports every test file up front during collection,
+# before running any of them, so a later file's real
+# `from sklearn.metrics import ...` (e.g. test_heldout_baseline.py, unrelated
+# to this one) gets the mock instead and fails with "ModuleNotFoundError: No
+# module named 'sklearn.metrics'; 'sklearn' is not a package". A
+# tearDownModule() cleanup runs too late to fix this - it only fires after
+# this file's own tests execute, by which point collection has already
+# polluted every other file. Restoring it right here, immediately after the
+# only import that needed it mocked, is what actually fixes the leak.
+for _mod in ("sklearn.preprocessing", "sklearn"):
+    sys.modules.pop(_mod, None)
 
 
 # ===========================================================================
@@ -159,32 +181,27 @@ class TestIoTMessageHandler(unittest.TestCase):
         self.engine = EchoEngine()
         self.engine.class_names = ["Kookaburra", "Magpie"]
 
-        self.engine.combined_pipeline = MagicMock(return_value=(
-            np.zeros((260, 260, 3)),
-            np.zeros(48000 * 5, dtype=np.float32),
-            48000,
-        ))
-        self.engine.predict_class = MagicMock(return_value=("Kookaburra", 95.5))
+        # The consolidated engine runs local EfficientNetV2 TFLite inference for
+        # IoT messages (on_iot_message -> efficientnetv2_tflite_predict_from_audio_bytes),
+        # which returns (class, probability, processed_audio, sample_rate, top_predictions).
+        self.engine.efficientnetv2_tflite_predict_from_audio_bytes = MagicMock(
+            return_value=(
+                "Kookaburra", 95.5, np.zeros(48000 * 5, dtype=np.float32), 48000, [],
+            )
+        )
         self.engine.echo_api_send_detection_event = MagicMock()
-        self.engine.audio_to_string = MagicMock(return_value="base64audio")
 
-        # tf.expand_dims returns a mock tensor with .numpy().tolist()
-        mock_tensor = MagicMock()
-        mock_tensor.numpy.return_value.tolist.return_value = [[[[0.0] * 3] * 260] * 260]
-        sys.modules["tensorflow"].expand_dims.return_value = mock_tensor
-
-        # requests.post to model server
-        mock_resp = MagicMock()
-        mock_resp.text = json.dumps({"outputs": [[0.1, 0.9]]})
-        self.requests_patcher = patch("echo_engine.requests.post", return_value=mock_resp)
+        # The IoT path infers locally and must not POST to a remote model server;
+        # patch requests.post so we can assert it is never used.
+        self.requests_patcher = patch("echo_engine.requests.post")
         self.mock_post = self.requests_patcher.start()
 
     def tearDown(self):
         self.requests_patcher.stop()
 
-    def test_valid_payload_calls_pipeline(self):
+    def test_valid_payload_runs_local_inference(self):
         self.engine.on_iot_message(None, None, _make_msg(_valid_payload()))
-        self.engine.combined_pipeline.assert_called_once()
+        self.engine.efficientnetv2_tflite_predict_from_audio_bytes.assert_called_once()
 
     def test_valid_payload_calls_api(self):
         self.engine.on_iot_message(None, None, _make_msg(_valid_payload()))
@@ -205,9 +222,15 @@ class TestIoTMessageHandler(unittest.TestCase):
     def test_gps_coordinates_in_event(self):
         self.engine.on_iot_message(None, None, _make_msg(_valid_payload()))
         event = self.engine.echo_api_send_detection_event.call_args[0][0]
-        self.assertEqual(event["microphoneLLA"], [-37.8136, 144.9631, 0.0])
-        self.assertEqual(event["animalEstLLA"], [-37.8136, 144.9631, 0.0])
-        self.assertEqual(event["animalTrueLLA"], [-37.8136, 144.9631, 0.0])
+        expected_lla = {
+            "latitude": -37.8136,
+            "longitude": 144.9631,
+            "altitude": 0.0,
+        }
+        self.assertEqual(event["sourceType"], "real")
+        self.assertEqual(event["microphoneLLA"], expected_lla)
+        self.assertEqual(event["animalEstLLA"], expected_lla)
+        self.assertEqual(event["animalTrueLLA"], expected_lla)
 
     def test_gps_uncertainty_from_payload(self):
         self.engine.on_iot_message(None, None, _make_msg(_valid_payload(gps_uncertainty=5.0)))
@@ -222,16 +245,19 @@ class TestIoTMessageHandler(unittest.TestCase):
         self.assertEqual(event["animalLLAUncertainty"], 10.0)
 
     def test_species_and_confidence_forwarded(self):
-        self.engine.predict_class.return_value = ("Magpie", 87.3)
+        self.engine.efficientnetv2_tflite_predict_from_audio_bytes.return_value = (
+            "Magpie", 87.3, np.zeros(1, dtype=np.float32), 48000, [],
+        )
         self.engine.on_iot_message(None, None, _make_msg(_valid_payload()))
         args = self.engine.echo_api_send_detection_event.call_args[0]
         self.assertEqual(args[2], "Magpie")
         self.assertEqual(args[3], 87.3)
 
-    def test_model_server_url_from_config(self):
+    def test_iot_uses_local_inference_not_model_server(self):
+        # IoT inference is local; the handler must not call out to a remote model server.
         self.engine.on_iot_message(None, None, _make_msg(_valid_payload()))
-        post_url = self.mock_post.call_args[0][0]
-        self.assertEqual(post_url, _ENGINE_CONFIG["MODEL_SERVER"])
+        self.engine.efficientnetv2_tflite_predict_from_audio_bytes.assert_called_once()
+        self.mock_post.assert_not_called()
 
 
 # ===========================================================================
@@ -266,6 +292,30 @@ class TestIoTStartupOrder(unittest.TestCase):
         engine.execute()
 
         self.assertEqual(call_order, ["class_names", "iot_listener"])
+    class TestIoTStartupOrder(unittest.TestCase):
+        """Verify IoT listener starts AFTER class_names are loaded."""
+
+    def test_iot_listener_starts_after_class_names(self):
+        engine = EchoEngine()
+        call_order = []
+
+        engine.gcp_load_species_list = MagicMock(
+            side_effect=lambda: (
+                call_order.append("class_names"),
+                ["species"]
+            )[1]
+        )
+
+        engine.start_iot_mqtt_listener = MagicMock(
+            side_effect=lambda: call_order.append("iot_listener")
+        )
+
+        engine.execute()
+
+        self.assertEqual(
+            call_order,
+            ["class_names", "iot_listener"]
+        )
 
 
 if __name__ == "__main__":

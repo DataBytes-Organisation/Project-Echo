@@ -143,8 +143,7 @@ src/components/
 
 ```
 src/components/engine/
-├── echo_engine_iot.py        current runtime (MQTT + API integration)
-├── echo_engine.py            older runtime
+├── echo_engine.py            current runtime (MQTT + API integration)
 ├── echo_engine.sh, echo_engine.json, models.config
 ├── Engine.Dockerfile / Engine.test.Dockerfile / Model.Dockerfile
 ├── models/                   echo_model, weather_model, placeholder
@@ -161,8 +160,7 @@ Plus: `src/components/simulator/`, `src/components/store/`,
 
 | Item | Classification | Action |
 |---|---|---|
-| `echo_engine_iot.py` | Production | Keep as main runtime |
-| `echo_engine.py` | Legacy | Review and merge/remove — duplicate of the IoT-integrated runtime |
+| `echo_engine.py` | Production | Canonical IoT-integrated runtime |
 | `models/` | Production model weights | `.gitignore` already excludes `src/components/engine/models/*` — good, confirm DVC actually tracks these instead of them being untracked-and-missing |
 | `yamnet_dir/*.h5`, `.pkl` | Model weights checked into `src/components/` | **Confirmed** — `yamnet.h5` (15MB), `model_2_79.h5` (1.7MB), `model_3_82_16000.h5` (1.7MB), plus two `.pkl` files are real binary blobs committed directly to git (not LFS pointers, not covered by the `engine/models/*` gitignore rule). Move to DVC/LFS |
 | `*.ipynb` in `engine/` | Development notebooks in a production folder | Move to `docs/experiments/` or a research area |

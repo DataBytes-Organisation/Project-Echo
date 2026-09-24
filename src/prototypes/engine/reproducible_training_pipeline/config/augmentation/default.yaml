@@ -1,0 +1,15 @@
+# Augmentation preset: DEFAULT (recommended starting point).
+# Selected via: python main.py augmentation=default
+# This is also the preset used automatically if `augmentation=...` is not
+# specified on the command line (see the `defaults` list in config.yaml).
+
+_target_: torchvision.transforms.Compose
+transforms:
+  - _target_: augment.SpecAugment
+    p: 0.5
+    n_freq_mask: 2 # 2 frequency strips
+    n_time_mask: 2
+    freq_mask_ratio: 0.15 # up to 15% of total number of frequencies per strip (2 strips -> up to 30% combined)
+    time_mask_ratio: 0.10 # up to 10% of total number of timeframes per strip
+    max_total_time_ratio: 0.4 # hard safety cap: never more than 40% of the clip's total timeframes
+    mask_value: "zero"

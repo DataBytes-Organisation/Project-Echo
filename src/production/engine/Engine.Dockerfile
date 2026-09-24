@@ -71,10 +71,11 @@ ENV PATH="/opt/venv/bin:$PATH"
 COPY --from=echo_engine_builder /build/echo_engine.sh ./
 
 COPY yamnet_dir/ ./yamnet_dir/
-COPY ./echo_engine_iot.py ./echo_engine.py
+COPY ./echo_engine.py ./
 COPY ./echo_engine.json ./
 COPY ./echo_credentials.json ./
 COPY ./helpers ./helpers
+COPY ./inference_wrapper ./inference_wrapper
 COPY ./models/efficientnetv2 ./models/efficientnetv2
 
 # Setup GCloud config dir

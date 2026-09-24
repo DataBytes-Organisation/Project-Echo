@@ -110,6 +110,13 @@ services:
       RATE_LIMIT_REQUESTS: ${RATE_LIMIT_REQUESTS:-120}
       RATE_LIMIT_WINDOW_SECONDS: ${RATE_LIMIT_WINDOW_SECONDS:-60}
       RATE_LIMIT_TRUST_PROXY: ${RATE_LIMIT_TRUST_PROXY:-false}
+      # C4 made these fail-fast required settings; the CI stack has no .env
+      # file, so they must be supplied here to match echo_store's credentials.
+      MONGODB_URI: mongodb://root:root_password@ts-mongodb-cont:27017/EchoNet?authSource=admin
+      USER_MONGODB_URI: mongodb://root:root_password@ts-mongodb-cont:27017/EchoNet?authSource=admin
+      JWT_SECRET: ci-test-secret-not-for-production
+    depends_on:
+      - echo_store
 
     stdin_open: false
     tty: true
