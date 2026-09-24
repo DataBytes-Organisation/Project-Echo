@@ -33,3 +33,5 @@ python-multipart
 redis==5.2.1
 prometheus-client==0.21.1
 pytest
+rq==1.16.2
+fakeredis==2.26.2

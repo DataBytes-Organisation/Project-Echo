@@ -123,6 +123,8 @@ services:
       MQTT_PUBLISH_URL: "projectecho/engine/2"
       MQTT_DETECTION_TOPIC: "projectecho/backend/detections"
       ENGINE_API_KEY: ${ENGINE_API_KEY:-}
+      REDIS_URL: redis://echo-redis:6379/1
+      DETECTION_WEBHOOK_URL: ${DETECTION_WEBHOOK_URL:-}
 
     stdin_open: false
     tty: true
@@ -134,7 +136,44 @@ services:
     depends_on:
       echo_store:
         condition: service_healthy
-        
+      echo-redis:
+        condition: service_started
+
+  echo_rq_worker:
+    build:
+      context: ../../production/backend
+      dockerfile: API.Dockerfile
+    image: ts-api
+    container_name: ts-rq-worker-cont
+    networks:
+      - echo-net
+    volumes:
+      - ../../production/backend:/app
+      - credentials_volume:/root/.config/gcloud/
+    # Shared C1 queue with PR #1009: name echo-backend, Redis DB 1.
+    # --with-scheduler is required for Retry interval=10s.
+    env_file:
+      - .env
+    environment:
+      PYTHONUNBUFFERED: "1"
+      PYTHONPATH: /app
+      REDIS_URL: redis://echo-redis:6379/1
+      REDIS_HOST: echo-redis
+      REDIS_PORT: "6379"
+      JOB_TIMEOUT_SECONDS: "180"
+      JOB_MAX_RETRIES: "3"
+      JOB_RETRY_DELAY_SECONDS: "10"
+      MONGODB_URI: mongodb://root:root_password@ts-mongodb-cont:27017/EchoNet?authSource=admin
+      USER_MONGODB_URI: mongodb://root:root_password@ts-mongodb-cont:27017/EchoNet?authSource=admin
+      DETECTION_WEBHOOK_URL: ${DETECTION_WEBHOOK_URL:-}
+    command: rq worker echo-backend --with-scheduler --url redis://echo-redis:6379/1
+    restart: on-failure
+    depends_on:
+      echo_store:
+        condition: service_healthy
+      echo-redis:
+        condition: service_started
+
   mongo-express:
     image: mongo-express
     container_name: mongo-express

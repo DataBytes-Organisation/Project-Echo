@@ -17,6 +17,7 @@ from app.exceptions import (
     DetectionStorageError,
 )
 from app.schemas import DetectionCreate, Detection
+from app.jobs.queue import enqueue_detection_webhook
 from app.detection_rules import evaluate_detection, log_rejected_detection
 from app.cache import invalidate_insights
 
@@ -116,6 +117,7 @@ def create_detection(detection_in: DetectionCreate) -> Detection:
     try:
         result = Detections.insert_one(payload)
         created = Detections.find_one({"_id": result.inserted_id})
+        enqueue_detection_webhook(str(result.inserted_id))
     except PyMongoError as exc:
         _raise_storage_error(exc)
 
