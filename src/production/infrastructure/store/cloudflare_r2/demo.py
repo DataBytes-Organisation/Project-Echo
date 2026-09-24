@@ -4,12 +4,14 @@ from __future__ import annotations
 
 import hashlib
 
+from app.config import settings
+
 from .prototype_integration import R2EnginePrototype, R2SimulatorPrototype
 from .r2_storage import R2Config, R2Storage
 
 
 def main() -> None:
-    config = R2Config.from_env()
+    config = R2Config.from_settings(settings)
     storage = R2Storage(config)
     storage.check_connection()
     print("R2 connection: PASS")
