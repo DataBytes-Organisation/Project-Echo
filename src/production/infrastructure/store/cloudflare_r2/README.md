@@ -14,8 +14,10 @@ production path.
 ## Configuration
 
 Create a private Standard R2 bucket, leave public access disabled, and create a
-token with Object Read & Write access restricted to the prototype bucket. Set
-the variables shown in `.env.example` in the local environment. Never commit
+token with Object Read & Write access restricted to the prototype bucket.
+Cloudflare R2 configuration is centralised in the Backend settings.
+Configure the R2 variables in `src/production/backend/.env` using
+`src/production/backend/.env.example` as the reference. Never commit
 real credentials.
 
 Objects must use this layout:
@@ -24,9 +26,13 @@ Objects must use this layout:
 prototype/<species name>/<audio file>
 ```
 
-Install `requirements.txt`, then run from the parent `store` directory:
+```text
+Install `requirements.txt`, then run from the Backend directory with the
+shared storage package on `PYTHONPATH`:
 
 ```powershell
+cd src/production/backend
+$env:PYTHONPATH = (Resolve-Path ..\infrastructure\store).Path
 python -m cloudflare_r2.demo
 ```
 
