@@ -10,6 +10,7 @@ from pymongo.errors import ConnectionFailure, ExecutionTimeout
 
 from fastapi import FastAPI, Body, HTTPException, status, APIRouter, Request
 from fastapi.middleware.cors import CORSMiddleware
+from app.middleware.rate_limit import RateLimitMiddleware
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import Response, JSONResponse
 from fastapi.encoders import jsonable_encoder
@@ -53,6 +54,8 @@ app = FastAPI(
     """,
     version="1.0.0",
 )
+
+app.add_middleware(RateLimitMiddleware.from_environment)
 
 
 # Log API startup in structured JSON format
