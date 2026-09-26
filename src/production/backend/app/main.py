@@ -77,6 +77,7 @@ from app.routers import (
     sensors,
     payments,
 )
+from .routers import audio_jobs
 from app.routers import projects
 
 app.include_router(projects.router)
@@ -162,6 +163,7 @@ def mqtt_latest_events():
 add_correlation_id(app)
 
 app.include_router(audio_upload_router.router, tags=["audio"], prefix="/api")
+app.include_router(audio_jobs.router, prefix="/api")
 
 
 # Include routers

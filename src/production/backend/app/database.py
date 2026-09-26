@@ -83,6 +83,8 @@ AUS_STATES = ["victoria", "newsouthwales", "tasmania", "queensland", "southaustr
 # Update Database Setup (t2.2025)
 AudioUploads = db.audio_uploads
 Predictions = db.predictions
+AudioProcessingJobs = db.audio_processing_jobs
+AudioProcessingJobs.create_index([("status", pymongo.ASCENDING), ("created_at", pymongo.DESCENDING)])
 Detections = db.detections
 
 Detections.create_index([("species", pymongo.ASCENDING)], name = "idx_species")
