@@ -202,6 +202,18 @@ def show_home():
     return "Welcome to Project Echo API. Visit /docs for interactive documentation."
 
 
+
+@app.get("/api-info", tags=["public"], summary="Return API service information")
+def api_info():
+    """Provide clients with stable links to the service documentation."""
+    return {
+        "name": app.title,
+        "version": app.version,
+        "docs_url": app.docs_url,
+        "openapi_url": app.openapi_url,
+    }
+
+
 app.include_router(auth_router.router, tags=["auth"], prefix="/api")
 app.include_router(detections.router)
 
