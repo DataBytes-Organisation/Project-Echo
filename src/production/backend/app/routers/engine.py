@@ -4,6 +4,7 @@ from app import serializers
 from app import schemas
 from app.database import Events
 from app.services.detection_stream import detection_stream_manager
+from app.services.event_ingestion import persist_event
 from app.middleware.engine_auth import verify_engine_api_key
 import asyncio
 import datetime
@@ -59,22 +60,22 @@ def _build_stream_payload(inserted_id):
 )
 async def create_event(event: schemas.EventSchema):
     # Keep Mongo work off the event loop so open WebSocket clients stay responsive.
-    result = await asyncio.to_thread(Events.insert_one, event.dict())
+    inserted_id = await asyncio.to_thread(persist_event, event)
     await asyncio.to_thread(invalidate_insights)
     # Persistence already succeeded. Broadcast failures must not turn this into a 500.
     try:
         stream_payload = await asyncio.to_thread(
-            _build_stream_payload, result.inserted_id
+            _build_stream_payload, inserted_id
         )
         await detection_stream_manager.broadcast(stream_payload)
     except Exception:
         logger.warning(
             "Event %s persisted but live broadcast failed",
-            result.inserted_id,
+            inserted_id,
             exc_info=True,
         )
 
-    return {"status": "success", "eventId": str(result.inserted_id)}
+    return {"status": "success", "eventId": str(inserted_id)}
 
     
 # Return all species data
