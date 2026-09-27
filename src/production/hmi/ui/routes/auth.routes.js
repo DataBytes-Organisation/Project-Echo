@@ -50,12 +50,14 @@ module.exports = function (app) {
     let pw = req.body.password;
 
     let email = req.body.email;
+    let captchaToken = req.body.captchaToken; // FR-D4: forwarded to backend for verification
       
     try {
       const data = await apiClient.post('/hmi/signin', {
         username: uname,
         email: email,
-        password: pw
+        password: pw,
+        captchaToken: captchaToken
       });
 
       // Check if MFA is enabled
