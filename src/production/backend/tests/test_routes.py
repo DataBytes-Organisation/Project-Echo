@@ -9,6 +9,19 @@ def test_root_endpoint():
     assert response.status_code == 200
     assert "echo api" in response.text.lower()
 
+
+def test_api_info_endpoint():
+    """Verify the standalone service-information endpoint is available."""
+    response = client.get("/api-info")
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "name": "Project Echo API",
+        "version": "1.0.0",
+        "docs_url": "/docs",
+        "openapi_url": "/openapi.json",
+    }
+
 def test_openapi_spec_exists():
     """Verify that the OpenAPI export endpoint functions correctly."""
     response = client.get("/openapi-export")
@@ -30,5 +43,4 @@ def test_detections_route_exists():
     # It might return 500 if DB is not connected, but not 404
     response = client.get("/detections")
     assert response.status_code != 404
-
 
