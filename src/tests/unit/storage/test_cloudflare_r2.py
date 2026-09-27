@@ -57,6 +57,9 @@ class FakeR2Client:
     def upload_fileobj(self, source, bucket, key, **kwargs):
         self.upload = (source.read(), bucket, key, kwargs)
 
+    def delete_object(self, **kwargs):
+        self.delete_request = kwargs
+
 
 class R2PrototypeTests(unittest.TestCase):
     def setUp(self):
@@ -160,6 +163,19 @@ class R2PrototypeTests(unittest.TestCase):
     def test_invalid_file_key_is_rejected(self):
         with self.assertRaises(ValueError):
             self.storage.download_bytes("prototype/Species A/")
+
+    def test_delete_object_uses_configured_bucket(self):
+        self.storage.delete_object(
+            "audio_uploads/sample.wav"
+        )
+
+        self.assertEqual(
+            self.client.delete_request,
+            {
+                "Bucket": "bucket",
+                "Key": "audio_uploads/sample.wav",
+            },
+        )
 
 
 if __name__ == "__main__":

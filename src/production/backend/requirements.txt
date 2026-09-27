@@ -33,3 +33,4 @@ python-multipart
 redis==5.2.1
 prometheus-client==0.21.1
 pytest
+boto3>=1.34,<2

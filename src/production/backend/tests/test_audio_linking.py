@@ -1,9 +1,9 @@
+import asyncio
 import json
 
 import pytest
 from bson import ObjectId
 from fastapi import HTTPException
-from fastapi.responses import FileResponse
 
 from app.routers import audio_upload_router
 from app.services import mqtt_client
@@ -38,17 +38,17 @@ def valid_detection_payload(audio_clip):
     }
 
 
-def test_get_audio_returns_existing_file(monkeypatch, tmp_path):
+def test_get_audio_returns_existing_object(monkeypatch):
     upload_id = str(ObjectId())
-
-    audio_file = tmp_path / "stored.wav"
-    audio_file.write_bytes(b"audio-test-data")
+    storage_key = "audio_uploads/2026/09/23/stored.wav"
+    storage = object()
 
     fake_collection = FakeAudioUploads(
         {
             "_id": ObjectId(upload_id),
             "filename": "stored.wav",
             "original_filename": "original.wav",
+            "storage_key": storage_key,
             "content_type": "audio/wav",
         }
     )
@@ -60,20 +60,41 @@ def test_get_audio_returns_existing_file(monkeypatch, tmp_path):
     )
     monkeypatch.setattr(
         audio_upload_router,
-        "UPLOAD_DIR",
-        str(tmp_path),
+        "get_r2_storage",
+        lambda: storage,
     )
 
-    response = audio_upload_router.get_audio(upload_id)
+    def fake_download(storage_arg, key):
+        assert storage_arg is storage
+        assert key == storage_key
+        return b"audio-test-data"
 
-    assert isinstance(response, FileResponse)
-    assert response.path == str(audio_file)
+    monkeypatch.setattr(
+        audio_upload_router,
+        "download_from_r2",
+        fake_download,
+    )
+
+    response = asyncio.run(
+        audio_upload_router.get_audio(upload_id)
+    )
+
+    assert response.status_code == 200
+    assert response.body == b"audio-test-data"
     assert response.media_type == "audio/wav"
+    assert (
+        response.headers["content-disposition"]
+        == 'inline; filename="original.wav"'
+    )
 
 
 def test_invalid_audio_id_returns_400():
     with pytest.raises(HTTPException) as exc:
-        audio_upload_router.get_audio("not-a-valid-object-id")
+        asyncio.run(
+            audio_upload_router.get_audio(
+                "not-a-valid-object-id"
+            )
+        )
 
     assert exc.value.status_code == 400
 
@@ -86,19 +107,26 @@ def test_missing_audio_record_returns_404(monkeypatch):
     )
 
     with pytest.raises(HTTPException) as exc:
-        audio_upload_router.get_audio(str(ObjectId()))
+        asyncio.run(
+            audio_upload_router.get_audio(
+                str(ObjectId())
+            )
+        )
 
     assert exc.value.status_code == 404
 
 
-def test_missing_audio_file_returns_404(monkeypatch, tmp_path):
+def test_missing_audio_object_returns_404(monkeypatch):
     upload_id = str(ObjectId())
+    storage_key = "audio_uploads/missing.wav"
+    storage = object()
 
     fake_collection = FakeAudioUploads(
         {
             "_id": ObjectId(upload_id),
             "filename": "missing.wav",
             "original_filename": "missing.wav",
+            "storage_key": storage_key,
             "content_type": "audio/wav",
         }
     )
@@ -110,12 +138,27 @@ def test_missing_audio_file_returns_404(monkeypatch, tmp_path):
     )
     monkeypatch.setattr(
         audio_upload_router,
-        "UPLOAD_DIR",
-        str(tmp_path),
+        "get_r2_storage",
+        lambda: storage,
+    )
+
+    def missing_object(storage_arg, key):
+        assert storage_arg is storage
+        assert key == storage_key
+        raise audio_upload_router.R2ObjectNotFound(
+            "missing"
+        )
+
+    monkeypatch.setattr(
+        audio_upload_router,
+        "download_from_r2",
+        missing_object,
     )
 
     with pytest.raises(HTTPException) as exc:
-        audio_upload_router.get_audio(upload_id)
+        asyncio.run(
+            audio_upload_router.get_audio(upload_id)
+        )
 
     assert exc.value.status_code == 404
 
