@@ -1,0 +1,14 @@
+# Augmentation preset: TIME WARP (structural alternative to time/frequency
+# masking - see augmentation/time_warp.py for the full rationale). No
+# masking at all in this preset, so it's a clean comparison against
+# `none` and the masking presets, on the same metrics.
+# Selected via: python main.py augmentation=time_warp
+# Requires augmentation/ on PYTHONPATH - time_warp.py lives there, not in
+# this pipeline folder, since it's an experimental comparison arm rather
+# than a change to this folder's own files.
+
+_target_: torchvision.transforms.Compose
+transforms:
+  - _target_: time_warp.TimeWarp
+    p: 0.5
+    max_warp: 20 # ~10% of a 201-timeframe clip - roughly matches `default`'s time_mask_ratio=0.10 in scale

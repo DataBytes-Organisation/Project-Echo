@@ -1,0 +1,5 @@
+-r requirements.txt
+
+pytest
+mongomock
+httpx<0.28

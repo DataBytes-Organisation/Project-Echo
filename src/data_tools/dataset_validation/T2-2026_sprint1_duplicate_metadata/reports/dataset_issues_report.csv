@@ -1,0 +1,26 @@
+file_name,relative_path,species,species_label,source,issue_type,severity
+XC181330 - Red-browed Pardalote - Pardalotus rubricatus rubricatus.mp3,XC181330 - Red-browed Pardalote - Pardalotus rubricatus rubricatus.mp3,unknown,unknown,unknown,missing_source,High
+XC143502 - Brown Gerygone - Gerygone mouki richmondi.mp3,XC143502 - Brown Gerygone - Gerygone mouki richmondi.mp3,unknown,unknown,unknown,missing_source,High
+XC36630 - Red-browed Pardalote - Pardalotus rubricatus.mp3,XC36630 - Red-browed Pardalote - Pardalotus rubricatus.mp3,unknown,unknown,unknown,missing_source,High
+XC550699 - Rose Robin - Petroica rosea.mp3,XC550699 - Rose Robin - Petroica rosea.mp3,unknown,unknown,unknown,missing_source,High
+XC350439 - Rose Robin - Petroica rosea.mp3,XC350439 - Rose Robin - Petroica rosea.mp3,unknown,unknown,unknown,missing_source,High
+XC181330 - Red-browed Pardalote - Pardalotus rubricatus rubricatus.mp3,XC181330 - Red-browed Pardalote - Pardalotus rubricatus rubricatus.mp3,unknown,unknown,unknown,missing_species,High
+XC143502 - Brown Gerygone - Gerygone mouki richmondi.mp3,XC143502 - Brown Gerygone - Gerygone mouki richmondi.mp3,unknown,unknown,unknown,missing_species,High
+XC36630 - Red-browed Pardalote - Pardalotus rubricatus.mp3,XC36630 - Red-browed Pardalote - Pardalotus rubricatus.mp3,unknown,unknown,unknown,missing_species,High
+XC550699 - Rose Robin - Petroica rosea.mp3,XC550699 - Rose Robin - Petroica rosea.mp3,unknown,unknown,unknown,missing_species,High
+XC350439 - Rose Robin - Petroica rosea.mp3,XC350439 - Rose Robin - Petroica rosea.mp3,unknown,unknown,unknown,missing_species,High
+XC181330 - Red-browed Pardalote - Pardalotus rubricatus rubricatus.mp3,XC181330 - Red-browed Pardalote - Pardalotus rubricatus rubricatus.mp3,unknown,unknown,unknown,missing_species_label,High
+XC143502 - Brown Gerygone - Gerygone mouki richmondi.mp3,XC143502 - Brown Gerygone - Gerygone mouki richmondi.mp3,unknown,unknown,unknown,missing_species_label,High
+XC36630 - Red-browed Pardalote - Pardalotus rubricatus.mp3,XC36630 - Red-browed Pardalote - Pardalotus rubricatus.mp3,unknown,unknown,unknown,missing_species_label,High
+XC550699 - Rose Robin - Petroica rosea.mp3,XC550699 - Rose Robin - Petroica rosea.mp3,unknown,unknown,unknown,missing_species_label,High
+XC350439 - Rose Robin - Petroica rosea.mp3,XC350439 - Rose Robin - Petroica rosea.mp3,unknown,unknown,unknown,missing_species_label,High
+XC181330 - Red-browed Pardalote - Pardalotus rubricatus rubricatus.mp3,XC181330 - Red-browed Pardalote - Pardalotus rubricatus rubricatus.mp3,unknown,unknown,unknown,hash_read_error,Medium
+XC143502 - Brown Gerygone - Gerygone mouki richmondi.mp3,XC143502 - Brown Gerygone - Gerygone mouki richmondi.mp3,unknown,unknown,unknown,hash_read_error,Medium
+XC36630 - Red-browed Pardalote - Pardalotus rubricatus.mp3,XC36630 - Red-browed Pardalote - Pardalotus rubricatus.mp3,unknown,unknown,unknown,hash_read_error,Medium
+XC550699 - Rose Robin - Petroica rosea.mp3,XC550699 - Rose Robin - Petroica rosea.mp3,unknown,unknown,unknown,hash_read_error,Medium
+XC350439 - Rose Robin - Petroica rosea.mp3,XC350439 - Rose Robin - Petroica rosea.mp3,unknown,unknown,unknown,hash_read_error,Medium
+tony264-australia-4802329_1920.mp3,project_data_gcp/Spilopelia_chinensis/tony264-australia-4802329_1920.mp3,Spilopelia_chinensis,spilopelia_chinensis,project_data_gcp,hash_read_error,Medium
+XC352831.ogg,project_data_gcp/Branta_bernical_nigricans/XC352831.ogg,Branta_bernical_nigricans,branta_bernical_nigricans,project_data_gcp,hash_read_error,Medium
+XC164608.ogg,project_data_gcp/Branta_bernical_nigricans/XC164608.ogg,Branta_bernical_nigricans,branta_bernical_nigricans,project_data_gcp,hash_read_error,Medium
+XC143518.ogg,project_data_gcp/Branta_bernical_nigricans/XC143518.ogg,Branta_bernical_nigricans,branta_bernical_nigricans,project_data_gcp,hash_read_error,Medium
+pen_ash-little-pied-cormorant-7911240_1920.jpg,project_data_gcp/Parvipsitta pusilla/pen_ash-little-pied-cormorant-7911240_1920.jpg,Parvipsitta pusilla,parvipsitta_pusilla,project_data_gcp,hash_read_error,Medium

@@ -5,7 +5,7 @@ const fs = require('fs');
 const cookieSession = require('cookie-session');
 const helmet = require('helmet');
 const jwt = require('jsonwebtoken');
-const { client, checkUserSession, requireApiSession } = require('./middleware');
+const { client, checkUserSession, resolveLandingPath, requireApiSession } = require('./middleware');
 const controller = require('./controller/auth.controller');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
@@ -393,6 +393,7 @@ razorpayPayment.registerRazorpayBrowserRoutes(app, {
 
 
 
+app.get("/index.html", checkUserSession);
 app.use(express.static(path.join(__dirname, 'public'), { index: path.join(__dirname, 'public/login.html')}))
 
 var corsOptions = {
@@ -576,34 +577,24 @@ require('./routes/auth.routes')(app);
 require('./routes/user.routes')(app);
 require('./routes/map.routes')(app);
 require('./routes/sensor.routes')(app);
+require('./routes/detection-review.routes')(app);
 //updated 2026/01/26 to serve mongodb api endpoints to admin folder for data integration
 app.get(
-  ['/admin/*', '/map', '/requests', '/notifications'],
+  ['/admin*', '/map', '/requests', '/notifications'],
   checkUserSession
 );
 app.get("/verify-otp", (req, res) => {
   res.sendFile(path.join(__dirname, 'public/verify-otp.html'));
 });
 app.get("/", async (req, res) => {
-  console.log("token: ", await client.get('JWT', (err, storedToken) => {
-          if (err) {
-            return `Error retrieving token from Redis: ${err}`
-          } else {
-            return storedToken
-          }
-  }))
-  let role = await client.get('Roles', (err, storedToken) => {
-    if (err) {
-      return `Error retrieving user role from Redis: ${err}`
-    } else {
-      return storedToken
-    }
-  })
-
-  if (role && role.toLowerCase().includes("admin")) {
-    res.redirect("/admin-dashboard")
-  } else {
-    res.redirect("/map")
+  try {
+    if (!client.isOpen) await client.connect();
+    const storedToken = await client.get("JWT");
+    const role = await client.get("Roles");
+    return res.redirect(resolveLandingPath(req.session?.token, storedToken, role));
+  } catch (error) {
+    console.error("Landing redirect failed.");
+    return res.redirect("/login");
   }
 })
 //Serve the admin dashboard
@@ -886,27 +877,13 @@ app.get('/api/requests', async (req, res) => {
 //Page Direction to Welcome page after logging in
 app.get("/welcome", async (req,res) => {
   try {
-    console.log("token: ", await client.get('JWT', (err, storedToken) => {
-            if (err) {
-              return `Error retrieving token from Redis: ${err}`
-            } else {
-              return storedToken
-            }
-    }))
-    let role = await client.get('Roles', (err, storedToken) => {
-      if (err) {
-        return `Error retrieving user role from Redis: ${err}`
-      } else {
-        return storedToken
-      }
-    })
+    if (!client.isOpen) await client.connect();
+    const storedToken = await client.get("JWT");
+    const role = await client.get("Roles");
     //If the user that has just logged in is an admin, direct them
     //to the admin dashboard. Otherwise direct them to the map.
-    if (role.toLowerCase().includes("admin")) {
-      res.redirect("/admin-dashboard")
-    } else {
-      res.redirect("/map")
-    }
+    //Strangers without a matching session go back to login.
+    return res.redirect(resolveLandingPath(req.session?.token, storedToken, role));
   }
   catch {
     res.send(`<script> alert("No user info detected! Please login again"); window.location.href = "/login"; </script>`);
@@ -998,26 +975,62 @@ async function proxyToApi(req, res) {
     }
   }
 }
+async function proxyPredictionToApi(req, res) {
+  try {
+    const url = `${API_BASE_URL}${req.originalUrl}`;
+
+    const headers = {
+      'content-type': req.headers['content-type'],
+    };
+
+    if (req.headers['content-length']) {
+      headers['content-length'] = req.headers['content-length'];
+    }
+
+    const response = await axios({
+      method: req.method,
+      url,
+      headers,
+      data: req,
+      maxBodyLength: Infinity,
+      maxContentLength: Infinity,
+      validateStatus: () => true,
+    });
+
+    if (res.headersSent) return;
+
+    res.status(response.status);
+    return res.send(response.data);
+  } catch (error) {
+    console.error('Error proxying prediction to API:', error.message);
+
+    if (!res.headersSent) {
+      return res.status(502).json({ error: 'Prediction API unavailable' });
+    }
+  }
+}
 
 app.all('/sensors', proxyToApi);
 app.all('/sensors/*', proxyToApi);
-// Proxy all remaining API routes to the Python backend
-app.all('/detections', proxyToApi);
-app.all('/detections/*', proxyToApi);
-app.all('/movement_time/*', proxyToApi);
-app.all('/events_time/*', proxyToApi);
-app.all('/microphones', proxyToApi);
-app.all('/microphones/*', proxyToApi);
-app.all('/latest_movement', proxyToApi);
-app.all('/audio/*', proxyToApi);
-app.all('/post_recording', proxyToApi);
-app.all('/sim_control/*', proxyToApi);
+// Same-origin MQTT status/event polling for the map (HMI.js calls /mqtt/*
+// relatively so no host is hardcoded in the browser). The Backend does not
+// expose these routes yet, so they 404 through the proxy until it does —
+// identical UX to the previous direct-backend call failing.
+app.all('/mqtt', proxyToApi);
+app.all('/mqtt/*', proxyToApi);
+// Map/detail reads are owned by routes/map.routes.js (session-protected).
+// No duplicate unauthenticated proxies here: that keeps one production path
+// (authenticated HMI -> Backend API) for movement, vocalization, microphone,
+// audio, weather, and detection reads.
 app.all('/hmi/*', proxyToApi);
 
-app.get('/iot/nodes', async (req, res) => {
+app.get('/iot/nodes', checkUserSession, async (req, res) => {
   try {
-    const data = await apiClient.get('/iot/nodes');
-    res.json(data);
+    const response = await axios.get(`${API_BASE_URL}/iot/nodes`, {
+      headers: { Authorization: `Bearer ${req.session.token}` },
+      timeout: 10000,
+    });
+    res.json(response.data);
   } catch (error) {
     apiClient.sendApiError(res, error, 'Error fetching IoT nodes');
   }

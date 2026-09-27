@@ -31,5 +31,5 @@ def send_sms(to_number: str, message: str) -> bool:
         )
         return True
     except Exception:
-        logger.warning("Error sending SMS", exc_info=True)
+        logger.warning("SMS sending failed")
         return False

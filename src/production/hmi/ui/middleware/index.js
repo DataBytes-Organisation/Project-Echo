@@ -15,7 +15,7 @@
 
 const verifySignUp = require("./verifySignup");
 const redis = require("redis");
-const { createCheckUserSession } = require("./session");
+const { createCheckUserSession, tokensMatch, resolveLandingPath } = require("./session");
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Redis client
@@ -53,13 +53,13 @@ async function ensureRedisConnected() {
 // condition directly — keeping the lists here makes auditing straightforward.
 // ─────────────────────────────────────────────────────────────────────────────
 
-const PUBLIC_ROUTES = new Set(["/login", "/signup", "/map"]);
+const PUBLIC_ROUTES = new Set(["/login", "/signup"]);
 
 /**
  * Path prefixes that are always public regardless of the full path.
  * e.g. "/admin" covers "/admin", "/admin/users", "/admin/settings".
  */
-const PUBLIC_PREFIXES = ["/admin", "/public", "/static"];
+const PUBLIC_PREFIXES = ["/public", "/static"];
 
 /**
  * Return true if the given path should be accessible without a session token.
@@ -165,4 +165,6 @@ module.exports = {
   requireApiSession,
   clearUserSession,
   client,
+  tokensMatch,
+  resolveLandingPath,
 };

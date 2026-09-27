@@ -5,6 +5,11 @@ from fastapi import APIRouter, WebSocket, WebSocketDisconnect, status
 from app.middleware.auth import decodeJWT
 from app.services.detection_stream import detection_stream_manager
 
+from app.feature_flags import (
+    REALTIME_STREAMING_FLAG,
+    is_feature_enabled,
+)
+
 router = APIRouter()
 
 
@@ -32,14 +37,25 @@ async def websocket_test(websocket: WebSocket):
 
 @router.websocket("/ws/detections")
 async def detection_stream(websocket: WebSocket):
+    if not is_feature_enabled(REALTIME_STREAMING_FLAG):
+        await websocket.accept()
+        await websocket.close(
+            code=status.WS_1008_POLICY_VIOLATION
+        )
+        return
+
     token = _extract_ws_token(websocket)
     payload = decodeJWT(token) if token else None
+
     if not payload:
         # Reject unauthenticated wildlife location streams before accept.
-        await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
+        await websocket.close(
+            code=status.WS_1008_POLICY_VIOLATION
+        )
         return
 
     await detection_stream_manager.connect(websocket)
+
     try:
         while True:
             await websocket.receive_text()

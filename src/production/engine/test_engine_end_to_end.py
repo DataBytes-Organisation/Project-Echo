@@ -317,6 +317,7 @@ class TestEngineEndToEnd(unittest.TestCase):
             BACKEND_URL,
             json=expected_payload,
             timeout=5,
+            headers=None,
         )
 
     def test_standard_real_audio_reaches_backend_through_real_engine_methods(self):

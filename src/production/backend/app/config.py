@@ -2,9 +2,37 @@
 # Central typed configuration for the Backend API.
 # All Backend code should read configuration through `settings` rather than
 # calling os.getenv()/hardcoding values directly.
-from typing import List, Optional
+import os
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 from pydantic import BaseSettings, Field
+
+# Fields that may hold production secrets. Each can be supplied either as a
+# plain environment variable (e.g. JWT_SECRET, for local development) or as
+# a path in `<NAME>_FILE` (e.g. JWT_SECRET_FILE=/run/secrets/jwt_secret) that
+# points at a Docker/Kubernetes-mounted secret file. When both are set, the
+# `_FILE` variant wins, since it represents the deployment's secret store.
+_SECRET_FILE_ENV_VARS = (
+    "MONGODB_URI",
+    "USER_MONGODB_URI",
+    "JWT_SECRET",
+    "TWILIO_ACCOUNT_SID",
+    "TWILIO_AUTH_TOKEN",
+    "MAIL_PASSWORD",
+    "R2_ACCESS_KEY_ID",
+    "R2_SECRET_ACCESS_KEY",
+)
+
+
+def _secret_file_settings_source(_settings: "Settings") -> Dict[str, Any]:
+    resolved: Dict[str, Any] = {}
+    for env_var in _SECRET_FILE_ENV_VARS:
+        file_path = os.getenv(f"{env_var}_FILE")
+        if not file_path:
+            continue
+        resolved[env_var.lower()] = Path(file_path).read_text(encoding="utf-8").strip()
+    return resolved
 
 
 class Settings(BaseSettings):
@@ -29,10 +57,30 @@ class Settings(BaseSettings):
     internal_api_base_url: str = "http://ts-api-cont:9000"
     api_port: int = 9000
 
+    # --- Cloudflare R2 object storage ---
+    # Optional at Backend startup; validated as required when R2 storage is used.
+    r2_account_id: Optional[str] = Field(None, env="R2_ACCOUNT_ID")
+    r2_access_key_id: Optional[str] = Field(None, env="R2_ACCESS_KEY_ID")
+    r2_secret_access_key: Optional[str] = Field(None, env="R2_SECRET_ACCESS_KEY")
+    r2_bucket_name: Optional[str] = Field(None, env="R2_BUCKET_NAME")
+    r2_endpoint_url: Optional[str] = Field(None, env="R2_ENDPOINT_URL")
+    r2_dataset_prefix: str = Field("prototype", env="R2_DATASET_PREFIX")
+
     # --- Timeouts / thresholds (consumed by C10/C11 later) ---
     request_timeout_seconds: float = 15.0
     slow_operation_ms: float = 500.0
     cache_ttl_seconds: int = 60
+
+    # --- Feature flags (C12) ---
+    # Safe defaults keep current behaviour enabled unless explicitly disabled.
+    realtime_streaming_enabled: bool = Field(
+        True,
+        env="REALTIME_STREAMING_ENABLED",
+    )
+    analytics_extensions_enabled: bool = Field(
+        True,
+        env="ANALYTICS_EXTENSIONS_ENABLED",
+    )
 
     # --- Auth (required — fail fast if missing) ---
     jwt_secret: str = Field(...)
@@ -43,6 +91,14 @@ class Settings(BaseSettings):
     # --- Logging / CORS ---
     log_level: str = "INFO"
     cors_origins: List[str] = ["*"]
+
+    # --- Detection rule engine (A3) ---
+    # Evaluated by app.detection_rules.evaluate_detection for every incoming
+    # detection, shared by HTTP ingestion and (once wired) A1's MQTT bridge.
+    # Empty allow-lists mean "no restriction" for that rule.
+    detection_min_confidence: float = Field(0, ge=0, le=100)
+    detection_allowed_species: List[str] = []
+    detection_allowed_sensor_ids: List[str] = []
 
     # --- Twilio (optional — SMS/2FA degrades gracefully if unset) ---
     twilio_account_sid: Optional[str] = None
@@ -61,6 +117,24 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         case_sensitive = False
+
+        @classmethod
+        def parse_env_var(cls, field_name: str, raw_val: str):
+            # Comma-separated lists (DETECTION_ALLOWED_SPECIES=Koala,Sus Scrofa)
+            # instead of JSON-array syntax, for these specific fields. Pydantic's
+            # default parse_env_var (cls.json_loads) still applies to every
+            # other complex-typed field (e.g. cors_origins).
+            if field_name in {"detection_allowed_species", "detection_allowed_sensor_ids"}:
+                return [item.strip() for item in raw_val.split(",") if item.strip()]
+            return cls.json_loads(raw_val)
+
+        @classmethod
+        def customise_sources(cls, init_settings, env_settings, file_secret_settings):
+            # Secret-file values (via `_secret_file_settings_source`) outrank
+            # `env_settings`, which already covers both the real environment
+            # and `env_file` above. `file_secret_settings` (pydantic's
+            # `secrets_dir` mechanism) is unused here but kept for parity.
+            return init_settings, _secret_file_settings_source, env_settings, file_secret_settings
 
 
 settings = Settings()

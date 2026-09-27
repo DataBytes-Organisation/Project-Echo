@@ -364,7 +364,17 @@ def evaluate_checkpoint(checkpoint_path, augmentation_preset, seed, dataset, spl
 
     device = _torch.device("cpu")
     model = Model(cfg).to(device)
-    model.load_state_dict(_torch.load(checkpoint_path, map_location=device))
+    # Checkpoints saved before the Sprint 2 pipeline pull are a bare
+    # model.state_dict(). train.py's save_checkpoint() now wraps that in a
+    # full training-state dict (model_state_dict/optimizer_state_dict/
+    # scheduler_state_dict/best_metric/...) to support checkpoint-resume -
+    # a real format change, not a hypothetical one: it broke evaluation of
+    # the very first checkpoint trained after that pull (the time_warp
+    # comparison arm). Handling both formats so archived pre-pull
+    # checkpoints keep loading unchanged.
+    loaded = _torch.load(checkpoint_path, map_location=device)
+    state_dict = loaded["model_state_dict"] if isinstance(loaded, dict) and "model_state_dict" in loaded else loaded
+    model.load_state_dict(state_dict)
     model.eval()
 
     all_labels, all_preds = [], []

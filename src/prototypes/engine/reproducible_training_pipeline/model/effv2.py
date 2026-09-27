@@ -133,6 +133,22 @@ class EfficientNetV2ArcFace(EfficientNet):
 
 		return self.head(embedding)
 
+	def get_embedding(self, x: torch.Tensor) -> torch.Tensor:
+		"""L2-normalised embedding vector, the same one `forward()` passes into
+		`self.head` (CosineLinear internally does its own F.normalize on this
+		input). Exposed separately for similar-detection retrieval, which
+		compares detections in this embedding space rather than by class label
+		alone. See src/prototypes/engine/reproducible_training_pipeline/
+		similar_detections_prototype.ipynb for the investigation that led here:
+		an earlier checkpoint trained with norm_choice=freeze_bn produced a
+		collapsed embedding space (97% of dimensions had near-zero variance
+		across real samples) because BatchNorm was frozen at its untrained
+		initial statistics from the start of training (pretrained=false in that
+		run), never adapting to the spectrogram input domain.
+		"""
+		embedding = torch.flatten(self.avgpool(self.features(x)), 1)
+		return torch.nn.functional.normalize(embedding, dim=1)
+
 	def _fuse_conv_bn(self, block: nn.Sequential):
 		fuse_candidates = [
 			[str(i), str(i + 1)]

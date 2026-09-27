@@ -56,6 +56,17 @@
       "best_val_loss": 2.5729,
       "accuracy": 0.179,
       "macro_f1": 0.084
+    },
+    "time_warp": {
+      "hydra_preset": "time_warp",
+      "final_train_loss": 17.0276,
+      "final_train_acc": 0.0602,
+      "final_val_loss": 2.3027,
+      "final_val_acc": 0.4121,
+      "best_val_loss": 2.3027,
+      "accuracy": 0.41208791208791207,
+      "macro_f1": 0.351781640826115,
+      "note": "not a Sprint 1 SpecAugment preset - time_warp.py, a standalone non-masking alternative (see results/README.md Addendum)"
     }
   }
 }

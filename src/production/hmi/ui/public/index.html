@@ -122,7 +122,30 @@
       <div class="row main bg-black" style="padding: 0px !important;">
         <div class="col-md-12 col-main" style="padding: 0px !important;">
 
-          <div id="basemap" class="map_view"></div>
+          <div id="basemap" class="map_view" tabindex="0" aria-label="Detection map"></div>
+
+          <div id="live-map-controls" style="position:absolute; z-index:1000; top:10px; left:10px; background:rgba(20,20,20,0.9); color:white; padding:10px 14px; border-radius:8px; font-size:14px; font-family:sans-serif; box-shadow:0 2px 8px rgba(0,0,0,0.5);">
+
+
+        <div style="display:flex; gap:8px; margin-bottom:6px;">
+    <button id="pause-resume-btn" aria-pressed="false" title="Pause live updates" style="background:#2c7a3f; color:white; border:none; padding:6px 14px; border-radius:4px; font-size:13px; cursor:pointer;">Pause</button>
+    <button id="manual-refresh-btn" title="Refresh live feed and real-device detections" style="background:#2c5f8a; color:white; border:none; padding:6px 14px; border-radius:4px; font-size:13px; cursor:pointer;">Refresh</button>
+  </div>
+  <div style="display:flex; gap:8px; margin-bottom:6px;">
+    <select id="event-type-filter" style="background:#333; color:white; border:1px solid #555; padding:4px 8px; border-radius:4px; font-size:12px;">
+      <option value="all">All Types</option>
+      <option value="vocalization">Vocalization</option>
+      <option value="movement">Movement</option>
+      <option value="sensor_health">Sensor Health</option>
+      <option value="iot_node">IoT Node</option>
+    </select>
+    <select id="species-filter" style="background:#333; color:white; border:1px solid #555; padding:4px 8px; border-radius:4px; font-size:12px;">
+      <option value="all">All Species</option>
+    </select>
+  </div>
+  <div id="last-update-label" style="color:#ddd; font-size:12px;">Last update: —</div>
+  <div id="real-detection-status" role="status" aria-live="polite" style="color:#ddd; font-size:12px;">Loading real-device detections…</div>
+      </div>
 
           <div id="editFormWrapper">
             <form id="editForm">
@@ -414,7 +437,7 @@
             <!-- ── Animal popup tab ───────────────────────────────────── -->
             <div id="animal-popup">
               <div class="wrapper">
-                <div id="animal-popup-content">
+                <div id="animal-popup-content" role="region" aria-label="Detection details" tabindex="-1">
                   <div class="markup_form">
                     <div class="markup_column">
                       <div class="markup_row_left markup_row_title" style="width: 420px !important; margin: 0px !important;"><h2 id="desc_name"></h2></div>
@@ -426,6 +449,7 @@
                   <h2>Animal Summary</h2>
                   <div id="desc_summary" class="desc"></div>
                   <div id="desc_details" class="desc"></div>
+                  <div id="animal_weather_section">
                   <h2 style="margin-top: 20px !important;">Weather</h2>
                   <div class="markup_form">
                     <div class="markup_column"><div class="markup_row_left"><div>Date</div></div><div class="markup_row_right"><div id="weather_date"></div></div></div>
@@ -436,6 +460,7 @@
                     <div class="markup_column"><div class="markup_row_left"><div>Maximum Humiditiy</div></div><div class="markup_row_right"><div id="weather_maxhumidity"></div></div></div>
                     <div class="markup_column"><div class="markup_row_left"><div>Minimum Humiditiy</div></div><div class="markup_row_right"><div id="weather_minhumidity"></div></div></div>
                   </div>
+                  </div>
                   <h2 style="margin-top: 20px !important;">Event Details</h2>
                   <div class="markup_form">
                     <div class="markup_column">
@@ -444,8 +469,9 @@
                     </div>
                     <div class="markup_column"><div class="markup_row_left"><div>Longitude</div></div><div class="markup_row_right"><div id="markup_loc_lon"></div></div></div>
                     <div class="markup_column"><div class="markup_row_left"><div>Latitude</div></div><div class="markup_row_right"><div id="markup_loc_lat"></div></div></div>
+                    <div class="markup_column"><div class="markup_row_left"><div>Detection source</div></div><div class="markup_row_right"><div id="markup_source"></div></div></div>
                     <div class="markup_column"><div class="markup_row_left" style="width: 100px !important"><div>Date</div></div><div class="markup_row_right" style="text-align: right !important; width: 400px !important"><div id="markup_date"></div></div></div>
-                    <div class="markup_column"><div class="markup_row_left"><div>Location Confidence</div></div><div class="markup_row_right"><div id="markup_confidence"></div></div></div>
+                    <div class="markup_column"><div class="markup_row_left"><div id="markup_location_metric_label">Location Confidence</div></div><div class="markup_row_right"><div id="markup_confidence"></div></div></div>
                   </div>
                   <h2 id="animalAudioHeader" style="margin-top: 20px !important;">Audio</h2>
                   <div id="animalAudioControl" class="audio_component">
@@ -533,7 +559,36 @@
                       <audio id="audioElem" class="frb2-audio frb2-audio-muted" controls preload="metadata" controlsList="nodownload"></audio>
                     </div>
                   </section>
+                  <section id="frb4-analysis-panel" class="frb2-panel">
+                    <h2>Audio Analysis Controls</h2>
 
+                    <p class="frb2-help">
+                      Analyse the most recent recorded audio clip using the species prediction service.
+                    </p>
+
+                    <div class="frb2-actions">
+                      <button type="button"
+                              id="start_analysis_button"
+                              class="frb2-btn frb2-btn-record"
+                              onclick="startAudioAnalysis()">
+                        Start Analysis
+                      </button>
+
+                      <button type="button"
+                              id="stop_analysis_button"
+                              class="frb2-btn frb2-btn-stop"
+                              onclick="stopAudioAnalysis()"
+                              disabled>
+                        Stop Analysis
+                      </button>
+                    </div>
+
+                    <p id="audio_analysis_status" class="frb2-playback-status">
+                      Record an audio clip before starting analysis.
+                    </p>
+
+                    <div id="audio_analysis_result"></div>
+                  </section>
                   <!-- Keep legacy class hooks used by older helpers -->
                   <div id="audio_recording_container" class="frb2-legacy-hidden" aria-hidden="true">
                     <div id="recording_controls_container" class="recording_controls hide"></div>
@@ -604,6 +659,15 @@
                     <div class="time-range-picker">
                       <input type="text" id="datetime-range" name="datetime-range" style="width:100%" value="" />
                     </div>
+                  </div>
+                  <div class="container" id="detection-source-filter">
+                    <span>Detection source</span>
+                    <div class="seg-control" role="group" aria-label="Detection source">
+                      <button type="button" class="toggle-button btn btn-secondary seg-btn" data-detection-source="all" aria-pressed="true">All</button>
+                      <button type="button" class="toggle-button btn btn-secondary seg-btn" data-detection-source="simulator" aria-pressed="false">Simulated</button>
+                      <button type="button" class="toggle-button btn btn-secondary seg-btn" data-detection-source="real" aria-pressed="false">Real-device</button>
+                    </div>
+                    <p id="detection-source-status" role="status" aria-live="polite" style="margin-top: 8px;"></p>
                   </div>
                   <div class="container">
                     <input type="text" id="searchInput" placeholder="Search for an animal">
@@ -1289,7 +1353,13 @@
 
       document.addEventListener('animalToggled', function () {
         closeTab();
-        setTimeout(() => { currentTab = document.getElementById('animal-popup'); openNav('animal-popup'); }, 10);
+        setTimeout(() => { currentTab = document.getElementById('animal-popup'); openNav("animal-popup"); document.getElementById("animal-popup-content").focus(); }, 10);
+      });
+      document.getElementById("animal-popup-content").addEventListener("keydown", function (event) {
+        if (event.key === "Escape") {
+          closeMenu();
+          document.getElementById("basemap").focus();
+        }
       });
       document.addEventListener('micToggled', function () {
         closeTab();
@@ -1450,7 +1520,7 @@
     <script>
       // ── Filter checkboxes ───────────────────────────────────────────────
 
-      const myClass   = document.querySelectorAll('.form-check-input');
+      const myClass   = document.querySelectorAll('.form-check-input:not([name="detectionSource"])');
       const sim       = document.querySelectorAll('.s');
       const voc       = document.querySelectorAll('.v');
       const checkboxIDs = [];
@@ -1468,7 +1538,10 @@
           const index = filterState.indexOf(checkbox);
           if (index > -1) filterState.splice(index, 1);
         }
-        updateLayers(hmiState, filterState);
+        if (window.hmiState) {
+          window.hmiState.speciesFilterState = [...filterState];
+          updateLayers(window.hmiState, filterState);
+        }
       }
 
       function microphoneDisplay() { updateMics(); }
@@ -1483,8 +1556,13 @@
         } else if (filter === '_all') {
           voc.forEach(id => { if (!filterState.includes(id.id)) filterState.push(id.id); id.checked = true; });
         }
-        updateLayers(hmiState, filterState);
+        if (window.hmiState) {
+          window.hmiState.speciesFilterState = [...filterState];
+          updateLayers(window.hmiState, filterState);
+        }
       }
+
+      window.getSpeciesFilterState = () => [...filterState];
     </script>
 
     <script type="module">
@@ -1492,10 +1570,11 @@
       import {
         updateLayers, initialiseHMI, showMics, hideMics,
         updateAnimalMovementLayerFromPastData, updateVocalizationLayerFromPastData,
-        resetWildlifeLayers, MapOpenNav, MapCloseNav, getAnimalToggled,
+        MapOpenNav, MapCloseNav, getAnimalToggled,
         enableMicAnimation, disableMicAnimation, getUTC,
         startAudioRecording, stopAudioRecording, cancelAudioRecording,
-        playRecordingClip, testFunct, convertCSV
+        playRecordingClip, testFunct, convertCSV, setDetectionSourceFilter,
+        startAudioAnalysis, stopAudioAnalysis
       } from "./js/HMI.js";
 
       import { retrieveTruthEventsInTimeRange, retrieveVocalizationEventsInTimeRange } from "./js/routes.js";
@@ -1521,6 +1600,8 @@
       window.startAudioRecording = startAudioRecording;
       window.stopAudioRecording = stopAudioRecording;
       window.cancelAudioRecording = cancelAudioRecording;
+      window.startAudioAnalysis = startAudioAnalysis;
+      window.stopAudioAnalysis = stopAudioAnalysis;
 
       window.updateMics              = updateMics;
       window.downloadCSV             = downloadCSV;
@@ -1528,10 +1609,25 @@
       window.updateMicrophoneAnimation = updateMicrophoneAnimation;
       window.updateLayers            = updateLayers;
       window.closeNav                = MapCloseNav;
+      window.setDetectionSourceFilter = (filter) => setDetectionSourceFilter(hmiState, filter);
 
       let hmiState = {};
       window.hmiState = hmiState;
       hmiState.truthEventId = 10;
+      hmiState.detectionSourceFilter = "all";
+      hmiState.detectionSourceStatus = document.getElementById("detection-source-status");
+      if (typeof window.getSpeciesFilterState === "function") {
+        hmiState.speciesFilterState = window.getSpeciesFilterState();
+      }
+
+      document.querySelectorAll('[data-detection-source]').forEach((button) => {
+        button.addEventListener("click", () => {
+          document.querySelectorAll('[data-detection-source]').forEach((other) => {
+            other.setAttribute("aria-pressed", String(other === button));
+          });
+          setDetectionSourceFilter(hmiState, button.dataset.detectionSource);
+        });
+      });
 
       let datepickerStart = hmiState.currentTime;
       let datepickerEnd   = hmiState.previousUpdateTime;
@@ -1561,49 +1657,9 @@
       hmiState.layers         = {};
       hmiState.layerPool      = 1000;
 
-      const microphoneLocations = [
-        { lat: -38.808, lon: 143.554, id: 1 },
-        { lat: -38.813, lon: 143.537, id: 2 },
-        { lat: -38.794, lon: 143.52,  id: 3 },
-        { lat: -38.824, lon: 143.51,  id: 4 },
-        { lat: -38.812, lon: 143.573, id: 5 },
-      ];
-
-      const vocalizationEvents = [
-        { eventId: "6457a315e03129cb130fa270", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Tawny Frogmouth",      speciesScientificName: "Podargus strigoides",  speciesIdentificationConfidence: 90.98, locationLat: -38.80266562762370, locationLon: 143.563, locationConfidence: 90.98, animalType: "bird",      animalStatus: "normal",         animalDiet: "herbavore" },
-        { eventId: "6457a315e03129cb130fa271", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Cane toad",           speciesScientificName: "Rhinella marina",       speciesIdentificationConfidence: 90.98, locationLat: -38.81905478815443, locationLon: 143.529, locationConfidence: 90.98, animalType: "amphibian", animalStatus: "invasive",       animalDiet: "herbavore" },
-        { eventId: "6457a315e03129cb130fa272", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Wild Boar",           speciesScientificName: "Sus scrofa",           speciesIdentificationConfidence: 90.98, locationLat: -38.80166562762364, locationLon: 143.545, locationConfidence: 90.98, animalType: "mammal",    animalStatus: "endangered",     animalDiet: "omnivore"  },
-        { eventId: "6457a315e03129cb130fa273", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Redeye",              speciesScientificName: "Psaltoda moerens",     speciesIdentificationConfidence: 90.98, locationLat: -38.82166562762360, locationLon: 143.545, locationConfidence: 90.98, animalType: "insect",    animalStatus: "near-threatened",animalDiet: "carnivore" },
-        { eventId: "6457a315e03129cb130fa274", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Brown Rat",           speciesScientificName: "Rattus norvegicus",    speciesIdentificationConfidence: 90.98, locationLat: -38.80266562762380, locationLon: 143.565, locationConfidence: 90.98, animalType: "reptile",   animalStatus: "vulnerable",     animalDiet: "herbavore" },
-      ];
-
-      const movementEvents = {
-        "M_1": { animalId: "M_1", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Brown Rat",             speciesScientificName: "unknown",              speciesIdentificationConfidence: 100, locationLat: -38.80266562762367, locationLon: 143.560, locationConfidence: 100, animalType: "reptile",   animalStatus: "vulnerable",     animalDiet: "herbavore" },
-        "M_2": { animalId: "M_2", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Tawny Frogmouth",       speciesScientificName: "Podargus strigoides",  speciesIdentificationConfidence: 100, locationLat: -38.81905478815439, locationLon: 143.524, locationConfidence: 100, animalType: "bird",      animalStatus: "normal",         animalDiet: "herbavore" },
-        "M_3": { animalId: "M_3", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Cane toad",             speciesScientificName: "Rhinella marina",      speciesIdentificationConfidence: 100, locationLat: -38.80166562762367, locationLon: 143.540, locationConfidence: 100, animalType: "amphibian", animalStatus: "invasive",       animalDiet: "omnivore"  },
-        "M_4": { animalId: "M_4", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Red fox",               speciesScientificName: "Vulpes vulpes",        speciesIdentificationConfidence: 100, locationLat: -38.82166562762367, locationLon: 143.550, locationConfidence: 100, animalType: "mammal",    animalStatus: "endangered",     animalDiet: "carnivore" },
-        "M_5": { animalId: "M_5", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Brown Rat",             speciesScientificName: "Rattus norvegicus",    speciesIdentificationConfidence: 100, locationLat: -38.80266562762367, locationLon: 143.570, locationConfidence: 100, animalType: "reptile",   animalStatus: "vulnerable",     animalDiet: "herbavore" },
-        "M_6": { animalId: "M_6", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Australian Fairy Martin",speciesScientificName: "Petrochelidon ariel", speciesIdentificationConfidence: 100, locationLat: -38.81905478815439, locationLon: 143.580, locationConfidence: 100, animalType: "bird",      animalStatus: "normal",         animalDiet: "herbavore" },
-        "M_7": { animalId: "M_7", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Cane toad",             speciesScientificName: "Rhinella marina",      speciesIdentificationConfidence: 100, locationLat: -38.80166562762367, locationLon: 143.510, locationConfidence: 100, animalType: "amphibian", animalStatus: "invasive",       animalDiet: "omnivore"  },
-        "M_8": { animalId: "M_8", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Red fox",               speciesScientificName: "Vulpes vulpes",        speciesIdentificationConfidence: 100, locationLat: -38.82166562762367, locationLon: 143.520, locationConfidence: 100, animalType: "mammal",    animalStatus: "endangered",     animalDiet: "carnivore" },
-        "M_9": { animalId: "M_9", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Redeye",               speciesScientificName: "Psaltoda moerens",     speciesIdentificationConfidence: 100, locationLat: -38.80066562762367, locationLon: 143.555, locationConfidence: 100, animalType: "insect",    animalStatus: "near-threatened",animalDiet: "herbavore" },
-      };
-
-      const sampleJSONmovementEvents = [
-        { animalId: "M_1", timestamp: 1690765721, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Brown Rat",             speciesScientificName: "Rattus norvegicus",    speciesIdentificationConfidence: 100, locationLat: -38.80266562762367, locationLon: 143.560, locationConfidence: 100, animalType: "reptile",   animalStatus: "vulnerable",     animalDiet: "herbavore" },
-        { animalId: "M_2", timestamp: 1672448921, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Tawny Frogmouth",       speciesScientificName: "Podargus strigoides",  speciesIdentificationConfidence: 100, locationLat: -38.81905478815439, locationLon: 143.524, locationConfidence: 100, animalType: "bird",      animalStatus: "normal",         animalDiet: "herbavore" },
-        { animalId: "M_3", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Cane toad",             speciesScientificName: "Rhinella marina",      speciesIdentificationConfidence: 100, locationLat: -38.80166562762367, locationLon: 143.540, locationConfidence: 100, animalType: "amphibian", animalStatus: "invasive",       animalDiet: "omnivore"  },
-        { animalId: "M_4", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Red fox",               speciesScientificName: "Vulpes vulpes",        speciesIdentificationConfidence: 100, locationLat: -38.82166562762367, locationLon: 143.550, locationConfidence: 100, animalType: "mammal",    animalStatus: "endangered",     animalDiet: "carnivore" },
-        { animalId: "M_5", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Brown Rat",             speciesScientificName: "Rattus norvegicus",    speciesIdentificationConfidence: 100, locationLat: -38.80266562762367, locationLon: 143.570, locationConfidence: 100, animalType: "reptile",   animalStatus: "vulnerable",     animalDiet: "herbavore" },
-        { animalId: "M_6", timestamp: 1672448921, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Australian Fairy Martin",speciesScientificName: "Petrochelidon ariel", speciesIdentificationConfidence: 100, locationLat: -38.81905478815439, locationLon: 143.580, locationConfidence: 100, animalType: "bird",      animalStatus: "normal",         animalDiet: "herbavore" },
-        { animalId: "M_7", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Cane toad",             speciesScientificName: "Rhinella marina",      speciesIdentificationConfidence: 100, locationLat: -38.80166562762367, locationLon: 143.510, locationConfidence: 100, animalType: "amphibian", animalStatus: "invasive",       animalDiet: "omnivore"  },
-        { animalId: "M_8", timestamp: 1721997541, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Red fox",               speciesScientificName: "Vulpes vulpes",        speciesIdentificationConfidence: 100, locationLat: -38.82166562762367, locationLon: 143.520, locationConfidence: 100, animalType: "mammal",    animalStatus: "endangered",     animalDiet: "carnivore" },
-        { animalId: "M_9", timestamp: 1690765721, detectingmicID: 1, detectingMicLat: 43.132413, detectingMicLon: 25.235235, commonName: "Redeye",               speciesScientificName: "Psaltoda moerens",     speciesIdentificationConfidence: 100, locationLat: -38.80066562762367, locationLon: 143.555, locationConfidence: 100, animalType: "insect",    animalStatus: "near-threatened",animalDiet: "herbavore" },
-      ];
-
-      hmiState.movementEvents     = movementEvents;
-      hmiState.vocalizationEvents = vocalizationEvents;
-      hmiState.microphoneLocations = microphoneLocations;
+      hmiState.movementEvents     = {};
+      hmiState.vocalizationEvents = [];
+      hmiState.microphoneLocations = [];
 
       const elArea      = document.getElementById("basemap");
       const simulatorOl = document.getElementById("screen");
@@ -1630,25 +1686,9 @@
         else { disableMicAnimation(hmiState); if (mic.checked) showMics(hmiState); }
       }
 
-      // Live mode / date range picker
-      const toggleSwitch      = document.querySelector('#liveModeToggle');
-      const pastDataContainer = document.querySelector('.past-data-container');
-
-      toggleSwitch.addEventListener('change', function () {
-        if (this.checked) {
-          resetWildlifeLayers(hmiState);
-          hmiState.currentTime    = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
-          hmiState.previousUpdate = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
-          datepickerStart = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
-          datepickerEnd   = Math.floor((getUTC() - hmiState.timeOffset - hmiState.simUpdateDelay) / 1000);
-          hmiState.liveMode = true;
-          pastDataContainer.style.maxHeight = '0';
-        } else {
-          resetWildlifeLayers(hmiState);
-          hmiState.liveMode = false;
-          pastDataContainer.style.maxHeight = pastDataContainer.scrollHeight + 'px';
-        }
-      });
+      // Live mode toggle and past-data picker live in #live-map-controls wiring
+      // (setupLiveMapControls in HMI.js), which owns all live/pause behaviour.
+      // The date-range picker below only issues one-shot history queries.
 
       $(function () {
         $('#datetime-range').daterangepicker({
@@ -1716,9 +1756,9 @@
         retrieveTruthEventsInTimeRange(datepickerStart, datepickerEnd).then(res => {
           let data = dataCleansing(res.data);
           if (!data) {
-            // TASK 7: replaced ErrDisplay() with showToast
+            // Empty stays empty: never substitute sample records for live data.
             if (window.showToast) window.showToast('No results found for the selected time range.', 'warning');
-            data = dataCleansing(sampleJSONmovementEvents);
+            return;
           }
           const csv = convertCSV(data);
           exportCSV("exportedCSV.csv", csv);
@@ -1729,11 +1769,15 @@
         datepickerStart = hmiState.currentTime;
         datepickerEnd   = hmiState.previousUpdateTime;
         retrieveTruthEventsInTimeRange(datepickerStart, datepickerEnd).then(res => {
-          let data = (!res.data || res.data.length === 0) ? sampleJSONmovementEvents : res.data;
           if (!res.data || res.data.length === 0) {
-            if (window.showToast) window.showToast('No results found. Exporting sample data.', 'warning');
+            if (window.showToast) window.showToast('No results found for the selected time range.', 'warning');
+            return;
           }
-          data = dataCleansing(data);
+          const data = dataCleansing(res.data);
+          if (!data) {
+            if (window.showToast) window.showToast('No results found for the selected time range.', 'warning');
+            return;
+          }
           const ws = XLSX.utils.json_to_sheet(data);
           const wb = XLSX.utils.book_new();
           ws["!autofilter"] = { ref: XLSX.utils.encode_range(XLSX.utils.decode_range(ws['!ref'])) };

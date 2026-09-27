@@ -177,6 +177,47 @@
             "in": "path"
           }
         ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/projects/_meta/ecologists": {
+      "get": {
+        "tags": [
+          "projects"
+        ],
+        "summary": "List ecologists",
+        "operationId": "get_ecologists_projects__meta_ecologists_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
     "/mqtt/connection-state": {
       "get": {
         "tags": [
@@ -252,6 +293,36 @@
             }
           }
         }
+      }
+    },
+    "/hmi/detections": {
+      "get": {
+        "tags": [
+          "hmi"
+        ],
+        "summary": "List Real Detections",
+        "operationId": "list_real_detections_hmi_detections_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/RealDetectionRead"
+                  },
+                  "type": "array",
+                  "title": "Response List Real Detections Hmi Detections Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWTBearer": []
+          }
+        ]
       }
     },
     "/hmi/weather": {
@@ -2712,6 +2783,93 @@
               }
             }
           },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payments/razorpay/orders": {
+      "post": {
+        "tags": [
+          "payments"
+        ],
+        "summary": "Create Razorpay Order",
+        "operationId": "create_razorpay_order_payments_razorpay_orders_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RazorpayOrderRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RazorpayOrderResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWTBearer": []
+          }
+        ]
+      }
+    },
+    "/payments/razorpay/verify": {
+      "post": {
+        "tags": [
+          "payments"
+        ],
+        "summary": "Verify Razorpay Checkout",
+        "operationId": "verify_razorpay_checkout_payments_razorpay_verify_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RazorpayCheckoutProof"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentStatusResponse"
+                }
+              }
+            }
+          },
           "201": {
             "description": "Created",
             "content": {
@@ -4116,6 +4274,158 @@
         ],
         "title": "PaymentStatusResponse"
       },
+      "Project": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Name"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "location": {
+            "type": "string",
+            "title": "Location"
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Status"
+          },
+          "sensorIds": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Sensorids"
+          },
+          "ecologists": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Ecologists"
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "status",
+          "id"
+        ],
+        "title": "Project"
+      },
+      "ProjectCreate": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Name"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "location": {
+            "type": "string",
+            "title": "Location"
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Status"
+          },
+          "sensorIds": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Sensorids"
+          },
+          "ecologists": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Ecologists"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "status"
+        ],
+        "title": "ProjectCreate"
+      },
+      "ProjectListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/Project"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "ProjectListResponse"
+      },
+      "ProjectUpdate": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Name"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "location": {
+            "type": "string",
+            "title": "Location"
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Status"
+          },
+          "sensorIds": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Sensorids"
+          },
+          "ecologists": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Ecologists"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "status"
+        ],
+        "title": "ProjectUpdate"
+      },
       "RazorpayCheckoutProof": {
         "properties": {
           "paymentId": {
@@ -4183,6 +4493,64 @@
           "currency"
         ],
         "title": "RazorpayOrderResponse"
+      },
+      "RealDetectionRead": {
+        "properties": {
+          "sourceType": {
+            "type": "string",
+            "enum": [
+              "real",
+              "simulator"
+            ],
+            "title": "Sourcetype"
+          },
+          "_id": {
+            "type": "string",
+            "title": " Id"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "sensorId": {
+            "type": "string",
+            "title": "Sensorid"
+          },
+          "species": {
+            "type": "string",
+            "title": "Species"
+          },
+          "microphoneLLA": {
+            "$ref": "#/components/schemas/LLA"
+          },
+          "animalEstLLA": {
+            "$ref": "#/components/schemas/LLA"
+          },
+          "animalTrueLLA": {
+            "$ref": "#/components/schemas/LLA"
+          },
+          "animalLLAUncertainty": {
+            "type": "number",
+            "title": "Animalllauncertainty"
+          },
+          "confidence": {
+            "type": "number",
+            "title": "Confidence"
+          }
+        },
+        "type": "object",
+        "required": [
+          "sourceType",
+          "_id",
+          "timestamp",
+          "sensorId",
+          "species",
+          "microphoneLLA",
+          "confidence"
+        ],
+        "title": "RealDetectionRead",
+        "description": "HMI real-detection read shape (no audio payload)."
       },
       "RecordingData": {
         "properties": {

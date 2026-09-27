@@ -1,0 +1,364 @@
+"""Real detection HTTP contracts with Mongo and security boundaries faked."""
+import copy
+import unittest
+from types import SimpleNamespace
+from unittest.mock import MagicMock, patch
+
+from bson import BSON, ObjectId
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import Response
+from fastapi.exceptions import RequestValidationError
+from fastapi.testclient import TestClient
+from pydantic import ValidationError
+
+# Database import creates indexes; prevent all network activity at that boundary.
+with patch("pymongo.MongoClient", return_value=MagicMock()):
+    from app import schemas, serializers, detections as service
+    from app.routers import engine, hmi, detections
+from app.errors import (
+    StandardizeErrorResponseMiddleware, http_exception_handler,
+    validation_exception_handler, unhandled_exception_handler,
+)
+
+
+PAYLOAD = {
+    "sourceType": "real", "timestamp": "2026-08-06T10:30:00Z", "sensorId": "esp32-001",
+    "species": "Magpie", "confidence": 91.5, "microphoneLLA": [-37.8136, 144.9631, 0],
+    "animalEstLLA": [10, 20, 0], "animalTrueLLA": [30, 40, 0],
+    "animalLLAUncertainty": 5, "audioClip": "", "sampleRate": 0,
+}
+
+
+OBJECT_PAYLOAD = {
+    "sourceType": "simulator", "timestamp": "2026-08-06T10:30:00Z", "sensorId": "sim-001",
+    "species": "Magpie", "confidence": 88.0,
+    "microphoneLLA": {"latitude": -37.8136, "longitude": 144.9631, "altitude": 0},
+    "animalEstLLA": {"latitude": 10, "longitude": 20, "altitude": 0},
+    "animalTrueLLA": {"latitude": 30, "longitude": 40, "altitude": 0},
+    "animalLLAUncertainty": 5, "audioClip": "", "sampleRate": 16000,
+}
+
+
+class MemoryCollection:
+    """Small Mongo boundary fake; reject unsupported stages instead of silently passing."""
+    def __init__(self, collections):
+        self.documents = []
+        self.collections = collections
+
+    def insert_one(self, payload):
+        doc = copy.deepcopy(payload)
+        doc.setdefault("_id", ObjectId())
+        self.documents.append(doc)
+        return SimpleNamespace(inserted_id=doc["_id"])
+
+    @staticmethod
+    def matches(doc, query):
+        for key, value in query.items():
+            actual = doc
+            for part in key.split("."):
+                actual = actual[int(part)] if isinstance(actual, list) else actual.get(part)
+            if isinstance(value, dict):
+                for op, expected in value.items():
+                    if op == "$gte" and actual < expected:
+                        return False
+                    if op == "$lte" and actual > expected:
+                        return False
+            elif actual != value:
+                return False
+        return True
+
+    def find_one(self, query):
+        return next((copy.deepcopy(doc) for doc in self.documents if self.matches(doc, query)), None)
+
+    def count_documents(self, query):
+        return len([doc for doc in self.documents if self.matches(doc, query)])
+
+    def find(self, query):
+        docs = [doc for doc in self.documents if self.matches(doc, query)]
+        class Cursor(list):
+            def sort(self, key, order):
+                return Cursor(sorted(self, key=lambda doc: doc[key], reverse=order < 0))
+            def skip(self, count):
+                return Cursor(self[count:])
+            def limit(self, count):
+                return Cursor(self[:count])
+        return Cursor(docs)
+
+    def aggregate(self, pipeline):
+        docs = self.run(copy.deepcopy(self.documents), pipeline)
+        if any(len(BSON.encode(doc)) > 16 * 1024 * 1024 for doc in docs):
+            raise RuntimeError("Mongo aggregation result exceeds BSON document size limit")
+        return docs
+
+    def run(self, docs, pipeline):
+        for stage in pipeline:
+            op, value = next(iter(stage.items()))
+            if op == "$unionWith":
+                name = value if isinstance(value, str) else value["coll"]
+                docs += copy.deepcopy(self.collections[name].documents)
+            elif op == "$match":
+                docs = [doc for doc in docs if self.matches(doc, value)]
+            elif op == "$sort":
+                for key, order in reversed(list(value.items())):
+                    docs.sort(key=lambda doc: doc[key], reverse=order < 0)
+            elif op == "$skip":
+                docs = docs[value:]
+            elif op == "$limit":
+                docs = docs[:value]
+            elif op == "$count":
+                docs = [{value: len(docs)}] if docs else []
+            elif op == "$facet":
+                docs = [{key: self.run(copy.deepcopy(docs), stages) for key, stages in value.items()}]
+            else:
+                raise AssertionError(f"Unsupported fake Mongo stage: {op}")
+        return docs
+
+
+class RealDetectionTests(unittest.TestCase):
+    def setUp(self):
+        collections = {}
+        collections["events"] = self.events = MemoryCollection(collections)
+        collections["detections"] = self.detections = MemoryCollection(collections)
+        for target, name, value in [
+            (engine, "Events", self.events), (hmi, "Events", self.events),
+            (service, "Detections", self.detections),
+            (detections, "enforce_and_consume", lambda *args, **kwargs: None),
+            (hmi, "enforce_and_consume", lambda *args, **kwargs: None),
+        ]:
+            patcher = patch.object(target, name, value)
+            patcher.start()
+            self.addCleanup(patcher.stop)
+        if hasattr(service, "Events"):
+            patcher = patch.object(service, "Events", self.events)
+            patcher.start()
+            self.addCleanup(patcher.stop)
+        patcher = patch("app.middleware.pause_guard.get_service_state", return_value=False)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        app = FastAPI()
+        app.add_exception_handler(HTTPException, http_exception_handler)
+        app.add_exception_handler(RequestValidationError, validation_exception_handler)
+        app.add_exception_handler(Exception, unhandled_exception_handler)
+        app.add_middleware(StandardizeErrorResponseMiddleware)
+        app.include_router(engine.router, prefix="/engine")
+        app.include_router(detections.router)
+        app.include_router(hmi.router, prefix="/hmi")
+        self.app = app
+        self.client = TestClient(app, raise_server_exceptions=False)
+        self.addCleanup(self.client.close)
+
+    def assert_contract(self, record):
+        for key in ("sourceType", "species", "confidence", "sensorId"):
+            self.assertEqual(record.get(key), PAYLOAD[key], key)
+        self.assertIn("2026-08-06T10:30:00", record["timestamp"])
+        self.assertEqual(
+            (record["microphoneLLA"]["latitude"], record["microphoneLLA"]["longitude"],
+             record["microphoneLLA"]["altitude"]),
+            tuple(PAYLOAD["microphoneLLA"]))
+
+    def test_engine_ingest_is_persisted_once_and_readable_only_through_authenticated_hmi(self):
+        created = self.client.post("/engine/event", json=PAYLOAD)
+        self.assertEqual(created.status_code, 201, created.text)
+        self.assert_contract(created.json())
+        self.assertEqual(len(self.events.documents), 1)
+        self.assertEqual(len(self.detections.documents), 0)
+        # Engine events must not leak through the unauthenticated detection API.
+        self.assertIsNone(service.get_detection(created.json()["_id"]))
+        listing = self.client.get("/detections")
+        self.assertEqual(listing.status_code, 200, listing.text)
+        self.assertEqual(listing.json()["total"], 0)
+        self.assertEqual(listing.json()["items"], [])
+        self.app.dependency_overrides[hmi.jwtBearer] = lambda: "session-jwt"
+        listing = self.client.get("/hmi/detections", headers={"Authorization": "Bearer session-jwt"})
+        self.assertEqual(listing.status_code, 200, listing.text)
+        self.assert_contract(listing.json()[0])
+
+    def test_source_and_real_microphone_validation_rejects_bad_input_before_persistence(self):
+        invalid = [None, [], [1, 2], [1, 2, 3, 4], ["1", 2, 3], [True, 2, 3],
+                   [float("nan"), 2, 3], [1, float("inf"), 3], [1, 2, float("inf")],
+                   [-91, 2, 3], [91, 2, 3], [1, -181, 3], [1, 181, 3]]
+        for lla in invalid:
+            with self.subTest(lla=lla), self.assertRaises(ValidationError):
+                schemas.EventSchema(**{**PAYLOAD, "microphoneLLA": lla})
+        for source in ("simulated", "REAL", "untrusted"):
+            with self.subTest(source=source), self.assertRaises(ValidationError):
+                schemas.DetectionCreate(**{**PAYLOAD, "sourceType": source})
+        for endpoint in ("/engine/event", "/detections"):
+            for data in ({key: value for key, value in PAYLOAD.items() if key != "microphoneLLA"},
+                         {**PAYLOAD, "microphoneLLA": [91, 0, 0]}):
+                response = self.client.post(endpoint, json=data)
+                self.assertEqual(response.status_code, 422)
+                self.assertEqual(response.json()["error"]["code"], "VALIDATION_ERROR")
+        self.assertEqual(self.events.documents, [])
+        self.assertEqual(self.detections.documents, [])
+
+    def test_manual_and_engine_records_stay_in_their_own_read_paths(self):
+        response = self.client.post("/detections", json=PAYLOAD)
+        self.assertEqual(response.status_code, 200, response.text)
+        self.assert_contract(response.json())
+        self.assertEqual(self.client.post("/engine/event", json=PAYLOAD).status_code, 201)
+        listing = self.client.get("/detections").json()
+        self.assertEqual(listing["total"], 1)
+        self.assert_contract(listing["items"][0])
+        self.app.dependency_overrides[hmi.jwtBearer] = lambda: "session-jwt"
+        hmi_items = self.client.get("/hmi/detections").json()
+        self.assertEqual(len(hmi_items), 1)
+        self.assert_contract(hmi_items[0])
+
+    def test_hmi_detection_read_requires_authentication_and_empty_is_not_seeded(self):
+        response = self.client.get("/hmi/detections")
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.json()["error"]["code"], "FORBIDDEN")
+        self.app.dependency_overrides[hmi.jwtBearer] = lambda: "session-jwt"
+        self.assertEqual(self.client.get("/hmi/detections").json(), [])
+
+    def test_error_middleware_preserves_undecodable_json_bodies(self):
+        probe = FastAPI()
+        probe.add_middleware(StandardizeErrorResponseMiddleware)
+
+        @probe.get("/broken")
+        async def broken():
+            return Response(content=b"not-json", status_code=500, media_type="application/json")
+
+        client = TestClient(probe, raise_server_exceptions=False)
+        try:
+            response = client.get("/broken")
+        finally:
+            client.close()
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.content, b"not-json")
+
+    def test_hmi_detections_route_documents_its_response_shape(self):
+        schema = self.app.openapi()["paths"]["/hmi/detections"]["get"]["responses"]["200"]["content"]["application/json"]["schema"]
+        self.assertEqual(schema, {"type": "array", "items": {"$ref": "#/components/schemas/RealDetectionRead"}, "title": "Response List Real Detections Hmi Detections Get"})
+
+    def test_hmi_detection_read_honours_pause_guard_and_budget(self):
+        self.app.dependency_overrides[hmi.jwtBearer] = lambda: "session-jwt"
+        with patch.object(hmi, "enforce_and_consume") as budget:
+            self.assertEqual(self.client.get("/hmi/detections").status_code, 200)
+            budget.assert_called_once_with("detections", cost=1)
+        with patch("app.middleware.pause_guard.get_service_state", return_value=True):
+            paused = self.client.get("/hmi/detections")
+        self.assertEqual(paused.status_code, 503)
+        self.assertEqual(paused.json()["error"]["code"], "SERVICE_UNAVAILABLE")
+
+    def test_legacy_hmi_serializer_preserves_real_source_and_structured_location(self):
+        event = {**PAYLOAD, "_id": ObjectId()}
+        for serializer in (serializers.eventEntity, serializers.eventSpeciesEntity):
+            self.assert_contract(serializer(event))
+
+    def test_real_coordinate_boundary_values_are_valid_floats(self):
+        for lat, lon, alt in [(-90, -180, 0), (90, 180, -1), (0, 0, 10)]:
+            event = schemas.EventSchema(**{**PAYLOAD, "microphoneLLA":
+                                            {"latitude": lat, "longitude": lon, "altitude": alt}})
+            for value in (event.microphoneLLA.latitude, event.microphoneLLA.longitude,
+                          event.microphoneLLA.altitude):
+                self.assertTrue(isinstance(value, float))
+
+    def test_object_lla_simulator_payload_accepted_and_returned_as_objects(self):
+        created = self.client.post("/engine/event", json=OBJECT_PAYLOAD)
+        self.assertEqual(created.status_code, 201, created.text)
+        record = created.json()
+        self.assertEqual(record["sourceType"], "simulator")
+        for key in ("microphoneLLA", "animalEstLLA", "animalTrueLLA"):
+            self.assertIsInstance(record[key], dict, key)
+            self.assertEqual(
+                (record[key]["latitude"], record[key]["longitude"], record[key]["altitude"]),
+                tuple(OBJECT_PAYLOAD[key].values()), key)
+        self.assertEqual(len(self.events.documents), 1)
+
+    def test_real_payload_with_null_animal_fields_accepted(self):
+        payload = {**OBJECT_PAYLOAD, "sourceType": "real", "sensorId": "esp32-001",
+                   "animalEstLLA": None, "animalTrueLLA": None, "animalLLAUncertainty": None}
+        created = self.client.post("/engine/event", json=payload)
+        self.assertEqual(created.status_code, 201, created.text)
+        record = created.json()
+        self.assertIsNone(record["animalEstLLA"])
+        self.assertIsNone(record["animalTrueLLA"])
+        self.assertIsNone(record["animalLLAUncertainty"])
+        self.assertEqual(record["microphoneLLA"]["latitude"], -37.8136)
+
+    def test_legacy_array_payload_coerced_to_objects(self):
+        created = self.client.post("/engine/event", json=PAYLOAD)
+        self.assertEqual(created.status_code, 201, created.text)
+        record = created.json()
+        self.assertEqual(
+            (record["microphoneLLA"]["latitude"], record["microphoneLLA"]["longitude"],
+             record["microphoneLLA"]["altitude"]),
+            (-37.8136, 144.9631, 0))
+
+    def test_invalid_object_lla_rejected_before_persistence(self):
+        bad_mics = [
+            {"longitude": 0, "altitude": 0},
+            {"latitude": -91, "longitude": 0, "altitude": 0},
+            {"latitude": 0, "longitude": 181, "altitude": 0},
+            {"latitude": "37", "longitude": 0, "altitude": 0},
+            {"latitude": True, "longitude": 0, "altitude": 0},
+            [1, 2], {"latitude": 0, "longitude": 0},
+        ]
+        for mic in bad_mics:
+            with self.subTest(mic=mic):
+                with self.assertRaises(ValidationError):
+                    schemas.EventSchema(**{**OBJECT_PAYLOAD, "microphoneLLA": mic})
+                response = self.client.post(
+                    "/engine/event", json={**OBJECT_PAYLOAD, "microphoneLLA": mic})
+                self.assertEqual(response.status_code, 422)
+                self.assertEqual(response.json()["error"]["code"], "VALIDATION_ERROR")
+        with self.assertRaises(ValidationError):
+            schemas.EventSchema(**{**OBJECT_PAYLOAD, "microphoneLLA":
+                                    {"latitude": float("nan"), "longitude": 0, "altitude": 0}})
+        with self.assertRaises(ValidationError):
+            schemas.EventSchema(**{**OBJECT_PAYLOAD, "sourceType": "simulated"})
+        self.assertEqual(self.events.documents, [])
+
+    def test_real_query_and_serializer_agree_sourceless_means_simulator(self):
+        created = self.client.post("/engine/event", json=PAYLOAD)
+        self.assertEqual(created.status_code, 201, created.text)
+        sourceless = {key: value for key, value in PAYLOAD.items() if key != "sourceType"}
+        sourceless["_id"] = ObjectId()
+        self.events.insert_one(sourceless)
+        self.app.dependency_overrides[hmi.jwtBearer] = lambda: "session-jwt"
+        items = self.client.get("/hmi/detections").json()
+        self.assertEqual(len(items), 1)
+        self.assertEqual(items[0]["sensorId"], "esp32-001")
+        for serializer in (serializers.eventEntity, serializers.eventSpeciesEntity):
+            self.assertEqual(serializer(sourceless)["sourceType"], "simulator")
+
+    def test_hmi_detections_response_validates_as_lla_objects(self):
+        payload = {**OBJECT_PAYLOAD, "sourceType": "real", "sensorId": "esp32-001",
+                   "animalEstLLA": None, "animalTrueLLA": None, "animalLLAUncertainty": None}
+        created = self.client.post("/engine/event", json=payload)
+        self.assertEqual(created.status_code, 201, created.text)
+        self.app.dependency_overrides[hmi.jwtBearer] = lambda: "session-jwt"
+        items = self.client.get("/hmi/detections").json()
+        # TestClient enforces response_model=List[RealDetectionRead]; reaching
+        # here proves serializer output validates as LLA objects end-to-end.
+        self.assertEqual(len(items), 1)
+        mic = items[0]["microphoneLLA"]
+        self.assertEqual((mic["latitude"], mic["longitude"], mic["altitude"]),
+                         (-37.8136, 144.9631, 0))
+        self.assertEqual(items[0]["sourceType"], "real")
+        self.assertIsNone(items[0]["animalTrueLLA"])
+
+    def test_sourceless_docs_read_back_as_simulator(self):
+        legacy = {**PAYLOAD, "_id": ObjectId()}
+        del legacy["sourceType"]
+        for serializer in (serializers.eventEntity, serializers.eventSpeciesEntity):
+            record = serializer(legacy)
+            self.assertEqual(record["sourceType"], "simulator")
+            self.assertIsInstance(record["microphoneLLA"], dict)
+            self.assertEqual(record["microphoneLLA"]["latitude"], -37.8136)
+
+    def test_audio_bearing_page_does_not_exceed_mongo_document_limit(self):
+        for _ in range(2):
+            event = schemas.EventSchema(**{**PAYLOAD, "audioClip": "a" * (9 * 1024 * 1024)})
+            self.events.insert_one(event.dict())
+        self.app.dependency_overrides[hmi.jwtBearer] = lambda: "session-jwt"
+        response = self.client.get("/hmi/detections")
+        self.assertEqual(response.status_code, 200, response.text)
+        self.assertEqual(len(response.json()), 2)
+        self.assertNotIn("audioClip", response.json()[0])
+
+
+if __name__ == "__main__":
+    unittest.main()

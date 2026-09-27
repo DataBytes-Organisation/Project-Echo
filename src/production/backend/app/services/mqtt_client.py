@@ -1,6 +1,15 @@
-import paho.mqtt.client as mqtt
+import logging
 import os
 import json
+
+import paho.mqtt.client as mqtt
+from pydantic import ValidationError
+
+from app.schemas import EventSchema
+from app.services.event_ingestion import persist_event
+
+
+logger = logging.getLogger(__name__)
 
 connection_state = "disconnected"  # disconnected | connecting | connected | reconnecting
 latest_events = {}
@@ -12,22 +21,84 @@ MQTT_TOPICS = os.environ.get(
     "projectecho/engine/2,projectecho/movement,iot/data/test",
 ).split(",")
 
+MQTT_DETECTION_TOPIC = os.environ.get(
+    "MQTT_DETECTION_TOPIC",
+    "projectecho/backend/detections",
+)
+
+MQTT_TOPICS = [
+    topic.strip()
+    for topic in MQTT_TOPICS
+    if topic.strip()
+]
+
+if MQTT_DETECTION_TOPIC not in MQTT_TOPICS:
+    MQTT_TOPICS.append(MQTT_DETECTION_TOPIC)
+
+
 def on_connect(client, userdata, flags, rc):
     global connection_state
     connection_state = "connected"
-    print(f"[MQTT] Connected, rc={rc}")
+    logger.info("MQTT client connected, rc=%s", rc)
     for topic in MQTT_TOPICS:
         client.subscribe(topic.strip())
 
 def on_disconnect(client, userdata, rc):
     global connection_state
     connection_state = "reconnecting"
-    print(f"[MQTT] Disconnected, rc={rc} - attempting reconnect")
+    logger.warning("MQTT client disconnected, rc=%s; attempting reconnect", rc)
+
+def persist_detection_payload(raw_payload):
+    """
+    Validate a classified detection MQTT message using EventSchema
+    and persist it through the shared Backend event path.
+    """
+    try:
+        data = json.loads(raw_payload)
+    except (json.JSONDecodeError, TypeError, UnicodeDecodeError) as exc:
+        logger.warning("MQTT detection rejected: invalid JSON (%s)", exc)
+        return None
+
+    try:
+        event = EventSchema(**data)
+    except ValidationError as exc:
+        logger.warning(
+            "MQTT detection rejected by EventSchema: %s",
+            exc,
+        )
+        return None
+
+    try:
+        inserted_id = persist_event(event)
+    except Exception as exc:
+        logger.exception(
+            "MQTT detection persistence failed: %s",
+            exc,
+        )
+        return None
+
+    logger.info(
+        "MQTT detection persisted successfully "
+        "eventId=%s sensorId=%s species=%s",
+        inserted_id,
+        event.sensorId,
+        event.species,
+    )
+
+    return str(inserted_id)
+
 
 def on_message(client, userdata, msg):
+    if msg.topic == MQTT_DETECTION_TOPIC:
+        persist_detection_payload(msg.payload)
+        return
+
     normalized = normalize_payload(msg.payload, msg.topic)
     if normalized:
-        print(f"[MQTT] Normalized event: {normalized}")
+        logger.debug(
+            "MQTT event received, event_type=%s",
+            normalized.get("eventType", "unknown"),
+        )
         key = normalized.get("_id", "unknown")
         latest_events[key] = normalized
     # TODO: forward `normalized` to wherever the frontend/dashboard reads from
@@ -40,7 +111,7 @@ def normalize_payload(raw_payload, topic):
     try:
         data = json.loads(raw_payload)
     except (json.JSONDecodeError, TypeError):
-        print(f"[MQTT] Could not parse payload on {topic} as JSON")
+        logger.warning("MQTT payload could not be parsed as JSON")
         return None
 
     # Vocalization / recording events (from comms_manager.py's
@@ -107,7 +178,7 @@ def normalize_payload(raw_payload, topic):
             "status": data.get("status"),
         }
 
-    print(f"[MQTT] Unrecognized payload shape on {topic}: {list(data.keys())}")
+    logger.warning("MQTT payload shape not recognized")
     return {"eventType": "unknown", "raw": data}
 
 def start_mqtt_client():
@@ -120,9 +191,11 @@ def start_mqtt_client():
     client.reconnect_delay_set(min_delay=1, max_delay=30)
     try:
         client.connect(MQTT_BROKER_URL, MQTT_BROKER_PORT)
-    except Exception as e:
+    except Exception:
         connection_state = "reconnecting"
-        print(f"[MQTT] Initial connect failed: {e} — will keep retrying in background")
+        logger.warning(
+            "MQTT initial connection failed; will keep retrying in background"
+        )
     client.loop_start()
     return client
 
