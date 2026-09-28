@@ -3,12 +3,12 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
-const { createCheckUserSession, tokensMatch, resolveLandingPath } = require("../middleware/session");
+const { createCheckUserSession, tokensMatch, resolveLandingPath } = require("../server/middleware/session");
 
 function loadMiddleware(storedToken = "session-jwt") {
   const redis = { isOpen: true, on() {}, async get() { return storedToken; } };
   const module = { exports: {} };
-  vm.runInNewContext(fs.readFileSync(path.join(__dirname, "../middleware/index.js"), "utf8"), {
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname, "../server/middleware/index.js"), "utf8"), {
     module,
     exports: module.exports,
     process: { env: {} },

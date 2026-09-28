@@ -3,7 +3,7 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
-const { createCheckUserSession } = require("../middleware/session");
+const { createCheckUserSession } = require("../server/middleware/session");
 
 function load(relative, dependencies) {
   const module = { exports: {} };
@@ -19,7 +19,7 @@ function load(relative, dependencies) {
 
 function harness() {
   const redis = { isOpen: true, on() {}, async get() { return "session-jwt"; } };
-  const middleware = load("../middleware/index.js", {
+  const middleware = load("../server/middleware/index.js", {
     "./verifySignup": {}, redis: { createClient: () => redis },
     "./session": { createCheckUserSession },
   });
@@ -39,7 +39,7 @@ function harness() {
       return res.status(502).json({ error: { code: "UPSTREAM_ERROR", message: String(fallbackMessage), details: null } });
     },
   };
-  const register = load("../routes/map.routes.js", {
+  const register = load("../server/routes/map.routes.js", {
     "../middleware": middleware, axios: http, dotenv: { config() {} },
     "../services/apiClient": apiStub,
   });
@@ -206,24 +206,26 @@ test("authenticated map reads stay safe when the Backend fails", async () => {
 });
 
 test("the HMI server keeps one session-protected owner for map reads", async () => {
-  const source = fs.readFileSync(path.join(__dirname, "../server.js"), "utf8");
-  assert.doesNotMatch(source, /app\.all\('\/movement_time\/\*'/);
-  assert.doesNotMatch(source, /app\.all\('\/events_time\/\*'/);
-  assert.doesNotMatch(source, /app\.all\('\/microphones'/);
-  assert.doesNotMatch(source, /app\.all\('\/latest_movement'/);
-  assert.doesNotMatch(source, /app\.all\('\/audio\/\*'/);
-  assert.match(source, /app\.get\('\/iot\/nodes', checkUserSession/);
+  const appSource = fs.readFileSync(path.join(__dirname, "../server/app.js"), "utf8");
+  const mapSource = fs.readFileSync(path.join(__dirname, "../server/routes/map.routes.js"), "utf8");
+  const proxySource = fs.readFileSync(path.join(__dirname, "../server/routes/proxy.routes.js"), "utf8");
+  assert.doesNotMatch(appSource, /app\.all\('\/movement_time\/\*'/);
+  assert.doesNotMatch(appSource, /app\.all\('\/events_time\/\*'/);
+  assert.doesNotMatch(appSource, /app\.all\('\/microphones'/);
+  assert.doesNotMatch(appSource, /app\.all\('\/latest_movement'/);
+  assert.doesNotMatch(appSource, /app\.all\('\/audio\/\*'/);
+  assert.match(mapSource, /app\.get\(`\/events_time\/:start\/:end`, checkUserSession/);
+  assert.match(proxySource, /app\.get\('\/iot\/nodes', checkUserSession/);
 });
 
 test("the static map alias is session-protected before Express serves files", async () => {
-  const express = require("express");
-  const app = express();
-  app.use((req, _res, next) => { req.session = { token: req.headers["test-token"] }; next(); });
-  const checkUserSession = createCheckUserSession({ isOpen: true, async get() { return "session-jwt"; } });
-  // Execute the relevant production registrations in their original order.
-  const registration = fs.readFileSync(path.join(__dirname, "../server.js"), "utf8")
-    .split("\n").filter(line => line.includes('app.get("/index.html"') || line.includes("app.use(express.static")).join("\n");
-  vm.runInNewContext(registration, { app, express, path, __dirname: path.join(__dirname, ".."), checkUserSession });
+  const { createApp } = require("../server/app");
+  const app = createApp({
+    checkUserSession(req, res, next) {
+      if (req.headers["test-token"] === "session-jwt") return next();
+      return res.redirect("/login");
+    },
+  });
   const server = app.listen(0, "127.0.0.1");
   await new Promise(resolve => server.once("listening", resolve));
   try {

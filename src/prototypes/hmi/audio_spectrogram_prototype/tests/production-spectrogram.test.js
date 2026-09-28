@@ -16,15 +16,15 @@ const {
 
 const productionModulePath = path.resolve(
   __dirname,
-  "../../../../production/hmi/ui/public/js/spectrogram.js"
+  "../../../../production/hmi/ui/public/features/audio/spectrogram.js"
 );
 const productionWorkflowPath = path.resolve(
   __dirname,
-  "../../../../production/hmi/ui/public/js/spectrogram-workflow.js"
+  "../../../../production/hmi/ui/public/features/audio/spectrogram-workflow.js"
 );
 const productionRecorderPath = path.resolve(
   __dirname,
-  "../../../../production/hmi/ui/public/js/audio_recorder.js"
+  "../../../../production/hmi/ui/public/features/audio/audio-recorder.js"
 );
 
 async function loadProductionModule() {

@@ -14,7 +14,7 @@ test("live WS bypass is gone: no direct-backend stream client", async () => {
 });
 
 test("HMI map has no direct-backend stream wiring or local token read", async () => {
-  const source = await readFile(new URL("../public/js/HMI.js", import.meta.url), "utf8");
+  const source = await readFile(new URL("../public/features/map/hmi-map.js", import.meta.url), "utf8");
   assert.doesNotMatch(source, /detection_stream_client/);
   assert.doesNotMatch(source, /connectDetectionStream/);
   assert.doesNotMatch(source, /startDetectionStream/);
