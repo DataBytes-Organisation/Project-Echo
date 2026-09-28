@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Project Echo - B1.3 Multi-Client Stream Tester</title>
+
+  <style>
+    :root {
+      font-family: Arial, Helvetica, sans-serif;
+      color-scheme: dark;
+    }
+
+    body {
+      margin: 0;
+      padding: 24px;
+      background: #111827;
+      color: #e5e7eb;
+    }
+
+    h1 {
+      margin-top: 0;
+    }
+
+    .subtitle {
+      color: #9ca3af;
+      margin-bottom: 24px;
+    }
+
+    .config,
+    .client,
+    .comparison {
+      background: #1f2937;
+      border: 1px solid #374151;
+      border-radius: 10px;
+      padding: 18px;
+      margin-bottom: 18px;
+    }
+
+    .row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    input {
+      flex: 1;
+      min-width: 280px;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #4b5563;
+      background: #111827;
+      color: #f9fafb;
+    }
+
+    button {
+      padding: 9px 14px;
+      border: 0;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    .connect {
+      background: #10b981;
+      color: #04130d;
+    }
+
+    .disconnect {
+      background: #ef4444;
+      color: white;
+    }
+
+    .reconnect {
+      background: #3b82f6;
+      color: white;
+    }
+
+    .secondary {
+      background: #6b7280;
+      color: white;
+    }
+
+    .status {
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .status.connected {
+      background: #064e3b;
+      color: #6ee7b7;
+    }
+
+    .status.disconnected {
+      background: #7f1d1d;
+      color: #fca5a5;
+    }
+
+    .status.connecting {
+      background: #78350f;
+      color: #fcd34d;
+    }
+
+    .client-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    @media (max-width: 900px) {
+      .client-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .stats {
+      margin: 12px 0;
+      color: #d1d5db;
+      font-size: 14px;
+    }
+
+    pre {
+      height: 360px;
+      overflow: auto;
+      background: #030712;
+      border: 1px solid #374151;
+      border-radius: 6px;
+      padding: 12px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .pass {
+      color: #6ee7b7;
+      font-weight: bold;
+    }
+
+    .fail {
+      color: #fca5a5;
+      font-weight: bold;
+    }
+
+    code {
+      background: #111827;
+      padding: 2px 5px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Project Echo - B1.3 Multi-Client Stream Tester</h1>
+
+  <div class="subtitle">
+    Manual evidence tool for simultaneous WebSocket clients,
+    disconnect/reconnect behaviour and detection delivery.
+  </div>
+
+  <section class="config">
+    <h2>Connection Configuration</h2>
+
+    <div class="row">
+      <label for="wsUrl">WebSocket URL</label>
+      <input
+        id="wsUrl"
+        value="ws://localhost:9000/ws/detections"
+      />
+    </div>
+
+    <br />
+
+    <div class="row">
+      <label for="jwt">JWT</label>
+      <input
+        id="jwt"
+        type="password"
+        placeholder="Paste a valid local login JWT here"
+      />
+    </div>
+
+    <p>
+      The JWT is only kept in this browser page and is appended to the
+      WebSocket URL as the <code>token</code> query parameter.
+    </p>
+  </section>
+
+  <div class="client-grid">
+    <section class="client">
+      <h2>Client A</h2>
+
+      <div class="row">
+        <span id="statusA" class="status disconnected">
+          DISCONNECTED
+        </span>
+
+        <button class="connect" onclick="connectClient('A')">
+          Connect
+        </button>
+
+        <button class="disconnect" onclick="disconnectClient('A')">
+          Disconnect
+        </button>
+
+        <button class="reconnect" onclick="reconnectClient('A')">
+          Reconnect
+        </button>
+
+        <button class="secondary" onclick="clearClient('A')">
+          Clear Log
+        </button>
+      </div>
+
+      <div class="stats">
+        Messages received:
+        <strong id="countA">0</strong>
+        |
+        Last event:
+        <strong id="lastEventA">none</strong>
+      </div>
+
+      <pre id="logA"></pre>
+    </section>
+
+    <section class="client">
+      <h2>Client B</h2>
+
+      <div class="row">
+        <span id="statusB" class="status disconnected">
+          DISCONNECTED
+        </span>
+
+        <button class="connect" onclick="connectClient('B')">
+          Connect
+        </button>
+
+        <button class="disconnect" onclick="disconnectClient('B')">
+          Disconnect
+        </button>
+
+        <button class="reconnect" onclick="reconnectClient('B')">
+          Reconnect
+        </button>
+
+        <button class="secondary" onclick="clearClient('B')">
+          Clear Log
+        </button>
+      </div>
+
+      <div class="stats">
+        Messages received:
+        <strong id="countB">0</strong>
+        |
+        Last event:
+        <strong id="lastEventB">none</strong>
+      </div>
+
+      <pre id="logB"></pre>
+    </section>
+  </div>
+
+  <section class="comparison">
+    <h2>Latest Message Comparison</h2>
+
+    <button class="secondary" onclick="compareLatest()">
+      Compare Latest A / B
+    </button>
+
+    <p id="comparisonResult">
+      No comparison performed yet.
+    </p>
+  </section>
+
+  <script>
+    const clients = {
+      A: {
+        socket: null,
+        count: 0,
+        latest: null
+      },
+
+      B: {
+        socket: null,
+        count: 0,
+        latest: null
+      }
+    };
+
+    function timestamp() {
+      return new Date().toISOString();
+    }
+
+    function log(clientName, message, data = null) {
+      const element = document.getElementById(`log${clientName}`);
+
+      let line = `[${timestamp()}] ${message}`;
+
+      if (data !== null) {
+        line += "\n" + JSON.stringify(data, null, 2);
+      }
+
+      element.textContent += line + "\n\n";
+      element.scrollTop = element.scrollHeight;
+    }
+
+    function setStatus(clientName, state) {
+      const element = document.getElementById(
+        `status${clientName}`
+      );
+
+      element.className = `status ${state}`;
+      element.textContent = state.toUpperCase();
+    }
+
+    function buildSocketUrl() {
+      const baseUrl = document
+        .getElementById("wsUrl")
+        .value
+        .trim();
+
+      const token = document
+        .getElementById("jwt")
+        .value
+        .trim();
+
+      if (!baseUrl) {
+        throw new Error("WebSocket URL is required.");
+      }
+
+      if (!token) {
+        throw new Error("A valid JWT is required.");
+      }
+
+      const separator = baseUrl.includes("?") ? "&" : "?";
+
+      return (
+        baseUrl +
+        separator +
+        "token=" +
+        encodeURIComponent(token)
+      );
+    }
+
+    function connectClient(clientName) {
+      const client = clients[clientName];
+
+      if (
+        client.socket &&
+        (
+          client.socket.readyState === WebSocket.OPEN ||
+          client.socket.readyState === WebSocket.CONNECTING
+        )
+      ) {
+        log(
+          clientName,
+          "Connection request ignored: client is already active."
+        );
+
+        return;
+      }
+
+      let url;
+
+      try {
+        url = buildSocketUrl();
+      } catch (error) {
+        log(clientName, `ERROR: ${error.message}`);
+        return;
+      }
+
+      setStatus(clientName, "connecting");
+      log(clientName, "Opening WebSocket connection...");
+
+      const socket = new WebSocket(url);
+      client.socket = socket;
+
+      socket.onopen = () => {
+        if (client.socket !== socket) {
+          return;
+        }
+
+        setStatus(clientName, "connected");
+        log(clientName, "CONNECTED");
+      };
+
+      socket.onmessage = (event) => {
+        if (client.socket !== socket) {
+          return;
+        }
+
+        let payload;
+
+        try {
+          payload = JSON.parse(event.data);
+        } catch {
+          payload = event.data;
+        }
+
+        client.latest = payload;
+        client.count += 1;
+
+        document.getElementById(
+          `count${clientName}`
+        ).textContent = client.count;
+
+        const eventId =
+          payload &&
+          typeof payload === "object" &&
+          payload._id
+            ? payload._id
+            : "unknown";
+
+        document.getElementById(
+          `lastEvent${clientName}`
+        ).textContent = eventId;
+
+        log(
+          clientName,
+          `DETECTION RECEIVED (#${client.count})`,
+          payload
+        );
+      };
+
+      socket.onerror = () => {
+        log(
+          clientName,
+          "WebSocket error occurred."
+        );
+      };
+
+      socket.onclose = (event) => {
+        if (client.socket === socket) {
+          client.socket = null;
+          setStatus(clientName, "disconnected");
+        }
+
+        log(
+          clientName,
+          `DISCONNECTED - code=${event.code}, reason=${
+            event.reason || "none"
+          }`
+        );
+      };
+    }
+
+    function disconnectClient(clientName) {
+      const client = clients[clientName];
+
+      if (!client.socket) {
+        log(
+          clientName,
+          "Disconnect ignored: no active socket."
+        );
+
+        return;
+      }
+
+      log(clientName, "Closing WebSocket...");
+
+      client.socket.close(
+        1000,
+        "B1.3 manual test disconnect"
+      );
+    }
+
+    function reconnectClient(clientName) {
+      const client = clients[clientName];
+
+      log(clientName, "Reconnect requested.");
+
+      if (
+        client.socket &&
+        client.socket.readyState !== WebSocket.CLOSED
+      ) {
+        const oldSocket = client.socket;
+
+        oldSocket.addEventListener(
+          "close",
+          () => {
+            setTimeout(
+              () => connectClient(clientName),
+              250
+            );
+          },
+          { once: true }
+        );
+
+        oldSocket.close(
+          1000,
+          "B1.3 reconnect"
+        );
+      } else {
+        connectClient(clientName);
+      }
+    }
+
+    function clearClient(clientName) {
+      const client = clients[clientName];
+
+      client.count = 0;
+      client.latest = null;
+
+      document.getElementById(
+        `count${clientName}`
+      ).textContent = "0";
+
+      document.getElementById(
+        `lastEvent${clientName}`
+      ).textContent = "none";
+
+      document.getElementById(
+        `log${clientName}`
+      ).textContent = "";
+    }
+
+    function canonicalJson(value) {
+      if (
+        value === null ||
+        typeof value !== "object"
+      ) {
+        return JSON.stringify(value);
+      }
+
+      if (Array.isArray(value)) {
+        return (
+          "[" +
+          value.map(canonicalJson).join(",") +
+          "]"
+        );
+      }
+
+      const keys = Object.keys(value).sort();
+
+      return (
+        "{" +
+        keys
+          .map(
+            key =>
+              JSON.stringify(key) +
+              ":" +
+              canonicalJson(value[key])
+          )
+          .join(",") +
+        "}"
+      );
+    }
+
+    function compareLatest() {
+      const result = document.getElementById(
+        "comparisonResult"
+      );
+
+      const messageA = clients.A.latest;
+      const messageB = clients.B.latest;
+
+      if (messageA === null || messageB === null) {
+        result.className = "fail";
+        result.textContent =
+          "Cannot compare: both clients must receive at least one message.";
+
+        return;
+      }
+
+      if (
+        canonicalJson(messageA) ===
+        canonicalJson(messageB)
+      ) {
+        result.className = "pass";
+        result.textContent =
+          "PASS: Client A and Client B received identical latest payloads.";
+      } else {
+        result.className = "fail";
+        result.textContent =
+          "FAIL: Latest payloads are different.";
+      }
+    }
+  </script>
+</body>
+</html>
