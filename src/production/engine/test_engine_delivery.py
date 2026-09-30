@@ -2,6 +2,7 @@
 Automated tests for Engine Backend delivery reliability.
 """
 
+import os
 import unittest
 from unittest.mock import MagicMock, patch
 
@@ -22,6 +23,10 @@ def _response(status_code, text=""):
 class TestEngineBackendDelivery(unittest.TestCase):
 
     def setUp(self):
+        env_patcher = patch.dict(os.environ, {"ENGINE_API_KEY": ""})
+        env_patcher.start()
+        self.addCleanup(env_patcher.stop)
+
         self.engine = EchoEngine()
         self.engine.config["API_URL"] = (
             "http://mock-backend/engine/event"
@@ -78,6 +83,7 @@ class TestEngineBackendDelivery(unittest.TestCase):
             "http://mock-backend/engine/event",
             json=mock_post.call_args.kwargs["json"],
             timeout=8,
+            headers=None,
         )
 
     def test_http_400_does_not_retry(self):
@@ -208,6 +214,32 @@ class TestEngineBackendDelivery(unittest.TestCase):
 
         self.assertEqual(mock_post.call_count, 1)
         self.assertIn("HTTP 422", str(raised.exception))
+
+    def test_engine_api_key_sent_as_header_when_configured(self):
+        with patch.dict(os.environ, {"ENGINE_API_KEY": "test-engine-key"}):
+            with patch.object(
+                engine_module.requests,
+                "post",
+                return_value=_response(201, "created"),
+            ) as mock_post:
+                self._send()
+
+        mock_post.assert_called_once()
+        self.assertEqual(
+            mock_post.call_args.kwargs["headers"],
+            {"X-Engine-Api-Key": "test-engine-key"},
+        )
+
+    def test_engine_api_key_header_omitted_when_unset(self):
+        with patch.object(
+            engine_module.requests,
+            "post",
+            return_value=_response(201, "created"),
+        ) as mock_post:
+            self._send()
+
+        mock_post.assert_called_once()
+        self.assertIsNone(mock_post.call_args.kwargs["headers"])
 
 
 if __name__ == "__main__":

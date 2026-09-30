@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import os
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, BinaryIO, Iterator
@@ -14,39 +13,49 @@ class R2Config:
     bucket_name: str
     access_key_id: str
     secret_access_key: str
+    endpoint_url: str
     dataset_prefix: str = "prototype"
 
-    @property
-    def endpoint_url(self) -> str:
-        return f"https://{self.account_id}.r2.cloudflarestorage.com"
-
     @classmethod
-    def from_env(cls) -> "R2Config":
-        required_names = (
-            "R2_ACCOUNT_ID",
-            "R2_BUCKET_NAME",
-            "R2_ACCESS_KEY_ID",
-            "R2_SECRET_ACCESS_KEY",
-        )
+    def from_settings(cls, app_settings: Any) -> "R2Config":
+        """Build R2 configuration from the validated Backend settings object."""
         values = {
-            name: os.environ.get(name, "").strip() for name in required_names
+            "R2_ACCOUNT_ID": app_settings.r2_account_id,
+            "R2_BUCKET_NAME": app_settings.r2_bucket_name,
+            "R2_ACCESS_KEY_ID": app_settings.r2_access_key_id,
+            "R2_SECRET_ACCESS_KEY": app_settings.r2_secret_access_key,
+            "R2_ENDPOINT_URL": app_settings.r2_endpoint_url,
         }
-        missing = [name for name, value in values.items() if not value]
+
+        normalized = {
+            name: value.strip() if isinstance(value, str) else ""
+            for name, value in values.items()
+        }
+
+        missing = [
+            name
+            for name, value in normalized.items()
+            if not value
+        ]
         if missing:
             raise ValueError(
                 "Missing required Cloudflare R2 configuration: "
                 + ", ".join(missing)
             )
 
+        dataset_prefix = (
+            app_settings.r2_dataset_prefix.strip()
+            if app_settings.r2_dataset_prefix
+            else "prototype"
+        ) or "prototype"
+
         return cls(
-            account_id=values["R2_ACCOUNT_ID"],
-            bucket_name=values["R2_BUCKET_NAME"],
-            access_key_id=values["R2_ACCESS_KEY_ID"],
-            secret_access_key=values["R2_SECRET_ACCESS_KEY"],
-            dataset_prefix=(
-                os.environ.get("R2_DATASET_PREFIX", "prototype").strip()
-                or "prototype"
-            ),
+            account_id=normalized["R2_ACCOUNT_ID"],
+            bucket_name=normalized["R2_BUCKET_NAME"],
+            access_key_id=normalized["R2_ACCESS_KEY_ID"],
+            secret_access_key=normalized["R2_SECRET_ACCESS_KEY"],
+            endpoint_url=normalized["R2_ENDPOINT_URL"],
+            dataset_prefix=dataset_prefix,
         )
 
 

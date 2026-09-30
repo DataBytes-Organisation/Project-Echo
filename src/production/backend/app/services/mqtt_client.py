@@ -3,6 +3,10 @@ import os
 import json
 
 import paho.mqtt.client as mqtt
+from pydantic import ValidationError
+
+from app.schemas import EventSchema
+from app.services.event_ingestion import persist_event
 
 
 logger = logging.getLogger(__name__)
@@ -17,6 +21,21 @@ MQTT_TOPICS = os.environ.get(
     "projectecho/engine/2,projectecho/movement,iot/data/test",
 ).split(",")
 
+MQTT_DETECTION_TOPIC = os.environ.get(
+    "MQTT_DETECTION_TOPIC",
+    "projectecho/backend/detections",
+)
+
+MQTT_TOPICS = [
+    topic.strip()
+    for topic in MQTT_TOPICS
+    if topic.strip()
+]
+
+if MQTT_DETECTION_TOPIC not in MQTT_TOPICS:
+    MQTT_TOPICS.append(MQTT_DETECTION_TOPIC)
+
+
 def on_connect(client, userdata, flags, rc):
     global connection_state
     connection_state = "connected"
@@ -29,7 +48,51 @@ def on_disconnect(client, userdata, rc):
     connection_state = "reconnecting"
     logger.warning("MQTT client disconnected, rc=%s; attempting reconnect", rc)
 
+def persist_detection_payload(raw_payload):
+    """
+    Validate a classified detection MQTT message using EventSchema
+    and persist it through the shared Backend event path.
+    """
+    try:
+        data = json.loads(raw_payload)
+    except (json.JSONDecodeError, TypeError, UnicodeDecodeError) as exc:
+        logger.warning("MQTT detection rejected: invalid JSON (%s)", exc)
+        return None
+
+    try:
+        event = EventSchema(**data)
+    except ValidationError as exc:
+        logger.warning(
+            "MQTT detection rejected by EventSchema: %s",
+            exc,
+        )
+        return None
+
+    try:
+        inserted_id = persist_event(event)
+    except Exception as exc:
+        logger.exception(
+            "MQTT detection persistence failed: %s",
+            exc,
+        )
+        return None
+
+    logger.info(
+        "MQTT detection persisted successfully "
+        "eventId=%s sensorId=%s species=%s",
+        inserted_id,
+        event.sensorId,
+        event.species,
+    )
+
+    return str(inserted_id)
+
+
 def on_message(client, userdata, msg):
+    if msg.topic == MQTT_DETECTION_TOPIC:
+        persist_detection_payload(msg.payload)
+        return
+
     normalized = normalize_payload(msg.payload, msg.topic)
     if normalized:
         logger.debug(
