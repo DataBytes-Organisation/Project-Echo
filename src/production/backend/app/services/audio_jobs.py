@@ -8,7 +8,7 @@ from bson import ObjectId
 from pymongo import ReturnDocument
 
 from app.database import AudioProcessingJobs, Predictions
-from app.services.model_adapter import MultiModalPredictionError, predict_with_failure_detection
+from app.services.model_adapter import predict_with_failure_detection
 
 
 VALID_STATUSES = {"queued", "processing", "completed", "failed"}
@@ -81,7 +81,7 @@ def process_job(job_id: str) -> None:
             {"_id": oid},
             {"$set": {"status": "completed", "updated_at": now, "result": prediction}, "$unset": {"error": ""}},
         )
-    except (OSError, MultiModalPredictionError) as exc:
+    except Exception as exc:
         AudioProcessingJobs.update_one(
             {"_id": oid},
             {"$set": {"status": "failed", "updated_at": datetime.utcnow(), "error": str(exc)}},

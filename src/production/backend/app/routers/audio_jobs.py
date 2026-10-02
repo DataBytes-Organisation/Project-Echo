@@ -1,5 +1,6 @@
 """HTTP API for asynchronous audio processing jobs."""
 
+import asyncio
 import os
 from datetime import datetime
 from typing import Optional
@@ -17,6 +18,47 @@ from app.services import audio_jobs
 
 
 router = APIRouter(prefix="/audio/jobs", tags=["audio-jobs"])
+
+
+def _store_audio_job(
+    file_path: str,
+    data: bytes,
+    filename: str,
+    original_filename: str,
+    content_type: Optional[str],
+    user_id: Optional[str],
+):
+    """Persist an upload and its job, undoing either partial write on failure."""
+    upload_id = None
+    try:
+        with open(file_path, "wb") as output:
+            output.write(data)
+        upload = {
+            "original_filename": original_filename,
+            "filename": filename,
+            "path": os.path.relpath(file_path, os.path.dirname(__file__)),
+            "content_type": content_type,
+            "size_bytes": len(data),
+            "upload_timestamp": datetime.utcnow(),
+            "user_id": user_id,
+        }
+        upload_result = AudioUploads.insert_one(upload)
+        upload_id = upload_result.inserted_id
+        return audio_jobs.create_job(str(upload_id), file_path, filename, user_id)
+    except Exception:
+        # The upload and processing-job records form one logical operation.
+        # Remove any persisted upload metadata as well as the file on failure.
+        if upload_id is not None:
+            try:
+                AudioUploads.delete_one({"_id": upload_id})
+            except Exception:
+                pass
+        try:
+            if os.path.exists(file_path):
+                os.remove(file_path)
+        except OSError:
+            pass
+        raise
 
 
 @router.post("", status_code=status.HTTP_202_ACCEPTED, summary="Queue an audio file for background prediction")
@@ -42,22 +84,18 @@ async def queue_audio_job(
     filename = f"{datetime.utcnow().strftime('%Y%m%d%H%M%S%f')}_{os.path.basename(file.filename)}"
     file_path = os.path.join(UPLOAD_DIR, filename)
     try:
-        with open(file_path, "wb") as output:
-            output.write(data)
-        upload = {
-            "original_filename": os.path.basename(file.filename),
-            "filename": filename,
-            "path": os.path.relpath(file_path, os.path.dirname(__file__)),
-            "content_type": file.content_type,
-            "size_bytes": len(data),
-            "upload_timestamp": datetime.utcnow(),
-            "user_id": user_id,
-        }
-        upload_result = AudioUploads.insert_one(upload)
-        job = audio_jobs.create_job(str(upload_result.inserted_id), file_path, filename, user_id)
+        # File and PyMongo operations are blocking; keep the event loop free for
+        # concurrent WebSocket clients while they complete.
+        job = await asyncio.to_thread(
+            _store_audio_job,
+            file_path,
+            data,
+            filename,
+            os.path.basename(file.filename),
+            file.content_type,
+            user_id,
+        )
     except Exception as exc:
-        if os.path.exists(file_path):
-            os.remove(file_path)
         raise HTTPException(status_code=500, detail="Failed to queue audio processing job") from exc
 
     background_tasks.add_task(audio_jobs.process_job, str(job["_id"]))
@@ -78,8 +116,10 @@ def get_audio_job(job_id: str):
 @router.post("/{job_id}/retry", status_code=status.HTTP_202_ACCEPTED, summary="Retry a failed audio processing job")
 def retry_audio_job(job_id: str, background_tasks: BackgroundTasks):
     try:
+        audio_jobs._job_id(job_id)
         job = audio_jobs.retry_job(job_id)
     except ValueError as exc:
-        raise HTTPException(status_code=409, detail=str(exc)) from exc
+        status_code = 400 if str(exc) == "Invalid job ID" else 409
+        raise HTTPException(status_code=status_code, detail=str(exc)) from exc
     background_tasks.add_task(audio_jobs.process_job, str(job["_id"]))
     return {"job_id": str(job["_id"]), "status": "queued"}
