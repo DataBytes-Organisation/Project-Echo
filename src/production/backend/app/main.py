@@ -10,6 +10,7 @@ from pymongo.errors import ConnectionFailure, ExecutionTimeout
 
 from fastapi import FastAPI, Body, HTTPException, status, APIRouter, Request
 from fastapi.middleware.cors import CORSMiddleware
+from app.middleware.rate_limit import RateLimitMiddleware
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import Response, JSONResponse
 from fastapi.encoders import jsonable_encoder
@@ -53,6 +54,8 @@ app = FastAPI(
     """,
     version="1.0.0",
 )
+
+app.add_middleware(RateLimitMiddleware.from_environment)
 
 
 # Log API startup in structured JSON format
@@ -202,6 +205,18 @@ app.include_router(insights.router, tags=["insights"])
 @app.get("/", response_description="API Root")
 def show_home():
     return "Welcome to Project Echo API. Visit /docs for interactive documentation."
+
+
+
+@app.get("/api-info", tags=["public"], summary="Return API service information")
+def api_info():
+    """Provide clients with stable links to the service documentation."""
+    return {
+        "name": app.title,
+        "version": app.version,
+        "docs_url": app.docs_url,
+        "openapi_url": app.openapi_url,
+    }
 
 
 app.include_router(auth_router.router, tags=["auth"], prefix="/api")
